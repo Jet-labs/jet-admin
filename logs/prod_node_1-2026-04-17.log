@@ -1,0 +1,4 @@
+[36minfo[39m: prod_node_1: 17-04-2026 20:58:13: [36mGET /api/v1/tenants/1/database/metadata 404 173 - 2.197 ms[39m
+[36m[39m
+[36minfo[39m: prod_node_1: 17-04-2026 20:58:55: [36mGET /api/v1/tenants/1/database/metadata 404 173 - 3.205 ms[39m
+[36m[39m

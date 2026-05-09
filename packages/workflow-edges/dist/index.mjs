@@ -102,13 +102,13 @@ function DeletableEdge({
         onChange: onLabelChange,
         onBlur: onLabelBlur,
         onKeyDown,
-        className: "text-xs border border-slate-300 rounded px-1 py-0.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white min-w-[60px] text-slate-900 placeholder:text-slate-400",
+        className: "text-xs border border-brand-border rounded-sm px-1 py-0.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-brand-black min-w-[60px] text-brand-text-primary placeholder:text-brand-text-primary",
         placeholder: "Name edge"
       }
     ) : /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1 group" }, /* @__PURE__ */ React.createElement(
       Button,
       {
-        className: "w-5 h-5 bg-white border border-slate-200 rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-red-50 hover:border-red-200 transition-colors text-slate-400 hover:text-red-500 text-[10px]",
+        className: "w-5 h-5 bg-brand-black border border-brand-border rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-red-50 hover:border-red-200 transition-colors text-brand-text-primary hover:text-red-500 text-[10px]",
         onClick: onDeleteClick,
         title: "Delete Edge"
       },
@@ -117,7 +117,7 @@ function DeletableEdge({
       "div",
       {
         onClick: onEdgeClick,
-        className: `px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] text-slate-500 shadow-sm cursor-text hover:border-blue-300 transition-colors ${!edgeLabel ? "opacity-50 hover:opacity-100" : ""}`
+        className: `px-1.5 py-0.5 rounded-sm bg-brand-black border border-brand-border text-[10px] text-brand-text-primary shadow-sm cursor-text hover:border-blue-300 transition-colors ${!edgeLabel ? "opacity-50 hover:opacity-100" : ""}`
       },
       edgeLabel || "Name edge"
     ))

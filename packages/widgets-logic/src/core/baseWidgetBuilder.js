@@ -34,32 +34,32 @@ export class BaseWidgetBuilder {
   }
 
   /**
-   * Transform bound query results using the mapping config into widget-ready data.
+   * Transform bound data source results using the mapping config into widget-ready data.
    * Subclasses should override this method.
    *
-   * @param {object} queryResults - Normalized results: { alias: resultData }
+   * @param {object} dataSourceResults - Normalized results: { alias: resultData }
    * @param {object} mappingConfig - Widget-type-specific mapping config
    * @returns {object} Widget-ready data
    */
-  mapQueryResults(queryResults, mappingConfig) {
-    return queryResults;
+  mapQueryResults(dataSourceResults, mappingConfig) {
+    return dataSourceResults;
   }
 
   /**
-   * Resolve the data prop for the widget component from widgetConfig + queryResults.
+   * Resolve the data prop for the widget component from widgetConfig + dataSourceResults.
    * 
    * This is the STANDARD entry point called by the rendering layer (WidgetPreview,
    * DashboardWidget) to get the data to pass to the widget component.
    * Each widget type implements its own resolution logic.
    *
    * @param {object} widgetConfig - The full widget configuration
-   * @param {object|null} queryResults - Executed query/workflow results: { alias: data }
+   * @param {object|null} dataSourceResults - Executed data source results: { alias: data }
    * @returns {any} Data ready for the widget component's `data` prop, or null
    */
-  resolveData(widgetConfig, queryResults) {
-    // Default: use dataMapping.dataArrayPath to resolve from queryResults
-    if (!queryResults || !widgetConfig?.dataMapping?.dataArrayPath) return null;
-    const resolved = getByPath(queryResults, widgetConfig.dataMapping.dataArrayPath);
+  resolveData(widgetConfig, dataSourceResults) {
+    // Default: use dataMapping.dataArrayPath to resolve from dataSourceResults
+    if (!dataSourceResults || !widgetConfig?.dataMapping?.dataArrayPath) return null;
+    const resolved = getByPath(dataSourceResults, widgetConfig.dataMapping.dataArrayPath);
     if (Array.isArray(resolved)) return resolved;
     if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
       return resolved.data;

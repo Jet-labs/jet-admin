@@ -1,0 +1,25 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": { "type": "string", "enum": ["publish"], "default": "publish" },
+      "topic": { "type": "string" },
+      "message": { "type": "string" },
+      "qos": { "type": "integer", "enum": [0, 1, 2], "default": 0 },
+      "retain": { "type": "boolean", "default": false }
+    },
+    "required": ["operation", "topic", "message"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/topic", "label": "Topic" },
+      { "type": "Control", "scope": "#/properties/message", "label": "Message", "options": { "multi": true } },
+      { "type": "HorizontalLayout", "elements": [
+        { "type": "Control", "scope": "#/properties/qos", "label": "QoS Level" },
+        { "type": "Control", "scope": "#/properties/retain", "label": "Retain" }
+      ]}
+    ]
+  },
+  "data": { "operation": "publish", "topic": "", "message": "", "qos": 0, "retain": false }
+}

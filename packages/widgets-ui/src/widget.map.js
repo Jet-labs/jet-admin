@@ -3,10 +3,8 @@ import { FaChartBar } from "react-icons/fa";
 import { getDemoData, registerWidgets } from "./widget.config";
 import { WIDGET_TYPES } from "@jet-admin/widget-types";
 import { VegaConfigEditor } from "./vega/vegaConfigEditor";
-import { VegaDataMappingEditor } from "./vega/vegaDataMappingEditor";
 import { ButtonConfigEditor } from "./button/buttonConfigEditor";
 import { TableConfigEditor } from "./table/tableConfigEditor";
-import { TableDataMappingEditor } from "./table/tableDataMappingEditor";
 import { MdOutlineSmartButton, MdOutlineTableChart } from "react-icons/md";
 
 
@@ -37,13 +35,12 @@ export const WIDGETS_MAP = {
     description: "Declarative visualization grammar",
     component: ({ data, ...props }) => {
       return (
-        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-[#1c1c1e]">Loading chart...</div>}>
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading chart...</div>}>
           <LazyVegaWidget data={data} {...props} />
         </React.Suspense>
       );
     },
     configEditor: VegaConfigEditor,
-    dataMappingEditor: VegaDataMappingEditor,
     icon: ({ className }) => <FaChartBar className={`!text-lg ${className}`} />,
     sampleConfig: {
       options: {
@@ -62,13 +59,12 @@ export const WIDGETS_MAP = {
     description: "Low-level visualization grammar",
     component: ({ data, ...props }) => {
       return (
-        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-[#1c1c1e]">Loading chart...</div>}>
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading chart...</div>}>
           <LazyVegaWidget data={data} {...props} />
         </React.Suspense>
       );
     },
     configEditor: VegaConfigEditor,
-    dataMappingEditor: VegaDataMappingEditor,
     icon: ({ className }) => <FaChartBar className={`!text-lg ${className}`} />,
     sampleConfig: {
       options: {
@@ -87,13 +83,12 @@ export const WIDGETS_MAP = {
     description: "Trigger a workflow",
     component: ({ data, ...props }) => {
       return (
-        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-[#1c1c1e]">Loading button...</div>}>
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading button...</div>}>
           <LazyButtonWidget data={data} {...props} />
         </React.Suspense>
       );
     },
     configEditor: ButtonConfigEditor,
-    dataMappingEditor: null,
     icon: ({ className }) => <MdOutlineSmartButton className={`!text-lg ${className}`} />,
     sampleConfig: {
       text: "Click Me",
@@ -110,13 +105,12 @@ export const WIDGETS_MAP = {
     description: "Tabular data display with pagination",
     component: ({ data, ...props }) => {
       return (
-        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-[#1c1c1e]">Loading table...</div>}>
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading table...</div>}>
           <LazyTableWidget data={data} {...props} />
         </React.Suspense>
       );
     },
     configEditor: TableConfigEditor,
-    dataMappingEditor: TableDataMappingEditor,
     icon: ({ className }) => <MdOutlineTableChart className={`!text-lg ${className}`} />,
     sampleConfig: {
       dataArrayTemplate: "{{ctx.data}}",

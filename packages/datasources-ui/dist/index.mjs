@@ -22,7 +22,7 @@ var QueryResponseJSONTab = ({ data }) => {
       readOnly: true,
       showHeader: false,
       height: "100%",
-      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-200"
     }
   ));
 };
@@ -43,7 +43,7 @@ var QueryResponseRAWTab = ({ data }) => {
       readOnly: true,
       showHeader: false,
       height: "100%",
-      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-200"
     }
   ));
 };
@@ -69,7 +69,7 @@ var QueryResponseSchemaTab = ({ data }) => {
       readOnly: true,
       showHeader: false,
       height: "100%",
-      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-200"
     }
   ));
 };
@@ -115,7 +115,7 @@ var QueryResponseTableTab = ({
       sx: { width, height },
       className: `!flex !flex-col !justify-start !items-stretch ${className}`
     },
-    !dataSchema ? /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex flex-col justify-center items-center w-full text-slate-500" }, /* @__PURE__ */ React4.createElement("span", null, "Data schema not valid or no data available")) : !columns ? /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ React4.createElement("span", null, "Columns cannot be extracted or mapped")) : data && Array.isArray(data) && data.length && columns ? /* @__PURE__ */ React4.createElement(
+    !dataSchema ? /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex flex-col justify-center items-center w-full text-[#1c1c1e]" }, /* @__PURE__ */ React4.createElement("span", null, "Data schema not valid or no data available")) : !columns ? /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-[#1c1c1e]" }, /* @__PURE__ */ React4.createElement("span", null, "Columns cannot be extracted or mapped")) : data && Array.isArray(data) && data.length && columns ? /* @__PURE__ */ React4.createElement(
       DataGrid,
       {
         rows: data.map((item, index) => {
@@ -169,7 +169,7 @@ var QueryResponseTableTab = ({
           }
         }
       }
-    ) : /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ React4.createElement("span", null, "No data"))
+    ) : /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-[#1c1c1e]" }, /* @__PURE__ */ React4.createElement("span", null, "No data"))
   );
 };
 
@@ -183,12 +183,12 @@ var QueryResponseView = ({ queryResult }) => {
     {
       key: label,
       variant: "ghost",
-      className: `px-4 mr-2 py-2 text-sm font-medium rounded transition-colors ${index === tab ? "text-primary bg-primary/5" : "text-foreground hover:bg-slate-100"}`,
+      className: `px-4 mr-2 py-2 text-sm font-medium rounded-sm transition-colors ${index === tab ? "text-primary bg-primary/5" : "text-foreground hover:bg-brand-border-dark"}`,
       onClick: () => setTab(index),
       type: "button"
     },
     label
-  ))), /* @__PURE__ */ React5.createElement("div", { className: "p-3 border mt-3 border-border rounded bg-background flex flex-col gap-2 overflow-y-auto flex-1" }, tab === 0 && /* @__PURE__ */ React5.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab === 1 && /* @__PURE__ */ React5.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab === 2 && /* @__PURE__ */ React5.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab === 3 && /* @__PURE__ */ React5.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
+  ))), /* @__PURE__ */ React5.createElement("div", { className: "p-3 border mt-3 border-border rounded-sm bg-brand-dark flex flex-col gap-2 overflow-y-auto flex-1" }, tab === 0 && /* @__PURE__ */ React5.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab === 1 && /* @__PURE__ */ React5.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab === 2 && /* @__PURE__ */ React5.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab === 3 && /* @__PURE__ */ React5.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
 };
 QueryResponseView.propTypes = {
   queryResult: PropTypes5.object
@@ -240,7 +240,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
     {
       value: tab,
       onChange: _handleTabChange,
-      className: "!w-full !border-b !border-gray-200",
+      className: "!w-full !border-b !border-slate-200",
       sx: {
         "& .MuiTabs-indicator": {
           background: "#646cff !important"
@@ -254,7 +254,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         disableRipple: true,
         disableFocusRipple: true,
         disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 0 ? "!text-[#646cff]" : "!text-slate-700"}`
+        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 0 ? "!text-[#646cff]" : "!text-[#1c1c1e]"}`
       }
     ),
     /* @__PURE__ */ React7.createElement(
@@ -264,7 +264,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         disableRipple: true,
         disableFocusRipple: true,
         disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 1 ? "!text-[#646cff]" : "!text-slate-700"}`
+        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 1 ? "!text-[#646cff]" : "!text-[#1c1c1e]"}`
       }
     ),
     /* @__PURE__ */ React7.createElement(
@@ -274,7 +274,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         disableRipple: true,
         disableFocusRipple: true,
         disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 2 ? "!text-[#646cff]" : "!text-slate-700"}`
+        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 2 ? "!text-[#646cff]" : "!text-[#1c1c1e]"}`
       }
     ),
     /* @__PURE__ */ React7.createElement(
@@ -284,7 +284,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         disableRipple: true,
         disableFocusRipple: true,
         disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 3 ? "!text-[#646cff]" : "!text-slate-700"}`
+        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 3 ? "!text-[#646cff]" : "!text-[#1c1c1e]"}`
       }
     )
   ), /* @__PURE__ */ React7.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab === 0 && /* @__PURE__ */ React7.createElement(QueryResponseWebViewTab, { data: queryResult ? queryResult : "" }), tab === 1 && /* @__PURE__ */ React7.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab === 2 && /* @__PURE__ */ React7.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab === 3 && /* @__PURE__ */ React7.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
@@ -292,7 +292,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
 
 // src/index.js
 var GenericDatasourceTestResultUI = ({ connectionResult }) => {
-  let connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
+  let connectionResultClass = "bg-slate-100 !border-slate-200 text-[#1c1c1e]";
   let connectionResultText = "Connection not tested";
   console.log("connectionResult", connectionResult);
   if (connectionResult === true || connectionResult?.ok === true) {
@@ -302,7 +302,7 @@ var GenericDatasourceTestResultUI = ({ connectionResult }) => {
     connectionResultClass = "bg-red-100 !border-red-400 text-red-700";
     connectionResultText = connectionResult?.error || "Connection failed";
   } else if (connectionResult === void 0) {
-    connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
+    connectionResultClass = "bg-slate-100 !border-slate-200 text-[#1c1c1e]";
     connectionResultText = "Connection not tested";
   } else {
     connectionResultClass = "bg-orange-100 !border-orange-400 text-orange-700";
@@ -370,7 +370,14 @@ var DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.SLACK.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.NOTION.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.JIRA.value]: createGenericDatasourceUI(),
-  [DATASOURCE_TYPES.GOOGLEANALYTICS.value]: createGenericDatasourceUI()
+  [DATASOURCE_TYPES.GOOGLEANALYTICS.value]: createGenericDatasourceUI(),
+  // Listener-capable new datasources
+  [DATASOURCE_TYPES.WEBHOOK.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.MQTT.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.WEBSOCKET.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.SSE.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.SYSLOG.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.NATS.value]: createGenericDatasourceUI()
 };
 export {
   DATASOURCE_UI_COMPONENTS

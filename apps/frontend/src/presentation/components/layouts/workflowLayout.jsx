@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { WorkflowContextProvider } from "../../../logic/contexts/workflowContext";
+
 import { WorkflowDrawerList } from "../drawerList/workflowDrawerList";
 import {
   ResizableHandle,
@@ -9,26 +9,26 @@ import {
 } from "../ui/resizable";
 import { CONSTANTS } from "../../../constants";
 
+
+
 export const WorkflowLayout = () => {
   return (
-    <WorkflowContextProvider>
-      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-        <ResizablePanelGroup
-          direction="horizontal"
-          autoSaveId={
-            CONSTANTS.RESIZABLE_PANEL_KEYS.WORKFLOW_LAYOUT_SEPARATION
-          }
-          className="h-full w-full"
-        >
-          <ResizablePanel defaultSize={20}>
-            <WorkflowDrawerList />
-          </ResizablePanel>
-          <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
-            <Outlet />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
+          <ResizablePanelGroup
+            direction="horizontal"
+            autoSaveId={
+              CONSTANTS.RESIZABLE_PANEL_KEYS.WORKFLOW_LAYOUT_SEPARATION
+            }
+            className="h-full w-full"
+          >
+            <ResizablePanel defaultSize={20}>
+              <WorkflowDrawerList />
+            </ResizablePanel>
+            <ResizableHandle withHandle={true} />
+            <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
+              <Outlet />
+            </ResizablePanel>
+          </ResizablePanelGroup>
       </div>
-    </WorkflowContextProvider>
   );
 };

@@ -1,7 +1,8 @@
-import { useRoleManagementState } from "../../../logic/contexts/roleManagementContext";
+import { useTenantPermissions } from "../../../logic/hooks/useTenantPermissions";
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { CONSTANTS } from "../../../constants";
 import PropTypes from "prop-types";
+import { useParams } from "react-router-dom";
 
 import { Badge, Button, Checkbox, Label, Spinner } from "@jet-admin/ui";
 export const TenantPermissionSelectionInput = ({
@@ -18,11 +19,12 @@ export const TenantPermissionSelectionInput = ({
     onChange: PropTypes.func.isRequired,
     error: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   };
+  const { tenantID } = useParams();
   const {
     tenantPermissions,
     tenantPermissionsError,
     isLoadingTenantPermissions,
-  } = useRoleManagementState();
+  } = useTenantPermissions(tenantID);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -113,7 +115,7 @@ export const TenantPermissionSelectionInput = ({
           )}
         </Button>
         {isOpen && (
-          <div className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-border bg-background shadow-lg">
+          <div className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-border bg-brand-dark shadow-lg">
             {tenantPermissions.permissions.map((tenantPermission) => (
               <div
                 key={tenantPermission.permissionID}

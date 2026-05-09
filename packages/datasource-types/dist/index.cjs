@@ -375,6 +375,33 @@ var queryConfig_default = {
   }
 };
 
+// src/postgresql/listenerConfig.json
+var listenerConfig_default = {
+  schema: {
+    type: "object",
+    properties: {
+      channels: {
+        type: "string",
+        description: "Comma-separated PostgreSQL NOTIFY channel names to LISTEN on"
+      }
+    },
+    required: ["channels"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/channels",
+        label: "LISTEN Channels (comma-separated)"
+      }
+    ]
+  },
+  data: {
+    channels: ""
+  }
+};
+
 // src/restapi/formConfig.json
 var formConfig_default2 = {
   schema: {
@@ -1319,6 +1346,43 @@ var queryConfig_default4 = {
   }
 };
 
+// src/firestore/listenerConfig.json
+var listenerConfig_default2 = {
+  schema: {
+    type: "object",
+    properties: {
+      collection: {
+        type: "string",
+        description: "Firestore collection name to listen to"
+      },
+      documentId: {
+        type: "string",
+        description: "Optional: Document ID to listen to a specific document instead of the whole collection"
+      }
+    },
+    required: ["collection"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/collection",
+        label: "Collection Name"
+      },
+      {
+        type: "Control",
+        scope: "#/properties/documentId",
+        label: "Document ID (Optional)"
+      }
+    ]
+  },
+  data: {
+    collection: "",
+    documentId: ""
+  }
+};
+
 // src/mysql/formConfig.json
 var formConfig_default5 = {
   schema: {
@@ -2176,6 +2240,47 @@ var queryConfig_default6 = {
   }
 };
 
+// src/mongodb/listenerConfig.json
+var listenerConfig_default3 = {
+  schema: {
+    type: "object",
+    properties: {
+      collection: {
+        type: "string",
+        description: "Collection name to listen to (leave empty to listen to entire database)"
+      },
+      operationTypes: {
+        type: "array",
+        items: {
+          type: "string",
+          enum: ["insert", "update", "replace", "delete", "invalidate", "drop", "dropDatabase", "rename"]
+        },
+        description: "Filter by operation types (leave empty to receive all)",
+        uniqueItems: true
+      }
+    }
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/collection",
+        label: "Collection Name"
+      },
+      {
+        type: "Control",
+        scope: "#/properties/operationTypes",
+        label: "Operation Types"
+      }
+    ]
+  },
+  data: {
+    collection: "",
+    operationTypes: []
+  }
+};
+
 // src/googlesheets/formConfig.json
 var formConfig_default7 = {
   schema: {
@@ -2936,6 +3041,49 @@ var queryConfig_default8 = {
   }
 };
 
+// src/graphql/listenerConfig.json
+var listenerConfig_default4 = {
+  schema: {
+    type: "object",
+    properties: {
+      subscription: {
+        type: "string",
+        description: "GraphQL Subscription Query"
+      },
+      variables: {
+        type: "string",
+        description: "Variables as JSON object (optional)"
+      }
+    },
+    required: ["subscription"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/subscription",
+        label: "Subscription Query",
+        options: {
+          multi: true
+        }
+      },
+      {
+        type: "Control",
+        scope: "#/properties/variables",
+        label: "Variables (JSON)",
+        options: {
+          multi: true
+        }
+      }
+    ]
+  },
+  data: {
+    subscription: "",
+    variables: "{}"
+  }
+};
+
 // src/rabbitmq/formConfig.json
 var formConfig_default9 = {
   schema: {
@@ -3150,6 +3298,12 @@ var queryConfig_default9 = {
         type: "string",
         description: "Exchange name (optional, for publish)"
       },
+      exchangeType: {
+        type: "string",
+        description: "Exchange type (direct, topic, fanout, headers)",
+        enum: ["direct", "topic", "fanout", "headers"],
+        default: "direct"
+      },
       routingKey: {
         type: "string",
         description: "Routing key (optional)"
@@ -3265,6 +3419,7 @@ var queryConfig_default9 = {
             type: "HorizontalLayout",
             elements: [
               { type: "Control", scope: "#/properties/exchange", label: "Exchange" },
+              { type: "Control", scope: "#/properties/exchangeType", label: "Exchange Type" },
               { type: "Control", scope: "#/properties/routingKey", label: "Routing Key" }
             ]
           },
@@ -3338,6 +3493,7 @@ var queryConfig_default9 = {
     operation: "publish",
     queue: "my-queue",
     exchange: "",
+    exchangeType: "direct",
     routingKey: "",
     message: '{\n  "type": "order",\n  "data": {}\n}',
     messageCount: 1,
@@ -3346,6 +3502,68 @@ var queryConfig_default9 = {
     queueOptions: { durable: true, autoDelete: false, exclusive: false },
     messageOptions: { persistent: true, contentType: "application/json" },
     args: []
+  }
+};
+
+// src/rabbitmq/listenerConfig.json
+var listenerConfig_default5 = {
+  schema: {
+    type: "object",
+    properties: {
+      exchange: {
+        type: "string",
+        description: "Exchange name to bind to"
+      },
+      exchangeType: {
+        type: "string",
+        description: "Exchange type (direct, topic, fanout, headers)",
+        enum: ["direct", "topic", "fanout", "headers"],
+        default: "topic"
+      },
+      routingKey: {
+        type: "string",
+        description: "Routing key pattern (supports wildcards: * and #)",
+        default: "#"
+      },
+      queue: {
+        type: "string",
+        description: "Queue name (auto-generated if empty)"
+      },
+      prefetch: {
+        type: "integer",
+        description: "Prefetch count for the consumer",
+        default: 10,
+        minimum: 1
+      }
+    },
+    required: ["exchange"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "HorizontalLayout",
+        elements: [
+          { type: "Control", scope: "#/properties/exchange", label: "Exchange" },
+          { type: "Control", scope: "#/properties/exchangeType", label: "Exchange Type" },
+          { type: "Control", scope: "#/properties/routingKey", label: "Routing Key" }
+        ]
+      },
+      {
+        type: "HorizontalLayout",
+        elements: [
+          { type: "Control", scope: "#/properties/queue", label: "Queue Name" },
+          { type: "Control", scope: "#/properties/prefetch", label: "Prefetch Count" }
+        ]
+      }
+    ]
+  },
+  data: {
+    exchange: "",
+    exchangeType: "topic",
+    routingKey: "#",
+    queue: "",
+    prefetch: 10
   }
 };
 
@@ -3638,6 +3856,60 @@ var queryConfig_default10 = {
     storeDestination: { type: "dataQuery", dataQueryId: "" },
     topicConfig: { numPartitions: 1, replicationFactor: 1 },
     args: []
+  }
+};
+
+// src/kafka/listenerConfig.json
+var listenerConfig_default6 = {
+  schema: {
+    type: "object",
+    properties: {
+      topic: {
+        type: "string",
+        description: "Kafka topic to subscribe to"
+      },
+      consumerGroup: {
+        type: "string",
+        description: "Consumer group ID for offset tracking",
+        default: "jet-listener"
+      },
+      fromBeginning: {
+        type: "boolean",
+        description: "Start consuming from the beginning of the topic",
+        default: false
+      }
+    },
+    required: ["topic"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/topic",
+        label: "Topic"
+      },
+      {
+        type: "HorizontalLayout",
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/consumerGroup",
+            label: "Consumer Group"
+          },
+          {
+            type: "Control",
+            scope: "#/properties/fromBeginning",
+            label: "From Beginning"
+          }
+        ]
+      }
+    ]
+  },
+  data: {
+    topic: "",
+    consumerGroup: "jet-listener",
+    fromBeginning: false
   }
 };
 
@@ -4018,6 +4290,85 @@ var queryConfig_default11 = {
     consumeMode: "preview",
     storeDestination: { type: "dataQuery", dataQueryId: "" },
     args: []
+  }
+};
+
+// src/redis/listenerConfig.json
+var listenerConfig_default7 = {
+  schema: {
+    type: "object",
+    properties: {
+      subscriptionType: {
+        type: "string",
+        enum: ["pubsub", "stream"],
+        default: "pubsub",
+        description: "Redis subscription type: Pub/Sub channels or Streams"
+      },
+      channels: {
+        type: "string",
+        description: "Comma-separated Pub/Sub channel names"
+      },
+      stream: {
+        type: "string",
+        description: "Redis Stream key"
+      },
+      consumerGroup: {
+        type: "string",
+        description: "Consumer group for Redis Streams"
+      },
+      consumerName: {
+        type: "string",
+        description: "Consumer name within the group",
+        default: "jet-listener-1"
+      }
+    },
+    required: ["subscriptionType"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/subscriptionType",
+        label: "Subscription Type"
+      },
+      {
+        type: "Group",
+        label: "Pub/Sub Configuration",
+        rule: {
+          effect: "SHOW",
+          condition: { scope: "#/properties/subscriptionType", schema: { const: "pubsub" } }
+        },
+        elements: [
+          { type: "Control", scope: "#/properties/channels", label: "Channels (comma-separated)" }
+        ]
+      },
+      {
+        type: "Group",
+        label: "Stream Configuration",
+        rule: {
+          effect: "SHOW",
+          condition: { scope: "#/properties/subscriptionType", schema: { const: "stream" } }
+        },
+        elements: [
+          { type: "Control", scope: "#/properties/stream", label: "Stream Key" },
+          {
+            type: "HorizontalLayout",
+            elements: [
+              { type: "Control", scope: "#/properties/consumerGroup", label: "Consumer Group" },
+              { type: "Control", scope: "#/properties/consumerName", label: "Consumer Name" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  data: {
+    subscriptionType: "pubsub",
+    channels: "",
+    stream: "",
+    consumerGroup: "",
+    consumerName: "jet-listener-1"
   }
 };
 
@@ -7032,6 +7383,496 @@ var queryConfig_default28 = {
   }
 };
 
+// src/webhook/formConfig.json
+var formConfig_default29 = {
+  schema: {
+    type: "object",
+    properties: {
+      connectionName: {
+        type: "string",
+        description: "A unique name for this webhook endpoint.",
+        minLength: 3
+      },
+      allowedMethods: {
+        type: "string",
+        enum: ["POST", "PUT", "GET", "ANY"],
+        description: "Allowed HTTP method(s) for incoming requests",
+        default: "POST"
+      },
+      authType: {
+        type: "string",
+        enum: ["none", "header", "query_param", "basic"],
+        description: "Authentication method for incoming requests",
+        default: "none"
+      },
+      authHeaderName: {
+        type: "string",
+        description: "Header name for authentication (e.g., X-Api-Key)"
+      },
+      authSecret: {
+        type: "string",
+        description: "Secret value to validate against"
+      }
+    },
+    required: ["connectionName"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/connectionName", label: "Connection Name" },
+      {
+        type: "HorizontalLayout",
+        elements: [
+          { type: "Control", scope: "#/properties/allowedMethods", label: "Allowed Method" },
+          { type: "Control", scope: "#/properties/authType", label: "Auth Type" }
+        ]
+      },
+      {
+        type: "Group",
+        label: "Authentication",
+        rule: {
+          effect: "SHOW",
+          condition: {
+            type: "OR",
+            conditions: [
+              { scope: "#/properties/authType", schema: { const: "header" } },
+              { scope: "#/properties/authType", schema: { const: "query_param" } }
+            ]
+          }
+        },
+        elements: [
+          { type: "Control", scope: "#/properties/authHeaderName", label: "Auth Header / Param Name" },
+          { type: "Control", scope: "#/properties/authSecret", label: "Auth Secret", options: { format: "password" } }
+        ]
+      }
+    ]
+  },
+  data: {
+    connectionName: "MyWebhook",
+    allowedMethods: "POST",
+    authType: "none",
+    authHeaderName: "",
+    authSecret: ""
+  }
+};
+
+// src/webhook/queryConfig.json
+var queryConfig_default29 = {
+  schema: {
+    type: "object",
+    properties: {
+      operation: {
+        type: "string",
+        enum: ["list_recent", "get_event", "test_endpoint"],
+        description: "Query operation"
+      },
+      limit: {
+        type: "integer",
+        description: "Max events to return",
+        default: 50
+      }
+    },
+    required: ["operation"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/operation", label: "Operation" },
+      { type: "Control", scope: "#/properties/limit", label: "Limit" }
+    ]
+  },
+  data: { operation: "list_recent", limit: 50 }
+};
+
+// src/webhook/listenerConfig.json
+var listenerConfig_default8 = {
+  schema: {
+    type: "object",
+    properties: {
+      pathSuffix: {
+        type: "string",
+        description: "Custom URL path suffix for this listener's webhook endpoint"
+      },
+      responseStatusCode: {
+        type: "integer",
+        description: "HTTP status code to respond with",
+        default: 200
+      },
+      responseBody: {
+        type: "string",
+        description: "Static response body to send back to the caller",
+        default: '{"ok":true}'
+      }
+    }
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/pathSuffix", label: "Endpoint Path Suffix", options: { placeholder: "e.g. stripe-events" } },
+      {
+        type: "HorizontalLayout",
+        elements: [
+          { type: "Control", scope: "#/properties/responseStatusCode", label: "Response Status" },
+          { type: "Control", scope: "#/properties/responseBody", label: "Response Body" }
+        ]
+      }
+    ]
+  },
+  data: { pathSuffix: "", responseStatusCode: 200, responseBody: '{"ok":true}' }
+};
+
+// src/mqtt/formConfig.json
+var formConfig_default30 = {
+  schema: {
+    type: "object",
+    properties: {
+      connectionName: { type: "string", minLength: 3 },
+      brokerUrl: { type: "string", description: "MQTT broker URL (e.g. mqtt://localhost:1883)" },
+      clientId: { type: "string", default: "jet-admin" },
+      username: { type: "string" },
+      password: { type: "string" },
+      useTLS: { type: "boolean", default: false },
+      keepAlive: { type: "integer", default: 60, description: "Keep-alive interval in seconds" }
+    },
+    required: ["connectionName", "brokerUrl"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "HorizontalLayout", elements: [
+        { type: "Control", scope: "#/properties/connectionName", label: "Connection Name" },
+        { type: "Control", scope: "#/properties/clientId", label: "Client ID" }
+      ] },
+      { type: "Control", scope: "#/properties/brokerUrl", label: "Broker URL", options: { placeholder: "mqtt://localhost:1883" } },
+      { type: "Control", scope: "#/properties/useTLS", label: "Use TLS" },
+      { type: "Group", label: "Authentication", elements: [
+        { type: "HorizontalLayout", elements: [
+          { type: "Control", scope: "#/properties/username", label: "Username" },
+          { type: "Control", scope: "#/properties/password", label: "Password", options: { format: "password" } }
+        ] }
+      ] },
+      { type: "Control", scope: "#/properties/keepAlive", label: "Keep-Alive (seconds)" }
+    ]
+  },
+  data: { connectionName: "MyMQTT", brokerUrl: "", clientId: "jet-admin", username: "", password: "", useTLS: false, keepAlive: 60 }
+};
+
+// src/mqtt/queryConfig.json
+var queryConfig_default30 = {
+  schema: {
+    type: "object",
+    properties: {
+      operation: { type: "string", enum: ["publish"], default: "publish" },
+      topic: { type: "string" },
+      message: { type: "string" },
+      qos: { type: "integer", enum: [0, 1, 2], default: 0 },
+      retain: { type: "boolean", default: false }
+    },
+    required: ["operation", "topic", "message"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/topic", label: "Topic" },
+      { type: "Control", scope: "#/properties/message", label: "Message", options: { multi: true } },
+      { type: "HorizontalLayout", elements: [
+        { type: "Control", scope: "#/properties/qos", label: "QoS Level" },
+        { type: "Control", scope: "#/properties/retain", label: "Retain" }
+      ] }
+    ]
+  },
+  data: { operation: "publish", topic: "", message: "", qos: 0, retain: false }
+};
+
+// src/mqtt/listenerConfig.json
+var listenerConfig_default9 = {
+  schema: {
+    type: "object",
+    properties: {
+      topics: { type: "string", description: "Comma-separated MQTT topics to subscribe to (supports wildcards: # and +)" },
+      qos: { type: "integer", enum: [0, 1, 2], default: 0, description: "Quality of Service level" }
+    },
+    required: ["topics"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/topics", label: "Topics (comma-separated)", options: { placeholder: "sensors/+/temperature, alerts/#" } },
+      { type: "Control", scope: "#/properties/qos", label: "QoS Level" }
+    ]
+  },
+  data: { topics: "", qos: 0 }
+};
+
+// src/websocket/formConfig.json
+var formConfig_default31 = {
+  schema: {
+    type: "object",
+    properties: {
+      connectionName: { type: "string", minLength: 3 },
+      url: { type: "string", description: "WebSocket server URL (ws:// or wss://)" },
+      headers: { type: "string", description: "Custom headers as JSON object string" },
+      reconnect: { type: "boolean", default: true },
+      reconnectIntervalMs: { type: "integer", default: 5e3 }
+    },
+    required: ["connectionName", "url"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/connectionName", label: "Connection Name" },
+      { type: "Control", scope: "#/properties/url", label: "WebSocket URL", options: { placeholder: "wss://example.com/ws" } },
+      { type: "Control", scope: "#/properties/headers", label: "Custom Headers (JSON)", options: { multi: true, rows: 2 } },
+      { type: "HorizontalLayout", elements: [
+        { type: "Control", scope: "#/properties/reconnect", label: "Auto-Reconnect" },
+        { type: "Control", scope: "#/properties/reconnectIntervalMs", label: "Reconnect Interval (ms)" }
+      ] }
+    ]
+  },
+  data: { connectionName: "MyWebSocket", url: "", headers: "{}", reconnect: true, reconnectIntervalMs: 5e3 }
+};
+
+// src/websocket/queryConfig.json
+var queryConfig_default31 = {
+  schema: {
+    type: "object",
+    properties: {
+      operation: { type: "string", enum: ["send_message"], default: "send_message" },
+      message: { type: "string", description: "Message payload to send" }
+    },
+    required: ["operation", "message"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/message", label: "Message", options: { multi: true } }
+    ]
+  },
+  data: { operation: "send_message", message: "" }
+};
+
+// src/websocket/listenerConfig.json
+var listenerConfig_default10 = {
+  schema: {
+    type: "object",
+    properties: {
+      messageFilter: { type: "string", description: "Optional JSONPath or regex to filter incoming messages" },
+      parseAsJSON: { type: "boolean", default: true, description: "Parse incoming messages as JSON" }
+    }
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/parseAsJSON", label: "Parse as JSON" },
+      { type: "Control", scope: "#/properties/messageFilter", label: "Message Filter (optional)", options: { placeholder: "JSONPath or regex" } }
+    ]
+  },
+  data: { messageFilter: "", parseAsJSON: true }
+};
+
+// src/sse/formConfig.json
+var formConfig_default32 = {
+  schema: {
+    type: "object",
+    properties: {
+      connectionName: { type: "string", minLength: 3 },
+      url: { type: "string", description: "SSE endpoint URL" },
+      headers: { type: "string", description: "Custom headers as JSON object string" }
+    },
+    required: ["connectionName", "url"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/connectionName", label: "Connection Name" },
+      { type: "Control", scope: "#/properties/url", label: "SSE Endpoint URL", options: { placeholder: "https://api.example.com/events" } },
+      { type: "Control", scope: "#/properties/headers", label: "Custom Headers (JSON)", options: { multi: true, rows: 2 } }
+    ]
+  },
+  data: { connectionName: "MySSE", url: "", headers: "{}" }
+};
+
+// src/sse/queryConfig.json
+var queryConfig_default32 = {
+  schema: { type: "object", properties: {} },
+  uischema: { type: "VerticalLayout", elements: [] },
+  data: {}
+};
+
+// src/sse/listenerConfig.json
+var listenerConfig_default11 = {
+  schema: {
+    type: "object",
+    properties: {
+      eventTypes: { type: "string", description: "Comma-separated SSE event types to listen for (leave empty for all)" },
+      parseAsJSON: { type: "boolean", default: true }
+    }
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/eventTypes", label: "Event Types (comma-separated)", options: { placeholder: "message, update, error" } },
+      { type: "Control", scope: "#/properties/parseAsJSON", label: "Parse data as JSON" }
+    ]
+  },
+  data: { eventTypes: "", parseAsJSON: true }
+};
+
+// src/syslog/formConfig.json
+var formConfig_default33 = {
+  schema: {
+    type: "object",
+    properties: {
+      connectionName: { type: "string", minLength: 3 },
+      protocol: { type: "string", enum: ["udp", "tcp"], default: "udp" },
+      port: { type: "integer", default: 514, description: "Port to listen on for syslog messages" },
+      format: { type: "string", enum: ["rfc3164", "rfc5424", "auto"], default: "auto", description: "Syslog message format" }
+    },
+    required: ["connectionName", "protocol", "port"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/connectionName", label: "Connection Name" },
+      { type: "HorizontalLayout", elements: [
+        { type: "Control", scope: "#/properties/protocol", label: "Protocol" },
+        { type: "Control", scope: "#/properties/port", label: "Listen Port" }
+      ] },
+      { type: "Control", scope: "#/properties/format", label: "Syslog Format" }
+    ]
+  },
+  data: { connectionName: "MySyslog", protocol: "udp", port: 514, format: "auto" }
+};
+
+// src/syslog/queryConfig.json
+var queryConfig_default33 = {
+  schema: {
+    type: "object",
+    properties: {
+      operation: { type: "string", enum: ["query_buffer"], default: "query_buffer" },
+      severity: { type: "string", enum: ["all", "emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"], default: "all" },
+      limit: { type: "integer", default: 100 }
+    },
+    required: ["operation"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "HorizontalLayout", elements: [
+        { type: "Control", scope: "#/properties/severity", label: "Min Severity" },
+        { type: "Control", scope: "#/properties/limit", label: "Limit" }
+      ] }
+    ]
+  },
+  data: { operation: "query_buffer", severity: "all", limit: 100 }
+};
+
+// src/syslog/listenerConfig.json
+var listenerConfig_default12 = {
+  schema: {
+    type: "object",
+    properties: {
+      severityFilter: {
+        type: "string",
+        enum: ["all", "emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"],
+        default: "all",
+        description: "Only forward messages at or above this severity"
+      },
+      facilityFilter: {
+        type: "string",
+        description: "Comma-separated syslog facility names to include (leave empty for all)"
+      },
+      hostnameFilter: {
+        type: "string",
+        description: "Regex pattern to filter by hostname"
+      }
+    }
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/severityFilter", label: "Min Severity" },
+      { type: "Control", scope: "#/properties/facilityFilter", label: "Facility Filter", options: { placeholder: "kern, auth, local0" } },
+      { type: "Control", scope: "#/properties/hostnameFilter", label: "Hostname Filter (regex)", options: { placeholder: "web-server-.*" } }
+    ]
+  },
+  data: { severityFilter: "all", facilityFilter: "", hostnameFilter: "" }
+};
+
+// src/nats/formConfig.json
+var formConfig_default34 = {
+  schema: {
+    type: "object",
+    properties: {
+      connectionName: { type: "string", minLength: 3 },
+      servers: { type: "string", description: "Comma-separated NATS server URLs (e.g. nats://localhost:4222)" },
+      token: { type: "string", description: "Auth token (optional)" },
+      user: { type: "string" },
+      pass: { type: "string" },
+      useTLS: { type: "boolean", default: false }
+    },
+    required: ["connectionName", "servers"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/connectionName", label: "Connection Name" },
+      { type: "Control", scope: "#/properties/servers", label: "Server URLs", options: { placeholder: "nats://localhost:4222" } },
+      { type: "Control", scope: "#/properties/useTLS", label: "Use TLS" },
+      { type: "Group", label: "Authentication", elements: [
+        { type: "Control", scope: "#/properties/token", label: "Token", options: { format: "password" } },
+        { type: "HorizontalLayout", elements: [
+          { type: "Control", scope: "#/properties/user", label: "Username" },
+          { type: "Control", scope: "#/properties/pass", label: "Password", options: { format: "password" } }
+        ] }
+      ] }
+    ]
+  },
+  data: { connectionName: "MyNATS", servers: "", token: "", user: "", pass: "", useTLS: false }
+};
+
+// src/nats/queryConfig.json
+var queryConfig_default34 = {
+  schema: {
+    type: "object",
+    properties: {
+      operation: { type: "string", enum: ["publish", "request"], default: "publish" },
+      subject: { type: "string" },
+      payload: { type: "string" }
+    },
+    required: ["operation", "subject"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/operation", label: "Operation" },
+      { type: "Control", scope: "#/properties/subject", label: "Subject" },
+      { type: "Control", scope: "#/properties/payload", label: "Payload", options: { multi: true } }
+    ]
+  },
+  data: { operation: "publish", subject: "", payload: "" }
+};
+
+// src/nats/listenerConfig.json
+var listenerConfig_default13 = {
+  schema: {
+    type: "object",
+    properties: {
+      subjects: { type: "string", description: "Comma-separated NATS subjects to subscribe to (supports wildcards: * and >)" },
+      queueGroup: { type: "string", description: "Optional queue group for load balancing" }
+    },
+    required: ["subjects"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/subjects", label: "Subjects (comma-separated)", options: { placeholder: "orders.*, events.>" } },
+      { type: "Control", scope: "#/properties/queueGroup", label: "Queue Group (optional)", options: { placeholder: "jet-workers" } }
+    ]
+  },
+  data: { subjects: "", queueGroup: "" }
+};
+
 // src/index.js
 var DATASOURCE_TYPES = {
   POSTGRESQL: {
@@ -7040,7 +7881,9 @@ var DATASOURCE_TYPES = {
     icon: "SiPostgresql",
     iconColor: "#336791",
     formConfig: formConfig_default,
-    queryConfigForm: queryConfig_default
+    queryConfigForm: queryConfig_default,
+    listenerConfigForm: listenerConfig_default,
+    supportsListener: true
   },
   RESTAPI: {
     name: "REST API",
@@ -7048,7 +7891,9 @@ var DATASOURCE_TYPES = {
     icon: "TbApi",
     iconColor: "#10b981",
     formConfig: formConfig_default2,
-    queryConfigForm: queryConfig_default2
+    queryConfigForm: queryConfig_default2,
+    listenerConfigForm: null,
+    supportsListener: false
   },
   WEB_URL: {
     name: "Web URL",
@@ -7064,7 +7909,9 @@ var DATASOURCE_TYPES = {
     icon: "SiFirebase",
     iconColor: "#FFCA28",
     formConfig: formConfig_default4,
-    queryConfigForm: queryConfig_default4
+    queryConfigForm: queryConfig_default4,
+    listenerConfigForm: listenerConfig_default2,
+    supportsListener: true
   },
   MYSQL: {
     name: "MySQL",
@@ -7080,7 +7927,9 @@ var DATASOURCE_TYPES = {
     icon: "SiMongodb",
     iconColor: "#47A248",
     formConfig: formConfig_default6,
-    queryConfigForm: queryConfig_default6
+    queryConfigForm: queryConfig_default6,
+    listenerConfigForm: listenerConfig_default3,
+    supportsListener: true
   },
   GOOGLESHEETS: {
     name: "Google Sheets",
@@ -7096,7 +7945,9 @@ var DATASOURCE_TYPES = {
     icon: "SiGraphql",
     iconColor: "#E10098",
     formConfig: formConfig_default8,
-    queryConfigForm: queryConfig_default8
+    queryConfigForm: queryConfig_default8,
+    listenerConfigForm: listenerConfig_default4,
+    supportsListener: true
   },
   RABBITMQ: {
     name: "RabbitMQ",
@@ -7104,7 +7955,9 @@ var DATASOURCE_TYPES = {
     icon: "SiRabbitmq",
     iconColor: "#FF6600",
     formConfig: formConfig_default9,
-    queryConfigForm: queryConfig_default9
+    queryConfigForm: queryConfig_default9,
+    listenerConfigForm: listenerConfig_default5,
+    supportsListener: true
   },
   KAFKA: {
     name: "Kafka",
@@ -7112,7 +7965,9 @@ var DATASOURCE_TYPES = {
     icon: "SiApachekafka",
     iconColor: "#231F20",
     formConfig: formConfig_default10,
-    queryConfigForm: queryConfig_default10
+    queryConfigForm: queryConfig_default10,
+    listenerConfigForm: listenerConfig_default6,
+    supportsListener: true
   },
   REDIS: {
     name: "Redis",
@@ -7120,7 +7975,9 @@ var DATASOURCE_TYPES = {
     icon: "SiRedis",
     iconColor: "#DC382D",
     formConfig: formConfig_default11,
-    queryConfigForm: queryConfig_default11
+    queryConfigForm: queryConfig_default11,
+    listenerConfigForm: listenerConfig_default7,
+    supportsListener: true
   },
   // Batch 1 datasources
   MSSQL: {
@@ -7259,6 +8116,67 @@ var DATASOURCE_TYPES = {
     iconColor: "#E37400",
     formConfig: formConfig_default28,
     queryConfigForm: queryConfig_default28
+  },
+  // Listener-capable datasource types
+  WEBHOOK: {
+    name: "Webhook",
+    value: "webhook",
+    icon: "TbWebhook",
+    iconColor: "#8B5CF6",
+    formConfig: formConfig_default29,
+    queryConfigForm: queryConfig_default29,
+    listenerConfigForm: listenerConfig_default8,
+    supportsListener: true
+  },
+  MQTT: {
+    name: "MQTT",
+    value: "mqtt",
+    icon: "SiMqtt",
+    iconColor: "#660066",
+    formConfig: formConfig_default30,
+    queryConfigForm: queryConfig_default30,
+    listenerConfigForm: listenerConfig_default9,
+    supportsListener: true
+  },
+  WEBSOCKET: {
+    name: "WebSocket",
+    value: "websocket",
+    icon: "TbPlugConnected",
+    iconColor: "#06B6D4",
+    formConfig: formConfig_default31,
+    queryConfigForm: queryConfig_default31,
+    listenerConfigForm: listenerConfig_default10,
+    supportsListener: true
+  },
+  SSE: {
+    name: "Server-Sent Events",
+    value: "sse",
+    icon: "TbArrowBigDownLines",
+    iconColor: "#F59E0B",
+    formConfig: formConfig_default32,
+    queryConfigForm: queryConfig_default32,
+    listenerConfigForm: listenerConfig_default11,
+    supportsListener: true
+  },
+  SYSLOG: {
+    name: "Syslog",
+    value: "syslog",
+    icon: "TbFileText",
+    iconColor: "#64748B",
+    formConfig: formConfig_default33,
+    queryConfigForm: queryConfig_default33,
+    listenerConfigForm: listenerConfig_default12,
+    supportsListener: true
+  },
+  NATS: {
+    name: "NATS",
+    value: "nats",
+    icon: "SiNatsdotio",
+    iconColor: "#27AAE1",
+    formConfig: formConfig_default34,
+    queryConfigForm: queryConfig_default34,
+    listenerConfigForm: listenerConfig_default13,
+    supportsListener: true
   }
 };
 var getDatasourceTypeByValue = (value) => {

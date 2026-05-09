@@ -14,7 +14,7 @@ export const QueryResponseRAWTab = ({ data }) => {
         readOnly
         showHeader={false}
         height="100%"
-        className="rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
+        className="rounded-none border-b border-t-0 border-x-0 !h-full border-slate-200"
       />
     </div>
   );

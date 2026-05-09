@@ -53,7 +53,7 @@ export const processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
 };
 
 /**
- * Resolve the data prop for a widget component from widgetConfig + queryResults.
+ * Resolve the data prop for a widget component from widgetConfig + dataSourceResults.
  * 
  * This is the STANDARD entry point for all rendering layers (WidgetPreview,
  * DashboardWidget). It delegates to the widget type's builder.resolveData()
@@ -62,15 +62,15 @@ export const processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
  * @param {object} params
  * @param {string} params.widgetType - Widget type identifier
  * @param {object} params.widgetConfig - The full widget configuration
- * @param {object|null} params.queryResults - Executed query/workflow results
+ * @param {object|null} params.dataSourceResults - Executed data source results
  * @returns {any} Data ready for the widget component's `data` prop, or null
  */
-export const resolveWidgetData = ({ widgetType, widgetConfig, queryResults }) => {
-  if (!queryResults || !widgetConfig) return null;
+export const resolveWidgetData = ({ widgetType, widgetConfig, dataSourceResults }) => {
+  if (!dataSourceResults || !widgetConfig) return null;
 
   const processor = WIDGET_PROCESSORS_MAP[widgetType];
   if (processor && typeof processor.resolveData === 'function') {
-    return processor.resolveData(widgetConfig, queryResults);
+    return processor.resolveData(widgetConfig, dataSourceResults);
   }
 
   return null;

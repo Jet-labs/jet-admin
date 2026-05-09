@@ -6,7 +6,7 @@ const UpdateWorkflowPage = () => {
   const { tenantID, workflowID } = useParams();
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
       <WorkflowUpdationForm tenantID={tenantID} workflowID={workflowID} />
     </div>
   );

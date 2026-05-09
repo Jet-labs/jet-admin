@@ -8,7 +8,7 @@ import {
 import {
   useAuthActions,
   useAuthState,
-} from "../../../logic/contexts/authContext";
+} from "../../../logic/hooks/useAuth";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import PropTypes from "prop-types";
 import { LuPinOff } from "react-icons/lu";
@@ -88,10 +88,10 @@ export const DefaultDashboardSelectionLayout = ({
     <div className="w-full h-full">
       {pinnedDashboardID && dashboard ? (
         <div className="w-full flex flex-col justify-start items-center h-full">
-          <div className="flex flex-row justify-between items-center w-full px-3 py-2 border-b border-gray-200 ">
+          <div className="flex flex-row justify-between items-center w-full px-4 py-3 border-b border-brand-border ">
             <div className="w-full  flex flex-col justify-center items-start">
               {dashboard && (
-                <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-700">
+                <h1 className="text-lg font-bold leading-tight tracking-tight text-brand-text-primary">
                   {dashboard.dashboardTitle}
                 </h1>
               )}
@@ -144,7 +144,7 @@ export const DefaultDashboardSelectionLayout = ({
             isRefetching={isRefetechingDashboard}
           >
             <div
-              className="w-full overflow-y-auto bg-slate-100 h-full"
+              className="w-full overflow-y-auto bg-brand-border-dark h-full"
               id={`printable-area-dashboard-${pinnedDashboardID}`}
             >
               {dashboard && (
@@ -193,16 +193,16 @@ export const DefaultDashboardSelectionLayout = ({
           refetch={refetchDashboards}
         >
           <div className="h-full w-full flex justify-center items-center p-6">
-            <div className="bg-white p-8 max-w-md text-center">
+            <div className="bg-brand-black p-8 max-w-md text-center">
               <div className="flex justify-center mb-4">
                 <div className="bg-primary/10 p-4 rounded-full">
                   <MdOutlineSpaceDashboard className="text-primary text-4xl" />
                 </div>
               </div>
-              <h2 className="text-xl font-bold text-slate-700 mb-2">
+              <h2 className="text-xl font-bold text-brand-text-primary mb-2">
                 {CONSTANTS.STRINGS.DASHBOARD_VIEWER_NO_PINNED_DASHBOARD_TITLE}
               </h2>
-              <p className="text-slate-600 mb-6">
+              <p className="text-brand-text-primary mb-6">
                 {
                   CONSTANTS.STRINGS
                     .DASHBOARD_VIEWER_NO_PINNED_DASHBOARD_DESCRIPTION

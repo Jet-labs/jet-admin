@@ -43,24 +43,7 @@ const TenantLayoutLandingPage = () => {
       description: "Manage tenant users and permissions",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_TENANT_USERS.path(tenantID)),
     },
-    {
-      title: "Database Schemas",
-      icon: <img src={schemaLogo} alt="Database Schemas" className="w-8 h-8" />,
-      count: tenant?.tenantDatabaseSchemasCount || 0,
-      description: "View and manage database schemas",
-      action: () =>
-        navigate(CONSTANTS.ROUTES.VIEW_SCHEMA.path(tenantID, "public")),
-    },
-    {
-      title: "Database Tables",
-      icon: <img src={tableLogo} alt="Database Tables" className="w-8 h-8" />,
-      count: tenant?.tenantDatabaseTablesCount || 0,
-      description: "View and manage database tables",
-      action: () =>
-        navigate(
-          CONSTANTS.ROUTES.VIEW_DATABASE_TABLES.path(tenantID, "public")
-        ),
-    },
+
     {
       title: "Database saved queries",
       icon: <img src={queryLogo} alt="Database Queries" className="w-8 h-8" />,
@@ -111,62 +94,48 @@ const TenantLayoutLandingPage = () => {
       error={tenantError}
     >
       {tenant ? (
-        <div className="bg-gray-50 h-full w-full p-2">
-          <div className="bg-white rounded border border-gray-200 p-4 mb-2">
+        <div className="bg-brand-dark h-full w-full p-2">
+          <div className="bg-brand-black rounded-sm border border-brand-border p-4 mb-2">
             <div className="flex items-center mb-4">
               {tenant.tenantLogoURL ? (
                 <TenantLogo
                   src={tenant.tenantLogoURL}
                   alt="Tenant Logo"
-                  className="w-16 h-16 rounded"
+                  className="w-16 h-16 rounded-sm"
                 />
               ) : (
-                <FaStoreAlt className="w-12 h-12 text-slate-500" />
+                <FaStoreAlt className="w-12 h-12 text-brand-text-primary" />
               )}
               <div className="ml-4">
-                <h1 className="text-2xl font-bold text-slate-700">
+                <h1 className="text-2xl font-bold text-brand-text-primary">
                   {tenant.tenantTitle}
                 </h1>
-                <p className="text-gray-500">
+                <p className="text-brand-light-gray">
                   Created {moment(tenant.createdAt).format("MMMM D, YYYY")}
                 </p>
               </div>
             </div>
 
-            <div className=" pt-2 mt-2">
-              <h2 className="text-base font-semibold text-slate-700 mb-2">
-                Database Connection
-              </h2>
-              {tenant.tenantDBURL ? (
-                <CodeBlock code={tenant.tenantDBURL} />
-              ) : (
-                <div className="flex items-center mb-2">
-                  <FaDatabase className="text-slate-400 mr-2 text-xs" />
-                  <span className="text-slate-400 text-xs">
-                    {CONSTANTS.STRINGS.NO_DATABASE_URL}
-                  </span>
-                </div>
-              )}
-            </div>
+
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
             {tenantCards.map((card, index) => (
               <div
                 key={index}
-                className="bg-white rounded border border-gray-200 p-6 cursor-pointer hover:border-primary"
+                className="bg-brand-black rounded-sm border border-brand-border p-6 cursor-pointer hover:border-primary"
                 onClick={card.action}
               >
                 <div className="flex justify-between items-center mb-4">
                   {card.icon}
-                  <span className="text-2xl font-bold text-slate-700">
+                  <span className="text-2xl font-bold text-brand-text-primary">
                     {card.count}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-700 mb-2">
+                <h3 className="text-lg font-semibold text-brand-text-primary mb-2">
                   {card.title}
                 </h3>
-                <p className="text-gray-600">{card.description}</p>
+                <p className="text-brand-light-gray">{card.description}</p>
               </div>
             ))}
           </div>

@@ -14,7 +14,7 @@ export const CustomGroupLayout = (props) => {
   }
 
   return (
-    <div className={`border border-border rounded p-3 mt-2 bg-background ${customClass}`}>
+    <div className={`border border-border rounded-sm p-3 mt-2 bg-brand-dark ${customClass}`}>
       {uischema.label && (
         <h3 className="text-xs font-medium text-muted-foreground mb-2">
           {uischema.label}

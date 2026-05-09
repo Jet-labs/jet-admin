@@ -1,0 +1,34 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionName": { "type": "string", "minLength": 3 },
+      "brokerUrl": { "type": "string", "description": "MQTT broker URL (e.g. mqtt://localhost:1883)" },
+      "clientId": { "type": "string", "default": "jet-admin" },
+      "username": { "type": "string" },
+      "password": { "type": "string" },
+      "useTLS": { "type": "boolean", "default": false },
+      "keepAlive": { "type": "integer", "default": 60, "description": "Keep-alive interval in seconds" }
+    },
+    "required": ["connectionName", "brokerUrl"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "HorizontalLayout", "elements": [
+        { "type": "Control", "scope": "#/properties/connectionName", "label": "Connection Name" },
+        { "type": "Control", "scope": "#/properties/clientId", "label": "Client ID" }
+      ]},
+      { "type": "Control", "scope": "#/properties/brokerUrl", "label": "Broker URL", "options": { "placeholder": "mqtt://localhost:1883" } },
+      { "type": "Control", "scope": "#/properties/useTLS", "label": "Use TLS" },
+      { "type": "Group", "label": "Authentication", "elements": [
+        { "type": "HorizontalLayout", "elements": [
+          { "type": "Control", "scope": "#/properties/username", "label": "Username" },
+          { "type": "Control", "scope": "#/properties/password", "label": "Password", "options": { "format": "password" } }
+        ]}
+      ]},
+      { "type": "Control", "scope": "#/properties/keepAlive", "label": "Keep-Alive (seconds)" }
+    ]
+  },
+  "data": { "connectionName": "MyMQTT", "brokerUrl": "", "clientId": "jet-admin", "username": "", "password": "", "useTLS": false, "keepAlive": 60 }
+}

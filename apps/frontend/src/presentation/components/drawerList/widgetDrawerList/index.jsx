@@ -3,14 +3,14 @@ import React from "react";
 import { FaPlus } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useWidgetsState } from "../../../../logic/contexts/widgetsContext";
+import { useWidgets } from "../../../../logic/hooks/useWidgets";
 import { NoEntityUI } from "../../ui/noEntityUI";
 
 import { Button } from "@jet-admin/ui";
 export const WidgetDrawerList = () => {
-  const { isLoadingWidgets, widgets, isFetchingWidgets } = useWidgetsState();
-  const routeParam = useParams();
   const { tenantID } = useParams();
+  const { isLoadingWidgets, widgets, isFetchingWidgets } = useWidgets(tenantID);
+  const routeParam = useParams();
   const navigate = useNavigate();
   const _navigateToAddMoreWidget = () => {
     navigate(CONSTANTS.ROUTES.ADD_WIDGET.path(tenantID));
@@ -33,7 +33,7 @@ export const WidgetDrawerList = () => {
   };
 
   return (
-    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddMoreWidget}
         variant="primary-ghost"

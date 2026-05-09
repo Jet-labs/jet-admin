@@ -12,6 +12,8 @@ const QUEUE_NAMES = {
   TASK: 'workflow.tasks',
   RESULTS: 'workflow.results',
   TASK_DLQ: 'workflow.tasks.dlq',
+  LISTENER_EVENTS: 'listener.events',
+  LISTENER_EVENTS_DLQ: 'listener.events.dlq',
 };
 
 const MONITOR_EXCHANGE = 'monitor.exchange';
@@ -23,10 +25,12 @@ monitorBus.setMaxListeners(50);
 // Worker callbacks registered by taskWorker / orchestrator
 let taskWorkerFn = null;
 let resultsWorkerFn = null;
+let listenerEventWorkerFn = null;
 
 // fastq instances
 let taskQueue = null;
 let resultsQueue = null;
+let listenerEventQueue = null;
 
 // --- Internal workers that fastq calls ---
 
@@ -44,6 +48,14 @@ async function _processResult(result) {
     return;
   }
   await resultsWorkerFn(result);
+}
+
+async function _processListenerEvent(job) {
+  if (!listenerEventWorkerFn) {
+    Logger.log('warning', { message: 'queue.config:no listener event worker registered, dropping event' });
+    return;
+  }
+  await listenerEventWorkerFn(job);
 }
 
 // --- Public API (mirrors rabbitmq.config.js exports) ---
@@ -65,6 +77,7 @@ async function initializeQueue() {
   // concurrency of 10 matches the prefetch used in taskWorker
   taskQueue = fastq.promise(_processTask, 10);
   resultsQueue = fastq.promise(_processResult, 10);
+  listenerEventQueue = fastq.promise(_processListenerEvent, 20);  // higher concurrency for events
 
   Logger.log('success', { message: 'queue.config:in-memory queues ready' });
 }
@@ -85,6 +98,30 @@ function registerTaskWorker(fn) {
 function registerResultsWorker(fn) {
   resultsWorkerFn = fn;
   Logger.log('info', { message: 'queue.config:results worker registered' });
+}
+
+/**
+ * Register the listener event worker function
+ * @param {Function} fn - async (eventJob) => void
+ */
+function registerListenerEventWorker(fn) {
+  listenerEventWorkerFn = fn;
+  Logger.log('info', { message: 'queue.config:listener event worker registered' });
+}
+
+/**
+ * Add a listener event to the processing queue
+ * @param {Object} eventJob - { listenerID, tenantID, rawEvent, transformScript, actions }
+ */
+async function addListenerEvent(eventJob) {
+  if (!listenerEventQueue) {
+    throw new Error('Queue not initialized. Call initializeQueue() first.');
+  }
+
+  listenerEventQueue.push(eventJob).catch((err) => {
+    Logger.log('error', { message: 'queue.config:listener event push failed', params: { error: err.message } });
+  });
+  publishToMonitor(QUEUE_NAMES.LISTENER_EVENTS, { listenerID: eventJob.listenerID });
 }
 
 /**
@@ -163,14 +200,19 @@ async function closeQueue() {
     if (resultsQueue) {
       resultsQueue.kill();
     }
+    if (listenerEventQueue) {
+      listenerEventQueue.kill();
+    }
     Logger.log('info', { message: 'queue.config:queues closed' });
   } catch (error) {
     Logger.log('error', { message: 'queue.config:error closing queues', params: { error: error.message } });
   } finally {
     taskQueue = null;
     resultsQueue = null;
+    listenerEventQueue = null;
     taskWorkerFn = null;
     resultsWorkerFn = null;
+    listenerEventWorkerFn = null;
   }
 }
 
@@ -179,8 +221,10 @@ module.exports = {
   closeQueue,
   addNodeJob,
   addResult,
+  addListenerEvent,
   registerTaskWorker,
   registerResultsWorker,
+  registerListenerEventWorker,
   isConnectionHealthy,
   publishToMonitor,
   monitorBus,

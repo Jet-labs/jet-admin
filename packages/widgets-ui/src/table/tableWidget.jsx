@@ -96,8 +96,8 @@ export const TableWidget = ({
     if (isLoadingWorkflows) {
       return (
         <div className="flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6 relative">
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/90 backdrop-blur-[1px]">
-            <div className="flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-[#1c1c1e] shadow-sm">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-brand-dark/90 backdrop-blur-[1px]">
+            <div className="flex items-center gap-2 rounded-md bg-brand-border-dark/90 px-4 py-2 text-sm text-brand-text-primary shadow-sm">
               <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" />
               </svg>
@@ -120,8 +120,8 @@ export const TableWidget = ({
   return (
     <div className="flex flex-col w-full h-full min-h-0 overflow-hidden relative">
       {isLoadingWorkflows && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/50 backdrop-blur-[1px]">
-          <div className="flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-[#1c1c1e] shadow-sm">
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-brand-dark/50 backdrop-blur-[1px]">
+          <div className="flex items-center gap-2 rounded-md bg-brand-border-dark/90 px-4 py-2 text-sm text-brand-text-primary shadow-sm">
             <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" />
             </svg>
@@ -177,8 +177,7 @@ export const TableWidget = ({
             </span>
             <Button
               variant="ghost"
-              size="sm"
-              square
+              size="icon"
               className="h-7 w-7"
               onClick={() => handlePageChange(1)}
               disabled={currentPage === 1 || isLoadingWorkflows}
@@ -187,8 +186,7 @@ export const TableWidget = ({
             </Button>
             <Button
               variant="ghost"
-              size="sm"
-              square
+              size="icon"
               className="h-7 w-7"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1 || isLoadingWorkflows}
@@ -197,8 +195,7 @@ export const TableWidget = ({
             </Button>
             <Button
               variant="ghost"
-              size="sm"
-              square
+              size="icon"
               className="h-7 w-7"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage >= totalPages || isLoadingWorkflows}
@@ -207,8 +204,7 @@ export const TableWidget = ({
             </Button>
             <Button
               variant="ghost"
-              size="sm"
-              square
+              size="icon"
               className="h-7 w-7"
               onClick={() => handlePageChange(totalPages)}
               disabled={currentPage >= totalPages || isLoadingWorkflows}

@@ -18,7 +18,7 @@ export const WidgetPreview = ({
   isRefreshingData,
   refreshData,
   widgetConfig,
-  queryResults,
+  dataSourceResults,
 }) => {
   WidgetPreview.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -31,7 +31,7 @@ export const WidgetPreview = ({
     isRefreshingData: PropTypes.bool.isRequired,
     refreshData: PropTypes.func.isRequired,
     widgetConfig: PropTypes.object,
-    queryResults: PropTypes.object,
+    dataSourceResults: PropTypes.object,
   };
 
   const uniqueKey = `widgetPreview_${tenantID}_${widgetID}`;
@@ -65,12 +65,12 @@ export const WidgetPreview = ({
     // Data can be passed directly from the parent (query results, etc.)
     let chartData = data?.data || data;
 
-    // Resolve data from queryResults via the widget type's builder
-    if (!chartData && queryResults) {
+    // Resolve data from dataSourceResults via the widget type's builder
+    if (!chartData && dataSourceResults) {
       chartData = resolveWidgetData({
         widgetType: resolvedType,
         widgetConfig,
-        queryResults,
+        dataSourceResults,
       });
     }
 
@@ -92,7 +92,7 @@ export const WidgetPreview = ({
     widgetType,
     widgetConfig: widgetConfig || null,
     dataPassedToWidget: data || null,
-    queryResults: queryResults ? Object.keys(queryResults) : null,
+    dataSourceResults: dataSourceResults ? Object.keys(dataSourceResults) : null,
   };
 
   return (
@@ -115,11 +115,11 @@ export const WidgetPreview = ({
       )}
 
       {/* Debug Panel */}
-      <div className="shrink-0 border-t border-border bg-zinc-50">
+      <div className="shrink-0 border-t border-brand-border bg-brand-black">
         <button
           type="button"
           onClick={() => setShowDebug(!showDebug)}
-          className="w-full flex items-center gap-1.5 px-3 py-1.5 text-[0.65rem] font-medium text-muted-foreground hover:text-foreground hover:bg-zinc-100 transition-colors"
+          className="w-full flex items-center gap-1.5 px-3 py-1.5 text-[0.65rem] font-medium text-brand-text-muted hover:text-brand-text-primary hover:bg-brand-border-dark transition-colors"
         >
           {showDebug ? <FiChevronDown className="w-3 h-3" /> : <FiChevronRight className="w-3 h-3" />}
           <FiCode className="w-3 h-3" />
@@ -127,7 +127,7 @@ export const WidgetPreview = ({
         </button>
         {showDebug && (
           <div className="px-3 pb-3 max-h-64 overflow-auto">
-            <pre className="text-[0.6rem] font-mono leading-relaxed text-zinc-700 bg-zinc-100 border border-zinc-200 rounded p-2 whitespace-pre-wrap break-all">
+            <pre className="text-[0.6rem] font-mono leading-relaxed text-brand-text-muted bg-brand-black border border-brand-border rounded-sm p-2 whitespace-pre-wrap break-all">
               {JSON.stringify(debugInfo, null, 2)}
             </pre>
           </div>

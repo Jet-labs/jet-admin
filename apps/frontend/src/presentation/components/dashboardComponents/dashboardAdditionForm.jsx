@@ -81,8 +81,8 @@ export const DashboardAdditionForm = ({ tenantID }) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="flex h-full w-full flex-col items-center bg-background">
-        <div className="flex w-full items-center justify-between gap-3 border-b border-border bg-background p-3">
+      <div className="flex h-full w-full flex-col items-center bg-brand-dark">
+        <div className="flex w-full items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3">
           <h1 className="text-lg font-semibold text-foreground">
             {CONSTANTS.STRINGS.ADD_DASHBOARD_FORM_TITLE}
           </h1>
@@ -103,11 +103,11 @@ export const DashboardAdditionForm = ({ tenantID }) => {
           }
           className="!h-full !w-full"
         >
-          <ResizablePanel defaultSize={20} className="overflow-hidden bg-background">
+          <ResizablePanel defaultSize={20} className="overflow-hidden bg-brand-dark">
             <form
               id="dashboard-addition-form"
               onSubmit={dashboardAdditionForm.handleSubmit}
-              className="flex h-full w-full flex-col overflow-hidden bg-background"
+              className="flex h-full w-full flex-col overflow-hidden bg-brand-dark"
             >
               <DashboardEditor dashboardEditorForm={dashboardAdditionForm} />
               <DashboardWidgetList
@@ -118,7 +118,7 @@ export const DashboardAdditionForm = ({ tenantID }) => {
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
             {dashboardAdditionForm && dashboardAdditionForm.values && (
               <DashboardDropzone
                 tenantID={tenantID}

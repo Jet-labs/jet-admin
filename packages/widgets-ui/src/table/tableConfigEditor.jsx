@@ -20,6 +20,109 @@ import {
 } from "react-icons/md";
 import { FiZap } from "react-icons/fi";
 
+const TemplateAutocompleteInput = ({ value, onChange, placeholder, suggestions }) => {
+  const [showSuggestions, setShowSuggestions] = React.useState(false);
+
+  const handleFocus = () => {
+    if (suggestions.length > 0) setShowSuggestions(true);
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => setShowSuggestions(false), 200);
+  };
+
+  const handleChange = (e) => {
+    onChange(e.target.value);
+    setShowSuggestions(true);
+  };
+
+  const handleSelect = (path) => {
+    onChange(path);
+    setShowSuggestions(false);
+  };
+
+  // Filter suggestions based on current input
+  const filteredSuggestions = suggestions.filter(s =>
+    !value || s.value.toLowerCase().includes(value.toLowerCase()) || value === "{{"
+  );
+
+  return (
+    <div className="relative flex flex-col gap-1">
+      <Input
+        type="text"
+        className="text-xs font-mono h-8 w-full"
+        value={value || ""}
+        onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        placeholder={placeholder}
+      />
+      {showSuggestions && filteredSuggestions.length > 0 && (
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-brand-dark border border-border rounded-md shadow-lg max-h-48 overflow-auto">
+          {filteredSuggestions.map((s, idx) => (
+            <div
+              key={idx}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleSelect(s.value)}
+              className="w-full px-2 py-1.5 text-left text-xs hover:bg-muted flex items-center justify-between gap-2 border-b border-border last:border-0 cursor-pointer transition-colors"
+            >
+              <span className="font-mono text-foreground">{s.label}</span>
+              {s.detail && <span className="text-[10px] text-muted-foreground">{s.detail}</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
+ * Recursively walk a context object and collect all array-of-objects paths.
+ */
+const collectArrayPaths = (obj, prefix = "", depth = 0, maxDepth = 4) => {
+  const results = [];
+  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
+
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith("__")) continue;
+    const val = obj[key];
+    const fullPath = prefix ? `${prefix}.${key}` : key;
+
+    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
+      results.push({
+        path: fullPath,
+        label: fullPath,
+        sampleKeys: Object.keys(val[0]),
+        rowCount: val.length,
+      });
+    } else if (val && typeof val === "object" && !Array.isArray(val)) {
+      results.push(...collectArrayPaths(val, fullPath, depth + 1, maxDepth));
+    }
+  }
+  return results;
+};
+
+/**
+ * Collect numeric/scalar paths from a context object for total row count mapping.
+ */
+const collectScalarPaths = (obj, prefix = "", depth = 0, maxDepth = 3) => {
+  const results = [];
+  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
+
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith("__")) continue;
+    const val = obj[key];
+    const fullPath = prefix ? `${prefix}.${key}` : key;
+
+    if (typeof val === "number") {
+      results.push({ path: fullPath, label: fullPath, value: val });
+    } else if (val && typeof val === "object" && !Array.isArray(val)) {
+      results.push(...collectScalarPaths(val, fullPath, depth + 1, maxDepth));
+    }
+  }
+  return results;
+};
+
 /**
  * Resolve a dotted path against an object (e.g. "alias.data" -> obj.alias.data).
  */
@@ -43,22 +146,95 @@ const resolvePath = (obj, path) => {
  *
  * Data source binding and path mapping are handled in the "Data" tab.
  */
-export const TableConfigEditor = ({ widgetEditorForm, queryResults }) => {
+export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+  const dataSources = config.dataSources || [];
   const columns = config.columns || [];
   const pagination = config.pagination || {
     enabled: false,
     pageParam: "page",
     pageSizeParam: "limit",
+    totalTemplate: "",
   };
 
-  // Discover column keys from queryResults using dataMapping.dataArrayPath
-  const dataArrayPath = config.dataMapping?.dataArrayPath;
+  // Build alias-based suggestions from bound data sources
+  const aliasSuggestions = useMemo(() => {
+    if (!dataSources?.length) return [];
+    return dataSources.filter((s) => s.alias).map((s) => s.alias);
+  }, [dataSources]);
+
+  // Discover array paths from live query results
+  const arrayPaths = useMemo(() => {
+    const paths = [];
+    if (dataSourceResults) {
+      paths.push(...collectArrayPaths(dataSourceResults));
+    }
+    // If no discovered paths, generate suggestions from aliases
+    if (paths.length === 0 && aliasSuggestions.length > 0) {
+      for (const alias of aliasSuggestions) {
+        paths.push({
+          path: `${alias}.data`,
+          label: `${alias}.data`,
+          sampleKeys: [],
+          rowCount: 0,
+          isSuggestion: true,
+        });
+        paths.push({
+          path: alias,
+          label: alias,
+          sampleKeys: [],
+          rowCount: 0,
+          isSuggestion: true,
+        });
+      }
+    }
+    return paths;
+  }, [dataSourceResults, aliasSuggestions]);
+
+  // Discover scalar (number) paths for total rows
+  const scalarPaths = useMemo(() => {
+    const paths = [];
+    if (dataSourceResults) {
+      paths.push(...collectScalarPaths(dataSourceResults));
+    }
+    if (paths.length === 0 && aliasSuggestions.length > 0) {
+      for (const alias of aliasSuggestions) {
+        paths.push({
+          path: `${alias}.total`,
+          label: `${alias}.total`,
+          value: null,
+          isSuggestion: true,
+        });
+      }
+    }
+    return paths;
+  }, [dataSourceResults, aliasSuggestions]);
+
+  const arraySuggestions = useMemo(() => {
+    return arrayPaths.map(arr => ({
+      label: `{{ ${arr.path} }}`,
+      value: `{{ ${arr.path} }}`,
+      detail: arr.isSuggestion ? "suggested" : `${arr.rowCount} rows`
+    }));
+  }, [arrayPaths]);
+
+  const scalarSuggestions = useMemo(() => {
+    return scalarPaths.map(s => ({
+      label: `{{ ${s.path} }}`,
+      value: `{{ ${s.path} }}`,
+      detail: s.isSuggestion ? "" : `= ${s.value}`
+    }));
+  }, [scalarPaths]);
+
+  // Discover column keys from queryResults using dataArrayTemplate
+  // We need to strip {{ }} to resolve the path in the builder
+  const dataArrayPathStr = config.dataArrayTemplate || config.dataMapping?.dataArrayPath || "";
+  const dataArrayPath = dataArrayPathStr.replace(/^{{\s*/, '').replace(/\s*}}$/, '');
 
   const discoveredColumns = useMemo(() => {
-    if (!queryResults || !dataArrayPath) return [];
+    if (!dataSourceResults || !dataArrayPath) return [];
 
-    const resolved = resolvePath(queryResults, dataArrayPath);
+    const resolved = resolvePath(dataSourceResults, dataArrayPath);
 
     if (
       Array.isArray(resolved) &&
@@ -74,7 +250,7 @@ export const TableConfigEditor = ({ widgetEditorForm, queryResults }) => {
       }));
     }
     return [];
-  }, [queryResults, dataArrayPath]);
+  }, [dataSourceResults, dataArrayPath]);
 
   // All available field keys for dropdown suggestions in column key inputs
   const availableKeys = useMemo(() => {
@@ -136,6 +312,10 @@ export const TableConfigEditor = ({ widgetEditorForm, queryResults }) => {
     });
   };
 
+  const handleConfigChange = (field, value) => {
+    widgetEditorForm.setFieldValue(`widgetConfig.${field}`, value);
+  };
+
   const handlePaginationChange = (field, value) => {
     widgetEditorForm.setFieldValue("widgetConfig.pagination", {
       ...pagination,
@@ -145,6 +325,39 @@ export const TableConfigEditor = ({ widgetEditorForm, queryResults }) => {
 
   return (
     <div className="space-y-5">
+      {/* ═══ Data Source Mapping ═══ */}
+      <div className="space-y-3">
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-foreground">
+            Data Array Template
+          </Label>
+          <TemplateAutocompleteInput
+            value={config.dataArrayTemplate || config.dataMapping?.dataArrayPath || ""}
+            onChange={(val) => handleConfigChange("dataArrayTemplate", val)}
+            placeholder="e.g. {{ queries.my_query.data }}"
+            suggestions={arraySuggestions}
+          />
+          <p className="text-[0.65rem] text-muted-foreground">
+            Mustache template evaluating to an array of objects.
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-foreground">
+            Total Count Template <span className="text-muted-foreground font-normal">(optional)</span>
+          </Label>
+          <TemplateAutocompleteInput
+            value={pagination.totalTemplate || config.dataMapping?.totalCountPath || ""}
+            onChange={(val) => handlePaginationChange("totalTemplate", val)}
+            placeholder="e.g. {{ queries.my_query.total }}"
+            suggestions={scalarSuggestions}
+          />
+          <p className="text-[0.6rem] text-muted-foreground">
+            Used for server-side pagination. Leave empty to use array length.
+          </p>
+        </div>
+      </div>
+
       {/* ═══ Columns ═══ */}
       <div className="space-y-2">
         <div className="flex justify-between items-center">
@@ -219,26 +432,24 @@ export const TableConfigEditor = ({ widgetEditorForm, queryResults }) => {
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
-                    square
-                    className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                    size="icon"
+                    className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted"
                     onClick={() => handleMoveColumn(idx, -1)}
                     disabled={idx === 0}
                     title="Move up"
                   >
-                    <MdArrowUpward className="text-xs" />
+                    <MdArrowUpward className="h-3.5 w-3.5" />
                   </Button>
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
-                    square
-                    className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                    size="icon"
+                    className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted"
                     onClick={() => handleMoveColumn(idx, 1)}
                     disabled={idx === columns.length - 1}
                     title="Move down"
                   >
-                    <MdArrowDownward className="text-xs" />
+                    <MdArrowDownward className="h-3.5 w-3.5" />
                   </Button>
                 </div>
                 {/* Fields */}
@@ -287,13 +498,12 @@ export const TableConfigEditor = ({ widgetEditorForm, queryResults }) => {
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
-                  square
-                  className="h-7 w-7 text-destructive"
+                  size="icon"
+                  className="h-7 w-7 shrink-0 text-destructive hover:bg-destructive/10"
                   onClick={() => handleRemoveColumn(idx)}
                   title="Remove column"
                 >
-                  <MdDeleteOutline />
+                  <MdDeleteOutline className="h-4 w-4" />
                 </Button>
               </div>
             ))}
@@ -302,7 +512,7 @@ export const TableConfigEditor = ({ widgetEditorForm, queryResults }) => {
       </div>
 
       {/* ═══ Pagination ═══ */}
-      <div className="space-y-3 border-t pt-4">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-xs font-medium text-foreground">
             Pagination
@@ -350,16 +560,13 @@ export const TableConfigEditor = ({ widgetEditorForm, queryResults }) => {
           </div>
         )}
       </div>
-
-      {/* Bottom spacer */}
-      <div className="h-8 shrink-0" />
     </div>
   );
 };
 
 TableConfigEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
-  queryResults: PropTypes.object,
+  dataSourceResults: PropTypes.object,
 };
 
 export default TableConfigEditor;

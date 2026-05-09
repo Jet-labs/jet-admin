@@ -7,8 +7,6 @@ import { LoopNode, LoopNodeConfigurator } from './nodes/loopNode';
 import { DelayNode, DelayNodeConfigurator } from './nodes/delayNode';
 import { EndNode, EndNodeConfigurator } from './nodes/endNode';
 import { DataCollectionNode, DataCollectionNodeConfigurator } from './nodes/dataCollectionNode';
-import { ConnectorPullNode, ConnectorPullNodeConfigurator } from './nodes/connectorPullNode';
-import { ConnectorPushNode, ConnectorPushNodeConfigurator } from './nodes/connectorPushNode';
 
 export const WORKFLOW_NODE_TYPES = {
     START: { value: 'start', label: 'Start' },

@@ -63,11 +63,7 @@ input[type="range"]::-webkit-slider-thumb {
    border-radius: 50%;
 }
 
-input[type="range"]:focus::-webkit-slider-thumb {   
-  /* border: 1px solid #053a5f;
-  outline: 3px solid #053a5f;
-  outline-offset: 0.125rem;  */
-}
+/* Removes default focus */
 
 /******** Firefox styles ********/
 /* slider track */
@@ -96,21 +92,26 @@ input[type="range"]:focus::-moz-range-thumb {
 
 /* data-grid.css */
 .rdg {
-  --border-color: #e5e7eb !important;
+  --border-color: var(--brand-border) !important; /* Supabase border */
+  --row-hover-background-color: var(--brand-border-dark) !important;
 }
 
 /* Cell borders */
 .rdg-cell {
   border-right: 1px solid var(--border-color) !important;
   border-bottom: 1px solid var(--border-color) !important;
-    background-color: #fff !important;
-    color: black;
+  background-color: var(--brand-dark) !important; /* dark surface */
+  color: var(--brand-text-primary); /* text primary */
 }
 
 /* Header borders */
 .rdg-header-row .rdg-cell {
-  border-bottom: 2px solid #d1d5db !important;
-  background-color: #f8fafc !important;
+  border-bottom: 1px solid var(--brand-border-mid) !important; /* stronger border for header */
+  background-color: var(--brand-black) !important; /* deep black header */
+  font-family: "Source Code Pro", "Office Code Pro", Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-size: 12px;
 }
 
 /* Row borders */
@@ -123,12 +124,12 @@ input[type="range"]:focus::-moz-range-thumb {
   border-right: none !important;
 }
 
-
 .MuiDataGrid-cell--editing {
-  background-color: #e3f2fd !important;
+  background-color: var(--brand-green-border) !important; /* Supabase green overlay */
 }
 .changed-cell {
-  background-color: #ffe7a4 !important;
+  background-color: var(--brand-green) !important; /* Brand green */
+  color: var(--brand-black) !important; /* Contrast text */
   position: relative;
 }
 

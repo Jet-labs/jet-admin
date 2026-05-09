@@ -83,12 +83,12 @@ export const ChartTypeSelector = ({ value, onChange }) => {
             onClick={() => onChange(type.id)}
             title={type.description}
             className={`
-              flex flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-3
+              flex flex-col items-center justify-center gap-1.5 rounded-md px-2 py-3
               border text-xs font-medium transition-all
               ${isSelected
                 /* ✅ Correct: semantic primary tokens */
                 ? 'bg-primary/10 border-primary text-primary shadow-sm'
-                : 'bg-white border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground'
+                : 'bg-brand-dark border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground'
               }
             `}
           >

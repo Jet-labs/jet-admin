@@ -1,0 +1,20 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionName": { "type": "string", "minLength": 3 },
+      "url": { "type": "string", "description": "SSE endpoint URL" },
+      "headers": { "type": "string", "description": "Custom headers as JSON object string" }
+    },
+    "required": ["connectionName", "url"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/connectionName", "label": "Connection Name" },
+      { "type": "Control", "scope": "#/properties/url", "label": "SSE Endpoint URL", "options": { "placeholder": "https://api.example.com/events" } },
+      { "type": "Control", "scope": "#/properties/headers", "label": "Custom Headers (JSON)", "options": { "multi": true, "rows": 2 } }
+    ]
+  },
+  "data": { "connectionName": "MySSE", "url": "", "headers": "{}" }
+}

@@ -1,7 +1,8 @@
 import axios from "axios";
+import { createClient } from "graphql-ws";
+import WebSocket from "ws";
 import { Logger } from "../../utils/logger.js";
 import DataSource from "../datasource.js";
-
 export default class GraphQLDataSource extends DataSource {
   async execute(dataQueryOptions, context) {
     Logger.log("info", {
@@ -138,5 +139,112 @@ export default class GraphQLDataSource extends DataSource {
     `;
 
     return await this.execute({ query: introspectionQuery });
+  }
+
+  async subscribe(config, onEvent) {
+    const datasourceOptions = this.config.datasourceOptions || {};
+    const endpoint = datasourceOptions.endpoint;
+    
+    if (!endpoint) {
+      throw new Error("GraphQL endpoint is required for subscriptions");
+    }
+
+    let wsEndpoint = endpoint.replace(/^http/, 'ws');
+    if (datasourceOptions.wsEndpoint) {
+      wsEndpoint = datasourceOptions.wsEndpoint;
+    }
+
+    const { subscription, variables } = config;
+
+    if (!subscription) {
+      throw new Error("GraphQL subscription query is required");
+    }
+
+    Logger.log("info", {
+      message: "graphql:subscribe:start",
+      params: { wsEndpoint, datasourceID: this.config.datasourceID },
+    });
+
+    let parsedVariables = {};
+    if (variables) {
+      try {
+        parsedVariables = typeof variables === "string" ? JSON.parse(variables) : variables;
+      } catch (e) {
+        Logger.log("warn", {
+          message: "graphql:subscribe:variableParseError",
+          params: { error: e.message },
+        });
+      }
+    }
+
+    const connectionParams = {};
+    if (datasourceOptions.authType === "bearer" && datasourceOptions.bearerToken) {
+      connectionParams.Authorization = `Bearer ${datasourceOptions.bearerToken}`;
+    } else if (datasourceOptions.authType === "apiKey" && datasourceOptions.apiKey?.value) {
+      connectionParams[datasourceOptions.apiKey.headerName || "x-api-key"] = datasourceOptions.apiKey.value;
+    }
+
+    if (datasourceOptions.headers && Array.isArray(datasourceOptions.headers)) {
+      datasourceOptions.headers.forEach(header => {
+        if (header.key && header.value) {
+          connectionParams[header.key] = header.value;
+        }
+      });
+    }
+
+    const client = createClient({
+      url: wsEndpoint,
+      webSocketImpl: WebSocket,
+      connectionParams: Object.keys(connectionParams).length > 0 ? connectionParams : undefined,
+    });
+
+    const unsubscribeFn = client.subscribe(
+      {
+        query: subscription,
+        variables: parsedVariables,
+      },
+      {
+        next: (data) => {
+          onEvent({ payload: data.data || data });
+        },
+        error: (error) => {
+          Logger.log("error", {
+            message: "graphql:subscribe:error",
+            params: { error },
+          });
+        },
+        complete: () => {
+          Logger.log("info", {
+            message: "graphql:subscribe:complete",
+            params: { datasourceID: this.config.datasourceID },
+          });
+        },
+      }
+    );
+
+    return { client, unsubscribeFn };
+  }
+
+  async unsubscribe(handle) {
+    if (!handle) return;
+    
+    Logger.log("info", {
+      message: "graphql:unsubscribe",
+      params: { datasourceID: this.config.datasourceID },
+    });
+
+    try {
+      if (handle.unsubscribeFn) {
+        handle.unsubscribeFn();
+      }
+      if (handle.client) {
+        await handle.client.dispose();
+      }
+    } catch (e) {
+      Logger.log("error", {
+        message: "graphql:unsubscribe:error",
+        params: { error: e.message },
+      });
+    }
   }
 }

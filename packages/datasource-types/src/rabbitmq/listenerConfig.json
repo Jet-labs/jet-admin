@@ -1,0 +1,60 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "exchange": {
+        "type": "string",
+        "description": "Exchange name to bind to"
+      },
+      "exchangeType": {
+        "type": "string",
+        "description": "Exchange type (direct, topic, fanout, headers)",
+        "enum": ["direct", "topic", "fanout", "headers"],
+        "default": "topic"
+      },
+      "routingKey": {
+        "type": "string",
+        "description": "Routing key pattern (supports wildcards: * and #)",
+        "default": "#"
+      },
+      "queue": {
+        "type": "string",
+        "description": "Queue name (auto-generated if empty)"
+      },
+      "prefetch": {
+        "type": "integer",
+        "description": "Prefetch count for the consumer",
+        "default": 10,
+        "minimum": 1
+      }
+    },
+    "required": ["exchange"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/exchange", "label": "Exchange" },
+          { "type": "Control", "scope": "#/properties/exchangeType", "label": "Exchange Type" },
+          { "type": "Control", "scope": "#/properties/routingKey", "label": "Routing Key" }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/queue", "label": "Queue Name" },
+          { "type": "Control", "scope": "#/properties/prefetch", "label": "Prefetch Count" }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "exchange": "",
+    "exchangeType": "topic",
+    "routingKey": "#",
+    "queue": "",
+    "prefetch": 10
+  }
+}

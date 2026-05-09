@@ -1,0 +1,20 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": { "type": "string", "enum": ["publish", "request"], "default": "publish" },
+      "subject": { "type": "string" },
+      "payload": { "type": "string" }
+    },
+    "required": ["operation", "subject"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/operation", "label": "Operation" },
+      { "type": "Control", "scope": "#/properties/subject", "label": "Subject" },
+      { "type": "Control", "scope": "#/properties/payload", "label": "Payload", "options": { "multi": true } }
+    ]
+  },
+  "data": { "operation": "publish", "subject": "", "payload": "" }
+}

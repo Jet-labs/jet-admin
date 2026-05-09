@@ -67,7 +67,7 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
     >
       <DialogContent className="max-w-md p-0 overflow-hidden border-none shadow-2xl">
         <form
-          className="flex flex-col bg-background"
+          className="flex flex-col bg-brand-dark"
           onSubmit={addUserToTenantForm.handleSubmit}
           noValidate
         >
@@ -118,7 +118,6 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
 
             <Button
               type="submit"
-              size="sm"
               disabled={isAddingMemberToTenant}
             >
               {isAddingMemberToTenant && <Spinner className="mr-2" size={14} />}

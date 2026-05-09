@@ -3,51 +3,23 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { RootLayout } from "../layouts/rootLayout";
 import { CONSTANTS } from "../../../constants";
 import { ProtectedLayout } from "../layouts/protectedLayout";
-import { DatabaseSchemaLayout } from "../layouts/databaseSchemaLayout";
-import { DatabaseTableLayout } from "../layouts/databaseTableLayout";
-import { DatabaseTriggerLayout } from "../layouts/databaseTriggerLayout";
 import { DataQueryLayout } from "../layouts/dataQueryLayout";
 import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
 import { DashboardLayout } from "../layouts/dashboardLayout";
 import { WidgetLayout } from "../layouts/widgetLayout";
-import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
 import { APIKeyLayout } from "../layouts/apiKeyLayout";
 import { CronJobLayout } from "../layouts/cronJobLayout";
 import { WorkflowLayout } from "../layouts/workflowLayout";
 import { DatasourceLayout } from "../layouts/datasourceLayout";
-import { SubscriptionLayout } from "../layouts/subscriptionLayout";
-import { WebhookLayout } from "../layouts/webhookLayout";
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
 const HomePage = lazy(() => import("../../pages/homePage"));
 const AccountPage = lazy(() => import("../../pages/accountPage"));
 const AddTenantPage = lazy(() => import("../../pages/addTenantPage"));
 const UpdateTenantPage = lazy(() => import("../../pages/updateTenantPage"));
-const AddSchemaPage = lazy(() => import("../../pages/addSchemaPage"));
 const TenantLayoutLandingPage = lazy(() =>
   import("../../pages/tenantLayoutLandingPage")
-);
-const AddDatabaseTablePage = lazy(() =>
-  import("../../pages/addDatabaseTablePage")
-);
-const AddDatabaseTriggerPage = lazy(() =>
-  import("../../pages/addDatabaseTriggerPage")
-);
-const TableLayoutLandingPage = lazy(() =>
-  import("../../pages/tableLayoutLandingPage")
-);
-const ViewDatabaseTablePage = lazy(() =>
-  import("../../pages/viewDatabaseTablePage")
-);
-const UpdateDatabaseTablePage = lazy(() =>
-  import("../../pages/updateDatabaseTablePage")
-);
-const ViewDatabaseTriggerPage = lazy(() =>
-  import("../../pages/viewDatabaseTriggerPage")
-);
-const TriggerLayoutLandingPage = lazy(() =>
-  import("../../pages/triggerLayoutLandingPage")
 );
 const AddDataQueryPage = lazy(() => import("../../pages/addDataQueryPage"));
 const UpdateDataQueryPage = lazy(() =>
@@ -77,12 +49,6 @@ const AddTenantRolePage = lazy(() => import("../../pages/addTenantRolePage"));
 const UpdateTenantRolePage = lazy(() =>
   import("../../pages/updateTenantRolePage")
 );
-const AddDatabaseNotificationPage = lazy(() =>
-  import("../../pages/addDatabaseNotificationPage")
-);
-const UpdateDatabaseNotificationPage = lazy(() =>
-  import("../../pages/updateDatabaseNotificationPage")
-);
 const AddAPIKeyPage = lazy(() => import("../../pages/addAPIKeyPage"));
 const APIKeyLayoutLandingPage = lazy(() =>
   import("../../pages/apiKeyLayoutLandingPage")
@@ -95,9 +61,6 @@ const ViewCronJobHistoryPage = lazy(() =>
 );
 const CronJobLayoutLandingPage = lazy(() =>
   import("../../pages/cronJobLayoutLandingPage")
-);
-const DatabaseSchemaLandingPage = lazy(() =>
-  import("../../pages/databaseSchemaLandingPage")
 );
 const ViewAuditLogsPage = lazy(() => import("../../pages/viewAuditLogsPage"));
 
@@ -116,20 +79,13 @@ const UpdateDatasourcePage = lazy(() =>
   import("../../pages/updateDatasourcePage")
 );
 
-const SubscriptionLayoutLandingPage = lazy(() =>
-  import("../../pages/subscriptionLayoutLandingPage")
+const ListenerLayout = lazy(() => import("../layouts/listenerLayout"));
+const ListenerLayoutLandingPage = lazy(() =>
+  import("../../pages/listenerLayoutLandingPage")
 );
-const AddSubscriptionPage = lazy(() => import("../../pages/addSubscriptionPage"));
-const UpdateSubscriptionPage = lazy(() =>
-  import("../../pages/updateSubscriptionPage")
-);
-
-const WebhookLayoutLandingPage = lazy(() =>
-  import("../../pages/webhookLayoutLandingPage")
-);
-const AddWebhookPage = lazy(() => import("../../pages/addWebhookPage"));
-const UpdateWebhookPage = lazy(() =>
-  import("../../pages/updateWebhookPage")
+const AddListenerPage = lazy(() => import("../../pages/addListenerPage"));
+const UpdateListenerPage = lazy(() =>
+  import("../../pages/updateListenerPage")
 );
 
 const router = createBrowserRouter([
@@ -158,58 +114,7 @@ const router = createBrowserRouter([
             path: CONSTANTS.ROUTES.UPDATE_TENANT.code,
             element: <UpdateTenantPage />,
           },
-          {
-            path: CONSTANTS.ROUTES.ADD_SCHEMA.code,
-            element: <AddSchemaPage />,
-          },
 
-          {
-            element: <DatabaseSchemaLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_SCHEMA.code,
-                element: <DatabaseSchemaLandingPage />,
-              },
-              {
-                element: <DatabaseTableLayout />,
-                children: [
-                  {
-                    path: CONSTANTS.ROUTES.VIEW_DATABASE_TABLES.code,
-                    element: <TableLayoutLandingPage />,
-                  },
-                  {
-                    path: CONSTANTS.ROUTES.ADD_DATABASE_TABLE.code,
-                    element: <AddDatabaseTablePage />,
-                  },
-                  {
-                    path: CONSTANTS.ROUTES.VIEW_DATABASE_TABLE_BY_NAME.code,
-                    element: <ViewDatabaseTablePage />,
-                  },
-                  {
-                    path: CONSTANTS.ROUTES.UPDATE_DATABASE_TABLE_BY_NAME.code,
-                    element: <UpdateDatabaseTablePage />,
-                  },
-                ],
-              },
-              {
-                element: <DatabaseTriggerLayout />,
-                children: [
-                  {
-                    path: CONSTANTS.ROUTES.ADD_DATABASE_TRIGGER.code,
-                    element: <AddDatabaseTriggerPage />,
-                  },
-                  {
-                    path: CONSTANTS.ROUTES.VIEW_DATABASE_TRIGGERS.code,
-                    element: <TriggerLayoutLandingPage />,
-                  },
-                  {
-                    path: CONSTANTS.ROUTES.VIEW_DATABASE_TRIGGER_BY_NAME.code,
-                    element: <ViewDatabaseTriggerPage />,
-                  },
-                ],
-              },
-            ],
-          },
           {
             element: <DatasourceLayout />,
             children: [
@@ -262,6 +167,7 @@ const router = createBrowserRouter([
               },
             ],
           },
+          /*
           {
             element: <DatabaseNotificationLayout />,
             children: [
@@ -279,6 +185,7 @@ const router = createBrowserRouter([
               },
             ],
           },
+          */
           {
             element: <APIKeyLayout />,
             children: [
@@ -369,39 +276,23 @@ const router = createBrowserRouter([
             ],
           },
           {
-            element: <SubscriptionLayout />,
+            element: <ListenerLayout />,
             children: [
               {
-                path: CONSTANTS.ROUTES.VIEW_SUBSCRIPTIONS.code,
-                element: <SubscriptionLayoutLandingPage />,
+                path: CONSTANTS.ROUTES.VIEW_LISTENERS.code,
+                element: <ListenerLayoutLandingPage />,
               },
               {
-                path: CONSTANTS.ROUTES.ADD_SUBSCRIPTION.code,
-                element: <AddSubscriptionPage />,
+                path: CONSTANTS.ROUTES.ADD_LISTENER.code,
+                element: <AddListenerPage />,
               },
               {
-                path: CONSTANTS.ROUTES.UPDATE_SUBSCRIPTION_BY_ID.code,
-                element: <UpdateSubscriptionPage />,
+                path: CONSTANTS.ROUTES.UPDATE_LISTENER_BY_ID.code,
+                element: <UpdateListenerPage />,
               },
             ],
           },
-          {
-            element: <WebhookLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_WEBHOOKS.code,
-                element: <WebhookLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_WEBHOOK.code,
-                element: <AddWebhookPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_WEBHOOK_BY_ID.code,
-                element: <UpdateWebhookPage />,
-              },
-            ],
-          },
+
           {
             element: <RoleManagementLayout />,
             children: [

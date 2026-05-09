@@ -180,48 +180,42 @@ var React2 = __toESM(require("react"));
 var import_react_slot = require("@radix-ui/react-slot");
 var import_class_variance_authority = require("class-variance-authority");
 var buttonVariants = (0, import_class_variance_authority.cva)(
-  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green-border focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        "destructive-ghost": "bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600",
-        "primary-ghost": "bg-primary/10 text-primary hover:bg-primary/20",
-        "primary-outline": "border border-primary bg-background text-primary hover:bg-primary/10",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline"
+        default: "bg-brand-green text-brand-black font-semibold border border-transparent hover:bg-brand-green/90",
+        secondary: "bg-brand-border-dark text-brand-text-primary border border-brand-border hover:bg-brand-border hover:border-brand-border-mid",
+        green: "bg-brand-green text-brand-black font-semibold border border-transparent hover:bg-brand-green/90",
+        destructive: "bg-red-600 text-white hover:bg-red-700 border border-transparent",
+        white: "bg-brand-text-primary text-brand-black hover:opacity-90 border border-transparent",
+        outline: "bg-transparent border border-brand-border text-brand-text-primary hover:bg-white/5 hover:border-brand-border-mid",
+        ghost: "bg-transparent text-brand-text-primary hover:bg-white/5",
+        link: "text-brand-green-link hover:text-brand-green underline-offset-4 hover:underline",
+        pill: "bg-brand-border-dark text-brand-text-primary border border-brand-border hover:border-brand-border-mid"
       },
       size: {
-        default: "h-7 px-3",
-        sm: "h-7 px-2.5 text-xs",
-        lg: "h-10 px-5 text-base"
-      },
-      square: {
-        true: "px-0"
+        default: "px-[14px] py-[5px] text-[13px] rounded-sm",
+        sm: "px-[10px] py-[3px] text-[12px] rounded-sm",
+        lg: "px-[20px] py-[8px] text-[14px] rounded-sm",
+        icon: "h-[28px] w-[28px] rounded-sm",
+        circle: "h-[36px] w-[36px] p-0 rounded-pill",
+        pill: "px-[24px] py-[5px] text-[13px] rounded-pill"
       }
     },
-    compoundVariants: [
-      { square: true, size: "default", className: "w-7" },
-      { square: true, size: "sm", className: "w-7" },
-      { square: true, size: "lg", className: "w-10" }
-    ],
     defaultVariants: {
       variant: "default",
-      size: "default",
-      square: false
+      size: "default"
     }
   }
 );
 var Button = React2.forwardRef(
-  ({ className, variant, size, square, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? import_react_slot.Slot : "button";
     return /* @__PURE__ */ React2.createElement(
       Comp,
       {
-        className: cn(buttonVariants({ variant, size, square, className })),
+        className: cn(buttonVariants({ variant, size, className })),
         ref,
         ...props
       }
@@ -252,7 +246,7 @@ var AlertDialogContent = React3.forwardRef(
     {
       ref,
       className: cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-sm translate-x-[-50%] translate-y-[-50%] gap-3 border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-sm translate-x-[-50%] translate-y-[-50%] gap-3 border border-brand-border bg-brand-dark p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
         className
       ),
       ...props
@@ -366,16 +360,16 @@ AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 var React5 = __toESM(require("react"));
 var import_class_variance_authority2 = require("class-variance-authority");
 var badgeVariants = (0, import_class_variance_authority2.cva)(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-pill px-[8px] py-[4px] text-[12px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-green-border focus:ring-offset-2",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-        success: "border-transparent bg-green-100 text-green-800",
-        warning: "border-transparent bg-orange-100 text-orange-800"
+        default: "border border-transparent bg-brand-green text-brand-black hover:opacity-90",
+        secondary: "border border-brand-border bg-brand-black text-brand-text-primary",
+        destructive: "border border-transparent bg-destructive text-brand-text-primary hover:opacity-90",
+        outline: "border border-brand-border text-brand-text-primary",
+        success: "border border-transparent bg-brand-green text-brand-black",
+        warning: "border border-transparent bg-brand-warning text-brand-black"
       }
     },
     defaultVariants: {
@@ -389,12 +383,14 @@ function Badge({ className, variant, ...props }) {
 
 // src/components/card.jsx
 var React6 = __toESM(require("react"));
-var Card = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React6.createElement(
+var Card = React6.forwardRef(({ className, variant = "default", ...props }, ref) => /* @__PURE__ */ React6.createElement(
   "div",
   {
     ref,
     className: cn(
-      "rounded border bg-card text-card-foreground shadow-sm",
+      "rounded-md bg-brand-dark border border-brand-border text-brand-text-primary",
+      variant === "glass" && "bg-brand-dark/80 backdrop-blur-xl saturate-150",
+      variant === "pastel" && "bg-brand-border-dark",
       className
     ),
     ...props
@@ -415,7 +411,7 @@ var CardTitle = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE__
   {
     ref,
     className: cn(
-      "text-2xl font-semibold leading-none tracking-tight",
+      "text-[24px] font-normal leading-[1.33] tracking-[-0.16px] text-brand-text-primary",
       className
     ),
     ...props
@@ -426,7 +422,7 @@ var CardDescription = React6.forwardRef(({ className, ...props }, ref) => /* @__
   "p",
   {
     ref,
-    className: cn("text-sm text-muted-foreground", className),
+    className: cn("text-[14px] font-normal text-brand-text-muted leading-[1.5]", className),
     ...props
   }
 ));
@@ -493,13 +489,13 @@ var DialogContent = React8.forwardRef(
     {
       ref,
       className: cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-brand-border bg-brand-dark p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
         className
       ),
       ...props
     },
     children,
-    /* @__PURE__ */ React8.createElement(DialogPrimitive.Close, { className: "absolute right-4 top-4 rounded opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground" }, /* @__PURE__ */ React8.createElement(import_lucide_react3.X, { className: "h-4 w-4" }), /* @__PURE__ */ React8.createElement("span", { className: "sr-only" }, "Close"))
+    /* @__PURE__ */ React8.createElement(DialogPrimitive.Close, { className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-brand-dark transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-brand-green-border focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-brand-border-dark data-[state=open]:text-brand-text-muted" }, /* @__PURE__ */ React8.createElement(import_lucide_react3.X, { className: "h-4 w-4" }), /* @__PURE__ */ React8.createElement("span", { className: "sr-only" }, "Close"))
   ))
 );
 DialogContent.displayName = DialogPrimitive.Content.displayName;
@@ -563,7 +559,7 @@ var DropdownMenuSubTrigger = React9.forwardRef(
     {
       ref,
       className: cn(
-        "flex cursor-default select-none items-center rounded px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent",
+        "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-brand-border-dark data-[state=open]:bg-brand-border-dark",
         inset && "pl-8",
         className
       ),
@@ -580,7 +576,7 @@ var DropdownMenuSubContent = React9.forwardRef(
     {
       ref,
       className: cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 min-w-[8rem] overflow-hidden rounded-sm border border-brand-border bg-brand-dark p-1 text-brand-text-primary shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -595,7 +591,7 @@ var DropdownMenuContent = React9.forwardRef(
       ref,
       sideOffset,
       className: cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 min-w-[8rem] overflow-hidden rounded-sm border border-brand-border bg-brand-dark p-1 text-brand-text-primary shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -609,7 +605,7 @@ var DropdownMenuItem = React9.forwardRef(
     {
       ref,
       className: cn(
-        "relative flex cursor-default select-none items-center rounded px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-brand-border-dark focus:text-brand-text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         inset && "pl-8",
         className
       ),
@@ -624,7 +620,7 @@ var DropdownMenuCheckboxItem = React9.forwardRef(
     {
       ref,
       className: cn(
-        "relative flex cursor-default select-none items-center rounded py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-brand-border-dark focus:text-brand-text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       ),
       checked,
@@ -651,7 +647,7 @@ var DropdownMenuSeparator = React9.forwardRef(
     DropdownMenuPrimitive.Separator,
     {
       ref,
-      className: cn("-mx-1 my-1 h-px bg-muted", className),
+      className: cn("-mx-1 my-1 h-px bg-brand-border", className),
       ...props
     }
   )
@@ -670,7 +666,7 @@ var Input = React10.forwardRef(({ className, type, ...props }, ref) => {
     {
       type,
       className: cn(
-        "flex h-8 w-full rounded border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "flex w-full rounded-sm border border-brand-border bg-brand-black px-2 py-1.5 text-sm text-brand-text-primary placeholder:text-brand-text-muted focus-visible:outline-none focus-visible:border-brand-border-mid focus-visible:ring-2 focus-visible:ring-brand-green-border disabled:cursor-not-allowed disabled:opacity-50",
         className
       ),
       ref,
@@ -710,7 +706,7 @@ var PopoverContent = React12.forwardRef(
       align,
       sideOffset,
       className: cn(
-        "z-50 w-72 rounded border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 w-72 rounded-sm border border-brand-border bg-brand-dark p-4 text-brand-text-primary shadow-none outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -797,7 +793,7 @@ var SelectTrigger = React15.forwardRef(
     {
       ref,
       className: cn(
-        "flex h-8 w-full items-center justify-between rounded border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+        "flex h-8 w-full items-center justify-between rounded-sm border border-brand-border bg-brand-black px-2.5 py-1.5 text-sm text-brand-text-primary ring-offset-brand-dark placeholder:text-brand-text-muted focus:outline-none focus:border-brand-border-mid focus:ring-2 focus:ring-brand-green-border disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
         className
       ),
       ...props
@@ -843,7 +839,7 @@ var SelectContent = React15.forwardRef(
     {
       ref,
       className: cn(
-        "relative z-[1100] max-h-96 min-w-[8rem] overflow-hidden rounded border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "relative z-[1100] max-h-96 min-w-[8rem] overflow-hidden rounded-sm border border-brand-border bg-brand-dark text-brand-text-primary shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
       ),
@@ -880,7 +876,7 @@ var SelectItem = React15.forwardRef(
     {
       ref,
       className: cn(
-        "relative flex w-full cursor-default select-none items-center rounded py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-brand-border-dark focus:text-brand-text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       ),
       ...props
@@ -894,7 +890,7 @@ var SelectSeparator = React15.forwardRef(({ className, ...props }, ref) => /* @_
   SelectPrimitive.Separator,
   {
     ref,
-    className: cn("-mx-1 my-1 h-px bg-muted", className),
+    className: cn("-mx-1 my-1 h-px bg-brand-border", className),
     ...props
   }
 ));
@@ -954,7 +950,7 @@ var Switch = React18.forwardRef(({ className, ...props }, ref) => /* @__PURE__ *
     SwitchPrimitives.Thumb,
     {
       className: cn(
-        "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
+        "pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
       )
     }
   )
@@ -970,7 +966,7 @@ var TabsList = React19.forwardRef(({ className, ...props }, ref) => /* @__PURE__
   {
     ref,
     className: cn(
-      "inline-flex h-10 items-center justify-center rounded bg-muted p-1 text-muted-foreground",
+      "inline-flex h-12 items-end justify-start rounded-none border-b border-brand-border bg-transparent p-0 text-brand-text-muted w-full",
       className
     ),
     ...props
@@ -982,7 +978,7 @@ var TabsTrigger = React19.forwardRef(({ className, ...props }, ref) => /* @__PUR
   {
     ref,
     className: cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+      "inline-flex items-center justify-center whitespace-nowrap px-4 py-3 border-b-2 border-transparent -mb-px text-[14px] font-medium tracking-[0.2px] ring-offset-brand-dark transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green-border focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-brand-green data-[state=active]:border-brand-green data-[state=active]:shadow-none hover:text-brand-text-primary",
       className
     ),
     ...props
@@ -994,7 +990,7 @@ var TabsContent = React19.forwardRef(({ className, ...props }, ref) => /* @__PUR
   {
     ref,
     className: cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "mt-4 ring-offset-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green-border focus-visible:ring-offset-2 text-brand-text-primary",
       className
     ),
     ...props
@@ -1009,7 +1005,7 @@ var Textarea = React20.forwardRef(({ className, ...props }, ref) => {
     "textarea",
     {
       className: cn(
-        "flex min-h-[80px] w-full rounded border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "flex min-h-[80px] w-full rounded-sm border border-brand-border bg-brand-black p-2 text-sm text-brand-text-primary placeholder:text-brand-text-muted focus-visible:outline-none focus-visible:border-brand-border-mid focus-visible:ring-2 focus-visible:ring-brand-green-border disabled:cursor-not-allowed disabled:opacity-50",
         className
       ),
       ref,
@@ -1032,7 +1028,7 @@ var TooltipContent = React21.forwardRef(
       ref,
       sideOffset,
       className: cn(
-        "z-50 overflow-hidden rounded border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 overflow-hidden rounded-sm border border-brand-border bg-brand-dark px-3 py-1.5 text-sm text-brand-text-primary shadow-none animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -1452,7 +1448,7 @@ var CodeEditor = React23.forwardRef(({
   height = 300,
   disabled = false,
   readOnly = false,
-  theme = "github-light",
+  theme = "vs-dark",
   className,
   title,
   titleIcon,
@@ -1515,14 +1511,14 @@ var CodeEditor = React23.forwardRef(({
       className: cn(
         "flex flex-col overflow-hidden rounded border text-sm shadow-sm transition-colors",
         status === "error" ? "border-destructive/50 ring-1 ring-destructive/20" : "border-border hover:border-border/80",
-        isExpanded ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-background" : "relative bg-background",
+        isExpanded ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-brand-dark" : "relative bg-brand-dark",
         className
       ),
       ...props
     },
     showHeader && /* @__PURE__ */ React23.createElement("div", { className: "flex min-h-[36px] flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-1.5" }, /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-3" }, (title || titleIcon) && /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5 font-medium text-foreground" }, titleIcon ? titleIcon : /* @__PURE__ */ React23.createElement(import_lucide_react8.Code, { className: "h-3.5 w-3.5 text-primary" }), title && /* @__PURE__ */ React23.createElement("span", { className: "text-xs" }, title)), status && /* @__PURE__ */ React23.createElement("span", { className: cn(
       "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide",
-      status === "valid" ? "bg-green-100 text-green-700 border border-green-200" : status === "error" ? "bg-red-100 text-red-700 border border-red-200" : ""
+      status === "valid" ? "bg-green-950/40 text-green-400 border border-green-800" : status === "error" ? "bg-red-950/40 text-red-400 border border-red-800" : ""
     ) }, status === "valid" ? /* @__PURE__ */ React23.createElement(import_lucide_react8.CheckCircle2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(import_lucide_react8.AlertTriangle, { className: "h-3 w-3" }), status === "valid" ? "Valid" : "Invalid"), headerLeft), /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5" }, headerExtra, showFormatButton && !isReadOnly && /* @__PURE__ */ React23.createElement(
       "button",
       {
@@ -1553,7 +1549,7 @@ var CodeEditor = React23.forwardRef(({
         onChange,
         beforeMount: handleEditorWillMount,
         onMount: handleEditorDidMount,
-        theme: theme === "github-light" ? "github-light" : "vs",
+        theme: "vs-dark",
         options: {
           readOnly: isReadOnly,
           minimap: { enabled: isExpanded },
@@ -1587,7 +1583,7 @@ var CodeEditor = React23.forwardRef(({
           ...editorOptions
         }
       }
-    ), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border/50 bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm" }, footerHint)),
+    ), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-brand-border bg-brand-dark/95 px-2 py-1 text-[10px] text-brand-text-muted shadow-sm backdrop-blur-sm" }, footerHint)),
     status === "error" && statusMessage && /* @__PURE__ */ React23.createElement("div", { className: "flex items-start gap-2 border-t border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive" }, /* @__PURE__ */ React23.createElement(import_lucide_react8.AlertTriangle, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" }), /* @__PURE__ */ React23.createElement("span", { className: "font-medium whitespace-pre-wrap leading-relaxed" }, statusMessage))
   );
 });
@@ -1646,7 +1642,7 @@ function ArrayInput({
           variant: "ghost",
           size: "sm",
           square: true,
-          className: "h-8 w-8 text-slate-500 hover:text-red-500 flex-shrink-0 mt-1",
+          className: "h-8 w-8 text-[#1c1c1e] hover:text-red-500 flex-shrink-0 mt-1",
           onClick: () => handleRemoveItem(index),
           disabled: disabled || !canRemove
         },
@@ -1673,14 +1669,14 @@ function ArrayInput({
         variant: "ghost",
         size: "sm",
         square: true,
-        className: "h-8 w-8 text-slate-500 hover:text-red-500 flex-shrink-0",
+        className: "h-8 w-8 text-[#1c1c1e] hover:text-red-500 flex-shrink-0",
         onClick: () => handleRemoveItem(index),
         disabled: disabled || !canRemove
       },
       /* @__PURE__ */ import_react3.default.createElement(import_lucide_react9.Trash2, { className: "h-4 w-4" })
     ));
   };
-  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2 w-full" }, currentArray.length > 0 ? /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2" }, currentArray.map(renderItem)) : /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-xs text-slate-400 italic" }, "No items added to array."), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(
+  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2 w-full" }, currentArray.length > 0 ? /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2" }, currentArray.map(renderItem)) : /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-xs text-[#1c1c1e] italic" }, "No items added to array."), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(
     Button,
     {
       type: "button",
@@ -1716,7 +1712,7 @@ function InputArgsForm({
   className
 }) {
   if (!Array.isArray(args) || args.length === 0) {
-    return /* @__PURE__ */ import_react4.default.createElement("p", { className: "text-xs text-slate-400 italic" }, "No input parameters defined.");
+    return /* @__PURE__ */ import_react4.default.createElement("p", { className: "text-xs text-[#1c1c1e] italic" }, "No input parameters defined.");
   }
   const renderField = (arg) => {
     const argName = arg.key;

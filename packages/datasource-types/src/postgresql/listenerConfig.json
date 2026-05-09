@@ -1,0 +1,25 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "channels": {
+        "type": "string",
+        "description": "Comma-separated PostgreSQL NOTIFY channel names to LISTEN on"
+      }
+    },
+    "required": ["channels"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/channels",
+        "label": "LISTEN Channels (comma-separated)"
+      }
+    ]
+  },
+  "data": {
+    "channels": ""
+  }
+}

@@ -41,30 +41,30 @@ var BaseWidgetBuilder = class {
     };
   }
   /**
-   * Transform bound query results using the mapping config into widget-ready data.
+   * Transform bound data source results using the mapping config into widget-ready data.
    * Subclasses should override this method.
    *
-   * @param {object} queryResults - Normalized results: { alias: resultData }
+   * @param {object} dataSourceResults - Normalized results: { alias: resultData }
    * @param {object} mappingConfig - Widget-type-specific mapping config
    * @returns {object} Widget-ready data
    */
-  mapQueryResults(queryResults, mappingConfig) {
-    return queryResults;
+  mapQueryResults(dataSourceResults, mappingConfig) {
+    return dataSourceResults;
   }
   /**
-   * Resolve the data prop for the widget component from widgetConfig + queryResults.
+   * Resolve the data prop for the widget component from widgetConfig + dataSourceResults.
    * 
    * This is the STANDARD entry point called by the rendering layer (WidgetPreview,
    * DashboardWidget) to get the data to pass to the widget component.
    * Each widget type implements its own resolution logic.
    *
    * @param {object} widgetConfig - The full widget configuration
-   * @param {object|null} queryResults - Executed query/workflow results: { alias: data }
+   * @param {object|null} dataSourceResults - Executed data source results: { alias: data }
    * @returns {any} Data ready for the widget component's `data` prop, or null
    */
-  resolveData(widgetConfig, queryResults) {
-    if (!queryResults || !widgetConfig?.dataMapping?.dataArrayPath) return null;
-    const resolved = getByPath(queryResults, widgetConfig.dataMapping.dataArrayPath);
+  resolveData(widgetConfig, dataSourceResults) {
+    if (!dataSourceResults || !widgetConfig?.dataMapping?.dataArrayPath) return null;
+    const resolved = getByPath(dataSourceResults, widgetConfig.dataMapping.dataArrayPath);
     if (Array.isArray(resolved)) return resolved;
     if (resolved && typeof resolved === "object" && Array.isArray(resolved.data)) {
       return resolved.data;
@@ -107,42 +107,33 @@ var VegaWidgetBuilder = class extends BaseWidgetBuilder {
     };
   }
   /**
-   * Map normalized query results to vega-ready named data sources.
-   * @param {object} queryResults - { alias: resultData }
+   * Map normalized data source results to vega-ready named data sources.
+   * @param {object} dataSourceResults - { alias: resultData }
    * @param {object} mappingConfig - { dataSources: { vegaName: "alias.path" } }
    * @returns {object} { vegaData: { name: [...] } }
    */
-  mapQueryResults(queryResults, mappingConfig) {
+  mapQueryResults(dataSourceResults, mappingConfig) {
     if (!mappingConfig?.dataSources) return { vegaData: {} };
     const vegaData = {};
     for (const [vegaName, path] of Object.entries(mappingConfig.dataSources)) {
-      vegaData[vegaName] = getByPath(queryResults, path) || [];
+      vegaData[vegaName] = getByPath(dataSourceResults, path) || [];
     }
     return { vegaData };
   }
   /**
-   * Resolve the data prop for VegaWidget from widgetConfig + queryResults.
-   * Clones the vegaSpec and resolves {{template}} expressions in data.values.
+   * Resolve the data prop for VegaWidget from widgetConfig + dataSourceResults.
+   * Expects that all template expressions have already been resolved by the
+   * frontend evaluationEngine before reaching this method.
    *
-   * @param {object} widgetConfig - The full widget configuration
-   * @param {object|null} queryResults - Executed query/workflow results
-   * @returns {object|null} Complete Vega spec with resolved data, or null
+   * @param {object} widgetConfig - The full widget configuration (already resolved)
+   * @param {object|null} dataSourceResults - Executed data source results
+   * @returns {object|null} Complete Vega spec with data, or null
    */
-  resolveData(widgetConfig, queryResults) {
+  resolveData(widgetConfig, dataSourceResults) {
     if (!widgetConfig?.vegaSpec) return null;
     const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
-    if (spec.data?.values && typeof spec.data.values === "string" && spec.data.values.includes("{{")) {
-      const templateMatch = spec.data.values.match(/\{\{([^}]+)\}\}/);
-      if (templateMatch && queryResults) {
-        const resolved = getByPath(queryResults, templateMatch[1]);
-        if (Array.isArray(resolved)) {
-          spec.data = { values: resolved };
-        } else if (resolved && typeof resolved === "object" && Array.isArray(resolved.data)) {
-          spec.data = { values: resolved.data };
-        } else {
-          spec.data = { values: [] };
-        }
-      } else {
+    if (spec.data?.values && !Array.isArray(spec.data.values)) {
+      if (typeof spec.data.values === "string") {
         spec.data = { values: [] };
       }
     }
@@ -175,6 +166,23 @@ var TableWidgetBuilder = class extends BaseWidgetBuilder {
       }
     };
   }
+  /**
+   * Resolve the data prop for TableWidget from widgetConfig + dataSourceResults.
+   * Expects all template expressions to be resolved by the evaluationEngine.
+   *
+   * @param {object} widgetConfig - The full widget configuration (already resolved)
+   * @param {object|null} dataSourceResults - Executed data source results
+   * @returns {Array|null} Array of row objects for the table, or null
+   */
+  resolveData(widgetConfig, dataSourceResults) {
+    if (!dataSourceResults || !widgetConfig?.dataMapping?.dataArrayPath) return null;
+    const resolved = getByPath(dataSourceResults, widgetConfig.dataMapping.dataArrayPath);
+    if (Array.isArray(resolved)) return resolved;
+    if (resolved && typeof resolved === "object" && Array.isArray(resolved.data)) {
+      return resolved.data;
+    }
+    return null;
+  }
   static get dataManifest() {
     return {
       supportsMultipleQueries: false,
@@ -185,16 +193,16 @@ var TableWidgetBuilder = class extends BaseWidgetBuilder {
     };
   }
   /**
-   * Map normalized query results to table-ready data.
-   * @param {object} queryResults - { alias: resultData }
+   * Map normalized data source results to table-ready data.
+   * @param {object} dataSourceResults - { alias: resultData }
    * @param {object} mappingConfig - { dataArrayPath, totalCountPath }
    * @returns {object} { dataArray, totalCount }
    */
-  mapQueryResults(queryResults, mappingConfig) {
+  mapQueryResults(dataSourceResults, mappingConfig) {
     if (!mappingConfig) return { dataArray: [], totalCount: 0 };
     return {
-      dataArray: getByPath(queryResults, mappingConfig.dataArrayPath) || [],
-      totalCount: getByPath(queryResults, mappingConfig.totalCountPath) || 0
+      dataArray: getByPath(dataSourceResults, mappingConfig.dataArrayPath) || [],
+      totalCount: getByPath(dataSourceResults, mappingConfig.totalCountPath) || 0
     };
   }
 };
@@ -215,11 +223,11 @@ var processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
   }
   return widgetConfig || null;
 };
-var resolveWidgetData = ({ widgetType, widgetConfig, queryResults }) => {
-  if (!queryResults || !widgetConfig) return null;
+var resolveWidgetData = ({ widgetType, widgetConfig, dataSourceResults }) => {
+  if (!dataSourceResults || !widgetConfig) return null;
   const processor = WIDGET_PROCESSORS_MAP[widgetType];
   if (processor && typeof processor.resolveData === "function") {
-    return processor.resolveData(widgetConfig, queryResults);
+    return processor.resolveData(widgetConfig, dataSourceResults);
   }
   return null;
 };

@@ -108,7 +108,6 @@ components:
           description: "Database connection URL"
       required:
         - tenantTitle
-        - tenantDBURL
 
     TenantUpdate:
       type: object
@@ -117,8 +116,7 @@ components:
           type: string
         tenantDescription:
           type: string
-        tenantDBURL:
-          type: string
+
 
     Tenant:
       allOf:

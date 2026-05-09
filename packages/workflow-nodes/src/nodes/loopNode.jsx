@@ -227,28 +227,28 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         />
 
         {/* Comprehensive instructions */}
-        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
-          <div className="font-semibold text-slate-700 text-xs">📘 Loop Configuration</div>
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
+          <div className="font-semibold text-brand-text-primary text-xs">📘 Loop Configuration</div>
 
           <div>
-            <span className="font-medium text-slate-700">Source Array Format:</span>
-            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
-              <div><code className="bg-white px-1 rounded">{"{{ctx.queryResult}}"}</code> → array from previous node</div>
-              <div><code className="bg-white px-1 rounded">{"{{ctx.input.items}}"}</code> → array from input</div>
+            <span className="font-medium text-brand-text-primary">Source Array Format:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.queryResult}}"}</code> → array from previous node</div>
+              <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.input.items}}"}</code> → array from input</div>
             </div>
           </div>
 
           <div>
-            <span className="font-medium text-slate-700">Inside Loop Body:</span>
-            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
-              <div><code className="bg-white px-1 rounded">ctx.item</code> → current array element</div>
-              <div><code className="bg-white px-1 rounded">ctx.index</code> → current iteration index (0-based)</div>
+            <span className="font-medium text-brand-text-primary">Inside Loop Body:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-brand-black px-1 rounded-sm">ctx.item</code> → current array element</div>
+              <div><code className="bg-brand-black px-1 rounded-sm">ctx.index</code> → current iteration index (0-based)</div>
             </div>
           </div>
 
           <div>
-            <span className="font-medium text-slate-700">Handles:</span>
-            <div className="ml-3 mt-0.5 text-slate-500">
+            <span className="font-medium text-brand-text-primary">Handles:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary">
               <strong>Loop (cyan):</strong> Executes for each item → <strong>Completed (green):</strong> After all iterations
             </div>
           </div>
@@ -257,7 +257,7 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         <Button
           type="button"
           onClick={handleSave}
-          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
           Save
         </Button>
@@ -278,12 +278,12 @@ export const LoopNode = memo(({ data, isConnectable }) => {
 
   return (
     <div className={`
-      bg-white border rounded
+      bg-brand-black border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${isDisabled
-        ? 'border-slate-200 opacity-50'
-        : 'border-slate-200 hover:border-cyan-400 hover:shadow-md'
+        ? 'border-brand-border opacity-50'
+        : 'border-brand-border hover:border-cyan-400 hover:shadow-md'
       }
       ${!data.sourceVariable ? '!border-red-400 !bg-red-50' : ''}
     `}>
@@ -299,20 +299,20 @@ export const LoopNode = memo(({ data, isConnectable }) => {
                   }} 
                   className={`
           flex flex-col items-center justify-center px-3 py-3 border-r
-          ${isDisabled ? 'bg-slate-50 border-slate-100' : 'bg-cyan-50 border-cyan-100'}
+          ${isDisabled ? 'bg-brand-dark border-brand-border' : 'bg-cyan-50 border-cyan-100'}
         `}>
-          <TbRepeat className={`w-5 h-5 ${isDisabled ? 'text-slate-400' : 'text-cyan-500'}`} />
+          <TbRepeat className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : 'text-cyan-500'}`} />
         </div>
 
         {/* Center: Main info */}
         <div className="flex-1 px-3 py-2 min-w-0">
           {/* Title row */}
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-xs font-semibold truncate ${isDisabled ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+            <span className={`text-xs font-semibold truncate ${isDisabled ? 'text-brand-text-primary line-through' : 'text-brand-text-primary'}`}>
               {data?.title || 'Loop'}
             </span>
             {isDisabled && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200">
+              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
                 <VscDebugDisconnect className="w-2.5 h-2.5" />
                 Skip
               </span>
@@ -320,15 +320,15 @@ export const LoopNode = memo(({ data, isConnectable }) => {
           </div>
 
           {/* Loop info */}
-          <div className={`text-[10px] font-mono mt-0.5 ${isDisabled ? 'text-slate-300' : 'text-slate-400'}`}>
+          <div className={`text-[10px] font-mono mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
             for ({itemVariable} in {sourceVariable.length > 20 ? sourceVariable.substring(0, 20) + '...' : sourceVariable})
           </div>
         </div>
 
         {/* Right: Output indicators */}
-        <div className="flex flex-col items-center justify-center px-2 border-l border-slate-100">
-          <div className={`w-2 h-2 rounded-full mb-1 ${isDisabled ? 'bg-slate-300' : 'bg-cyan-400'}`} title="Loop Body" />
-          <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-slate-300' : 'bg-green-400'}`} title="Completed" />
+        <div className="flex flex-col items-center justify-center px-2 border-l border-brand-border">
+          <div className={`w-2 h-2 rounded-full mb-1 ${isDisabled ? 'bg-brand-black' : 'bg-cyan-400'}`} title="Loop Body" />
+          <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-brand-black' : 'bg-green-400'}`} title="Completed" />
         </div>
       </div>
 

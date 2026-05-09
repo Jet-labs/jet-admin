@@ -14,7 +14,7 @@ import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectV
 
 function Section({ title, description, children }) {
   return (
-    <div className="rounded border border-border bg-card p-4 space-y-3">
+    <div className="rounded-sm border border-border bg-card p-4 space-y-3">
       {(title || description) && (
         <div>
           {title && (
@@ -125,7 +125,7 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
         </div>
         {/* Show selected datasource with icon */}
         {currentDatasourceType && (
-          <div className="mt-2 flex items-center gap-2 px-3 py-2 bg-muted rounded border border-border">
+          <div className="mt-2 flex items-center gap-2 px-3 py-2 bg-muted rounded-sm border border-border">
             <DatasourceIcon
               icon={currentDatasourceType.icon}
               iconColor={currentDatasourceType.iconColor}

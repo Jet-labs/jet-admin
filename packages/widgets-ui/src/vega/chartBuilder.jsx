@@ -11,7 +11,7 @@ import { Input, Label, Select, SelectContent, SelectGroup, SelectItem, SelectLab
 
 function Section({ title, description, children }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-3 space-y-3">
+    <div className="rounded-md border border-border bg-card p-3 space-y-3">
       {(title || description) && (
         <div>
           {title && (
@@ -43,9 +43,11 @@ export const ChartBuilder = ({ widgetEditorForm, workflowContext, workflows }) =
 
   const availableFields = useMemo(() => {
     if (!workflowContext || !builderSpec.data?.source) return [];
-    const match = builderSpec.data.source.match(/\{\{ctx\.([^}]+)\}\}/);
-    if (!match) return [];
-    const path = match[1];
+    
+    let path = builderSpec.data.source;
+    if (path.startsWith('{{ctx.')) path = path.replace('{{ctx.', '').replace('}}', '');
+    else if (path.startsWith('{{')) path = path.replace('{{', '').replace('}}', '');
+    
     let current = workflowContext;
     for (const part of path.split('.')) {
       if (current === undefined || current === null) break;
@@ -57,11 +59,9 @@ export const ChartBuilder = ({ widgetEditorForm, workflowContext, workflows }) =
     return [];
   }, [workflowContext, builderSpec.data?.source]);
 
-  const selectedWorkflow = useMemo(() => {
-    const workflowID = widgetEditorForm.values.workflowID;
-    if (!workflowID || !workflows) return null;
-    return workflows.find(w => String(w.workflowID) === String(workflowID));
-  }, [widgetEditorForm.values.workflowID, workflows]);
+  const hasDataSources = useMemo(() => {
+    return widgetEditorForm.values.widgetConfig?.dataSources?.length > 0;
+  }, [widgetEditorForm.values.widgetConfig?.dataSources]);
 
   const handleSpecChange = (updatePath, newValue) => {
     setBuilderSpec(prev => {
@@ -102,11 +102,11 @@ export const ChartBuilder = ({ widgetEditorForm, workflowContext, workflows }) =
     }));
   };
 
-  if (!selectedWorkflow) {
+  if (!hasDataSources) {
     return (
-      <div className="flex flex-col items-center justify-center py-8 text-center rounded-lg border border-dashed border-border bg-muted/20">
+      <div className="flex flex-col items-center justify-center py-8 text-center rounded-md border border-dashed border-border bg-muted/20">
         <p className="text-sm font-medium text-foreground mb-1">No Data Source Selected</p>
-        <p className="text-xs text-muted-foreground">Please select a Workflow Data Source above to start building your chart.</p>
+        <p className="text-xs text-muted-foreground">Please add a Data Source in the Data tab first.</p>
       </div>
     );
   }
@@ -124,8 +124,7 @@ export const ChartBuilder = ({ widgetEditorForm, workflowContext, workflows }) =
         <VariablePathPicker
           value={builderSpec.data?.source || ''}
           onChange={(val) => handleSpecChange('data.source', typeof val === 'string' ? val : val.variablePath)}
-          workflow={selectedWorkflow}
-          placeholder="e.g., {{ctx.queryResult.rows}}"
+          placeholder="e.g., {{get_drivers}}"
           showTransforms={true}
         />
         {availableFields.length > 0 && (

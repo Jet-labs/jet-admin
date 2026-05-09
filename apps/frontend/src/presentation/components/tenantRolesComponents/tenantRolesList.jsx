@@ -2,22 +2,23 @@ import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { useRoleManagementState } from "../../../logic/contexts/roleManagementContext";
+import { useTenantRoles } from "../../../logic/hooks/useTenantRoles";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { Badge } from "@jet-admin/ui";
 import { DATAGRID_SX } from "../../../shared/dataGridTheme";
 
 export const TenantRolesList = () => {
+  const { tenantID } = useParams();
   const {
     tenantRoles,
     tenantRolesError,
     isLoadingTenantRoles,
     isFetchingTenantRoles,
-  } = useRoleManagementState();
+  } = useTenantRoles(tenantID);
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
-  const { tenantID } = useParams();
+
 
   const columns = [
     {
@@ -62,7 +63,7 @@ export const TenantRolesList = () => {
       error={tenantRolesError}
     >
       {tenantRoles?.roles?.length ? (
-        <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+        <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
           <DataGrid
             apiRef={apiRef}
             rows={tenantRoles.roles}

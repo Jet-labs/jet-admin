@@ -45,11 +45,11 @@ export const QueryResponseTableTab = ({
       className={`!flex !flex-col !justify-start !items-stretch ${className}`}
     >
       {!dataSchema ? (
-        <div className="!h-32 flex flex-col justify-center items-center w-full text-slate-500">
+        <div className="!h-32 flex flex-col justify-center items-center w-full text-[#1c1c1e]">
           <span>Data schema not valid or no data available</span>
         </div>
       ) : !columns ? (
-        <div className="!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500">
+        <div className="!h-32 flex !flex-col !justify-center !items-center w-full text-[#1c1c1e]">
           <span>Columns cannot be extracted or mapped</span>
         </div>
       ) : data && Array.isArray(data) && data.length && columns ? (
@@ -110,7 +110,7 @@ export const QueryResponseTableTab = ({
           }}
         />
       ) : (
-        <div className="!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500">
+        <div className="!h-32 flex !flex-col !justify-center !items-center w-full text-[#1c1c1e]">
           <span>No data</span>
         </div>
       )}

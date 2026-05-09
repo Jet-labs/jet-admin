@@ -31,8 +31,8 @@ export const TenantStats = ({ tenants }) => {
 
   return (
     <div className="w-full h-full">
-      <div className="flex justify-between items-center w-full p-3 border-b border-slate-200 ">
-        <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+      <div className="flex justify-between items-center w-full p-3 border-b border-brand-border ">
+        <h1 className="text-xl font-bold leading-tight tracking-tight text-brand-text-primary md:text-2xl ">
           {CONSTANTS.STRINGS.TENANTS_STATS_TITLE}
         </h1>
         <Button
@@ -48,23 +48,23 @@ export const TenantStats = ({ tenants }) => {
         {tenants.map((tenant) => (
           <div
             key={tenant.tenantID}
-            className="bg-card rounded border border-border p-3 cursor-pointer hover:border-primary "
+            className="bg-card rounded-sm border border-border p-3 cursor-pointer hover:border-primary "
             onClick={() => handleTenantClick(tenant.tenantID)}
           >
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center">
-                <div className="flex-shrink-0 w-8 h-8 rounded border border-slate-300 bg-slate-100 flex justify-center items-center">
+                <div className="flex-shrink-0 w-8 h-8 rounded-sm border border-brand-border bg-brand-border-dark flex justify-center items-center">
                   {tenant.tenantLogoURL ? (
                     <TenantLogo
                       src={tenant.tenantLogoURL}
                       alt="Tenant Logo"
-                      className="w-full h-full rounded"
+                      className="w-full h-full rounded-sm"
                     />
                   ) : (
-                    <FaStoreAlt className="w-5 h-5 text-slate-500" />
+                    <FaStoreAlt className="w-5 h-5 text-brand-text-primary" />
                   )}
                 </div>
-                <h2 className="text-base font-semibold text-slate-700 ml-2 hover:text-primary">
+                <h2 className="text-base font-semibold text-brand-text-primary ml-2 hover:text-primary">
                   {tenant.tenantTitle}
                 </h2>
               </div>
@@ -76,13 +76,13 @@ export const TenantStats = ({ tenants }) => {
                   );
                 }}
                 variant="ghost" size="sm"
-                square className="text-gray-500 hover:text-primary"
+                square className="text-brand-light-gray hover:text-primary"
               >
                 <FaCog />
               </Button>
             </div>
 
-            <div className="flex justify-between text-xs text-gray-500">
+            <div className="flex justify-between text-xs text-brand-light-gray">
               <span>
                 Created:{" "}
                 {moment(tenant.createdAt).format("MMM Do YY").toLocaleString()}

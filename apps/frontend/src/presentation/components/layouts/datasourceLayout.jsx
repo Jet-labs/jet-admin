@@ -9,12 +9,11 @@ import {
   ResizablePanelGroup,
 } from "../ui/resizable";
 import { DatasourceDrawerList } from "../drawerList/datasourceDrawerList";
-import { DatasourcesContextProvider } from "../../../logic/contexts/datasourceContext";
+
 
 export const DatasourceLayout = () => {
   return (
-    <DatasourcesContextProvider>
-      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={
@@ -26,11 +25,10 @@ export const DatasourceLayout = () => {
             <DatasourceDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
             <Outlet />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-    </DatasourcesContextProvider>
   );
 };

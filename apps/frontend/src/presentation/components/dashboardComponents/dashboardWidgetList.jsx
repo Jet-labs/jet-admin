@@ -5,7 +5,7 @@ import { FiExternalLink } from "react-icons/fi";
 import { GoGrabber } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { useDashboardsState } from "../../../logic/contexts/dashboardsContext";
+import { useWidgets } from "../../../logic/hooks/useWidgets";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { Button } from "@jet-admin/ui";
@@ -15,7 +15,8 @@ export const DashboardWidgetList = ({ tenantID }) => {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
       .isRequired,
   };
-  const { isLoadingWidgets, loadWidgetsError, widgets } = useDashboardsState();
+
+  const { isLoadingWidgets, loadWidgetsError, widgets } = useWidgets(tenantID);
 
   const _handleDragStart = (e, id) => {
     // Set the data transfer with the widget ID

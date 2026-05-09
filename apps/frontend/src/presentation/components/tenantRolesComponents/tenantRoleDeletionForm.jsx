@@ -4,7 +4,7 @@ import { CONSTANTS } from "../../../constants";
 import {
     deleteTenantRoleByIDAPI
 } from "../../../data/apis/tenantRole";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";

@@ -30,20 +30,20 @@ const ResizableHandle = ({ withHandle, className, ...props }) => {
 
   return (
     <ResizablePrimitive.PanelResizeHandle
-      className={`group relative flex w-px items-center justify-center bg-slate-200 transition-all duration-200 ease-in-out 
-        hover:bg-primary 
+      className={`group relative flex w-px items-center justify-center bg-brand-border transition-all duration-200 ease-in-out 
+        hover:bg-brand-green 
         data-[panel-group-direction=vertical]:h-px 
         data-[panel-group-direction=vertical]:w-full 
         data-[panel-group-direction=vertical]:hover:h-0.5 
-        data-[panel-group-direction=vertical]:hover:bg-primary 
+        data-[panel-group-direction=vertical]:hover:bg-brand-green 
         hover:w-0.5
-        focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 
+        focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-green-border focus-visible:ring-offset-1 
         ${className}`}
       {...props}
     >
       {withHandle && (
-        <div className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border border-slate-200">
-          <GoGrabber className="!text-lg bg-slate-100 text-slate-800" />
+        <div className="z-10 flex h-4 w-3 items-center justify-center rounded-sm bg-brand-dark border border-brand-border">
+          <GoGrabber className="!text-lg text-brand-text-muted" />
         </div>
       )}
     </ResizablePrimitive.PanelResizeHandle>

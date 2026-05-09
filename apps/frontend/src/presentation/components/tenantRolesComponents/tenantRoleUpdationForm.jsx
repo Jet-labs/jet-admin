@@ -16,7 +16,7 @@ import { Button, Spinner, Input, Label } from "@jet-admin/ui";
 
 function Section({ title, description, children }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+    <div className="rounded-md border border-border bg-card p-4 space-y-3">
       {(title || description) && (
         <div className="mb-2">
           {title && (
@@ -120,14 +120,14 @@ export const TenantRoleUpdationForm = () => {
   );
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-brand-dark">
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenantRoleByID}
         error={loadTenantRoleByIDError}
       >
         {tenantRole && (
           <>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background px-4 py-3 shrink-0">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3 shrink-0">
               <div>
                 <h1 className="text-base font-semibold tracking-tight text-foreground">
                   {CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_TITLE}
@@ -146,7 +146,6 @@ export const TenantRoleUpdationForm = () => {
                 </Button>
                 <Button
                   type="submit"
-                  size="sm"
                   form="update-role-form"
                   disabled={isUpdatingTenantRoleByID}
                 >
@@ -156,7 +155,7 @@ export const TenantRoleUpdationForm = () => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 md:p-8">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6">
               <section className="mx-auto max-w-2xl w-full">
                 <form
                   id="update-role-form"

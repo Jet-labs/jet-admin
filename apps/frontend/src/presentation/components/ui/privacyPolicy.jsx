@@ -18,7 +18,7 @@ const PrivacyPolicy = () => {
       <div key={id} className="mb-4">
         <Button
           onClick={() => toggleSection(id)}
-          className="flex justify-between items-center w-full text-left font-semibold text-lg bg-slate-100 p-2 rounded"
+          className="flex justify-between items-center w-full text-left font-semibold text-lg bg-brand-border-dark p-2 rounded-sm"
         >
           {title}
           {/* {isExpanded ? <FaChevronUp size={20} /> : <FaChevronDown size={20} />} */}

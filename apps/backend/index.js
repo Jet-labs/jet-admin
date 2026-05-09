@@ -1,4 +1,10 @@
 require("ignore-styles");
+
+// Patch BigInt JSON serialization globally
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 const environment = require("./environment");
 const cookieParser = require("cookie-parser");
 const constants = require("./constants");
@@ -9,9 +15,7 @@ const { cronJobService } = require("./modules/cronJob/cronJob.service");
 const { socketIO } = require("./config/socket.io");
 const { isModuleEnabled } = require("./config/module.config");
 const { widgetSocketController } = require("./modules/widget/widget.socket.controller");
-const {
-  aiSocketController,
-} = require("./modules/ai/socket/ai.socket.controller");
+const { listenerConnectionManager } = require("./modules/listener/listenerEngine/connectionManager");
 // Middleware setup
 expressApp.use(cookieParser());
 const path = require('path');
@@ -46,10 +50,6 @@ if (isModuleEnabled(constants.MODULES.TENANT)) {
   );
 }
 
-expressApp.use(
-  "/api/v1/webhooks",
-  require("./modules/webhook/webhook.receiver.routes")
-);
 
 // if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
 //   Logger.log("success", { message: "workflow module enabled" });
@@ -88,18 +88,6 @@ expressApp.all("*", (req, res) => {
 
 socketIO.on("connection", async (socket) => {
   const { firebase_id, token } = socket.handshake.auth;
-
-  socket.on(
-    constants.SOCKET_RECEIVE_EVENTS.AI_CHAT_USER_MESSAGE,
-    async (data) => {
-      await aiSocketController.onUserMessageReceived({
-        socket,
-        message: data.message,
-        chatRoomID: data.chatRoomID,
-        firebaseID: firebase_id,
-      });
-    }
-  );
 
   socket.on(
     constants.SOCKET_RECEIVE_EVENTS.WORKFLOW_RUN_JOIN,
@@ -173,83 +161,6 @@ socketIO.on("connection", async (socket) => {
     }
   );
 
-  // ============================================================
-  // Agent Socket Handlers
-  // ============================================================
-  socket.on(
-    constants.SOCKET_RECEIVE_EVENTS.AGENT_USER_MESSAGE,
-    async (data) => {
-      await aiSocketController.onAgentUserMessage({
-        socket,
-        chatRoomID: data.chatRoomID,
-        tenantID: data.tenantID,
-        userID: data.userID,
-        message: data.message,
-      });
-    }
-  );
-
-  socket.on(
-    constants.SOCKET_RECEIVE_EVENTS.AGENT_DATASOURCE_APPROVAL,
-    async (data) => {
-      await aiSocketController.onAgentDatasourceApproval({
-        socket,
-        chatRoomID: data.chatRoomID,
-        tenantID: data.tenantID,
-        userID: data.userID,
-        approvedIDs: data.approvedIDs,
-      });
-    }
-  );
-
-  socket.on(
-    constants.SOCKET_RECEIVE_EVENTS.AGENT_QUERY_APPROVAL,
-    async (data) => {
-      await aiSocketController.onAgentQueryApproval({
-        socket,
-        chatRoomID: data.chatRoomID,
-        tenantID: data.tenantID,
-        userID: data.userID,
-      });
-    }
-  );
-
-  socket.on(
-    constants.SOCKET_RECEIVE_EVENTS.AGENT_PROMOTE_TO_WIDGET,
-    async (data) => {
-      await aiSocketController.onAgentPromoteToWidget({
-        socket,
-        chatRoomID: data.chatRoomID,
-        tenantID: data.tenantID,
-        userID: data.userID,
-        widgetTitle: data.widgetTitle,
-      });
-    }
-  );
-
-  socket.on(
-    constants.SOCKET_RECEIVE_EVENTS.AGENT_FOLLOW_UP,
-    async (data) => {
-      await aiSocketController.onAgentFollowUp({
-        socket,
-        chatRoomID: data.chatRoomID,
-        tenantID: data.tenantID,
-        userID: data.userID,
-        message: data.message,
-      });
-    }
-  );
-
-  socket.on(
-    constants.SOCKET_RECEIVE_EVENTS.AGENT_CANCEL,
-    async (data) => {
-      await aiSocketController.onAgentCancel({
-        socket,
-        chatRoomID: data.chatRoomID,
-      });
-    }
-  );
-
   Logger.log("success", {
     message: "user connected to socket",
     params: { firebase_id },
@@ -261,6 +172,13 @@ socketIO.on("connection", async (socket) => {
       socket,
       firebaseID: firebase_id,
     });
+
+    try {
+
+      listenerConnectionManager.clearTestScriptsForSession(socket.id);
+    } catch (e) {
+      // Ignore errors during disconnect cleanup
+    }
 
     Logger.log("info", {
       message: "socket connection disconnected",

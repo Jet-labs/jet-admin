@@ -3,17 +3,20 @@
  * 
  * Manages the connection between widgets and workflows:
  * - Tracks widget subscriptions to workflow instances
- * - Streams processed, chart-ready data to connected widgets in real-time
+ * - Streams raw workflow context to connected widgets in real-time
  * - Handles bidirectional communication
+ *
+ * NOTE: This bridge is intentionally UI-agnostic. It does NOT resolve
+ * templates or process widget configs. All template resolution and
+ * data transformation happens on the frontend (evaluationEngine +
+ * widgets-logic builders).
  */
 const Logger = require("../../utils/logger");
 const { socketIO } = require("../../config/socket.io");
-const { processWorkflowDataForWidget } = require('@jet-admin/widgets-logic');
-const { resolveTemplate } = require("../../utils/templateEngine/resolver");
 
 // In-memory store for widget-workflow connections
 // In production, consider Redis for horizontal scaling
-const widgetConnections = new Map(); // Map<widgetID, { instanceID, socketId, status, widgetConfig, ... }>
+const widgetConnections = new Map(); // Map<widgetID, { instanceID, socketId, status, ... }>
 const instanceWidgets = new Map();   // Map<instanceID, Set<widgetID>>
 
 /**
@@ -35,21 +38,16 @@ const widgetWorkflowBridge = {
         widgetID, 
         instanceID, 
         socketId: socket.id, 
-        hasWidgetType: !!metadata.widgetType,
         metadata,
       },
     });
 
-    // Store widget connection with generic configuration for data processing
-    // widgetConfig is an opaque blob — only widgets-logic knows its internals
+    // Store widget connection for tracking only (no UI config needed)
     widgetConnections.set(widgetID, {
       instanceID,
       socketId: socket.id,
       status: 'connected',
       connectedAt: new Date().toISOString(),
-      widgetType: metadata.widgetType,
-      widgetConfig: metadata.widgetConfig,
-      workflowConfig: metadata.workflowConfig,
       ...metadata,
     });
 
@@ -77,21 +75,7 @@ const widgetWorkflowBridge = {
     return true;
   },
 
-  /**
-   * Update widget configuration
-   * @param {string} widgetID - Widget ID
-   * @param {object} config - New configuration { widgetType, widgetConfig, workflowConfig }
-   */
-  updateWidgetConfig(widgetID, config) {
-    const connection = widgetConnections.get(widgetID);
-    if (!connection) return false;
 
-    if (config.widgetType) connection.widgetType = config.widgetType;
-    if (config.widgetConfig) connection.widgetConfig = config.widgetConfig;
-    if (config.workflowConfig) connection.workflowConfig = config.workflowConfig;
-
-    return true;
-  },
 
   /**
    * Unregister a widget's connection
@@ -158,62 +142,12 @@ const widgetWorkflowBridge = {
     return widgetConnections.get(widgetID) || null;
   },
 
-  /**
-   * Process context data for a widget based on its configuration.
-   * 
-   * Widget-type-agnostic pipeline:
-   * 1. Resolve all {{ctx.*}} templates in widgetConfig using backend template engine
-   * 2. Delegate to widgets-logic processWorkflowDataForWidget (which extracts type-specific fields)
-   * 3. Return complete, renderable processedData
-   * 
-   * @param {object} context - Raw workflow context
-   * @param {object} config - Generic widget configuration { widgetType, widgetConfig, workflowConfig }
-   * @returns {object} Processed data ready for rendering, or null
-   */
-  processContextForWidget(context, config) {
-    const { widgetType, widgetConfig, workflowConfig } = config;
-    Logger.log('info', {
-      message: 'widgetWorkflowBridge:processContextForWidget',
-      params: { widgetType, hasWidgetConfig: !!widgetConfig, hasWorkflowConfig: !!workflowConfig },
-    });
 
-    if (!widgetConfig) {
-      Logger.log('info', {
-        message: 'widgetWorkflowBridge:processContextForWidget:noWidgetConfig',
-        params: { widgetType },
-      });
-      return null;
-    }
-
-    try {
-      // Step 1: Resolve all {{ctx.*}} templates in widgetConfig using the backend template engine
-      // This is a deep resolve — handles nested objects, arrays, strings
-      const resolvedWidgetConfig = resolveTemplate(widgetConfig, { ctx: context }, {
-        preserveSingleExpressionType: true,
-      });
-      Logger.log('info', {
-        message: 'widgetWorkflowBridge:processContextForWidget:resolvedWidgetConfig',
-        params: { widgetType, resolvedWidgetConfig },
-      });
-
-      // Step 2: Delegate to widgets-logic (sole owner of widget-type-specific logic)
-      return processWorkflowDataForWidget({
-        widgetType: widgetType || 'vega-lite',
-        widgetConfig: resolvedWidgetConfig,
-      });
-    } catch (error) {
-      Logger.log('error', {
-        message: 'widgetWorkflowBridge:processContextForWidget:error',
-        params: { error: error.message, widgetType },
-      });
-      return null;
-    }
-  },
 
   /**
-   * Emit context update to all widgets subscribed to an instance
-   * Called by orchestrator when context changes
-   * NOW PROCESSES DATA in real-time for each widget
+   * Emit context update to all widgets subscribed to an instance.
+   * Called by orchestrator when context changes.
+   * Sends raw context only — frontend handles all resolution.
    * @param {string} instanceID - Workflow instance ID
    * @param {object} update - Context update payload
    */
@@ -233,37 +167,11 @@ const widgetWorkflowBridge = {
       params: { instanceID, widgetCount: widgets.length, updateType: update.type },
     });
 
-    const contextSnapshot = update.contextSnapshot;
-    Logger.log('info', {
-      message: 'widgetWorkflowBridge:emitContextUpdate:contextSnapshot',
-      params: { instanceID, hasContextSnapshot: !!contextSnapshot },
-    });
-
     for (const widgetID of widgets) {
-      const connection = widgetConnections.get(widgetID);
-      Logger.log('info', {
-        message: 'widgetWorkflowBridge:emitContextUpdate:widget',
-        params: { widgetID, connection },
-      });
-      
-      // Process context for this widget using generic config
-      let processedData = null;
-      if (connection && contextSnapshot) {
-        processedData = this.processContextForWidget(contextSnapshot, {
-          widgetType: connection.widgetType,
-          widgetConfig: connection.widgetConfig,
-          workflowConfig: connection.workflowConfig,
-        });
-      }
-
       socketIO.to(`widget:${widgetID}`).emit('widget_context_update', {
         widgetID,
         instanceID,
-        update: {
-          ...update,
-          // Include processed, chart-ready data if available
-          processedData,
-        },
+        update,
         timestamp: new Date().toISOString(),
       });
     }
@@ -286,25 +194,11 @@ const widgetWorkflowBridge = {
     });
 
     for (const widgetID of widgets) {
-      const connection = widgetConnections.get(widgetID);
-      
-      // Process final context for this widget using generic config
-      let processedData = null;
-      if (connection && finalContext) {
-        processedData = this.processContextForWidget(finalContext, {
-          widgetType: connection.widgetType,
-          widgetConfig: connection.widgetConfig,
-          workflowConfig: connection.workflowConfig,
-        });
-      }
-
       socketIO.to(`widget:${widgetID}`).emit('widget_workflow_status', {
         widgetID,
         instanceID,
         status,
         finalContext,
-        // Include processed, chart-ready data
-        processedData,
         timestamp: new Date().toISOString(),
       });
     }
@@ -341,8 +235,6 @@ const widgetWorkflowBridge = {
         instanceID: conn.instanceID,
         status: conn.status,
         connectedAt: conn.connectedAt,
-        widgetType: conn.widgetType,
-        hasWidgetConfig: !!conn.widgetConfig,
       })),
     };
   },

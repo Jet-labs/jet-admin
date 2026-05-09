@@ -52,7 +52,7 @@ export const WidgetCustomCSSForm = ({ tenantID, widgetID, }) => {
         variant="ghost"
         size="sm"
         onClick={_handleOpen}
-        className="text-xs bg-slate-100 text-primary hover:bg-slate-50 hover:text-primary"
+        className="text-xs bg-brand-border-dark text-primary hover:bg-brand-black hover:text-primary"
       >
         <PiFileCssFill className="text-base mr-1" />
         {CONSTANTS.STRINGS.DASHBOARD_WIDGET_CUSTOM_CSS_BUTTON}

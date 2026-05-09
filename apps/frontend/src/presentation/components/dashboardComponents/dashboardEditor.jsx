@@ -9,7 +9,7 @@ export const DashboardEditor = ({ dashboardEditorForm }) => {
     dashboardEditorForm: PropTypes.object.isRequired,
   };
   return (
-    <div className="w-full space-y-3 p-3">
+    <div className="w-full space-y-3 p-4">
       <div className="space-y-1.5">
         <Label htmlFor="dashboardTitle">
           {CONSTANTS.STRINGS.DASHBOARD_EDITOR_FORM_NAME_FIELD_LABEL}

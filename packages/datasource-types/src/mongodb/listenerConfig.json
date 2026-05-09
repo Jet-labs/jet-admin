@@ -1,0 +1,39 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "collection": {
+        "type": "string",
+        "description": "Collection name to listen to (leave empty to listen to entire database)"
+      },
+      "operationTypes": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["insert", "update", "replace", "delete", "invalidate", "drop", "dropDatabase", "rename"]
+        },
+        "description": "Filter by operation types (leave empty to receive all)",
+        "uniqueItems": true
+      }
+    }
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/collection",
+        "label": "Collection Name"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/operationTypes",
+        "label": "Operation Types"
+      }
+    ]
+  },
+  "data": {
+    "collection": "",
+    "operationTypes": []
+  }
+}

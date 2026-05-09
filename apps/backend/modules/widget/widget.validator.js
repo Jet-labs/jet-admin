@@ -12,20 +12,29 @@ const createWidgetSchema = z.object({
   widgetTitle: z.string().min(1, "widgetTitle is required").max(255),
   widgetDescription: z.string().optional(),
   widgetType: z.string().min(1, "widgetType is required"),
-  widgetConfig: z.object({}).passthrough(),
+  widgetConfig: z.object({
+    properties: z.object({}).passthrough().optional(),
+    events: z.object({}).passthrough().optional(),
+  }).passthrough(),
 }).passthrough();
 
 const updateWidgetSchema = z.object({
   widgetTitle: z.string().min(1).max(255).optional(),
   widgetDescription: z.string().optional(),
   widgetType: z.string().min(1).optional(),
-  widgetConfig: z.object({}).passthrough().optional(),
+  widgetConfig: z.object({
+    properties: z.object({}).passthrough().optional(),
+    events: z.object({}).passthrough().optional(),
+  }).passthrough().optional(),
 }).passthrough();
 
 const testWidgetDataSchema = z.object({
   widgetTitle: z.string().optional(),
   widgetType: z.string().optional(),
-  widgetConfig: z.object({}).passthrough().optional(),
+  widgetConfig: z.object({
+    properties: z.object({}).passthrough().optional(),
+    events: z.object({}).passthrough().optional(),
+  }).passthrough().optional(),
 }).passthrough();
 
 // ============================================================

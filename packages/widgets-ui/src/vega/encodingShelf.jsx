@@ -106,7 +106,7 @@ export const EncodingShelf = ({
   const isEmpty = !value || !value.field;
 
   const shelfClass = [
-    'flex items-center w-full min-h-[36px] bg-white border border-border rounded-md p-1 gap-2 transition-colors',
+    'flex items-center w-full min-h-[36px] bg-brand-dark border border-border rounded-md p-1 gap-2 transition-colors',
     isEmpty ? 'border-dashed border-border bg-muted/30' : '',
     isDragOver ? 'border-primary bg-primary/5 shadow-inner' : '',
     className,
@@ -172,8 +172,7 @@ export const EncodingShelf = ({
             <Button
               type="button"
               variant="ghost"
-                size="sm"
-                square
+              size="icon"
               onClick={handleSortToggle}
               className="ml-auto h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/5 text-xs"
               title={`Sort: ${value.sort || 'default'}`}

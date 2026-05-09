@@ -18,7 +18,7 @@ export const Breadcrumbs = () => {
     return (
       <div key={index} className="flex items-center">
         {isLast ? (
-          <span className="text-xs font-medium text-gray-700">{segment}</span>
+          <span className="text-xs font-medium text-brand-light-gray">{segment}</span>
         ) : (
           <>
             <Link
@@ -35,7 +35,7 @@ export const Breadcrumbs = () => {
   });
 
   return (
-    <div className="flex items-center bg-slate-100 p-1 rounded  mx-3">
+    <div className="flex items-center bg-brand-border-dark p-1 rounded-sm  mx-3">
       <a
         href="/"
         className="text-xs text-primary/80 hover:text-primary transition duration-150"

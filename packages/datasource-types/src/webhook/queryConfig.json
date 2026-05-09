@@ -1,0 +1,26 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["list_recent", "get_event", "test_endpoint"],
+        "description": "Query operation"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Max events to return",
+        "default": 50
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/operation", "label": "Operation" },
+      { "type": "Control", "scope": "#/properties/limit", "label": "Limit" }
+    ]
+  },
+  "data": { "operation": "list_recent", "limit": 50 }
+}

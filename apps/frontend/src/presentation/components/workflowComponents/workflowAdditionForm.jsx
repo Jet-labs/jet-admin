@@ -58,8 +58,8 @@ export const WorkflowAdditionForm = ({ tenantID }) => {
 
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-background">
-      <div className="w-full p-3 border-b border-border flex flex-row justify-between items-center bg-background">
+    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
+      <div className="w-full px-4 py-3 border-b border-border flex flex-row justify-between items-center bg-brand-dark">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground text-start">
           {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_TITLE}
         </h1>

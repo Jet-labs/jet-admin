@@ -200,4 +200,98 @@ export default class MongoDBDataSource extends DataSource {
     const count = await col.countDocuments(this.parseJSON(filter));
     return { count };
   }
+
+  async subscribe(config, onEvent) {
+    const datasourceOptions = this.config.datasourceOptions || {};
+    let connectionString;
+    let dbName;
+
+    if (datasourceOptions.connectionString) {
+      connectionString = datasourceOptions.connectionString;
+      const urlMatch = connectionString.match(/\/([^/?]+)(\?|$)/);
+      dbName = urlMatch ? urlMatch[1] : "test";
+    } else {
+      const details = datasourceOptions.connectionDetails || datasourceOptions;
+      const { host, port, database, username, password, authSource, ssl, replicaSet } = details;
+      
+      dbName = database || datasourceOptions.database;
+      
+      let authPart = "";
+      if (username && password) {
+        authPart = `${encodeURIComponent(username)}:${encodeURIComponent(password)}@`;
+      }
+      
+      const params = new URLSearchParams();
+      if (authSource) params.append("authSource", authSource);
+      if (ssl) params.append("ssl", "true");
+      if (replicaSet) params.append("replicaSet", replicaSet);
+      
+      const queryString = params.toString() ? `?${params.toString()}` : "";
+      connectionString = `mongodb://${authPart}${host || "localhost"}:${port || 27017}/${dbName}${queryString}`;
+    }
+
+    const collectionName = config.collection;
+    const operationTypes = config.operationTypes || [];
+
+    Logger.log("info", {
+      message: "mongodb:subscribe:start",
+      params: { collectionName, operationTypes, datasourceID: this.config.datasourceID },
+    });
+
+    const client = new MongoClient(connectionString);
+    await client.connect();
+
+    const db = client.db(dbName);
+    const target = collectionName ? db.collection(collectionName) : db;
+    
+    let pipeline = [];
+    if (operationTypes.length > 0) {
+      pipeline.push({ $match: { operationType: { $in: operationTypes } } });
+    }
+
+    const changeStream = target.watch(pipeline);
+    
+    changeStream.on("change", (next) => {
+      onEvent({
+        operationType: next.operationType,
+        collection: next.ns?.coll,
+        documentKey: next.documentKey,
+        fullDocument: next.fullDocument,
+        updateDescription: next.updateDescription,
+        payload: next
+      });
+    });
+
+    changeStream.on("error", (error) => {
+      Logger.log("error", {
+        message: "mongodb:subscribe:changeStreamError",
+        params: { error: error.message }
+      });
+    });
+
+    return { client, changeStream };
+  }
+
+  async unsubscribe(handle) {
+    if (!handle) return;
+    
+    Logger.log("info", {
+      message: "mongodb:unsubscribe",
+      params: { datasourceID: this.config.datasourceID },
+    });
+
+    try {
+      if (handle.changeStream) {
+        await handle.changeStream.close();
+      }
+      if (handle.client) {
+        await handle.client.close();
+      }
+    } catch (e) {
+      Logger.log("error", {
+        message: "mongodb:unsubscribe:error",
+        params: { error: e.message },
+      });
+    }
+  }
 }

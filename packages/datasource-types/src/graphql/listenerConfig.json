@@ -1,0 +1,41 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "subscription": {
+        "type": "string",
+        "description": "GraphQL Subscription Query"
+      },
+      "variables": {
+        "type": "string",
+        "description": "Variables as JSON object (optional)"
+      }
+    },
+    "required": ["subscription"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/subscription",
+        "label": "Subscription Query",
+        "options": {
+          "multi": true
+        }
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/variables",
+        "label": "Variables (JSON)",
+        "options": {
+          "multi": true
+        }
+      }
+    ]
+  },
+  "data": {
+    "subscription": "",
+    "variables": "{}"
+  }
+}

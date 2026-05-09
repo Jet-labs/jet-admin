@@ -38,19 +38,6 @@ router.post(
   widgetController.cloneWidgetByID
 );
 
-router.get(
-  "/:widgetID/data",
-  validate(widgetIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:widget:test"]),
-  widgetController.getWidgetDataByID
-);
-
-router.post(
-  "/data",
-  authMiddleware.checkUserPermissions(["tenant:widget:test"]),
-  widgetController.getWidgetDataUsingWidget
-);
-
 router.patch(
   "/:widgetID",
   validateAll({

@@ -1,186 +1,120 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 210 40% 17%;
-    --card: 0 0% 100%;
-    --card-foreground: 210 40% 17%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 40% 17%;
-    --primary: 239 84% 67%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 210 40% 17%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 210 40% 17%;
+    --background: 0 0% 9%;
+    --foreground: 0 0% 98%;
+    
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 153 61% 53%;
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 98%;
+    
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 54%;
+    
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 98%;
+    
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 239 84% 67%;
-    --radius: 0.5rem;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 0 0% 18%;
+    --input: 0 0% 21%;
+    --ring: 153 61% 53%;
+    
+    --radius: 6px;
+    
+    /* Custom brand properties */
+    --brand-green: #3ecf8e;
+    --brand-green-link: #00c573;
+    --brand-green-border: rgba(62, 207, 142, 0.3);
+    
+    --brand-black: #0f0f0f;
+    --brand-dark: #171717;
+    --brand-border-dark: #242424;
+    --brand-border: #2e2e2e;
+    --brand-border-mid: #363636;
+    --brand-border-light: #393939;
+    
+    --brand-text-dark: #4d4d4d;
+    --brand-text-muted: #898989;
+    --brand-text-secondary: #b4b4b4;
+    --brand-text-primary: #fafafa;
+    
+    --shadow-whisper: none;
+    --shadow-card: none;
+    --shadow-deep: none;
   }
 }
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
 
-  color-scheme: light;
-    color: hsl(var(--foreground));
-    background-color: hsl(var(--background));
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-  input:-webkit-autofill,
-  input:-webkit-autofill:focus {
-    transition: background-color 0s 600000s, color 0s 600000s !important;
+@layer base {
+  * {
+    border-color: var(--brand-border);
   }
 
-a {
-  font-weight: 500;
-  color: hsl(var(--primary));
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-.poppins-thin {
-  font-family: "Poppins", sans-serif;
-  font-weight: 100;
-  font-style: normal;
-}
-
-.poppins-extralight {
-  font-family: "Poppins", sans-serif;
-  font-weight: 200;
-  font-style: normal;
-}
-
-.poppins-light {
-  font-family: "Poppins", sans-serif;
-  font-weight: 300;
-  font-style: normal;
-}
-
-.poppins-regular {
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.poppins-medium {
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-  font-style: normal;
-}
-
-.poppins-semibold {
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-  font-style: normal;
-}
-
-.poppins-bold {
-  font-family: "Poppins", sans-serif;
-  font-weight: 700;
-  font-style: normal;
-}
-
-.poppins-extrabold {
-  font-family: "Poppins", sans-serif;
-  font-weight: 800;
-  font-style: normal;
-}
-
-.poppins-black {
-  font-family: "Poppins", sans-serif;
-  font-weight: 900;
-  font-style: normal;
-}
-
-.poppins-thin-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 100;
-  font-style: italic;
-}
-
-.poppins-extralight-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 200;
-  font-style: italic;
-}
-
-.poppins-light-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 300;
-  font-style: italic;
-}
-
-.poppins-regular-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
-  font-style: italic;
-}
-
-.poppins-medium-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-  font-style: italic;
-}
-
-.poppins-semibold-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-  font-style: italic;
-}
-
-.poppins-bold-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 700;
-  font-style: italic;
-}
-
-.poppins-extrabold-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 800;
-  font-style: italic;
-}
-
-.poppins-black-italic {
-  font-family: "Poppins", sans-serif;
-  font-weight: 900;
-  font-style: italic;
-}
-
-.aldrich-logo {
-  font-family: "Orbitron", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 800;
-  font-style: normal;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
+  html,
+  body {
+    margin: 0;
+    padding: 0;
     width: 100%;
     height: 100vh;
     overflow: hidden;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  font-family: "Poppins", serif !important;
+    display: flex;
+    place-items: center;
+    min-width: 320px;
+    font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    line-height: 1.5;
+    font-weight: 400;
+    color-scheme: dark;
+    color: var(--brand-text-primary);
+    background-color: var(--brand-dark);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition: background-color 0s 600000s, color 0s 600000s !important;
+}
+
+a {
+  font-weight: 500;
+  color: var(--brand-green-link);
+  text-decoration: none;
+  transition: color 0.15s ease-in-out;
+}
+
+a:hover {
+  color: var(--brand-green);
+}
+
+.link-lime {
+  color: var(--brand-green-link);
+  text-decoration: none;
+}
+.link-lime:hover {
+  color: var(--brand-green);
+}
+
+.link-purple {
+  color: var(--brand-text-primary);
+  text-decoration: none;
+}
+.link-purple:hover {
+  color: var(--brand-text-secondary);
 }
 
 #root {
@@ -191,12 +125,19 @@ body {
   flex-direction: column;
 }
 
-button:focus {outline:0 !important;}
-
-.poppins {
-  font-family: "Poppins", serif !important;
+button:focus {
+  outline: 0 !important;
 }
 
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--brand-green-border);
+}
+
+/* MUI overrides to match Supabase Font */
 .MuiTypography-root,
 .MuiButtonBase-root,
 .MuiDataGrid-root,
@@ -206,12 +147,34 @@ button:focus {outline:0 !important;}
 .MuiFormControlLabel-label,
 .MuiListItemText-primary,
 .MuiListItemText-secondary {
-  font-family: "Poppins", serif !important;
+  font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  color: var(--brand-text-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--brand-text-primary);
+  font-family: "Circular", "Helvetica Neue", Helvetica, sans-serif !important;
+  font-weight: 400;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  line-height: 1.00 !important;
+  letter-spacing: normal;
+}
+
+h2 {
+  line-height: 1.25 !important;
+  letter-spacing: normal;
+}
+
+h3 {
+  line-height: 1.33 !important;
+  letter-spacing: -0.16px;
 }
 
 button {
@@ -221,139 +184,41 @@ button {
 
 .cm-focused {
   outline-style: solid !important;
+  outline-color: var(--brand-border-mid) !important;
 }
-.non-focusable-code-editor{
+.non-focusable-code-editor {
   & .cm-focused {
-  outline: none !important;
-}
+    outline: none !important;
+  }
 }
 
-
-/* width */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #cfcfcf;
+  background: var(--brand-border);
+  border-radius: 3px;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #929292;
+  background: var(--brand-border-light);
 }
 
-.poppins-thin {
-  font-family: "Poppins", serif;
-  font-weight: 100;
-  font-style: normal;
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
-.poppins-extralight {
-  font-family: "Poppins", serif;
-  font-weight: 200;
-  font-style: normal;
-}
-
-.poppins-light {
-  font-family: "Poppins", serif;
-  font-weight: 300;
-  font-style: normal;
-}
-
-.poppins-regular {
-  font-family: "Poppins", serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.poppins-medium {
-  font-family: "Poppins", serif;
-  font-weight: 500;
-  font-style: normal;
-}
-
-.poppins-semibold {
-  font-family: "Poppins", serif;
-  font-weight: 600;
-  font-style: normal;
-}
-
-.poppins-bold {
-  font-family: "Poppins", serif;
-  font-weight: 700;
-  font-style: normal;
-}
-
-.poppins-extrabold {
-  font-family: "Poppins", serif;
-  font-weight: 800;
-  font-style: normal;
-}
-
-.poppins-black {
-  font-family: "Poppins", serif;
-  font-weight: 900;
-  font-style: normal;
-}
-
-.poppins-thin-italic {
-  font-family: "Poppins", serif;
-  font-weight: 100;
-  font-style: italic;
-}
-
-.poppins-extralight-italic {
-  font-family: "Poppins", serif;
-  font-weight: 200;
-  font-style: italic;
-}
-
-.poppins-light-italic {
-  font-family: "Poppins", serif;
-  font-weight: 300;
-  font-style: italic;
-}
-
-.poppins-regular-italic {
-  font-family: "Poppins", serif;
-  font-weight: 400;
-  font-style: italic;
-}
-
-.poppins-medium-italic {
-  font-family: "Poppins", serif;
-  font-weight: 500;
-  font-style: italic;
-}
-
-.poppins-semibold-italic {
-  font-family: "Poppins", serif;
-  font-weight: 600;
-  font-style: italic;
-}
-
-.poppins-bold-italic {
-  font-family: "Poppins", serif;
-  font-weight: 700;
-  font-style: italic;
-}
-
-.poppins-extrabold-italic {
-  font-family: "Poppins", serif;
-  font-weight: 800;
-  font-style: italic;
-}
-
-.poppins-black-italic {
-  font-family: "Poppins", serif;
-  font-weight: 900;
-  font-style: italic;
+/* System-wide labels */
+.label-caps {
+  font-family: "Source Code Pro", "Office Code Pro", Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-size: 12px;
 }

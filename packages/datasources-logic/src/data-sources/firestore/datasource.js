@@ -162,4 +162,76 @@ export default class FirestoreDataSource extends DataSource {
       return value; // Return as string if not valid JSON
     }
   }
+
+  async subscribe(config, onEvent) {
+    const { collection, documentId } = config;
+
+    if (!collection) {
+      throw new Error("Collection is required for Firestore listener");
+    }
+
+    Logger.log("info", {
+      message: "firestore:subscribe:start",
+      params: { collection, documentId, datasourceID: this.config.datasourceID },
+    });
+
+    const db = await this.getFirestoreDb();
+
+    let target;
+    if (documentId) {
+      target = db.collection(collection).doc(documentId);
+    } else {
+      target = db.collection(collection);
+    }
+
+    const unsubscribeFn = target.onSnapshot(
+      (snapshot) => {
+        if (documentId) {
+          // Document snapshot
+          onEvent({
+            collection,
+            documentId,
+            exists: snapshot.exists,
+            payload: snapshot.data() || null,
+          });
+        } else {
+          // Query snapshot (collection)
+          snapshot.docChanges().forEach((change) => {
+            onEvent({
+              collection,
+              documentId: change.doc.id,
+              type: change.type, // 'added', 'modified', 'removed'
+              payload: change.doc.data(),
+            });
+          });
+        }
+      },
+      (error) => {
+        Logger.log("error", {
+          message: "firestore:subscribe:error",
+          params: { error: error.message },
+        });
+      }
+    );
+
+    return { unsubscribeFn };
+  }
+
+  async unsubscribe(handle) {
+    if (!handle || !handle.unsubscribeFn) return;
+
+    Logger.log("info", {
+      message: "firestore:unsubscribe",
+      params: { datasourceID: this.config.datasourceID },
+    });
+
+    try {
+      handle.unsubscribeFn();
+    } catch (e) {
+      Logger.log("error", {
+        message: "firestore:unsubscribe:error",
+        params: { error: e.message },
+      });
+    }
+  }
 }

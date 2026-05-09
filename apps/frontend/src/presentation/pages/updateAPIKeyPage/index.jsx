@@ -4,7 +4,7 @@ import { APIKeyUpdationForm } from "../../components/apiKeyComponents/apiKeyUpda
 const UpdateAPIKeyPage = () => {
   const { tenantID, apiKeyID } = useParams();
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto bg-background">
+    <div className="flex h-full w-full flex-col overflow-y-auto bg-brand-dark">
       <APIKeyUpdationForm tenantID={tenantID} apiKeyID={apiKeyID} />
     </div>
   );

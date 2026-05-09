@@ -1,14 +1,5 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
-const {
-  TenantAwarePostgreSQLPoolManager,
-} = require("../../config/tenant-aware-pgpool-manager.config");
-const jsonSchemaGenerator = require("json-schema-generator");
-const { postgreSQLParserUtil } = require("../../utils/postgresql.util");
-const environmentVariables = require("../../environment");
-const { databaseService } = require("../database/database.service");
-const { aiUtil } = require("../../utils/aiprompt.util");
-const { aiService } = require("../ai/ai.service");
 const { isUUID } = require("validator");
 const { v4: uuid } = require("uuid");
 const dataQueryService = {};
@@ -236,112 +227,6 @@ dataQueryService.createBulkDataQuery = async ({
       },
     });
     throw error;
-  }
-};
-/**
- *
- * @param {object} param0
- * @param {number} param0.userID
- * @param {number} param0.tenantID
- * @param {string} param0.aiPrompt
- * @returns
- */
-dataQueryService.generateAIPromptBasedQuery = async ({
-  userID,
-  tenantID,
-  dbPool,
-  aiPrompt,
-}) => {
-  const entryTime = Date.now();
-  Logger.log("info", {
-    message: "dataQueryService:generateAIPromptBasedQuery:started",
-    params: { userID, tenantID, aiPrompt },
-  });
-
-  // --- Get API Key ---
-  const apiKey = environmentVariables.GEMINI_API_KEY;
-  if (!apiKey) {
-    Logger.log("error", {
-      message: "dataQueryService:generateAIPromptBasedQuery:failure",
-      params: {
-        userID,
-        tenantID,
-        aiPrompt,
-        error: "GEMINI_API_KEY environment variable not set.",
-      },
-    });
-    throw new Error("Server configuration error: Missing Gemini API Key.");
-  }
-
-  const databaseSchemaInfo = await databaseService.getDatabaseSchemaForAI({
-    userID,
-    tenantID,
-    dbPool,
-  });
-
-  Logger.log("info", {
-    message: "dataQueryService:generateAIPromptBasedQuery:schema_loaded",
-    params: {
-      userID,
-      tenantID,
-      aiPrompt,
-      databaseSchemaInfoLength: databaseSchemaInfo?.length,
-    },
-  });
-
-  if (!databaseSchemaInfo) {
-    Logger.log("error", {
-      message: "dataQueryService:generateAIPromptBasedQuery:failure",
-      params: {
-        userID,
-        tenantID,
-        aiPrompt,
-        error: "Database schema information is missing.",
-      },
-    });
-    throw new Error("Database schema information is missing.");
-  }
-
-  const fullPrompt = await aiUtil.generateAIPromptForQueryGeneration({
-    databaseSchemaInfo,
-    aiPrompt,
-  });
-
-  Logger.log("info", {
-    message: "dataQueryService:generateAIPromptBasedQuery:prompt_generated",
-    params: {
-      userID,
-      tenantID,
-      aiPrompt,
-      fullPromptLength: fullPrompt?.length,
-    },
-  });
-
-  try {
-    const dataQuery = await aiService.generateAIPromptBasedQuery({
-      aiPrompt: fullPrompt,
-    });
-
-    Logger.log("success", {
-      message: "dataQueryService:generateAIPromptBasedQuery:success",
-      params: { userID, tenantID, dataQuery },
-    });
-    return dataQuery;
-  } catch (error) {
-    // Log API errors or other failures
-    Logger.log("error", {
-      message: "dataQueryService:generateAIPromptBasedQuery:failure",
-      params: {
-        userID,
-        tenantID,
-        aiPrompt,
-        error,
-      },
-    });
-    // Re-throw the original error or a more user-friendly one
-    throw new Error(
-      `Failed to generate database query using AI: ${error.message}`
-    );
   }
 };
 

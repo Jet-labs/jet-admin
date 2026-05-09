@@ -85,7 +85,7 @@ export const CodeBlock = ({
         {showLineNumbers && (
           <div
             className={`text-xs w-8 text-right pr-2 select-none ${
-              theme === "dark" ? "text-gray-500" : "text-gray-400"
+              theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"
             }`}
           >
             {index + 1}
@@ -96,7 +96,7 @@ export const CodeBlock = ({
             language === "plaintext" ? (
               <pre
                 className={`${
-                  theme === "dark" ? "text-gray-200" : "text-gray-800"
+                  theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"
                 }`}
               >
                 {line || " "}
@@ -111,7 +111,7 @@ export const CodeBlock = ({
           ) : (
             <pre
               className={`${
-                theme === "dark" ? "text-gray-200" : "text-gray-800"
+                theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"
               }`}
             >
               {line || " "}
@@ -158,8 +158,8 @@ export const CodeBlock = ({
     <div
       className={`rounded-md overflow-y-auto border ${
         theme === "dark"
-          ? "border-gray-700 bg-gray-800"
-          : "border-gray-200 bg-white"
+          ? "border-brand-border bg-brand-black"
+          : "border-brand-border bg-brand-black"
       }`}
       style={{
         maxHeight: expanded ? "none" : maxHeight,
@@ -168,17 +168,17 @@ export const CodeBlock = ({
       <div
         className={`flex items-center justify-between px-4 py-2 border-b ${
           theme === "dark"
-            ? "bg-gray-700 border-gray-600"
-            : "bg-gray-50 border-gray-200"
+            ? "bg-brand-black border-brand-border"
+            : "bg-brand-dark border-brand-border"
         }`}
       >
         <div className="flex items-center space-x-2">
           <IoCodeOutline
-            className={theme === "dark" ? "text-gray-300" : "text-gray-500"}
+            className={theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"}
           />
           <span
             className={`text-xs font-medium ml-2 ${
-              theme === "dark" ? "text-gray-300" : "text-gray-500"
+              theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"
             }`}
           >
             {getLanguageDisplay()}
@@ -187,10 +187,10 @@ export const CodeBlock = ({
         <div className="flex space-x-2">
           <Button
             onClick={toggleExpand}
-            className={`text-xs py-1 px-2 rounded flex items-center space-x-1 ${
+            className={`text-xs py-1 px-2 rounded-sm flex items-center space-x-1 ${
               theme === "dark"
-                ? "bg-gray-600 hover:bg-gray-500 text-gray-200"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                ? "bg-brand-black hover:bg-brand-dark0 text-brand-light-gray"
+                : "bg-brand-border-dark hover:bg-brand-black text-brand-light-gray"
             } transition-colors`}
           >
             {expanded ? <FiMinimize size={14} /> : <FiMaximize size={14} />}
@@ -198,10 +198,10 @@ export const CodeBlock = ({
           </Button>
           <Button
             onClick={copyToClipboard}
-            className={`text-xs py-1 px-2 rounded flex items-center space-x-1 ${
+            className={`text-xs py-1 px-2 rounded-sm flex items-center space-x-1 ${
               theme === "dark"
-                ? "bg-gray-600 hover:bg-gray-500 text-gray-200"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                ? "bg-brand-black hover:bg-brand-dark0 text-brand-light-gray"
+                : "bg-brand-border-dark hover:bg-brand-black text-brand-light-gray"
             } transition-colors`}
           >
             {copied ? (
@@ -219,7 +219,7 @@ export const CodeBlock = ({
           wrapText
             ? "whitespace-pre-wrap break-words"
             : "whitespace-pre overflow-x-auto"
-        } ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}
+        } ${theme === "dark" ? "bg-brand-black" : "bg-brand-black"}`}
       >
         {renderCodeWithLineNumbers()}
       </div>

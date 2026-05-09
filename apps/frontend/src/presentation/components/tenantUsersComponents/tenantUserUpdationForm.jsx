@@ -12,7 +12,7 @@ import {
   removeTenantUserFromTenantByIDAPI,
   updateTenantUserRolesByIDAPI,
 } from "../../../data/apis/userManagement";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { TenantRoleSelectionDialog } from "../tenantRolesComponents/tenantRoleSelectionDialog";
@@ -20,7 +20,7 @@ import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapp
 
 function Section({ title, description, children }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+    <div className="rounded-md border border-border bg-card p-4 space-y-3">
       {(title || description) && (
         <div className="mb-2">
           {title && (
@@ -146,7 +146,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
   };
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-brand-dark">
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenantUser}
         error={tenantUserError}
@@ -166,7 +166,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
               }
             />
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background px-4 py-3 shrink-0">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3 shrink-0">
               <div>
                 <h1 className="text-base font-semibold tracking-tight text-foreground">
                   {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_FORM_TITLE}
@@ -195,7 +195,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 md:p-8">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6">
               <section className="mx-auto max-w-2xl w-full space-y-6">
                 <Section 
                   title={CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_PROFILE_TITLE}
@@ -263,7 +263,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
                       <div className="grid gap-3">
                         {tenantUser.roles.map((tenantUserRole) => (
                           <div
-                            className="rounded-lg border border-border bg-background p-3 hover:bg-muted/30 transition-colors"
+                            className="rounded-md border border-border bg-brand-dark p-3 hover:bg-muted/30 transition-colors"
                             key={`user_tenant_select_role_${tenantUserRole.roleID}`}
                           >
                             <div className="flex flex-col gap-1">

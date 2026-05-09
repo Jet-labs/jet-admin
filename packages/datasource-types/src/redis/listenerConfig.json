@@ -1,0 +1,77 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "subscriptionType": {
+        "type": "string",
+        "enum": ["pubsub", "stream"],
+        "default": "pubsub",
+        "description": "Redis subscription type: Pub/Sub channels or Streams"
+      },
+      "channels": {
+        "type": "string",
+        "description": "Comma-separated Pub/Sub channel names"
+      },
+      "stream": {
+        "type": "string",
+        "description": "Redis Stream key"
+      },
+      "consumerGroup": {
+        "type": "string",
+        "description": "Consumer group for Redis Streams"
+      },
+      "consumerName": {
+        "type": "string",
+        "description": "Consumer name within the group",
+        "default": "jet-listener-1"
+      }
+    },
+    "required": ["subscriptionType"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/subscriptionType",
+        "label": "Subscription Type"
+      },
+      {
+        "type": "Group",
+        "label": "Pub/Sub Configuration",
+        "rule": {
+          "effect": "SHOW",
+          "condition": { "scope": "#/properties/subscriptionType", "schema": { "const": "pubsub" } }
+        },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/channels", "label": "Channels (comma-separated)" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Stream Configuration",
+        "rule": {
+          "effect": "SHOW",
+          "condition": { "scope": "#/properties/subscriptionType", "schema": { "const": "stream" } }
+        },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/stream", "label": "Stream Key" },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/consumerGroup", "label": "Consumer Group" },
+              { "type": "Control", "scope": "#/properties/consumerName", "label": "Consumer Name" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "subscriptionType": "pubsub",
+    "channels": "",
+    "stream": "",
+    "consumerGroup": "",
+    "consumerName": "jet-listener-1"
+  }
+}

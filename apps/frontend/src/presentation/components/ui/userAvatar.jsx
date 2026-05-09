@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { CONSTANTS } from "../../../constants";
-import { useAuthState } from "../../../logic/contexts/authContext";
+import { useAuthState } from "../../../logic/hooks/useAuth";
 import React from "react";
 
 export const UserAvatar = () => {
@@ -11,9 +11,9 @@ export const UserAvatar = () => {
     <>
       <Link
         to={CONSTANTS.ROUTES.ACCOUNT.path()}
-        className="relative cursor-pointer inline-flex items-center justify-center w-8 h-8 overflow-hidden bg-slate-100 rounded-full border-2 border-slate-600"
+        className="relative cursor-pointer inline-flex items-center justify-center w-8 h-8 overflow-hidden bg-brand-border-dark rounded-full border-2 border-brand-border"
       >
-        <span className="font-medium text-slate-600 ">
+        <span className="font-medium text-brand-text-primary ">
           {user
             ? String(user.email).charAt(0) + String(user.email).charAt(1)
             : `Us`}

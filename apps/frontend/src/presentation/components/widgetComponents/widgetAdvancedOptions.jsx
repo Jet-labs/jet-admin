@@ -23,7 +23,7 @@ export const WidgetAdvancedOptions = ({ widgetForm, parentWidgetType }) => {
   }
 
   return (
-    <div className="mt-4 border-t pt-4">
+    <div className="mt-4">
       <h3 className="mb-2 text-sm font-semibold text-foreground">
         Advanced Options
       </h3>

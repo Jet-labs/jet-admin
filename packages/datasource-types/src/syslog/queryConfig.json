@@ -1,0 +1,21 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": { "type": "string", "enum": ["query_buffer"], "default": "query_buffer" },
+      "severity": { "type": "string", "enum": ["all", "emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"], "default": "all" },
+      "limit": { "type": "integer", "default": 100 }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "HorizontalLayout", "elements": [
+        { "type": "Control", "scope": "#/properties/severity", "label": "Min Severity" },
+        { "type": "Control", "scope": "#/properties/limit", "label": "Limit" }
+      ]}
+    ]
+  },
+  "data": { "operation": "query_buffer", "severity": "all", "limit": 100 }
+}

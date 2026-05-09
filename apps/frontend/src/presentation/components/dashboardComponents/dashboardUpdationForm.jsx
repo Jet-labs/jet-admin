@@ -7,7 +7,7 @@ import {
   getDashboardByIDAPI,
   updateDashboardByIDAPI,
 } from "../../../data/apis/dashboard";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
@@ -130,8 +130,8 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-background">
-      <div className="flex w-full items-start justify-between gap-3 border-b border-border bg-background p-3">
+    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
+      <div className="flex w-full items-start justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3">
         <div className="flex flex-col items-start gap-1">
           <h1 className="text-lg font-semibold text-foreground">
             {CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_TITLE}
@@ -176,11 +176,11 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
           }
           className="!h-full !w-full"
         >
-          <ResizablePanel defaultSize={20} className="overflow-hidden bg-background">
+          <ResizablePanel defaultSize={20} className="overflow-hidden bg-brand-dark">
             <form
               id="dashboard-updation-form"
               onSubmit={dashboardUpdationForm.handleSubmit}
-              className="flex h-full w-full flex-col overflow-hidden bg-background"
+              className="flex h-full w-full flex-col overflow-hidden bg-brand-dark"
             >
               <DashboardEditor dashboardEditorForm={dashboardUpdationForm} />
               <DashboardWidgetList
@@ -191,7 +191,7 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
             {dashboardUpdationForm && dashboardUpdationForm.values && (
               <DashboardDropzone
                 tenantID={tenantID}

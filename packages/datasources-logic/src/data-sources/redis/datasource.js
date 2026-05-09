@@ -237,4 +237,118 @@ export default class RedisDataSource extends DataSource {
         throw new Error(`Unknown operation: ${operation}`);
     }
   }
+
+  async subscribe(config, onEvent) {
+    const redis = this.getRedisClient();
+    const subType = config.subscriptionType || "pubsub";
+
+    Logger.log("info", {
+      message: "redis:subscribe:start",
+      params: { subType, datasourceID: this.config.datasourceID },
+    });
+
+    if (subType === "pubsub") {
+      const channels = (config.channels || "").split(",").map((c) => c.trim()).filter(Boolean);
+      if (!channels.length) {
+        redis.disconnect();
+        throw new Error("No channels specified for Redis pubsub listener");
+      }
+
+      await redis.subscribe(...channels);
+      
+      redis.on("message", (channel, message) => {
+        let parsed = message;
+        try { parsed = JSON.parse(message); } catch {}
+        onEvent({ channel, payload: parsed });
+      });
+
+      return { type: "pubsub", client: redis };
+      
+    } else if (subType === "stream") {
+      const stream = config.stream;
+      const group = config.consumerGroup;
+      const consumer = config.consumerName || "jet-listener-1";
+      
+      if (!stream || !group) {
+        redis.disconnect();
+        throw new Error("Stream and consumerGroup required for Redis stream listener");
+      }
+
+      // Ensure group exists
+      try {
+        await redis.xgroup("CREATE", stream, group, "$", "MKSTREAM");
+      } catch (e) {
+        if (!e.message.includes("BUSYGROUP")) {
+          redis.disconnect();
+          throw e;
+        }
+      }
+
+      let isRunning = true;
+      const poll = async () => {
+        while (isRunning) {
+          try {
+            // Block for 5 seconds to wait for new messages
+            const result = await redis.xreadgroup(
+              "GROUP", group, consumer, 
+              "BLOCK", 5000, 
+              "COUNT", 10, 
+              "STREAMS", stream, ">"
+            );
+            
+            if (result && result.length > 0) {
+              const messages = result[0][1];
+              for (const [id, fields] of messages) {
+                const data = {};
+                for (let i = 0; i < fields.length; i += 2) {
+                  let val = fields[i + 1];
+                  try { val = JSON.parse(val); } catch {}
+                  data[fields[i]] = val;
+                }
+                
+                // Dispatch event
+                onEvent({ stream, id, payload: data });
+                
+                // Acknowledge the message
+                await redis.xack(stream, group, id);
+              }
+            }
+          } catch (e) {
+            if (isRunning) {
+              Logger.log("error", { 
+                message: "redis:stream:poll:error", 
+                params: { error: e.message }
+              });
+              // Sleep briefly on error before retrying to prevent tight loops
+              await new Promise(r => setTimeout(r, 5000));
+            }
+          }
+        }
+      };
+      
+      // Start background polling without awaiting
+      poll(); 
+
+      return { type: "stream", client: redis, stop: () => { isRunning = false; } };
+    }
+
+    redis.disconnect();
+    throw new Error(`Unknown Redis subscription type: ${subType}`);
+  }
+
+  async unsubscribe(handle) {
+    if (!handle) return;
+    Logger.log("info", {
+      message: "redis:unsubscribe",
+      params: { type: handle.type, datasourceID: this.config.datasourceID },
+    });
+
+    if (handle.type === "pubsub") {
+      await handle.client.unsubscribe();
+      handle.client.disconnect();
+    } else if (handle.type === "stream") {
+      handle.stop();
+      handle.client.disconnect();
+    }
+  }
 }

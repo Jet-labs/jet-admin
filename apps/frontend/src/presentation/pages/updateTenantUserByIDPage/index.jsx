@@ -6,7 +6,7 @@ const UpdateTenantUserByIDPage = () => {
   const { tenantID, tenantUserID } = useParams();
 
   return (
-    <div className="flex h-full w-full flex-col items-center overflow-y-auto bg-background p-4 md:p-8">
+    <div className="flex h-full w-full flex-col items-center overflow-y-auto bg-brand-dark p-4 md:p-8">
       <TenantUserUpdationForm tenantID={tenantID} tenantUserID={tenantUserID} />
     </div>
   );

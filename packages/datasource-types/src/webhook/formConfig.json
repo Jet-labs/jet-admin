@@ -1,0 +1,71 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionName": {
+        "type": "string",
+        "description": "A unique name for this webhook endpoint.",
+        "minLength": 3
+      },
+      "allowedMethods": {
+        "type": "string",
+        "enum": ["POST", "PUT", "GET", "ANY"],
+        "description": "Allowed HTTP method(s) for incoming requests",
+        "default": "POST"
+      },
+      "authType": {
+        "type": "string",
+        "enum": ["none", "header", "query_param", "basic"],
+        "description": "Authentication method for incoming requests",
+        "default": "none"
+      },
+      "authHeaderName": {
+        "type": "string",
+        "description": "Header name for authentication (e.g., X-Api-Key)"
+      },
+      "authSecret": {
+        "type": "string",
+        "description": "Secret value to validate against"
+      }
+    },
+    "required": ["connectionName"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/connectionName", "label": "Connection Name" },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/allowedMethods", "label": "Allowed Method" },
+          { "type": "Control", "scope": "#/properties/authType", "label": "Auth Type" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Authentication",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/authType", "schema": { "const": "header" } },
+              { "scope": "#/properties/authType", "schema": { "const": "query_param" } }
+            ]
+          }
+        },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/authHeaderName", "label": "Auth Header / Param Name" },
+          { "type": "Control", "scope": "#/properties/authSecret", "label": "Auth Secret", "options": { "format": "password" } }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "connectionName": "MyWebhook",
+    "allowedMethods": "POST",
+    "authType": "none",
+    "authHeaderName": "",
+    "authSecret": ""
+  }
+}

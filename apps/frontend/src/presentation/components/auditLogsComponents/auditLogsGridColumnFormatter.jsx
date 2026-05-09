@@ -2,18 +2,12 @@ import { BiCalendar } from "react-icons/bi";
 import moment from "moment";
 import ReactJson from "react-json-view";
 import React from "react";
-import { JSONViewCell } from "../ui/jsonViewCell";
-import { EditCellWrapper } from "../ui/editCellWrapper";
 
 /**
  * Generates column definitions for MUI DataGrid with custom rendering and editing components.
  * @param {object} param0 - Configuration object.
  * @param {string} param0.tenantID - Tenant ID.
- * @param {string} param0.databaseSchemaName - Schema name.
- * @param {string} param0.databaseTableName - Table name.
- * @param {Array<DatabaseTableColumn>} param0.databaseTableColumns - Array of column metadata objects.
  * @param {*} [param0.customIntMappings] - Optional custom mappings for integer types.
- * @param {Map} [param0.databaseTableColumnForeignKeyMap] - Map of foreign key references.
  * @returns {Array<object>} - Array of DataGrid column definitions.
  */
 export const getFormattedAuditLogColumns = () => {
@@ -99,11 +93,11 @@ export const getFormattedAuditLogColumns = () => {
               }
             >
               <span
-                className={`${"px-2 py-0.5 rounded text-sm font-medium w-min"} ${
+                className={`${"px-2 py-0.5 rounded-sm text-sm font-medium w-min"} ${
                   // eslint-disable-next-line no-extra-boolean-cast
                   !!params.value
-                    ? "bg-green-100 text-green-800 w-full flex  flex-row justify-start items-center p-2"
-                    : "bg-red-100 text-red-800 w-full flex  flex-row justify-start items-center p-2"
+                    ? "bg-green-950/40 text-green-400 w-full flex  flex-row justify-start items-center p-2"
+                    : "bg-red-950/40 text-red-400 w-full flex  flex-row justify-start items-center p-2"
                 }`}
               >
                 {String(Boolean(params.value))}
@@ -156,7 +150,7 @@ export const getFormattedAuditLogColumns = () => {
                 "w-full flex h-full flex-row justify-start items-center"
               }
             >
-              <span className="px-2 py-0.5 rounded text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2">
+              <span className="px-2 py-0.5 rounded-sm text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2">
                 {params.value}
               </span>
             </div>
@@ -177,19 +171,19 @@ export const getFormattedAuditLogColumns = () => {
         },
         renderCell: (params) => {
           let chipStyle =
-            "px-2 py-0.5 rounded text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2";
+            "px-2 py-0.5 rounded-sm text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2";
           switch (params.value) {
             case "GET":
-              chipStyle += " bg-green-100 text-green-800";
+              chipStyle += " bg-green-950/40 text-green-400";
               break
             case "POST":
-              chipStyle += " bg-blue-100 text-blue-800";
+              chipStyle += " bg-blue-950/40 text-blue-400";
               break;
             case "PUT":
               chipStyle += " bg-yellow-100 text-yellow-800";
               break;
             case "DELETE":
-              chipStyle += " bg-red-100 text-red-800";
+              chipStyle += " bg-red-950/40 text-red-400";
               break;
             default:
               break;
@@ -211,7 +205,7 @@ export const getFormattedAuditLogColumns = () => {
         field: "metadata",
         headerName: "Metadata",
         width: 500,
-        editable: true,
+        editable: false,
         sortable: true,
         type: "object",
         headerAlign: "left",
@@ -221,7 +215,7 @@ export const getFormattedAuditLogColumns = () => {
         },
         renderCell: (params) => {
           return (
-            <div className="max-h-32 overflow-auto rounded !text-slate-700 p-2">
+            <div className="max-h-32 overflow-auto rounded-sm !text-brand-text-primary p-2">
               <ReactJson
                 src={params.value}
                 theme="rjv-default"
@@ -231,9 +225,6 @@ export const getFormattedAuditLogColumns = () => {
               />
             </div>
           );
-        },
-        renderEditCell: (params) => {
-          return <EditCellWrapper params={params}><JSONViewCell params={params} /></EditCellWrapper>;
         },
       },
     ];

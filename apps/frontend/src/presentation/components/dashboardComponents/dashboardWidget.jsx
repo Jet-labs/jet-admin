@@ -168,12 +168,12 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
         }}
       >
         {widget && showHeader && (
-          <div className="border-b border-slate-200/80 bg-gradient-to-r from-slate-50 to-background px-3 py-1.5">
+          <div className="border-b border-brand-border/80 bg-gradient-to-r from-slate-50 to-background px-3 py-1.5">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <div className="min-w-0">
-                    <div className="truncate text-xs font-semibold text-[#1c1c1e]">
+                    <div className="truncate text-xs font-semibold text-brand-text-primary">
                       {widget.widgetTitle}
                     </div>
                   </div>
@@ -182,7 +182,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
 
               <div className="flex shrink-0 items-center gap-2">
                 {refreshLabel ? (
-                  <Badge variant="outline" className="gap-1 border-slate-200 text-[11px] text-[#1c1c1e]">
+                  <Badge variant="outline" className="gap-1 border-brand-border text-[11px] text-brand-text-primary">
                     <FiClock className="text-[11px]" />
                     {refreshLabel}
                   </Badge>
@@ -192,7 +192,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
                   variant="ghost"
                   size="sm"
                   square
-                  className="h-6 w-6 text-[#1c1c1e] hover:bg-slate-100 hover:text-[#1c1c1e]"
+                  className="h-6 w-6 text-brand-text-primary hover:bg-brand-border-dark hover:text-brand-text-primary"
                   onClick={() => {
                     refetchWidget();
                   }}
@@ -207,7 +207,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
 
         {widgetRender?.errorMessage ? (
           <div className="flex h-full w-full items-center justify-center p-4">
-            <span className="rounded border border-red-100 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
+            <span className="rounded-sm border border-red-100 bg-red-950/40 px-3 py-2 text-center text-xs text-red-600">
               {widgetRender.errorMessage}
             </span>
           </div>
@@ -218,11 +218,11 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
           const widgetData = resolveWidgetData({
             widgetType: widgetRender.widgetType,
             widgetConfig: resolvedConfig,
-            queryResults: dataSourceResults,
+            dataSourceResults: dataSourceResults,
           });
 
           return (
-            <div className="min-h-0 flex-1 bg-white px-2 pb-2 pt-1">
+            <div className="min-h-0 flex-1 bg-brand-dark px-2 pb-2 pt-1">
               <RenderedWidgetComponent
                 widgetTitle={widget.widgetTitle}
                 widgetType={widgetRender.widgetType}

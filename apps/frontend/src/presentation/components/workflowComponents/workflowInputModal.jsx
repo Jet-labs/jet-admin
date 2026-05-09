@@ -95,10 +95,10 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="bg-brand-black rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
-          <h3 className="text-sm font-semibold text-slate-700">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-brand-border bg-brand-dark">
+          <h3 className="text-sm font-semibold text-brand-text-primary">
             Workflow Input Parameters
           </h3>
           <Button
@@ -107,7 +107,7 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
             size="sm"
             square
             onClick={onClose}
-            className="h-8 w-8 text-slate-400 hover:text-slate-600"
+            className="h-8 w-8 text-brand-text-primary hover:text-brand-text-primary"
           >
             <FaTimes className="w-4 h-4" />
           </Button>
@@ -125,7 +125,7 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-slate-200 bg-slate-50">
+          <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-brand-border bg-brand-dark">
             <Button
               type="button"
               variant="outline"

@@ -101,8 +101,8 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
   }, [datasourceID]);
 
   return (
-    <div className="h-full w-full bg-background">
-      <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background px-4 py-3">
+    <div className="h-full w-full bg-brand-dark">
+      <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3">
         <div>
           <h1 className="text-base font-semibold tracking-tight text-foreground">
             {CONSTANTS.STRINGS.UPDATE_DATASOURCE_FORM_TITLE}
@@ -135,7 +135,6 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
           <Button
             type="submit"
             form="datasource-update-form"
-            size="sm"
             disabled={isUpdatingDatasource}
           >
             {isUpdatingDatasource && (
@@ -173,9 +172,9 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel ref={testResultPanelRef} defaultSize={80} collapsible={true} minSize={5}>
-            <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-              <div className="flex items-center justify-between border-b border-border bg-slate-50 px-4 py-2 flex-shrink-0">
-                <span className="text-xs font-semibold text-slate-700">
+            <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
+              <div className="flex items-center justify-between border-b border-border bg-brand-dark px-4 py-2 flex-shrink-0">
+                <span className="text-xs font-semibold text-brand-text-primary">
                   Datasource Test Result
                 </span>
 
@@ -188,7 +187,7 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
                     connectionResult: datasourceTestResult,
                   })
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center text-slate-500 italic text-sm">
+                  <div className="h-full w-full flex items-center justify-center text-brand-text-primary italic text-sm">
                     Test the connection to see results here.
                   </div>
                 )}

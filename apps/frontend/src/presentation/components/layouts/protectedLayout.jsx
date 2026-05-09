@@ -6,7 +6,7 @@ import { CONSTANTS } from "../../../constants";
 import {
   useAuthActions,
   useAuthState,
-} from "../../../logic/contexts/authContext";
+} from "../../../logic/hooks/useAuth";
 import { MainDrawerList } from "../drawerList/mainDrawerList";
 import { Breadcrumbs } from "../ui/breadCrumbs";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
@@ -38,11 +38,11 @@ export const ProtectedLayout = () => {
     <ReactQueryLoadingErrorWrapper
       isLoading={!firebaseUserState || firebaseUserState.isLoading}
       error={firebaseUserState.error}
-      loadingContainerClass="h-screen w-screen bg-white flex flex-col justify-center items-center"
+      loadingContainerClass="h-screen w-screen bg-brand-black flex flex-col justify-center items-center"
     >
       <div className="flex h-full w-full flex-col justify-start items-stretch overflow-hidden">
-        <nav className="w-full  border-b-2 border-primary bg-white">
-          <div className="px-3 py-2">
+        <nav className="w-full  border-b-2 border-primary bg-brand-black">
+          <div className="px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center justify-start rtl:justify-end">
                 <Link to={"/"} className="flex">
@@ -74,7 +74,7 @@ export const ProtectedLayout = () => {
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
-            <div className="w-full h-full overflow-hidden bg-background">
+            <div className="w-full h-full overflow-hidden bg-brand-dark">
               <Outlet />
             </div>
           </ResizablePanel>

@@ -11,18 +11,14 @@ const { z, schemas } = require("../../utils/validation.utils");
 const createTenantSchema = z.object({
   tenantTitle: z.string().min(1, "tenantTitle is required").max(255),
   tenantDescription: z.string().optional(),
-  tenantDBURL: z.string().min(1, "tenantDBURL is required"),
 }).passthrough();
 
 const updateTenantSchema = z.object({
   tenantTitle: z.string().optional(),
   tenantDescription: z.string().optional(),
-  tenantDBURL: z.string().optional(),
 }).passthrough();
 
-const testDbConnectionSchema = z.object({
-  tenantDBURL: z.string().min(1, "tenantDBURL is required"),
-}).passthrough();
+
 
 // ============================================================
 // URL Param Schemas
@@ -39,6 +35,5 @@ const tenantIdParamSchema = z.object({
 module.exports = {
   createTenantSchema,
   updateTenantSchema,
-  testDbConnectionSchema,
   tenantIdParamSchema,
 };

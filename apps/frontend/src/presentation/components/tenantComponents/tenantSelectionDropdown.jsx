@@ -6,7 +6,7 @@ import { CONSTANTS } from "../../../constants";
 import {
   useTenantActions,
   useTenantState,
-} from "../../../logic/contexts/tenantContext";
+} from "../../../logic/hooks/useTenant";
 import { StringUtils } from "../../../utils/string";
 import { TenantLogo } from "./tenantLogo";
 
@@ -50,22 +50,22 @@ export const TenantSelectionDropdown = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="w-full flex justify-between items-center bg-white hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-100 h-10 p-2"
+          className="w-full flex justify-between items-center bg-brand-black hover:bg-brand-border-dark focus:outline-none focus:ring-4 focus:ring-brand-border-dark h-10 p-2"
         >
           <div className="flex items-center min-w-0 flex-grow">
-            <div className="flex-shrink-0 w-7 h-7 rounded border border-slate-300 bg-slate-100 flex justify-center items-center">
+            <div className="flex-shrink-0 w-7 h-7 rounded-sm border border-brand-border bg-brand-border-dark flex justify-center items-center">
               {selectedTenant?.tenantLogoURL ? (
                 <TenantLogo
                   src={selectedTenant.tenantLogoURL}
                   alt="Tenant Logo"
-                  className="w-full h-full rounded"
+                  className="w-full h-full rounded-sm"
                 />
               ) : (
-                <FaStoreAlt className="w-5 h-5 text-slate-500" />
+                <FaStoreAlt className="w-5 h-5 text-brand-text-primary" />
               )}
             </div>
             <div className="ml-2 flex flex-col min-w-0 overflow-hidden flex-1">
-              <span className="text-sm font-semibold text-slate-600 text-left truncate">
+              <span className="text-sm font-semibold text-brand-text-primary text-left truncate">
                 {selectedTenant
                   ? StringUtils.truncateName(selectedTenant.tenantTitle, 15)
                   : CONSTANTS.STRINGS
@@ -73,7 +73,7 @@ export const TenantSelectionDropdown = () => {
               </span>
             </div>
           </div>
-          <FaChevronDown className="text-slate-600 ml-2" />
+          <FaChevronDown className="text-brand-text-primary ml-2" />
         </Button>
       </DropdownMenuTrigger>
 
@@ -87,7 +87,7 @@ export const TenantSelectionDropdown = () => {
             onClick={() => handleTenantChange(tenant)}
             className="flex items-center cursor-pointer p-1.5"
           >
-            <div className="flex-shrink-0 w-7 h-7 rounded border border-slate-300 bg-slate-100 flex justify-center items-center overflow-hidden">
+            <div className="flex-shrink-0 w-7 h-7 rounded-sm border border-brand-border bg-brand-border-dark flex justify-center items-center overflow-hidden">
               {tenant.tenantLogoURL ? (
                 <TenantLogo
                   src={tenant.tenantLogoURL}
@@ -95,11 +95,11 @@ export const TenantSelectionDropdown = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <FaStoreAlt className="w-5 h-5 text-slate-500" />
+                <FaStoreAlt className="w-5 h-5 text-brand-text-primary" />
               )}
             </div>
             <div className="ml-3 flex flex-col justify-start items-start min-w-0 overflow-hidden w-full">
-              <span className="text-sm font-semibold text-slate-700 text-left truncate w-full">
+              <span className="text-sm font-semibold text-brand-text-primary text-left truncate w-full">
                 {StringUtils.truncateName(tenant.tenantTitle, 16).replace(/^./, (c) =>
                   c.toUpperCase()
                 )}

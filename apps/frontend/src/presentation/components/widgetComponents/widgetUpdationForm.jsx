@@ -48,8 +48,8 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
 
   const queryClient = useQueryClient();
 
-  // Lifted state: query results shared between config editor and preview
-  const [queryResults, setQueryResults] = useState(null);
+  // Lifted state: data source results shared between config editor and preview
+  const [dataSourceResults, setDataSourceResults] = useState(null);
 
   const updateWidgetForm = useFormik({
     initialValues: initialValues,
@@ -109,8 +109,8 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
   }, [widget]);
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-white">
-      <div className="flex w-full items-start justify-between border-b border-border bg-white p-3">
+    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
+      <div className="flex w-full items-start justify-between border-b border-border bg-brand-dark px-4 py-3">
         <div className="flex flex-col">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_TITLE}
@@ -159,15 +159,15 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
         >
           <ResizablePanel defaultSize={35} className="!overflow-y-auto !pb-10">
             <form
-              className="flex w-full flex-col items-stretch gap-2 bg-white p-3"
+              className="flex w-full flex-col items-stretch gap-2 bg-brand-dark p-4"
               onSubmit={updateWidgetForm.handleSubmit}
             >
               {updateWidgetForm && (
                 <WidgetConfigEditor
                   key={`widgetConfigEditor_${widgetID}`}
                   widgetEditorForm={updateWidgetForm}
-                  queryResults={queryResults}
-                  onQueryResults={setQueryResults}
+                  dataSourceResults={dataSourceResults}
+                  onDataSourceResults={setDataSourceResults}
                 />
               )}
             </form>
@@ -182,7 +182,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
                 widgetTitle={updateWidgetForm.values.widgetTitle}
                 widgetType={updateWidgetForm.values.widgetType}
                 widgetConfig={updateWidgetForm.values.widgetConfig}
-                queryResults={queryResults}
+                dataSourceResults={dataSourceResults}
                 isFetchingData={false}
                 isRefreshingData={false}
                 refreshData={() => {}}

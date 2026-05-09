@@ -44,7 +44,7 @@ export const WidgetPropertiesEditor = ({ widgetEditorForm }) => {
           name="containerTailwindCss"
           id="containerTailwindCss"
           className="text-xs font-mono"
-          placeholder="e.g. p-4 rounded-lg shadow"
+          placeholder="e.g. p-4 rounded-md shadow"
           value={properties.containerTailwindCss || ""}
           onChange={(e) => handlePropertyChange("containerTailwindCss", e.target.value)}
         />

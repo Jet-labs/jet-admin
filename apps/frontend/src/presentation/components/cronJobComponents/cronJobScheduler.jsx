@@ -136,14 +136,14 @@ function ToggleChip({ label, selected, onClick, size = "sm" }) {
       type="button"
       onClick={onClick}
       className={[
-        "inline-flex items-center justify-center rounded font-mono transition-all duration-150 select-none",
+        "inline-flex items-center justify-center rounded-sm font-mono transition-all duration-150 select-none",
         "border focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         size === "xs"
           ? "h-7 min-w-[2.25rem] px-1.5 text-[11px]"
           : "h-8 min-w-[2.75rem] px-2 text-xs",
         selected
           ? "border-primary bg-primary text-primary-foreground font-semibold shadow-sm"
-          : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:text-foreground",
+          : "border-border bg-brand-dark text-muted-foreground hover:border-primary/50 hover:text-foreground",
       ].join(" ")}
     >
       {label}

@@ -32,8 +32,8 @@ import { VscClearAll, VscJson, VscTerminal } from "react-icons/vsc";
 import { TbBraces } from "react-icons/tb";
 import { IoMdTime } from "react-icons/io";
 import { MdOutlineInput } from "react-icons/md";
-import { useWorkflowState, useWorkflowActions } from "../../../logic/contexts/workflowContext";
-import { useDatasourcesState, useDatasourcesActions } from "../../../logic/contexts/datasourceContext";
+import { useDataQueries } from "../../../logic/hooks/useDataQueries";
+import { useDatasources } from "../../../logic/hooks/useDatasources";
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
 import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
 import { WorkflowConsole } from "./workflowConsole";
@@ -126,10 +126,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     // Destructure for cleaner access
     const { values, setFieldValue, errors, handleChange, handleBlur } = workflowEditorForm;
     const { tenantID } = useParams();
-    const { dataQueries } = useWorkflowState();
-    const { refetchDataQueries } = useWorkflowActions();
-    const { datasources } = useDatasourcesState();
-    const { refetchDatasources } = useDatasourcesActions();
+    const { dataQueries, refetchDataQueries } = useDataQueries(tenantID);
+    const { datasources, refetchDatasources } = useDatasources(tenantID);
     const [selectedNodeId, setSelectedNodeId] = useState(null);
     const [showSchemaPanel, setShowSchemaPanel] = useState(false);
 
@@ -391,7 +389,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         {/* Sidebar Controls */}
                         <ResizablePanel defaultSize={20} className="flex flex-col h-full overflow-hidden">
 
-                            <div className="flex-1 overflow-y-auto space-y-4 p-4 flex flex-col justify-start items-stretch bg-background">
+                            <div className="flex-1 overflow-y-auto space-y-4 p-4 flex flex-col justify-start items-stretch bg-brand-dark">
                                 <div>
                                     <label htmlFor="title" className="block mb-1.5 text-xs font-medium text-muted-foreground">
                                         {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_LABEL}
@@ -427,7 +425,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => onAddNode(node.value)}
-                                                className="justify-start bg-background hover:bg-muted font-medium border-border"
+                                                className="justify-start bg-brand-dark hover:bg-muted font-medium border-border"
                                             >
                                                 {node.value === 'start' && <FaPlay className="size-3.5 mr-2 text-emerald-500" />}
                                                 {node.value === 'dataQuery' && <SiQuantconnect className="size-4 mr-2 text-blue-500" />}
@@ -485,7 +483,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                             onClick={onTestRunClick}
                                             disabled={values.nodes.length === 0 || isTestRunning}
                                             size="sm"
-                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-sm"
+                                            className="flex-1"
                                         >
                                             <FaPlay className="size-3 mr-2" />
                                             {isTestRunning ? "Running..." : "Test Run"}

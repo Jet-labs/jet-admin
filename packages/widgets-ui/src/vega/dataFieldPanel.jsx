@@ -249,7 +249,7 @@ export const DataFieldPanel = ({
       case 'output': return <MdOutput className="w-3 h-3 shrink-0 text-fuchsia-600" />;
       case 'runtime': return <FiZap className="w-3 h-3 shrink-0 text-amber-600" />;
       case 'datasource': return <FiDatabase className="w-3 h-3 shrink-0 text-blue-600" />;
-      default: return <FiDatabase className="w-3 h-3 shrink-0 text-[#1c1c1e]" />;
+      default: return <FiDatabase className="w-3 h-3 shrink-0 text-brand-text-primary" />;
     }
   };
 
@@ -275,7 +275,7 @@ export const DataFieldPanel = ({
   };
 
   return (
-    <div className={`flex flex-col h-full bg-white ${className}`}>
+    <div className={`flex flex-col h-full bg-brand-dark ${className}`}>
       {/* Header */}
       <div className="p-2.5 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
@@ -297,7 +297,7 @@ export const DataFieldPanel = ({
 
           {/* Suggestions dropdown */}
           {showSuggestions && allSuggestions.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80">
+            <div className="absolute left-0 right-0 top-full mt-1 bg-brand-dark border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80">
               <div className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted sticky top-0">
                 Available Variables ({allSuggestions.length})
               </div>
@@ -305,7 +305,7 @@ export const DataFieldPanel = ({
                 <div
                   key={`${s.path}-${i}`}
                   onClick={() => handleSelectSuggestion(s)}
-                  className={`w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? 'bg-primary/5 border-l-2 border-l-primary' : 'bg-white hover:bg-muted'}`}
+                  className={`w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? 'bg-primary/5 border-l-2 border-l-primary' : 'bg-brand-dark hover:bg-muted'}`}
                 >
                   <div className="mt-0.5">{getCategoryIcon(s.source || s.category)}</div>
                   <div className="flex-1 min-w-0">
@@ -322,7 +322,7 @@ export const DataFieldPanel = ({
                     )}
                   </div>
                   {s.source === 'runtime' && (
-                    <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">LIVE</span>
+                    <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-sm uppercase tracking-wider shrink-0">LIVE</span>
                   )}
                 </div>
               ))}
@@ -332,7 +332,7 @@ export const DataFieldPanel = ({
 
         {/* Show selected source info */}
         {dataSource && fields.length > 0 && (
-          <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded w-fit border border-emerald-100">
+          <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm w-fit border border-emerald-100">
             <FiZap className="w-3 h-3" />
             {fields.length} fields detected
           </div>
@@ -341,8 +341,8 @@ export const DataFieldPanel = ({
 
       {/* Search */}
       {fields.length > 5 && (
-        <div className="px-2.5 py-1.5 border-b border-border bg-white">
-          <div className="flex items-center gap-2 bg-muted/50 border border-border rounded px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow">
+        <div className="px-2.5 py-1.5 border-b border-border bg-brand-dark">
+          <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-sm px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow">
             <FiSearch className="w-3.5 h-3.5 text-muted-foreground" />
             <Input
               type="text"
@@ -385,7 +385,7 @@ export const DataFieldPanel = ({
         )}
 
         {/* Manual field add */}
-        <div className="mt-3 pt-3 border-t border-border">
+        <div className="mt-3">
           {showManualAdd ? (
             <div className="flex flex-col gap-2">
               <Input

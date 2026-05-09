@@ -1,0 +1,30 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionName": { "type": "string", "minLength": 3 },
+      "servers": { "type": "string", "description": "Comma-separated NATS server URLs (e.g. nats://localhost:4222)" },
+      "token": { "type": "string", "description": "Auth token (optional)" },
+      "user": { "type": "string" },
+      "pass": { "type": "string" },
+      "useTLS": { "type": "boolean", "default": false }
+    },
+    "required": ["connectionName", "servers"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/connectionName", "label": "Connection Name" },
+      { "type": "Control", "scope": "#/properties/servers", "label": "Server URLs", "options": { "placeholder": "nats://localhost:4222" } },
+      { "type": "Control", "scope": "#/properties/useTLS", "label": "Use TLS" },
+      { "type": "Group", "label": "Authentication", "elements": [
+        { "type": "Control", "scope": "#/properties/token", "label": "Token", "options": { "format": "password" } },
+        { "type": "HorizontalLayout", "elements": [
+          { "type": "Control", "scope": "#/properties/user", "label": "Username" },
+          { "type": "Control", "scope": "#/properties/pass", "label": "Password", "options": { "format": "password" } }
+        ]}
+      ]}
+    ]
+  },
+  "data": { "connectionName": "MyNATS", "servers": "", "token": "", "user": "", "pass": "", "useTLS": false }
+}

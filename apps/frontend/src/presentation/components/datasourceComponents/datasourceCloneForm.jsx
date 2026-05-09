@@ -5,7 +5,7 @@ import { FaRegClone } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { cloneDatasourceByIDAPI } from "../../../data/apis/datasource";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
 import { Button, Spinner } from "@jet-admin/ui";
@@ -55,10 +55,10 @@ export const DatasourceCloneForm = ({ tenantID, datasourceID }) => {
   return (
     <>
       <Button
+        variant="outline"
         onClick={_handleCloneDatasource}
         disabled={isCloningDatasource}
         type="button"
-        variant="primary-ghost"
         size="sm"
         square
       >

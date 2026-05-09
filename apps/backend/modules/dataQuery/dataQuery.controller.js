@@ -171,52 +171,6 @@ dataQueryController.createBulkDataQuery = async (req, res) => {
 };
 
 /**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- */
-dataQueryController.generateAIPromptBasedQuery = async (req, res) => {
-  try {
-    const { user, dbPool } = req;
-    const { tenantID } = req.params;
-    const { aiPrompt } = req.body;
-    Logger.log("info", {
-      message: "dataQueryController:generateAIPromptBasedQuery:params",
-      params: {
-        userID: user.userID,
-        tenantID,
-        aiPrompt,
-      },
-    });
-
-    const dataQuery = await dataQueryService.generateAIPromptBasedQuery({
-      userID: user.userID,
-      tenantID,
-      aiPrompt,
-      dbPool,
-    });
-
-    Logger.log("success", {
-      message: "dataQueryController:generateAIPromptBasedQuery:success",
-      params: {
-        userID: user.userID,
-        tenantID,
-        aiPrompt,
-        dataQuery,
-      },
-    });
-
-    return expressUtils.sendResponse(res, true, { dataQuery });
-  } catch (error) {
-    Logger.log("error", {
-      message: "dataQueryController:generateAIPromptBasedQuery:catch-1",
-      params: { error },
-    });
-    return expressUtils.sendResponse(res, false, {}, error);
-  }
-};
-
-/**
  * Creates a new database schema.
  * @param {import("express").Request} req
  * @param {import("express").Response} res

@@ -53,7 +53,7 @@ export const CustomSuggestionInput = (props) => {
       )}
 
       {isOpen && suggestions && (
-        <div className="absolute right-0 top-6 w-48 bg-background border border-border shadow-xl rounded z-[50] max-h-40 overflow-y-auto">
+        <div className="absolute right-0 top-6 w-48 bg-brand-dark border border-border shadow-xl rounded-sm z-[50] max-h-40 overflow-y-auto">
           <div className="p-2 border-b border-border flex justify-between items-center bg-muted/50">
             <span className="text-[10px] font-semibold text-muted-foreground">Pick a node</span>
             <Button type="button" variant="ghost" size="sm" onClick={() => setIsOpen(false)}>×</Button>

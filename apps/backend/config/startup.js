@@ -24,9 +24,13 @@ async function startAllListeners() {
     const { startResultsConsumer } = require('../modules/workflow/workflowEngine/engine');
     await startResultsConsumer();
 
-    // 4. Subscription listener (bootstraps active subscription consumers)
-    const { startSubscriptionListener } = require('../modules/subscription/listeners/subscriptionListener');
-    await startSubscriptionListener();
+    // 4. Listener pipeline worker (processes listener events from queue)
+    const { startPipelineWorker } = require('../modules/listener/listenerEngine/pipelineWorker');
+    await startPipelineWorker();
+
+    // 5. Listener connection manager (bootstraps all active listeners)
+    const { listenerConnectionManager } = require('../modules/listener/listenerEngine/connectionManager');
+    await listenerConnectionManager.startAll();
 
     Logger.log('success', { message: 'startup:startAllListeners:done' });
   } catch (error) {
@@ -42,8 +46,8 @@ async function stopAllListeners() {
   Logger.log('info', { message: 'startup:stopAllListeners:init' });
 
   try {
-    const { stopSubscriptionListener } = require('../modules/subscription/listeners/subscriptionListener');
-    await stopSubscriptionListener();
+    const { listenerConnectionManager } = require('../modules/listener/listenerEngine/connectionManager');
+    await listenerConnectionManager.stopAll();
   } catch (e) { /* ignore */ }
 
   await closeQueue();

@@ -9,7 +9,7 @@ const {
   formatAuthContextForLog,
   getCreationContextFromAuthContext,
 } = require("../../utils/auth.context.utils");
-const { processWorkflowDataForWidget } = require("@jet-admin/widgets-logic");
+
 const { resolveTemplate } = require("../../utils/templateEngine/resolver");
 const { resolveInputs } = require("../../utils/inputArgs.util");
 const { extractWorkflowDefinitions } = require("../../utils/definitionProvider.util");
@@ -533,63 +533,29 @@ workflowService.stopTestWorkflow = async ({ instanceID }) => {
 };
 
 /**
- * Get the status of a workflow run and process context data for widget display.
- * Widget-type-agnostic: accepts widgetConfig as opaque blob, delegates to widgets-logic.
+ * Get the status of a workflow run for widget display.
+ * Returns raw context data — the frontend handles all template resolution
+ * and data transformation via evaluationEngine + widgets-logic builders.
  * 
  * @param {object} params
  * @param {string} params.instanceID - Workflow instance ID
- * @param {string} params.widgetType - Widget type ('vega-lite', 'vega', or future types)
- * @param {object} params.workflowConfig - Workflow binding config
- * @param {object} params.widgetConfig - Opaque widget config blob (templates not yet resolved)
- * @returns {Promise<object>} Workflow status with processed data
+ * @returns {Promise<object>} Workflow status with raw context data
  */
-workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, workflowConfig, widgetConfig }) => {
+workflowService.getRunStatusForWidget = async ({ instanceID }) => {
   Logger.log("info", {
     message: "workflowService:getRunStatusForWidget:params",
-    params: { instanceID, widgetType },
+    params: { instanceID },
   });
 
   try {
-    // Get base run status
+    // Get base run status (includes raw contextData)
     const runStatus = await workflowService.getRunStatus(instanceID);
 
     if (!runStatus) {
       return null;
     }
 
-    // If not completed, return status as-is
-    if (runStatus.status !== 'COMPLETED') {
-      return runStatus;
-    }
-
-    if (!widgetConfig) {
-      Logger.log("info", {
-        message: "workflowService:getRunStatusForWidget:noWidgetConfig",
-        params: { instanceID },
-      });
-      return runStatus;
-    }
-
-    // Resolve templates in widgetConfig generically
-    const resolvedWidgetConfig = resolveTemplate(widgetConfig, { ctx: runStatus.contextData }, {
-      preserveSingleExpressionType: true,
-    });
-
-    // Delegate to widgets-logic for final spec shape
-    const processedData = processWorkflowDataForWidget({
-      widgetType: widgetType || 'vega-lite',
-      widgetConfig: resolvedWidgetConfig,
-    });
-
-    Logger.log("success", {
-      message: "workflowService:getRunStatusForWidget:processed",
-      params: { instanceID, widgetType, hasData: !!processedData },
-    });
-
-    return {
-      ...runStatus,
-      data: processedData,
-    };
+    return runStatus;
   } catch (error) {
     Logger.log("error", {
       message: "workflowService:getRunStatusForWidget:failure",

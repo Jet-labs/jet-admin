@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { useWidgetsState } from "../../../logic/contexts/widgetsContext";
+import { useWorkflows } from "../../../logic/hooks/useWorkflows";
+import { useDataQueries } from "../../../logic/hooks/useDataQueries";
 import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { executeWorkflowAPI } from "../../../data/apis/workflow";
 
@@ -78,21 +79,21 @@ const executeDataSources = async (dataSources, tenantID) => {
 
 export const WidgetConfigEditor = ({
   widgetEditorForm,
-  queryResults,
-  onQueryResults,
+  dataSourceResults,
+  onDataSourceResults,
 }) => {
   WidgetConfigEditor.propTypes = {
     widgetEditorForm: PropTypes.object.isRequired,
-    queryResults: PropTypes.object,
-    onQueryResults: PropTypes.func,
+    dataSourceResults: PropTypes.object,
+    onDataSourceResults: PropTypes.func,
   };
 
   const { tenantID } = useParams();
-  const { dataQueries, workflows } = useWidgetsState();
+  const { workflows } = useWorkflows(tenantID);
+  const { dataQueries } = useDataQueries(tenantID);
 
   const widgetType = widgetEditorForm.values.widgetType;
   const ConfigEditorComponent = WIDGETS_MAP[widgetType]?.configEditor;
-  const DataMappingEditorComponent = WIDGETS_MAP[widgetType]?.dataMappingEditor;
 
   // Get the data manifest from the builder
   const builder = WIDGET_PROCESSORS_MAP?.[widgetType];
@@ -115,11 +116,11 @@ export const WidgetConfigEditor = ({
       setIsTestRunning(true);
       executeDataSources(dataSources, tenantID)
         .then((results) => {
-          if (results) onQueryResults?.(results);
+          if (results) onDataSourceResults?.(results);
         })
         .finally(() => setIsTestRunning(false));
     }
-  }, [dataSources, tenantID, onQueryResults]);
+  }, [dataSources, tenantID, onDataSourceResults]);
 
   // Manual test run / refresh
   const handleTestRun = useCallback(async () => {
@@ -129,11 +130,11 @@ export const WidgetConfigEditor = ({
     setIsTestRunning(true);
     try {
       const results = await executeDataSources(sources, tenantID);
-      onQueryResults?.(results);
+      onDataSourceResults?.(results);
     } finally {
       setIsTestRunning(false);
     }
-  }, [widgetEditorForm.values.widgetConfig?.dataSources, tenantID, onQueryResults]);
+  }, [widgetEditorForm.values.widgetConfig?.dataSources, tenantID, onDataSourceResults]);
 
   return (
     <div className="flex h-full w-full flex-col gap-3">
@@ -210,20 +211,10 @@ export const WidgetConfigEditor = ({
             widgetEditorForm={widgetEditorForm}
             dataQueries={dataQueries || []}
             workflows={workflows || []}
-            queryResults={queryResults}
+            dataSourceResults={dataSourceResults}
             onTestRun={handleTestRun}
             isTestRunning={isTestRunning}
           />
-
-          {/* Widget-specific Data Mapping Editor */}
-          {DataMappingEditorComponent && (
-            <DataMappingEditorComponent
-              widgetEditorForm={widgetEditorForm}
-              dataManifest={dataManifest}
-              queryResults={queryResults}
-              boundDataSources={widgetEditorForm.values.widgetConfig?.dataSources || []}
-            />
-          )}
         </TabsContent>
 
         <TabsContent value="properties" className="mt-3 space-y-3">
@@ -231,7 +222,8 @@ export const WidgetConfigEditor = ({
           {ConfigEditorComponent && (
             <ConfigEditorComponent
               widgetEditorForm={widgetEditorForm}
-              queryResults={queryResults}
+              dataSourceResults={dataSourceResults}
+              workflowContext={dataSourceResults}
             />
           )}
 

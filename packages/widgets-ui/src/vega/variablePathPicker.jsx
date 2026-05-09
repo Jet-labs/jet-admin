@@ -145,8 +145,7 @@ export const VariablePathPicker = ({
             <Button
               onClick={() => handlePathChange('')}
               variant="ghost"
-              size="sm"
-              square
+              size="icon"
               className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5"
               type="button"
             >
@@ -156,7 +155,7 @@ export const VariablePathPicker = ({
 
           {/* Suggestions dropdown */}
           {showSuggestions && filteredSuggestions.length > 0 && (
-            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-border rounded-md shadow-lg max-h-48 overflow-auto">
+            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-brand-dark border border-border rounded-md shadow-lg max-h-48 overflow-auto">
               {filteredSuggestions.map((variable) => (
                 <div
                   key={variable.path}
@@ -170,7 +169,7 @@ export const VariablePathPicker = ({
                       <span className="text-[10px] text-muted-foreground">from {variable.nodeTitle}</span>
                     )}
                   </div>
-                  <span className="text-[10px] px-1 py-0.5 bg-muted rounded text-muted-foreground shrink-0">
+                  <span className="text-[10px] px-1 py-0.5 bg-muted rounded-sm text-muted-foreground shrink-0">
                     {variable.category === 'input' ? 'input' : variable.category === 'nodeOutput' ? 'node' : 'output'}
                   </span>
                 </div>
@@ -212,7 +211,7 @@ export const VariablePathPicker = ({
 
       {/* Variable Explorer inline */}
       {showExplorer && (
-        <div className="border border-border rounded-lg overflow-hidden bg-muted/20">
+        <div className="border border-border rounded-md overflow-hidden bg-muted/20">
           <VariableExplorer
             workflow={workflow}
             onSelect={handleVariableSelect}
@@ -225,7 +224,7 @@ export const VariablePathPicker = ({
 
       {/* Transform options */}
       {showAdvanced && (
-        <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-3">
+        <div className="p-3 rounded-md border border-border bg-muted/30 space-y-3">
           {/* Transform type */}
           <div>
             <p className="text-[10px] text-muted-foreground mb-1">Transform Type</p>

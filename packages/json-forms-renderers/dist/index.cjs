@@ -744,7 +744,7 @@ var CustomSuggestionInput = (props) => {
       onChange: (ev) => handleChange(path, ev.target.value),
       value: data || ""
     }
-  ), hasErrors && /* @__PURE__ */ import_react6.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors), isOpen && suggestions && /* @__PURE__ */ import_react6.default.createElement("div", { className: "absolute right-0 top-6 w-48 bg-background border border-border shadow-xl rounded z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "p-2 border-b border-border flex justify-between items-center bg-muted/50" }, /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-[10px] font-semibold text-muted-foreground" }, "Pick a node"), /* @__PURE__ */ import_react6.default.createElement(import_ui6.Button, { type: "button", variant: "ghost", size: "sm", onClick: () => setIsOpen(false) }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ import_react6.default.createElement("div", { className: "px-2 py-1 text-[10px] text-muted-foreground italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ import_react6.default.createElement(
+  ), hasErrors && /* @__PURE__ */ import_react6.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors), isOpen && suggestions && /* @__PURE__ */ import_react6.default.createElement("div", { className: "absolute right-0 top-6 w-48 bg-brand-dark border border-border shadow-xl rounded-sm z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "p-2 border-b border-border flex justify-between items-center bg-muted/50" }, /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-[10px] font-semibold text-muted-foreground" }, "Pick a node"), /* @__PURE__ */ import_react6.default.createElement(import_ui6.Button, { type: "button", variant: "ghost", size: "sm", onClick: () => setIsOpen(false) }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ import_react6.default.createElement("div", { className: "px-2 py-1 text-[10px] text-muted-foreground italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ import_react6.default.createElement(
     "div",
     {
       key: idx,
@@ -834,7 +834,7 @@ var DynamicArgsControl = (props) => {
   if (args.length === 0) {
     return null;
   }
-  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "border border-border rounded p-3 mt-2 bg-background" }, /* @__PURE__ */ import_react7.default.createElement(import_ui7.Label, { className: "block mb-2 text-xs font-medium text-muted-foreground" }, "Arguments"), /* @__PURE__ */ import_react7.default.createElement("div", { className: "space-y-2" }, args.map((arg, index) => {
+  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "border border-border rounded-sm p-3 mt-2 bg-brand-dark" }, /* @__PURE__ */ import_react7.default.createElement(import_ui7.Label, { className: "block mb-2 text-xs font-medium text-muted-foreground" }, "Arguments"), /* @__PURE__ */ import_react7.default.createElement("div", { className: "space-y-2" }, args.map((arg, index) => {
     const argName = arg.key;
     return /* @__PURE__ */ import_react7.default.createElement(
       ArgInputWithVariablePicker,
@@ -902,7 +902,7 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
       title: "Insert variable from previous node"
     },
     /* @__PURE__ */ import_react7.default.createElement(import_lucide_react2.Variable, { className: "w-4 h-4" })
-  ), showDropdown && /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-background border border-border rounded shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-3 text-xs text-muted-foreground text-center" }, "No variables available yet.", /* @__PURE__ */ import_react7.default.createElement("br", null), /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider border-b border-border bg-primary/5" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ import_react7.default.createElement(
+  ), showDropdown && /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-brand-dark border border-border rounded-sm shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-3 text-xs text-muted-foreground text-center" }, "No variables available yet.", /* @__PURE__ */ import_react7.default.createElement("br", null), /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider border-b border-border bg-primary/5" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ import_react7.default.createElement(
     import_ui7.Button,
     {
       key: `input-${idx}`,
@@ -966,7 +966,7 @@ var CustomKeyValueArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ import_react8.default.createElement(import_ui8.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react8.default.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react8.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react8.default.createElement(
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-3 border border-border rounded-sm bg-brand-dark mb-3" }, /* @__PURE__ */ import_react8.default.createElement(import_ui8.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react8.default.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react8.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react8.default.createElement(
     import_react9.JsonFormsDispatch,
     {
       uischema: {
@@ -1061,7 +1061,7 @@ var CustomKeyValueTypeArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ import_react10.default.createElement(import_ui9.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react10.default.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react10.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react10.default.createElement(
+  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "p-3 border border-border rounded-sm bg-brand-dark mb-3" }, /* @__PURE__ */ import_react10.default.createElement(import_ui9.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react10.default.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react10.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react10.default.createElement(
     import_react11.JsonFormsDispatch,
     {
       uischema: {
@@ -1170,7 +1170,7 @@ var CustomKeyTypeArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "p-3 border mt-3 border-border rounded bg-background mb-3" }, /* @__PURE__ */ import_react12.default.createElement(import_ui10.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react12.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react12.default.createElement(
+  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "p-3 border mt-3 border-border rounded-sm bg-brand-dark mb-3" }, /* @__PURE__ */ import_react12.default.createElement(import_ui10.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react12.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react12.default.createElement(
     import_react13.JsonFormsDispatch,
     {
       uischema: {
@@ -1258,7 +1258,7 @@ var CustomStringArrayRenderer = (props) => {
   if (visible === false) {
     return null;
   }
-  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ import_react14.default.createElement(import_ui11.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema?.label || "Items"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ import_react14.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react14.default.createElement(
+  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "p-3 border border-border rounded-sm bg-brand-dark mb-3" }, /* @__PURE__ */ import_react14.default.createElement(import_ui11.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema?.label || "Items"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ import_react14.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react14.default.createElement(
     import_ui11.Input,
     {
       type: "text",
@@ -1344,7 +1344,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
     newItems[index] = { ...newItems[index], [field]: value };
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ import_react15.default.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ import_react15.default.createElement(import_ui12.Label, { className: "block mb-2 text-sm font-medium text-foreground" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ import_react15.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ import_react15.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react15.default.createElement(
+  return /* @__PURE__ */ import_react15.default.createElement("div", { className: "p-3 border border-border rounded-sm bg-brand-dark mb-3" }, /* @__PURE__ */ import_react15.default.createElement(import_ui12.Label, { className: "block mb-2 text-sm font-medium text-foreground" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ import_react15.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ import_react15.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react15.default.createElement(
     import_ui12.Input,
     {
       type: "text",
@@ -1434,7 +1434,7 @@ var CustomGenericObjectArrayRenderer = ({
   if (propertyKeys.length === 0) {
     return null;
   }
-  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ import_react16.default.createElement(import_ui13.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react16.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react16.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, propertyKeys.map((propKey) => /* @__PURE__ */ import_react16.default.createElement("div", { key: propKey, className: "flex-grow" }, /* @__PURE__ */ import_react16.default.createElement(
+  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "p-3 border border-border rounded-sm bg-brand-dark mb-3" }, /* @__PURE__ */ import_react16.default.createElement(import_ui13.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react16.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react16.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, propertyKeys.map((propKey) => /* @__PURE__ */ import_react16.default.createElement("div", { key: propKey, className: "flex-grow" }, /* @__PURE__ */ import_react16.default.createElement(
     import_react17.JsonFormsDispatch,
     {
       uischema: {
@@ -1492,7 +1492,7 @@ var CustomGroupLayout = (props) => {
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ import_react18.default.createElement("div", { className: `border border-border rounded p-3 mt-2 bg-background ${customClass}` }, uischema.label && /* @__PURE__ */ import_react18.default.createElement("h3", { className: "text-xs font-medium text-muted-foreground mb-2" }, uischema.label), /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ import_react18.default.createElement(
+  return /* @__PURE__ */ import_react18.default.createElement("div", { className: `border border-border rounded-sm p-3 mt-2 bg-brand-dark ${customClass}` }, uischema.label && /* @__PURE__ */ import_react18.default.createElement("h3", { className: "text-xs font-medium text-muted-foreground mb-2" }, uischema.label), /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ import_react18.default.createElement(
     import_react19.JsonFormsDispatch,
     {
       key: index,
@@ -1637,12 +1637,12 @@ var CustomTabRenderer = (props) => {
     {
       key: category.label || `tab-${index}`,
       variant: "ghost",
-      className: `px-4 mr-2 py-2 text-sm font-medium rounded ${index === activeTab ? "text-primary bg-primary/5" : "text-foreground"}`,
+      className: `px-4 mr-2 py-2 text-sm font-medium rounded-sm ${index === activeTab ? "text-primary bg-primary/5" : "text-foreground"}`,
       onClick: () => setActiveTab(index),
       type: "button"
     },
     category.label
-  ))), /* @__PURE__ */ import_react23.default.createElement("div", { className: "p-3 border mt-3 border-border rounded bg-background flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ import_react23.default.createElement(
+  ))), /* @__PURE__ */ import_react23.default.createElement("div", { className: "p-3 border mt-3 border-border rounded-sm bg-brand-dark flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ import_react23.default.createElement(
     import_react24.JsonFormsDispatch,
     {
       key: i,

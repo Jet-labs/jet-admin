@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from "@jet-admin/ui";
 import { FiPlus, FiTrash2, FiRefreshCw, FiLoader } from "react-icons/fi";
+import { WorkflowConsole } from "../workflowComponents/workflowConsole";
+import { useRuntimeStore } from "../../../logic/stores/useRuntimeStore";
 
 /**
  * DataSourcesEditor
@@ -28,10 +30,11 @@ export const DataSourcesEditor = ({
   widgetEditorForm,
   dataQueries,
   workflows,
-  queryResults,
+  dataSourceResults,
   onTestRun,
   isTestRunning,
 }) => {
+  const workflowExecutions = useRuntimeStore((state) => state.workflowExecutions);
   const dataSources =
     widgetEditorForm.values.widgetConfig?.dataSources || [];
 
@@ -135,8 +138,8 @@ export const DataSourcesEditor = ({
           Data Sources
         </Label>
         <div className="flex items-center gap-1.5">
-          {queryResults && (
-            <span className="text-[0.6rem] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+          {dataSourceResults && (
+            <span className="inline-flex items-center text-[12px] font-medium text-emerald-600 bg-emerald-50/50 px-[10px] h-[24px] rounded-sm border border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
               Data loaded
             </span>
           )}
@@ -145,7 +148,7 @@ export const DataSourcesEditor = ({
               type="button"
               variant="outline"
               size="sm"
-              className="h-7 text-xs gap-1"
+              // className="h-7 text-xs gap-1"
               onClick={onTestRun}
               disabled={isTestRunning}
             >
@@ -154,7 +157,7 @@ export const DataSourcesEditor = ({
               ) : (
                 <FiRefreshCw className="w-3 h-3" />
               )}
-              {queryResults ? "Refresh" : "Load Data"}
+              {dataSourceResults ? "Refresh" : "Load Data"}
             </Button>
           )}
         </div>
@@ -172,7 +175,7 @@ export const DataSourcesEditor = ({
         return (
           <div
             key={idx}
-            className="space-y-2.5 rounded-lg border bg-background/50 p-3"
+            className="space-y-2.5 rounded-md border bg-background/50 p-3"
           >
             {/* Header row */}
             <div className="flex items-center justify-between">
@@ -277,7 +280,7 @@ export const DataSourcesEditor = ({
 
             {/* Input Arguments */}
             {argDefs.length > 0 && (
-              <div className="space-y-2 border-t pt-2">
+              <div className="space-y-2 mt-2">
                 <Label className="text-[0.6rem] text-muted-foreground font-medium">
                   Input Arguments
                 </Label>
@@ -309,33 +312,58 @@ export const DataSourcesEditor = ({
             )}
 
             {/* Query result preview */}
-            {queryResults?.[source.alias] && (
-              <div className="border-t pt-2">
+            {dataSourceResults?.[source.alias] && (
+              <div className="mt-2">
                 <Label className="text-[0.6rem] text-muted-foreground">
-                  Result Preview
+                  {source.type === 'workflow' && dataSourceResults[source.alias]?.instanceID ? 'Execution Status' : 'Result Preview'}
                 </Label>
-                <pre className="mt-1 max-h-24 overflow-auto rounded bg-muted p-2 text-[0.6rem] font-mono">
-                  {JSON.stringify(queryResults[source.alias], null, 2)?.slice(
-                    0,
-                    500
-                  )}
-                </pre>
+                {source.type === 'workflow' && dataSourceResults[source.alias]?.instanceID ? (() => {
+                  const instanceID = dataSourceResults[source.alias].instanceID;
+                  const executionData = workflowExecutions[instanceID] || { 
+                    logs: [{
+                      type: 'start',
+                      timestamp: Date.now(),
+                      label: 'Workflow Dispatched',
+                      message: `Instance ID: ${instanceID}`
+                    }], 
+                    status: 'RUNNING' 
+                  };
+                  
+                  return (
+                    <div className="mt-1 h-48 border border-border rounded-md overflow-hidden shadow-inner flex flex-col">
+                      <WorkflowConsole 
+                        logs={executionData.logs}
+                        isRunning={executionData.status !== 'COMPLETED' && executionData.status !== 'FAILED'}
+                        className="flex-1 h-full"
+                      />
+                    </div>
+                  );
+                })() : (
+                  <pre className="mt-1 max-h-24 overflow-auto rounded-sm bg-muted p-2 text-[0.6rem] font-mono">
+                    {JSON.stringify(dataSourceResults[source.alias], null, 2)?.slice(
+                      0,
+                      500
+                    )}
+                  </pre>
+                )}
               </div>
             )}
           </div>
         );
       })}
 
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="w-full text-xs gap-1"
-        onClick={handleAddSource}
-      >
-        <FiPlus className="w-3 h-3" />
-        Add Data Source
-      </Button>
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="text-xs gap-1"
+          onClick={handleAddSource}
+        >
+          <FiPlus className="w-3.5 h-3.5" />
+          Add Data Source
+        </Button>
+      </div>
     </div>
   );
 };
@@ -344,7 +372,7 @@ DataSourcesEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
   dataQueries: PropTypes.array,
   workflows: PropTypes.array,
-  queryResults: PropTypes.object,
+  dataSourceResults: PropTypes.object,
   onTestRun: PropTypes.func,
   isTestRunning: PropTypes.bool,
 };

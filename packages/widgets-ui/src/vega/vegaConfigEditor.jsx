@@ -73,7 +73,7 @@ export const VegaConfigEditor = ({
   };
 
   return (
-    <div className="bg-white border border-border rounded-md p-3 flex flex-col gap-3">
+    <div className="bg-brand-dark border border-border rounded-md p-3 flex flex-col gap-3">
       {isVegaLite && (
         <div className="flex flex-row items-center gap-2">
           <span className="text-xs font-medium text-muted-foreground">Visual Editor</span>
@@ -121,7 +121,7 @@ export const VegaConfigEditor = ({
                     value={widgetEditorForm.values.widgetConfig?.refetchInterval || ""}
                   />
                 </div>
-                <div className="border-t border-border pt-4">
+                <div className="mt-2">
                   <Label className="text-xs text-muted-foreground italic">
                     Additional options moved to Widget Settings.
                   </Label>
@@ -158,7 +158,7 @@ export const VegaConfigEditor = ({
       )}
 
       {!showParseWarning && currentMode === 'raw' && (
-        <div className="min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-white">
+        <div className="min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-brand-dark">
           <VegaSpecEditor
             value={widgetEditorForm.values.widgetConfig?.vegaSpec}
             onChange={(spec) => widgetEditorForm.setFieldValue('widgetConfig.vegaSpec', spec)}

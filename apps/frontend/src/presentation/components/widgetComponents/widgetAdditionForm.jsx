@@ -43,8 +43,8 @@ export const WidgetAdditionForm = ({ tenantID }) => {
   const uniqueKey = `${tenantID}`;
   const queryClient = useQueryClient();
 
-  // Lifted state: query results shared between config editor and preview
-  const [queryResults, setQueryResults] = useState(null);
+  // Lifted state: data source results shared between config editor and preview
+  const [dataSourceResults, setDataSourceResults] = useState(null);
 
   const { isPending: isAddingWidget, mutate: addWidget } = useMutation({
     mutationFn: (data) => {
@@ -76,8 +76,8 @@ export const WidgetAdditionForm = ({ tenantID }) => {
   });
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-white">
-      <div className="flex w-full items-center justify-between border-b border-border bg-white p-3">
+    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
+      <div className="flex w-full items-center justify-between border-b border-border bg-brand-dark px-4 py-3">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {CONSTANTS.STRINGS.ADD_WIDGET_FORM_TITLE}
         </h1>
@@ -97,15 +97,15 @@ export const WidgetAdditionForm = ({ tenantID }) => {
         <ResizablePanel defaultSize={55}>
           <form
             id="widget-addition-form"
-            className="flex h-full w-full flex-col items-stretch gap-2 overflow-y-auto bg-white p-3 pb-10"
+            className="flex h-full w-full flex-col items-stretch gap-2 overflow-y-auto bg-brand-dark p-4 pb-10"
             onSubmit={addWidgetForm.handleSubmit}
           >
             {addWidgetForm && (
               <WidgetConfigEditor
                 key={`widgetConfigEditor_${uniqueKey}`}
                 widgetEditorForm={addWidgetForm}
-                queryResults={queryResults}
-                onQueryResults={setQueryResults}
+                dataSourceResults={dataSourceResults}
+                onDataSourceResults={setDataSourceResults}
               />
             )}
           </form>
@@ -117,7 +117,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
               widgetTitle={addWidgetForm.values.widgetTitle}
               widgetType={addWidgetForm.values.widgetType}
               widgetConfig={addWidgetForm.values.widgetConfig}
-              queryResults={queryResults}
+              dataSourceResults={dataSourceResults}
               isFetchingData={false}
               isRefreshingData={false}
               refreshData={() => {}}

@@ -57,7 +57,7 @@ export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
       />
 
       {/* Help callout */}
-      <div className="rounded-lg border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
+      <div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
         <div className="font-semibold text-xs text-foreground">📘 How This Works</div>
 
         <div>
@@ -74,16 +74,16 @@ export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
           <div className="ml-3 mt-0.5 text-muted-foreground">
             Define inputs in the <strong>"Input Parameters"</strong> panel (right side).
             Access them using:{' '}
-            <code className="bg-background px-1 py-0.5 rounded border border-border font-mono">{'{{ctx.input.paramName}}'}</code>
+            <code className="bg-brand-dark px-1 py-0.5 rounded-sm border border-border font-mono">{'{{ctx.input.paramName}}'}</code>
           </div>
         </div>
 
         <div>
           <span className="font-medium text-foreground">Variable Format:</span>
           <div className="ml-3 mt-0.5 font-mono text-[9px] space-y-0.5 text-muted-foreground">
-            <div><code className="bg-background px-1 rounded border border-border">{'{{ctx.input.userId}}'}</code> → input parameter</div>
-            <div><code className="bg-background px-1 rounded border border-border">{'{{ctx.queryResult}}'}</code> → previous node output</div>
-            <div><code className="bg-background px-1 rounded border border-border">{'id_{{ctx.input.id}}'}</code> → string interpolation</div>
+            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.input.userId}}'}</code> → input parameter</div>
+            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.queryResult}}'}</code> → previous node output</div>
+            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'id_{{ctx.input.id}}'}</code> → string interpolation</div>
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@ export const StartNode = memo(({ id, data, isConnectable }) => {
       case 'completed': return 'border-green-400 ring-2 ring-green-300 ring-opacity-50';
       case 'failed': return 'border-red-400 ring-2 ring-red-300 ring-opacity-50';
       case 'skipped': return 'border-orange-300 opacity-60';
-      default: return 'border-slate-200 hover:border-green-400 hover:shadow-md';
+      default: return 'border-brand-border hover:border-green-400 hover:shadow-md';
     }
   };
 
@@ -138,14 +138,14 @@ export const StartNode = memo(({ id, data, isConnectable }) => {
   };
 
   return (
-    <div className={`relative bg-white border rounded min-w-[280px] max-w-[350px] transition-all duration-150 ${getStatusStyles()}`}>
+    <div className={`relative bg-brand-black border rounded-sm min-w-[280px] max-w-[350px] transition-all duration-150 ${getStatusStyles()}`}>
       <StatusIndicator />
       <div className="flex items-stretch">
         <div style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}
-          className={`flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === 'running' ? 'bg-blue-100 border-blue-200' :
-            executionStatus === 'completed' ? 'bg-green-100 border-green-200' :
-              executionStatus === 'failed' ? 'bg-red-50 border-red-100' :
-                'bg-green-50 border-green-100'
+          className={`flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+            executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
+              executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
+                'bg-green-950/40 border-green-800'
             }`}
         >
           <VscDebugStart className={`w-5 h-5 ${executionStatus === 'running' ? 'text-blue-600' :
@@ -156,11 +156,11 @@ export const StartNode = memo(({ id, data, isConnectable }) => {
         </div>
         <div className="flex-1 px-3 py-2 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold truncate text-slate-700">{data?.title || 'Start'}</span>
+            <span className="text-xs font-semibold truncate text-brand-text-primary">{data?.title || 'Start'}</span>
           </div>
-          <div className="text-[10px] mt-0.5 text-slate-400">Workflow entry point</div>
+          <div className="text-[10px] mt-0.5 text-brand-text-primary">Workflow entry point</div>
         </div>
-        <div className="flex flex-col items-center justify-center px-2 border-l border-slate-100">
+        <div className="flex flex-col items-center justify-center px-2 border-l border-brand-border">
           <div className="w-2 h-2 rounded-full bg-green-400" title="Output" />
         </div>
       </div>

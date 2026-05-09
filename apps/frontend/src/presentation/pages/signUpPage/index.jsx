@@ -4,7 +4,7 @@ import { CONSTANTS } from "../../../constants";
 import {
   useAuthActions,
   useAuthState,
-} from "../../../logic/contexts/authContext";
+} from "../../../logic/hooks/useAuth";
 import { useFormik } from "formik";
 import logo from "../../../assets/logo.png";
 import { formValidations } from "../../../utils/formValidation";
@@ -33,7 +33,7 @@ const SignInPage = () => {
   }, [firebaseUserState]);
 
   return (
-    <div className="bg-slate-50 flex h-screen w-screen flex-col justify-center items-center overflow-hidden">
+    <div className="bg-brand-dark flex h-screen w-screen flex-col justify-center items-center overflow-hidden">
       <section className=" md:w-1/3 sm:w-2/3 ">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <div className="flex flex-row justify-center items-center mb-6">
@@ -42,9 +42,9 @@ const SignInPage = () => {
               {CONSTANTS.APP_NAME}
             </span>
           </div>
-          <div className="w-full bg-white rounded shadow  md:mt-0 sm:max-w-md xl:p-0">
+          <div className="w-full bg-brand-black rounded-sm shadow  md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-5">
-              <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-900 md:text-lg mb-3">
+              <h1 className="text-lg font-bold leading-tight tracking-tight text-brand-text-primary md:text-lg mb-3">
                 {CONSTANTS.STRINGS.SIGN_UP_FORM_TITLE}
               </h1>
               <form
@@ -54,7 +54,7 @@ const SignInPage = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block mb-1 text-sm font-medium text-slate-500 "
+                    className="block mb-1 text-sm font-medium text-brand-text-primary "
                   >
                     {CONSTANTS.STRINGS.SIGN_UP_FORM_EMAIL_FIELD_LABEL}
                   </label>
@@ -62,7 +62,7 @@ const SignInPage = () => {
                     type="email"
                     name="email"
                     id="email"
-                    className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1.5"
+                    className=" placeholder:text-brand-text-primary text-sm bg-brand-dark border border-brand-border text-brand-text-primary rounded-sm  focus:outline-none focus:border-brand-border block w-full px-1.5 py-1.5"
                     placeholder={
                       CONSTANTS.STRINGS.SIGN_UP_FORM_EMAIL_FIELD_PLACEHOLDER
                     }
@@ -75,7 +75,7 @@ const SignInPage = () => {
                 <div>
                   <label
                     htmlFor="password"
-                    className="block mb-1 text-sm font-medium text-slate-500 "
+                    className="block mb-1 text-sm font-medium text-brand-text-primary "
                   >
                     {CONSTANTS.STRINGS.SIGN_UP_FORM_PASSWORD_FIELD_LABEL}
                   </label>
@@ -85,7 +85,7 @@ const SignInPage = () => {
                     id="password"
                     className={`${
                       emailSignUpForm.errors.password ? "!border-red-400" : ""
-                    } placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1.5`}
+                    } placeholder:text-brand-text-primary text-sm bg-brand-dark border border-brand-border text-brand-text-primary rounded-sm  focus:outline-none focus:border-brand-border block w-full px-1.5 py-1.5`}
                     placeholder=""
                     required={true}
                     onChange={emailSignUpForm.handleChange}
@@ -96,7 +96,7 @@ const SignInPage = () => {
                 <div>
                   <label
                     htmlFor="confirmPassword"
-                    className="block mb-1 text-sm font-medium text-slate-500 "
+                    className="block mb-1 text-sm font-medium text-brand-text-primary "
                   >
                     {
                       CONSTANTS.STRINGS
@@ -111,7 +111,7 @@ const SignInPage = () => {
                       emailSignUpForm.errors.confirmPassword
                         ? "!border-red-400"
                         : ""
-                    } placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1.5`}
+                    } placeholder:text-brand-text-primary text-sm bg-brand-dark border border-brand-border text-brand-text-primary rounded-sm  focus:outline-none focus:border-brand-border block w-full px-1.5 py-1.5`}
                     placeholder=""
                     required={true}
                     onChange={emailSignUpForm.handleChange}
@@ -126,19 +126,19 @@ const SignInPage = () => {
                 ) : (
                   <Button
                     type="submit"
-                    className="px-3 py-2 w-full text-xs font-medium text-center text-white bg-blue-700 rounded hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 "
+                    className="px-3 py-2 w-full text-xs font-medium text-center text-brand-text-primary bg-brand-green rounded-sm hover:bg-brand-green/90 focus:ring-4 focus:outline-none focus:ring-brand-green-border "
                   >
                     {CONSTANTS.STRINGS.SIGN_UP_FORM_SUBMIT_BUTTON}
                   </Button>
                 )}
 
-                <div className="py-3 flex items-center text-sm text-slate-400 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">
+                <div className="py-3 flex items-center text-sm text-brand-text-primary before:flex-1 before:border-t before:border-brand-border before:me-6 after:flex-1 after:border-t after:border-brand-border after:ms-6">
                   Or
                 </div>
                 <Button
                   type="button"
                   onClick={googleSignIn}
-                  className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded text-sm px-5 py-1.5 text-center inline-flex justify-center items-center  me-2 mb-2 w-full"
+                  className="text-brand-text-primary bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-sm text-sm px-5 py-1.5 text-center inline-flex justify-center items-center  me-2 mb-2 w-full"
                 >
                   <svg
                     className="w-4 h-4 me-2"
@@ -158,7 +158,7 @@ const SignInPage = () => {
 
                 {signUpState && signUpState.error && (
                   <div
-                    className="p-4 mb-4 text-sm text-red-800 rounded bg-red-50 "
+                    className="p-4 mb-4 text-sm text-red-400 rounded-sm bg-red-950/40 "
                     role="alert"
                   >
                     <span className="font-medium">Sign up error!</span>
@@ -166,7 +166,7 @@ const SignInPage = () => {
                   </div>
                 )}
 
-                <p className="text-sm font-light text-slate-500 ">
+                <p className="text-sm font-light text-brand-text-primary ">
                   {CONSTANTS.STRINGS.SIGN_UP_FORM_TO_SIGN_IN_MESSAGE}
                   <Link
                     to={CONSTANTS.ROUTES.SIGN_IN.path()}

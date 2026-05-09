@@ -1,0 +1,24 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionName": { "type": "string", "minLength": 3 },
+      "protocol": { "type": "string", "enum": ["udp", "tcp"], "default": "udp" },
+      "port": { "type": "integer", "default": 514, "description": "Port to listen on for syslog messages" },
+      "format": { "type": "string", "enum": ["rfc3164", "rfc5424", "auto"], "default": "auto", "description": "Syslog message format" }
+    },
+    "required": ["connectionName", "protocol", "port"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/connectionName", "label": "Connection Name" },
+      { "type": "HorizontalLayout", "elements": [
+        { "type": "Control", "scope": "#/properties/protocol", "label": "Protocol" },
+        { "type": "Control", "scope": "#/properties/port", "label": "Listen Port" }
+      ]},
+      { "type": "Control", "scope": "#/properties/format", "label": "Syslog Format" }
+    ]
+  },
+  "data": { "connectionName": "MySyslog", "protocol": "udp", "port": 514, "format": "auto" }
+}

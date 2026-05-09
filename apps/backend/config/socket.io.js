@@ -8,4 +8,5 @@ const socketIO = new Server(httpServer, {
   },
 });
 socketIO.use(authMiddleware.authProviderSocket);
+
 module.exports = { socketIO };

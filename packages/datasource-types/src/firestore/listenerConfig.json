@@ -1,0 +1,35 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "collection": {
+        "type": "string",
+        "description": "Firestore collection name to listen to"
+      },
+      "documentId": {
+        "type": "string",
+        "description": "Optional: Document ID to listen to a specific document instead of the whole collection"
+      }
+    },
+    "required": ["collection"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/collection",
+        "label": "Collection Name"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/documentId",
+        "label": "Document ID (Optional)"
+      }
+    ]
+  },
+  "data": {
+    "collection": "",
+    "documentId": ""
+  }
+}

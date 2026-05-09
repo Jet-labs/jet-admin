@@ -4,7 +4,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { deleteAPIKeyByIDAPI } from "../../../data/apis/apiKey";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import PropTypes from "prop-types";
 import { Button, Spinner } from "@jet-admin/ui";

@@ -195,24 +195,24 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
         />
 
         {/* Comprehensive instructions */}
-        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
-          <div className="font-semibold text-slate-700 text-xs">📘 Delay Types</div>
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
+          <div className="font-semibold text-brand-text-primary text-xs">📘 Delay Types</div>
 
           <div>
-            <span className="font-medium text-slate-700">Fixed Duration:</span>
-            <div className="ml-3 mt-0.5 text-slate-500">
+            <span className="font-medium text-brand-text-primary">Fixed Duration:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary">
               Set exact wait time using minutes, seconds, and milliseconds.
             </div>
           </div>
 
           <div>
-            <span className="font-medium text-slate-700">From Variable:</span>
-            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px]">
-              <code className="bg-white px-1 rounded">{"{{ctx.waitTime}}"}</code> → value in milliseconds
+            <span className="font-medium text-brand-text-primary">From Variable:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px]">
+              <code className="bg-brand-black px-1 rounded-sm">{"{{ctx.waitTime}}"}</code> → value in milliseconds
             </div>
           </div>
 
-          <div className="text-green-600 bg-green-50 border border-green-200 rounded p-1.5 mt-2">
+          <div className="text-green-600 bg-green-50 border border-green-800 rounded-sm p-1.5 mt-2">
             <strong>✓ Non-blocking:</strong> Delay uses queue scheduling. Workflow resources are released during wait.
           </div>
         </div>
@@ -220,7 +220,7 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
         <Button
           type="button"
           onClick={handleSave}
-          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
           Save
         </Button>
@@ -262,12 +262,12 @@ export const DelayNode = memo(({ data, isConnectable }) => {
 
   return (
     <div className={`
-      bg-white border rounded
+      bg-brand-black border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${isDisabled
-        ? 'border-slate-200 opacity-50'
-        : 'border-slate-200 hover:border-amber-400 hover:shadow-md'
+        ? 'border-brand-border opacity-50'
+        : 'border-brand-border hover:border-amber-400 hover:shadow-md'
       }
     `}>
       {/* Main content - horizontal layout */}
@@ -282,20 +282,20 @@ export const DelayNode = memo(({ data, isConnectable }) => {
                   }} 
                   className={`
           flex flex-col items-center justify-center px-3 py-3 border-r
-          ${isDisabled ? 'bg-slate-50 border-slate-100' : 'bg-amber-50 border-amber-100'}
+          ${isDisabled ? 'bg-brand-dark border-brand-border' : 'bg-amber-950/40 border-amber-100'}
         `}>
-          <IoMdTime className={`w-5 h-5 ${isDisabled ? 'text-slate-400' : 'text-amber-500'}`} />
+          <IoMdTime className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : 'text-amber-500'}`} />
         </div>
 
         {/* Center: Main info */}
         <div className="flex-1 px-3 py-2 min-w-0">
           {/* Title row */}
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-xs font-semibold truncate ${isDisabled ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+            <span className={`text-xs font-semibold truncate ${isDisabled ? 'text-brand-text-primary line-through' : 'text-brand-text-primary'}`}>
               {data?.title || 'Delay'}
             </span>
             {isDisabled && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200">
+              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
                 <VscDebugDisconnect className="w-2.5 h-2.5" />
                 Skip
               </span>
@@ -303,14 +303,14 @@ export const DelayNode = memo(({ data, isConnectable }) => {
           </div>
 
           {/* Delay info */}
-          <div className={`text-[10px] font-mono mt-0.5 ${isDisabled ? 'text-slate-300' : 'text-slate-400'}`}>
+          <div className={`text-[10px] font-mono mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
             wait {getDelayDisplay()}
           </div>
         </div>
 
         {/* Right: Output indicator */}
-        <div className="flex flex-col items-center justify-center px-2 border-l border-slate-100">
-          <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-slate-300' : 'bg-amber-400'}`} title="After Delay" />
+        <div className="flex flex-col items-center justify-center px-2 border-l border-brand-border">
+          <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-brand-black' : 'bg-amber-400'}`} title="After Delay" />
         </div>
       </div>
 

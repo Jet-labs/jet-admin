@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
-import { useWidgetsState } from "../../../logic/contexts/widgetsContext";
-import { useDataQueriesState } from "../../../logic/contexts/dataQueriesContext";
+import { useWorkflows } from "../../../logic/hooks/useWorkflows";
+import { useDataQueries } from "../../../logic/hooks/useDataQueries";
+import { useParams } from "react-router-dom";
 
 import {
   Button,
@@ -61,8 +62,9 @@ export const WidgetEventsEditor = ({ widgetEditorForm }) => {
     widgetEditorForm: PropTypes.object.isRequired,
   };
 
-  const { workflows } = useWidgetsState();
-  const { dataQueries } = useDataQueriesState();
+  const { tenantID } = useParams();
+  const { workflows } = useWorkflows(tenantID);
+  const { dataQueries } = useDataQueries(tenantID);
 
   const events = widgetEditorForm.values.widgetConfig?.events || {};
 
@@ -161,7 +163,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm }) => {
             {actions.map((action, actionIndex) => (
               <div
                 key={actionIndex}
-                className="rounded border border-border bg-background p-2.5 space-y-2"
+                className="rounded-sm border border-border bg-background p-2.5 space-y-2"
               >
                 <div className="flex items-center justify-between gap-2">
                   {/* Action Type Selector */}

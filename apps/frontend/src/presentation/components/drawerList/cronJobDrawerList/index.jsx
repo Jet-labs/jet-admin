@@ -3,7 +3,7 @@ import { FaPlus } from "react-icons/fa";
 import { RiCalendarScheduleLine } from "react-icons/ri";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useCronJobsState } from "../../../../logic/contexts/cronJobsContext";
+import { useCronJobs } from "../../../../logic/hooks/useCronJobs";
 import { NoEntityUI } from "../../ui/noEntityUI";
 
 import { Button } from "@jet-admin/ui";
@@ -11,15 +11,14 @@ export const CronJobDrawerList = () => {
   const { tenantID } = useParams();
   const navigate = useNavigate();
   const routeParam = useParams();
-  const { isLoadingCronJobs, cronJobs, isFetchingCronJobs } =
-    useCronJobsState();
+  const { isLoadingCronJobs, cronJobs, isFetchingCronJobs } = useCronJobs(tenantID);
 
   const _navigateToAddNotification = () => {
     navigate(CONSTANTS.ROUTES.ADD_CRON_JOB.path(tenantID));
   };
 
   return (
-    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddNotification}
         variant="primary-ghost"
