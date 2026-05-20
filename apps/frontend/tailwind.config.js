@@ -20,7 +20,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "var(--brand-green)",
+          DEFAULT: "rgb(var(--brand-green-rgb))",
           foreground: "var(--brand-text-primary)",
         },
         secondary: {
@@ -44,7 +44,7 @@ export default {
           foreground: "var(--brand-text-primary)",
         },
         card: {
-          DEFAULT: "var(--brand-dark)",
+          DEFAULT: "var(--brand-dark-card)",
           foreground: "var(--brand-text-primary)",
         },
         brand: {

@@ -310,4 +310,76 @@ apiKeyService.deleteAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
   }
 };
 
+/**
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {number} param0.apiKeyID
+ * @returns {Promise<boolean>}
+ */
+apiKeyService.cloneAPIKey = async ({ userID, tenantID, apiKeyID, authContext }) => {
+  Logger.log("info", {
+    message: "apiKeyService:cloneAPIKey:params",
+    params: { userID, tenantID, apiKeyID, authContext },
+  });
+
+  try {
+    const existing = await prisma.tblAPIKeys.findUnique({
+      where: { apiKeyID },
+      include: {
+        tblAPIKeyRoleMappings: true,
+      },
+    });
+
+    if (!existing) {
+      throw new Error("API Key not found");
+    }
+
+    if (existing.tenantID !== tenantID) {
+      throw new Error("API Key does not belong to this tenant");
+    }
+
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+
+    const clonedAPIKey = await prisma.$transaction(async (tx) => {
+      const apiKey = await tx.tblAPIKeys.create({
+        data: {
+          tenantID: tenantID,
+          creatorID,
+          createdByApiKeyID,
+          apiKeyTitle: existing.apiKeyTitle + " (Copy)",
+          apiKey: generateAPIKey(),
+          isDisabled: true, // Safe default
+        },
+      });
+
+      const apiKeyRoleMappings = existing.tblAPIKeyRoleMappings.map((mapping) => ({
+        roleID: mapping.roleID,
+        apiKeyID: apiKey.apiKeyID,
+      }));
+
+      if (apiKeyRoleMappings.length > 0) {
+        await tx.tblAPIKeyRoleMappings.createMany({
+          data: apiKeyRoleMappings,
+        });
+      }
+
+      return apiKey;
+    });
+
+    Logger.log("success", {
+      message: "apiKeyService:cloneAPIKey:success",
+      params: { userID, clonedAPIKey },
+    });
+
+    return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "apiKeyService:cloneAPIKey:failure",
+      params: { userID, error },
+    });
+    throw error;
+  }
+};
+
 module.exports = { apiKeyService };

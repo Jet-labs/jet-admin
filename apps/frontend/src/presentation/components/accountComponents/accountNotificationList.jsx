@@ -8,7 +8,7 @@ export const AccountNotificationList = () => {
   return (
     <div className="w-full mt-10 flex flex-col justify-start items-stretch gap-2">
       {user?.notifications?.length > 0 ? (
-        <span className="text-brand-text-primary font-semibold text-sm">
+        <span className="text-foreground font-semibold text-sm">
           {CONSTANTS.STRINGS.USER_NOTIFICATIONS_TITLE}
         </span>
       ) : null}
@@ -17,13 +17,13 @@ export const AccountNotificationList = () => {
         return (
           <div
             key={key}
-            className="p-2  border-brand-border border rounded-sm flex flex-col justify-start items-start gap-1 border-l-2 border-l-primary"
+            className="p-2  border-border border rounded-sm flex flex-col justify-start items-start gap-1 border-l-2 border-l-primary"
           >
-            <span className="text-brand-text-primary text-sm font-medium">
+            <span className="text-foreground text-sm font-medium">
               {notification.title}
             </span>
             {notification.description && (
-              <span className="text-brand-text-primary text-xs font-light">
+              <span className="text-foreground text-xs font-light">
                 {notification.description}
               </span>
             )}

@@ -6,7 +6,7 @@ const UpdateListenerPage = () => {
   const { tenantID, listenerID } = useParams();
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       <ListenerUpdationForm tenantID={tenantID} listenerID={listenerID} />
     </div>
   );

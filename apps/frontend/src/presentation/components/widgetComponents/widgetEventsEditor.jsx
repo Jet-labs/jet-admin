@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
+import { Plus, Trash2 } from 'lucide-react';
 import PropTypes from "prop-types";
-import { FiPlus, FiTrash2 } from "react-icons/fi";
 import { useWorkflows } from "../../../logic/hooks/useWorkflows";
 import { useDataQueries } from "../../../logic/hooks/useDataQueries";
 import { useParams } from "react-router-dom";
@@ -155,7 +155,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm }) => {
                 className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
                 onClick={() => handleAddEvent(eventType)}
               >
-                <FiPlus className="mr-1 h-3 w-3" />
+                <Plus className="mr-1 h-3 w-3" />
                 Add Action
               </Button>
             </div>
@@ -192,7 +192,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm }) => {
                     className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
                     onClick={() => handleRemoveAction(eventType, actionIndex)}
                   >
-                    <FiTrash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
 

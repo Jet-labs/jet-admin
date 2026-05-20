@@ -12,7 +12,7 @@ export const CustomVerticalLayout = (props) => {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-2">
       {elements.map((element, index) => (
         <JsonFormsDispatch
           key={index}

@@ -1,12 +1,11 @@
 import React from "react";
-import { TbCloudDataConnection } from "react-icons/tb";
-
+import { Cloud } from 'lucide-react';
 const ListenerLayoutLandingPage = () => {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center bg-brand-dark text-center p-6">
+    <div className="flex h-full w-full flex-col items-center justify-center bg-background text-center p-6">
       <div className="flex flex-col items-center gap-3 max-w-sm">
         <div className="rounded-lg bg-muted p-4">
-          <TbCloudDataConnection className="w-8 h-8 text-muted-foreground" />
+          <Cloud className="w-8 h-8 text-muted-foreground" />
         </div>
         <h2 className="text-base font-semibold text-foreground">Listeners</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">

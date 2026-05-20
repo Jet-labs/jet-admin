@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdDeleteOutline } from "react-icons/md";
+import { Trash2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { deleteDatasourceByIDAPI } from "../../../data/apis/datasource";
@@ -53,17 +53,19 @@ export const DatasourceDeletionForm = ({ tenantID, datasourceID }) => {
   return (
     <>
       <Button
-        variant="destructive-ghost"
-        size="sm"
+        type="button"
+        variant="destructive"
+        size="icon"
         square
         onClick={_handleDeleteDatasource}
         disabled={isDeletingDatasource}
-        type="button"
+        className="shrink-0"
+        aria-label="Delete datasource"
       >
         {isDeletingDatasource ? (
           <Spinner size={14} />
         ) : (
-            <MdDeleteOutline className="size-4" />
+            <Trash2 className="h-3 w-3" />
         )}
       </Button>
     </>

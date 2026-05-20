@@ -115,7 +115,7 @@ export const TenantPermissionSelectionInput = ({
           )}
         </Button>
         {isOpen && (
-          <div className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-border bg-brand-dark shadow-lg">
+          <div className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-border bg-background shadow-lg">
             {tenantPermissions.permissions.map((tenantPermission) => (
               <div
                 key={tenantPermission.permissionID}

@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useCallback } from "react";
+import { Play, X } from 'lucide-react';
 import PropTypes from "prop-types";
-import { FaPlay, FaTimes } from "react-icons/fa";
-
 import { Button, InputArgsForm } from "@jet-admin/ui";
 /**
  * Modal to prompt for workflow input parameters before test run.
@@ -95,10 +94,10 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-brand-black rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="bg-background rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-brand-border bg-brand-dark">
-          <h3 className="text-sm font-semibold text-brand-text-primary">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background">
+          <h3 className="text-sm font-semibold text-foreground">
             Workflow Input Parameters
           </h3>
           <Button
@@ -107,9 +106,9 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
             size="sm"
             square
             onClick={onClose}
-            className="h-8 w-8 text-brand-text-primary hover:text-brand-text-primary"
+            className="h-8 w-8 text-foreground hover:text-foreground"
           >
-            <FaTimes className="w-4 h-4" />
+            <X className="w-4 h-4" />
           </Button>
         </div>
 
@@ -125,7 +124,7 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-brand-border bg-brand-dark">
+          <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border bg-background">
             <Button
               type="button"
               variant="outline"
@@ -140,7 +139,7 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
               onClick={handleSubmit}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
-              <FaPlay className="w-3 h-3 mr-1.5" />
+              <Play className="w-3 h-3 mr-1.5" />
               Run Workflow
             </Button>
           </div>

@@ -8,7 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createWorkflowAPI } from "../../../data/apis/workflow";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { Button, Spinner, PageHeader } from "@jet-admin/ui";
 
 export const WorkflowAdditionForm = ({ tenantID }) => {
   WorkflowAdditionForm.propTypes = {
@@ -58,22 +58,14 @@ export const WorkflowAdditionForm = ({ tenantID }) => {
 
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
-      <div className="w-full px-4 py-3 border-b border-border flex flex-row justify-between items-center bg-brand-dark">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground text-start">
-          {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_TITLE}
-        </h1>
-        <Button
-          type="button"
-          onClick={workflowAdditionForm.handleSubmit}
-          disabled={isAddingWorkflow}
-        >
-          {isAddingWorkflow && (
-            <Spinner className="mr-2" size={16} />
-          )}
-          {CONSTANTS.STRINGS.ADD_WORKFLOW_BUTTON_TEXT}
-        </Button>
-      </div>
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_WORKFLOWS_TITLE}
+        onSave={workflowAdditionForm.handleSubmit}
+        isSaving={isAddingWorkflow}
+        saveText="Save"
+      />
 
       <form
         className="w-full flex-1 overflow-hidden"

@@ -10,7 +10,7 @@ import {
 
 export const DashboardLayout = () => {
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark relative">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background relative">
       <ResizablePanelGroup
         direction="horizontal"
         autoSaveId={
@@ -22,7 +22,7 @@ export const DashboardLayout = () => {
           <DashboardDrawerList />
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
-        <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
+        <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
           <Outlet />
         </ResizablePanel>
       </ResizablePanelGroup>

@@ -1,4 +1,4 @@
-import { FaPlus } from "react-icons/fa";
+import { Plus } from 'lucide-react';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useDataQueries } from "../../../../logic/hooks/useDataQueries";
@@ -21,13 +21,13 @@ export const DataQueryDrawerList = () => {
   };
 
   return (
-    <div className="bg-brand-dark h-full overflow-hidden p-3 w-full flex flex-col gap-3">
+    <div className="bg-background h-full overflow-hidden p-3 w-full flex flex-col gap-3">
       <Button
         onClick={_navigateToAddMoreQuery}
-        variant="primary-ghost"
+        variant="secondary"
         className="w-full justify-start"
       >
-        <FaPlus className="size-4 mr-2" />
+        <Plus className="size-4 mr-2" />
         {CONSTANTS.STRINGS.ADD_QUERY_BUTTON_TEXT}
       </Button>
 
@@ -56,7 +56,7 @@ export const DataQueryDrawerList = () => {
               >
                 <div
                   className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${isActive
-                      ? "bg-primary/10 text-primary"
+                    ? "bg-primary/5 text-primary"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >

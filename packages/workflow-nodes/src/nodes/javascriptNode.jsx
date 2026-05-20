@@ -3,12 +3,8 @@ import { Handle, Position } from 'reactflow';
 import { JsonForms } from '@jsonforms/react';
 import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
-import { FaJs } from 'react-icons/fa';
-import { IoMdTime } from 'react-icons/io';
-import { TbRefresh } from 'react-icons/tb';
-import { BiErrorCircle } from 'react-icons/bi';
-import { VscDebugDisconnect } from 'react-icons/vsc';
 import { Button } from '@jet-admin/ui';
+import { Ban, Clock, RefreshCw, AlertCircle, FileCode } from 'lucide-react';
 
 // ============================================================================
 // Error handling options
@@ -280,6 +276,7 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
 
         <Button
           type="button"
+          size="sm"
           onClick={handleSave}
           className="w-full"
         >
@@ -328,7 +325,7 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
     if (executionStatus === 'running') {
       return (
         <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin">
-          <TbRefresh className="w-3 h-3 text-white" />
+          <RefreshCw className="w-3 h-3 text-white" />
         </div>
       );
     }
@@ -362,7 +359,7 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
         ? 'border-brand-border opacity-50'
         : getStatusStyles()
       }
-      ${!data.code ? '!border-red-400 !bg-red-50' : ''}
+      ${!data.code ? '!border-red-400 !bg-red-950/40' : ''}
     `}>
       <StatusIndicator />
 
@@ -383,7 +380,7 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
                   executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
                     'bg-yellow-950/40 border-yellow-800'}
         `}>
-          <FaJs className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' :
+          <FileCode className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' :
               executionStatus === 'running' ? 'text-blue-600' :
                 executionStatus === 'completed' ? 'text-green-600' :
                   executionStatus === 'failed' ? 'text-red-600' :
@@ -400,7 +397,7 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
             </span>
             {isDisabled && (
               <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
-                <VscDebugDisconnect className="w-2.5 h-2.5" />
+                <Ban className="w-2.5 h-2.5" />
                 Skip
               </span>
             )}

@@ -18,7 +18,7 @@ import React from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { Button, Spinner, PageHeader } from "@jet-admin/ui";
 export const DashboardAdditionForm = ({ tenantID }) => {
   DashboardAdditionForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -81,20 +81,14 @@ export const DashboardAdditionForm = ({ tenantID }) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="flex h-full w-full flex-col items-center bg-brand-dark">
-        <div className="flex w-full items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3">
-          <h1 className="text-lg font-semibold text-foreground">
-            {CONSTANTS.STRINGS.ADD_DASHBOARD_FORM_TITLE}
-          </h1>
-          <Button
-            type="submit"
-            form="dashboard-addition-form"
-            disabled={isAddingDashboard}
-          >
-            {isAddingDashboard && <Spinner className="mr-2" size={16} />}
-            {CONSTANTS.STRINGS.ADD_DASHBOARD_BUTTON_TEXT}
-          </Button>
-        </div>
+      <div className="flex h-full w-full flex-col items-center bg-background">
+        <PageHeader
+          title={CONSTANTS.STRINGS.ADD_DASHBOARD_FORM_TITLE}
+          parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_DASHBOARDS_TITLE}
+          onSave={dashboardAdditionForm.handleSubmit}
+          isSaving={isAddingDashboard}
+          saveText="Save"
+        />
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={
@@ -103,11 +97,11 @@ export const DashboardAdditionForm = ({ tenantID }) => {
           }
           className="!h-full !w-full"
         >
-          <ResizablePanel defaultSize={20} className="overflow-hidden bg-brand-dark">
+          <ResizablePanel defaultSize={20} className="overflow-hidden bg-background">
             <form
               id="dashboard-addition-form"
               onSubmit={dashboardAdditionForm.handleSubmit}
-              className="flex h-full w-full flex-col overflow-hidden bg-brand-dark"
+              className="flex h-full w-full flex-col overflow-hidden bg-background"
             >
               <DashboardEditor dashboardEditorForm={dashboardAdditionForm} />
               <DashboardWidgetList
@@ -118,7 +112,7 @@ export const DashboardAdditionForm = ({ tenantID }) => {
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
             {dashboardAdditionForm && dashboardAdditionForm.values && (
               <DashboardDropzone
                 tenantID={tenantID}

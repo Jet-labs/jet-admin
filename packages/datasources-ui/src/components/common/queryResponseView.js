@@ -21,7 +21,7 @@ export const QueryResponseView = ({ queryResult }) => {
             className={`px-4 mr-2 py-2 text-sm font-medium rounded-sm transition-colors ${
               index === tab
                 ? "text-primary bg-primary/5"
-                : "text-foreground hover:bg-brand-border-dark"
+                : "text-foreground hover:bg-muted"
             }`}
             onClick={() => setTab(index)}
             type="button"
@@ -30,7 +30,7 @@ export const QueryResponseView = ({ queryResult }) => {
           </Button>
         ))}
       </div>
-      <div className="p-3 border mt-3 border-border rounded-sm bg-brand-dark flex flex-col gap-2 overflow-y-auto flex-1">
+      <div className="p-3 border mt-3 border-border rounded-sm bg-background flex flex-col gap-2 overflow-y-auto flex-1">
         {tab === 0 && (
           <QueryResponseTableTab data={queryResult ? queryResult : ""} />
         )}

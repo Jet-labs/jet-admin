@@ -47,4 +47,11 @@ router.delete(
   apiKeyController.deleteAPIKeyByID
 );
 
+router.post(
+  "/:apiKeyID/clone",
+  validate(apiKeyIdParamSchema, "params"),
+  authMiddleware.checkUserPermissions(["tenant:apikey:create"]),
+  apiKeyController.cloneAPIKey
+);
+
 module.exports = router;

@@ -9,14 +9,14 @@ const { z, schemas } = require("../../utils/validation.utils");
 // ============================================================
 
 const createApiKeySchema = z.object({
-  apiKeyName: z.string().min(1, "apiKeyName is required").max(255),
+  apiKeyTitle: z.string().min(1, "apiKeyTitle is required").max(255),
   apiKeyDescription: z.string().optional(),
   apiKeyPermissions: z.array(z.string()).optional(),
   apiKeyExpiry: z.string().optional(),
 }).passthrough();
 
 const updateApiKeySchema = z.object({
-  apiKeyName: z.string().min(1).max(255).optional(),
+  apiKeyTitle: z.string().min(1).max(255).optional(),
   apiKeyDescription: z.string().optional(),
   apiKeyPermissions: z.array(z.string()).optional(),
   apiKeyExpiry: z.string().optional(),

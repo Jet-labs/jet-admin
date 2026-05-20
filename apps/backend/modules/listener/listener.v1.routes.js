@@ -27,6 +27,7 @@ router.post('/', listenerController.createListener);
 router.get('/:listenerID', listenerController.getListenerByID);
 router.put('/:listenerID', listenerController.updateListener);
 router.delete('/:listenerID', listenerController.deleteListener);
+router.post('/:listenerID/clone', listenerController.cloneListener);
 
 // Lifecycle & Testing
 router.post('/:listenerID/activate', listenerController.activateListener);

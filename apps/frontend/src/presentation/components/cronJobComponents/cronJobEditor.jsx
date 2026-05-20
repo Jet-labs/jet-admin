@@ -15,30 +15,10 @@ import {
   SelectValue,
   InputArgsForm,
   Switch,
+  Section,
 } from "@jet-admin/ui";
 
 // ─── Small helper components ─────────────────────────────────────────────────
-
-/** Wraps a form section with a consistent heading + card look. */
-function Section({ title, description, children }) {
-  return (
-    <div className="rounded-md border border-border bg-card p-4 space-y-3">
-      {(title || description) && (
-        <div>
-          {title && (
-            <p className="text-xs font-mono font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-              {title}
-            </p>
-          )}
-          {description && (
-            <p className="text-[11px] text-muted-foreground">{description}</p>
-          )}
-        </div>
-      )}
-      {children}
-    </div>
-  );
-}
 
 function FieldError({ message }) {
   if (!message) return null;

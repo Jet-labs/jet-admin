@@ -45,11 +45,11 @@ export const QueryResponseTableTab = ({
       className={`!flex !flex-col !justify-start !items-stretch ${className}`}
     >
       {!dataSchema ? (
-        <div className="!h-32 flex flex-col justify-center items-center w-full text-[#1c1c1e]">
+        <div className="!h-32 flex flex-col justify-center items-center w-full text-foreground">
           <span>Data schema not valid or no data available</span>
         </div>
       ) : !columns ? (
-        <div className="!h-32 flex !flex-col !justify-center !items-center w-full text-[#1c1c1e]">
+        <div className="!h-32 flex !flex-col !justify-center !items-center w-full text-foreground">
           <span>Columns cannot be extracted or mapped</span>
         </div>
       ) : data && Array.isArray(data) && data.length && columns ? (
@@ -64,7 +64,7 @@ export const QueryResponseTableTab = ({
           showCellVerticalBorder
           getRowClassName={(params) =>
             params.indexRelativeToCurrentPage % 2 === 0
-              ? "bg-[#646cff]/10"
+              ? "bg-primary/10"
               : "Mui-odd"
           }
           getRowHeight={() => "auto"}
@@ -104,13 +104,13 @@ export const QueryResponseTableTab = ({
               minWidth: "auto !important",
               width: "auto !important",
               flex: "0 0 auto !important",
-              color: "#646cff !important",
+              color: "hsl(var(--primary))",
               padding: "0.25rem !important",
             },
           }}
         />
       ) : (
-        <div className="!h-32 flex !flex-col !justify-center !items-center w-full text-[#1c1c1e]">
+        <div className="!h-32 flex !flex-col !justify-center !items-center w-full text-foreground">
           <span>No data</span>
         </div>
       )}

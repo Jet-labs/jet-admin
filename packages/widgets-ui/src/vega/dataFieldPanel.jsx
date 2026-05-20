@@ -3,11 +3,9 @@ import PropTypes from 'prop-types';
 import { FieldPill } from './fieldPill';
 import { inferFieldsFromData } from './chartSpecGenerator';
 import { extractWorkflowSchema } from './variableExplorer';
-import { FiSearch, FiDatabase, FiPlus, FiZap } from 'react-icons/fi';
-import { BiGitMerge } from 'react-icons/bi';
-import { MdOutput } from 'react-icons/md';
 
 import { Button, Input, Label } from "@jet-admin/ui";
+import { Database, GitMerge, ArrowRightFromLine } from 'lucide-react';
 /**
  * Recursively walk context and collect all array paths.
  */
@@ -245,11 +243,11 @@ export const DataFieldPanel = ({
 
   const getCategoryIcon = (cat) => {
     switch (cat) {
-      case 'node': return <BiGitMerge className="w-3 h-3 shrink-0 text-emerald-600" />;
-      case 'output': return <MdOutput className="w-3 h-3 shrink-0 text-fuchsia-600" />;
+      case 'node': return <GitMerge className="w-3 h-3 shrink-0 text-emerald-600" />;
+      case 'output': return <ArrowRightFromLine className="w-3 h-3 shrink-0 text-fuchsia-600" />;
       case 'runtime': return <FiZap className="w-3 h-3 shrink-0 text-amber-600" />;
-      case 'datasource': return <FiDatabase className="w-3 h-3 shrink-0 text-blue-600" />;
-      default: return <FiDatabase className="w-3 h-3 shrink-0 text-brand-text-primary" />;
+      case 'datasource': return <Database className="w-3 h-3 shrink-0 text-blue-600" />;
+      default: return <Database className="w-3 h-3 shrink-0 text-brand-text-primary" />;
     }
   };
 
@@ -279,7 +277,7 @@ export const DataFieldPanel = ({
       {/* Header */}
       <div className="p-2.5 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-          <FiDatabase className="w-3.5 h-3.5 text-muted-foreground" />
+          <Database className="w-3.5 h-3.5 text-muted-foreground" />
           <span>Data Source</span>
         </div>
 
@@ -365,7 +363,7 @@ export const DataFieldPanel = ({
           </>
         ) : (
           <div className="flex flex-col items-center justify-center h-full py-6 text-center px-3">
-            <FiDatabase className="w-8 h-8 mb-2 text-muted-foreground/30" />
+            <Database className="w-8 h-8 mb-2 text-muted-foreground/30" />
             <p className="text-xs text-muted-foreground leading-relaxed mb-3">
               {dataSource
                 ? 'Run the workflow to detect fields from the data'

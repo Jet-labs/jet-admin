@@ -14,9 +14,7 @@
   "files": [
     "dist"
   ],
-  "dependencies": {
-    "react-icons": "^5.5.0"
-  },
+
   "scripts": {
     "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --packages=external && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --packages=external ",
     "dev": "npm run build -- --watch"

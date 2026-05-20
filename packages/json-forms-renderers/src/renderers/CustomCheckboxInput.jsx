@@ -20,7 +20,7 @@ export const CustomCheckboxInput = (props) => {
   };
 
   return (
-    <div className="flex items-center mb-3">
+    <div className="flex items-center">
       <Checkbox
         id={path}
         checked={!!data}

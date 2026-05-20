@@ -22,15 +22,17 @@ import {
   Card,
   CodeEditor,
   InputArgsForm,
+  CardFooter,
+  CardTitle,
 } from "@jet-admin/ui";
 import { Zap, Search, Save, Smartphone, Plus, Trash2, Edit2, Play, CircleSlash, ArrowRight } from "lucide-react";
 import PropTypes from "prop-types";
-
+import { GitBranch, FileCode2, DatabaseZap, PanelTop } from "lucide-react";
 const ACTION_TYPES = [
-  { value: "trigger_workflow", label: "Trigger Workflow", icon: Zap, color: "text-amber-400", bg: "bg-amber-400/10", border: "border-amber-400/20" },
-  { value: "trigger_query", label: "Trigger Data Query", icon: Search, color: "text-brand-green", bg: "bg-brand-green/10", border: "border-brand-green/20" },
-  { value: "save_to_buffer", label: "Save to Buffer", icon: Save, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" },
-  { value: "push_to_widget", label: "Push to Widget", icon: Smartphone, color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-400/20" },
+  { value: "trigger_workflow", label: "Trigger Workflow", icon: GitBranch, color: "text-primary", bg: "bg-muted", border: "border-border" },
+  { value: "trigger_query", label: "Trigger Data Query", icon: FileCode2, color: "text-primary", bg: "bg-muted", border: "border-border" },
+  { value: "save_to_buffer", label: "Save to Buffer", icon: DatabaseZap, color: "text-primary", bg: "bg-muted", border: "border-border" },
+  { value: "push_to_widget", label: "Push to Widget", icon: PanelTop, color: "text-primary", bg: "bg-muted", border: "border-border" },
 ];
 
 export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) => {
@@ -110,28 +112,30 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold text-brand-text-primary tracking-tight">Pipeline Actions</h3>
+          <h3 className="text-base font-semibold text-foreground tracking-tight">Pipeline Actions</h3>
           <p className="text-xs text-muted-foreground mt-1">Actions execute sequentially when an event is received.</p>
         </div>
-        <Button onClick={() => setIsAdding(true)} className="h-9 px-4 font-medium" variant="default">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Action
-        </Button>
+        {actions.length > 0 && (
+          <Button size="sm" variant="secondary" onClick={() => setIsAdding(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Action
+          </Button>
+        )}
       </div>
 
       {actions.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center border-dashed border-border/60 bg-brand-dark/20 py-16 text-center transition-colors hover:bg-brand-dark/40 hover:border-border">
+        <Card className="flex flex-col items-center justify-center border-dashed border-border/60 bg-background/20 py-16 text-center transition-colors hover:bg-background/40 hover:border-border">
           <div className="mb-4 rounded-full bg-brand-border/40 p-4 ring-1 ring-border shadow-inner">
             <Play className="h-6 w-6 text-muted-foreground/80 pl-1" />
           </div>
-          <h4 className="text-sm font-semibold text-brand-text-primary">No actions configured</h4>
+          <h4 className="text-sm font-semibold text-foreground">No actions configured</h4>
           <p className="mt-2 text-xs text-muted-foreground max-w-sm">
             Add your first action to start processing, transforming, and routing incoming data events.
           </p>
-          <Button variant="outline" className="mt-6" onClick={() => setIsAdding(true)}>
+          <Button size="sm" variant="secondary" className="mt-6" onClick={() => setIsAdding(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Configure Action
           </Button>
@@ -146,19 +150,19 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
               <div key={action.actionID} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
                 {/* Timeline Node */}
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-[3px] border-brand-dark bg-brand-border/80 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 ring-1 ring-border/20 transition-all group-hover:ring-brand-green/30 group-hover:border-brand-dark/90">
-                  <span className="text-[11px] font-bold text-muted-foreground group-hover:text-brand-text-primary">{index + 1}</span>
+                  <span className="text-[11px] font-bold text-muted-foreground group-hover:text-foreground">{index + 1}</span>
                 </div>
 
                 {/* Card Content */}
-                <Card className={`w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] p-4 transition-all duration-300 border shadow-sm hover:shadow-md ${!action.isEnabled ? 'opacity-60 grayscale-[0.3]' : 'hover:border-border/80 bg-brand-dark/60 backdrop-blur-sm'}`}>
+                <Card className={`w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] p-4 transition-all duration-300 border shadow-sm hover:shadow-md ${!action.isEnabled ? 'opacity-60 grayscale-[0.3]' : 'hover:border-border/80 bg-background/60 backdrop-blur-sm'}`}>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${typeConfig?.border || 'border-border'} ${typeConfig?.bg || 'bg-muted'} shadow-inner`}>
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border ${typeConfig?.border || 'border-border'} ${typeConfig?.bg || 'bg-muted'} shadow-inner`}>
                         <Icon className={`h-4 w-4 ${typeConfig?.color || 'text-muted-foreground'}`} />
                       </div>
                       <div className="min-w-0 flex-1 pt-0.5">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="text-sm font-semibold text-brand-text-primary truncate">
+                          <h4 className="text-sm font-semibold text-foreground truncate">
                             {typeConfig?.label || action.actionType}
                           </h4>
                           {!action.isEnabled && (
@@ -173,8 +177,8 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
                             <span className="flex items-center gap-1.5">
                               {Object.entries(action.actionConfig).slice(0, 2).map(([k, v]) => (
                                 <React.Fragment key={k}>
-                                  <span className="text-brand-text-muted">{k}:</span>
-                                  <span className="text-brand-text-primary truncate">{typeof v === 'object' ? '{...}' : String(v)}</span>
+                                  <span className="text-muted-foreground">{k}:</span>
+                                  <span className="text-foreground truncate">{typeof v === 'object' ? '{...}' : String(v)}</span>
                                 </React.Fragment>
                               ))}
                             </span>
@@ -190,14 +194,14 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
                         checked={action.isEnabled}
                         onCheckedChange={() => handleToggleEnable(action)}
                         size="sm"
-                        className="scale-90 data-[state=checked]:bg-brand-green"
+                        className="scale-90 data-[state=checked]:bg-primary"
                       />
                       <div className="hidden sm:block w-px h-4 bg-border/60 mx-1"></div>
                       <div className="flex">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 text-muted-foreground hover:text-brand-text-primary hover:bg-brand-border/40"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-brand-border/40"
                           onClick={() => setEditingAction(action)}
                         >
                           <Edit2 className="h-3.5 w-3.5" />
@@ -245,18 +249,18 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
   const selectedType = ACTION_TYPES.find(t => t.value === formData.actionType);
 
   return (
-    <Card className="bg-brand-dark/80 backdrop-blur border-brand-green/30 shadow-lg overflow-hidden">
-      <div className="border-b border-border/50 bg-brand-dark px-6 py-4 flex items-center justify-between">
+    <Card className="">
+      <div className="border-b rounded-t-md border-border/50 bg-background p-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-brand-green animate-pulse" />
-          <h3 className="text-sm font-semibold text-brand-text-primary tracking-tight">
+
+          <h3 className="text-sm font-semibold text-foreground tracking-tight">
             {action ? "Edit Pipeline Action" : "Add Pipeline Action"}
           </h3>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-6 space-y-6">
-        <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="p-4 space-y-4">
+        <div className="space-y-4">
           <div className="space-y-3">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Action Type</Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -267,14 +271,14 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
                   <div
                     key={t.value}
                     onClick={() => setFormData({ ...formData, actionType: t.value, actionConfig: {} })}
-                    className={`cursor-pointer rounded-xl border p-4 transition-all duration-200 ${
+                    className={`cursor-pointer rounded-sm border p-4 transition-all duration-200 ${
                       isSelected 
                         ? `border-${t.color.split('-')[1]}-500/50 ${t.bg} shadow-sm ring-1 ring-${t.color.split('-')[1]}-500/20` 
-                        : "border-border/50 bg-brand-dark/40 hover:border-border hover:bg-brand-border/20"
+                      : "border-border/50 bg-background/40 hover:border-border hover:bg-brand-border/20"
                     }`}
                   >
                     <Icon className={`h-5 w-5 mb-3 ${isSelected ? t.color : "text-muted-foreground"}`} />
-                    <div className={`text-sm font-medium ${isSelected ? "text-brand-text-primary" : "text-muted-foreground"}`}>
+                    <div className={`text-sm font-medium ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
                       {t.label}
                     </div>
                   </div>
@@ -283,10 +287,10 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
             </div>
           </div>
 
-          <div className="rounded-xl border border-border/50 bg-brand-dark/40 p-5">
+          <div className="rounded-sm border border-border/50 bg-background/40 p-5">
             <div className="flex items-center gap-2 mb-4">
               <selectedType.icon className={`h-4 w-4 ${selectedType.color}`} />
-              <h4 className="text-sm font-medium text-brand-text-primary">Configuration Details</h4>
+              <h4 className="text-sm font-medium text-foreground">Configuration Details</h4>
             </div>
             <ActionConfigEditor
               type={formData.actionType}
@@ -297,9 +301,9 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
             />
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-border/50 bg-brand-dark/40 p-4">
+          <div className="flex items-center justify-between rounded-sm border border-border/50 bg-background/40 p-4">
             <div className="flex items-center gap-3">
-              <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${formData.isEnabled ? 'bg-brand-green/10 text-brand-green' : 'bg-muted text-muted-foreground'}`}>
+              <div className={`flex h-8 w-8 items-center justify-center rounded-sm ${formData.isEnabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                 {formData.isEnabled ? <Play className="h-4 w-4" /> : <CircleSlash className="h-4 w-4" />}
               </div>
               <div className="space-y-0.5">
@@ -311,16 +315,16 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
               id="enable-action"
               checked={formData.isEnabled}
               onCheckedChange={(val) => setFormData({ ...formData, isEnabled: val })}
-              className="data-[state=checked]:bg-brand-green"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-6 border-t border-border/50">
-          <Button variant="ghost" type="button" onClick={onCancel} disabled={isSaving} className="px-6 hover:bg-brand-border/40">
+        <div className="flex items-center justify-end gap-3">
+          <Button variant="destructive" size="sm" type="button" onClick={onCancel} disabled={isSaving} className="px-6 hover:bg-brand-border/40">
             Cancel
           </Button>
-          <Button type="submit" disabled={isSaving} className="px-6 bg-brand-text-primary text-brand-dark hover:bg-white font-medium">
+          <Button type="submit" disabled={isSaving} size="sm" variant="default">
             {isSaving && <Spinner size={14} className="mr-2" />}
             {action ? "Save Changes" : "Create Action"}
           </Button>
@@ -340,15 +344,15 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
   };
 
   const renderModeToggle = () => (
-    <div className="flex items-center gap-1 mt-1.5 bg-brand-dark/60 p-0.5 rounded-md border border-border/40 w-fit">
+    <div className="flex items-center gap-1 mt-1.5 bg-background/60 p-0.5 rounded-sm border border-border/40 w-fit">
       <span 
-        className={`text-[10px] px-2.5 py-1 rounded cursor-pointer transition-colors ${!isJsonMode ? 'bg-brand-green/20 text-brand-green font-medium' : 'text-muted-foreground hover:text-brand-text-primary hover:bg-brand-border/30'}`} 
+        className={`text-[10px] px-2.5 py-1 rounded-sm cursor-pointer transition-colors ${!isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
         onClick={() => setIsJsonMode(false)}
       >
         Form
       </span>
       <span 
-        className={`text-[10px] px-2.5 py-1 rounded cursor-pointer transition-colors ${isJsonMode ? 'bg-brand-green/20 text-brand-green font-medium' : 'text-muted-foreground hover:text-brand-text-primary hover:bg-brand-border/30'}`} 
+        className={`text-[10px] px-2.5 py-1 rounded-sm cursor-pointer transition-colors ${isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
         onClick={() => setIsJsonMode(true)}
       >
         JSON
@@ -376,7 +380,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                 onChange({ ...config, workflowID: val, inputMapping: defaultMapping });
               }}
             >
-              <SelectTrigger className="font-mono text-sm bg-brand-dark">
+              <SelectTrigger className="font-mono text-sm bg-background">
                 <SelectValue placeholder="Choose a workflow..." />
               </SelectTrigger>
               <SelectContent>
@@ -396,7 +400,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
             </div>
             
             {isJsonMode ? (
-              <div className="rounded-md border border-border/60 overflow-hidden ring-1 ring-black/5 shadow-sm">
+              <div className="rounded-sm border border-border/60 overflow-hidden ring-1 ring-black/5 shadow-sm">
                 <CodeEditor
                   height={180}
                   language="json"
@@ -421,7 +425,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               
               if (!config.workflowID) {
                 return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-md text-center bg-brand-dark/20">
+                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-sm text-center bg-background/20">
                     Select a workflow above to configure its inputs.
                   </p>
                 );
@@ -429,7 +433,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               
               if (args.length === 0) {
                 return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-md text-center bg-brand-dark/20">
+                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-sm text-center bg-background/20">
                     This workflow has no input arguments defined.
                   </p>
                 );
@@ -439,7 +443,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               const normalizedArgs = args.map(arg => ({ ...arg, key: arg.key || arg.name }));
 
               return (
-                <div className="rounded-md border border-border/60 bg-brand-dark/30 p-4 shadow-sm">
+                <div className="rounded-sm border border-border/60 bg-background/30 p-4 shadow-sm">
                   <InputArgsForm
                     args={normalizedArgs}
                     values={typeof config.inputMapping === 'object' ? config.inputMapping : {}}
@@ -478,7 +482,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                 onChange({ ...config, dataQueryID: val, argMapping: defaultMapping });
               }}
             >
-              <SelectTrigger className="font-mono text-sm bg-brand-dark">
+              <SelectTrigger className="font-mono text-sm bg-background">
                 <SelectValue placeholder="Choose a data query..." />
               </SelectTrigger>
               <SelectContent>
@@ -498,7 +502,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
             </div>
             
             {isJsonMode ? (
-              <div className="rounded-md border border-border/60 overflow-hidden ring-1 ring-black/5 shadow-sm">
+              <div className="rounded-sm border border-border/60 overflow-hidden ring-1 ring-black/5 shadow-sm">
                 <CodeEditor
                   height={180}
                   language="json"
@@ -523,7 +527,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               
               if (!config.dataQueryID) {
                 return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-md text-center bg-brand-dark/20">
+                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-sm text-center bg-background/20">
                     Select a data query above to configure its arguments.
                   </p>
                 );
@@ -531,7 +535,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               
               if (args.length === 0) {
                 return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-md text-center bg-brand-dark/20">
+                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-sm text-center bg-background/20">
                     This query has no arguments defined.
                   </p>
                 );
@@ -541,7 +545,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               const normalizedArgs = args.map(arg => ({ ...arg, key: arg.key || arg.name }));
 
               return (
-                <div className="rounded-md border border-border/60 bg-brand-dark/30 p-4 shadow-sm">
+                <div className="rounded-sm border border-border/60 bg-background/30 p-4 shadow-sm">
                   <InputArgsForm
                     args={normalizedArgs}
                     values={typeof config.argMapping === 'object' ? config.argMapping : {}}
@@ -570,14 +574,14 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
             <Input
               value={config.bufferName || "default"}
               onChange={(e) => onChange({ ...config, bufferName: e.target.value })}
-              className="bg-brand-dark font-medium"
+              className="bg-background font-medium"
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
              <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Retention Policy</Label>
               <Select value={config.retentionPolicy || "count"} onValueChange={(val) => onChange({ ...config, retentionPolicy: val })}>
-                <SelectTrigger className="bg-brand-dark">
+                <SelectTrigger className="bg-background">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -594,7 +598,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                   type="number"
                   value={config.maxEvents || 1000}
                   onChange={(e) => onChange({ ...config, maxEvents: parseInt(e.target.value) })}
-                  className="bg-brand-dark"
+                  className="bg-background"
                 />
               </div>
             )}
@@ -605,7 +609,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                   type="number"
                   value={config.maxAgeHours || 24}
                   onChange={(e) => onChange({ ...config, maxAgeHours: parseInt(e.target.value) })}
-                  className="bg-brand-dark"
+                  className="bg-background"
                   placeholder="e.g. 24 for 1 day"
                 />
               </div>
@@ -623,14 +627,14 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                 value={config.widgetID || ""}
                 onChange={(e) => onChange({ ...config, widgetID: e.target.value })}
                 placeholder="Leave empty to broadcast to all"
-                className="font-mono text-sm bg-brand-dark"
+                className="font-mono text-sm bg-background"
               />
               <p className="text-[10px] text-muted-foreground">If empty, broadcasts on listener channel.</p>
             </div>
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Update Mode</Label>
               <Select value={config.mode || "replace"} onValueChange={(val) => onChange({ ...config, mode: val })}>
-                <SelectTrigger className="bg-brand-dark">
+                <SelectTrigger className="bg-background">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -644,12 +648,12 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Data Path</Label>
             <div className="flex gap-2 items-center">
-              <span className="text-xs text-muted-foreground font-mono bg-brand-dark px-2 py-1.5 rounded border border-border/50">event.</span>
+              <span className="text-xs text-muted-foreground font-mono bg-background px-2 py-1.5 rounded-sm border border-border/50">event.</span>
               <Input
                 value={config.dataPath || ""}
                 onChange={(e) => onChange({ ...config, dataPath: e.target.value })}
                 placeholder="e.g. payload.items (Optional)"
-                className="font-mono text-sm bg-brand-dark"
+                className="font-mono text-sm bg-background"
               />
             </div>
           </div>

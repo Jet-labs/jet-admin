@@ -30,7 +30,7 @@ export const DashboardDropzone = ({
   const containerRef = useRef(null);
 
   // Reactive state tree for widget data binding and event dispatching
-  const { stateTree, setQueryResult } = useRuntime({ tenantID });
+  const { stateTree, setQueryResult } = useRuntime(tenantID);
   const previousWidth = useRef(0);
 
   const _handleDelete = (index) => {

@@ -3,8 +3,8 @@ import { Handle, Position } from 'reactflow';
 import { JsonForms } from '@jsonforms/react';
 import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
-import { VscDebugStart } from 'react-icons/vsc';
 import { Button } from '@jet-admin/ui';
+import { Play } from 'lucide-react';
 
 export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
   const { strings } = useWorkflowNodes();
@@ -89,7 +89,7 @@ export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* ✅ Correct: variant="default" — no raw color overrides */}
-      <Button type="button" onClick={handleSave} className="w-full">
+      <Button type="button" size="sm" onClick={handleSave} className="w-full">
         Save
       </Button>
     </div>
@@ -148,7 +148,7 @@ export const StartNode = memo(({ id, data, isConnectable }) => {
                 'bg-green-950/40 border-green-800'
             }`}
         >
-          <VscDebugStart className={`w-5 h-5 ${executionStatus === 'running' ? 'text-blue-600' :
+          <Play className={`w-5 h-5 ${executionStatus === 'running' ? 'text-blue-600' :
             executionStatus === 'completed' ? 'text-green-600' :
               executionStatus === 'failed' ? 'text-red-600' :
                 'text-green-500'

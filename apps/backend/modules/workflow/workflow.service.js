@@ -349,6 +349,114 @@ workflowService.deleteWorkflow = async ({ userID, tenantID, workflowID, authCont
 };
 
 /**
+ * Clone a workflow.
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {number} param0.workflowID
+ * @returns {Promise<object>}
+ */
+workflowService.cloneWorkflow = async ({ userID, tenantID, workflowID, authContext }) => {
+  Logger.log("info", {
+    message: "workflowService:cloneWorkflow:params",
+    params: {
+      userID,
+      tenantID,
+      workflowID,
+      ...formatAuthContextForLog(authContext),
+    },
+  });
+
+  try {
+    const existing = await prisma.tblWorkflows.findUnique({
+      where: { workflowID },
+      include: {
+        tblWorkflowNodes: true,
+        tblWorkflowEdge: true,
+      },
+    });
+
+    if (!existing) {
+      throw new Error("Workflow not found");
+    }
+
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const crypto = require('crypto');
+
+    const workflowCloneTransaction = await prisma.$transaction(async (tx) => {
+      const workflow = await tx.tblWorkflows.create({
+        data: {
+          tenantID: tenantID,
+          title: existing.title + " (Copy)",
+          creatorID,
+          createdByApiKeyID,
+          workflowOptions: existing.workflowOptions || {},
+        },
+      });
+
+      const nodeMap = {};
+      const nodeCreateManyData = existing.tblWorkflowNodes.map((node) => {
+        const newNodeID = crypto.randomUUID();
+        nodeMap[node.nodeID] = newNodeID;
+        return {
+          nodeID: newNodeID,
+          workflowID: workflow.workflowID,
+          nodeType: node.nodeType,
+          timeoutSeconds: node.timeoutSeconds,
+          retryLimit: node.retryLimit,
+          nodeConfig: node.nodeConfig,
+        };
+      });
+
+      const edgeCreateManyData = existing.tblWorkflowEdge.map((edge) => {
+        return {
+          workflowID: workflow.workflowID,
+          upstreamNodeID: nodeMap[edge.upstreamNodeID],
+          downstreamNodeID: nodeMap[edge.downstreamNodeID],
+          sourceHandle: edge.sourceHandle,
+          targetHandle: edge.targetHandle,
+          edgeType: edge.edgeType,
+          edgeConfig: edge.edgeConfig,
+        };
+      });
+
+      if (nodeCreateManyData.length > 0) {
+        await tx.tblWorkflowNodes.createMany({
+          data: nodeCreateManyData,
+        });
+      }
+
+      if (edgeCreateManyData.length > 0) {
+        await tx.tblWorkflowEdge.createMany({
+          data: edgeCreateManyData,
+        });
+      }
+
+      return workflow;
+    });
+
+    Logger.log("success", {
+      message: "workflowService:cloneWorkflow:success",
+      params: {
+        userID,
+        workflowID,
+        newWorkflowID: workflowCloneTransaction.workflowID,
+      },
+    });
+    return workflowCloneTransaction;
+  } catch (error) {
+    Logger.log("error", {
+      message: "workflowService:cloneWorkflow:failure",
+      params: {
+        userID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
+/**
  * Execute a workflow asynchronously.
  * Returns instanceID immediately - actual execution happens in queue.
  * @param {object} param0

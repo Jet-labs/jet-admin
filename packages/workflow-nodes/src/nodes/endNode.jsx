@@ -3,10 +3,8 @@ import { Handle, Position } from 'reactflow';
 import { JsonForms } from '@jsonforms/react';
 import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
-import { VscDebugStop } from 'react-icons/vsc';
-import { FaCheck, FaTimes, FaExclamationTriangle, FaPlus, FaTrash } from 'react-icons/fa';
-import { IoMdArrowDropleft } from 'react-icons/io';
 import { Button, Input } from '@jet-admin/ui';
+import { Square, Check, X, AlertTriangle, Plus, Trash2, ChevronLeft } from 'lucide-react';
 
 // ============================================================================
 // End Status Types
@@ -51,7 +49,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
           onClick={addParameter}
           className="flex items-center gap-1 px-2 py-1 text-xs bg-brand-black text-[#646cff] hover:bg-[#646cff]/10 rounded-sm transition-colors border border-brand-border"
         >
-          <FaPlus className="w-2.5 h-2.5" />
+          <Plus className="w-2.5 h-2.5" />
           Add Output
         </Button>
       </div>
@@ -73,7 +71,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <IoMdArrowDropleft className="w-3 h-3 text-red-500" />
+                  <ChevronLeft className="w-3 h-3 text-red-500" />
                   <Input
                     type="text"
                     value={param.name}
@@ -88,7 +86,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
                   className="p-1 bg-brand-black text-brand-text-primary hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
                   title="Remove output"
                 >
-                  <FaTrash className="w-3 h-3" />
+                  <Trash2 className="w-3 h-3" />
                 </Button>
               </div>
 
@@ -282,6 +280,7 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
 
         <Button
           type="button"
+          size="sm"
           onClick={handleSave}
           className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
@@ -316,7 +315,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
           textColor: 'text-green-500',
           hoverBorder: 'hover:border-green-400',
           handleColor: '#22c55e',
-          icon: FaCheck,
+          icon: Check,
           label: 'Success',
         };
       case END_STATUS.FAILURE:
@@ -327,7 +326,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
           textColor: 'text-red-500',
           hoverBorder: 'hover:border-red-400',
           handleColor: '#ef4444',
-          icon: FaTimes,
+          icon: X,
           label: 'Failure',
         };
       case END_STATUS.CANCELLED:
@@ -338,7 +337,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
           textColor: 'text-amber-500',
           hoverBorder: 'hover:border-amber-400',
           handleColor: '#f59e0b',
-          icon: FaExclamationTriangle,
+          icon: AlertTriangle,
           label: 'Cancelled',
         };
       default:
@@ -349,7 +348,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
           textColor: 'text-brand-text-primary',
           hoverBorder: 'hover:border-brand-border',
           handleColor: '#94a3b8',
-          icon: VscDebugStop,
+          icon: Square,
           label: 'End',
         };
     }

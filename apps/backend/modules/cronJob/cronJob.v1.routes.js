@@ -19,6 +19,13 @@ router.get(
   cronJobController.getAllCronJobs
 );
 
+// GET /status/connections - Get all connection statuses
+router.get(
+  "/status/connections",
+  authMiddleware.checkUserPermissions(["tenant:cronjob:list"]),
+  cronJobController.getConnectionStatus
+);
+
 // POST / - Create a new Cron Job
 router.post(
   "/",
@@ -52,6 +59,14 @@ router.delete(
   validate(cronJobIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:cronjob:delete"]),
   cronJobController.deleteCronJobByID
+);
+
+// POST /:cronJobID/clone - Clone a specific Cron Job
+router.post(
+  "/:cronJobID/clone",
+  validate(cronJobIdParamSchema, "params"),
+  authMiddleware.checkUserPermissions(["tenant:cronjob:create"]),
+  cronJobController.cloneCronJob
 );
 
 // --- Job History Routes ---

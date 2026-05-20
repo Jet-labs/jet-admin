@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Copy } from 'lucide-react';
 import PropTypes from "prop-types";
 import React from "react";
-import { FaRegClone } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { cloneWidgetByIDAPI } from "../../../data/apis/widget";
@@ -54,16 +54,17 @@ export const WidgetCloneForm = ({ tenantID, widgetID }) => {
     <>
       <Button
         type="button"
-        variant="primary-ghost"
-        size="sm"
+        variant="outline"
+        size="icon"
         square
         onClick={_handleCloneWidget}
         disabled={isCloningWidget}
+        aria-label="Widget clone"
       >
         {isCloningWidget ? (
           <Spinner size={16} />
         ) : (
-            <FaRegClone className="size-4 text-primary" />
+            <Copy className="h-3 w-3" />
         )}
       </Button>
     </>

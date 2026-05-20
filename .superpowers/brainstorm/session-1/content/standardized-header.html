@@ -1,0 +1,35 @@
+<h2>Standardized Header Design</h2>
+<p class="subtitle">Here is the proposed design for the consolidated header component based on Option A.</p>
+
+<div class="mockup" style="padding: 15px; border: 1px solid #e4e4e7; border-radius: 8px; background: white;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <div style="font-weight: 600; font-size: 1.1rem; color: #18181b;">Update Scheduled Job</div>
+      <div style="color: #71717a; font-size: 0.8rem; font-family: monospace;">ID: job_12345</div>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <!-- Secondary Actions -->
+      <button class="mock-button" style="background: white; color: #18181b; padding: 6px 12px; border-radius: 4px; border: 1px solid #e4e4e7; font-size: 0.875rem; cursor: pointer;">View History</button>
+      <button class="mock-button" style="background: white; color: #18181b; padding: 6px 12px; border-radius: 4px; border: 1px solid #e4e4e7; font-size: 0.875rem; cursor: pointer;">Clone</button>
+      
+      <!-- Destructive Action -->
+      <button class="mock-button" style="background: #fee2e2; color: #dc2626; padding: 6px 12px; border-radius: 4px; border: 1px solid #fecaca; font-size: 0.875rem; cursor: pointer;">Delete</button>
+      
+      <!-- Primary Action -->
+      <button class="mock-button" style="background: #3ecf8e; color: white; padding: 6px 12px; border-radius: 4px; border: none; font-weight: 500; font-size: 0.875rem; cursor: pointer;">Update</button>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons" style="margin-top: 20px;">
+  <div class="pros">
+    <h4>Standardized Text</h4>
+    <ul>
+      <li><strong>Save / Update:</strong> I'll use "Update" as the label for the primary action across all modules.</li>
+      <li><strong>Delete:</strong> Exactly "Delete" for the destructive action.</li>
+      <li><strong>Clone:</strong> Exactly "Clone" for the duplication action.</li>
+    </ul>
+  </div>
+</div>
+
+<p>I will also add the missing <strong>Clone</strong> functionality to Listeners, Workflows, API Keys, and Cron Jobs, and the missing <strong>Delete</strong> button to Workflows.</p>

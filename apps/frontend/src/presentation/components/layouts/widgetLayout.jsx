@@ -13,7 +13,7 @@ import {
 
 export const WidgetLayout = () => {
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_LAYOUT_SEPARATION}
@@ -23,7 +23,7 @@ export const WidgetLayout = () => {
             <WidgetDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
             <Outlet />
           </ResizablePanel>
         </ResizablePanelGroup>

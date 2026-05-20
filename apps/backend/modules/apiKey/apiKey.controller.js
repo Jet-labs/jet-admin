@@ -196,4 +196,38 @@ apiKeyController.deleteAPIKeyByID = async (req, res) => {
   }
 };
 
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+apiKeyController.cloneAPIKey = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, apiKeyID } = req.params;
+    const authContext = getServiceAuthContext(req);
+
+    Logger.log("info", {
+      message: "apiKeyController:cloneAPIKey:params",
+      params: { userID: user.userID, tenantID, apiKeyID, authContext },
+    });
+
+    const result = await apiKeyService.cloneAPIKey({
+      userID: user.userID,
+      tenantID: tenantID,
+      apiKeyID: apiKeyID,
+      authContext,
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      message: "APIKey cloned successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "apiKeyController:cloneAPIKey:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
 module.exports = { apiKeyController };

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Copy } from 'lucide-react';
 import PropTypes from "prop-types";
 import React from "react";
-import { FaRegClone } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { cloneDataQueryByIDAPI } from "../../../data/apis/dataQuery";
@@ -55,17 +55,19 @@ export const DataQueryCloneForm = ({ tenantID, dataQueryID }) => {
   return (
     <>
       <Button
+        type="button"
         variant="outline"
+        size="icon"
+        square
         onClick={_handleCloneQuery}
         disabled={isCloningDataQuery}
-        type="button"
-        size="sm"
-        square
+        className="shrink-0"
+        aria-label="Clone query"
       >
         {isCloningDataQuery ? (
           <Spinner size={14} />
         ) : (
-            <FaRegClone className="size-4 text-primary" />
+            <Copy className="h-3 w-3" />
         )}
       </Button>
     </>

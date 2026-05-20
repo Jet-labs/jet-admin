@@ -4,7 +4,7 @@
  * Also handles hot-reload integration with the ConnectionManager.
  */
 const { prisma } = require('../../config/prisma.config');
-const { listenerConnectionManager } = require('./listenerEngine/connectionManager');
+const { listenerEngine } = require('./listenerEngine/engine');
 const Logger = require('../../utils/logger');
 
 const listenerService = {
@@ -97,7 +97,7 @@ const listenerService = {
 
       // If created as active, start it
       if (listener.status === 'active') {
-        await listenerConnectionManager.startOne(listener);
+        await listenerEngine.startOne(listener);
       }
 
       return listener;
@@ -145,10 +145,10 @@ const listenerService = {
 
       // Hot-reload: restart if config changed and listener is active
       if (listener.status === 'active') {
-        await listenerConnectionManager.restartOne(listenerID);
+        await listenerEngine.restartOne(listenerID);
       } else {
         // If set to inactive, stop it
-        await listenerConnectionManager.stopOne(listenerID);
+        await listenerEngine.stopOne(listenerID);
       }
 
       return listener;
@@ -173,7 +173,7 @@ const listenerService = {
       if (!existing) return null;
 
       // Stop the listener if active
-      await listenerConnectionManager.stopOne(listenerID);
+      await listenerEngine.stopOne(listenerID);
 
       // CASCADE will delete actions and events
       await prisma.tblListeners.delete({
@@ -189,6 +189,64 @@ const listenerService = {
     } catch (error) {
       Logger.log("error", {
         message: "listenerService:deleteListener:error",
+        params: { error, listenerID },
+      });
+      throw error;
+    }
+  },
+
+  // ─── Clone ────────────────────────────────────────────────────────────
+
+  async cloneListener({ tenantID, listenerID }) {
+    Logger.log("info", {
+      message: "listenerService:cloneListener:params",
+      params: { tenantID, listenerID },
+    });
+    try {
+      const existing = await prisma.tblListeners.findFirst({
+        where: { listenerID, tenantID },
+        include: { tblListenerActions: { orderBy: { orderIndex: 'asc' } } },
+      });
+      if (!existing) throw new Error("Listener not found");
+
+      const newListener = await prisma.$transaction(async (tx) => {
+        const created = await tx.tblListeners.create({
+          data: {
+            tenantID,
+            datasourceID: existing.datasourceID,
+            listenerTitle: existing.listenerTitle + " (Copy)",
+            listenerDescription: existing.listenerDescription,
+            listenerType: existing.listenerType,
+            listenerConfig: existing.listenerConfig,
+            transformScript: existing.transformScript,
+            status: "inactive",
+          },
+        });
+
+        // Clone actions
+        if (existing.tblListenerActions?.length) {
+          await tx.tblListenerActions.createMany({
+            data: existing.tblListenerActions.map((a) => ({
+              listenerID: created.listenerID,
+              actionType: a.actionType,
+              actionConfig: a.actionConfig,
+              isEnabled: a.isEnabled,
+              orderIndex: a.orderIndex,
+            })),
+          });
+        }
+
+        return created;
+      });
+
+      Logger.log("success", {
+        message: "listenerService:cloneListener:success",
+        params: { listenerID, newListenerID: newListener.listenerID },
+      });
+      return newListener;
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerService:cloneListener:error",
         params: { error, listenerID },
       });
       throw error;
@@ -224,7 +282,7 @@ const listenerService = {
       });
 
       if (listener.status === 'active') {
-        await listenerConnectionManager.restartOne(listenerID);
+        await listenerEngine.restartOne(listenerID);
       }
 
       return action;
@@ -264,7 +322,7 @@ const listenerService = {
       });
 
       if (listener.status === 'active') {
-        await listenerConnectionManager.restartOne(listenerID);
+        await listenerEngine.restartOne(listenerID);
       }
 
       return action;
@@ -298,7 +356,7 @@ const listenerService = {
       });
 
       if (listener.status === 'active') {
-        await listenerConnectionManager.restartOne(listenerID);
+        await listenerEngine.restartOne(listenerID);
       }
 
       return { actionID };
@@ -324,11 +382,11 @@ const listenerService = {
   // ─── Status & Testing ───────────────────────────────────────────────────
 
   getConnectionStatus() {
-    return listenerConnectionManager.getStatus();
+    return listenerEngine.getStatus();
   },
 
   updateTestScript(listenerID, sessionID, transformScript) {
-    listenerConnectionManager.setTestScript(listenerID, sessionID, transformScript);
+    listenerEngine.setTestScript(listenerID, sessionID, transformScript);
   },
 
   // ─── Boot (called from startup.js) ──────────────────────────────────────
@@ -336,7 +394,7 @@ const listenerService = {
   async startAllServerListeners() {
     Logger.log("info", { message: "listenerService:startAllServerListeners:init" });
     try {
-      await listenerConnectionManager.startAll();
+      await listenerEngine.startAll();
       Logger.log("success", { message: "listenerService:startAllServerListeners:done" });
     } catch (error) {
       Logger.log("error", { message: "listenerService:startAllServerListeners:error", params: { error } });
@@ -346,7 +404,7 @@ const listenerService = {
   async stopAllServerListeners() {
     Logger.log("info", { message: "listenerService:stopAllServerListeners:init" });
     try {
-      await listenerConnectionManager.stopAll();
+      await listenerEngine.stopAll();
       Logger.log("success", { message: "listenerService:stopAllServerListeners:done" });
     } catch (error) {
       Logger.log("error", { message: "listenerService:stopAllServerListeners:error", params: { error } });

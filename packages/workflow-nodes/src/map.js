@@ -361,7 +361,6 @@ export const WORKFLOW_NODES_MAP = {
             itemVariable: "item",
             indexVariable: "index",
             maxIterations: 1000,
-            batchSize: 1,
             delayBetweenItems: 0,
             errorHandling: "fail_workflow",
             isDisabled: false,
@@ -375,7 +374,6 @@ export const WORKFLOW_NODES_MAP = {
                 itemVariable: { type: "string", title: "Item Variable Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$", default: "item" },
                 indexVariable: { type: "string", title: "Index Variable Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$", default: "index" },
                 maxIterations: { type: "integer", title: "Max Iterations", minimum: 1, maximum: 100000, default: 1000 },
-                batchSize: { type: "integer", title: "Batch Size", minimum: 1, maximum: 100, default: 1 },
                 delayBetweenItems: { type: "integer", title: "Delay Between Items (ms)", minimum: 0, maximum: 60000, default: 0 },
                 errorHandling: { type: "string", title: "Error Behavior", enum: ["fail_workflow", "continue", "skip_item"], default: "fail_workflow" },
                 isDisabled: { type: "boolean", title: "Skip this node", default: false },
@@ -407,7 +405,6 @@ export const WORKFLOW_NODES_MAP = {
                     label: "Advanced",
                     elements: [
                         { type: "Control", scope: "#/properties/maxIterations" },
-                        { type: "Control", scope: "#/properties/batchSize" },
                         { type: "Control", scope: "#/properties/delayBetweenItems" },
                         { type: "Control", scope: "#/properties/errorHandling" },
                         { type: "Control", scope: "#/properties/isDisabled" },

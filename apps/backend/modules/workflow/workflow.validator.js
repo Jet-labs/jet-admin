@@ -61,6 +61,51 @@ const addWorkflowTemplateIssues = (data, ctx) => {
   }
 };
 
+const validateIntegerRange = (ctx, path, value, min, max, label) => {
+  if (value === undefined || value === null || value === '') return;
+  if (!Number.isInteger(Number(value)) || Number(value) < min || Number(value) > max) {
+    addCustomIssue(ctx, path, `${label} must be an integer between ${min} and ${max}`);
+  }
+};
+
+const addWorkflowNodeConfigIssues = (data, ctx) => {
+  if (!data.nodes) return;
+
+  data.nodes.forEach((node, index) => {
+    const nodeType = node?.type ?? node?.nodeType;
+    const nodeData = node?.data ?? node?.nodeConfig ?? {};
+    const nodePath = ["nodes", index, "data"];
+
+    if (nodeType === "loop") {
+      validateIntegerRange(ctx, [...nodePath, "maxIterations"], nodeData.maxIterations, 1, 100000, "maxIterations");
+      validateIntegerRange(ctx, [...nodePath, "delayBetweenItems"], nodeData.delayBetweenItems, 0, 60000, "delayBetweenItems");
+
+      for (const variableField of ["itemVariable", "indexVariable"]) {
+        const value = nodeData?.[variableField];
+        if (value && !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
+          addCustomIssue(ctx, [...nodePath, variableField], `${variableField} must be a valid JavaScript identifier`);
+        }
+      }
+    }
+
+    if (nodeType === "delay") {
+      const delayType = nodeData.delayType || "fixed";
+      if (!["fixed", "dynamic", "until"].includes(delayType)) {
+        addCustomIssue(ctx, [...nodePath, "delayType"], "delayType must be fixed, dynamic, or until");
+      }
+      validateIntegerRange(ctx, [...nodePath, "delayMs"], nodeData.delayMs, 0, 999, "delayMs");
+      validateIntegerRange(ctx, [...nodePath, "delaySeconds"], nodeData.delaySeconds, 0, 59, "delaySeconds");
+      validateIntegerRange(ctx, [...nodePath, "delayMinutes"], nodeData.delayMinutes, 0, 1440, "delayMinutes");
+      if (delayType === "dynamic" && !nodeData.delayVariable) {
+        addCustomIssue(ctx, [...nodePath, "delayVariable"], "delayVariable is required for dynamic delays");
+      }
+      if (delayType === "until" && !nodeData.untilTime) {
+        addCustomIssue(ctx, [...nodePath, "untilTime"], "untilTime is required for until delays");
+      }
+    }
+  });
+};
+
 const createWorkflowSchema = z.object({
   title: z.string().min(1, "workflow title is required").max(255),
   workflowDescription: z.string().optional(),
@@ -69,6 +114,7 @@ const createWorkflowSchema = z.object({
   workflowOptions: z.object({}).passthrough().optional(),
 }).passthrough().superRefine((data, ctx) => {
   addWorkflowTemplateIssues(data, ctx);
+  addWorkflowNodeConfigIssues(data, ctx);
 });
 
 const updateWorkflowSchema = z.object({
@@ -79,6 +125,7 @@ const updateWorkflowSchema = z.object({
   workflowOptions: z.object({}).passthrough().optional(),
 }).passthrough().superRefine((data, ctx) => {
   addWorkflowTemplateIssues(data, ctx);
+  addWorkflowNodeConfigIssues(data, ctx);
 });
 
 const executeWorkflowSchema = z.object({
@@ -92,6 +139,7 @@ const testWorkflowSchema = z.object({
   inputArgs: z.object({}).passthrough().optional(),
 }).passthrough().superRefine((data, ctx) => {
   addWorkflowTemplateIssues(data, ctx);
+  addWorkflowNodeConfigIssues(data, ctx);
 });
 
 // ============================================================

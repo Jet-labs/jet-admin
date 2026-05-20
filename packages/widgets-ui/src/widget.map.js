@@ -1,11 +1,10 @@
 import React from "react";
-import { FaChartBar } from "react-icons/fa";
 import { getDemoData, registerWidgets } from "./widget.config";
 import { WIDGET_TYPES } from "@jet-admin/widget-types";
 import { VegaConfigEditor } from "./vega/vegaConfigEditor";
 import { ButtonConfigEditor } from "./button/buttonConfigEditor";
 import { TableConfigEditor } from "./table/tableConfigEditor";
-import { MdOutlineSmartButton, MdOutlineTableChart } from "react-icons/md";
+import { BarChart, Component, Table } from 'lucide-react';
 
 
 // Register widgets
@@ -22,6 +21,7 @@ const LazyButtonWidget = React.lazy(() =>
 
 const LazyTableWidget = React.lazy(() =>
   import("./table/index.js").then(module => ({ default: module.TableWidget }))
+
 );
 
 
@@ -41,7 +41,7 @@ export const WIDGETS_MAP = {
       );
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => <FaChartBar className={`!text-lg ${className}`} />,
+    icon: ({ className }) => <BarChart className={`!text-lg ${className}`} />,
     sampleConfig: {
       options: {
         showActions: false,
@@ -65,7 +65,7 @@ export const WIDGETS_MAP = {
       );
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => <FaChartBar className={`!text-lg ${className}`} />,
+    icon: ({ className }) => <BarChart className={`!text-lg ${className}`} />,
     sampleConfig: {
       options: {
         showActions: false,
@@ -89,7 +89,7 @@ export const WIDGETS_MAP = {
       );
     },
     configEditor: ButtonConfigEditor,
-    icon: ({ className }) => <MdOutlineSmartButton className={`!text-lg ${className}`} />,
+    icon: ({ className }) => <Component className={`!text-lg ${className}`} />,
     sampleConfig: {
       text: "Click Me",
       variant: "default",
@@ -111,7 +111,7 @@ export const WIDGETS_MAP = {
       );
     },
     configEditor: TableConfigEditor,
-    icon: ({ className }) => <MdOutlineTableChart className={`!text-lg ${className}`} />,
+    icon: ({ className }) => <Table className={`!text-lg ${className}`} />,
     sampleConfig: {
       dataArrayTemplate: "{{ctx.data}}",
       columns: [],

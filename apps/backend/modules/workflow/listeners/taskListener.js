@@ -54,6 +54,7 @@ async function _processJob(jobData) {
     workflowID,
     attempts = 0,
     maxAttempts = 3,
+    nodeAttempt = 1,
     isTestRun = false,
     isJoinNode = false,  // ← set by orchestrator/dagScheduler
   } = jobData;
@@ -93,7 +94,7 @@ async function _processJob(jobData) {
         instanceID,
         nodeID,
         workflowID,
-        nodeAttempt: attempts + 1,      // ← ADD: lets dataCollectionHandler store it
+        nodeAttempt,
         resolveTemplate: (template, meta = {}) =>
           sharedResolveTemplate(template, currentContext, WORKFLOW_TEMPLATE_OPTIONS, {
             module: 'workflow',
@@ -120,7 +121,7 @@ async function _processJob(jobData) {
         output: result.output,   // contains the full collectionConfig
         nextHandle: result.nextHandle ?? 'output',
         queueDelay: 0,
-        nodeAttempt: attempts + 1,
+        nodeAttempt,
       });
     } else {
       await addResult({
@@ -132,7 +133,7 @@ async function _processJob(jobData) {
         output: result.output,
         nextHandle: result.nextHandle ?? 'output',
         queueDelay: result.queueDelay ?? 0,
-        nodeAttempt: attempts + 1,
+        nodeAttempt,
       });
     }
 
@@ -166,7 +167,7 @@ async function _processJob(jobData) {
         output: null,
         nextHandle: 'error',
         taskError: execError.message,
-        nodeAttempt: attempts + 1,  // ← ADDED: records which attempt finally failed
+        nodeAttempt,
       });
     }
   }

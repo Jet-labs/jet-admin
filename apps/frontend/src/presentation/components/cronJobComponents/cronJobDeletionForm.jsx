@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdDeleteOutline } from "react-icons/md";
+import { Trash2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { deleteCronJobByIDAPI } from "../../../data/apis/cronJob";
@@ -56,19 +56,19 @@ export const CronJobDeletionForm = ({ tenantID, cronJobID }) => {
 
   return (
     <Button
-      variant="destructive-ghost"
-      size="sm"
+      type="button"
+      variant="destructive"
+      size="icon"
       square
       onClick={_handleDeleteClick}
       disabled={isDeletingCronJob}
-      type="button"
       className="shrink-0"
       aria-label="Delete scheduled job"
     >
       {isDeletingCronJob ? (
         <Spinner size={14} />
       ) : (
-        <MdDeleteOutline className="h-4 w-4" />
+        <Trash2 className="h-3 w-3" />
       )}
     </Button>
   );

@@ -3,7 +3,7 @@ import { TenantRoleAdditionForm } from "../../components/tenantRolesComponents/t
 
 const AddTenantRolePage = () => {
   return (
-    <div className="flex h-full w-full flex-col items-center overflow-y-auto bg-brand-dark p-4 md:p-8">
+    <div className="flex h-full w-full flex-col items-center overflow-y-auto bg-background">
       <TenantRoleAdditionForm />
     </div>
   );

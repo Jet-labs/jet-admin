@@ -39,7 +39,7 @@ export const CustomNumberInput = (props) => {
   const hasErrors = errors && errors.length > 0;
 
   return (
-    <div className="mb-3">
+    <div className="">
       <Label
         htmlFor={path}
         className={`block mb-1 text-xs font-medium ${
@@ -49,6 +49,7 @@ export const CustomNumberInput = (props) => {
         {label || description}
       </Label>
       <Input
+        size="sm"
         type="number"
         id={path}
         name={path}

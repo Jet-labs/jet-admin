@@ -23,6 +23,11 @@ const Logger = require("../../../utils/logger");
 
 const dagScheduler = {};
 
+function normalizeHandle(handle) {
+  if (handle === 'done') return 'completed';
+  return handle || 'output';
+}
+
 // ─── Simple lookups ───────────────────────────────────────────────────────────
 
 dagScheduler.getStartNode = async (workflowID) => {
@@ -146,8 +151,9 @@ dagScheduler.calculateNextNodes = async (
     where: { workflowID, upstreamNodeID: completedNodeID },
   });
 
+  const normalizedOutputHandle = normalizeHandle(outputHandle);
   const matchingEdges = outgoingEdges.filter(
-    (e) => (e.sourceHandle || 'output') === (outputHandle || 'output')
+    (e) => normalizeHandle(e.sourceHandle) === normalizedOutputHandle
   );
 
   if (matchingEdges.length === 0) {
@@ -192,7 +198,7 @@ dagScheduler.calculateNextNodes = async (
 
   for (const node of candidateNodes) {
     const incomingEdges = incomingEdgesByNode.get(node.nodeID) ?? [];
-    const joinMode = node.nodeConfig?.joinMode ?? 'all';
+    const joinMode = node.nodeConfig?.joinMode ?? (node.nodeType === 'loop' ? 'any' : 'all');
     const isJoinNode = incomingEdges.length > 1;
 
     const ready = dagScheduler.isNodeReadyToExecute({

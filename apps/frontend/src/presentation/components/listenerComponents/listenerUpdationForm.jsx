@@ -3,12 +3,14 @@ import React from "react";
 import {
   updateListenerAPI,
   getListenerByIDAPI,
+  deleteListenerAPI,
 } from "../../../data/apis/listener";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CONSTANTS } from "../../../constants";
 import PropTypes from "prop-types";
 import { ListenerEditor } from "./listenerEditor";
+import { ListenerCloneForm } from "./listenerCloneForm";
 import { ListenerDeletionForm } from "./listenerDeletionForm";
 import { ListenerTestingForm } from "./listenerTestingForm";
 import {
@@ -17,7 +19,9 @@ import {
   ResizablePanelGroup,
 } from "../ui/resizable";
 
-import { Button, Spinner, Tabs, TabsContent, TabsList, TabsTrigger } from "@jet-admin/ui";
+import { Spinner, Tabs, TabsContent, TabsList, TabsTrigger, PageHeader } from "@jet-admin/ui";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
+import { useNavigate } from "react-router-dom";
 import { ListenerActionManager } from "./listenerActionManager";
 
 export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
@@ -28,6 +32,8 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
   };
 
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { showConfirmation } = useGlobalUI();
 
   const { data: listener, isLoading: isLoadingListener } = useQuery({
     queryKey: ["LISTENER_DETAIL", tenantID, listenerID],
@@ -62,6 +68,8 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
       },
     });
 
+
+
   const listenerUpdationForm = useFormik({
     initialValues: {
       listenerTitle: listener?.listenerTitle || "",
@@ -80,48 +88,36 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
 
   if (isLoadingListener) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-brand-dark">
+      <div className="flex h-full w-full items-center justify-center bg-background">
         <Spinner size={24} />
       </div>
     );
   }
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
-      <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3">
-        <div>
-          <h1 className="text-base font-semibold tracking-tight text-foreground">
-            {CONSTANTS.STRINGS.UPDATE_LISTENER_FORM_TITLE}
-          </h1>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {listener?.listenerTitle || "Listener configuration"}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <ListenerDeletionForm
-            tenantID={tenantID}
-            listenerID={listenerID}
-          />
-          <Button
-            type="submit"
-            form="listener-update-form"
-            disabled={isUpdatingListener}
-          >
-            {isUpdatingListener && <Spinner size={14} />}
-            {CONSTANTS.STRINGS.UPDATE_LISTENER_SUBMIT_BUTTON_TEXT}
-          </Button>
-        </div>
-      </div>
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.UPDATE_LISTENER_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_LISTENERS_TITLE}
+
+        id={listenerID}
+        onSave={listenerUpdationForm.handleSubmit}
+        isSaving={isUpdatingListener}
+      >
+        <ListenerDeletionForm tenantID={tenantID} listenerID={listenerID} />
+        <ListenerCloneForm tenantID={tenantID} listenerID={listenerID} />
+      </PageHeader>
 
       <ResizablePanelGroup
         direction="vertical"
         autoSaveId="listener-updation-panel-layout"
         className="!w-full !h-full"
       >
-        <ResizablePanel defaultSize={60} className="!overflow-y-auto h-full p-3 md:p-6">
-          <div className="mx-auto w-full max-w-4xl pb-8">
+        <ResizablePanel defaultSize={60} className="!overflow-y-auto h-full p-8"
+        >
+          <div className="mx-auto w-full max-w-2xl">
             <Tabs defaultValue="config" className="w-full">
-              <TabsList className="mb-6">
+              <TabsList className="">
                 <TabsTrigger value="config">General Configuration</TabsTrigger>
                 <TabsTrigger value="actions">Pipeline Actions ({listener?.actions?.length || 0})</TabsTrigger>
               </TabsList>

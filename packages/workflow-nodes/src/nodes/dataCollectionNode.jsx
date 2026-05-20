@@ -14,9 +14,7 @@ import { Handle, Position } from 'reactflow';
 import { v4 as uuidv4 } from 'uuid';
 import { useWorkflowNodes, useNodeExecutionStatus } from '../context';
 import { getStatusStyles, StatusIndicator } from '../StatusIndicator';
-import { FaWpforms, FaPlus, FaTrash } from 'react-icons/fa';
-import { MdOutlineInput } from 'react-icons/md';
-import { VscDebugDisconnect } from 'react-icons/vsc';
+import { FileText, Plus, Trash2, ArrowRightToLine, Ban } from 'lucide-react';
 import {
     Button,
     Input,
@@ -27,6 +25,7 @@ import {
     SelectValue,
     Checkbox,
     Label,
+    Textarea,
 } from '@jet-admin/ui';
 
 // ─── Field types that map to JSON Schema + JSON-Forms UISchema ─────────────
@@ -152,7 +151,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                 <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Instructions
                 </Label>
-                <textarea
+                <Textarea
                     value={description}
                     onChange={e => setDescription(e.target.value)}
                     rows={2}
@@ -189,7 +188,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                         </Label>
                         <Button type="button" variant="ghost" size="sm" onClick={addField}
                             className="h-6 px-2 text-[10px] text-primary hover:bg-primary/10">
-                            <FaPlus className="w-2.5 h-2.5 mr-1" /> Add field
+                            <Plus className="w-2.5 h-2.5 mr-1" /> Add field
                         </Button>
                     </div>
 
@@ -222,7 +221,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                                 <Button type="button" variant="destructive-ghost" size="sm" square
                                     onClick={() => removeField(field.id)}
                                     className="h-7 w-7 mt-4 flex-shrink-0" disabled={fields.length === 1}>
-                                    <FaTrash className="w-2.5 h-2.5" />
+                                    <Trash2 className="w-2.5 h-2.5" />
                                 </Button>
                             </div>
 
@@ -330,7 +329,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                 </div>
             </div>
 
-            <Button type="button" onClick={handleSave} className="w-full">
+            <Button type="button" size="sm" onClick={handleSave} className="w-full">
                 Save
             </Button>
         </div>
@@ -377,8 +376,8 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
           `}
                 >
                     {isSuspended
-                        ? <MdOutlineInput className="w-5 h-5 text-amber-600" />
-                        : <FaWpforms className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' :
+                        ? <ArrowRightToLine className="w-5 h-5 text-amber-600" />
+                        : <FileText className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' :
                                 executionStatus === 'running' ? 'text-blue-600' :
                                     executionStatus === 'completed' ? 'text-green-600' :
                                         executionStatus === 'failed' ? 'text-red-600' :
@@ -401,7 +400,7 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
                         )}
                         {isDisabled && !isSuspended && (
                             <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
-                                <VscDebugDisconnect className="w-2.5 h-2.5" />
+                                <Ban className="w-2.5 h-2.5" />
                                 Skip
                             </span>
                         )}

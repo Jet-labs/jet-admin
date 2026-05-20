@@ -19,28 +19,9 @@ import {
   SelectValue,
   Spinner,
   Textarea,
+  Section
 } from "@jet-admin/ui";
 import { useDatasources } from "../../../logic/hooks/useDatasources";
-
-function Section({ title, description, children }) {
-  return (
-    <div className="rounded-sm border border-border bg-card p-4 space-y-3">
-      {(title || description) && (
-        <div>
-          {title && (
-            <p className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-              {title}
-            </p>
-          )}
-          {description && (
-            <p className="text-[11px] text-muted-foreground">{description}</p>
-          )}
-        </div>
-      )}
-      {children}
-    </div>
-  );
-}
 
 // Get only datasource types that support listeners
 const getListenerCapableDatasources = () => {

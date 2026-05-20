@@ -1,51 +1,52 @@
 import React from "react";
-import { FiChevronRight } from "react-icons/fi";
+import { ChevronRight, Home } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export const Breadcrumbs = () => {
   const location = useLocation();
-  const pathname = location.pathname;
+  const segments = location.pathname.split("/").filter(Boolean);
 
-  // Split the pathname into segments
-  const segments = pathname.split("/").filter(Boolean);
-
-  // Create breadcrumb elements
   const breadcrumbs = segments.map((segment, index) => {
-    // Generate URL for each segment
     const url = `/${segments.slice(0, index + 1).join("/")}`;
     const isLast = index === segments.length - 1;
+    const label = segment.length > 8 ? segment.slice(0, 20) + "\u2026" : segment;
 
     return (
-      <div key={index} className="flex items-center">
+      <React.Fragment key={index}>
+        <ChevronRight size={12} className="text-primary/40 flex-shrink-0" />
         {isLast ? (
-          <span className="text-xs font-medium text-brand-light-gray">{segment}</span>
+          <span
+            title={segment}
+            className="text-xs font-medium text-muted-foreground/70 inline-block truncate max-w-[120px]"
+          >
+            {label}
+          </span>
         ) : (
-          <>
             <Link
               to={url}
-              className="text-xs text-primary/80 hover:text-primary transition duration-150"
+              title={segment}
+              className="text-xs inline-block truncate max-w-[120px] text-primary/80 hover:text-primary transition-colors duration-150"
             >
-                {segment.length > 8 ? segment.slice(0, 8) + "..." : segment}
+              {label}
             </Link>
-            <FiChevronRight className="text-primary/80 mx-1" />
-          </>
         )}
-      </div>
+      </React.Fragment>
     );
   });
 
   return (
-    <div className="flex items-center bg-brand-border-dark p-1 rounded-sm  mx-3">
-      <a
-        href="/"
-        className="text-xs text-primary/80 hover:text-primary transition duration-150"
+    <nav
+      aria-label="Breadcrumb"
+      className="flex items-center gap-0.5 bg-muted rounded-sm mx-3 px-2.5 py-1 h-7 w-fit max-w-full overflow-hidden"
+    >
+      <Link
+        to="/"
+        aria-label="Home"
+        className="flex items-center text-primary/80 hover:text-primary transition-colors duration-150 flex-shrink-0"
       >
-        Home
-      </a>
-      {segments.length > 0 && (
-        <FiChevronRight className="text-primary/80 mx-1" />
-      )}
+        <Home size={12} />
+      </Link>
       {breadcrumbs}
-    </div>
+    </nav>
   );
 };

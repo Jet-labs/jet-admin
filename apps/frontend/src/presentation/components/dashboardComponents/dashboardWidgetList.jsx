@@ -1,8 +1,7 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
+import { ExternalLink, GripVertical } from 'lucide-react';
 import PropTypes from "prop-types";
 import React from "react";
-import { FiExternalLink } from "react-icons/fi";
-import { GoGrabber } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { useWidgets } from "../../../logic/hooks/useWidgets";
@@ -79,7 +78,7 @@ export const DashboardWidgetList = ({ tenantID }) => {
           to={CONSTANTS.ROUTES.UPDATE_WIDGET_BY_ID.path(tenantID, widgetID)}
           target="_blank"
         >
-          <FiExternalLink className="h-4 w-4" />
+          <ExternalLink className="h-4 w-4" />
         </Link>
       </Button>
     );
@@ -110,7 +109,7 @@ export const DashboardWidgetList = ({ tenantID }) => {
                       onDragStart={(e) => _handleDragStart(e, key)}
                       className="cursor-grab"
                     >
-                      <GoGrabber className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <GripVertical className="mr-2 h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>{_renderWidgetIcon(widget.widgetType)}</div>
                     <span className="truncate text-sm font-medium text-foreground">

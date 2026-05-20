@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { IoCodeOutline } from "react-icons/io5";
-import { FiCopy, FiCheck, FiMaximize, FiMinimize } from "react-icons/fi";
+import { Check, Code, Copy, Maximize, Minimize } from 'lucide-react';
+
 import hljs from "highlight.js";
 import "highlight.js/styles/atom-one-light.css";
 import PropTypes from "prop-types";
@@ -85,7 +85,7 @@ export const CodeBlock = ({
         {showLineNumbers && (
           <div
             className={`text-xs w-8 text-right pr-2 select-none ${
-              theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"
+              theme === "dark" ? "text-muted-foreground/70" : "text-muted-foreground/70"
             }`}
           >
             {index + 1}
@@ -96,7 +96,7 @@ export const CodeBlock = ({
             language === "plaintext" ? (
               <pre
                 className={`${
-                  theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"
+                  theme === "dark" ? "text-muted-foreground/70" : "text-muted-foreground/70"
                 }`}
               >
                 {line || " "}
@@ -111,7 +111,7 @@ export const CodeBlock = ({
           ) : (
             <pre
               className={`${
-                theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"
+                theme === "dark" ? "text-muted-foreground/70" : "text-muted-foreground/70"
               }`}
             >
               {line || " "}
@@ -158,8 +158,8 @@ export const CodeBlock = ({
     <div
       className={`rounded-md overflow-y-auto border ${
         theme === "dark"
-          ? "border-brand-border bg-brand-black"
-          : "border-brand-border bg-brand-black"
+          ? "border-border bg-background"
+          : "border-border bg-background"
       }`}
       style={{
         maxHeight: expanded ? "none" : maxHeight,
@@ -168,17 +168,17 @@ export const CodeBlock = ({
       <div
         className={`flex items-center justify-between px-4 py-2 border-b ${
           theme === "dark"
-            ? "bg-brand-black border-brand-border"
-            : "bg-brand-dark border-brand-border"
+            ? "bg-background border-border"
+            : "bg-background border-border"
         }`}
       >
         <div className="flex items-center space-x-2">
-          <IoCodeOutline
-            className={theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"}
+          <Code
+            className={theme === "dark" ? "text-muted-foreground/70" : "text-muted-foreground/70"}
           />
           <span
             className={`text-xs font-medium ml-2 ${
-              theme === "dark" ? "text-brand-light-gray" : "text-brand-light-gray"
+              theme === "dark" ? "text-muted-foreground/70" : "text-muted-foreground/70"
             }`}
           >
             {getLanguageDisplay()}
@@ -189,25 +189,25 @@ export const CodeBlock = ({
             onClick={toggleExpand}
             className={`text-xs py-1 px-2 rounded-sm flex items-center space-x-1 ${
               theme === "dark"
-                ? "bg-brand-black hover:bg-brand-dark0 text-brand-light-gray"
-                : "bg-brand-border-dark hover:bg-brand-black text-brand-light-gray"
+                ? "bg-background hover:bg-background0 text-muted-foreground/70"
+                : "bg-muted hover:bg-foreground/10 text-muted-foreground/70"
             } transition-colors`}
           >
-            {expanded ? <FiMinimize size={14} /> : <FiMaximize size={14} />}
+            {expanded ? <Minimize size={14} /> : <Maximize size={14} />}
             <span>{expanded ? "Collapse" : "Expand"}</span>
           </Button>
           <Button
             onClick={copyToClipboard}
             className={`text-xs py-1 px-2 rounded-sm flex items-center space-x-1 ${
               theme === "dark"
-                ? "bg-brand-black hover:bg-brand-dark0 text-brand-light-gray"
-                : "bg-brand-border-dark hover:bg-brand-black text-brand-light-gray"
+                ? "bg-background hover:bg-background0 text-muted-foreground/70"
+                : "bg-muted hover:bg-foreground/10 text-muted-foreground/70"
             } transition-colors`}
           >
             {copied ? (
-              <FiCheck size={14} className="text-green-500" />
+              <Check size={14} className="text-green-500" />
             ) : (
-              <FiCopy size={14} />
+              <Copy size={14} />
             )}
             <span>{copied ? "Copied!" : "Copy"}</span>
           </Button>
@@ -219,7 +219,7 @@ export const CodeBlock = ({
           wrapText
             ? "whitespace-pre-wrap break-words"
             : "whitespace-pre overflow-x-auto"
-        } ${theme === "dark" ? "bg-brand-black" : "bg-brand-black"}`}
+        } ${theme === "dark" ? "bg-background" : "bg-background"}`}
       >
         {renderCodeWithLineNumbers()}
       </div>

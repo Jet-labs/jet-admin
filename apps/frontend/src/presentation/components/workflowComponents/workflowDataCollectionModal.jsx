@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
+import { Send } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { JsonForms } from '@jsonforms/react';
 import { jetFormsRenderers } from '@jet-admin/json-forms-renderers';
-import { FaPaperPlane } from 'react-icons/fa';
 import { 
     Button, 
     Spinner,
@@ -87,7 +87,7 @@ export const WorkflowDataCollectionModal = ({
                         disabled={isSubmitting || formErrors.length > 0}
                     >
                         {isSubmitting && <Spinner className="mr-2" size={14} />}
-                        <FaPaperPlane className="w-3 h-3 mr-1.5" />
+                        <Send className="w-3 h-3 mr-1.5" />
                         Submit &amp; continue
                     </Button>
                 </DialogFooter>

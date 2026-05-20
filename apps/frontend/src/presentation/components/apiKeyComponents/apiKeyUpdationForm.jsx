@@ -10,15 +10,16 @@ import {
 import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { APIKeyDeletionForm } from "./apiKeyDeletionForm";
+import { APIKeyCloneForm } from "./apiKeyCloneForm";
 
 import { APIKeyEditor } from "./apiKeyEditor";
 import { formValidations } from "../../../utils/formValidation";
 import { APIKeyRoleSelectionDialog } from "./apiKeyRoleSelectionDialog";
-import { Codeblock } from "../ui/codeblock";
+import { CodeBlock } from "../ui/codeblock";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { PageHeader } from "@jet-admin/ui";
 export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
   APIKeyUpdationForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -101,48 +102,34 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
   }, [apiKey]);
 
   return (
-    <section className="w-full bg-brand-dark">
-      <div className="border-b border-border bg-brand-dark px-4 py-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_TITLE}
-        </h1>
-      </div>
+    <section className="w-full bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_API_KEYS_TITLE}
+        id={apiKeyID}
+        onSave={apiKeyUpdationForm.handleSubmit}
+        isSaving={isUpdatingAPIKey}
+      >
+        <APIKeyDeletionForm tenantID={tenantID} apiKeyID={apiKeyID} />
+        <APIKeyCloneForm tenantID={tenantID} apiKeyID={apiKeyID} />
+        <APIKeyRoleSelectionDialog
+          tenantID={tenantID}
+          apiKeyEditorForm={apiKeyUpdationForm}
+          isLoadingAPIKeyEditorForm={isUpdatingAPIKey || isLoadingAPIKey}
+        />
+      </PageHeader>
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingAPIKey}
         error={loadAPIKeyError}
       >
         <div className="mx-auto w-full max-w-2xl space-y-4 p-4 md:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="space-y-1">
-              {apiKey && (
-                <span className="text-xs text-muted-foreground">{`API Key ID: ${apiKey.apiKeyID}`}</span>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <APIKeyDeletionForm tenantID={tenantID} apiKeyID={apiKeyID} />
-              <APIKeyRoleSelectionDialog
-                tenantID={tenantID}
-                apiKeyEditorForm={apiKeyUpdationForm}
-                isLoadingAPIKeyEditorForm={isUpdatingAPIKey || isLoadingAPIKey}
-              />
-              <Button
-                type="submit"
-                form="api-key-updation-form"
-                disabled={isUpdatingAPIKey}
-              >
-                {isUpdatingAPIKey && <Spinner className="mr-2" size={16} />}
-                {CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_SUBMIT_BUTTON}
-              </Button>
-            </div>
-          </div>
 
           <form
             id="api-key-updation-form"
             className="space-y-4"
             onSubmit={apiKeyUpdationForm.handleSubmit}
           >
-            {apiKey && <Codeblock code={`${apiKey.apiKey}`} className="w-full" />}
+            {apiKey && <CodeBlock code={`${apiKey.apiKey}`} className="w-full" />}
             <APIKeyEditor
               tenantID={tenantID}
               apiKeyEditorForm={apiKeyUpdationForm}

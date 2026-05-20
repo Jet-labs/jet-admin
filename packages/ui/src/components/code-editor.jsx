@@ -86,8 +86,8 @@ const CodeEditor = React.forwardRef(({
         "flex flex-col overflow-hidden rounded border text-sm shadow-sm transition-colors",
         status === "error" ? "border-destructive/50 ring-1 ring-destructive/20" : "border-border hover:border-border/80",
         isExpanded
-          ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-brand-dark"
-          : "relative bg-brand-dark",
+          ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-background"
+          : "relative bg-background",
         className
       )}
       {...props}
@@ -197,7 +197,7 @@ const CodeEditor = React.forwardRef(({
 
         {/* Footer Hint Overlay */}
         {footerHint && (
-          <div className="absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-brand-border bg-brand-dark/95 px-2 py-1 text-[10px] text-brand-text-muted shadow-sm backdrop-blur-sm">
+          <div className="absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm">
             {footerHint}
           </div>
         )}

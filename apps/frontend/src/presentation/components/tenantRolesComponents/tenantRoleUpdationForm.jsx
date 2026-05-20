@@ -12,29 +12,7 @@ import { TenantRoleDeletionForm } from "./tenantRoleDeletionForm";
 import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput";
 import { formValidations } from "../../../utils/formValidation";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-import { Button, Spinner, Input, Label } from "@jet-admin/ui";
-
-function Section({ title, description, children }) {
-  return (
-    <div className="rounded-md border border-border bg-card p-4 space-y-3">
-      {(title || description) && (
-        <div className="mb-2">
-          {title && (
-            <p className="mb-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              {title}
-            </p>
-          )}
-          {description && (
-            <p className="text-[11px] text-muted-foreground">{description}</p>
-          )}
-        </div>
-      )}
-      <div className="space-y-4">
-        {children}
-      </div>
-    </div>
-  );
-}
+import { Button, Spinner, Input, Label, PageHeader, Section } from "@jet-admin/ui";
 
 function FieldError({ message }) {
   if (!message) return null;
@@ -120,46 +98,36 @@ export const TenantRoleUpdationForm = () => {
   );
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden bg-brand-dark">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenantRoleByID}
         error={loadTenantRoleByIDError}
       >
         {tenantRole && (
           <>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3 shrink-0">
-              <div>
-                <h1 className="text-base font-semibold tracking-tight text-foreground">
-                  {CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_TITLE}
-                </h1>
-                <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-                  ID: {tenantRoleID}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <TenantRoleDeletionForm
-                  tenantID={tenantID}
-                  tenantRoleID={tenantRoleID}
-                />
-                <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  form="update-role-form"
-                  disabled={isUpdatingTenantRoleByID}
-                >
-                  {isUpdatingTenantRoleByID && <Spinner size={14} className="mr-2" />}
-                  {CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_FORM_SUBMIT_BUTTON}
-                </Button>
-              </div>
-            </div>
+            <PageHeader
+              title={CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_TITLE}
+              parentTitle={CONSTANTS.STRINGS.TENANT_ROLE_MANAGEMENT_TITLE}
+
+              id={tenantRoleID}
+              onSave={updateTenantRoleByIDForm.handleSubmit}
+              isSaving={isUpdatingTenantRoleByID}
+              saveText="Update"
+            >
+              <TenantRoleDeletionForm
+                tenantID={tenantID}
+                tenantRoleID={tenantRoleID}
+              />
+              <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
+                Back
+              </Button>
+            </PageHeader>
 
             <div className="flex-1 overflow-y-auto p-4 md:p-6">
               <section className="mx-auto max-w-2xl w-full">
                 <form
                   id="update-role-form"
-                  className="space-y-6"
+                  className="space-y-4"
                   onSubmit={updateTenantRoleByIDForm.handleSubmit}
                   noValidate
                 >

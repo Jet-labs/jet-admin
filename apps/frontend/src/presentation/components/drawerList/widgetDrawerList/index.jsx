@@ -1,6 +1,6 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
+import { Plus } from 'lucide-react';
 import React from "react";
-import { FaPlus } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useWidgets } from "../../../../logic/hooks/useWidgets";
@@ -33,13 +33,13 @@ export const WidgetDrawerList = () => {
   };
 
   return (
-    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddMoreWidget}
-        variant="primary-ghost"
+        variant="secondary"
         className="w-full justify-start"
       >
-        <FaPlus className="!w-4 !h-4 !text-primary mr-1" />
+        <Plus className="!w-4 !h-4 !text-primary mr-1" />
         {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
       </Button>
       {isLoadingWidgets || isFetchingWidgets ? (
@@ -66,7 +66,7 @@ export const WidgetDrawerList = () => {
               >
                 <div
                   className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
-                      ? "bg-primary/10 text-primary"
+                    ? "bg-primary/5 text-primary"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >

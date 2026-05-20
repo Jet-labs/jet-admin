@@ -1,8 +1,7 @@
 import React, { useState } from "react";
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from "@jet-admin/ui";
-// import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-
-const PrivacyPolicy = () => {
+// const PrivacyPolicy = () => {
   const [expandedSections, setExpandedSections] = useState({});
 
   const toggleSection = (sectionId) => {
@@ -18,10 +17,10 @@ const PrivacyPolicy = () => {
       <div key={id} className="mb-4">
         <Button
           onClick={() => toggleSection(id)}
-          className="flex justify-between items-center w-full text-left font-semibold text-lg bg-brand-border-dark p-2 rounded-sm"
+          className="flex justify-between items-center w-full text-left font-semibold text-lg bg-muted p-2 rounded-sm"
         >
           {title}
-          {/* {isExpanded ? <FaChevronUp size={20} /> : <FaChevronDown size={20} />} */}
+          {/* {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />} */}
         </Button>
         {isExpanded && <div className="mt-2 pl-4">{content}</div>}
       </div>

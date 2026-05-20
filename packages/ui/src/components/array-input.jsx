@@ -70,9 +70,8 @@ export function ArrayInput({
           <Button
             type="button"
             variant="ghost"
-            size="sm"
-            square
-            className="h-8 w-8 text-[#1c1c1e] hover:text-red-500 flex-shrink-0 mt-1"
+            size="icon"
+            className="text-[#1c1c1e] hover:text-red-500 flex-shrink-0 mt-1"
             onClick={() => handleRemoveItem(index)}
             disabled={disabled || !canRemove}
           >
@@ -108,9 +107,8 @@ export function ArrayInput({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          square
-          className="h-8 w-8 text-[#1c1c1e] hover:text-red-500 flex-shrink-0"
+          size="icon"
+          className="text-[#1c1c1e] hover:text-red-500 flex-shrink-0"
           onClick={() => handleRemoveItem(index)}
           disabled={disabled || !canRemove}
         >
@@ -131,8 +129,8 @@ export function ArrayInput({
         <Button
           type="button"
           variant="outline"
-          size="sm"
-          className="flex-1 text-xs h-8"
+          size="default"
+          className="flex-1 text-xs"
           onClick={handleAddItem}
           disabled={disabled || !canAdd}
         >

@@ -1,6 +1,6 @@
 
 import React, { useMemo } from "react";
-import { FaChevronDown, FaPlus, FaStoreAlt } from "react-icons/fa";
+import { ChevronDown, Plus, Store } from 'lucide-react';
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import {
@@ -50,10 +50,10 @@ export const TenantSelectionDropdown = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="w-full flex justify-between items-center bg-brand-black hover:bg-brand-border-dark focus:outline-none focus:ring-4 focus:ring-brand-border-dark h-10 p-2"
+          className="w-full flex justify-between items-center bg-background hover:bg-muted focus:outline-none focus:ring-4 focus:ring-brand-border-dark h-10 p-2"
         >
           <div className="flex items-center min-w-0 flex-grow">
-            <div className="flex-shrink-0 w-7 h-7 rounded-sm border border-brand-border bg-brand-border-dark flex justify-center items-center">
+            <div className="flex-shrink-0 w-7 h-7 rounded-sm border border-border bg-muted flex justify-center items-center">
               {selectedTenant?.tenantLogoURL ? (
                 <TenantLogo
                   src={selectedTenant.tenantLogoURL}
@@ -61,11 +61,11 @@ export const TenantSelectionDropdown = () => {
                   className="w-full h-full rounded-sm"
                 />
               ) : (
-                <FaStoreAlt className="w-5 h-5 text-brand-text-primary" />
+                <Store className="w-5 h-5 text-foreground" />
               )}
             </div>
             <div className="ml-2 flex flex-col min-w-0 overflow-hidden flex-1">
-              <span className="text-sm font-semibold text-brand-text-primary text-left truncate">
+              <span className="text-sm font-semibold text-foreground text-left truncate">
                 {selectedTenant
                   ? StringUtils.truncateName(selectedTenant.tenantTitle, 15)
                   : CONSTANTS.STRINGS
@@ -73,7 +73,7 @@ export const TenantSelectionDropdown = () => {
               </span>
             </div>
           </div>
-          <FaChevronDown className="text-brand-text-primary ml-2" />
+          <ChevronDown className="text-foreground ml-2" />
         </Button>
       </DropdownMenuTrigger>
 
@@ -87,7 +87,7 @@ export const TenantSelectionDropdown = () => {
             onClick={() => handleTenantChange(tenant)}
             className="flex items-center cursor-pointer p-1.5"
           >
-            <div className="flex-shrink-0 w-7 h-7 rounded-sm border border-brand-border bg-brand-border-dark flex justify-center items-center overflow-hidden">
+            <div className="flex-shrink-0 w-7 h-7 rounded-sm border border-border bg-muted flex justify-center items-center overflow-hidden">
               {tenant.tenantLogoURL ? (
                 <TenantLogo
                   src={tenant.tenantLogoURL}
@@ -95,11 +95,11 @@ export const TenantSelectionDropdown = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <FaStoreAlt className="w-5 h-5 text-brand-text-primary" />
+                <Store className="w-5 h-5 text-foreground" />
               )}
             </div>
             <div className="ml-3 flex flex-col justify-start items-start min-w-0 overflow-hidden w-full">
-              <span className="text-sm font-semibold text-brand-text-primary text-left truncate w-full">
+              <span className="text-sm font-semibold text-foreground text-left truncate w-full">
                 {StringUtils.truncateName(tenant.tenantTitle, 16).replace(/^./, (c) =>
                   c.toUpperCase()
                 )}
@@ -114,7 +114,7 @@ export const TenantSelectionDropdown = () => {
           onClick={navigateToAddTenantPage}
           className="flex items-center cursor-pointer text-primary p-1.5 justify-center"
         >
-          <FaPlus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           <span className="font-medium">
             {CONSTANTS.STRINGS.TENANT_SELECTION_DROPDOWN_ADD_TENANT}
           </span>

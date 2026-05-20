@@ -1,17 +1,17 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
-import {
-  FaCode, FaChartBar, FaChartLine, FaChartPie,
-} from "react-icons/fa";
-import { BiScatterChart } from "react-icons/bi";
+
+
+
 import { extractWorkflowSchema } from "./variableExplorer";
 import { CodeEditor } from "@jet-admin/ui";
+import { BarChart, Code, LineChart, PieChart, ScatterChart } from 'lucide-react';
 
 /* ─────────────────────────────────────────────────────────── templates ── */
 const VEGA_TEMPLATES = {
   empty: {
     name: "Empty",
-    icon: FaCode,
+    icon: Code,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       description: "Custom visualization",
@@ -25,7 +25,7 @@ const VEGA_TEMPLATES = {
   },
   bar: {
     name: "Bar",
-    icon: FaChartBar,
+    icon: BarChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -47,7 +47,7 @@ const VEGA_TEMPLATES = {
   },
   line: {
     name: "Line",
-    icon: FaChartLine,
+    icon: LineChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -69,7 +69,7 @@ const VEGA_TEMPLATES = {
   },
   pie: {
     name: "Pie",
-    icon: FaChartPie,
+    icon: PieChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -89,7 +89,7 @@ const VEGA_TEMPLATES = {
   },
   scatter: {
     name: "Scatter",
-    icon: BiScatterChart,
+    icon: ScatterChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -113,7 +113,7 @@ const VEGA_TEMPLATES = {
   },
   heatmap: {
     name: "Heatmap",
-    icon: FaChartBar,
+    icon: BarChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -457,7 +457,7 @@ export const VegaSpecEditor = ({
       className="hover:bg-muted hover:text-foreground"
       onClick={() => setShowTemplates((v) => !v)}
     >
-      <FaChartBar size={9} />
+      <BarChart size={9} />
       Templates
     </button>
   );
@@ -500,7 +500,7 @@ export const VegaSpecEditor = ({
         language="json"
         disabled={disabled}
         title="Vega-Lite"
-        titleIcon={<FaCode style={{ color: "var(--we-bg-accent, #6366f1)", fontSize: 13 }} />}
+        titleIcon={<Code style={{ color: "var(--we-bg-accent, #6366f1)", fontSize: 13 }} />}
         status={hasError ? "error" : "valid"}
         statusMessage={parseError ? `Parse error: ${parseError}` : null}
         headerLeft={headerLeft}

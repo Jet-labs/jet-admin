@@ -58,6 +58,14 @@ router.delete(
   workflowController.deleteWorkflow
 );
 
+// Clone workflow
+router.post(
+  "/:workflowID/clone",
+  validate(workflowIdParamSchema, "params"),
+  authMiddleware.checkUserPermissions(["tenant:workflow:create"]),
+  workflowController.cloneWorkflow
+);
+
 // Execute workflow (async - returns instanceID immediately)
 router.post(
   "/:workflowID/execute",

@@ -99,7 +99,7 @@ export const TenantRoleSelectionInput = ({
             )}
           </Button>
           {isOpen && tenantRoles.roles && (
-            <div className="absolute z-50 mt-1 w-full bg-brand-dark border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+            <div className="absolute z-50 mt-1 w-full bg-background border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
               {tenantRoles.roles.map((tenantRole) => (
                 <div
                   key={tenantRole.roleID}

@@ -42,7 +42,7 @@ export const CustomGenericObjectArrayRenderer = ({
   }
 
   return (
-    <div className="p-3 border border-border rounded-sm bg-brand-dark mb-3">
+    <div className="p-3 border border-border rounded-sm bg-background">
       <Label className="block mb-1 text-sm font-medium text-foreground">
         {label || uischema.label || "Items"}
       </Label>
@@ -71,7 +71,7 @@ export const CustomGenericObjectArrayRenderer = ({
             <Button
               type="button"
               variant="destructive-ghost"
-              size="sm"
+              size="icon"
               square
               onClick={() => handleRemoveItem(index)}
             >
@@ -89,7 +89,7 @@ export const CustomGenericObjectArrayRenderer = ({
 
       <Button
         type="button"
-        variant="primary-ghost"
+        variant="outline"
         size="sm"
         onClick={handleAddItem}
         className="mt-3"

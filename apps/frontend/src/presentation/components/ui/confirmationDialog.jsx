@@ -29,7 +29,7 @@ export const ConfirmationDialog = ({
         {isLoading ? (
           <div className="flex flex-row justify-start items-center p-2">
             {loadingText && (
-              <span className="text-sm font-semibold text-brand-text-primary">
+              <span className="text-sm font-semibold text-foreground">
                 {loadingText}
               </span>
             )}
@@ -47,7 +47,7 @@ export const ConfirmationDialog = ({
                     size="icon"
                     className="p-0 opacity-70 hover:opacity-100"
                   >
-                    <X className="h-4 w-4 text-brand-text-primary" />
+                    <X className="h-4 w-4 text-foreground" />
                   </Button>
                 </DialogTitle>
               </DialogHeader>

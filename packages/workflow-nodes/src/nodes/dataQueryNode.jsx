@@ -3,10 +3,7 @@ import { Handle, Position } from 'reactflow';
 import { JsonForms } from '@jsonforms/react';
 import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
-import { SiQuantconnect } from 'react-icons/si';
-import { TbRefresh } from 'react-icons/tb';
-import { VscDebugDisconnect } from 'react-icons/vsc';
-import { FaPlay } from 'react-icons/fa';
+import { Zap, RefreshCw, Ban, Play } from 'lucide-react';
 import { Button } from '@jet-admin/ui';
 
 const ERROR_HANDLING_OPTIONS = {
@@ -151,11 +148,11 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       <div className="flex items-center gap-2">
         {onQueryTest && formData.dataQueryID && (
           <Button type="button" variant="outline" size="sm" onClick={handleOpenTest} className="flex items-center gap-1.5">
-            <FaPlay className="h-3 w-3" />
+            <Play className="h-3 w-3" />
             Test Query
           </Button>
         )}
-        <Button type="button" onClick={handleSave} className="flex-1">
+        <Button type="button" size="sm" onClick={handleSave} className="flex-1">
           {strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || 'Save'}
         </Button>
       </div>
@@ -194,7 +191,7 @@ export const DataQueryNode = memo(({ id, data, isConnectable }) => {
   const StatusIndicator = () => {
     if (executionStatus === 'running') return (
       <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin">
-        <TbRefresh className="w-3 h-3 text-white" />
+        <RefreshCw className="w-3 h-3 text-white" />
       </div>
     );
     if (executionStatus === 'completed') return (
@@ -215,7 +212,7 @@ export const DataQueryNode = memo(({ id, data, isConnectable }) => {
   };
 
   return (
-    <div className={`relative bg-brand-black border rounded-sm min-w-[340px] max-w-[400px] transition-all duration-150 ${isDisabled ? 'border-brand-border opacity-50' : getStatusStyles()} ${!data.dataQueryID ? '!border-red-400 !bg-red-50' : ''}`}>
+    <div className={`relative bg-brand-black border rounded-sm min-w-[280px] max-w-[350px] transition-all duration-150 ${isDisabled ? 'border-brand-border opacity-50' : getStatusStyles()} ${!data.dataQueryID ? '!border-red-400 !bg-red-950/40' : ''}`}>
       <StatusIndicator />
       <div className="flex items-stretch">
         <div style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}
@@ -226,14 +223,14 @@ export const DataQueryNode = memo(({ id, data, isConnectable }) => {
                   'bg-blue-950/40 border-blue-800'
             }`}
         >
-          <SiQuantconnect className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : executionStatus === 'running' ? 'text-blue-600' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-blue-500'}`} />
+          <Zap className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : executionStatus === 'running' ? 'text-blue-600' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-blue-500'}`} />
         </div>
         <div className="flex-1 px-3 py-2 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <span className={`text-xs font-semibold truncate ${isDisabled ? 'text-brand-text-primary line-through' : 'text-brand-text-primary'}`}>{data?.title || 'Untitled'}</span>
             {isDisabled && (
               <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
-                <VscDebugDisconnect className="w-2.5 h-2.5" />Skip
+                <Ban className="w-2.5 h-2.5" />Skip
               </span>
             )}
           </div>

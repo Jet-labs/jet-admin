@@ -117,16 +117,16 @@ formValidations.apiKeyUpdationFormValidationSchema = Yup.object().shape({
 });
 
 formValidations.cronJobAdditionFormValidationSchema = Yup.object().shape({
-  cronJobTitle: Yup.string().required("Cron job title is required"),
+  cronJobTitle: Yup.string().required("Scheduled job title is required"),
   cronJobDescription: Yup.string().optional(),
-  cronJobSchedule: Yup.string().required("Cron schedule is required"),
+  cronJobSchedule: Yup.string().required("Schedule is required"),
   workflowID: Yup.string().required("Workflow is required"),
 });
 
 formValidations.cronJobUpdationFormValidationSchema = Yup.object().shape({
-  cronJobTitle: Yup.string().required("Cron job title is required"),
+  cronJobTitle: Yup.string().required("Scheduled job title is required"),
   cronJobDescription: Yup.string().optional(),
-  cronJobSchedule: Yup.string().required("Cron schedule is required"),
+  cronJobSchedule: Yup.string().required("Schedule is required"),
   workflowID: Yup.string().required("Workflow is required"),
 });
 

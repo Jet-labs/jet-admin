@@ -112,6 +112,14 @@ class CronJobEngine {
     }
     Logger.log("success", { message: "CronJobEngine:scheduleAll:done" });
   }
+
+  getStatus() {
+    const statuses = {};
+    for (const id of Object.keys(this.scheduledJobs)) {
+      statuses[id] = { state: 'scheduled' };
+    }
+    return statuses;
+  }
 }
 
 const cronJobEngine = new CronJobEngine();

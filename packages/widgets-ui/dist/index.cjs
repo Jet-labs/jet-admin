@@ -190,13 +190,13 @@ var init_vega = __esm({
 });
 
 // src/table/tableWidget.jsx
-var import_react10, import_prop_types9, import_ui9, import_md4, TableWidget;
+var import_react10, import_prop_types9, import_ui9, import_lucide_react6, TableWidget;
 var init_tableWidget = __esm({
   "src/table/tableWidget.jsx"() {
     import_react10 = __toESM(require("react"));
     import_prop_types9 = __toESM(require("prop-types"));
     import_ui9 = require("@jet-admin/ui");
-    import_md4 = require("react-icons/md");
+    import_lucide_react6 = require("lucide-react");
     TableWidget = ({
       widgetConfig,
       data: processedData,
@@ -276,7 +276,7 @@ var init_tableWidget = __esm({
           onClick: () => handlePageChange(1),
           disabled: currentPage === 1 || isLoadingWorkflows
         },
-        /* @__PURE__ */ import_react10.default.createElement(import_md4.MdFirstPage, { className: "text-base" })
+        /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronsLeft, { className: "text-base" })
       ), /* @__PURE__ */ import_react10.default.createElement(
         import_ui9.Button,
         {
@@ -286,7 +286,7 @@ var init_tableWidget = __esm({
           onClick: () => handlePageChange(currentPage - 1),
           disabled: currentPage === 1 || isLoadingWorkflows
         },
-        /* @__PURE__ */ import_react10.default.createElement(import_md4.MdChevronLeft, { className: "text-base" })
+        /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronLeft, { className: "text-base" })
       ), /* @__PURE__ */ import_react10.default.createElement(
         import_ui9.Button,
         {
@@ -296,7 +296,7 @@ var init_tableWidget = __esm({
           onClick: () => handlePageChange(currentPage + 1),
           disabled: currentPage >= totalPages || isLoadingWorkflows
         },
-        /* @__PURE__ */ import_react10.default.createElement(import_md4.MdChevronRight, { className: "text-base" })
+        /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronRight, { className: "text-base" })
       ), /* @__PURE__ */ import_react10.default.createElement(
         import_ui9.Button,
         {
@@ -306,7 +306,7 @@ var init_tableWidget = __esm({
           onClick: () => handlePageChange(totalPages),
           disabled: currentPage >= totalPages || isLoadingWorkflows
         },
-        /* @__PURE__ */ import_react10.default.createElement(import_md4.MdLastPage, { className: "text-base" })
+        /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronsRight, { className: "text-base" })
       ))));
     };
     TableWidget.propTypes = {
@@ -319,14 +319,13 @@ var init_tableWidget = __esm({
 });
 
 // src/table/tableConfigEditor.jsx
-var import_react11, import_prop_types10, import_ui10, import_md5, import_fi5, TemplateAutocompleteInput, collectArrayPaths2, collectScalarPaths, resolvePath, TableConfigEditor;
+var import_react11, import_prop_types10, import_ui10, import_lucide_react7, TemplateAutocompleteInput, collectArrayPaths2, collectScalarPaths, resolvePath, TableConfigEditor;
 var init_tableConfigEditor = __esm({
   "src/table/tableConfigEditor.jsx"() {
     import_react11 = __toESM(require("react"));
     import_prop_types10 = __toESM(require("prop-types"));
     import_ui10 = require("@jet-admin/ui");
-    import_md5 = require("react-icons/md");
-    import_fi5 = require("react-icons/fi");
+    import_lucide_react7 = require("lucide-react");
     TemplateAutocompleteInput = ({ value, onChange, placeholder, suggestions }) => {
       const [showSuggestions, setShowSuggestions] = import_react11.default.useState(false);
       const handleFocus = () => {
@@ -583,7 +582,7 @@ var init_tableConfigEditor = __esm({
           className: "h-7 text-xs px-2",
           title: "Auto-detect columns from data"
         },
-        /* @__PURE__ */ import_react11.default.createElement(import_md5.MdAutoAwesome, { className: "mr-1 text-amber-500" }),
+        /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Sparkles, { className: "mr-1 text-amber-500" }),
         " Auto-detect"
       ), /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Button,
@@ -594,9 +593,9 @@ var init_tableConfigEditor = __esm({
           onClick: handleAddColumn,
           className: "h-7 text-xs px-2"
         },
-        /* @__PURE__ */ import_react11.default.createElement(import_md5.MdAdd, { className: "mr-1" }),
+        /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Plus, { className: "mr-1" }),
         " Add"
-      ))), discoveredColumns.length > 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2" }, /* @__PURE__ */ import_react11.default.createElement(import_fi5.FiZap, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ import_react11.default.createElement("span", null, /* @__PURE__ */ import_react11.default.createElement("strong", null, discoveredColumns.length), " fields detected from loaded data. Click ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Auto-detect"), " to populate columns.")), !dataArrayPath && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "Configure a Data Array Path in the Data tab first, then come back here to set up columns."), dataArrayPath && discoveredColumns.length === 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "No columns detected. Click ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Load Data"), " in the Data tab, or add columns manually."), columns.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, columns.map((col, idx) => /* @__PURE__ */ import_react11.default.createElement(
+      ))), discoveredColumns.length > 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Zap, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ import_react11.default.createElement("span", null, /* @__PURE__ */ import_react11.default.createElement("strong", null, discoveredColumns.length), " fields detected from loaded data. Click ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Auto-detect"), " to populate columns.")), !dataArrayPath && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "Configure a Data Array Path in the Data tab first, then come back here to set up columns."), dataArrayPath && discoveredColumns.length === 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "No columns detected. Click ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Load Data"), " in the Data tab, or add columns manually."), columns.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, columns.map((col, idx) => /* @__PURE__ */ import_react11.default.createElement(
         "div",
         {
           key: idx,
@@ -613,7 +612,7 @@ var init_tableConfigEditor = __esm({
             disabled: idx === 0,
             title: "Move up"
           },
-          /* @__PURE__ */ import_react11.default.createElement(import_md5.MdArrowUpward, { className: "h-3.5 w-3.5" })
+          /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.ArrowUp, { className: "h-3.5 w-3.5" })
         ), /* @__PURE__ */ import_react11.default.createElement(
           import_ui10.Button,
           {
@@ -625,7 +624,7 @@ var init_tableConfigEditor = __esm({
             disabled: idx === columns.length - 1,
             title: "Move down"
           },
-          /* @__PURE__ */ import_react11.default.createElement(import_md5.MdArrowDownward, { className: "h-3.5 w-3.5" })
+          /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.ArrowDown, { className: "h-3.5 w-3.5" })
         )),
         /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Header Label"), /* @__PURE__ */ import_react11.default.createElement(
           import_ui10.Input,
@@ -663,7 +662,7 @@ var init_tableConfigEditor = __esm({
             onClick: () => handleRemoveColumn(idx),
             title: "Remove column"
           },
-          /* @__PURE__ */ import_react11.default.createElement(import_md5.MdDeleteOutline, { className: "h-4 w-4" })
+          /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Trash2, { className: "h-4 w-4" })
         )
       )))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Switch,
@@ -824,7 +823,6 @@ init_vega();
 // src/vega/vegaConfigEditor.jsx
 var import_react9 = __toESM(require("react"));
 var import_prop_types8 = __toESM(require("prop-types"));
-var import_fi4 = require("react-icons/fi");
 
 // src/vega/chartSpecParser.js
 var MARK_TO_CHART_TYPE = {
@@ -999,24 +997,20 @@ var import_ui8 = require("@jet-admin/ui");
 // src/vega/vegaSpecEditor.jsx
 var import_react3 = __toESM(require("react"));
 var import_prop_types2 = __toESM(require("prop-types"));
-var import_fa = require("react-icons/fa");
-var import_bi2 = require("react-icons/bi");
 
 // src/vega/variableExplorer.jsx
 var import_react2 = __toESM(require("react"));
 var import_prop_types = __toESM(require("prop-types"));
-var import_fi = require("react-icons/fi");
-var import_bi = require("react-icons/bi");
-var import_md = require("react-icons/md");
 var import_ui = require("@jet-admin/ui");
+var import_lucide_react = require("lucide-react");
 var getCategoryIcon = (category) => {
   switch (category) {
     case "input":
-      return /* @__PURE__ */ import_react2.default.createElement(import_md.MdInput, { className: "w-3.5 h-3.5 text-emerald-500" });
+      return /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.ArrowRightToLine, { className: "w-3.5 h-3.5 text-emerald-500" });
     case "nodeOutput":
-      return /* @__PURE__ */ import_react2.default.createElement(import_bi.BiGitMerge, { className: "w-3.5 h-3.5 text-primary" });
+      return /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.GitMerge, { className: "w-3.5 h-3.5 text-primary" });
     case "workflowOutput":
-      return /* @__PURE__ */ import_react2.default.createElement(import_md.MdOutput, { className: "w-3.5 h-3.5 text-purple-500" });
+      return /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.ArrowRightFromLine, { className: "w-3.5 h-3.5 text-purple-500" });
     default:
       return null;
   }
@@ -1054,7 +1048,7 @@ var VariableItem = ({ variable, onSelect, isSelected }) => {
         title: "Copy path",
         type: "button"
       },
-      copied ? /* @__PURE__ */ import_react2.default.createElement(import_fi.FiCheck, { className: "w-3 h-3 text-emerald-500" }) : /* @__PURE__ */ import_react2.default.createElement(import_fi.FiCopy, { className: "w-3 h-3 text-muted-foreground" })
+      copied ? /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.Check, { className: "w-3 h-3 text-emerald-500" }) : /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.Copy, { className: "w-3 h-3 text-muted-foreground" })
     )
   );
 };
@@ -1084,7 +1078,7 @@ var VariableCategory = ({
       onClick: () => setIsExpanded(!isExpanded),
       className: "flex items-center gap-1.5 w-full px-2 py-1.5 rounded-sm cursor-pointer bg-muted/50 border border-border hover:bg-muted transition-colors"
     },
-    isExpanded ? /* @__PURE__ */ import_react2.default.createElement(import_fi.FiChevronDown, { className: "w-3 h-3 text-muted-foreground" }) : /* @__PURE__ */ import_react2.default.createElement(import_fi.FiChevronRight, { className: "w-3 h-3 text-muted-foreground" }),
+    isExpanded ? /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.ChevronDown, { className: "w-3 h-3 text-muted-foreground" }) : /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.ChevronRight, { className: "w-3 h-3 text-muted-foreground" }),
     getCategoryIcon(category),
     /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[11px] font-medium uppercase tracking-wide flex-1 text-muted-foreground" }, title),
     /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[10px] px-1.5 py-0.5 rounded-sm bg-brand-dark border border-border text-muted-foreground" }, variables.length)
@@ -1258,10 +1252,11 @@ VariableExplorer.propTypes = {
 
 // src/vega/vegaSpecEditor.jsx
 var import_ui2 = require("@jet-admin/ui");
+var import_lucide_react2 = require("lucide-react");
 var VEGA_TEMPLATES = {
   empty: {
     name: "Empty",
-    icon: import_fa.FaCode,
+    icon: import_lucide_react2.Code,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       description: "Custom visualization",
@@ -1275,7 +1270,7 @@ var VEGA_TEMPLATES = {
   },
   bar: {
     name: "Bar",
-    icon: import_fa.FaChartBar,
+    icon: import_lucide_react2.BarChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -1297,7 +1292,7 @@ var VEGA_TEMPLATES = {
   },
   line: {
     name: "Line",
-    icon: import_fa.FaChartLine,
+    icon: import_lucide_react2.LineChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -1319,7 +1314,7 @@ var VEGA_TEMPLATES = {
   },
   pie: {
     name: "Pie",
-    icon: import_fa.FaChartPie,
+    icon: import_lucide_react2.PieChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -1339,7 +1334,7 @@ var VEGA_TEMPLATES = {
   },
   scatter: {
     name: "Scatter",
-    icon: import_bi2.BiScatterChart,
+    icon: import_lucide_react2.ScatterChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -1363,7 +1358,7 @@ var VEGA_TEMPLATES = {
   },
   heatmap: {
     name: "Heatmap",
-    icon: import_fa.FaChartBar,
+    icon: import_lucide_react2.BarChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -1697,7 +1692,7 @@ var VegaSpecEditor = ({
       className: "hover:bg-muted hover:text-foreground",
       onClick: () => setShowTemplates((v) => !v)
     },
-    /* @__PURE__ */ import_react3.default.createElement(import_fa.FaChartBar, { size: 9 }),
+    /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.BarChart, { size: 9 }),
     "Templates"
   );
   const headerLeft = contextVarCount > 0 ? /* @__PURE__ */ import_react3.default.createElement("span", { style: S.badge("accent") }, contextVarCount, " ctx vars") : null;
@@ -1735,7 +1730,7 @@ var VegaSpecEditor = ({
       language: "json",
       disabled,
       title: "Vega-Lite",
-      titleIcon: /* @__PURE__ */ import_react3.default.createElement(import_fa.FaCode, { style: { color: "var(--we-bg-accent, #6366f1)", fontSize: 13 } }),
+      titleIcon: /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.Code, { style: { color: "var(--we-bg-accent, #6366f1)", fontSize: 13 } }),
       status: hasError ? "error" : "valid",
       statusMessage: parseError ? `Parse error: ${parseError}` : null,
       headerLeft,
@@ -2136,10 +2131,8 @@ FieldPill.propTypes = {
 };
 
 // src/vega/dataFieldPanel.jsx
-var import_fi2 = require("react-icons/fi");
-var import_bi3 = require("react-icons/bi");
-var import_md2 = require("react-icons/md");
 var import_ui4 = require("@jet-admin/ui");
+var import_lucide_react3 = require("lucide-react");
 var collectArrayPaths = (obj, prefix = "ctx", depth = 0, maxDepth = 4) => {
   const results = [];
   if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
@@ -2331,15 +2324,15 @@ var DataFieldPanel = ({
   const getCategoryIcon2 = (cat) => {
     switch (cat) {
       case "node":
-        return /* @__PURE__ */ import_react5.default.createElement(import_bi3.BiGitMerge, { className: "w-3 h-3 shrink-0 text-emerald-600" });
+        return /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.GitMerge, { className: "w-3 h-3 shrink-0 text-emerald-600" });
       case "output":
-        return /* @__PURE__ */ import_react5.default.createElement(import_md2.MdOutput, { className: "w-3 h-3 shrink-0 text-fuchsia-600" });
+        return /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.ArrowRightFromLine, { className: "w-3 h-3 shrink-0 text-fuchsia-600" });
       case "runtime":
-        return /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiZap, { className: "w-3 h-3 shrink-0 text-amber-600" });
+        return /* @__PURE__ */ import_react5.default.createElement(FiZap, { className: "w-3 h-3 shrink-0 text-amber-600" });
       case "datasource":
-        return /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiDatabase, { className: "w-3 h-3 shrink-0 text-blue-600" });
+        return /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Database, { className: "w-3 h-3 shrink-0 text-blue-600" });
       default:
-        return /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiDatabase, { className: "w-3 h-3 shrink-0 text-brand-text-primary" });
+        return /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Database, { className: "w-3 h-3 shrink-0 text-brand-text-primary" });
     }
   };
   const renderFieldGroup = (groupFields, label, colorClass) => {
@@ -2354,7 +2347,7 @@ var DataFieldPanel = ({
       }
     ))));
   };
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: `flex flex-col h-full bg-brand-dark ${className}` }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "p-2.5 border-b border-border bg-muted/30" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiDatabase, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement("span", null, "Data Source")), /* @__PURE__ */ import_react5.default.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ import_react5.default.createElement(
+  return /* @__PURE__ */ import_react5.default.createElement("div", { className: `flex flex-col h-full bg-brand-dark ${className}` }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "p-2.5 border-b border-border bg-muted/30" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Database, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement("span", null, "Data Source")), /* @__PURE__ */ import_react5.default.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ import_react5.default.createElement(
     import_ui4.Input,
     {
       type: "text",
@@ -2375,7 +2368,7 @@ var DataFieldPanel = ({
     /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-0.5" }, getCategoryIcon2(s.source || s.category)),
     /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-[11px] font-medium text-foreground font-mono truncate" }, s.label), /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-[10px] text-muted-foreground truncate mt-0.5", title: s.description }, s.description), s.nodeTitle && /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-[9px] text-emerald-600 mt-1 uppercase tracking-wider font-semibold" }, "from: ", s.nodeTitle)),
     s.source === "runtime" && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-sm uppercase tracking-wider shrink-0" }, "LIVE")
-  )))), dataSource && fields.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm w-fit border border-emerald-100" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiZap, { className: "w-3 h-3" }), fields.length, " fields detected")), fields.length > 5 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-2.5 py-1.5 border-b border-border bg-brand-dark" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 bg-muted/50 border border-border rounded-sm px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiSearch, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement(
+  )))), dataSource && fields.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm w-fit border border-emerald-100" }, /* @__PURE__ */ import_react5.default.createElement(FiZap, { className: "w-3 h-3" }), fields.length, " fields detected")), fields.length > 5 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-2.5 py-1.5 border-b border-border bg-brand-dark" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 bg-muted/50 border border-border rounded-sm px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow" }, /* @__PURE__ */ import_react5.default.createElement(FiSearch, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement(
     import_ui4.Input,
     {
       type: "text",
@@ -2384,7 +2377,7 @@ var DataFieldPanel = ({
       placeholder: "Filter fields...",
       className: "flex-1 text-xs bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-6 p-0"
     }
-  ))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1 overflow-y-auto p-2.5 min-h-0" }, fields.length > 0 ? /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, renderFieldGroup(quantFields, "Measures", "text-emerald-600"), renderFieldGroup(catFields, "Dimensions", "text-blue-600"), renderFieldGroup(tempFields, "Temporal", "text-amber-600")) : /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex flex-col items-center justify-center h-full py-6 text-center px-3" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiDatabase, { className: "w-8 h-8 mb-2 text-muted-foreground/30" }), /* @__PURE__ */ import_react5.default.createElement("p", { className: "text-xs text-muted-foreground leading-relaxed mb-3" }, dataSource ? "Run the workflow to detect fields from the data" : "Choose a data source above or type a ctx path"), !dataSource && allSuggestions.length > 0 && /* @__PURE__ */ import_react5.default.createElement(
+  ))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1 overflow-y-auto p-2.5 min-h-0" }, fields.length > 0 ? /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, renderFieldGroup(quantFields, "Measures", "text-emerald-600"), renderFieldGroup(catFields, "Dimensions", "text-blue-600"), renderFieldGroup(tempFields, "Temporal", "text-amber-600")) : /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex flex-col items-center justify-center h-full py-6 text-center px-3" }, /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Database, { className: "w-8 h-8 mb-2 text-muted-foreground/30" }), /* @__PURE__ */ import_react5.default.createElement("p", { className: "text-xs text-muted-foreground leading-relaxed mb-3" }, dataSource ? "Run the workflow to detect fields from the data" : "Choose a data source above or type a ctx path"), !dataSource && allSuggestions.length > 0 && /* @__PURE__ */ import_react5.default.createElement(
     import_ui4.Button,
     {
       type: "button",
@@ -2433,7 +2426,7 @@ var DataFieldPanel = ({
       onClick: () => setShowManualAdd(true),
       className: "w-full h-auto py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 border-dashed border-border hover:bg-muted hover:text-foreground"
     },
-    /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiPlus, { className: "w-3.5 h-3.5 mr-1" }),
+    /* @__PURE__ */ import_react5.default.createElement(FiPlus, { className: "w-3.5 h-3.5 mr-1" }),
     /* @__PURE__ */ import_react5.default.createElement("span", null, "Add Field Manually")
   ))));
 };
@@ -2624,9 +2617,8 @@ MarkSelector.propTypes = {
 };
 
 // src/vega/shelfBuilder.jsx
-var import_fi3 = require("react-icons/fi");
-var import_md3 = require("react-icons/md");
 var import_ui7 = require("@jet-admin/ui");
+var import_lucide_react4 = require("lucide-react");
 var VEGA_STRINGS = {
   WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings"
 };
@@ -2746,9 +2738,9 @@ var ShelfBuilder = ({
       size: "sm",
       className: "h-8 text-xs"
     },
-    /* @__PURE__ */ import_react8.default.createElement(import_md3.MdOutlineAutoGraph, { className: "inline-block h-3 w-3 mr-2" }),
+    /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.TrendingUp, { className: "inline-block h-3 w-3 mr-2" }),
     VEGA_STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON
-  )), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogContent, { className: "max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-brand-dark border-border shadow-2xl" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogHeader, { className: "flex flex-row items-center px-4 py-3 border-b border-border bg-brand-dark shrink-0 space-y-0" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 text-foreground" }, /* @__PURE__ */ import_react8.default.createElement(import_md3.MdOutlineAutoGraph, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogTitle, { className: "text-base font-bold m-0 p-0 text-left" }, "Visual Chart Editor"))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0" }, !hasAnyData ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded-sm bg-brand-dark" }, /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiDatabase, { className: "w-10 h-10 mb-3 text-muted-foreground/40" }), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm font-semibold text-foreground mb-1" }, "No Data Source Selected"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Add a Data Source in the Data tab and run a Test, or select a Workflow.")) : /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col w-56 shrink-0 bg-brand-dark border border-border rounded-md overflow-hidden min-h-0 h-full" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-2 border-b border-border bg-brand-dark" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Select, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectTrigger, { className: "text-xs font-medium" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectValue, { placeholder: "Select Data Input" })), /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectContent, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { value: "workflow" }, "Workflow Output"), workflowContext && Object.keys(workflowContext).map((key) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key, value: `{{ctx.${key}}}` }, `ctx.${key}`)), queryResults && Object.keys(queryResults).map((alias) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key: `qr-${alias}`, value: `{{${alias}.data}}` }, alias, " (Data Source)"))))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden outline-none min-h-0" }, /* @__PURE__ */ import_react8.default.createElement(
+  )), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogContent, { className: "max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-brand-dark border-border shadow-2xl" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogHeader, { className: "flex flex-row items-center px-4 py-3 border-b border-border bg-brand-dark shrink-0 space-y-0" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 text-foreground" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.TrendingUp, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogTitle, { className: "text-base font-bold m-0 p-0 text-left" }, "Visual Chart Editor"))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0" }, !hasAnyData ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded-sm bg-brand-dark" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.Database, { className: "w-10 h-10 mb-3 text-muted-foreground/40" }), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm font-semibold text-foreground mb-1" }, "No Data Source Selected"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Add a Data Source in the Data tab and run a Test, or select a Workflow.")) : /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col w-56 shrink-0 bg-brand-dark border border-border rounded-md overflow-hidden min-h-0 h-full" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-2 border-b border-border bg-brand-dark" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Select, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectTrigger, { className: "text-xs font-medium" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectValue, { placeholder: "Select Data Input" })), /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectContent, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { value: "workflow" }, "Workflow Output"), workflowContext && Object.keys(workflowContext).map((key) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key, value: `{{ctx.${key}}}` }, `ctx.${key}`)), queryResults && Object.keys(queryResults).map((alias) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key: `qr-${alias}`, value: `{{${alias}.data}}` }, alias, " (Data Source)"))))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden outline-none min-h-0" }, /* @__PURE__ */ import_react8.default.createElement(
     DataFieldPanel,
     {
       workflowContext,
@@ -2774,7 +2766,7 @@ var ShelfBuilder = ({
       onClick: () => setShowSecondary(!showSecondary),
       className: "w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-brand-dark font-medium cursor-pointer"
     },
-    showSecondary ? /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiChevronDown, { className: "w-4 h-4 mr-2 text-muted-foreground" }) : /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiChevronRight, { className: "w-4 h-4 mr-2 text-muted-foreground" }),
+    showSecondary ? /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.ChevronDown, { className: "w-4 h-4 mr-2 text-muted-foreground" }) : /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.ChevronRight, { className: "w-4 h-4 mr-2 text-muted-foreground" }),
     /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-[10px] font-bold uppercase tracking-wider text-foreground" }, "More Channels ", /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-primary ml-1" }, "(", SECONDARY_SHELVES.filter((ch) => shelfSpec.encoding[ch]?.field).length, " active)"))
   ), showSecondary && /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-3 flex flex-col gap-3 bg-muted/30" }, SECONDARY_SHELVES.map((ch) => /* @__PURE__ */ import_react8.default.createElement(
     EncodingShelf,
@@ -2791,7 +2783,7 @@ var ShelfBuilder = ({
       onClick: () => setShowStyle(!showStyle),
       className: "flex items-center gap-2 p-1 text-muted-foreground hover:text-foreground focus:outline-none transition-colors bg-transparent cursor-pointer"
     },
-    showStyle ? /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiChevronRight, { className: "w-4 h-4" }),
+    showStyle ? /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.ChevronRight, { className: "w-4 h-4" }),
     /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-[10px] font-bold uppercase tracking-widest" }, "Chart Style & Settings")
   ), showStyle && /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 space-y-4" }, /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, "Marks"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-muted/30 border border-border rounded-md p-2" }, /* @__PURE__ */ import_react8.default.createElement(MarkSelector, { value: shelfSpec.mark || "auto", onChange: handleMarkChange }), shelfSpec.mark === "auto" && /* @__PURE__ */ import_react8.default.createElement("div", { className: "text-[10px] text-muted-foreground italic p-1 text-center mt-1" }, "Auto-resolved to: ", /* @__PURE__ */ import_react8.default.createElement("span", { className: "font-semibold text-foreground not-italic ml-1" }, resolvedMark)))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "mt-2 space-y-3" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest" }, "Appearance"), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Chart Title"), /* @__PURE__ */ import_react8.default.createElement(
     import_ui7.Input,
@@ -2827,6 +2819,7 @@ ShelfBuilder.propTypes = {
 };
 
 // src/vega/vegaConfigEditor.jsx
+var import_lucide_react5 = require("lucide-react");
 var VEGA_STRINGS2 = {
   WIDGET_EDITOR_FORM_SETTINGS_BUTTON: "Settings",
   WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL: "Refresh interval"
@@ -2888,7 +2881,7 @@ var VegaConfigEditor = ({
       className: "h-8 text-xs",
       onClick: () => setIsSettingsDialogOpen(true)
     },
-    /* @__PURE__ */ import_react9.default.createElement(import_fi4.FiSettings, { className: "inline-block h-3 w-3 mr-2" }),
+    /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.Settings, { className: "inline-block h-3 w-3 mr-2" }),
     VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON
   ), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Dialog, { open: isSettingsDialogOpen, onOpenChange: setIsSettingsDialogOpen }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.DialogContent, { className: "max-w-lg" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.DialogHeader, null, /* @__PURE__ */ import_react9.default.createElement(import_ui8.DialogTitle, null, VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON)), /* @__PURE__ */ import_react9.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, `${VEGA_STRINGS2.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL} (ms)`), /* @__PURE__ */ import_react9.default.createElement(
     import_ui8.Input,
@@ -2899,7 +2892,7 @@ var VegaConfigEditor = ({
       onChange: widgetEditorForm.handleChange,
       value: widgetEditorForm.values.widgetConfig?.refetchInterval || ""
     }
-  )), /* @__PURE__ */ import_react9.default.createElement("div", { className: "mt-2" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Label, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ import_react9.default.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ import_react9.default.createElement(import_fi4.FiAlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react9.default.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ import_react9.default.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ import_react9.default.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ import_react9.default.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ import_react9.default.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-brand-dark" }, /* @__PURE__ */ import_react9.default.createElement(
+  )), /* @__PURE__ */ import_react9.default.createElement("div", { className: "mt-2" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Label, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ import_react9.default.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react9.default.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ import_react9.default.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ import_react9.default.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ import_react9.default.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ import_react9.default.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-brand-dark" }, /* @__PURE__ */ import_react9.default.createElement(
     VegaSpecEditor,
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,
@@ -2923,7 +2916,6 @@ init_tableConfigEditor();
 
 // src/widget.map.js
 var import_react14 = __toESM(require("react"));
-var import_fa2 = require("react-icons/fa");
 
 // src/widget.config.js
 var registerWidgets = () => {
@@ -3031,7 +3023,7 @@ var getDemoData = (type) => {
 var import_widget_types = require("@jet-admin/widget-types");
 init_buttonConfigEditor();
 init_tableConfigEditor();
-var import_md6 = require("react-icons/md");
+var import_lucide_react8 = require("lucide-react");
 registerWidgets();
 var LazyVegaWidget = import_react14.default.lazy(
   () => Promise.resolve().then(() => (init_vega(), vega_exports)).then((module2) => ({ default: module2.VegaWidget }))
@@ -3053,7 +3045,7 @@ var WIDGETS_MAP = {
       return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Suspense, { fallback: /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading chart...") }, /* @__PURE__ */ import_react14.default.createElement(LazyVegaWidget, { data, ...props }));
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_fa2.FaChartBar, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_lucide_react8.BarChart, { className: `!text-lg ${className}` }),
     sampleConfig: {
       options: {
         showActions: false,
@@ -3073,7 +3065,7 @@ var WIDGETS_MAP = {
       return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Suspense, { fallback: /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading chart...") }, /* @__PURE__ */ import_react14.default.createElement(LazyVegaWidget, { data, ...props }));
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_fa2.FaChartBar, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_lucide_react8.BarChart, { className: `!text-lg ${className}` }),
     sampleConfig: {
       options: {
         showActions: false,
@@ -3093,7 +3085,7 @@ var WIDGETS_MAP = {
       return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Suspense, { fallback: /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading button...") }, /* @__PURE__ */ import_react14.default.createElement(LazyButtonWidget, { data, ...props }));
     },
     configEditor: ButtonConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_md6.MdOutlineSmartButton, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_lucide_react8.Component, { className: `!text-lg ${className}` }),
     sampleConfig: {
       text: "Click Me",
       variant: "default",
@@ -3111,7 +3103,7 @@ var WIDGETS_MAP = {
       return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Suspense, { fallback: /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading table...") }, /* @__PURE__ */ import_react14.default.createElement(LazyTableWidget, { data, ...props }));
     },
     configEditor: TableConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_md6.MdOutlineTableChart, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_lucide_react8.Table, { className: `!text-lg ${className}` }),
     sampleConfig: {
       dataArrayTemplate: "{{ctx.data}}",
       columns: [],

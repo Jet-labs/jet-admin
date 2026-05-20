@@ -1,6 +1,5 @@
 import React from "react";
-import { FaPlus } from "react-icons/fa";
-import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { LayoutDashboard, Plus } from 'lucide-react';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useDashboards } from "../../../../logic/hooks/useDashboards";
@@ -16,13 +15,13 @@ export const DashboardDrawerList = () => {
   };
 
   return (
-    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddMoreDashboard}
-        variant="primary-ghost"
+        variant="secondary"
         className="w-full justify-start"
       >
-        <FaPlus className="mr-2 h-4 w-4" />
+        <Plus className="mr-2 h-4 w-4" />
         {CONSTANTS.STRINGS.ADD_DASHBOARD_BUTTON_TEXT}
       </Button>
 
@@ -50,12 +49,12 @@ export const DashboardDrawerList = () => {
               >
                 <div
                   className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
-                      ? "bg-primary/10 text-primary"
+                    ? "bg-primary/5 text-primary"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
                   <div className="flex-shrink-0">
-                    <MdOutlineSpaceDashboard
+                    <LayoutDashboard
                       className="h-4 w-4"
                     />
                   </div>

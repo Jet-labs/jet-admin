@@ -1,4 +1,5 @@
-import { IoClose } from "react-icons/io5";
+
+import { X } from 'lucide-react';
 import { DataQueryTestingForm } from "./dataQueryTestingForm";
 import { useParams } from "react-router-dom";
 import React, { useState } from "react";
@@ -35,7 +36,7 @@ export const DataQueryTestingPanel = ({
         }}
       ></div>
       <div
-        className={`fixed right-0 top-0 h-full w-1/3 bg-brand-black transform transition-transform duration-300 ease-in-out  ${
+        className={`fixed right-0 top-0 h-full w-1/3 bg-background transform transition-transform duration-300 ease-in-out  ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{
@@ -49,7 +50,7 @@ export const DataQueryTestingPanel = ({
             variant="outline"
             size="icon"
           >
-            <IoClose className="text-base text-brand-text-primary" />
+            <X className="text-base text-foreground" />
           </Button>
           {selectedQueryForTesting && (
             <div className="w-full flex flex-col justify-start items-stretch h-full flex-grow">

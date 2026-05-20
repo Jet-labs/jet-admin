@@ -43,8 +43,8 @@ export const TenantAdditionForm = () => {
   });
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden bg-brand-dark">
-      <div className="flex items-center justify-between border-b border-border bg-brand-dark px-4 py-3 shrink-0">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
+      <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 shrink-0">
         <div>
           <h1 className="text-base font-semibold tracking-tight text-foreground">
             {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}

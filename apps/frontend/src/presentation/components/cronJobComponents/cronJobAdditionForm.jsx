@@ -7,7 +7,7 @@ import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CronJobEditor } from "./cronJobEditor";
 import PropTypes from "prop-types";
-import { Button, Spinner } from "@jet-admin/ui";
+import { Button, Spinner, PageHeader } from "@jet-admin/ui";
 
 export const CronJobAdditionForm = ({ tenantID }) => {
   CronJobAdditionForm.propTypes = {
@@ -55,18 +55,15 @@ export const CronJobAdditionForm = ({ tenantID }) => {
   });
 
   return (
-    <section className="w-full bg-brand-dark">
+    <section className="w-full bg-background">
       {/* ── Page header ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between border-b border-border bg-brand-dark px-4 py-3">
-        <div>
-          <h1 className="text-base font-semibold tracking-tight text-foreground">
-            {CONSTANTS.STRINGS.ADD_CRON_JOB_FORM_TITLE}
-          </h1>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Define a new scheduled job and attach it to a workflow.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={CONSTANTS.STRINGS.ADD_CRON_JOB_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_CRON_JOBS_TITLE}
+        onSave={cronJobAdditionForm.handleSubmit}
+        isSaving={isAddingCronJob}
+        saveText="Save"
+      />
 
       {/* ── Form body ───────────────────────────────────────────────────── */}
       <div className="mx-auto w-full max-w-2xl p-4 md:p-6">
@@ -77,12 +74,7 @@ export const CronJobAdditionForm = ({ tenantID }) => {
             isLoadingCronJobEditorForm={isAddingCronJob}
           />
 
-          <div className="mt-4 flex justify-end">
-            <Button type="submit" disabled={isAddingCronJob}>
-              {isAddingCronJob && <Spinner className="mr-2" size={14} />}
-              {CONSTANTS.STRINGS.ADD_CRON_JOB_SUBMIT_BUTTON_TEXT}
-            </Button>
-          </div>
+
         </form>
       </div>
     </section>

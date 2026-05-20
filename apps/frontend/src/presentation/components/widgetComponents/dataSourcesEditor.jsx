@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from "react";
+import { Loader, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import PropTypes from "prop-types";
 import {
   Button,
@@ -10,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@jet-admin/ui";
-import { FiPlus, FiTrash2, FiRefreshCw, FiLoader } from "react-icons/fi";
 import { WorkflowConsole } from "../workflowComponents/workflowConsole";
 import { useRuntimeStore } from "../../../logic/stores/useRuntimeStore";
 
@@ -153,9 +153,9 @@ export const DataSourcesEditor = ({
               disabled={isTestRunning}
             >
               {isTestRunning ? (
-                <FiLoader className="w-3 h-3 animate-spin" />
+                <Loader className="w-3 h-3 animate-spin" />
               ) : (
-                <FiRefreshCw className="w-3 h-3" />
+                <RefreshCw className="w-3 h-3" />
               )}
               {dataSourceResults ? "Refresh" : "Load Data"}
             </Button>
@@ -189,7 +189,7 @@ export const DataSourcesEditor = ({
                 className="h-6 w-6 text-destructive hover:bg-destructive/10"
                 onClick={() => handleRemoveSource(idx)}
               >
-                <FiTrash2 className="w-3 h-3" />
+                <Trash2 className="w-3 h-3" />
               </Button>
             </div>
 
@@ -360,7 +360,7 @@ export const DataSourcesEditor = ({
           className="text-xs gap-1"
           onClick={handleAddSource}
         >
-          <FiPlus className="w-3.5 h-3.5" />
+          <Plus className="w-3.5 h-3.5" />
           Add Data Source
         </Button>
       </div>

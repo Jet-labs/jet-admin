@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { FaPlay, FaCheck, FaTimes, FaSpinner, FaClock, FaArrowRight } from 'react-icons/fa';
-import { VscTerminal, VscClearAll } from 'react-icons/vsc';
+import { ArrowRight, Check, Clock, Eraser, Loader, Play, Terminal, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 import { Button } from "@jet-admin/ui";
@@ -28,21 +27,21 @@ export const WorkflowConsole = ({
   const getLogStyle = (log) => {
     switch (log.type) {
       case 'start':
-        return { icon: FaPlay, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
+        return { icon: Play, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
       case 'node_start':
-        return { icon: FaArrowRight, color: 'text-blue-500', bgColor: 'bg-blue-950/400/10' };
+        return { icon: ArrowRight, color: 'text-blue-500', bgColor: 'bg-blue-950/400/10' };
       case 'node_complete':
-        return { icon: FaCheck, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
+        return { icon: Check, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
       case 'node_error':
-        return { icon: FaTimes, color: 'text-destructive', bgColor: 'bg-destructive/10' };
+        return { icon: X, color: 'text-destructive', bgColor: 'bg-destructive/10' };
       case 'workflow_complete':
-        return { icon: FaCheck, color: 'text-emerald-600', bgColor: 'bg-emerald-600/10' };
+        return { icon: Check, color: 'text-emerald-600', bgColor: 'bg-emerald-600/10' };
       case 'workflow_error':
-        return { icon: FaTimes, color: 'text-destructive', bgColor: 'bg-destructive/10' };
+        return { icon: X, color: 'text-destructive', bgColor: 'bg-destructive/10' };
       case 'info':
-        return { icon: FaClock, color: 'text-muted-foreground', bgColor: 'bg-transparent' };
+        return { icon: Clock, color: 'text-muted-foreground', bgColor: 'bg-transparent' };
       default:
-        return { icon: FaClock, color: 'text-muted-foreground', bgColor: 'bg-transparent' };
+        return { icon: Clock, color: 'text-muted-foreground', bgColor: 'bg-transparent' };
     }
   };
 
@@ -59,15 +58,15 @@ export const WorkflowConsole = ({
   };
 
   return (
-    <div className={`flex flex-col bg-brand-dark overflow-hidden ${className}`}>
+    <div className={`flex flex-col bg-background overflow-hidden ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2">
-          <VscTerminal className="size-4 text-muted-foreground" />
+          <Terminal className="size-4 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">Console</span>
           {isRunning && (
             <span className="flex items-center gap-1.5 text-xs text-blue-500 font-medium">
-              <FaSpinner className="size-3 animate-spin" />
+              <Loader className="size-3 animate-spin" />
               Running
             </span>
           )}
@@ -83,14 +82,14 @@ export const WorkflowConsole = ({
               className="h-7 w-7 text-muted-foreground hover:text-foreground"
               title="Clear logs"
             >
-              <VscClearAll className="size-4" />
+              <Eraser className="size-4" />
             </Button>
           )}
         </div>
       </div>
 
       {/* Logs area */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 font-mono text-xs bg-brand-dark/50">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 font-mono text-xs bg-background/50">
         {logs.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground/60">
             <span>No logs yet. Click "Test Run" to start.</span>
@@ -124,7 +123,7 @@ export const WorkflowConsole = ({
                       </span>
                     )}
                     {log.output && (
-                      <div className="mt-1.5 p-2.5 bg-brand-dark/80 rounded-md border border-border text-foreground/90 overflow-x-auto shadow-sm">
+                      <div className="mt-1.5 p-2.5 bg-background/80 rounded-md border border-border text-foreground/90 overflow-x-auto shadow-sm">
                         <pre className="whitespace-pre-wrap break-all leading-relaxed">
                           {typeof log.output === 'object' 
                             ? JSON.stringify(log.output, null, 2) 

@@ -9,7 +9,7 @@ import {
   useAuthState,
 } from "../../../logic/hooks/useAuth";
 import { formValidations } from "../../../utils/formValidation";
-import { Button, Spinner, Input } from "@jet-admin/ui";
+import { Button, Spinner, Input, Section } from "@jet-admin/ui";
 const SignInPage = () => {
   const { firebaseUserState, signInState } = useAuthState();
   const { googleSignIn, emailSignIn } = useAuthActions();
@@ -33,29 +33,28 @@ const SignInPage = () => {
   }, [firebaseUserState]);
 
   return (
-    <div className="bg-brand-dark flex h-screen w-screen flex-col justify-center items-center overflow-hidden">
+    <div className="bg-background flex h-screen w-screen flex-col justify-center items-center overflow-hidden">
       <section className=" md:w-2/3 sm:w-full w-full">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <div className="flex flex-row justify-center items-center mb-6">
             <img className=" w-8 h-8 mr-2  " src={logo} alt="logo" />
-            <span className=" self-center text-xl !font-extrabold whitespace-nowrap text-[#00203e] aldrich-logo">
+            <span className="ml-2 text-lg leading-none font-bold whitespace-nowrap text-primary aldrich-logo">
               {CONSTANTS.APP_NAME}
             </span>
           </div>
 
-          <div className="w-full bg-brand-black rounded-sm shadow  md:mt-0 sm:max-w-md xl:p-0">
-            <div className="p-5">
-              <h1 className="text-lg font-bold leading-tight tracking-tight text-brand-text-primary md:text-lg mb-3">
-                {CONSTANTS.STRINGS.SIGN_IN_FORM_TITLE}
-              </h1>
-              <form
-                className="space-y-3 md:space-y-4"
-                onSubmit={emailSignInForm.handleSubmit}
-              >
+          <Section
+            title={CONSTANTS.STRINGS.SIGN_IN_FORM_TITLE}
+            className="w-full sm:max-w-md"
+          >
+            <form
+              className="space-y-3 md:space-y-4"
+              onSubmit={emailSignInForm.handleSubmit}
+            >
                 <div>
                   <label
                     htmlFor="email"
-                    className="block mb-1 text-sm font-medium text-brand-text-primary "
+                    className="block mb-1 text-sm font-medium text-foreground "
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_EMAIL_FIELD_LABEL}
                   </label>
@@ -63,7 +62,7 @@ const SignInPage = () => {
                     type="email"
                     name="email"
                     id="email"
-                    className=" placeholder:text-brand-text-primary text-sm bg-brand-dark border border-brand-border text-brand-text-primary rounded-sm  focus:outline-none focus:border-brand-border block w-full px-1.5 py-1.5"
+                    className="w-full"
                     placeholder={
                       CONSTANTS.STRINGS.SIGN_IN_FORM_EMAIL_FIELD_PLACEHOLDER
                     }
@@ -76,7 +75,7 @@ const SignInPage = () => {
                 <div>
                   <label
                     htmlFor="password"
-                    className="block mb-1 text-sm font-medium text-brand-text-primary "
+                    className="block mb-1 text-sm font-medium text-foreground "
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_PASSWORD_FIELD_LABEL}
                   </label>
@@ -84,7 +83,7 @@ const SignInPage = () => {
                     type="password"
                     name="password"
                     id="password"
-                    className=" placeholder:text-brand-text-primary text-sm bg-brand-dark border border-brand-border text-brand-text-primary rounded-sm  focus:outline-none focus:border-brand-border block w-full px-1.5 py-1.5"
+                    className="w-full"
                     required={true}
                     onChange={emailSignInForm.handleChange}
                     onBlur={emailSignInForm.handleBlur}
@@ -98,18 +97,18 @@ const SignInPage = () => {
                 ) : (
                   <Button
                     type="submit"
-                    className=" px-3 py-2 w-full text-xs font-medium text-center text-brand-text-primary bg-brand-green rounded-sm hover:bg-brand-green/90 focus:ring-4 focus:outline-none focus:ring-brand-green-border "
+                      className="w-full"
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_SUBMIT_BUTTON}
                   </Button>
                 )}
-                <div className="py-3 flex items-center text-sm text-brand-text-primary before:flex-1 before:border-t before:border-brand-border before:me-6 after:flex-1 after:border-t after:border-brand-border after:ms-6">
+                <div className="py-3 flex items-center text-sm text-foreground before:flex-1 before:border-t before:border-border before:me-6 after:flex-1 after:border-t after:border-border after:ms-6">
                   Or
                 </div>
                 <Button
                   type="button"
                   onClick={googleSignIn}
-                  className="text-brand-text-primary bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-sm text-sm px-5 py-1.5 text-center inline-flex justify-center items-center  me-2 mb-2 w-full"
+                  className="text-foreground bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-sm text-sm px-5 py-1.5 text-center inline-flex justify-center items-center  me-2 mb-2 w-full"
                 >
                   <svg
                     className="w-4 h-4 me-2"
@@ -138,7 +137,7 @@ const SignInPage = () => {
                   </div>
                 )}
 
-                <p className="text-sm font-light text-brand-text-primary ">
+                <p className="text-sm font-light text-foreground ">
                   {CONSTANTS.STRINGS.SIGN_IN_FORM_TO_SIGN_UP_MESSAGE}
                   <Link
                     to={CONSTANTS.ROUTES.SIGN_UP.path()}
@@ -148,8 +147,7 @@ const SignInPage = () => {
                   </Link>
                 </p>
               </form>
-            </div>
-          </div>
+          </Section>
         </div>
       </section>
     </div>

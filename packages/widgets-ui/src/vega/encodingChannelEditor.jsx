@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FiChevronDown, FiChevronRight } from 'react-icons/fi';
+
 import { CollapseComponent } from '@jet-admin/ui';
 import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 

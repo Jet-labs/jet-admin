@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Copy } from 'lucide-react';
 import PropTypes from "prop-types";
 import React from "react";
-import { FaRegClone } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { cloneDashboardByIDAPI } from "../../../data/apis/dashboard";
@@ -54,19 +54,19 @@ export const DashboardCloneForm = ({ tenantID, dashboardID }) => {
 
   return (
     <Button
-      variant="outline"
-      onClick={_handleCloneDashboard}
-      disabled={isCloningDashboard}
       type="button"
-      size="sm"
+      variant="outline"
+      size="icon"
       square
       className="shrink-0"
       aria-label="Clone dashboard"
+      onClick={_handleCloneDashboard}
+      disabled={isCloningDashboard}
     >
       {isCloningDashboard ? (
         <Spinner size={16} />
       ) : (
-        <FaRegClone className="h-4 w-4" />
+          <Copy className="h-3 w-3" />
       )}
     </Button>
   );

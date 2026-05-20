@@ -10,7 +10,7 @@ export const CustomTextInput = (props) => {
   const hasErrors = errors && errors.length > 0;
 
   return (
-    <div className="mb-3">
+    <div className="">
       <Label
         htmlFor={path}
         className={`block mb-1 text-xs font-medium ${
@@ -36,6 +36,7 @@ export const CustomTextInput = (props) => {
         />
       ) : (
           <Input
+            size="sm"
           type={uischema?.options?.format === "password" ? "password" : "text"}
           id={path}
           name={path}

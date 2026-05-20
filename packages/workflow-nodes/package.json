@@ -25,7 +25,8 @@
     "@jsonforms/core": "^3.5.1",
     "@jsonforms/react": "^3.5.1",
     "@jet-admin/json-forms-renderers": "^1.0.0",
-    "@jet-admin/ui": "^1.0.0"
+    "@jet-admin/ui": "^1.0.0",
+    "lucide-react": "^0.577.0"
   },
   "devDependencies": {
     "esbuild": "^0.25.3"

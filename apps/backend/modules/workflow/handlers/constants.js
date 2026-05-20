@@ -7,6 +7,7 @@
 const ERROR_HANDLING = {
   CONTINUE: 'continue',       // Continue workflow via error handle
   FAIL_WORKFLOW: 'fail_workflow', // Stop entire workflow on error
+  SKIP_ITEM: 'skip_item',
 };
 
 // Standard next handles
@@ -20,6 +21,7 @@ const NEXT_HANDLE = {
   // For loop nodes
   LOOP: 'loop',
   DONE: 'done',
+  COMPLETED: 'completed',
   // For delay & start nodes
   OUTPUT: 'output',
 };

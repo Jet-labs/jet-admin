@@ -1,6 +1,5 @@
 import React from "react";
-import { FaPlus } from "react-icons/fa";
-import { RiCalendarScheduleLine } from "react-icons/ri";
+import { CalendarClock, Plus } from 'lucide-react';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useCronJobs } from "../../../../logic/hooks/useCronJobs";
@@ -18,13 +17,13 @@ export const CronJobDrawerList = () => {
   };
 
   return (
-    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddNotification}
-        variant="primary-ghost"
+        variant="secondary"
         className="w-full justify-start"
       >
-        <FaPlus className="mr-2 h-4 w-4" />
+        <Plus className="mr-2 h-4 w-4" />
         {CONSTANTS.STRINGS.ADD_CRON_JOB_BUTTON_TEXT}
       </Button>
 
@@ -51,12 +50,12 @@ export const CronJobDrawerList = () => {
               >
                 <div
                   className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-primary/5 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
                   <div className="flex-shrink-0">
-                    <RiCalendarScheduleLine className="h-4 w-4" />
+                    <CalendarClock className="h-4 w-4" />
                   </div>
 
                   <span

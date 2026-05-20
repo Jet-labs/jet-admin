@@ -28,9 +28,9 @@ async function startAllListeners() {
     const { startPipelineWorker } = require('../modules/listener/listenerEngine/pipelineWorker');
     await startPipelineWorker();
 
-    // 5. Listener connection manager (bootstraps all active listeners)
-    const { listenerConnectionManager } = require('../modules/listener/listenerEngine/connectionManager');
-    await listenerConnectionManager.startAll();
+    // 5. Listener engine (bootstraps all active listeners)
+    const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
+    await listenerEngine.startAll();
 
     Logger.log('success', { message: 'startup:startAllListeners:done' });
   } catch (error) {
@@ -46,8 +46,8 @@ async function stopAllListeners() {
   Logger.log('info', { message: 'startup:stopAllListeners:init' });
 
   try {
-    const { listenerConnectionManager } = require('../modules/listener/listenerEngine/connectionManager');
-    await listenerConnectionManager.stopAll();
+    const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
+    await listenerEngine.stopAll();
   } catch (e) { /* ignore */ }
 
   await closeQueue();

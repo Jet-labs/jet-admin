@@ -1,4 +1,5 @@
-import { IoClose } from "react-icons/io5";
+
+import { X } from 'lucide-react';
 import { useParams } from "react-router-dom";
 import React, { useState, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
@@ -172,7 +173,7 @@ export const WorkflowTestingPanel = ({
         }}
       ></div>
       <div
-        className={`fixed right-0 top-0 h-full w-1/3 bg-brand-black transform transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 h-full w-1/3 bg-background transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{
@@ -189,7 +190,7 @@ export const WorkflowTestingPanel = ({
               className="h-7 w-7"
               onClick={_handleClose}
             >
-              <IoClose className="h-4 w-4 text-brand-text-primary" />
+              <X className="h-4 w-4 text-foreground" />
             </Button>
             
             {selectedWorkflowForTesting && (
@@ -210,12 +211,12 @@ export const WorkflowTestingPanel = ({
           
           {selectedWorkflowForTesting && (
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="mb-2 p-2 bg-brand-dark rounded-sm border border-brand-border">
-                <h3 className="text-sm font-medium text-brand-text-primary">
+              <div className="mb-2 p-2 bg-background rounded-sm border border-border">
+                <h3 className="text-sm font-medium text-foreground">
                   {selectedWorkflowForTesting.title}
                 </h3>
                 {selectedWorkflowForTesting.workflowOptions?.args?.length > 0 && (
-                  <p className="text-xs text-brand-text-primary mt-1">
+                  <p className="text-xs text-foreground mt-1">
                     Has {selectedWorkflowForTesting.workflowOptions.args.length} input parameter(s)
                   </p>
                 )}

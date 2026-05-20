@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaCog } from "react-icons/fa";
+import { Settings } from 'lucide-react';
 import { CONSTANTS } from "../../../constants";
 import { TenantRoleSelectionInput } from "../tenantRolesComponents/tenantRoleSelectionInput";
 import PropTypes from "prop-types";
@@ -42,7 +42,7 @@ export const APIKeyRoleSelectionDialog = ({
         {isLoadingAPIKeyEditorForm ? (
           <Spinner size={16} className="mr-2" />
         ) : (
-            <FaCog className="mr-2 h-4 w-4" />
+            <Settings className="mr-2 h-4 w-4" />
         )}
         {CONSTANTS.STRINGS.UPDATE_TENANT_API_KEY_BY_ID_MANAGE_ROLES}
       </Button>

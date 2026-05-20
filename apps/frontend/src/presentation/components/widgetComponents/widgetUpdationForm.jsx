@@ -21,7 +21,7 @@ import { WidgetDeletionForm } from "./widgetDeletionForm";
 import { WidgetConfigEditor } from "./widgetConfigEditor";
 import { WidgetPreview } from "./widgetPreview";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { PageHeader } from "@jet-admin/ui";
 
 const initialValues = {
   widgetTitle: "",
@@ -109,41 +109,26 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
   }, [widget]);
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
-      <div className="flex w-full items-start justify-between border-b border-border bg-brand-dark px-4 py-3">
-        <div className="flex flex-col">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_TITLE}
-          </h1>
-          {widget && (
-            <span className="mt-1 text-xs text-muted-foreground">
-              {`Widget ID: ${widget.widgetID}`}
-            </span>
-          )}
-        </div>
-        <div className="flex flex-row justify-end items-center gap-2">
-          <WidgetCloneForm
-            key={`widgetCloneForm_${widgetID}`}
-            tenantID={tenantID}
-            widgetID={widgetID}
-          />
-          <WidgetDeletionForm
-            key={`widgetDeletionForm_${widgetID}`}
-            tenantID={tenantID}
-            widgetID={widgetID}
-          />
-          <Button
-            type="button"
-            onClick={updateWidgetForm.handleSubmit}
-            disabled={isUpdatingWidget}
-          >
-            {isUpdatingWidget && (
-              <Spinner className="mr-3" size={16} />
-            )}
-            {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_SUBMIT_BUTTON}
-          </Button>
-        </div>
-      </div>
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_WIDGETS_TITLE}
+        id={widgetID}
+        onSave={updateWidgetForm.handleSubmit}
+        isSaving={isUpdatingWidget}
+      >
+        <WidgetDeletionForm
+          key={`widgetDeletionForm_${widgetID}`}
+          tenantID={tenantID}
+          widgetID={widgetID}
+        />
+        <WidgetCloneForm
+          key={`widgetCloneForm_${widgetID}`}
+          tenantID={tenantID}
+          widgetID={widgetID}
+        />
+
+      </PageHeader>
 
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingWidget}
@@ -159,7 +144,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
         >
           <ResizablePanel defaultSize={35} className="!overflow-y-auto !pb-10">
             <form
-              className="flex w-full flex-col items-stretch gap-2 bg-brand-dark p-4"
+              className="flex w-full flex-col items-stretch gap-2 bg-background p-4"
               onSubmit={updateWidgetForm.handleSubmit}
             >
               {updateWidgetForm && (

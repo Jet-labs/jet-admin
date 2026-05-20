@@ -4,37 +4,46 @@ import { cva } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green-border focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
   {
     variants: {
       variant: {
         default:
-          "bg-brand-green text-brand-black font-semibold border border-transparent hover:bg-brand-green/90",
+          "bg-primary/50 text-primary-foreground font-semibold border border-primary/80 hover:border-primary hover:bg-primary/70",
         secondary:
-          "bg-brand-border-dark text-brand-text-primary border border-brand-border hover:bg-brand-border hover:border-brand-border-mid",
+          "bg-muted text-foreground border border-border/50 hover:bg-muted/80 hover:border-border",
         green:
-          "bg-brand-green text-brand-black font-semibold border border-transparent hover:bg-brand-green/90",
+          "bg-primary text-primary-foreground font-semibold border border-transparent hover:bg-primary/90",
         destructive:
-          "bg-red-600 text-white hover:bg-red-700 border border-transparent",
+          "bg-red-500/20 text-white hover:bg-red-500/40 border border-red-500/40",
         white:
-          "bg-brand-text-primary text-brand-black hover:opacity-90 border border-transparent",
+          "bg-foreground text-background hover:opacity-90 border border-transparent",
         outline:
-          "bg-transparent border border-brand-border text-brand-text-primary hover:bg-white/5 hover:border-brand-border-mid",
+          "bg-transparent border border-border text-foreground hover:bg-white/5",
         ghost:
-          "bg-transparent text-brand-text-primary hover:bg-white/5",
+          "bg-transparent text-foreground hover:bg-white/5",
         link:
-          "text-brand-green-link hover:text-brand-green underline-offset-4 hover:underline",
+          "text-primary/90 hover:text-primary underline-offset-4 hover:underline",
         pill:
-          "bg-brand-border-dark text-brand-text-primary border border-brand-border hover:border-brand-border-mid",
+          "bg-muted text-foreground border border-border hover:border-border/80",
+        "primary-ghost":
+          "bg-primary/10 text-primary hover:bg-primary/20 border border-transparent",
+        "destructive-ghost":
+          "bg-transparent text-destructive hover:bg-destructive/10 border border-transparent",
+        "primary-outline":
+          "bg-transparent text-primary border border-primary/50 hover:bg-primary/10",
       },
       size: {
-        default: "px-[14px] py-[5px] text-[13px] rounded-sm",
-        sm: "px-[10px] py-[3px] text-[12px] rounded-sm",
-        lg: "px-[20px] py-[8px] text-[14px] rounded-sm",
-        icon: "h-[28px] w-[28px] rounded-sm",
-        circle: "h-[36px] w-[36px] p-0 rounded-pill",
-        pill: "px-[24px] py-[5px] text-[13px] rounded-pill",
+        default: "h-8 px-3 text-sm rounded-sm",
+        sm: "h-7 px-2.5 text-xs rounded-sm",
+        lg: "h-10 px-5 text-sm rounded-sm",
+        icon: "h-7 w-7 rounded-sm",
+        circle: "h-9 w-9 p-0 rounded-full",
+        pill: "h-8 px-4 text-sm rounded-full",
       },
+      square: {
+        true: "aspect-square p-0",
+      }
     },
     defaultVariants: {
       variant: "default",
@@ -44,11 +53,11 @@ const buttonVariants = cva(
 );
 
 const Button = React.forwardRef(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, square, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, square, className }))}
         ref={ref}
         {...props}
       />

@@ -16,6 +16,7 @@ import {
   JetVerticalLayout,
   JetTabLayout,
   JetRadioControl,
+  JetHorizontalLayout,
 } from './renderers/index.js';
 
 import {
@@ -36,6 +37,7 @@ import {
   verticalLayoutTester,
   tabRendererTester,
   radioInputTester,
+  horizontalLayoutTester,
 } from './testers.js';
 
 /**
@@ -57,6 +59,7 @@ export const jetFormsBaseRenderers = [
   { tester: genericObjectArrayTester, renderer: JetGenericObjectArrayControl },
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout },
+  { tester: horizontalLayoutTester, renderer: JetHorizontalLayout },
 ];
 
 /**

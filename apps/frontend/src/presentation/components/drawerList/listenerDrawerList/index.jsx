@@ -1,11 +1,9 @@
-import { FaPlus } from "react-icons/fa";
+import { Cloud, Plus } from 'lucide-react';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import React from "react";
 import { useListeners } from "../../../../logic/hooks/useListeners";
-import { TbCloudDataConnection } from "react-icons/tb";
-
 import { Button } from "@jet-admin/ui";
 
 const STATUS_COLORS = {
@@ -30,13 +28,13 @@ export const ListenerDrawerList = () => {
   };
 
   return (
-    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddListener}
-        variant="primary-ghost"
+        variant="secondary"
         className="w-full justify-start"
       >
-        <FaPlus className="w-4 h-4 mr-2" />
+        <Plus className="size-4 mr-2" />
         {CONSTANTS.STRINGS.ADD_LISTENER_BUTTON_TEXT}
       </Button>
 
@@ -64,12 +62,12 @@ export const ListenerDrawerList = () => {
               >
                 <div
                   className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary/5 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
                 >
                   <div className="flex-shrink-0 relative">
-                    <TbCloudDataConnection
+                    <Cloud
                       className={`w-4 h-4 ${isActive ? "text-primary" : "text-muted-foreground"}`}
                     />
                     <span

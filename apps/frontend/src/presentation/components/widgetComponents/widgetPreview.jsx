@@ -1,10 +1,9 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
+import { ChevronDown, ChevronRight, Code } from 'lucide-react';
 import { resolveWidgetData } from "@jet-admin/widgets-logic";
 import PropTypes from "prop-types";
 import { useCallback, useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
-import { FiChevronDown, FiChevronRight, FiCode } from "react-icons/fi";
-
 import { Spinner } from "@jet-admin/ui";
 
 export const WidgetPreview = ({
@@ -115,19 +114,19 @@ export const WidgetPreview = ({
       )}
 
       {/* Debug Panel */}
-      <div className="shrink-0 border-t border-brand-border bg-brand-black">
+      <div className="shrink-0 border-t border-border bg-background">
         <button
           type="button"
           onClick={() => setShowDebug(!showDebug)}
-          className="w-full flex items-center gap-1.5 px-3 py-1.5 text-[0.65rem] font-medium text-brand-text-muted hover:text-brand-text-primary hover:bg-brand-border-dark transition-colors"
+          className="w-full flex items-center gap-1.5 px-3 py-1.5 text-[0.65rem] font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
-          {showDebug ? <FiChevronDown className="w-3 h-3" /> : <FiChevronRight className="w-3 h-3" />}
-          <FiCode className="w-3 h-3" />
+          {showDebug ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+          <Code className="w-3 h-3" />
           <span>Debug: Widget Config</span>
         </button>
         {showDebug && (
           <div className="px-3 pb-3 max-h-64 overflow-auto">
-            <pre className="text-[0.6rem] font-mono leading-relaxed text-brand-text-muted bg-brand-black border border-brand-border rounded-sm p-2 whitespace-pre-wrap break-all">
+            <pre className="text-[0.6rem] font-mono leading-relaxed text-muted-foreground bg-background border border-border rounded-sm p-2 whitespace-pre-wrap break-all">
               {JSON.stringify(debugInfo, null, 2)}
             </pre>
           </div>

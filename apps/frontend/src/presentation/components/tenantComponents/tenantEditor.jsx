@@ -7,29 +7,9 @@ import { TenantLogo } from "./tenantLogo";
 import PropTypes from "prop-types";
 import React from "react";
 
-import { Button, Spinner, Input, Label } from "@jet-admin/ui";
+import { Button, Spinner, Input, Label, Section } from "@jet-admin/ui";
 
-function Section({ title, description, children }) {
-  return (
-    <div className="rounded-md border border-border bg-card p-4 space-y-3">
-      {(title || description) && (
-        <div className="mb-2">
-          {title && (
-            <p className="mb-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              {title}
-            </p>
-          )}
-          {description && (
-            <p className="text-[11px] text-muted-foreground">{description}</p>
-          )}
-        </div>
-      )}
-      <div className="space-y-4">
-        {children}
-      </div>
-    </div>
-  );
-}
+
 
 function FieldError({ message }) {
   if (!message) return null;

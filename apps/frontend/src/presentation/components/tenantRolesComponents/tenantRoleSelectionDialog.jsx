@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaTimes } from "react-icons/fa";
+import { X } from 'lucide-react';
 import { CONSTANTS } from "../../../constants";
 import { TenantRoleSelectionInput } from "./tenantRoleSelectionInput";
 import PropTypes from "prop-types";

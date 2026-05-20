@@ -11,14 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@jet-admin/ui";
-import {
-  MdDeleteOutline,
-  MdAdd,
-  MdArrowUpward,
-  MdArrowDownward,
-  MdAutoAwesome,
-} from "react-icons/md";
-import { FiZap } from "react-icons/fi";
+import { Trash2, Plus, ArrowUp, ArrowDown, Sparkles, Zap } from 'lucide-react';
 
 const TemplateAutocompleteInput = ({ value, onChange, placeholder, suggestions }) => {
   const [showSuggestions, setShowSuggestions] = React.useState(false);
@@ -374,7 +367,7 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
                 className="h-7 text-xs px-2"
                 title="Auto-detect columns from data"
               >
-                <MdAutoAwesome className="mr-1 text-amber-500" /> Auto-detect
+                <Sparkles className="mr-1 text-amber-500" /> Auto-detect
               </Button>
             )}
             <Button
@@ -384,7 +377,7 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
               onClick={handleAddColumn}
               className="h-7 text-xs px-2"
             >
-              <MdAdd className="mr-1" /> Add
+              <Plus className="mr-1" /> Add
             </Button>
           </div>
         </div>
@@ -392,7 +385,7 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
         {/* Hint: auto-detect available */}
         {discoveredColumns.length > 0 && columns.length === 0 && (
           <div className="flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-            <FiZap className="w-3.5 h-3.5 shrink-0" />
+            <Zap className="w-3.5 h-3.5 shrink-0" />
             <span>
               <strong>{discoveredColumns.length}</strong> fields detected from
               loaded data. Click <strong>Auto-detect</strong> to populate
@@ -438,7 +431,7 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
                     disabled={idx === 0}
                     title="Move up"
                   >
-                    <MdArrowUpward className="h-3.5 w-3.5" />
+                    <ArrowUp className="h-3.5 w-3.5" />
                   </Button>
                   <Button
                     type="button"
@@ -449,7 +442,7 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
                     disabled={idx === columns.length - 1}
                     title="Move down"
                   >
-                    <MdArrowDownward className="h-3.5 w-3.5" />
+                    <ArrowDown className="h-3.5 w-3.5" />
                   </Button>
                 </div>
                 {/* Fields */}
@@ -503,7 +496,7 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
                   onClick={() => handleRemoveColumn(idx)}
                   title="Remove column"
                 >
-                  <MdDeleteOutline className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             ))}

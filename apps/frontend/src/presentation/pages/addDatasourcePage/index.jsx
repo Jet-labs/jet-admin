@@ -6,7 +6,7 @@ const AddDatasourcePage = () => {
     const { tenantID } = useParams();
 
     return (
-        <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
+        <div className="flex h-full w-full flex-col overflow-hidden bg-background">
             <DatasourceAdditionForm tenantID={tenantID} />
         </div>
     );

@@ -9,6 +9,7 @@ import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { getFormattedAuditLogColumns } from "./auditLogsGridColumnFormatter";
 import { getAuditLogsAPI } from "../../../data/apis/auditLog";
+import { DATAGRID_SX } from "../../../shared/dataGridTheme";
 
 export const AuditLogsGrid = ({ tenantID,  }) => {
   AuditLogsGrid.propTypes = {
@@ -74,8 +75,8 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
       >
         {auditLogsData ? (
           <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
-            <div className="w-full px-3 py-2 border-b border-brand-border flex flex-col justify-center items-start">
-              <h1 className="text-lg font-bold leading-tight tracking-tight text-brand-text-primary">
+            <div className="w-full px-3 py-2 border-b border-border flex flex-col justify-center items-start">
+              <h1 className="text-lg font-bold leading-tight tracking-tight text-foreground">
                 {CONSTANTS.STRINGS.VIEW_AUDIT_LOGS_TITLE}
               </h1>
             </div>
@@ -89,38 +90,10 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
                 loading={isLoadingAuditLogs}
                 getRowId={(row) => _getRowID(row)} // Custom row ID getter
                 sx={{
-                  "--unstable_DataGrid-radius": "0",
-                  "& .MuiDataGrid-root": {
-                    borderRadius: 0,
-                  },
-                  "& .MuiIconButton-root": {
-                    outline: "none",
-                  },
+                  ...DATAGRID_SX,
                   "& .MuiDataGrid-cell": {
+                    ...DATAGRID_SX["& .MuiDataGrid-cell"],
                     fontSize: "0.875rem",
-                    lineHeight: "1.25rem",
-                    fontWeight: "400",
-                  },
-                  "& .MuiCheckbox-root": {
-                    padding: "4px",
-                  },
-                  "& .MuiDataGrid-columnHeaderCheckbox": {
-                    minWidth: "auto !important",
-                    width: "auto !important",
-                    flex: "0 0 auto !important",
-                    padding: "0.25rem !important",
-                    "& .MuiDataGrid-columnHeaderTitleContainer": {
-                      width: "auto",
-                      minWidth: "auto",
-                      flex: "none",
-                    },
-                  },
-                  "& .MuiDataGrid-cellCheckbox": {
-                    minWidth: "auto !important",
-                    width: "auto !important",
-                    flex: "0 0 auto !important",
-                    color: "hsl(var(--primary))",
-                    padding: "0.25rem !important",
                   },
                 }}
                 showCellVerticalBorder

@@ -11,33 +11,17 @@ import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
 import { useDatasourceOptions } from "../../../logic/hooks/useDatasourceOptions";
 import {
+  Input,
   Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Section,
 } from "@jet-admin/ui";
 
-function Section({ title, description, children }) {
-  return (
-    <div className="rounded-sm border border-border bg-card p-4 space-y-3">
-      {(title || description) && (
-        <div>
-          {title && (
-            <p className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-              {title}
-            </p>
-          )}
-          {description && (
-            <p className="text-[11px] text-muted-foreground">{description}</p>
-          )}
-        </div>
-      )}
-      {children}
-    </div>
-  );
-}
+
 
 const injectQueryArgsIntoUiSchema = (uiSchema, queryArgs) => {
   if (!uiSchema || typeof uiSchema !== "object") {
@@ -136,49 +120,74 @@ export const DataQueryEditor = ({
   );
 
   return (
-    <div className="space-y-4">
-      {/* JSON Forms for datasourceOptions */}
-      <Section title="Identity">
-        <div className="space-y-1.5">
-          <Label htmlFor="datasourceID">
-            {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL} <span className="text-destructive">*</span>
-          </Label>
+    <div className="w-full">
+      <Section title="Query Configuration">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="dataQueryTitle">
+              {CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_LABEL} <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              name="dataQueryTitle"
+              id="dataQueryTitle"
+              placeholder={
+                CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_PLACEHOLDER
+              }
+              required={true}
+              onChange={dataQueryEditorForm.handleChange}
+              onBlur={dataQueryEditorForm.handleBlur}
+              value={dataQueryEditorForm.values.dataQueryTitle}
+            />
+            {dataQueryEditorForm.touched.dataQueryTitle && dataQueryEditorForm.errors.dataQueryTitle && (
+              <p className="text-xs text-red-500">
+                {dataQueryEditorForm.errors.dataQueryTitle}
+              </p>
+            )}
+          </div>
 
-          <Select value={dataQueryEditorForm.values.datasourceID} onValueChange={_handleDatasourceTypeChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select datasource" />
-            </SelectTrigger>
-            <SelectContent>
-              {datasources?.map((datasource) => (
-                <SelectItem key={datasource.value} value={datasource.value}>
-                  {datasource.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {dataQueryEditorForm.errors.datasourceID && (
-            <p className="text-xs text-red-500">
-              {dataQueryEditorForm.errors.datasourceID}
-            </p>
+          <div className="space-y-1.5">
+            <Label htmlFor="datasourceID">
+              {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL} <span className="text-destructive">*</span>
+            </Label>
+            <Select
+              value={dataQueryEditorForm.values.datasourceID}
+              onValueChange={_handleDatasourceTypeChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select datasource" />
+              </SelectTrigger>
+              <SelectContent>
+                {datasources?.map((datasource) => (
+                  <SelectItem key={datasource.value} value={datasource.value}>
+                    {datasource.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {dataQueryEditorForm.touched.datasourceID && dataQueryEditorForm.errors.datasourceID && (
+              <p className="text-xs text-red-500">
+                {dataQueryEditorForm.errors.datasourceID}
+              </p>
+            )}
+          </div>
+
+          {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType] &&
+            currentDatasourceType?.queryConfigForm && (
+              <div className="border-t border-border pt-4 mt-2">
+                <JsonForms
+                  key={uniqueKey}
+                  schema={currentDatasourceType.queryConfigForm.schema}
+                  uischema={queryConfigUiSchema}
+                  data={dataQueryEditorForm.values.dataQueryOptions}
+                  renderers={[...materialRenderers, ...customJSONFormRenderers]}
+                  cells={materialCells}
+                  validationMode="ValidateAndShow"
+                  onChange={_handleDatasourceOptionsChange}
+                />
+              </div>
           )}
         </div>
       </Section>
-        {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType] &&
-          currentDatasourceType?.queryConfigForm && (
-        <Section title="Query Details">
-            <JsonForms
-              key={uniqueKey}
-              schema={currentDatasourceType.queryConfigForm.schema}
-              uischema={queryConfigUiSchema}
-              data={dataQueryEditorForm.values.dataQueryOptions}
-              renderers={[...materialRenderers, ...customJSONFormRenderers]}
-              cells={materialCells}
-              // This onChange updates only the 'datasourceOptions' in Formik
-              validationMode="ValidateAndShow"
-              onChange={_handleDatasourceOptionsChange}
-            />
-          </Section>
-        )}
     </div>
   );
 };

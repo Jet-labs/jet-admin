@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BiChevronDown, BiChevronUp } from "react-icons/bi";
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { CONSTANTS } from "../../../constants";
 import PropTypes from "prop-types";
 
@@ -32,9 +32,9 @@ export const CollapseComponent = ({
         variant="ghost" className="p-0 m-0 text-primary hover:text-primary"
       >
         {isOpen ? (
-          <BiChevronUp className="text-base mr-1" />
+          <ChevronUp className="text-base mr-1" />
         ) : (
-            <BiChevronDown className="text-base mr-1" />
+            <ChevronDown className="text-base mr-1" />
         )}
         {isOpen
           ? hideButtonText ||

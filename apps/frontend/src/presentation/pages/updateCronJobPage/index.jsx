@@ -4,7 +4,7 @@ import { CronJobUpdationForm } from "../../components/cronJobComponents/cronJobU
 const UpdateCronJobPage = () => {
   const { tenantID, cronJobID } = useParams();
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto bg-brand-dark">
+    <div className="flex h-full w-full flex-col overflow-y-auto bg-background">
       <CronJobUpdationForm tenantID={tenantID} cronJobID={cronJobID} />
     </div>
   );

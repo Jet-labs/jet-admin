@@ -23,7 +23,7 @@ import { DashboardEditor } from "./dashboardEditor";
 import { appendWidgetToDashboardConfig } from "./dashboardLayoutUtils";
 import { DashboardWidgetList } from "./dashboardWidgetList";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { PageHeader } from "@jet-admin/ui";
 export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
   DashboardUpdationForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -130,39 +130,26 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
-      <div className="flex w-full items-start justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3">
-        <div className="flex flex-col items-start gap-1">
-          <h1 className="text-lg font-semibold text-foreground">
-            {CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_TITLE}
-          </h1>
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_DASHBOARDS_TITLE}
 
-          {dashboard && (
-            <span className="text-xs text-muted-foreground">{`Dashboard ID: ${dashboard.dashboardID}`}</span>
-          )}
-        </div>
-
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <Button
-            type="submit"
-            form="dashboard-updation-form"
-            disabled={isUpdatingDashboard}
-          >
-            {isUpdatingDashboard && <Spinner className="mr-2" size={16} />}
-            {CONSTANTS.STRINGS.UPDATE_DASHBOARD_BUTTON_TEXT}
-          </Button>
-          <DashboardCloneForm
-            key={`dashboardCloneForm_${dashboard?.dashboardID}`}
-            tenantID={tenantID}
-            dashboardID={dashboardID}
-          />
-          <DashboardDeletionForm
-            key={`dashboardDeletionForm_${dashboard?.dashboardID}`}
-            tenantID={tenantID}
-            dashboardID={dashboardID}
-          />
-        </div>
-      </div>
+        id={dashboardID}
+        onSave={dashboardUpdationForm.handleSubmit}
+        isSaving={isUpdatingDashboard}
+      >
+        <DashboardDeletionForm
+          key={`dashboardDeletionForm_${dashboard?.dashboardID}`}
+          tenantID={tenantID}
+          dashboardID={dashboardID}
+        />
+        <DashboardCloneForm
+          key={`dashboardCloneForm_${dashboard?.dashboardID}`}
+          tenantID={tenantID}
+          dashboardID={dashboardID}
+        />
+      </PageHeader>
 
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingDashboard}
@@ -176,11 +163,11 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
           }
           className="!h-full !w-full"
         >
-          <ResizablePanel defaultSize={20} className="overflow-hidden bg-brand-dark">
+          <ResizablePanel defaultSize={20} className="overflow-hidden bg-background">
             <form
               id="dashboard-updation-form"
               onSubmit={dashboardUpdationForm.handleSubmit}
-              className="flex h-full w-full flex-col overflow-hidden bg-brand-dark"
+              className="flex h-full w-full flex-col overflow-hidden bg-background"
             >
               <DashboardEditor dashboardEditorForm={dashboardUpdationForm} />
               <DashboardWidgetList
@@ -191,7 +178,7 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
             {dashboardUpdationForm && dashboardUpdationForm.values && (
               <DashboardDropzone
                 tenantID={tenantID}

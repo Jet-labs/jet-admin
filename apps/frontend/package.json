@@ -67,6 +67,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dagre": "^0.8.5",
+    "date-fns": "^4.1.0",
     "firebase": "^11.0.1",
     "formik": "^2.4.6",
     "highlight.js": "^11.11.1",

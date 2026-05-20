@@ -57,7 +57,7 @@ export const CustomSelectInput = (props) => {
   const hasErrors = errors && errors.length > 0;
 
   return (
-    <div className="mb-3">
+    <div className="">
       <Label
         htmlFor={path}
         className={`block mb-1 text-xs font-medium ${
@@ -70,7 +70,8 @@ export const CustomSelectInput = (props) => {
         <Select value={data || ""} onValueChange={(val) => handleChange(path, val)} disabled={isDisabled}>
           <SelectTrigger
             id={path}
-            className={`text-sm ${hasErrors ? "border-red-500" : ""}`}
+            size="sm"
+            className={`${hasErrors ? "border-red-500" : ""}`}
           >
             <SelectValue placeholder={uischema?.options?.placeholder || "Select an option"} />
           </SelectTrigger>
@@ -86,7 +87,7 @@ export const CustomSelectInput = (props) => {
           <Button
             type="button"
             variant="outline"
-            size="sm"
+            size="icon"
             square
             onClick={handleRefreshClick}
             disabled={isRefreshing || isDisabled}

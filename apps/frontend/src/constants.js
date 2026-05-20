@@ -632,7 +632,7 @@ export const CONSTANTS = {
 
     ADD_LISTENER_FORM_TITLE: "Create new listener",
     UPDATE_LISTENER_FORM_TITLE: "Update listener",
-    ADD_LISTENER_SUBMIT_BUTTON_TEXT: "Add listener",
+    ADD_LISTENER_SUBMIT_BUTTON_TEXT: "Save",
     UPDATE_LISTENER_SUBMIT_BUTTON_TEXT: "Update listener",
     LISTENER_ADDED_SUCCESS: "Listener created successfully",
     LISTENER_UPDATED_SUCCESS: "Listener updated successfully",
@@ -640,6 +640,11 @@ export const CONSTANTS = {
     DELETE_LISTENER_DIALOG_TITLE: "Delete listener",
     DELETE_LISTENER_DIALOG_MESSAGE:
       "Are you sure you want to delete this listener? This action cannot be undone.",
+
+    CLONE_LISTENER_CLONING_SUCCESS: "Listener cloned successfully!",
+    CLONE_LISTENER_DIALOG_TITLE: "Clone listener",
+    CLONE_LISTENER_DIALOG_MESSAGE:
+      "Are you sure you want to clone this listener? This action cannot be undone.",
     LISTENER_EDITOR_FORM_TITLE_FIELD_LABEL: "Listener name",
     LISTENER_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your listener's name",
     LISTENER_EDITOR_FORM_DATASOURCE_FIELD_LABEL: "Target data source",
@@ -647,6 +652,30 @@ export const CONSTANTS = {
     LISTENER_EDITOR_FORM_STATUS_FIELD_LABEL: "Status",
     LISTENER_EDITOR_FORM_CONFIG_FIELD_LABEL: "Configuration",
     VIEW_CRON_JOB_HISTORY_BUTTON_TEXT: "History",
+
+    DELETE_WORKFLOW_DIALOG_TITLE: "Delete workflow",
+    DELETE_WORKFLOW_DIALOG_MESSAGE:
+      "Are you sure you want to delete this workflow? This action cannot be undone.",
+    WORKFLOW_DELETED_SUCCESS: "Workflow deleted successfully",
+
+    CLONE_WORKFLOW_CLONING_SUCCESS: "Workflow cloned successfully!",
+    CLONE_WORKFLOW_DIALOG_TITLE: "Clone workflow",
+    CLONE_WORKFLOW_DIALOG_MESSAGE:
+      "Are you sure you want to clone this workflow? This action cannot be undone.",
+
+    CLONE_CRON_JOB_CLONING_SUCCESS: "Scheduled job cloned successfully!",
+    CLONE_CRON_JOB_DIALOG_TITLE: "Clone scheduled job",
+    CLONE_CRON_JOB_DIALOG_MESSAGE:
+      "Are you sure you want to clone this scheduled job? This action cannot be undone.",
+
+    CLONE_API_KEY_CLONING_SUCCESS: "API key cloned successfully!",
+    CLONE_API_KEY_DIALOG_TITLE: "Clone API key",
+    CLONE_API_KEY_DIALOG_MESSAGE:
+      "Are you sure you want to clone this API key? This action cannot be undone.",
+
+    UPDATE_WORKFLOW_FORM_TITLE: "Update workflow",
+    UPDATE_WORKFLOW_BUTTON_TEXT: "Update workflow",
+    MAIN_DRAWER_ENGINES_TITLE: "Engines",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -841,6 +870,10 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/audit",
       path: (tenantID) => `/tenants/${tenantID}/audit`,
     },
+    VIEW_ENGINES: {
+      code: "/tenants/:tenantID/engines",
+      path: (tenantID) => `/tenants/${tenantID}/engines`,
+    },
   },
 
   APIS: {
@@ -857,6 +890,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/listeners/${listenerID}/activate`,
       deactivateListenerAPI: (tenantID, listenerID) =>
         `/api/v1/tenants/${tenantID}/listeners/${listenerID}/deactivate`,
+      cloneListenerAPI: (tenantID, listenerID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}/clone`,
       addListenerActionAPI: (tenantID, listenerID) =>
         `/api/v1/tenants/${tenantID}/listeners/${listenerID}/actions`,
       updateListenerActionAPI: (tenantID, listenerID, actionID) =>
@@ -875,6 +910,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/workflows/${workflowID}`,
       deleteWorkflowAPI: (tenantID, workflowID) =>
         `/api/v1/tenants/${tenantID}/workflows/${workflowID}`,
+      cloneWorkflowAPI: (tenantID, workflowID) =>
+        `/api/v1/tenants/${tenantID}/workflows/${workflowID}/clone`,
       executeWorkflowAPI: (tenantID, workflowID) =>
         `/api/v1/tenants/${tenantID}/workflows/${workflowID}/execute`,
       testWorkflowAPI: (tenantID) =>
@@ -942,6 +979,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}/roles`,
       deleteAPIKeyByIDAPI: (tenantID, apiKeyID) =>
         `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}`,
+      cloneAPIKeyAPI: (tenantID, apiKeyID) =>
+        `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}/clone`,
     },
     CRON_JOB: {
       getAllCronJobsAPI: (tenantID, page, pageSize) =>
@@ -957,6 +996,10 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/cronjobs/${jobID}/roles`,
       deleteCronJobByIDAPI: (tenantID, jobID) =>
         `/api/v1/tenants/${tenantID}/cronjobs/${jobID}`,
+      cloneCronJobAPI: (tenantID, jobID) =>
+        `/api/v1/tenants/${tenantID}/cronjobs/${jobID}/clone`,
+      getConnectionStatusAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/cronjobs/status/connections`,
     },
     AUDIT_LOG: {
       getAuditLogsAPI: (tenantID, page, pageSize) =>

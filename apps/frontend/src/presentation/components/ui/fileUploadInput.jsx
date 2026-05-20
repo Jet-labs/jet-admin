@@ -31,7 +31,7 @@ export const FileUpload = ({
     <div className="space-y-2">
       <label
         htmlFor="logo"
-        className="block text-sm font-medium text-brand-text-primary"
+        className="block text-sm font-medium text-foreground"
       >
         {title}
       </label>
@@ -56,21 +56,21 @@ export const FileUpload = ({
             ${
               uploadError
                 ? "border-red-400 bg-red-950/40 hover:bg-red-950/40"
-                : "border-brand-border bg-brand-dark hover:bg-brand-border-dark"
+                : "border-border bg-background hover:bg-muted"
             }
             border rounded-sm px-2 py-2 transition-colors duration-150
             ${isUploadingLogo ? "opacity-50 cursor-not-allowed" : ""}
           `}
           onClick={!isUploadingLogo ? handleButtonClick : undefined}
         >
-          <Upload className="w-5 h-5 text-brand-text-primary" />
-          <span className="text-sm text-brand-text-primary font-medium">
+          <Upload className="w-5 h-5 text-foreground" />
+          <span className="text-sm text-foreground font-medium">
             {isUploadingLogo ? "Uploading..." : "Choose File"}
           </span>
 
           {/* Show selected file name */}
           {fileInputRef.current?.files?.[0] && (
-            <span className="ml-2 text-sm text-brand-text-primary">
+            <span className="ml-2 text-sm text-foreground">
               {fileInputRef.current.files[0].name}
             </span>
           )}

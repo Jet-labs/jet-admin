@@ -1,15 +1,19 @@
 import React from "react";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
 import { WorkflowEditor } from "./workflowEditor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getWorkflowByIDAPI, updateWorkflowAPI } from "../../../data/apis/workflow";
+import { getWorkflowByIDAPI, updateWorkflowAPI, deleteWorkflowAPI } from "../../../data/apis/workflow";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { PageHeader } from "@jet-admin/ui";
+import { WorkflowCloneForm } from "./workflowCloneForm";
+import { WorkflowDeletionForm } from "./workflowDeletionForm";
 
 export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
   WorkflowUpdationForm.propTypes = {
@@ -17,6 +21,8 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
     workflowID: PropTypes.string.isRequired,
   };
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { showConfirmation } = useGlobalUI();
 
   const {
     isLoading: isLoadingWorkflow,
@@ -54,6 +60,8 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
   );
 
 
+
+
   const workflowUpdationForm = useFormik({
     initialValues: {
       tenantID,
@@ -71,29 +79,17 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
   });
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
-      <div className="flex w-full flex-row items-start justify-between border-b border-border bg-brand-dark px-4 py-3">
-        <div className="flex flex-col">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground text-start">
-            {CONSTANTS.STRINGS.UPDATE_WORKFLOW_FORM_TITLE}
-          </h1>
-          {workflow && (
-            <span className="mt-1 text-xs text-muted-foreground">
-              {`Workflow ID: ${workflow.workflowID}`}
-            </span>
-          )}
-        </div>
-        <Button
-          type="button"
-          onClick={workflowUpdationForm.handleSubmit}
-          disabled={isUpdatingWorkflow}
-        >
-          {isUpdatingWorkflow && (
-            <Spinner className="mr-2" size={16} />
-          )}
-          {CONSTANTS.STRINGS.UPDATE_WORKFLOW_BUTTON_TEXT}
-        </Button>
-      </div>
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.UPDATE_WORKFLOW_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_WORKFLOWS_TITLE}
+        id={workflowID}
+        onSave={workflowUpdationForm.handleSubmit}
+        isSaving={isUpdatingWorkflow}
+      >
+        <WorkflowDeletionForm tenantID={tenantID} workflowID={workflowID} />
+        <WorkflowCloneForm tenantID={tenantID} workflowID={workflowID} />
+      </PageHeader>
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingWorkflow}
         error={loadWorkflowError}

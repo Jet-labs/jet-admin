@@ -113,6 +113,26 @@ workflowController.deleteWorkflow = async (req, res) => {
 };
 
 /**
+ * Clone a workflow.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+workflowController.cloneWorkflow = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, workflowID } = req.params;
+    const authContext = getServiceAuthContext(req);
+    Logger.log("info", { message: "WorkflowController:cloneWorkflow:params", params: { userID: user.userID, tenantID, workflowID, authContext } });
+    const workflow = await workflowService.cloneWorkflow({ userID: user.userID, tenantID, workflowID, authContext });
+    Logger.log("success", { message: "WorkflowController:cloneWorkflow:success", params: { workflow } });
+    expressUtils.sendResponse(res, true, { workflow });
+  } catch (error) {
+    Logger.log("error", { message: "WorkflowController:cloneWorkflow:error", params: { error: error.message } });
+    expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
  * Execute a workflow.
  * @param {import("express").Request} req
  * @param {import("express").Response} res

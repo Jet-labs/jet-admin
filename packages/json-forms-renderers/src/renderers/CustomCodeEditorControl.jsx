@@ -216,7 +216,7 @@ export const CustomCodeEditorControl = ({
   const hasErrors = errors && errors.length > 0;
 
   return (
-    <div className="mb-3">
+    <div className="">
       <Label
         htmlFor={path}
         className={`block mb-1 text-xs font-medium ${

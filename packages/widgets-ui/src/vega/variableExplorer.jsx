@@ -1,17 +1,15 @@
 import React, { useState, useMemo, useCallback } from "react";
 import PropTypes from "prop-types";
-import { FiChevronRight, FiChevronDown, FiCopy, FiCheck } from "react-icons/fi";
-import { BiGitMerge } from "react-icons/bi";
-import { MdInput, MdOutput } from "react-icons/md";
 import { Button, Input } from "@jet-admin/ui";
+import { ChevronDown, ChevronRight, Copy, Check, GitMerge, ArrowRightToLine, ArrowRightFromLine } from 'lucide-react';
 
 // ─── Category icon ────────────────────────────────────────────────────────────
 
 const getCategoryIcon = (category) => {
   switch (category) {
-    case 'input': return <MdInput className="w-3.5 h-3.5 text-emerald-500" />;
-    case 'nodeOutput': return <BiGitMerge className="w-3.5 h-3.5 text-primary" />;
-    case 'workflowOutput': return <MdOutput className="w-3.5 h-3.5 text-purple-500" />;
+    case 'input': return <ArrowRightToLine className="w-3.5 h-3.5 text-emerald-500" />;
+    case 'nodeOutput': return <GitMerge className="w-3.5 h-3.5 text-primary" />;
+    case 'workflowOutput': return <ArrowRightFromLine className="w-3.5 h-3.5 text-purple-500" />;
     default: return null;
   }
 };
@@ -61,8 +59,8 @@ const VariableItem = ({ variable, onSelect, isSelected }) => {
         type="button"
       >
         {copied
-          ? <FiCheck className="w-3 h-3 text-emerald-500" />
-          : <FiCopy className="w-3 h-3 text-muted-foreground" />
+          ? <Check className="w-3 h-3 text-emerald-500" />
+          : <Copy className="w-3 h-3 text-muted-foreground" />
         }
       </Button>
     </div>
@@ -102,8 +100,8 @@ const VariableCategory = ({
         className="flex items-center gap-1.5 w-full px-2 py-1.5 rounded-sm cursor-pointer bg-muted/50 border border-border hover:bg-muted transition-colors"
       >
         {isExpanded
-          ? <FiChevronDown className="w-3 h-3 text-muted-foreground" />
-          : <FiChevronRight className="w-3 h-3 text-muted-foreground" />
+          ? <ChevronDown className="w-3 h-3 text-muted-foreground" />
+          : <ChevronRight className="w-3 h-3 text-muted-foreground" />
         }
         {getCategoryIcon(category)}
         <span className="text-[11px] font-medium uppercase tracking-wide flex-1 text-muted-foreground">

@@ -1,12 +1,12 @@
 import { UserPlus, Trash2 } from "lucide-react";
+import { Lock } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import { MdOutlineLockPerson } from "react-icons/md";
-import { Button, Separator, Spinner } from "@jet-admin/ui";
+import { Button, Separator, Spinner, PageHeader, Section } from "@jet-admin/ui";
 
 import { CONSTANTS } from "../../../constants";
 import {
@@ -20,28 +20,6 @@ import { TenantUserAdditionForm } from "../tenantUsersComponents/tenantUserAddit
 import { TenantEditor } from "./tenantEditor";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { TenantDeletionForm } from "./tenantDeletionForm";
-
-function Section({ title, description, children }) {
-  return (
-    <div className="rounded-md border border-border bg-card p-4 space-y-3">
-      {(title || description) && (
-        <div className="mb-2">
-          {title && (
-            <p className="mb-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              {title}
-            </p>
-          )}
-          {description && (
-            <p className="text-[11px] text-muted-foreground">{description}</p>
-          )}
-        </div>
-      )}
-      <div className="space-y-4">
-        {children}
-      </div>
-    </div>
-  );
-}
 
 export const TenantUpdationForm = ({ tenantID }) => {
   TenantUpdationForm.propTypes = {
@@ -121,7 +99,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
   };
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden bg-brand-dark">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenant}
         isFetching={isFetchingTenant}
@@ -129,33 +107,22 @@ export const TenantUpdationForm = ({ tenantID }) => {
       >
         {tenant && (
           <>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3 shrink-0">
-              <div>
-                <h1 className="text-base font-semibold tracking-tight text-foreground">
-                  {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
-                </h1>
-                <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-                  ID: {tenant.tenantID}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button variant="outline" size="sm" asChild>
-                  <Link to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}>
-                    <MdOutlineLockPerson className="h-4 w-4" />
-                    {CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE}
-                  </Link>
-                </Button>
-                <TenantDeletionForm tenantID={tenantID} />
-                <Button
-                  type="submit"
-                  form="update-tenant-form"
-                  disabled={isUpdatingTenant}
-                >
-                  {isUpdatingTenant && <Spinner size={14} className="mr-2" />}
-                  {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_SUBMIT_BUTTON}
-                </Button>
-              </div>
-            </div>
+            <PageHeader
+              title={CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
+              parentTitle={'Tenants'}
+              id={tenant.tenantID}
+              onSave={updateTenantForm.handleSubmit}
+              isSaving={isUpdatingTenant}
+              saveText="Save"
+            >
+              <Button variant="outline" size="sm" asChild>
+                <Link to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}>
+                  <Lock className="mr-1 h-3 w-3" />
+                  {CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE}
+                </Link>
+              </Button>
+              <TenantDeletionForm tenantID={tenantID} />
+            </PageHeader>
 
             <div className="flex-1 overflow-y-auto p-4 md:p-6">
               <section className="mx-auto max-w-2xl w-full">
@@ -167,7 +134,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
 
                 <form
                   id="update-tenant-form"
-                  className="space-y-6"
+                  className="space-y-4"
                   onSubmit={(e) => {
                     e.preventDefault();
                     updateTenantForm.handleSubmit();

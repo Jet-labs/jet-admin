@@ -73,7 +73,7 @@ export const TenantUsersList = () => {
       error={tenantUsersError}
     >
       {tenantUsers?.users?.length ? (
-        <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
+        <div className="flex h-full w-full flex-col overflow-hidden bg-background">
           <DataGrid
             apiRef={apiRef}
             rows={tenantUsers.users}

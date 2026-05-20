@@ -3,8 +3,7 @@ import { Handle, Position } from 'reactflow';
 import { JsonForms } from '@jsonforms/react';
 import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
-import { VscDebugDisconnect } from 'react-icons/vsc';
-import { IoMdTime } from 'react-icons/io';
+import { Ban, Clock } from 'lucide-react';
 import { Button } from '@jet-admin/ui';
 
 // ============================================================================
@@ -219,6 +218,7 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
 
         <Button
           type="button"
+          size="sm"
           onClick={handleSave}
           className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
@@ -284,7 +284,7 @@ export const DelayNode = memo(({ data, isConnectable }) => {
           flex flex-col items-center justify-center px-3 py-3 border-r
           ${isDisabled ? 'bg-brand-dark border-brand-border' : 'bg-amber-950/40 border-amber-100'}
         `}>
-          <IoMdTime className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : 'text-amber-500'}`} />
+          <Clock className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : 'text-amber-500'}`} />
         </div>
 
         {/* Center: Main info */}
@@ -296,7 +296,7 @@ export const DelayNode = memo(({ data, isConnectable }) => {
             </span>
             {isDisabled && (
               <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
-                <VscDebugDisconnect className="w-2.5 h-2.5" />
+                <Ban className="w-2.5 h-2.5" />
                 Skip
               </span>
             )}

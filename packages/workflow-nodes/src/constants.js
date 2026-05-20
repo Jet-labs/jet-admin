@@ -23,7 +23,7 @@ export const HANDLE_TYPE = {
   TRUE: 'true',
   FALSE: 'false',
   LOOP: 'loop',
-  DONE: 'done',
+  DONE: 'completed',
   OUTPUT: 'output',
 };
 

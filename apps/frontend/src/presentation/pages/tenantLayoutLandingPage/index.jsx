@@ -1,25 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
+import { ChevronRight, Store } from 'lucide-react';
 import moment from "moment";
-import React from "react";
-import { FaDatabase, FaStoreAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { getUserTenantByIDAPI } from "../../../data/apis/tenant";
 import { TenantLogo } from "../../components/tenantComponents/tenantLogo";
-
-import { CodeBlock } from "../../components/ui/codeBlock";
 import { NoEntityUI } from "../../components/ui/noEntityUI";
-
-import apiKeyLogo from "../../../assets/api_key_logo.png";
-import dashboardLogo from "../../../assets/dashboard_logo.png";
-import queryLogo from "../../../assets/query_logo.png";
-import rolesLogo from "../../../assets/roles_logo.png";
-import schemaLogo from "../../../assets/schema_logo.png";
-import tableLogo from "../../../assets/table_logo.png";
-import usersLogo from "../../../assets/users_logo.png";
-import cronjobLogo from "../../../assets/cronjob_logo.png";
-import widgetLogo from "../../../assets/widget_logo.png";
 import { ReactQueryLoadingErrorWrapper } from "../../components/ui/reactQueryLoadingErrorWrapper";
+
+
+import {
+  Clock,
+  Database,
+  FileCode2,
+  GitBranch,
+  KeyRound,
+  LayoutDashboard,
+  PanelTop,
+  Radio,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 
 const TenantLayoutLandingPage = () => {
   const { tenantID } = useParams();
@@ -38,52 +39,72 @@ const TenantLayoutLandingPage = () => {
   const tenantCards = [
     {
       title: "Users",
-      icon: <img src={usersLogo} alt="Users" className="w-8 h-8" />,
+      icon: <Users className="w-3.5 h-3.5" />,
       count: tenant?.relationships?.length || 0,
-      description: "Manage tenant users and permissions",
+      description: "Manage users and access permissions",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_TENANT_USERS.path(tenantID)),
     },
-
     {
-      title: "Database saved queries",
-      icon: <img src={queryLogo} alt="Database Queries" className="w-8 h-8" />,
+      title: "Data Sources",
+      icon: <Database className="w-3.5 h-3.5" />,
+      count: 0,
+      description: "External data source connections",
+      action: () => navigate(CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID)),
+    },
+    {
+      title: "Saved Queries",
+      icon: <FileCode2 className="w-3.5 h-3.5" />,
       count: tenant?.tenantDataQueryCount || 0,
-      description: "View and manage database saved queries",
+      description: "Stored database query definitions",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_QUERIES.path(tenantID)),
     },
     {
-      title: "Database Widgets",
-      icon: <img src={widgetLogo} alt="Database Widgets" className="w-8 h-8" />,
+      title: "Data Listeners",
+      icon: <Radio className="w-3.5 h-3.5" />,
+      count: 0,
+      description: "Real-time data event listeners",
+      action: () => navigate(CONSTANTS.ROUTES.VIEW_LISTENERS.path(tenantID)),
+    },
+    {
+      title: "Workflows",
+      icon: <GitBranch className="w-3.5 h-3.5" />,
+      count: 0,
+      description: "Visual automation and pipelines",
+      action: () => navigate(CONSTANTS.ROUTES.VIEW_WORKFLOWS.path(tenantID)),
+    },
+    {
+      title: "Widgets",
+      icon: <PanelTop className="w-3.5 h-3.5" />,
       count: tenant?.tenantWidgetCount || 0,
-      description: "View and manage database widgets",
+      description: "Reusable data visualization components",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_WIDGETS.path(tenantID)),
     },
     {
       title: "Dashboards",
-      icon: <img src={dashboardLogo} alt="Dashboards" className="w-8 h-8" />,
+      icon: <LayoutDashboard className="w-3.5 h-3.5" />,
       count: tenant?.tenantDashboardCount || 0,
-      description: "View and manage dashboards",
+      description: "Composed widget layouts and views",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_DASHBOARDS.path(tenantID)),
     },
     {
       title: "Roles",
-      icon: <img src={rolesLogo} alt="Roles" className="w-8 h-8" />,
+      icon: <ShieldCheck className="w-3.5 h-3.5" />,
       count: tenant?.tenantRolesCount || 0,
-      description: "Configure user roles and permissions",
+      description: "Permission sets and access control groups",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_TENANT_ROLES.path(tenantID)),
     },
     {
       title: "API Keys",
-      icon: <img src={apiKeyLogo} alt="API Keys" className="w-8 h-8" />,
+      icon: <KeyRound className="w-3.5 h-3.5" />,
       count: tenant?.tenantAPIKeyCount || 0,
-      description: "Create and manage API keys",
+      description: "Programmatic access credentials",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)),
     },
     {
-      title: "Cron Jobs",
-      icon: <img src={cronjobLogo} alt="Cron Jobs" className="w-8 h-8" />,
+      title: "Scheduled Jobs",
+      icon: <Clock className="w-3.5 h-3.5" />,
       count: tenant?.tenantCronJobCount || 0,
-      description: "Create and manage scheduled jobs",
+      description: "Scheduled and recurring task automation",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)),
     },
   ];
@@ -94,50 +115,82 @@ const TenantLayoutLandingPage = () => {
       error={tenantError}
     >
       {tenant ? (
-        <div className="bg-brand-dark h-full w-full p-2">
-          <div className="bg-brand-black rounded-sm border border-brand-border p-4 mb-2">
-            <div className="flex items-center mb-4">
+        <div className="bg-background w-full h-full">
+
+          {/* ── Tenant Header ─────────────────────────────────── */}
+          <div className="flex items-center gap-3 px-6 py-3 border-b border-border">
+            <div className="w-7 h-7 rounded border border-border bg-muted/50 flex items-center justify-center overflow-hidden shrink-0">
               {tenant.tenantLogoURL ? (
                 <TenantLogo
                   src={tenant.tenantLogoURL}
                   alt="Tenant Logo"
-                  className="w-16 h-16 rounded-sm"
+                  className="w-full h-full object-cover"
                 />
               ) : (
-                <FaStoreAlt className="w-12 h-12 text-brand-text-primary" />
+                  <Store className="w-3.5 h-3.5 text-muted-foreground" />
               )}
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold text-brand-text-primary">
-                  {tenant.tenantTitle}
-                </h1>
-                <p className="text-brand-light-gray">
-                  Created {moment(tenant.createdAt).format("MMMM D, YYYY")}
-                </p>
-              </div>
             </div>
 
+            <h1 className="text-sm font-medium text-foreground">
+              {tenant.tenantTitle}
+            </h1>
 
+            <span className="text-muted-foreground/40 text-xs select-none">·</span>
+
+            <span className="text-[13px] text-muted-foreground/70">
+              Created {moment(tenant.createdAt).format("MMM D, YYYY")}
+            </span>
+
+            <span className="ml-auto bg-primary/10 text-primary text-[11px] font-medium px-1.5 py-0.5 rounded-full">
+              Active
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-            {tenantCards.map((card, index) => (
-              <div
-                key={index}
-                className="bg-brand-black rounded-sm border border-brand-border p-6 cursor-pointer hover:border-primary"
-                onClick={card.action}
-              >
-                <div className="flex justify-between items-center mb-4">
-                  {card.icon}
-                  <span className="text-2xl font-bold text-brand-text-primary">
+          {/* ── Resource List ──────────────────────────────────── */}
+          <div className="px-6 py-4">
+
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+              Resources
+            </p>
+
+            <div className="rounded-sm border border-border overflow-hidden">
+              {tenantCards.map((card, index) => (
+                <div
+                  key={index}
+                  onClick={card.action}
+                  className={`
+                    flex items-center gap-3 px-4 py-2.5 cursor-pointer
+                    hover:bg-muted/50 transition-colors group
+                    ${index !== tenantCards.length - 1 ? "border-b border-border" : ""}
+                  `}
+                >
+                  {/* Icon */}
+                  <div className="w-6 h-6 rounded border border-border bg-background flex items-center justify-center shrink-0 text-muted-foreground group-hover:border-primary/30 group-hover:bg-primary/5 transition-colors">
+                    {card.icon}
+                  </div>
+
+                  {/* Title + description */}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium text-foreground">
+                      {card.title}
+                    </span>
+                    <span className="text-muted-foreground/40 mx-2 text-xs select-none">—</span>
+                    <span className="text-[13px] text-muted-foreground/70">
+                      {card.description}
+                    </span>
+                  </div>
+
+                  {/* Count */}
+                  <span className="text-sm font-medium text-foreground tabular-nums shrink-0">
                     {card.count}
                   </span>
+
+                  {/* Chevron */}
+                  <ChevronRight className="w-2.5 h-2.5 text-muted-foreground/40 shrink-0 group-hover:text-muted-foreground transition-colors" />
                 </div>
-                <h3 className="text-lg font-semibold text-brand-text-primary mb-2">
-                  {card.title}
-                </h3>
-                <p className="text-brand-light-gray">{card.description}</p>
-              </div>
-            ))}
+              ))}
+            </div>
+
           </div>
         </div>
       ) : (

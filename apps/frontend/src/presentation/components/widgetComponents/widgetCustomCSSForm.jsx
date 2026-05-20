@@ -1,8 +1,7 @@
 import PropTypes from "prop-types";
+import { FileCode } from 'lucide-react';
 import React, { useEffect, useState } from "react";
 import { CONSTANTS } from "../../../constants";
-import { PiFileCssFill } from "react-icons/pi";
-
 import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@jet-admin/ui";
 export const WidgetCustomCSSForm = ({ tenantID, widgetID, }) => {
   WidgetCustomCSSForm.propTypes = {
@@ -52,9 +51,9 @@ export const WidgetCustomCSSForm = ({ tenantID, widgetID, }) => {
         variant="ghost"
         size="sm"
         onClick={_handleOpen}
-        className="text-xs bg-brand-border-dark text-primary hover:bg-brand-black hover:text-primary"
+        className="text-xs bg-muted text-primary hover:bg-foreground/10 hover:text-primary"
       >
-        <PiFileCssFill className="text-base mr-1" />
+        <FileCode className="text-base mr-1" />
         {CONSTANTS.STRINGS.DASHBOARD_WIDGET_CUSTOM_CSS_BUTTON}
       </Button>
       <Dialog open={open} onOpenChange={(v) => { if (!v) _handleClose(); }}>

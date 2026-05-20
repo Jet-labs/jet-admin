@@ -1,6 +1,6 @@
 import React from "react";
-import { FaPlus } from "react-icons/fa";
-import { IoKeyOutline } from "react-icons/io5";
+import { Key, Plus } from 'lucide-react';
+
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useAPIKeys } from "../../../../logic/hooks/useAPIKeys";
@@ -18,13 +18,13 @@ export const APIKeyDrawerList = () => {
   };
 
   return (
-    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddNotification}
-        variant="primary-ghost"
+        variant="secondary"
         className="w-full justify-start"
       >
-        <FaPlus className="mr-2 h-4 w-4" />
+        <Plus className="mr-2 h-4 w-4" />
         {CONSTANTS.STRINGS.ADD_API_KEY_BUTTON_TEXT}
       </Button>
 
@@ -51,12 +51,12 @@ export const APIKeyDrawerList = () => {
               >
                 <div
                   className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
-                      ? "bg-primary/10 text-primary"
+                    ? "bg-primary/5 text-primary"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
                   <div className="flex-shrink-0">
-                    <IoKeyOutline className="h-4 w-4" />
+                    <Key className="h-4 w-4" />
                   </div>
 
                   <span

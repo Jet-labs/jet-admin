@@ -28,3 +28,6 @@ export { CollapseComponent } from './components/collapseComponent';
 export { CodeEditor } from './components/code-editor';
 export { ArrayInput } from './components/array-input';
 export { InputArgsForm } from './components/input-args-form';
+export { PageHeader } from './components/pageHeader';
+export { Section } from './components/section';
+

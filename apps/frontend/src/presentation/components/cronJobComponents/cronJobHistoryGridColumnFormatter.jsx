@@ -1,5 +1,5 @@
 import React from "react";
-import { MdCheckCircleOutline, MdErrorOutline, MdAccessTime, MdOutlineCancel } from "react-icons/md";
+import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { format, parseISO, isValid } from "date-fns";
 import ReactJson from "react-json-view";
 
@@ -21,18 +21,18 @@ function formatDateTime(value) {
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 const STATUS_CONFIG = {
-  success: { icon: MdCheckCircleOutline, className: "text-green-600 dark:text-green-400", bg: "bg-green-950/40  dark:bg-green-950/40  border-green-200  dark:border-green-800" },
-  failed: { icon: MdErrorOutline, className: "text-red-600   dark:text-red-400", bg: "bg-red-950/40    dark:bg-red-950/40    border-red-200    dark:border-red-800" },
-  error: { icon: MdErrorOutline, className: "text-red-600   dark:text-red-400", bg: "bg-red-950/40    dark:bg-red-950/40    border-red-200    dark:border-red-800" },
-  running: { icon: MdAccessTime, className: "text-blue-600  dark:text-blue-400", bg: "bg-blue-950/40   dark:bg-blue-950/40   border-blue-200   dark:border-blue-800" },
-  pending: { icon: MdAccessTime, className: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50  dark:bg-amber-950/40  border-amber-200  dark:border-amber-800" },
-  cancelled: { icon: MdOutlineCancel, className: "text-brand-light-gray  dark:text-brand-light-gray", bg: "bg-brand-dark   dark:bg-brand-black/40   border-brand-border   dark:border-brand-border" },
+  success: { icon: CheckCircle, className: "text-green-600 dark:text-green-400", bg: "bg-green-950/40  dark:bg-green-950/40  border-green-200  dark:border-green-800" },
+  failed: { icon: AlertCircle, className: "text-red-600   dark:text-red-400", bg: "bg-red-950/40    dark:bg-red-950/40    border-red-200    dark:border-red-800" },
+  error: { icon: AlertCircle, className: "text-red-600   dark:text-red-400", bg: "bg-red-950/40    dark:bg-red-950/40    border-red-200    dark:border-red-800" },
+  running: { icon: Clock, className: "text-blue-600  dark:text-blue-400", bg: "bg-blue-950/40   dark:bg-blue-950/40   border-blue-200   dark:border-blue-800" },
+  pending: { icon: Clock, className: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50  dark:bg-amber-950/40  border-amber-200  dark:border-amber-800" },
+  cancelled: { icon: XCircle, className: "text-muted-foreground/70  dark:text-muted-foreground/70", bg: "bg-background   dark:bg-background/40   border-border   dark:border-border" },
 };
 
 function StatusBadge({ value }) {
   const key = (value ?? "").toLowerCase();
   const config = STATUS_CONFIG[key] ?? {
-    icon: MdAccessTime,
+    icon: Clock,
     className: "text-muted-foreground",
     bg: "bg-muted border-border",
   };

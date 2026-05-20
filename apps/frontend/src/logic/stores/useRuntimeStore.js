@@ -5,6 +5,7 @@ import { createEventHandlers } from "../actionDispatcher";
 function buildStateTree(state) {
   const {
     dataQueries = [],
+    workflows = [],
     widgets = [],
     listeners = [],
     queryResults = {},

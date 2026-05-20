@@ -21,7 +21,7 @@ const BASE_RETRY_DELAY_MS = 1000;
 const MAX_RETRY_DELAY_MS = 60000;
 const HEALTH_CHECK_INTERVAL_MS = 30000;
 
-class ListenerConnectionManager {
+class ListenerEngine {
   constructor() {
     this.active = new Map();  // listenerID → { handle, instance, listener, state, retryCount, retryTimer }
     this.testScripts = new Map(); // listenerID → Map<sessionID, script>
@@ -61,7 +61,7 @@ class ListenerConnectionManager {
   // ─── Boot ───────────────────────────────────────────────────────────────────
 
   async startAll() {
-    Logger.log('info', { message: 'ListenerConnectionManager:startAll:init' });
+    Logger.log('info', { message: 'ListenerEngine:startAll:init' });
 
     try {
       const listeners = await prisma.tblListeners.findMany({
@@ -76,7 +76,7 @@ class ListenerConnectionManager {
       });
 
       Logger.log('info', {
-        message: 'ListenerConnectionManager:startAll:found',
+        message: 'ListenerEngine:startAll:found',
         params: { count: listeners.length },
       });
 
@@ -87,10 +87,10 @@ class ListenerConnectionManager {
       // Start periodic health check
       this.healthCheckTimer = setInterval(() => this._healthCheck(), HEALTH_CHECK_INTERVAL_MS);
 
-      Logger.log('success', { message: 'ListenerConnectionManager:startAll:done' });
+      Logger.log('success', { message: 'ListenerEngine:startAll:done' });
     } catch (error) {
       Logger.log('error', {
-        message: 'ListenerConnectionManager:startAll:error',
+        message: 'ListenerEngine:startAll:error',
         params: { error: error.message },
       });
     }
@@ -104,7 +104,7 @@ class ListenerConnectionManager {
     // Don't double-start
     if (this.active.has(listenerID)) {
       Logger.log('warning', {
-        message: 'ListenerConnectionManager:startOne:alreadyActive',
+        message: 'ListenerEngine:startOne:alreadyActive',
         params: { listenerID },
       });
       return;
@@ -193,7 +193,7 @@ class ListenerConnectionManager {
             });
           } catch (enqueueErr) {
             Logger.log('error', {
-              message: 'ListenerConnectionManager:enqueueError',
+              message: 'ListenerEngine:enqueueError',
               params: { listenerID, error: enqueueErr.message },
             });
           }
@@ -216,13 +216,13 @@ class ListenerConnectionManager {
       }).catch(() => {});
 
       Logger.log('success', {
-        message: 'ListenerConnectionManager:startOne:success',
+        message: 'ListenerEngine:startOne:success',
         params: { listenerID, type: listener.listenerType },
       });
 
     } catch (error) {
       Logger.log('error', {
-        message: 'ListenerConnectionManager:startOne:error',
+        message: 'ListenerEngine:startOne:error',
         params: { listenerID, error: error.message },
       });
 
@@ -254,12 +254,12 @@ class ListenerConnectionManager {
       this.active.delete(listenerID);
 
       Logger.log('info', {
-        message: 'ListenerConnectionManager:stopOne:success',
+        message: 'ListenerEngine:stopOne:success',
         params: { listenerID },
       });
     } catch (error) {
       Logger.log('error', {
-        message: 'ListenerConnectionManager:stopOne:error',
+        message: 'ListenerEngine:stopOne:error',
         params: { listenerID, error: error.message },
       });
       // Force remove from active map even on error
@@ -292,7 +292,7 @@ class ListenerConnectionManager {
   // ─── Stop all (graceful shutdown) ───────────────────────────────────────────
 
   async stopAll() {
-    Logger.log('info', { message: 'ListenerConnectionManager:stopAll:init' });
+    Logger.log('info', { message: 'ListenerEngine:stopAll:init' });
 
     if (this.healthCheckTimer) {
       clearInterval(this.healthCheckTimer);
@@ -304,7 +304,7 @@ class ListenerConnectionManager {
       await this.stopOne(listenerID);
     }
 
-    Logger.log('success', { message: 'ListenerConnectionManager:stopAll:done' });
+    Logger.log('success', { message: 'ListenerEngine:stopAll:done' });
   }
 
   // ─── Reconnection (fault tolerance) ─────────────────────────────────────────
@@ -317,7 +317,7 @@ class ListenerConnectionManager {
     entry.state = 'reconnecting';
 
     Logger.log('warning', {
-      message: 'ListenerConnectionManager:disconnected',
+      message: 'ListenerEngine:disconnected',
       params: { listenerID, error: error?.message, retryCount: entry.retryCount },
     });
 
@@ -334,7 +334,7 @@ class ListenerConnectionManager {
       }).catch(() => {});
 
       Logger.log('error', {
-        message: 'ListenerConnectionManager:maxRetriesExceeded',
+        message: 'ListenerEngine:maxRetriesExceeded',
         params: { listenerID },
       });
       return;
@@ -345,7 +345,7 @@ class ListenerConnectionManager {
 
     entry.retryTimer = setTimeout(async () => {
       Logger.log('info', {
-        message: 'ListenerConnectionManager:retrying',
+        message: 'ListenerEngine:retrying',
         params: { listenerID, attempt: entry.retryCount },
       });
       await this.restartOne(listenerID);
@@ -399,6 +399,6 @@ class ListenerConnectionManager {
 }
 
 // Singleton
-const listenerConnectionManager = new ListenerConnectionManager();
+const listenerEngine = new ListenerEngine();
 
-module.exports = { listenerConnectionManager };
+module.exports = { listenerEngine };

@@ -1,0 +1,50 @@
+<h2>Header Layout Options</h2>
+<p class="subtitle">Select the layout that best fits the update pages.</p>
+
+<div class="options">
+  <div class="option" data-choice="classic" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Classic Right-Aligned</h3>
+      <p>Title and ID on the left, all actions grouped on the right.</p>
+      <div class="mockup" style="margin-top: 10px; padding: 10px; border: 1px solid #e4e4e7; rounded-md">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 600; font-size: 1.1rem; color: #18181b;">Update Scheduled Job</div>
+            <div style="color: #71717a; font-size: 0.8rem; font-family: monospace;">ID: job_12345</div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="mock-button" style="background: #f4f4f5; color: #18181b; padding: 6px 12px; border-radius: 4px; border: 1px solid #e4e4e7;">History</button>
+            <button class="mock-button" style="background: #f4f4f5; color: #18181b; padding: 6px 12px; border-radius: 4px; border: 1px solid #e4e4e7;">Clone</button>
+            <button class="mock-button" style="background: #fee2e2; color: #dc2626; padding: 6px 12px; border-radius: 4px; border: 1px solid #fecaca;">Delete</button>
+            <button class="mock-button" style="background: #3ecf8e; color: white; padding: 6px 12px; border-radius: 4px; border: none; font-weight: 500;">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="stacked" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Left-Aligned Actions</h3>
+      <p>Actions placed closer to the title for a more compact feel.</p>
+      <div class="mockup" style="margin-top: 10px; padding: 10px; border: 1px solid #e4e4e7; rounded-md">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600; font-size: 1.1rem; color: #18181b;">Update Scheduled Job</div>
+              <div style="color: #71717a; font-size: 0.8rem; font-family: monospace;">ID: job_12345</div>
+            </div>
+            <button class="mock-button" style="background: #3ecf8e; color: white; padding: 6px 12px; border-radius: 4px; border: none; font-weight: 500;">Save Changes</button>
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: flex-start; border-top: 1px solid #f4f4f5; pt-2;">
+            <button class="mock-button" style="background: #f4f4f5; color: #18181b; padding: 6px 12px; border-radius: 4px; border: 1px solid #e4e4e7;">History</button>
+            <button class="mock-button" style="background: #f4f4f5; color: #18181b; padding: 6px 12px; border-radius: 4px; border: 1px solid #e4e4e7;">Clone</button>
+            <button class="mock-button" style="background: #fee2e2; color: #dc2626; padding: 6px 12px; border-radius: 4px; border: 1px solid #fecaca;">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

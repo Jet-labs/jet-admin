@@ -10,7 +10,7 @@ import { APIKeyEditor } from "./apiKeyEditor";
 import { APIKeyRoleSelectionDialog } from "./apiKeyRoleSelectionDialog";
 import PropTypes from "prop-types";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { Button, Spinner, PageHeader } from "@jet-admin/ui";
 export const APIKeyAdditionForm = ({ tenantID }) => {
   APIKeyAdditionForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -48,12 +48,14 @@ export const APIKeyAdditionForm = ({ tenantID }) => {
   });
 
   return (
-    <section className="w-full bg-brand-dark">
-      <div className="border-b border-border bg-brand-dark px-4 py-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {CONSTANTS.STRINGS.ADD_API_KEY_FORM_TITLE}
-        </h1>
-      </div>
+    <section className="w-full bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.ADD_API_KEY_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_API_KEYS_TITLE}
+        onSave={apiKeyAdditionForm.handleSubmit}
+        isSaving={isAddingAPIKey}
+        saveText="Save"
+      />
 
       <div className="mx-auto w-full max-w-2xl p-4 md:p-6">
         <form
@@ -72,10 +74,7 @@ export const APIKeyAdditionForm = ({ tenantID }) => {
               apiKeyEditorForm={apiKeyAdditionForm}
               isLoadingAPIKeyEditorForm={isAddingAPIKey}
             />
-            <Button type="submit" disabled={isAddingAPIKey}>
-              {isAddingAPIKey && <Spinner className="mr-2" size={16} />}
-              {CONSTANTS.STRINGS.ADD_API_KEY_FORM_SUBMIT}
-            </Button>
+
           </div>
         </form>
       </div>

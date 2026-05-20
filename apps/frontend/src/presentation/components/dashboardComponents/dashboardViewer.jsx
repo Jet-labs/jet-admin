@@ -44,10 +44,10 @@ export const DashboardViewer = ({ tenantID, dashboardID }) => {
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
-      <div className="flex flex-row justify-between items-center w-full px-3 py-2 border-b border-brand-border ">
+      <div className="flex flex-row justify-between items-center w-full px-3 py-2 border-b border-border ">
         <div className="w-full  flex flex-col justify-center items-start">
           {dashboard && (
-            <h1 className="text-lg font-bold leading-tight tracking-tight text-brand-text-primary">
+            <h1 className="text-lg font-bold leading-tight tracking-tight text-foreground">
               {dashboard.dashboardTitle}
             </h1>
           )}
@@ -68,7 +68,7 @@ export const DashboardViewer = ({ tenantID, dashboardID }) => {
         isRefetching={isRefetechingDashboard}
       >
         <div
-          className="w-full overflow-y-auto bg-brand-border-dark "
+          className="w-full overflow-y-auto bg-muted "
           id={`printable-area-dashboard-${dashboardID}`}
         >
           {dashboard && (

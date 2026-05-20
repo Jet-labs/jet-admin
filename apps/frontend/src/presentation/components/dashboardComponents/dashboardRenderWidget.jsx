@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
+import { X } from 'lucide-react';
 import React, { useState } from "react";
 import "react-grid-layout/css/styles.css";
-import { FaTimes } from "react-icons/fa";
 import "react-resizable/css/styles.css";
 import { useComponentSize } from "../../../logic/hooks/useComponentSize";
 import { DashboardWidget } from "./dashboardWidget";
@@ -33,9 +33,9 @@ export const DashboardRenderWidget = ({
 
   return (
     <Card
-      className={`!h-full !w-full flex-grow relative rounded-none overflow-hidden border bg-brand-dark/95 transition-all duration-200 ${isMouseHover
+      className={`!h-full !w-full flex-grow relative rounded-none overflow-hidden border bg-background/95 transition-all duration-200 ${isMouseHover
         ? "border-primary"
-        : "border-brand-border/80 shadow-sm"
+        : "border-border/80 shadow-sm"
         }`}
       onMouseEnter={
         editable
@@ -79,7 +79,7 @@ export const DashboardRenderWidget = ({
             }}
             aria-label="Remove widget"
           >
-            <FaTimes className="!text-[10px]" />
+            <X className="!text-[10px]" />
           </Button>
         </div>
       )}

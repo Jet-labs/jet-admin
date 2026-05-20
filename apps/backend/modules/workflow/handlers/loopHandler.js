@@ -1,63 +1,168 @@
 /**
  * Loop Node Handler
- * Iterates over arrays - Note: Loop body execution is handled by orchestrator
+ * Resumable iterator. Each execution emits one item to the loop body and stores
+ * cursor state in the workflow context. The graph should connect the last node
+ * in the body back to this loop node; when all items are consumed the handler
+ * follows the completed handle.
  */
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
 
+const DEFAULT_MAX_ITERATIONS = 1000;
+const MAX_MAX_ITERATIONS = 100000;
+const MAX_DELAY_BETWEEN_ITEMS_MS = 60000;
+
+function toPositiveInteger(value, fallback, max, fieldName) {
+  const number = Number(value ?? fallback);
+  if (!Number.isInteger(number) || number < 1 || number > max) {
+    throw new Error(`${fieldName} must be an integer between 1 and ${max}`);
+  }
+  return number;
+}
+
+function toDelayMs(value) {
+  const number = Number(value ?? 0);
+  if (!Number.isInteger(number) || number < 0 || number > MAX_DELAY_BETWEEN_ITEMS_MS) {
+    throw new Error(`delayBetweenItems must be an integer between 0 and ${MAX_DELAY_BETWEEN_ITEMS_MS}`);
+  }
+  return number;
+}
+
+function normalizeItems(value) {
+  if (Array.isArray(value)) return value;
+  if (value == null) return [];
+  return [value];
+}
+
 async function execute(nodeConfig, context, helpers) {
   const { resolveTemplate } = helpers;
+  const nodeID = helpers?.nodeID || 'unknown';
   const { 
     sourceVariable, 
     itemVariable = 'item', 
     indexVariable = 'index',
     outputVariable = 'loopResults',
+    maxIterations = DEFAULT_MAX_ITERATIONS,
+    delayBetweenItems = 0,
     errorHandling = ERROR_HANDLING.CONTINUE,
+    isDisabled = false,
   } = nodeConfig || {};
   
   try {
-    // Resolve source array using mustache syntax {{ctx.variablePath}}
-    // e.g., "{{ctx.input.items}}" or "{{ctx.previousNode.data}}"
-    let items;
-    if (typeof sourceVariable === 'string') {
-      items = resolveTemplate(sourceVariable, { nodeType: 'loop' });
-    } else {
-      items = sourceVariable;
-    }
-    
-    // Ensure items is always an array
-    if (!Array.isArray(items)) {
-      items = items ? [items] : [];
-    }
-
-    
-    // Note: For now, we return the loop config
-    // The orchestrator will need to handle loop iteration
-    // by queueing the loop body nodes for each item
-    
-    const output = {
-      [outputVariable]: [],
-      loopConfig: {
-        items,
-        itemVariable,
-        indexVariable,
-        currentIndex: 0,
-        totalItems: items.length,
-      },
-      success: true,
-    };
-    
-    // If empty array, go to completed
-    if (items.length === 0) {
+    if (isDisabled) {
       return {
-        output,
-        nextHandle: NEXT_HANDLE.DONE,
+        output: {
+          [outputVariable]: [],
+          skipped: true,
+          success: true,
+        },
+        nextHandle: NEXT_HANDLE.COMPLETED,
       };
     }
+
+    const iterationLimit = toPositiveInteger(
+      maxIterations,
+      DEFAULT_MAX_ITERATIONS,
+      MAX_MAX_ITERATIONS,
+      'maxIterations'
+    );
+    const itemDelayMs = toDelayMs(delayBetweenItems);
+    const stateKey = `__loop_${nodeID}`;
+    const existingState = context?.[stateKey];
+
+    let loopState = existingState && existingState.sourceVariable === sourceVariable
+      ? existingState
+      : null;
+
+    if (loopState?.completed) {
+      return {
+        output: {
+          [outputVariable]: loopState.results || [],
+          totalItems: loopState.totalItems,
+          success: true,
+          __contextPatch: {
+            [outputVariable]: loopState.results || [],
+            [stateKey]: loopState,
+          },
+        },
+        nextHandle: NEXT_HANDLE.COMPLETED,
+      };
+    }
+
+    if (!loopState) {
+      const resolvedItems = typeof sourceVariable === 'string'
+        ? resolveTemplate(sourceVariable, { nodeType: 'loop' })
+        : sourceVariable;
+      const items = normalizeItems(resolvedItems);
+
+      if (items.length > iterationLimit) {
+        throw new Error(`Loop source has ${items.length} items, exceeding maxIterations ${iterationLimit}`);
+      }
+
+      loopState = {
+        sourceVariable,
+        items,
+        nextIndex: 0,
+        totalItems: items.length,
+        results: [],
+        completed: false,
+      };
+    }
+
+    if (loopState.nextIndex >= loopState.totalItems) {
+      const completedState = { ...loopState, completed: true };
+      return {
+        output: {
+          [outputVariable]: completedState.results || [],
+          totalItems: completedState.totalItems,
+          success: true,
+          __contextPatch: {
+            [outputVariable]: completedState.results || [],
+            [stateKey]: completedState,
+          },
+        },
+        nextHandle: NEXT_HANDLE.COMPLETED,
+      };
+    }
+
+    const currentIndex = loopState.nextIndex;
+    const currentItem = loopState.items[currentIndex];
+    const nextState = {
+      ...loopState,
+      nextIndex: currentIndex + 1,
+      completed: currentIndex + 1 >= loopState.totalItems,
+    };
     
-    // Start loop - go to loop body
+    const output = {
+      currentItem,
+      currentIndex,
+      totalItems: loopState.totalItems,
+      remainingItems: loopState.totalItems - currentIndex - 1,
+      success: true,
+      __contextPatch: {
+        [itemVariable]: currentItem,
+        [indexVariable]: currentIndex,
+        [stateKey]: nextState,
+        __loopCurrent: {
+          nodeID,
+          itemVariable,
+          indexVariable,
+          item: currentItem,
+          index: currentIndex,
+          totalItems: loopState.totalItems,
+        },
+      },
+      loopConfig: {
+        itemVariable,
+        indexVariable,
+        currentIndex,
+        totalItems: loopState.totalItems,
+      },
+    };
+    
     return {
       output,
       nextHandle: NEXT_HANDLE.LOOP,
+      queueDelay: currentIndex > 0 ? itemDelayMs : 0,
     };
   } catch (error) {
     // If errorHandling is FAIL_WORKFLOW, throw to stop the workflow

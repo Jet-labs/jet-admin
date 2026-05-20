@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
+import { X } from 'lucide-react';
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { FaTimes } from "react-icons/fa";
 import {
   getDatasourceByIDAPI,
   updateDatasourceAPI,
@@ -22,7 +22,7 @@ import { DatasourceTestingForm } from "./datasourceTestingForm";
 import { DatasourceDeletionForm } from "./datasourceDeletionForm";
 import { DatasourceCloneForm } from "./datasourceCloneForm";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { PageHeader } from "@jet-admin/ui";
 // --- Original Metadata (only for datasourceOptions) ---
 const datasourceOptionsMetadata =
   DATASOURCE_TYPES.POSTGRESQL.formConfig;
@@ -101,49 +101,33 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
   }, [datasourceID]);
 
   return (
-    <div className="h-full w-full bg-brand-dark">
-      <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3">
-        <div>
-          <h1 className="text-base font-semibold tracking-tight text-foreground">
-            {CONSTANTS.STRINGS.UPDATE_DATASOURCE_FORM_TITLE}
-          </h1>
-          {datasource && (
-            <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-              ID: {datasource.datasourceID}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <DatasourceCloneForm
-            tenantID={tenantID}
-            datasourceID={datasourceID}
-          />
+    <div className="h-full w-full bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.UPDATE_DATASOURCE_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_DATASOURCE_TITLE}
 
-          <DatasourceDeletionForm
-            tenantID={tenantID}
-            datasourceID={datasourceID}
-          />
-          <DatasourceTestingForm
-            tenantID={tenantID}
-            datasourceType={datasourceUpdationForm.values.datasourceType}
-            datasourceOptions={
-              datasourceUpdationForm.values.datasourceOptions
-            }
-            setDatasourceTestResult={setDatasourceTestResult}
-            key={`datasourceTestingForm_${datasource?.datasourceID}`}
-          />
-          <Button
-            type="submit"
-            form="datasource-update-form"
-            disabled={isUpdatingDatasource}
-          >
-            {isUpdatingDatasource && (
-              <Spinner size={14} />
-            )}
-            {CONSTANTS.STRINGS.UPDATE_DATASOURCE_FORM_SUBMIT_BUTTON}
-          </Button>
-        </div>
-      </div>
+        id={datasourceID}
+        onSave={datasourceUpdationForm.handleSubmit}
+        isSaving={isUpdatingDatasource}
+      >
+        <DatasourceDeletionForm
+          tenantID={tenantID}
+          datasourceID={datasourceID}
+        />
+        <DatasourceCloneForm
+          tenantID={tenantID}
+          datasourceID={datasourceID}
+        />
+        <DatasourceTestingForm
+          tenantID={tenantID}
+          datasourceType={datasourceUpdationForm.values.datasourceType}
+          datasourceOptions={
+            datasourceUpdationForm.values.datasourceOptions
+          }
+          setDatasourceTestResult={setDatasourceTestResult}
+          key={`datasourceTestingForm_${datasource?.datasourceID}`}
+        />
+      </PageHeader>
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingDatasource}
         error={loadDatasourceError}
@@ -157,7 +141,7 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
         >
           <ResizablePanel
             defaultSize={20}
-            className="!overflow-y-auto h-full p-3 md:p-6"
+            className="!overflow-y-auto h-full p-8"
           >
             <div className="mx-auto w-full max-w-2xl">
               <form
@@ -172,9 +156,9 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel ref={testResultPanelRef} defaultSize={80} collapsible={true} minSize={5}>
-            <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
-              <div className="flex items-center justify-between border-b border-border bg-brand-dark px-4 py-2 flex-shrink-0">
-                <span className="text-xs font-semibold text-brand-text-primary">
+            <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+              <div className="flex items-center justify-between border-b border-border bg-background px-4 py-2 flex-shrink-0">
+                <span className="text-xs font-semibold text-foreground">
                   Datasource Test Result
                 </span>
 
@@ -187,7 +171,7 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
                     connectionResult: datasourceTestResult,
                   })
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center text-brand-text-primary italic text-sm">
+                    <div className="h-full w-full flex items-center justify-center text-foreground italic text-sm">
                     Test the connection to see results here.
                   </div>
                 )}

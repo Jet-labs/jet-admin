@@ -1,5 +1,5 @@
 import React from "react";
-import { IoMdDownload } from "react-icons/io";
+import { Download } from 'lucide-react';
 import { displayError } from "../../../utils/notification";
 import PropTypes from "prop-types";
 
@@ -127,7 +127,7 @@ export const DashboardPrintForm = ({ dashboardID }) => {
       variant="ghost" size="sm"
       square className="text-primary hover:bg-primary/10"
     >
-      <IoMdDownload className="text-primary h-4 w-4" />
+      <Download className="text-primary h-4 w-4" />
     </Button>
   );
 };

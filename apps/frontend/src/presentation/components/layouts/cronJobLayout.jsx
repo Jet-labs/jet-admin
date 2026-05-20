@@ -11,7 +11,7 @@ import {
 
 export const CronJobLayout = () => {
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={
@@ -23,7 +23,7 @@ export const CronJobLayout = () => {
             <CronJobDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
             <Outlet />
           </ResizablePanel>
         </ResizablePanelGroup>

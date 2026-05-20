@@ -9,10 +9,9 @@ import {
   inferMarkType,
   COLOR_SCHEMES,
 } from "./chartSpecGenerator";
-import { FiSettings, FiChevronDown, FiChevronRight, FiDatabase } from 'react-icons/fi';
-import { MdOutlineAutoGraph } from 'react-icons/md';
 
 import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@jet-admin/ui";
+import { Settings, ChevronDown, ChevronRight, Database, TrendingUp } from 'lucide-react';
 // Widget-specific string constants (inlined since this is a shared package)
 const VEGA_STRINGS = {
   WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings",
@@ -171,7 +170,7 @@ export const ShelfBuilder = ({
             size="sm"
             className="h-8 text-xs"
           >
-            <MdOutlineAutoGraph className="inline-block h-3 w-3 mr-2" />
+            <TrendingUp className="inline-block h-3 w-3 mr-2" />
             {VEGA_STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON}
           </Button>
         </DialogTrigger>
@@ -180,7 +179,7 @@ export const ShelfBuilder = ({
           {/* Modal Header */}
           <DialogHeader className="flex flex-row items-center px-4 py-3 border-b border-border bg-brand-dark shrink-0 space-y-0">
             <div className="flex items-center gap-2 text-foreground">
-              <MdOutlineAutoGraph className="w-5 h-5 text-primary" />
+              <TrendingUp className="w-5 h-5 text-primary" />
               <DialogTitle className="text-base font-bold m-0 p-0 text-left">Visual Chart Editor</DialogTitle>
             </div>
           </DialogHeader>
@@ -190,7 +189,7 @@ export const ShelfBuilder = ({
               
               {!hasAnyData ? (
                 <div className="flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded-sm bg-brand-dark">
-                  <FiDatabase className="w-10 h-10 mb-3 text-muted-foreground/40" />
+                  <Database className="w-10 h-10 mb-3 text-muted-foreground/40" />
                   <p className="text-sm font-semibold text-foreground mb-1">No Data Source Selected</p>
                   <p className="text-xs text-muted-foreground">Add a Data Source in the Data tab and run a Test, or select a Workflow.</p>
                 </div>
@@ -250,7 +249,7 @@ export const ShelfBuilder = ({
                         onClick={() => setShowSecondary(!showSecondary)}
                         className="w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-brand-dark font-medium cursor-pointer"
                       >
-                        {showSecondary ? <FiChevronDown className="w-4 h-4 mr-2 text-muted-foreground" /> : <FiChevronRight className="w-4 h-4 mr-2 text-muted-foreground" />}
+                        {showSecondary ? <ChevronDown className="w-4 h-4 mr-2 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 mr-2 text-muted-foreground" />}
                         <span className="text-[10px] font-bold uppercase tracking-wider text-foreground">
                           More Channels <span className="text-primary ml-1">({SECONDARY_SHELVES.filter(ch => shelfSpec.encoding[ch]?.field).length} active)</span>
                         </span>
@@ -278,7 +277,7 @@ export const ShelfBuilder = ({
                       onClick={() => setShowStyle(!showStyle)}
                       className="flex items-center gap-2 p-1 text-muted-foreground hover:text-foreground focus:outline-none transition-colors bg-transparent cursor-pointer"
                     >
-                      {showStyle ? <FiChevronDown className="w-4 h-4" /> : <FiChevronRight className="w-4 h-4" />}
+                      {showStyle ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                       <span className="text-[10px] font-bold uppercase tracking-widest">Chart Style & Settings</span>
                     </div>
                     

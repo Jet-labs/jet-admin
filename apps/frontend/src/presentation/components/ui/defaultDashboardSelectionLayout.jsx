@@ -1,4 +1,5 @@
 import React, {  useState } from "react";
+import { LayoutDashboard, Maximize2, PinOff } from 'lucide-react';
 import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../../constants";
 import {
@@ -11,11 +12,8 @@ import {
 } from "../../../logic/hooks/useAuth";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import PropTypes from "prop-types";
-import { LuPinOff } from "react-icons/lu";
-import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { ReactQueryLoadingErrorWrapper } from "./reactQueryLoadingErrorWrapper";
 import { DashboardRenderWidget } from "../dashboardComponents/dashboardRenderWidget";
-import { AiOutlineFullscreen } from "react-icons/ai";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import { Button, Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -88,10 +86,10 @@ export const DefaultDashboardSelectionLayout = ({
     <div className="w-full h-full">
       {pinnedDashboardID && dashboard ? (
         <div className="w-full flex flex-col justify-start items-center h-full">
-          <div className="flex flex-row justify-between items-center w-full px-4 py-3 border-b border-brand-border ">
+          <div className="flex flex-row justify-between items-center w-full px-4 py-3 border-b border-border ">
             <div className="w-full  flex flex-col justify-center items-start">
               {dashboard && (
-                <h1 className="text-lg font-bold leading-tight tracking-tight text-brand-text-primary">
+                <h1 className="text-lg font-bold leading-tight tracking-tight text-foreground">
                   {dashboard.dashboardTitle}
                 </h1>
               )}
@@ -124,13 +122,13 @@ export const DefaultDashboardSelectionLayout = ({
                     onClick={() => _handleSetDefaultDashboard(null)}
                     variant="primary-ghost" className="w-fit text-nowrap"
                   >
-                    <LuPinOff className="!w-3.5 !h-3.5 !text-primary" />
+                    <PinOff className="!w-3.5 !h-3.5 !text-primary" />
                     </Button>
                     <Button
                       onClick={fullScreenHandle.enter}
                       variant="primary-ghost" className="w-fit text-nowrap"
                     >
-                      <AiOutlineFullscreen className="text-primary h-4 w-4" />
+                      <Maximize2 className="text-primary h-4 w-4" />
                     </Button>
                 </>
               )}
@@ -144,7 +142,7 @@ export const DefaultDashboardSelectionLayout = ({
             isRefetching={isRefetechingDashboard}
           >
             <div
-              className="w-full overflow-y-auto bg-brand-border-dark h-full"
+              className="w-full overflow-y-auto bg-muted h-full"
               id={`printable-area-dashboard-${pinnedDashboardID}`}
             >
               {dashboard && (
@@ -193,16 +191,16 @@ export const DefaultDashboardSelectionLayout = ({
           refetch={refetchDashboards}
         >
           <div className="h-full w-full flex justify-center items-center p-6">
-            <div className="bg-brand-black p-8 max-w-md text-center">
+            <div className="bg-background p-8 max-w-md text-center">
               <div className="flex justify-center mb-4">
                 <div className="bg-primary/10 p-4 rounded-full">
-                  <MdOutlineSpaceDashboard className="text-primary text-4xl" />
+                  <LayoutDashboard className="text-primary text-4xl" />
                 </div>
               </div>
-              <h2 className="text-xl font-bold text-brand-text-primary mb-2">
+              <h2 className="text-xl font-bold text-foreground mb-2">
                 {CONSTANTS.STRINGS.DASHBOARD_VIEWER_NO_PINNED_DASHBOARD_TITLE}
               </h2>
-              <p className="text-brand-text-primary mb-6">
+              <p className="text-foreground mb-6">
                 {
                   CONSTANTS.STRINGS
                     .DASHBOARD_VIEWER_NO_PINNED_DASHBOARD_DESCRIPTION

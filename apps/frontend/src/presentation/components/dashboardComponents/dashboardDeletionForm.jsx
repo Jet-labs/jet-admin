@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdDeleteOutline } from "react-icons/md";
+import { Trash2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { deleteDashboardByIDAPI } from "../../../data/apis/dashboard";
@@ -52,19 +52,19 @@ export const DashboardDeletionForm = ({ tenantID, dashboardID }) => {
 
   return (
     <Button
-      variant="destructive-ghost"
-      size="sm"
-      square
-      onClick={_handleDeleteDashboard}
-      disabled={isDeletingDashboard}
       type="button"
+      variant="destructive"
+      size="icon"
+      square
       className="shrink-0"
       aria-label="Delete dashboard"
+      onClick={_handleDeleteDashboard}
+      disabled={isDeletingDashboard}
     >
       {isDeletingDashboard ? (
         <Spinner size={16} />
       ) : (
-        <MdDeleteOutline className="h-4 w-4" />
+          <Trash2 className="h-3 w-3" />
       )}
     </Button>
   );

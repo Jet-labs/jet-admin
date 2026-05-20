@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Clock, RefreshCw } from 'lucide-react';
 
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { useQuery } from "@tanstack/react-query";
 import PropTypes from "prop-types";
-import { FiClock, FiRefreshCw } from "react-icons/fi";
 import { CONSTANTS } from "../../../constants";
 import {
   getWidgetByIDAPI,
@@ -168,12 +168,12 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
         }}
       >
         {widget && showHeader && (
-          <div className="border-b border-brand-border/80 bg-gradient-to-r from-slate-50 to-background px-3 py-1.5">
+          <div className="border-b border-border/80 bg-gradient-to-r from-slate-50 to-background px-3 py-1.5">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <div className="min-w-0">
-                    <div className="truncate text-xs font-semibold text-brand-text-primary">
+                    <div className="truncate text-xs font-semibold text-foreground">
                       {widget.widgetTitle}
                     </div>
                   </div>
@@ -182,8 +182,8 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
 
               <div className="flex shrink-0 items-center gap-2">
                 {refreshLabel ? (
-                  <Badge variant="outline" className="gap-1 border-brand-border text-[11px] text-brand-text-primary">
-                    <FiClock className="text-[11px]" />
+                  <Badge variant="outline" className="gap-1 border-border text-[11px] text-foreground">
+                    <Clock className="text-[11px]" />
                     {refreshLabel}
                   </Badge>
                 ) : null}
@@ -192,13 +192,13 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
                   variant="ghost"
                   size="sm"
                   square
-                  className="h-6 w-6 text-brand-text-primary hover:bg-brand-border-dark hover:text-brand-text-primary"
+                  className="h-6 w-6 text-foreground hover:bg-muted hover:text-foreground"
                   onClick={() => {
                     refetchWidget();
                   }}
                   aria-label="Refresh widget"
                 >
-                  <FiRefreshCw className={isLoadingWidget ? "animate-spin h-3.5 w-3.5" : " h-3.5 w-3.5"} />
+                  <RefreshCw className={isLoadingWidget ? "animate-spin h-3.5 w-3.5" : " h-3.5 w-3.5"} />
                 </Button>
               </div>
             </div>
@@ -222,7 +222,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
           });
 
           return (
-            <div className="min-h-0 flex-1 bg-brand-dark px-2 pb-2 pt-1">
+            <div className="min-h-0 flex-1 bg-background px-2 pb-2 pt-1">
               <RenderedWidgetComponent
                 widgetTitle={widget.widgetTitle}
                 widgetType={widgetRender.widgetType}

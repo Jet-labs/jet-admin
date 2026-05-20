@@ -43,7 +43,7 @@ export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
             ${
               uploadError
                 ? "border-red-400 bg-red-950/40 hover:bg-red-950/40"
-                : "border-brand-border bg-brand-border-dark hover:bg-brand-black"
+                : "border-border bg-muted hover:bg-foreground/10"
             }
                 rounded
             transition-colors duration-150
@@ -54,13 +54,13 @@ export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
           {isUploadingLogo ? (
             <Spinner size={16} className="text-primary" />
           ) : (
-              <Upload className="w-5 h-5 text-brand-text-primary" />
+              <Upload className="w-5 h-5 text-foreground" />
           )}
 
           {/* Show selected file name */}
         </div>
         {fileInputRef.current?.files?.[0] && (
-          <span className="ml-2 text-sm text-brand-text-primary">
+          <span className="ml-2 text-sm text-foreground">
             {fileInputRef.current.files[0].name}
           </span>
         )}

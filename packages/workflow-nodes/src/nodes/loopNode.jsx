@@ -3,10 +3,8 @@ import { Handle, Position } from 'reactflow';
 import { JsonForms } from '@jsonforms/react';
 import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
-import { VscDebugDisconnect } from 'react-icons/vsc';
-import { TbRepeat } from 'react-icons/tb';
-import { IoMdArrowDropright } from 'react-icons/io';
 import { Button } from '@jet-admin/ui';
+import { Repeat, Ban, ChevronRight } from 'lucide-react';
 
 // ============================================================================
 // Error handling options
@@ -29,7 +27,6 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
     itemVariable: data?.itemVariable || 'item',
     indexVariable: data?.indexVariable || 'index',
     maxIterations: data?.maxIterations ?? 1000,
-    batchSize: data?.batchSize ?? 1,
     delayBetweenItems: data?.delayBetweenItems ?? 0,
     errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW,
     isDisabled: data?.isDisabled ?? false,
@@ -45,7 +42,6 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         itemVariable: data.itemVariable || 'item',
         indexVariable: data.indexVariable || 'index',
         maxIterations: data.maxIterations ?? 1000,
-        batchSize: data.batchSize ?? 1,
         delayBetweenItems: data.delayBetweenItems ?? 0,
         errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW,
         isDisabled: data.isDisabled ?? false,
@@ -102,14 +98,6 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
           minimum: 1,
           maximum: 100000,
           default: 1000,
-        },
-        batchSize: {
-          type: 'integer',
-          title: 'Batch Size',
-          description: 'Process items in batches (1 = sequential)',
-          minimum: 1,
-          maximum: 100,
-          default: 1,
         },
         delayBetweenItems: {
           type: 'integer',
@@ -185,7 +173,6 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
           label: 'Advanced',
           elements: [
             { type: 'Control', scope: '#/properties/maxIterations' },
-            { type: 'Control', scope: '#/properties/batchSize' },
             { type: 'Control', scope: '#/properties/delayBetweenItems' },
             {
               type: 'Control',
@@ -256,6 +243,7 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
 
         <Button
           type="button"
+          size="sm"
           onClick={handleSave}
           className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
@@ -269,39 +257,76 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
 // ============================================================================
 // LoopNode - Minimalist flat landscape design
 // ============================================================================
-export const LoopNode = memo(({ data, isConnectable }) => {
-  const { strings } = useWorkflowNodes();
+export const LoopNode = memo(({ id, data, isConnectable }) => {
+  const { strings, nodeExecutionStatus } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || 'idle';
 
   const isDisabled = data?.isDisabled ?? false;
   const sourceVariable = data?.sourceVariable || '{{ctx.array}}';
   const itemVariable = data?.itemVariable || 'item';
 
+  const getStatusStyles = () => {
+    switch (executionStatus) {
+      case 'running': return 'border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse';
+      case 'completed': return 'border-green-400 ring-2 ring-green-300 ring-opacity-50';
+      case 'failed': return 'border-red-400 ring-2 ring-red-300 ring-opacity-50';
+      case 'skipped': return 'border-orange-300 opacity-60';
+      default: return 'border-brand-border hover:border-cyan-400 hover:shadow-md';
+    }
+  };
+
+  const StatusIndicator = () => {
+    if (executionStatus === 'running') return (
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10">
+        <Repeat className="w-3 h-3 text-white" />
+      </div>
+    );
+    if (executionStatus === 'completed') return (
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10">
+        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+    );
+    if (executionStatus === 'failed') return (
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10">
+        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+    );
+    return null;
+  };
+
   return (
     <div className={`
-      bg-brand-black border rounded
+      relative bg-brand-black border rounded-sm
       min-w-[280px] max-w-[350px]
       transition-all duration-150
-      ${isDisabled
-        ? 'border-brand-border opacity-50'
-        : 'border-brand-border hover:border-cyan-400 hover:shadow-md'
-      }
-      ${!data.sourceVariable ? '!border-red-400 !bg-red-50' : ''}
+      ${isDisabled ? 'border-brand-border opacity-50' : getStatusStyles()}
+      ${!data.sourceVariable ? '!border-red-400 !bg-red-950/40' : ''}
     `}>
+      <StatusIndicator />
       {/* Main content - horizontal layout */}
       <div className="flex items-stretch">
 
         {/* Left: Icon */}
         <div
-        
-                  style={{
-                      borderTopLeftRadius: "0.25rem",
-                      borderBottomLeftRadius: "0.25rem",
-                  }} 
-                  className={`
-          flex flex-col items-center justify-center px-3 py-3 border-r
-          ${isDisabled ? 'bg-brand-dark border-brand-border' : 'bg-cyan-50 border-cyan-100'}
-        `}>
-          <TbRepeat className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : 'text-cyan-500'}`} />
+          style={{
+            borderTopLeftRadius: "0.25rem",
+            borderBottomLeftRadius: "0.25rem",
+          }} 
+          className={`
+            flex flex-col items-center justify-center px-3 py-3 border-r
+            ${isDisabled ? 'bg-brand-dark border-brand-border' : 
+              executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+              executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
+              executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
+              'bg-cyan-950/40 border-cyan-800'
+            }
+          `}
+        >
+          <Repeat className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : executionStatus === 'running' ? 'text-blue-600' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-cyan-500'}`} />
         </div>
 
         {/* Center: Main info */}
@@ -313,7 +338,7 @@ export const LoopNode = memo(({ data, isConnectable }) => {
             </span>
             {isDisabled && (
               <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
-                <VscDebugDisconnect className="w-2.5 h-2.5" />
+                <Ban className="w-2.5 h-2.5" />
                 Skip
               </span>
             )}

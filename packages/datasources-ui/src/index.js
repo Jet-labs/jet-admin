@@ -5,21 +5,21 @@ import { WebViewQueryResponseView } from "./components/common/webViewQueryRespon
 
 // Generic test result UI for all datasources
 const GenericDatasourceTestResultUI = ({ connectionResult }) => {
-  let connectionResultClass = "bg-slate-100 !border-slate-200 text-[#1c1c1e]";
+  let connectionResultClass = "bg-muted/40 border-border text-foreground";
   let connectionResultText = "Connection not tested";
   console.log("connectionResult", connectionResult);
 
   if (connectionResult === true || (connectionResult?.ok === true)) {
-    connectionResultClass = "bg-green-100 !border-green-400 text-green-700";
+    connectionResultClass = "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
     connectionResultText = connectionResult?.statusText || "Connection successful";
   } else if (connectionResult === false || (connectionResult?.ok === false)) {
-    connectionResultClass = "bg-red-100 !border-red-400 text-red-700";
+    connectionResultClass = "bg-destructive/10 border-destructive/30 text-destructive";
     connectionResultText = connectionResult?.error || "Connection failed";
   } else if (connectionResult === undefined) {
-    connectionResultClass = "bg-slate-100 !border-slate-200 text-[#1c1c1e]";
+    connectionResultClass = "bg-muted/40 border-border text-foreground";
     connectionResultText = "Connection not tested";
   } else {
-    connectionResultClass = "bg-orange-100 !border-orange-400 text-orange-700";
+    connectionResultClass = "bg-amber-500/10 border-amber-500/30 text-amber-400";
     connectionResultText = "Error testing connection";
   }
 

@@ -1,4 +1,4 @@
-import { FaPlus } from "react-icons/fa";
+import { Plus } from 'lucide-react';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { NoEntityUI } from "../../ui/noEntityUI";
@@ -25,13 +25,13 @@ export const DatasourceDrawerList = () => {
   };
 
   return (
-    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddMoreDatasource}
-        variant="primary-ghost"
+        variant="secondary"
         className="w-full justify-start"
       >
-        <FaPlus className="w-4 h-4 mr-2" />
+        <Plus className="w-4 h-4 mr-2" />
         {CONSTANTS.STRINGS.ADD_DATASOURCE_BUTTON_TEXT}
       </Button>
 
@@ -61,7 +61,7 @@ export const DatasourceDrawerList = () => {
               >
                 <div
                   className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary/5 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >

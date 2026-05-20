@@ -40,7 +40,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
   };
 
   return (
-    <div className="p-3 border border-border rounded-sm bg-brand-dark mb-3">
+    <div className="p-3 border border-border rounded-sm bg-background">
       <Label className="block mb-2 text-sm font-medium text-foreground">
         {label || uischema.label || "Conditions"}
       </Label>
@@ -54,6 +54,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
             {/* Field */}
             <div className="flex-1">
               <Input
+                size="sm"
                 type="text"
                 placeholder="Field"
                 value={item.field || ""}
@@ -65,7 +66,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
             {/* Operator */}
             <div className="w-36">
               <Select value={item.operator || "=="} onValueChange={(val) => handleItemChange(index, "operator", val)} disabled={isDisabled}>
-                <SelectTrigger className="text-sm">
+                <SelectTrigger size="sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -78,6 +79,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
             {/* Value */}
             <div className="flex-1">
               <Input
+                size="sm"
                 type="text"
                 placeholder="Value"
                 value={item.value || ""}
@@ -89,7 +91,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
             <Button
               type="button"
               variant="destructive-ghost"
-              size="sm"
+              size="icon"
               square
               onClick={() => handleRemoveItem(index)}
               disabled={isDisabled}
@@ -102,7 +104,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
 
       <Button
         type="button"
-        variant="primary-ghost"
+        variant="outline"
         size="sm"
         onClick={handleAddItem}
         disabled={isDisabled}

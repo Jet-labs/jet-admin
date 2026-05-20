@@ -15,7 +15,7 @@ const { cronJobService } = require("./modules/cronJob/cronJob.service");
 const { socketIO } = require("./config/socket.io");
 const { isModuleEnabled } = require("./config/module.config");
 const { widgetSocketController } = require("./modules/widget/widget.socket.controller");
-const { listenerConnectionManager } = require("./modules/listener/listenerEngine/connectionManager");
+const { listenerEngine } = require("./modules/listener/listenerEngine/engine");
 // Middleware setup
 expressApp.use(cookieParser());
 const path = require('path');
@@ -175,7 +175,7 @@ socketIO.on("connection", async (socket) => {
 
     try {
 
-      listenerConnectionManager.clearTestScriptsForSession(socket.id);
+      listenerEngine.clearTestScriptsForSession(socket.id);
     } catch (e) {
       // Ignore errors during disconnect cleanup
     }

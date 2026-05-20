@@ -172,6 +172,36 @@ const listenerController = {
     }
   },
 
+  async cloneListener(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID, listenerID } = req.params;
+
+      Logger.log("info", {
+        message: "listenerController:cloneListener:params",
+        params: { userID: user.userID, tenantID, listenerID },
+      });
+
+      const listener = await listenerService.cloneListener({ tenantID, listenerID });
+
+      Logger.log("success", {
+        message: "listenerController:cloneListener:success",
+        params: { listener },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        listener,
+        message: "Listener cloned successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:cloneListener:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
   // ─── Lifecycle ──────────────────────────────────────────────────────────
 
   async activateListener(req, res) {

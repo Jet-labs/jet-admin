@@ -115,7 +115,7 @@ var QueryResponseTableTab = ({
       sx: { width, height },
       className: `!flex !flex-col !justify-start !items-stretch ${className}`
     },
-    !dataSchema ? /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex flex-col justify-center items-center w-full text-[#1c1c1e]" }, /* @__PURE__ */ React4.createElement("span", null, "Data schema not valid or no data available")) : !columns ? /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-[#1c1c1e]" }, /* @__PURE__ */ React4.createElement("span", null, "Columns cannot be extracted or mapped")) : data && Array.isArray(data) && data.length && columns ? /* @__PURE__ */ React4.createElement(
+    !dataSchema ? /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex flex-col justify-center items-center w-full text-foreground" }, /* @__PURE__ */ React4.createElement("span", null, "Data schema not valid or no data available")) : !columns ? /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-foreground" }, /* @__PURE__ */ React4.createElement("span", null, "Columns cannot be extracted or mapped")) : data && Array.isArray(data) && data.length && columns ? /* @__PURE__ */ React4.createElement(
       DataGrid,
       {
         rows: data.map((item, index) => {
@@ -126,7 +126,7 @@ var QueryResponseTableTab = ({
         className: `!w-100 !border-0`,
         density: "compact",
         showCellVerticalBorder: true,
-        getRowClassName: (params) => params.indexRelativeToCurrentPage % 2 === 0 ? "bg-[#646cff]/10" : "Mui-odd",
+        getRowClassName: (params) => params.indexRelativeToCurrentPage % 2 === 0 ? "bg-primary/10" : "Mui-odd",
         getRowHeight: () => "auto",
         getRowId: (row) => row._g_uuid,
         defaultColumnOptions: {
@@ -164,12 +164,12 @@ var QueryResponseTableTab = ({
             minWidth: "auto !important",
             width: "auto !important",
             flex: "0 0 auto !important",
-            color: "#646cff !important",
+            color: "hsl(var(--primary))",
             padding: "0.25rem !important"
           }
         }
       }
-    ) : /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-[#1c1c1e]" }, /* @__PURE__ */ React4.createElement("span", null, "No data"))
+    ) : /* @__PURE__ */ React4.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-foreground" }, /* @__PURE__ */ React4.createElement("span", null, "No data"))
   );
 };
 
@@ -183,20 +183,19 @@ var QueryResponseView = ({ queryResult }) => {
     {
       key: label,
       variant: "ghost",
-      className: `px-4 mr-2 py-2 text-sm font-medium rounded-sm transition-colors ${index === tab ? "text-primary bg-primary/5" : "text-foreground hover:bg-brand-border-dark"}`,
+      className: `px-4 mr-2 py-2 text-sm font-medium rounded-sm transition-colors ${index === tab ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`,
       onClick: () => setTab(index),
       type: "button"
     },
     label
-  ))), /* @__PURE__ */ React5.createElement("div", { className: "p-3 border mt-3 border-border rounded-sm bg-brand-dark flex flex-col gap-2 overflow-y-auto flex-1" }, tab === 0 && /* @__PURE__ */ React5.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab === 1 && /* @__PURE__ */ React5.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab === 2 && /* @__PURE__ */ React5.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab === 3 && /* @__PURE__ */ React5.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
+  ))), /* @__PURE__ */ React5.createElement("div", { className: "p-3 border mt-3 border-border rounded-sm bg-background flex flex-col gap-2 overflow-y-auto flex-1" }, tab === 0 && /* @__PURE__ */ React5.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab === 1 && /* @__PURE__ */ React5.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab === 2 && /* @__PURE__ */ React5.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab === 3 && /* @__PURE__ */ React5.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
 };
 QueryResponseView.propTypes = {
   queryResult: PropTypes5.object
 };
 
 // src/components/common/webViewQueryResponseView.js
-import { Tab, Tabs } from "@mui/material";
-import React7, { useState as useState2 } from "react";
+import React7 from "react";
 import PropTypes7 from "prop-types";
 
 // src/components/common/queryResponseWebViewTab.js
@@ -226,86 +225,31 @@ var QueryResponseWebViewTab = ({
 };
 
 // src/components/common/webViewQueryResponseView.js
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@jet-admin/ui";
 var WebViewQueryResponseView = ({ queryResult }) => {
   WebViewQueryResponseView.propTypes = {
     queryResult: PropTypes7.object
   };
   console.log("queryResult", queryResult);
-  const [tab, setTab] = useState2(0);
-  const _handleTabChange = (event, newTab) => {
-    setTab(newTab);
-  };
-  return /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement(
-    Tabs,
-    {
-      value: tab,
-      onChange: _handleTabChange,
-      className: "!w-full !border-b !border-slate-200",
-      sx: {
-        "& .MuiTabs-indicator": {
-          background: "#646cff !important"
-        }
-      }
-    },
-    /* @__PURE__ */ React7.createElement(
-      Tab,
-      {
-        label: "Web View",
-        disableRipple: true,
-        disableFocusRipple: true,
-        disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 0 ? "!text-[#646cff]" : "!text-[#1c1c1e]"}`
-      }
-    ),
-    /* @__PURE__ */ React7.createElement(
-      Tab,
-      {
-        label: "JSON",
-        disableRipple: true,
-        disableFocusRipple: true,
-        disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 1 ? "!text-[#646cff]" : "!text-[#1c1c1e]"}`
-      }
-    ),
-    /* @__PURE__ */ React7.createElement(
-      Tab,
-      {
-        label: "Raw",
-        disableRipple: true,
-        disableFocusRipple: true,
-        disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 2 ? "!text-[#646cff]" : "!text-[#1c1c1e]"}`
-      }
-    ),
-    /* @__PURE__ */ React7.createElement(
-      Tab,
-      {
-        label: "Data Schema",
-        disableRipple: true,
-        disableFocusRipple: true,
-        disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 3 ? "!text-[#646cff]" : "!text-[#1c1c1e]"}`
-      }
-    )
-  ), /* @__PURE__ */ React7.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab === 0 && /* @__PURE__ */ React7.createElement(QueryResponseWebViewTab, { data: queryResult ? queryResult : "" }), tab === 1 && /* @__PURE__ */ React7.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab === 2 && /* @__PURE__ */ React7.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab === 3 && /* @__PURE__ */ React7.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
+  return /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement(Tabs, { defaultValue: "web", className: "w-full flex flex-col h-full" }, /* @__PURE__ */ React7.createElement(TabsList, null, /* @__PURE__ */ React7.createElement(TabsTrigger, { value: "web" }, "Web View"), /* @__PURE__ */ React7.createElement(TabsTrigger, { value: "json" }, "JSON"), /* @__PURE__ */ React7.createElement(TabsTrigger, { value: "raw" }, "Raw"), /* @__PURE__ */ React7.createElement(TabsTrigger, { value: "schema" }, "Data Schema")), /* @__PURE__ */ React7.createElement("div", { className: "w-100 h-full overflow-y-auto pb-5" }, /* @__PURE__ */ React7.createElement(TabsContent, { value: "web", className: "m-0 h-full" }, /* @__PURE__ */ React7.createElement(QueryResponseWebViewTab, { data: queryResult ? queryResult : "" })), /* @__PURE__ */ React7.createElement(TabsContent, { value: "json", className: "m-0 h-full" }, /* @__PURE__ */ React7.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" })), /* @__PURE__ */ React7.createElement(TabsContent, { value: "raw", className: "m-0 h-full" }, /* @__PURE__ */ React7.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" })), /* @__PURE__ */ React7.createElement(TabsContent, { value: "schema", className: "m-0 h-full" }, /* @__PURE__ */ React7.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })))));
 };
 
 // src/index.js
 var GenericDatasourceTestResultUI = ({ connectionResult }) => {
-  let connectionResultClass = "bg-slate-100 !border-slate-200 text-[#1c1c1e]";
+  let connectionResultClass = "bg-muted/40 border-border text-foreground";
   let connectionResultText = "Connection not tested";
   console.log("connectionResult", connectionResult);
   if (connectionResult === true || connectionResult?.ok === true) {
-    connectionResultClass = "bg-green-100 !border-green-400 text-green-700";
+    connectionResultClass = "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
     connectionResultText = connectionResult?.statusText || "Connection successful";
   } else if (connectionResult === false || connectionResult?.ok === false) {
-    connectionResultClass = "bg-red-100 !border-red-400 text-red-700";
+    connectionResultClass = "bg-destructive/10 border-destructive/30 text-destructive";
     connectionResultText = connectionResult?.error || "Connection failed";
   } else if (connectionResult === void 0) {
-    connectionResultClass = "bg-slate-100 !border-slate-200 text-[#1c1c1e]";
+    connectionResultClass = "bg-muted/40 border-border text-foreground";
     connectionResultText = "Connection not tested";
   } else {
-    connectionResultClass = "bg-orange-100 !border-orange-400 text-orange-700";
+    connectionResultClass = "bg-amber-500/10 border-amber-500/30 text-amber-400";
     connectionResultText = "Error testing connection";
   }
   return React8.createElement(

@@ -87,6 +87,9 @@ const AddListenerPage = lazy(() => import("../../pages/addListenerPage"));
 const UpdateListenerPage = lazy(() =>
   import("../../pages/updateListenerPage")
 );
+const EngineDashboardPage = lazy(() =>
+  import("../../pages/engineDashboardPage")
+);
 
 const router = createBrowserRouter([
   {
@@ -148,6 +151,10 @@ const router = createBrowserRouter([
                 element: <UpdateDataQueryPage />,
               },
             ],
+          },
+          {
+            path: CONSTANTS.ROUTES.VIEW_ENGINES.code,
+            element: <EngineDashboardPage />,
           },
 
           {
@@ -292,7 +299,6 @@ const router = createBrowserRouter([
               },
             ],
           },
-
           {
             element: <RoleManagementLayout />,
             children: [

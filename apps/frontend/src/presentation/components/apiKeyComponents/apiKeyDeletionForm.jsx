@@ -1,6 +1,6 @@
 import React from "react";
+import { Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { deleteAPIKeyByIDAPI } from "../../../data/apis/apiKey";
@@ -50,19 +50,19 @@ export const APIKeyDeletionForm = ({ tenantID, apiKeyID }) => {
 
   return (
     <Button
-      variant="destructive-ghost"
-      size="sm"
-      square
-      onClick={_handleDeleteNotification}
-      disabled={isDeletingAPIKey}
       type="button"
+      variant="destructive"
+      size="icon"
+      square
       className="shrink-0"
       aria-label="Delete API key"
+      onClick={_handleDeleteNotification}
+      disabled={isDeletingAPIKey}
     >
       {isDeletingAPIKey ? (
         <Spinner size={16} />
       ) : (
-        <MdDeleteOutline className="h-4 w-4" />
+        <Trash2 className="h-3 w-3" />
       )}
     </Button>
   );

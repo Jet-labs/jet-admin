@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
-import { FiX, FiCode, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { VariableExplorer, extractWorkflowSchema } from "./variableExplorer";
 import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { X, Code, ChevronDown, ChevronRight } from 'lucide-react';
 
 const TRANSFORM_TYPES = [
   { value: '', label: 'None' },
@@ -149,7 +149,7 @@ export const VariablePathPicker = ({
               className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5"
               type="button"
             >
-              <FiX className="w-3 h-3" />
+              <X className="w-3 h-3" />
             </Button>
           )}
 
@@ -188,7 +188,7 @@ export const VariablePathPicker = ({
             className="shrink-0"
             title="Browse variables"
           >
-            {showExplorer ? <FiChevronDown className="w-3 h-3 mr-1" /> : <FiChevronRight className="w-3 h-3 mr-1" />}
+            {showExplorer ? <ChevronDown className="w-3 h-3 mr-1" /> : <ChevronRight className="w-3 h-3 mr-1" />}
             Browse
           </Button>
         )}
@@ -202,7 +202,7 @@ export const VariablePathPicker = ({
             onClick={() => setShowAdvanced(!showAdvanced)}
             className="shrink-0"
           >
-            <FiCode className="w-3 h-3 mr-1" />
+            <Code className="w-3 h-3 mr-1" />
             Transform
             {hasTransform && <span className="w-1.5 h-1.5 bg-primary rounded-full ml-1" />}
           </Button>

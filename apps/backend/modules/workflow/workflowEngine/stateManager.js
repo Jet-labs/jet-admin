@@ -193,8 +193,51 @@ stateManager.getInstanceWithLogs = async (instanceID) => {
  * @param {string[]} nodeIDs   — candidate next-node IDs to check
  * @returns {Promise<Set<string>>}
  */
-stateManager.getDispatchedNodeIDs = async (instanceID, nodeIDs) => {
+stateManager.getOpenDispatchedNodeIDs = async (instanceID, nodeIDs) => {
   if (!nodeIDs || nodeIDs.length === 0) return new Set();
+
+  const rows = await prisma.tblWorkflowInstanceLogs.findMany({
+    where: {
+      instanceID,
+      eventType: {
+        in: [
+          constants.WORKFLOW_LOG_EVENT_TYPES.NODE_DISPATCHED,
+          constants.WORKFLOW_LOG_EVENT_TYPES.NODE_COMPLETED,
+          constants.WORKFLOW_LOG_EVENT_TYPES.NODE_FAILED,
+        ],
+      },
+      nodeID: { in: nodeIDs },
+    },
+    select: { nodeID: true, eventType: true },
+  });
+
+  const counts = new Map(nodeIDs.map((nodeID) => [
+    nodeID,
+    { dispatched: 0, terminal: 0 },
+  ]));
+
+  for (const row of rows) {
+    const current = counts.get(row.nodeID) || { dispatched: 0, terminal: 0 };
+    if (row.eventType === constants.WORKFLOW_LOG_EVENT_TYPES.NODE_DISPATCHED) {
+      current.dispatched += 1;
+    } else {
+      current.terminal += 1;
+    }
+    counts.set(row.nodeID, current);
+  }
+
+  return new Set(
+    [...counts.entries()]
+      .filter(([, count]) => count.dispatched > count.terminal)
+      .map(([nodeID]) => nodeID)
+  );
+};
+
+// Backwards-compatible alias for older tests/importers.
+stateManager.getDispatchedNodeIDs = stateManager.getOpenDispatchedNodeIDs;
+
+stateManager.getDispatchCounts = async (instanceID, nodeIDs) => {
+  if (!nodeIDs || nodeIDs.length === 0) return new Map();
 
   const rows = await prisma.tblWorkflowInstanceLogs.findMany({
     where: {
@@ -205,7 +248,12 @@ stateManager.getDispatchedNodeIDs = async (instanceID, nodeIDs) => {
     select: { nodeID: true },
   });
 
-  return new Set(rows.map((r) => r.nodeID));
+  const counts = new Map(nodeIDs.map((nodeID) => [nodeID, 0]));
+  for (const row of rows) {
+    counts.set(row.nodeID, (counts.get(row.nodeID) || 0) + 1);
+  }
+
+  return counts;
 };
 
 // ─── Context assembly ─────────────────────────────────────────────────────────

@@ -223,9 +223,11 @@ async function handleTaskResult(result) {
         return;
       }
 
-      // Filter: which of these next nodes has a concurrent winner already dispatched?
+      // Filter: which of these next nodes has a concurrent winner already dispatched
+      // and not yet completed/failed? Completed dispatches are intentionally
+      // reusable so loop-back edges can execute the same node again.
       const nextNodeIDs = nextNodes.map(n => n.nodeID);
-      const alreadyDispatched = await stateManager.getDispatchedNodeIDs(instanceID, nextNodeIDs);
+      const alreadyDispatched = await stateManager.getOpenDispatchedNodeIDs(instanceID, nextNodeIDs);
       const toDispatch = nextNodes.filter(n => !alreadyDispatched.has(n.nodeID));
 
       if (toDispatch.length === 0) {
@@ -266,20 +268,29 @@ async function handleTaskResult(result) {
       // This is the record that prevents the loser (on its retry) from
       // re-dispatching these nodes.
       // Write in bulk — one round-trip for all dispatched nodes.
+      const dispatchCounts = await stateManager.getDispatchCounts(
+        instanceID,
+        toDispatch.map(n => n.nodeID)
+      );
+      const dispatches = toDispatch.map(n => ({
+        ...n,
+        _nodeAttempt: (dispatchCounts.get(n.nodeID) || 0) + 1,
+      }));
+
       await stateManager.logEventBulk(
-        toDispatch.map(n => ({
+        dispatches.map(n => ({
           instanceID,
           nodeID: n.nodeID,
           eventType: constants.WORKFLOW_LOG_EVENT_TYPES.NODE_DISPATCHED,
           nodeStatus: null,
           payload: {},
-          nodeAttempt: casAttempt,  // records which CAS attempt made this dispatch
+          nodeAttempt: n._nodeAttempt,
         }))
       );
 
       // Now enqueue the actual jobs
       await _dispatchNextNodes({
-        nextNodes: toDispatch,
+        nextNodes: dispatches,
         instance: freshInstance,
         isTestRun,
         contextData: currentContext,
@@ -351,6 +362,10 @@ function _buildLogPayload({ nodeID, nodeType, outputVariable, output, status }) 
     payload[outputVariable] = output[outputVariable] !== undefined
       ? output[outputVariable]
       : output;
+  }
+
+  if (output?.__contextPatch && typeof output.__contextPatch === 'object') {
+    Object.assign(payload, output.__contextPatch);
   }
 
   if (nodeType === 'end' && output?.workflowOutput) {
@@ -438,6 +453,7 @@ async function _dispatchNextNodes({ nextNodes, instance, isTestRun, contextData,
         workflowID: instance.workflowID,
         isTestRun,
         isJoinNode: nextNode._isJoinNode ?? false,
+        nodeAttempt: nextNode._nodeAttempt,
       },
       { delay: queueDelay || 0 }
     );
@@ -447,9 +463,10 @@ async function _dispatchNextNodes({ nextNodes, instance, isTestRun, contextData,
 // ─── Test-run helpers ─────────────────────────────────────────────────────────
 
 async function _resolveTestNextNodes({ workflowDefinition, nodeID, nextHandle, instanceID, contextData }) {
+  const normalizeHandle = (handle) => (handle === 'done' ? 'completed' : (handle || 'output'));
   const matchingEdges = workflowDefinition.edges.filter(
     (e) => e.upstreamNodeID === nodeID
-      && (e.sourceHandle || 'output') === (nextHandle || 'output')
+      && normalizeHandle(e.sourceHandle) === normalizeHandle(nextHandle)
   );
 
   const candidateNodes = matchingEdges
@@ -461,7 +478,7 @@ async function _resolveTestNextNodes({ workflowDefinition, nodeID, nextHandle, i
       const incomingEdges = workflowDefinition.edges.filter(
         (e) => e.downstreamNodeID === candidateNode.nodeID
       );
-      const joinMode = candidateNode.nodeConfig?.joinMode ?? 'all';
+      const joinMode = candidateNode.nodeConfig?.joinMode ?? (candidateNode.nodeType === 'loop' ? 'any' : 'all');
       const ready = dagScheduler.isNodeReadyToExecute({
         incomingEdges, instanceID, joinMode,
         isTestRun: true, contextData,

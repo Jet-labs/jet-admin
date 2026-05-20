@@ -6,6 +6,8 @@
   :root {
     --background: 0 0% 9%;
     --foreground: 0 0% 98%;
+    --input-foreground-default: 0deg 0% 100%;
+      --border-control: 0deg 0% 22.4%;
     
     --card: 0 0% 9%;
     --card-foreground: 0 0% 98%;
@@ -35,12 +37,14 @@
     --radius: 6px;
     
     /* Custom brand properties */
-    --brand-green: #3ecf8e;
-    --brand-green-link: #00c573;
+    --brand-green: #7582ff;
+      --brand-green-rgb: 117 130 255;
+      --brand-green-link: #3e71cf;
     --brand-green-border: rgba(62, 207, 142, 0.3);
     
     --brand-black: #0f0f0f;
     --brand-dark: #171717;
+    --brand-dark-card: #1F1F1F;
     --brand-border-dark: #242424;
     --brand-border: #2e2e2e;
     --brand-border-mid: #363636;
@@ -54,6 +58,17 @@
     --shadow-whisper: none;
     --shadow-card: none;
     --shadow-deep: none;
+/* Terminal Console Panel Tokens */
+  --terminal-bg: #0a0a0a;
+  --terminal-border: #27272a;
+  /* zinc-800 */
+  --terminal-text: #d4d4d8;
+  /* zinc-300 */
+  --terminal-success: #4ade80;
+  /* green-400 */
+  --terminal-info: #818cf8;
+  /* indigo-400 */
+  --terminal-error: hsl(var(--destructive));
   }
 }
 
@@ -217,8 +232,22 @@ button {
 
 /* System-wide labels */
 .label-caps {
-  font-family: "Source Code Pro", "Office Code Pro", Menlo, monospace;
+  font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
   text-transform: uppercase;
   letter-spacing: 1.2px;
   font-size: 12px;
+}
+/* Custom Input Styling */
+.bg-input-custom {
+  background-color: hsl(var(--foreground) / 0.026);
+}
+
+.border-input-custom {
+  border-color: hsl(var(--border-control));
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+  .bg-input-custom {
+    background-color: color-mix(in oklab, hsl(var(--input-foreground-default)) 2.6%, transparent);
+  }
 }

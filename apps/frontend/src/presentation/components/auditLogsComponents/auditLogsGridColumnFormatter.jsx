@@ -1,4 +1,4 @@
-import { BiCalendar } from "react-icons/bi";
+import { Calendar } from 'lucide-react';
 import moment from "moment";
 import ReactJson from "react-json-view";
 import React from "react";
@@ -121,7 +121,7 @@ export const getFormattedAuditLogColumns = () => {
         renderCell: (params) => {
           return (
             <div className="space-x-2 w-fit flex h-full flex-row justify-start items-center">
-              <BiCalendar className="text-primary flex-shrink-0" />
+              <Calendar className="text-primary flex-shrink-0" />
               <span className="text-justify break-all overflow-hidden text-ellipsis whitespace-pre-wrap h-full flex items-center">
                 {params.value
                   ? moment(params.value).toDate().toISOString()
@@ -215,7 +215,7 @@ export const getFormattedAuditLogColumns = () => {
         },
         renderCell: (params) => {
           return (
-            <div className="max-h-32 overflow-auto rounded-sm !text-brand-text-primary p-2">
+            <div className="max-h-32 overflow-auto rounded-sm !text-foreground p-2">
               <ReactJson
                 src={params.value}
                 theme="rjv-default"

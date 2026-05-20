@@ -318,6 +318,13 @@ export const verticalLayoutTester = (uischema) => {
 };
 
 // ============================================================================
+// Horizontal Layout Tester
+// ============================================================================
+export const horizontalLayoutTester = (uischema) => {
+  return uischema.type === "HorizontalLayout" ? 10 : -1;
+};
+
+// ============================================================================
 // Generic Object Array Tester (fallback for any object array)
 // ============================================================================
 export const genericObjectArrayTester = (uischema, rootSchema) => {

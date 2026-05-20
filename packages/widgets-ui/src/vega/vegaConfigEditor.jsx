@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { FiAlertTriangle, FiSettings } from "react-icons/fi";
 import { parseVegaLiteSpec } from "./chartSpecParser";
 import {
   Button,
@@ -15,6 +14,7 @@ import {
 
 import { VegaSpecEditor } from "./vegaSpecEditor";
 import { ShelfBuilder } from "./shelfBuilder";
+import { AlertTriangle, Settings } from 'lucide-react';
 
 const VEGA_STRINGS = {
   WIDGET_EDITOR_FORM_SETTINGS_BUTTON: "Settings",
@@ -98,7 +98,7 @@ export const VegaConfigEditor = ({
             className="h-8 text-xs"
             onClick={() => setIsSettingsDialogOpen(true)}
           >
-            <FiSettings className="inline-block h-3 w-3 mr-2" />
+            <Settings className="inline-block h-3 w-3 mr-2" />
             {VEGA_STRINGS.WIDGET_EDITOR_FORM_SETTINGS_BUTTON}
           </Button>
           <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
@@ -135,7 +135,7 @@ export const VegaConfigEditor = ({
       {showParseWarning && (
         <div className="my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20">
           <div className="flex items-start gap-2 text-xs">
-            <FiAlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
             <div className="flex-1">
               <h4 className="mb-1 font-semibold text-amber-900 dark:text-amber-200">Cannot fully parse chart config</h4>
               <p className="mb-2 text-amber-800 dark:text-amber-300">

@@ -17,7 +17,7 @@ import { WidgetPreview } from "./widgetPreview";
 import PropTypes from "prop-types";
 import { WIDGET_TYPES } from "@jet-admin/widget-types";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { Button, Spinner, PageHeader } from "@jet-admin/ui";
 
 const defaultWidgetType = WIDGET_TYPES.VEGA_LITE.value;
 const initialValues = {
@@ -76,16 +76,14 @@ export const WidgetAdditionForm = ({ tenantID }) => {
   });
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
-      <div className="flex w-full items-center justify-between border-b border-border bg-brand-dark px-4 py-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {CONSTANTS.STRINGS.ADD_WIDGET_FORM_TITLE}
-        </h1>
-        <Button type="submit" form="widget-addition-form" disabled={isAddingWidget}>
-          {isAddingWidget && <Spinner className="mr-2" size={16} />}
-          {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
-        </Button>
-      </div>
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.ADD_WIDGET_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_WIDGETS_TITLE}
+        onSave={addWidgetForm.handleSubmit}
+        isSaving={isAddingWidget}
+        saveText="Save"
+      />
 
       <ResizablePanelGroup
         direction="horizontal"
@@ -97,7 +95,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
         <ResizablePanel defaultSize={55}>
           <form
             id="widget-addition-form"
-            className="flex h-full w-full flex-col items-stretch gap-2 overflow-y-auto bg-brand-dark p-4 pb-10"
+            className="flex h-full w-full flex-col items-stretch gap-2 overflow-y-auto bg-background p-4 pb-10"
             onSubmit={addWidgetForm.handleSubmit}
           >
             {addWidgetForm && (

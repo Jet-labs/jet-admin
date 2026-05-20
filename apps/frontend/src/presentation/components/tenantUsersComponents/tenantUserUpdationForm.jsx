@@ -3,7 +3,7 @@ import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import { Settings, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { Badge, Button, Spinner } from "@jet-admin/ui";
+import { Badge, Button, Spinner, PageHeader, Section } from "@jet-admin/ui";
 import React from "react";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
@@ -17,28 +17,6 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { TenantRoleSelectionDialog } from "../tenantRolesComponents/tenantRoleSelectionDialog";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-
-function Section({ title, description, children }) {
-  return (
-    <div className="rounded-md border border-border bg-card p-4 space-y-3">
-      {(title || description) && (
-        <div className="mb-2">
-          {title && (
-            <p className="mb-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              {title}
-            </p>
-          )}
-          {description && (
-            <p className="text-[11px] text-muted-foreground">{description}</p>
-          )}
-        </div>
-      )}
-      <div className="space-y-4">
-        {children}
-      </div>
-    </div>
-  );
-}
 
 export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
   TenantUserUpdationForm.propTypes = {
@@ -146,7 +124,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
   };
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden bg-brand-dark">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenantUser}
         error={tenantUserError}
@@ -166,37 +144,29 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
               }
             />
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3 shrink-0">
-              <div>
-                <h1 className="text-base font-semibold tracking-tight text-foreground">
-                  {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_FORM_TITLE}
-                </h1>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  Manage user profile and access controls.
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  variant="destructive-ghost"
-                  size="sm"
-                  onClick={_handleRemoveUserFromTenant}
-                  disabled={isRemovingTenantUserFromTenant}
-                >
-                  {isRemovingTenantUserFromTenant ? (
-                    <Spinner size={14} className="mr-2" />
-                  ) : (
-                    <Trash2 className="mr-2 h-4 w-4" />
-                  )}
-                  Remove from Tenant
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-                  Back
-                </Button>
-              </div>
-            </div>
+            <PageHeader
+              title={CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_FORM_TITLE}
+              parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_USER_MANAGEMENT_TITLE}
+
+            >
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={_handleRemoveUserFromTenant}
+                disabled={isRemovingTenantUserFromTenant}
+              >
+                {isRemovingTenantUserFromTenant ? (
+                  <Spinner size={14} className="mr-2" />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                )}
+                Remove from Tenant
+              </Button>
+
+            </PageHeader>
 
             <div className="flex-1 overflow-y-auto p-4 md:p-6">
-              <section className="mx-auto max-w-2xl w-full space-y-6">
+              <section className="mx-auto max-w-2xl w-full space-y-4">
                 <Section 
                   title={CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_PROFILE_TITLE}
                   description="General information about the user's membership."
@@ -263,7 +233,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
                       <div className="grid gap-3">
                         {tenantUser.roles.map((tenantUserRole) => (
                           <div
-                            className="rounded-md border border-border bg-brand-dark p-3 hover:bg-muted/30 transition-colors"
+                            className="rounded-md border border-border bg-background p-3 hover:bg-muted/30 transition-colors"
                             key={`user_tenant_select_role_${tenantUserRole.roleID}`}
                           >
                             <div className="flex flex-col gap-1">

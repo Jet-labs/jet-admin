@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { VscJson, VscChevronRight, VscChevronDown } from 'react-icons/vsc';
-import { FiCopy, FiCheck } from 'react-icons/fi';
+import { Check, ChevronDown, ChevronRight, Copy, FileJson } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 import { Button } from "@jet-admin/ui";
@@ -69,8 +68,8 @@ const JsonNode = ({ name, value, depth = 0 }) => {
       >
         {!isEmpty && (
           isExpanded 
-            ? <VscChevronDown className="size-3.5 text-muted-foreground shrink-0" />
-            : <VscChevronRight className="size-3.5 text-muted-foreground shrink-0" />
+            ? <ChevronDown className="size-3.5 text-muted-foreground shrink-0" />
+            : <ChevronRight className="size-3.5 text-muted-foreground shrink-0" />
         )}
         {isEmpty && <span className="size-3.5 shrink-0" />}
         
@@ -101,7 +100,7 @@ const JsonNode = ({ name, value, depth = 0 }) => {
           className="ml-2 h-5 w-5 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all duration-200"
           title="Copy value"
         >
-          {copied ? <FiCheck className="size-3 text-emerald-500" /> : <FiCopy className="size-3" />}
+          {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
         </Button>
       </div>
 
@@ -159,11 +158,11 @@ export const WorkflowContextPanel = ({
   };
 
   return (
-    <div className={`flex flex-col bg-brand-dark overflow-hidden ${className}`}>
+    <div className={`flex flex-col bg-background overflow-hidden ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2">
-          <VscJson className="size-4 text-muted-foreground" />
+          <FileJson className="size-4 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">Context</span>
           {isRunning && (
             <span className="flex items-center gap-1.5 text-xs text-blue-500 font-medium">
@@ -188,13 +187,13 @@ export const WorkflowContextPanel = ({
             className="h-7 w-7 text-muted-foreground hover:text-foreground"
             title="Copy all context"
           >
-            {copied ? <FiCheck className="size-3.5 text-emerald-500" /> : <FiCopy className="size-3.5" />}
+            {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
           </Button>
         </div>
       </div>
 
       {/* Context tree */}
-      <div className="flex-1 overflow-y-auto p-4 font-mono text-xs bg-brand-dark/50">
+      <div className="flex-1 overflow-y-auto p-4 font-mono text-xs bg-background/50">
         {isEmpty ? (
           <div className="flex items-center justify-center h-full text-muted-foreground/50 italic text-center px-4">
             <span>No context data yet. Run the workflow to see variables.</span>

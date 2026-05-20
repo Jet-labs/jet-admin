@@ -26,7 +26,7 @@ const HomePage = () => {
   ]);
 
   return (
-    <div className=" bg-brand-dark h-full w-full">
+    <div className=" bg-background h-full w-full">
       {tenants && <TenantStats tenants={tenants} />}
     </div>
   );

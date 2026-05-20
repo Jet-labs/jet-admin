@@ -143,7 +143,7 @@ function ToggleChip({ label, selected, onClick, size = "sm" }) {
           : "h-8 min-w-[2.75rem] px-2 text-xs",
         selected
           ? "border-primary bg-primary text-primary-foreground font-semibold shadow-sm"
-          : "border-border bg-brand-dark text-muted-foreground hover:border-primary/50 hover:text-foreground",
+          : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:text-foreground",
       ].join(" ")}
     >
       {label}

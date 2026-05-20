@@ -29,7 +29,7 @@ export const CustomStringArrayRenderer = (props) => {
   }
 
   return (
-    <div className="p-3 border border-border rounded-sm bg-brand-dark mb-3">
+    <div className="p-3 border border-border rounded-sm bg-background">
       <Label className="block mb-1 text-sm font-medium text-foreground">
         {label || uischema?.label || "Items"}
       </Label>
@@ -39,6 +39,7 @@ export const CustomStringArrayRenderer = (props) => {
           <div key={`${path}-${index}`} className="flex items-center space-x-2 mb-2">
             <div className="flex-grow">
               <Input
+                size="sm"
                 type="text"
                 value={item || ''}
                 onChange={(e) => handleItemChange(index, e.target.value)}
@@ -49,7 +50,7 @@ export const CustomStringArrayRenderer = (props) => {
             <Button
               type="button"
               variant="destructive-ghost"
-              size="sm"
+              size="icon"
               square
               onClick={() => handleRemoveItem(index)}
               disabled={!enabled}
@@ -68,7 +69,7 @@ export const CustomStringArrayRenderer = (props) => {
 
       <Button
         type="button"
-        variant="primary-ghost"
+        variant="outline"
         size="sm"
         onClick={handleAddItem}
         disabled={!enabled}

@@ -22,9 +22,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Textarea,
 } from '@jet-admin/ui';
-import { FaPlus, FaTrash } from 'react-icons/fa';
-import { VscDebugDisconnect } from 'react-icons/vsc';
+import { Plus, Trash2, Ban } from 'lucide-react';
 
 // ─── Operators ─────────────────────────────────────────────────────────────────
 
@@ -129,7 +129,7 @@ function ConditionRow({ condition, onChange, onDelete, canDelete }) {
   const update = (patch) => onChange({ ...condition, ...patch });
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-2">
       {op.isExpression ? (
         <Input
           value={condition.leftValue}
@@ -169,15 +169,18 @@ function ConditionRow({ condition, onChange, onDelete, canDelete }) {
             )}
           </>
       )}
-      <button
+      <Button
         type="button"
+        variant="destructive-ghost"
+        size="icon"
+        square
         onClick={onDelete}
         disabled={!canDelete}
-        className="h-7 w-7 shrink-0 flex items-center justify-center rounded-sm text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 disabled:opacity-20 transition-colors"
+        className="h-7 w-7"
         title="Remove condition"
       >
-        <FaTrash className="w-2.5 h-2.5" />
-      </button>
+        <Trash2 className="w-2.5 h-2.5" />
+      </Button>
     </div>
   );
 }
@@ -186,12 +189,12 @@ function AndOrDivider({ logic, onToggle }) {
   return (
     <div className="flex items-center gap-2 my-0.5">
       <div className="h-px flex-1 bg-border" />
-      <button
+      <Button
         type="button"
         onClick={onToggle}
         title={`Click to switch to ${logic === 'AND' ? 'OR' : 'AND'}`}
         className={`
-          text-[9px] font-bold px-2 py-0.5 rounded-sm border tracking-wider
+          h-auto text-[9px] font-bold px-2 py-0.5 rounded-sm border tracking-wider
           transition-colors select-none
           ${logic === 'AND'
           ? 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/15'
@@ -200,7 +203,7 @@ function AndOrDivider({ logic, onToggle }) {
         `}
       >
         {logic}
-      </button>
+      </Button>
       <div className="h-px flex-1 bg-border" />
     </div>
   );
@@ -243,11 +246,11 @@ function BranchEditor({ branch, onChange }) {
           Conditions
         </span>
         {branch.conditions.length > 1 && (
-          <button
+          <Button
             type="button"
             onClick={toggleLogic}
             className={`
-              text-[9px] font-bold px-2 py-0.5 rounded-sm border transition-colors
+              h-auto text-[9px] font-bold px-2 py-0.5 rounded-sm border transition-colors
               ${branch.conditionLogic === 'AND'
               ? 'bg-primary/10 text-primary border-primary/30'
               : 'bg-amber-950/40 text-amber-600 border-amber-800'
@@ -255,7 +258,7 @@ function BranchEditor({ branch, onChange }) {
             `}
           >
             {branch.conditionLogic}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -275,14 +278,16 @@ function BranchEditor({ branch, onChange }) {
         ))}
       </div>
 
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
         onClick={addCondition}
-        className="flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors"
+        className="flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors h-auto py-1"
       >
-        <FaPlus className="w-2.5 h-2.5" />
+        <Plus className="w-2.5 h-2.5" />
         Add condition
-      </button>
+      </Button>
     </div>
   );
 }
@@ -358,7 +363,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
         <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           Description
         </p>
-        <textarea
+        <Textarea
           value={description}
           onChange={e => setDescription(e.target.value)}
           rows={2}
@@ -402,25 +407,28 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
                 {branch.label || `Branch ${idx + 1}`}
               </span>
               {branches.length > 1 && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={e => { e.stopPropagation(); removeBranch(idx); }}
-                  className="ml-0.5 w-3.5 h-3.5 flex items-center justify-center text-muted-foreground/30 hover:text-destructive rounded-sm opacity-0 group-hover:opacity-100 transition-all"
+                  className="ml-0.5 w-3.5 h-3.5 text-muted-foreground/30 hover:text-destructive rounded-sm opacity-0 group-hover:opacity-100 transition-all"
                 >
                   ×
-                </button>
+                </Button>
               )}
             </div>
           ))}
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={addBranch}
-            className="px-3 py-2.5 text-xs text-primary hover:text-primary/80 hover:bg-brand-dark/60 transition-colors flex items-center gap-1 whitespace-nowrap"
+            className="px-3 py-2.5 text-xs text-primary hover:text-primary/80 hover:bg-brand-dark/60 transition-colors flex items-center gap-1 whitespace-nowrap h-auto"
           >
-            <FaPlus className="w-2.5 h-2.5" />
+            <Plus className="w-2.5 h-2.5" />
             Add branch
-          </button>
+          </Button>
         </div>
 
         {activeBranch
@@ -486,7 +494,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* ✅ Correct: Button variant="default", no raw color overrides */}
-      <Button type="button" onClick={handleSave} className="w-full">
+      <Button type="button" onClick={handleSave} className="w-full" size="sm">
         {strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || 'Save Condition'}
       </Button>
     </div>
@@ -534,7 +542,7 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
         </span>
         {isDisabled && (
           <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800 shrink-0">
-            <VscDebugDisconnect className="w-2.5 h-2.5" />
+            <Ban className="w-2.5 h-2.5" />
             Skip
           </span>
         )}

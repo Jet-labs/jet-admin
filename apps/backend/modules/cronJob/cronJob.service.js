@@ -327,6 +327,67 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
   }
 };
 
+/**
+ * Clones a Cron Job definition.
+ * @param {object} param0
+ * @param {number} param0.userID - ID of the user cloning the job
+ * @param {number} param0.tenantID
+ * @param {number} param0.cronJobID - The ID of the cron job to clone
+ * @returns {Promise<object>} The cloned cron job object
+ */
+cronJobService.cloneCronJob = async ({ userID, tenantID, cronJobID }) => {
+  Logger.log("info", {
+    message: "cronJobService:cloneCronJob:params",
+    params: { userID, tenantID, cronJobID },
+  });
+
+  try {
+    const existing = await prisma.tblCronJobs.findUnique({
+      where: {
+        cronJobID: cronJobID,
+        tenantID: tenantID,
+      },
+    });
+
+    if (!existing) {
+      throw new Error(`Cron job with ID ${cronJobID} not found.`);
+    }
+
+    const newCronJob = await prisma.tblCronJobs.create({
+      data: {
+        cronJobTitle: existing.cronJobTitle + " (Copy)",
+        tenantID,
+        cronJobDescription: existing.cronJobDescription,
+        cronJobSchedule: existing.cronJobSchedule,
+        workflowID: existing.workflowID,
+        workflowConfig: existing.workflowConfig,
+        isDisabled: true, // Safe default
+        timeoutSeconds: existing.timeoutSeconds,
+        retryAttempts: existing.retryAttempts,
+        retryDelaySeconds: existing.retryDelaySeconds,
+      },
+      include: {
+        tblWorkflows: true,
+      },
+    });
+
+    Logger.log("success", {
+      message: "cronJobService:cloneCronJob:success",
+      params: { userID, tenantID, cronJobID, newCronJobID: newCronJob.cronJobID },
+    });
+
+    await cronJobService.scheduleCronJobOnChange({ cronJob: newCronJob });
+
+    return newCronJob;
+  } catch (error) {
+    Logger.log("error", {
+      message: "cronJobService:cloneCronJob:failure",
+      params: { userID, tenantID, cronJobID, error },
+    });
+    throw error;
+  }
+};
+
 const { cronJobEngine } = require("./cronJobEngine/engine");
 
 /**
@@ -363,6 +424,14 @@ cronJobService.scheduleAllCronJobs = async () => {
     Logger.log("error", { message: "cronJobService:scheduleAllCronJobs:catch", params: { error } });
   }
 };
+
+/**
+ * Returns the status of the connection to the engine.
+ */
+cronJobService.getConnectionStatus = () => {
+  return cronJobEngine.getStatus();
+};
+
 // --- Job History Service Functions ---
 
 /**

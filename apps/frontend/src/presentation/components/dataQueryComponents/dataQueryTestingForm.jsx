@@ -1,11 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
+import { Play } from 'lucide-react';
 import React, { useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import { testDataQueryByDataAPI, testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { DataQueryArgsForm } from "./dataQueryArgsForm";
 import PropTypes from "prop-types";
-
 import { Button, Spinner } from "@jet-admin/ui";
 
 export const DataQueryTestingForm = ({
@@ -76,7 +76,7 @@ export const DataQueryTestingForm = ({
     ) {
       _handleOpenArgsForm();
     } else {
-      testDataQuery({ inputArgs: null });
+      testDataQuery({ inputArgs: {} });
     }
   };
 
@@ -106,16 +106,20 @@ export const DataQueryTestingForm = ({
         />
       ) : null}
       <Button
+        type="button"
+        variant="outline"
+        size="sm"
         onClick={_handleTestQuery}
         disabled={isTestingDataQuery}
-        type="button"
-        variant="primary-ghost"
-        size={size}
+        className="shrink-0"
+        aria-label="Test query"
       >
         {isTestingDataQuery ? (
-          <Spinner size={14} />
-        ) : null}
-        {CONSTANTS.STRINGS.TEST_QUERY_FORM_TEST_BUTTON}
+          <Spinner size={14} className="mr-1" />
+        ) : (
+          <Play className="h-3 w-3 mr-1" />
+        )}
+        Test
       </Button>
     </>
   );

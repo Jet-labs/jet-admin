@@ -109,6 +109,25 @@ export const deleteListenerAPI = async ({ tenantID, listenerID }) => {
   }
 };
 
+export const cloneListenerAPI = async ({ tenantID, listenerID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.LISTENER.cloneListenerAPI(tenantID, listenerID);
+    const headers = await _getHeaders();
+    const response = await axios.post(url, {}, { headers });
+    if (response.data && response.data.success === true) {
+      return true;
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const activateListenerAPI = async ({ tenantID, listenerID }) => {
   try {
     const url =
@@ -231,3 +250,23 @@ export const deleteListenerActionAPI = async ({ tenantID, listenerID, actionID }
     throw error;
   }
 };
+
+export const getListenerConnectionStatusAPI = async ({ tenantID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.LISTENER.getConnectionStatusAPI(tenantID);
+    const headers = await _getHeaders();
+    const response = await axios.get(url, { headers });
+    if (response.data && response.data.success === true) {
+      return response.data;
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+

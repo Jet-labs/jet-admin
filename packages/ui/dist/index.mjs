@@ -57,27 +57,33 @@ import * as React2 from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 var buttonVariants = cva(
-  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green-border focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
   {
     variants: {
       variant: {
-        default: "bg-brand-green text-brand-black font-semibold border border-transparent hover:bg-brand-green/90",
-        secondary: "bg-brand-border-dark text-brand-text-primary border border-brand-border hover:bg-brand-border hover:border-brand-border-mid",
-        green: "bg-brand-green text-brand-black font-semibold border border-transparent hover:bg-brand-green/90",
-        destructive: "bg-red-600 text-white hover:bg-red-700 border border-transparent",
-        white: "bg-brand-text-primary text-brand-black hover:opacity-90 border border-transparent",
-        outline: "bg-transparent border border-brand-border text-brand-text-primary hover:bg-white/5 hover:border-brand-border-mid",
-        ghost: "bg-transparent text-brand-text-primary hover:bg-white/5",
-        link: "text-brand-green-link hover:text-brand-green underline-offset-4 hover:underline",
-        pill: "bg-brand-border-dark text-brand-text-primary border border-brand-border hover:border-brand-border-mid"
+        default: "bg-primary/50 text-primary-foreground font-semibold border border-primary/80 hover:border-primary hover:bg-primary/70",
+        secondary: "bg-muted text-foreground border border-border/50 hover:bg-muted/80 hover:border-border",
+        green: "bg-primary text-primary-foreground font-semibold border border-transparent hover:bg-primary/90",
+        destructive: "bg-red-500/20 text-white hover:bg-red-500/40 border border-red-500/40",
+        white: "bg-foreground text-background hover:opacity-90 border border-transparent",
+        outline: "bg-transparent border border-border text-foreground hover:bg-white/5",
+        ghost: "bg-transparent text-foreground hover:bg-white/5",
+        link: "text-primary/90 hover:text-primary underline-offset-4 hover:underline",
+        pill: "bg-muted text-foreground border border-border hover:border-border/80",
+        "primary-ghost": "bg-primary/10 text-primary hover:bg-primary/20 border border-transparent",
+        "destructive-ghost": "bg-transparent text-destructive hover:bg-destructive/10 border border-transparent",
+        "primary-outline": "bg-transparent text-primary border border-primary/50 hover:bg-primary/10"
       },
       size: {
-        default: "px-[14px] py-[5px] text-[13px] rounded-sm",
-        sm: "px-[10px] py-[3px] text-[12px] rounded-sm",
-        lg: "px-[20px] py-[8px] text-[14px] rounded-sm",
-        icon: "h-[28px] w-[28px] rounded-sm",
-        circle: "h-[36px] w-[36px] p-0 rounded-pill",
-        pill: "px-[24px] py-[5px] text-[13px] rounded-pill"
+        default: "h-8 px-3 text-sm rounded-sm",
+        sm: "h-7 px-2.5 text-xs rounded-sm",
+        lg: "h-10 px-5 text-sm rounded-sm",
+        icon: "h-7 w-7 rounded-sm",
+        circle: "h-9 w-9 p-0 rounded-full",
+        pill: "h-8 px-4 text-sm rounded-full"
+      },
+      square: {
+        true: "aspect-square p-0"
       }
     },
     defaultVariants: {
@@ -87,12 +93,12 @@ var buttonVariants = cva(
   }
 );
 var Button = React2.forwardRef(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, square, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return /* @__PURE__ */ React2.createElement(
       Comp,
       {
-        className: cn(buttonVariants({ variant, size, className })),
+        className: cn(buttonVariants({ variant, size, square, className })),
         ref,
         ...props
       }
@@ -123,7 +129,7 @@ var AlertDialogContent = React3.forwardRef(
     {
       ref,
       className: cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-sm translate-x-[-50%] translate-y-[-50%] gap-3 border border-brand-border bg-brand-dark p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-sm translate-x-[-50%] translate-y-[-50%] gap-3 border border-border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
         className
       ),
       ...props
@@ -237,15 +243,15 @@ AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 import * as React5 from "react";
 import { cva as cva2 } from "class-variance-authority";
 var badgeVariants = cva2(
-  "inline-flex items-center rounded-pill px-[8px] py-[4px] text-[12px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-green-border focus:ring-offset-2",
+  "inline-flex items-center rounded-pill px-[8px] py-[4px] text-[12px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2",
   {
     variants: {
       variant: {
-        default: "border border-transparent bg-brand-green text-brand-black hover:opacity-90",
-        secondary: "border border-brand-border bg-brand-black text-brand-text-primary",
-        destructive: "border border-transparent bg-destructive text-brand-text-primary hover:opacity-90",
-        outline: "border border-brand-border text-brand-text-primary",
-        success: "border border-transparent bg-brand-green text-brand-black",
+        default: "border border-transparent bg-primary text-brand-black hover:opacity-90",
+        secondary: "border border-border bg-background text-foreground",
+        destructive: "border border-transparent bg-destructive text-foreground hover:opacity-90",
+        outline: "border border-border text-foreground",
+        success: "border border-transparent bg-primary text-brand-black",
         warning: "border border-transparent bg-brand-warning text-brand-black"
       }
     },
@@ -265,9 +271,9 @@ var Card = React6.forwardRef(({ className, variant = "default", ...props }, ref)
   {
     ref,
     className: cn(
-      "rounded-md bg-brand-dark border border-brand-border text-brand-text-primary",
-      variant === "glass" && "bg-brand-dark/80 backdrop-blur-xl saturate-150",
-      variant === "pastel" && "bg-brand-border-dark",
+      "rounded-md bg-background border border-border text-foreground",
+      variant === "glass" && "bg-background/80 backdrop-blur-xl saturate-150",
+      variant === "pastel" && "bg-muted",
       className
     ),
     ...props
@@ -288,7 +294,7 @@ var CardTitle = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE__
   {
     ref,
     className: cn(
-      "text-[24px] font-normal leading-[1.33] tracking-[-0.16px] text-brand-text-primary",
+      "text-[24px] font-normal leading-[1.33] tracking-[-0.16px] text-foreground",
       className
     ),
     ...props
@@ -299,7 +305,7 @@ var CardDescription = React6.forwardRef(({ className, ...props }, ref) => /* @__
   "p",
   {
     ref,
-    className: cn("text-[14px] font-normal text-brand-text-muted leading-[1.5]", className),
+    className: cn("text-[14px] font-normal text-muted-foreground leading-[1.5]", className),
     ...props
   }
 ));
@@ -366,13 +372,13 @@ var DialogContent = React8.forwardRef(
     {
       ref,
       className: cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-brand-border bg-brand-dark p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
         className
       ),
       ...props
     },
     children,
-    /* @__PURE__ */ React8.createElement(DialogPrimitive.Close, { className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-brand-dark transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-brand-green-border focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-brand-border-dark data-[state=open]:text-brand-text-muted" }, /* @__PURE__ */ React8.createElement(X, { className: "h-4 w-4" }), /* @__PURE__ */ React8.createElement("span", { className: "sr-only" }, "Close"))
+    /* @__PURE__ */ React8.createElement(DialogPrimitive.Close, { className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground" }, /* @__PURE__ */ React8.createElement(X, { className: "h-4 w-4" }), /* @__PURE__ */ React8.createElement("span", { className: "sr-only" }, "Close"))
   ))
 );
 DialogContent.displayName = DialogPrimitive.Content.displayName;
@@ -436,7 +442,7 @@ var DropdownMenuSubTrigger = React9.forwardRef(
     {
       ref,
       className: cn(
-        "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-brand-border-dark data-[state=open]:bg-brand-border-dark",
+        "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-muted data-[state=open]:bg-muted",
         inset && "pl-8",
         className
       ),
@@ -453,7 +459,7 @@ var DropdownMenuSubContent = React9.forwardRef(
     {
       ref,
       className: cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-sm border border-brand-border bg-brand-dark p-1 text-brand-text-primary shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 min-w-[8rem] overflow-hidden rounded-sm border border-border bg-background p-1 text-foreground shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -468,7 +474,7 @@ var DropdownMenuContent = React9.forwardRef(
       ref,
       sideOffset,
       className: cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-sm border border-brand-border bg-brand-dark p-1 text-brand-text-primary shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 min-w-[8rem] overflow-hidden rounded-sm border border-border bg-background p-1 text-foreground shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -482,7 +488,7 @@ var DropdownMenuItem = React9.forwardRef(
     {
       ref,
       className: cn(
-        "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-brand-border-dark focus:text-brand-text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         inset && "pl-8",
         className
       ),
@@ -497,7 +503,7 @@ var DropdownMenuCheckboxItem = React9.forwardRef(
     {
       ref,
       className: cn(
-        "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-brand-border-dark focus:text-brand-text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       ),
       checked,
@@ -537,15 +543,28 @@ DropdownMenuShortcut.displayName = "DropdownMenuShortcut";
 
 // src/components/input.jsx
 import * as React10 from "react";
-var Input = React10.forwardRef(({ className, type, ...props }, ref) => {
+import { cva as cva3 } from "class-variance-authority";
+var inputVariants = cva3(
+  "flex w-full rounded-sm border border-input-custom bg-input-custom text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-border/80 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
+  {
+    variants: {
+      size: {
+        default: "h-8 px-2.5 py-1 text-sm",
+        sm: "h-7 px-2 py-1 text-xs",
+        lg: "h-10 px-3 py-2 text-base"
+      }
+    },
+    defaultVariants: {
+      size: "default"
+    }
+  }
+);
+var Input = React10.forwardRef(({ className, type, size, ...props }, ref) => {
   return /* @__PURE__ */ React10.createElement(
     "input",
     {
       type,
-      className: cn(
-        "flex w-full rounded-sm border border-brand-border bg-brand-black px-2 py-1.5 text-sm text-brand-text-primary placeholder:text-brand-text-muted focus-visible:outline-none focus-visible:border-brand-border-mid focus-visible:ring-2 focus-visible:ring-brand-green-border disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      ),
+      className: cn(inputVariants({ size, className })),
       ref,
       ...props
     }
@@ -556,9 +575,9 @@ Input.displayName = "Input";
 // src/components/label.jsx
 import * as React11 from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
-import { cva as cva3 } from "class-variance-authority";
-var labelVariants = cva3(
-  "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+import { cva as cva4 } from "class-variance-authority";
+var labelVariants = cva4(
+  "text-xs font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 );
 var Label2 = React11.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React11.createElement(
   LabelPrimitive.Root,
@@ -583,7 +602,7 @@ var PopoverContent = React12.forwardRef(
       align,
       sideOffset,
       className: cn(
-        "z-50 w-72 rounded-sm border border-brand-border bg-brand-dark p-4 text-brand-text-primary shadow-none outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 w-72 rounded-sm border border-border bg-background p-4 text-foreground shadow-none outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -665,12 +684,14 @@ var Select = SelectPrimitive.Root;
 var SelectGroup = SelectPrimitive.Group;
 var SelectValue = SelectPrimitive.Value;
 var SelectTrigger = React15.forwardRef(
-  ({ className, children, ...props }, ref) => /* @__PURE__ */ React15.createElement(
+  ({ className, children, size = "default", ...props }, ref) => /* @__PURE__ */ React15.createElement(
     SelectPrimitive.Trigger,
     {
       ref,
       className: cn(
-        "flex h-8 w-full items-center justify-between rounded-sm border border-brand-border bg-brand-black px-2.5 py-1.5 text-sm text-brand-text-primary ring-offset-brand-dark placeholder:text-brand-text-muted focus:outline-none focus:border-brand-border-mid focus:ring-2 focus:ring-brand-green-border disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+        "flex w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+        size === "default" && "h-8 px-2.5 py-1.5 text-sm",
+        size === "sm" && "h-7 px-2 text-xs",
         className
       ),
       ...props
@@ -716,7 +737,7 @@ var SelectContent = React15.forwardRef(
     {
       ref,
       className: cn(
-        "relative z-[1100] max-h-96 min-w-[8rem] overflow-hidden rounded-sm border border-brand-border bg-brand-dark text-brand-text-primary shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "relative z-[1100] max-h-96 min-w-[8rem] overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
       ),
@@ -753,7 +774,7 @@ var SelectItem = React15.forwardRef(
     {
       ref,
       className: cn(
-        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-brand-border-dark focus:text-brand-text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       ),
       ...props
@@ -843,7 +864,7 @@ var TabsList = React19.forwardRef(({ className, ...props }, ref) => /* @__PURE__
   {
     ref,
     className: cn(
-      "inline-flex h-12 items-end justify-start rounded-none border-b border-brand-border bg-transparent p-0 text-brand-text-muted w-full",
+      "inline-flex h-12 items-end justify-start rounded-none border-b border-border bg-transparent p-0 text-muted-foreground w-full",
       className
     ),
     ...props
@@ -855,7 +876,7 @@ var TabsTrigger = React19.forwardRef(({ className, ...props }, ref) => /* @__PUR
   {
     ref,
     className: cn(
-      "inline-flex items-center justify-center whitespace-nowrap px-4 py-3 border-b-2 border-transparent -mb-px text-[14px] font-medium tracking-[0.2px] ring-offset-brand-dark transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green-border focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-brand-green data-[state=active]:border-brand-green data-[state=active]:shadow-none hover:text-brand-text-primary",
+      "inline-flex items-center justify-center whitespace-nowrap px-4 py-3 border-b-2 border-transparent -mb-px text-[14px] font-medium tracking-[0.2px] ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:shadow-none hover:text-foreground",
       className
     ),
     ...props
@@ -867,7 +888,7 @@ var TabsContent = React19.forwardRef(({ className, ...props }, ref) => /* @__PUR
   {
     ref,
     className: cn(
-      "mt-4 ring-offset-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green-border focus-visible:ring-offset-2 text-brand-text-primary",
+      "mt-4 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 text-foreground",
       className
     ),
     ...props
@@ -882,7 +903,7 @@ var Textarea = React20.forwardRef(({ className, ...props }, ref) => {
     "textarea",
     {
       className: cn(
-        "flex min-h-[80px] w-full rounded-sm border border-brand-border bg-brand-black p-2 text-sm text-brand-text-primary placeholder:text-brand-text-muted focus-visible:outline-none focus-visible:border-brand-border-mid focus-visible:ring-2 focus-visible:ring-brand-green-border disabled:cursor-not-allowed disabled:opacity-50",
+        "flex min-h-[80px] w-full rounded-sm border border-border bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-border/80 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
         className
       ),
       ref,
@@ -905,7 +926,7 @@ var TooltipContent = React21.forwardRef(
       ref,
       sideOffset,
       className: cn(
-        "z-50 overflow-hidden rounded-sm border border-brand-border bg-brand-dark px-3 py-1.5 text-sm text-brand-text-primary shadow-none animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 overflow-hidden rounded-sm border border-border bg-background px-3 py-1.5 text-sm text-foreground shadow-none animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -1388,7 +1409,7 @@ var CodeEditor = React23.forwardRef(({
       className: cn(
         "flex flex-col overflow-hidden rounded border text-sm shadow-sm transition-colors",
         status === "error" ? "border-destructive/50 ring-1 ring-destructive/20" : "border-border hover:border-border/80",
-        isExpanded ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-brand-dark" : "relative bg-brand-dark",
+        isExpanded ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-background" : "relative bg-background",
         className
       ),
       ...props
@@ -1460,7 +1481,7 @@ var CodeEditor = React23.forwardRef(({
           ...editorOptions
         }
       }
-    ), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-brand-border bg-brand-dark/95 px-2 py-1 text-[10px] text-brand-text-muted shadow-sm backdrop-blur-sm" }, footerHint)),
+    ), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm" }, footerHint)),
     status === "error" && statusMessage && /* @__PURE__ */ React23.createElement("div", { className: "flex items-start gap-2 border-t border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive" }, /* @__PURE__ */ React23.createElement(AlertTriangle, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" }), /* @__PURE__ */ React23.createElement("span", { className: "font-medium whitespace-pre-wrap leading-relaxed" }, statusMessage))
   );
 });
@@ -1517,9 +1538,8 @@ function ArrayInput({
         {
           type: "button",
           variant: "ghost",
-          size: "sm",
-          square: true,
-          className: "h-8 w-8 text-[#1c1c1e] hover:text-red-500 flex-shrink-0 mt-1",
+          size: "icon",
+          className: "text-[#1c1c1e] hover:text-red-500 flex-shrink-0 mt-1",
           onClick: () => handleRemoveItem(index),
           disabled: disabled || !canRemove
         },
@@ -1544,9 +1564,8 @@ function ArrayInput({
       {
         type: "button",
         variant: "ghost",
-        size: "sm",
-        square: true,
-        className: "h-8 w-8 text-[#1c1c1e] hover:text-red-500 flex-shrink-0",
+        size: "icon",
+        className: "text-[#1c1c1e] hover:text-red-500 flex-shrink-0",
         onClick: () => handleRemoveItem(index),
         disabled: disabled || !canRemove
       },
@@ -1558,8 +1577,8 @@ function ArrayInput({
     {
       type: "button",
       variant: "outline",
-      size: "sm",
-      className: "flex-1 text-xs h-8",
+      size: "default",
+      className: "flex-1 text-xs",
       onClick: handleAddItem,
       disabled: disabled || !canAdd
     },
@@ -1685,6 +1704,87 @@ InputArgsForm.propTypes = {
   disabled: PropTypes3.bool,
   className: PropTypes3.string
 };
+
+// src/components/pageHeader.jsx
+import React26 from "react";
+import PropTypes4 from "prop-types";
+import { ChevronLeft } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+var PageHeader = ({
+  title,
+  id,
+  onSave,
+  onDelete,
+  onClone,
+  onHistory,
+  isSaving = false,
+  isDeleting = false,
+  isCloning = false,
+  hasHistory = false,
+  saveText = "Update",
+  parentTitle,
+  children
+}) => {
+  return /* @__PURE__ */ React26.createElement("div", { className: "flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-3 px-4" }, /* @__PURE__ */ React26.createElement("div", { className: "flex items-center gap-4" }, parentTitle && /* @__PURE__ */ React26.createElement(React26.Fragment, null, /* @__PURE__ */ React26.createElement(
+    "h1",
+    {
+      className: "text-base font-semibold tracking-tight text-foreground leading-none"
+    },
+    parentTitle
+  ), /* @__PURE__ */ React26.createElement(
+    "span",
+    {
+      className: "text-base font-semibold tracking-tight text-foreground leading-none"
+    },
+    "/"
+  )), /* @__PURE__ */ React26.createElement("div", null, /* @__PURE__ */ React26.createElement("h1", { className: "text-base font-semibold tracking-tight text-foreground leading-none" }, title), id && /* @__PURE__ */ React26.createElement("p", { className: "mt-1.5 font-mono text-xs text-muted-foreground" }, "ID: ", id))), /* @__PURE__ */ React26.createElement("div", { className: "flex items-center gap-2" }, children, hasHistory && onHistory && /* @__PURE__ */ React26.createElement(Button, { variant: "outline", size: "sm", onClick: onHistory }, "View History"), onClone && /* @__PURE__ */ React26.createElement(Button, { variant: "outline", size: "sm", onClick: onClone, disabled: isCloning }, isCloning && /* @__PURE__ */ React26.createElement(Spinner, { size: 14, className: "mr-2" }), "Clone"), onDelete && /* @__PURE__ */ React26.createElement(
+    Button,
+    {
+      variant: "outline",
+      size: "sm",
+      onClick: onDelete,
+      disabled: isDeleting,
+      className: "text-destructive hover:bg-destructive/10 border-destructive/20"
+    },
+    isDeleting && /* @__PURE__ */ React26.createElement(Spinner, { size: 14, className: "mr-2" }),
+    "Delete"
+  ), onSave && /* @__PURE__ */ React26.createElement(Button, { size: "sm", onClick: onSave, disabled: isSaving }, isSaving && /* @__PURE__ */ React26.createElement(Spinner, { size: 14, className: "mr-2" }), saveText)));
+};
+PageHeader.propTypes = {
+  title: PropTypes4.string.isRequired,
+  id: PropTypes4.string,
+  onSave: PropTypes4.func,
+  onDelete: PropTypes4.func,
+  onClone: PropTypes4.func,
+  onHistory: PropTypes4.func,
+  isSaving: PropTypes4.bool,
+  isDeleting: PropTypes4.bool,
+  isCloning: PropTypes4.bool,
+  hasHistory: PropTypes4.bool,
+  saveText: PropTypes4.string,
+  children: PropTypes4.node
+};
+
+// src/components/section.jsx
+import * as React27 from "react";
+var Section = React27.forwardRef(
+  ({ className, title, description, children, ...props }, ref) => {
+    return /* @__PURE__ */ React27.createElement(
+      "div",
+      {
+        ref,
+        className: cn(
+          "rounded-md border border-border bg-card p-4 space-y-3",
+          className
+        ),
+        ...props
+      },
+      (title || description) && /* @__PURE__ */ React27.createElement("div", null, title && /* @__PURE__ */ React27.createElement("p", { className: "text-xs font-bold text-muted-foreground mb-0.5" }, title), description && /* @__PURE__ */ React27.createElement("p", { className: "text-[11px] text-muted-foreground" }, description)),
+      children
+    );
+  }
+);
+Section.displayName = "Section";
 export {
   Accordion,
   AccordionContent,
@@ -1743,6 +1843,7 @@ export {
   Input,
   InputArgsForm,
   Label2 as Label,
+  PageHeader,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -1750,6 +1851,7 @@ export {
   RadioGroupItem,
   ScrollArea,
   ScrollBar,
+  Section,
   Select,
   SelectContent,
   SelectGroup,

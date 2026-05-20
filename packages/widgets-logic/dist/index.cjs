@@ -205,11 +205,15 @@ var TableWidgetBuilder = class extends BaseWidgetBuilder {
    * @returns {Array|null} Array of row objects for the table, or null
    */
   resolveData(widgetConfig, dataSourceResults) {
-    if (!dataSourceResults || !widgetConfig?.dataMapping?.dataArrayPath) return null;
-    const resolved = getByPath(dataSourceResults, widgetConfig.dataMapping.dataArrayPath);
-    if (Array.isArray(resolved)) return resolved;
-    if (resolved && typeof resolved === "object" && Array.isArray(resolved.data)) {
-      return resolved.data;
+    if (Array.isArray(widgetConfig?.dataArrayTemplate)) {
+      return widgetConfig.dataArrayTemplate;
+    }
+    if (dataSourceResults && widgetConfig?.dataMapping?.dataArrayPath) {
+      const resolved = getByPath(dataSourceResults, widgetConfig.dataMapping.dataArrayPath);
+      if (Array.isArray(resolved)) return resolved;
+      if (resolved && typeof resolved === "object" && Array.isArray(resolved.data)) {
+        return resolved.data;
+      }
     }
     return null;
   }

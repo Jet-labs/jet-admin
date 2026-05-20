@@ -38,7 +38,7 @@ export const CustomTabRenderer = (props) => {
       </div>
 
       {/* Tab Content */}
-      <div className="p-3 border mt-3 border-border rounded-sm bg-brand-dark flex flex-col gap-2">
+      <div className="p-3 border mt-3 border-border rounded-sm bg-background flex flex-col gap-2">
         {activeCategory?.elements.map((element, i) => (
           <JsonFormsDispatch
             key={i}

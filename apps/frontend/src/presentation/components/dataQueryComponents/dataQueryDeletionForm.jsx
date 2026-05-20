@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdDeleteOutline } from "react-icons/md";
+import { Trash2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { deleteDataQueryByIDAPI } from "../../../data/apis/dataQuery";
@@ -53,17 +53,19 @@ export const DataQueryDeletionForm = ({ tenantID, dataQueryID }) => {
   return (
     <>
       <Button
-        variant="destructive-ghost"
-        size="sm"
+        type="button"
+        variant="destructive"
+        size="icon"
         square
         onClick={_handleDeleteQuery}
         disabled={isDeletingDataQuery}
-        type="button"
+        className="shrink-0"
+        aria-label="Delete query"
       >
         {isDeletingDataQuery ? (
           <Spinner size={14} />
         ) : (
-            <MdDeleteOutline className="size-4" />
+            <Trash2 className="h-3 w-3" />
         )}
       </Button>
     </>

@@ -27,6 +27,7 @@ export {
   CustomGroupLayout,
   CustomVerticalLayout,
   CustomTabRenderer,
+  CustomHorizontalLayout,
 } from './renderers/index.js';
 
 // Export HOC wrapped components
@@ -55,6 +56,7 @@ export {
   JetGroupLayout,
   JetVerticalLayout,
   JetTabLayout,
+  JetHorizontalLayout,
 } from './renderers/index.js';
 
 // Export testers

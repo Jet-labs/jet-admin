@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Play, Square, Unplug } from 'lucide-react';
 import React, { useState, useEffect, useRef } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
@@ -9,9 +10,6 @@ import {
 } from "../../../data/apis/listener";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import PropTypes from "prop-types";
-import { FaPlay, FaStop } from "react-icons/fa";
-import { TbPlugConnected, TbPlugConnectedX } from "react-icons/tb";
-
 import { Button, Spinner } from "@jet-admin/ui";
 import { useSocketStore } from "../../../logic/stores/useSocketStore";
 import {
@@ -146,18 +144,18 @@ export const ListenerTestingForm = ({
   const isBusy = isActivating || isDeactivating;
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border bg-brand-dark px-4 py-2 flex-shrink-0">
+      <div className="flex items-center justify-between border-b border-border bg-background px-4 py-2 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold text-brand-text-primary">
+          <span className="text-xs font-semibold text-foreground">
             Listener Test Result
           </span>
           <div className="flex items-center gap-1.5 ml-2 border-l border-border pl-3">
             {isActive ? (
-              <TbPlugConnected className="w-3.5 h-3.5 text-emerald-500" />
+              <Unplug className="w-3.5 h-3.5 text-emerald-500" />
             ) : (
-              <TbPlugConnectedX className="w-3.5 h-3.5 text-zinc-500" />
+                <Unplug className="w-3.5 h-3.5 text-zinc-500" />
             )}
             <span
               className={`text-[10px] font-semibold uppercase tracking-wider ${
@@ -192,7 +190,7 @@ export const ListenerTestingForm = ({
           <Button
             onClick={() => removeScript()}
             disabled={isRemovingScript || !socket?.id}
-            variant="outline"
+            variant="secondary"
             size="sm"
             className="h-7 text-[11px]"
           >
@@ -204,23 +202,21 @@ export const ListenerTestingForm = ({
               onClick={() => deactivateListener()}
               disabled={isBusy}
               type="button"
-              variant="outline"
+              variant="destructive"
               size="sm"
-              className="h-7 text-[11px] text-red-500 hover:text-red-400"
             >
-              {isDeactivating ? <Spinner size={12} /> : <FaStop className="w-2.5 h-2.5" />}
+              {isDeactivating ? <Spinner size={12} /> : <Square className="w-2.5 h-2.5" />}
               <span className="ml-1.5">Deactivate</span>
             </Button>
           ) : (
             <Button
               onClick={() => activateListener()}
               disabled={isBusy}
-              type="button"
-              variant="green"
+                type="button"
               size="sm"
-              className="h-7 text-[11px]"
+
             >
-              {isActivating ? <Spinner size={12} /> : <FaPlay className="w-2.5 h-2.5" />}
+                {isActivating ? <Spinner size={12} /> : <Play className="w-2.5 h-2.5" />}
               <span className="ml-1.5">Activate</span>
             </Button>
           )}

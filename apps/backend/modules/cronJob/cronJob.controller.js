@@ -335,6 +335,49 @@ cronJobController.deleteCronJobByID = async (req, res) => {
   }
 };
 
+/**
+ * Handles request to clone a Cron Job by ID.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+cronJobController.cloneCronJob = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, cronJobID } = req.params;
+    Logger.log("info", {
+      message: "cronJobController:cloneCronJob:params",
+      params: { userID: user.userID, tenantID, cronJobID },
+    });
+
+    const clonedCronJob = await cronJobService.cloneCronJob({
+      userID: user.userID,
+      tenantID: tenantID,
+      cronJobID: cronJobID,
+    });
+
+    Logger.log("success", {
+      message: "cronJobController:cloneCronJob:success",
+      params: { userID: user.userID, tenantID, cronJobID, clonedCronJobID: clonedCronJob.cronJobID },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      cronJob: clonedCronJob,
+      message: "Cron job cloned successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "cronJobController:cloneCronJob:catch-1",
+      params: { userID: req.user?.userID, cronJobID: req.params.cronJobID, error },
+    });
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      error.message || "Failed to clone cron job."
+    );
+  }
+};
+
 // --- Job History Controller Functions ---
 
 /**
@@ -402,6 +445,35 @@ cronJobController.getCronJobHistoryByID = async (req, res) => {
       {},
       error.message || "Failed to fetch cron job history."
     );
+  }
+};
+
+// ─── Status ─────────────────────────────────────────────────────────────
+
+/**
+ * Handles request to get connection status for cron jobs.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+cronJobController.getConnectionStatus = async (req, res) => {
+  Logger.log("info", { message: "cronJobController:getConnectionStatus:init" });
+  try {
+    const status = cronJobService.getConnectionStatus();
+    
+    Logger.log("success", {
+      message: "cronJobController:getConnectionStatus:success",
+      params: { count: Object.keys(status).length },
+    });
+    return expressUtils.sendResponse(res, true, {
+      status,
+      message: "Connection status fetched successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "cronJobController:getConnectionStatus:error",
+      params: { error: error.message },
+    });
+    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to fetch connection status.", 500);
   }
 };
 

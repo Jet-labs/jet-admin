@@ -44,7 +44,16 @@ export default class RabbitMQDataSource extends DataSource {
     let channel;
     
     try {
-      connection = await amqp.connect(this.buildConnectionUrl());
+      const url = this.buildConnectionUrl();
+      // Mask password if present in the URL
+      const maskedUrl = url.replace(/([^:]+):([^@]+)@/, "$1:****@");
+      
+      Logger.log("info", {
+        message: "rabbitmq:RabbitMQDataSource:connecting",
+        params: { url: maskedUrl, datasourceID: this.config.datasourceID },
+      });
+
+      connection = await amqp.connect(url);
       connection.on("error", (err) => {
         Logger.log("error", { message: "rabbitmq:connection:error", params: { error: err.message, datasourceID: this.config.datasourceID } });
       });

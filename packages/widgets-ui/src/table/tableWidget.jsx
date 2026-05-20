@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Button } from "@jet-admin/ui";
-import {
-  MdChevronLeft,
-  MdChevronRight,
-  MdFirstPage,
-  MdLastPage,
-} from "react-icons/md";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+
+
+
+
+
 
 /**
  * TableWidget
@@ -182,7 +182,7 @@ export const TableWidget = ({
               onClick={() => handlePageChange(1)}
               disabled={currentPage === 1 || isLoadingWorkflows}
             >
-              <MdFirstPage className="text-base" />
+              <ChevronsLeft className="text-base" />
             </Button>
             <Button
               variant="ghost"
@@ -191,7 +191,7 @@ export const TableWidget = ({
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1 || isLoadingWorkflows}
             >
-              <MdChevronLeft className="text-base" />
+              <ChevronLeft className="text-base" />
             </Button>
             <Button
               variant="ghost"
@@ -200,7 +200,7 @@ export const TableWidget = ({
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage >= totalPages || isLoadingWorkflows}
             >
-              <MdChevronRight className="text-base" />
+              <ChevronRight className="text-base" />
             </Button>
             <Button
               variant="ghost"
@@ -209,7 +209,7 @@ export const TableWidget = ({
               onClick={() => handlePageChange(totalPages)}
               disabled={currentPage >= totalPages || isLoadingWorkflows}
             >
-              <MdLastPage className="text-base" />
+              <ChevronsRight className="text-base" />
             </Button>
           </div>
         </div>

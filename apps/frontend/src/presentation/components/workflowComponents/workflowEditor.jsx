@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useMemo, useRef } from "react";
+import { ArrowRightToLine, Braces, Clock, Code, Columns, Eraser, FileJson, GitBranch, Play, Repeat, Square, Terminal, Zap } from 'lucide-react';
 import ReactFlow, {
     ReactFlowProvider,
     Controls,
@@ -25,13 +26,7 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "../ui/resizable";
-import { SiQuantconnect } from "react-icons/si";
-import { FaCode, FaCodeBranch, FaPlay, FaStop } from "react-icons/fa";
-import { TbLayoutDistributeHorizontal, TbRepeat } from "react-icons/tb";
-import { VscClearAll, VscJson, VscTerminal } from "react-icons/vsc";
-import { TbBraces } from "react-icons/tb";
-import { IoMdTime } from "react-icons/io";
-import { MdOutlineInput } from "react-icons/md";
+
 import { useDataQueries } from "../../../logic/hooks/useDataQueries";
 import { useDatasources } from "../../../logic/hooks/useDatasources";
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
@@ -389,7 +384,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         {/* Sidebar Controls */}
                         <ResizablePanel defaultSize={20} className="flex flex-col h-full overflow-hidden">
 
-                            <div className="flex-1 overflow-y-auto space-y-4 p-4 flex flex-col justify-start items-stretch bg-brand-dark">
+                            <div className="flex-1 overflow-y-auto space-y-4 p-4 flex flex-col justify-start items-stretch bg-background">
                                 <div>
                                     <label htmlFor="title" className="block mb-1.5 text-xs font-medium text-muted-foreground">
                                         {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_LABEL}
@@ -410,7 +405,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                 </div>
 
                                 <div className="flex flex-col gap-1.5">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">Nodes</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground tracking-wider mb-0.5">Nodes</p>
                                     {Object.values(WORKFLOW_NODES_MAP)
                                         .filter(node => {
                                             if (node.value === 'dataQuery' && (!dataQueries || dataQueries.length === 0)) {
@@ -425,24 +420,23 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => onAddNode(node.value)}
-                                                className="justify-start bg-brand-dark hover:bg-muted font-medium border-border"
+                                                className="justify-start bg-background hover:bg-muted font-medium border-border"
                                             >
-                                                {node.value === 'start' && <FaPlay className="size-3.5 mr-2 text-emerald-500" />}
-                                                {node.value === 'dataQuery' && <SiQuantconnect className="size-4 mr-2 text-blue-500" />}
+                                                {node.value === 'start' && <Play className="size-3.5 mr-2 text-emerald-500" />}
+                                                {node.value === 'dataQuery' && <Zap className="size-4 mr-2 text-blue-500" />}
 
-                                                {node.value === 'javascript' && <FaCode className="size-4 mr-2 text-amber-500" />}
-                                                {node.value === 'condition' && <FaCodeBranch className="size-4 mr-2 text-indigo-500" />}
-                                                {node.value === 'loop' && <TbRepeat className="size-4 mr-2 text-cyan-500" />}
-                                                {node.value === 'delay' && <IoMdTime className="size-4 mr-2 text-orange-500" />}
-                                                {node.value === 'end' && <FaStop className="size-3.5 mr-2 text-destructive" />}
-                                                {node.value === 'dataCollection' && <MdOutlineInput className="size-4 mr-2 text-violet-500" />}
+                                                {node.value === 'javascript' && <Code className="size-4 mr-2 text-amber-500" />}
+                                                {node.value === 'condition' && <GitBranch className="size-4 mr-2 text-indigo-500" />}
+                                                {node.value === 'loop' && <Repeat className="size-4 mr-2 text-cyan-500" />}
+                                                {node.value === 'delay' && <Clock className="size-4 mr-2 text-orange-500" />}
+                                                {node.value === 'end' && <Square className="size-3.5 mr-2 text-destructive" />}
+                                                {node.value === 'dataCollection' && <ArrowRightToLine className="size-4 mr-2 text-violet-500" />}
                                                 {node.label}
                                             </Button>
                                         ))}
                                 </div>
 
                                 <div className="flex flex-col gap-2">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Settings</p>
                                     <div>
                                         <label className="text-[10px] text-muted-foreground mb-1 block font-medium">Edge Style</label>
                                         <Select
@@ -476,7 +470,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                 <WorkflowInputArgsPanel workflowForm={workflowEditorForm} />
 
                                 <div className="flex flex-col gap-2">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Actions</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground tracking-wider">Actions</p>
                                     <div className="flex flex-row gap-2">
                                         <Button
                                             type="button"
@@ -485,7 +479,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                             size="sm"
                                             className="flex-1"
                                         >
-                                            <FaPlay className="size-3 mr-2" />
+                                            <Play className="size-3 mr-2" />
                                             {isTestRunning ? "Running..." : "Test Run"}
                                         </Button>
                                         {isTestRunning && (
@@ -498,7 +492,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 className="h-8 w-8"
                                                 title="Stop Test"
                                             >
-                                                <FaStop className="size-3" />
+                                                <Square className="size-3" />
                                             </Button>
                                         )}
                                     </div>
@@ -511,7 +505,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         className="w-full"
                                         title="Clear test run state"
                                     >
-                                        <VscClearAll className="size-4 mr-2" />
+                                        <Eraser className="size-4 mr-2" />
                                         Clear
                                     </Button>
                                     {dataCollectionRequest && !isDataCollectionModalOpen && (
@@ -522,7 +516,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                             size="sm"
                                             className="w-full bg-violet-600/10 text-violet-600 border-violet-600/30 hover:bg-violet-600/20 active:bg-violet-600/30 animate-pulse font-medium shadow-sm transition-all"
                                         >
-                                            <MdOutlineInput className="size-4 mr-2" />
+                                            <ArrowRightToLine className="size-4 mr-2" />
                                             Input Required
                                         </Button>
                                     )}
@@ -538,7 +532,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         size="sm"
                                         className="px-2 text-muted-foreground hover:text-foreground"
                                     >
-                                        <TbLayoutDistributeHorizontal className="size-4" />
+                                        <Columns className="size-4" />
                                     </Button>
                                     <Button
                                         type="button"
@@ -548,7 +542,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         size="sm"
                                         className="px-2 text-muted-foreground hover:text-foreground"
                                     >
-                                        <VscJson className="size-4" />
+                                        <FileJson className="size-4" />
                                     </Button>
                                     <Button
                                         type="button"
@@ -558,7 +552,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         size="sm"
                                         className={`px-2 flex items-center gap-1.5 transition-colors ${showConsole ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
                                     >
-                                        <VscTerminal className="size-4" />
+                                        <Terminal className="size-4" />
                                         {consoleLogs.length > 0 && (
                                             <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
                                                 {consoleLogs.length}
@@ -573,7 +567,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         size="sm"
                                         className={`px-2 flex items-center gap-1.5 transition-colors ${showContextPanel ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
                                     >
-                                        <TbBraces className="size-4" />
+                                        <Braces className="size-4" />
                                         {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length > 0 && (
                                             <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
                                                 {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length}

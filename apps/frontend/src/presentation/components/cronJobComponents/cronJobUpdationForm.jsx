@@ -2,18 +2,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import {
   getCronJobByIDAPI,
   updateCronJobAPI,
+  deleteCronJobByIDAPI,
 } from "../../../data/apis/cronJob";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-import { CronJobDeletionForm } from "./cronJobDeletionForm";
 import { CronJobEditor } from "./cronJobEditor";
-import { Button, Spinner } from "@jet-admin/ui";
+import { Spinner, PageHeader } from "@jet-admin/ui";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
+import { CronJobCloneForm } from "./cronJobCloneForm";
+import { CronJobDeletionForm } from "./cronJobDeletionForm";
 
 export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
   CronJobUpdationForm.propTypes = {
@@ -24,6 +27,8 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
   };
 
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { showConfirmation } = useGlobalUI();
 
   const {
     isLoading: isLoadingCronJob,
@@ -56,6 +61,8 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
       displayError(error);
     },
   });
+
+
 
   const cronJobUpdationForm = useFormik({
     initialValues: {
@@ -95,45 +102,20 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
   }, [cronJob]);
 
   return (
-    <section className="w-full bg-brand-dark">
+    <section className="w-full bg-background">
       {/* ── Page header ─────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3">
-        <div>
-          <h1 className="text-base font-semibold tracking-tight text-foreground">
-            {CONSTANTS.STRINGS.UPDATE_CRON_JOB_FORM_TITLE}
-          </h1>
-          {cronJob?.cronJobID && (
-            <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-              Job ID: {cronJob.cronJobID}
-            </p>
-          )}
-        </div>
-
-        {/* ── Header actions ────────────────────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Button asChild type="button" variant="outline" size="sm">
-            <Link
-              to={CONSTANTS.ROUTES.VIEW_CRON_JOB_HISTORY_BY_ID.path(
-                tenantID,
-                cronJobID
-              )}
-            >
-              {CONSTANTS.STRINGS.VIEW_CRON_JOB_HISTORY_BUTTON_TEXT}
-            </Link>
-          </Button>
-
-          <CronJobDeletionForm tenantID={tenantID} cronJobID={cronJobID} />
-
-          <Button
-            type="submit"
-            form="cron-job-updation-form"
-            disabled={isUpdatingCronJob}
-          >
-            {isUpdatingCronJob && <Spinner className="mr-2" size={14} />}
-            {CONSTANTS.STRINGS.UPDATE_CRON_JOB_SUBMIT_BUTTON_TEXT}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={CONSTANTS.STRINGS.UPDATE_CRON_JOB_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_CRON_JOBS_TITLE}
+        id={cronJob?.cronJobID}
+        onSave={cronJobUpdationForm.handleSubmit}
+        onHistory={() => navigate(CONSTANTS.ROUTES.VIEW_CRON_JOB_HISTORY_BY_ID.path(tenantID, cronJobID))}
+        hasHistory={true}
+        isSaving={isUpdatingCronJob}
+      >
+        <CronJobDeletionForm tenantID={tenantID} cronJobID={cronJobID} />
+        <CronJobCloneForm tenantID={tenantID} cronJobID={cronJobID} />
+      </PageHeader>
 
       {/* ── Form body ───────────────────────────────────────────────── */}
       <ReactQueryLoadingErrorWrapper

@@ -38,6 +38,7 @@ export const CustomSuggestionInput = (props) => {
       </Label>
 
       <Input
+        size="sm"
         type="text"
         id={path}
         name={path}
@@ -53,10 +54,10 @@ export const CustomSuggestionInput = (props) => {
       )}
 
       {isOpen && suggestions && (
-        <div className="absolute right-0 top-6 w-48 bg-brand-dark border border-border shadow-xl rounded-sm z-[50] max-h-40 overflow-y-auto">
+        <div className="absolute right-0 top-6 w-48 bg-background border border-border shadow-xl rounded-sm z-[50] max-h-40 overflow-y-auto">
           <div className="p-2 border-b border-border flex justify-between items-center bg-muted/50">
             <span className="text-[10px] font-semibold text-muted-foreground">Pick a node</span>
-            <Button type="button" variant="ghost" size="sm" onClick={() => setIsOpen(false)}>×</Button>
+            <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsOpen(false)}>×</Button>
           </div>
           {suggestions.length === 0 ? (
             <div className="px-2 py-1 text-[10px] text-muted-foreground italic">No suggestions</div>
