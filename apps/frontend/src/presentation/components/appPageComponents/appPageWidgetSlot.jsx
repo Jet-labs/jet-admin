@@ -36,14 +36,16 @@ export const AppPageWidgetSlot = ({
   index,
   handleDelete,
   editable = false,
+  sizing,
 }) => {
   AppPageWidgetSlot.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
       .isRequired,
     widgetKey: PropTypes.string.isRequired,
-    index: PropTypes.number.isRequired,
+    index: PropTypes.number,
     handleDelete: PropTypes.func,
     editable: PropTypes.bool,
+    sizing: PropTypes.string,
   };
 
   // Extract widgetID from the key format "widget_<uuid>"
@@ -167,11 +169,11 @@ export const AppPageWidgetSlot = ({
 
       <div
         className="!flex-row justify-center !items-center !w-full !h-full"
-        ref={ref}
+        ref={!sizing ? ref : null}
       >
         <div
-          className="relative flex h-full flex-col overflow-hidden bg-transparent"
-          style={{ width: size.width, height: size.height }}
+          className="relative flex h-full flex-col overflow-hidden bg-transparent w-full"
+          style={!sizing ? { width: size.width, height: size.height } : { width: "100%", height: "100%" }}
         >
           <ReactQueryLoadingErrorWrapper
             isLoading={isLoadingWidget}

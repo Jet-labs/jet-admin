@@ -10,9 +10,8 @@ import {
   addRow,
   wrapInContainer,
   unwrapContainer,
-  createRowNode,
-  createWidgetNode,
 } from "./layoutEngine.js";
+import { createRowNode, createWidgetNode } from "./layoutDefaults.js";
 import LayoutDropIndicator from "./LayoutDropIndicator.jsx";
 import LayoutResizeHandle from "./LayoutResizeHandle.jsx";
 import LayoutNodeToolbar from "./LayoutNodeToolbar.jsx";

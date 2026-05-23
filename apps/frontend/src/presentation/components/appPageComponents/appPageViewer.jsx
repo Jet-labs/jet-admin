@@ -12,9 +12,6 @@
 
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Responsive, WidthProvider } from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 import { getAppPageByIDAPI } from "../../../data/apis/appPage";
@@ -22,8 +19,8 @@ import { AppPageRuntimeProvider } from "../../../logic/appPageRuntime/AppPageRun
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { AppPageDataSourceBootstrapper } from "./appPageDataSourceBootstrapper";
 import { AppPageWidgetSlot } from "./appPageWidgetSlot";
-
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
+import { AppPagePrintForm } from "./appPagePrintForm";
+import { migrateV1ToV2, LayoutRenderer } from "./layout/index.js";
 
 export const AppPageViewer = ({ tenantID, appPageID }) => {
   AppPageViewer.propTypes = {
@@ -33,7 +30,7 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
       .isRequired,
   };
 
-  const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
+
 
   const {
     isLoading: isLoadingAppPage,
@@ -52,11 +49,24 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
     refetchOnWindowFocus: false,
   });
 
-  const onBreakpointChange = (newBreakpoint) => {
-    setCurrentBreakpoint(newBreakpoint);
-  };
 
-  const pageConfig = appPage?.appPageConfig || {};
+
+  const migratedPageConfig = React.useMemo(() => {
+    if (!appPage?.appPageConfig) return null;
+    return migrateV1ToV2(appPage.appPageConfig);
+  }, [appPage]);
+
+  const renderWidget = React.useCallback(
+    (widgetKey, sizing) => (
+      <AppPageWidgetSlot
+        tenantID={tenantID}
+        widgetKey={widgetKey}
+        editable={false}
+        sizing={sizing}
+      />
+    ),
+    [tenantID]
+  );
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
@@ -64,7 +74,7 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
         <div className="w-full flex flex-col justify-center items-start">
           {appPage && (
             <h1 className="text-lg font-bold leading-tight tracking-tight text-foreground">
-              {appPage.appPageTitle}
+               {appPage.appPageTitle}
             </h1>
           )}
           {appPage && (
@@ -72,6 +82,9 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
               {`Page ID: ${appPage.appPageID}`}
             </span>
           )}
+        </div>
+        <div className="flex flex-row justify-end items-center">
+          <AppPagePrintForm appPageID={appPageID} />
         </div>
       </div>
       <ReactQueryLoadingErrorWrapper
@@ -81,51 +94,26 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
         refetch={refetchAppPage}
         isRefetching={isRefetchingAppPage}
       >
-        {appPage && (
+        {appPage && migratedPageConfig && (
           <AppPageRuntimeProvider
             pageID={appPageID}
             tenantID={tenantID}
-            pageConfig={pageConfig}
+            pageConfig={migratedPageConfig}
           >
             {/* Bootstrap data sources — fires auto/reactive/polling fetches */}
             <AppPageDataSourceBootstrapper />
 
             <div
-              className="w-full overflow-y-auto bg-muted"
+              className="w-full overflow-y-auto bg-muted p-6"
               id={`printable-area-app-page-${appPageID}`}
             >
-              <ResponsiveReactGridLayout
-                isDraggable={false}
-                isResizable={false}
-                style={{ minHeight: "100%" }}
-                draggableCancel=".cancelSelectorName"
-                layouts={pageConfig?.layouts}
-                measureBeforeMount={false}
-                breakpoints={{
-                  lg: 1000,
-                  md: 996,
-                  sm: 768,
-                  xs: 480,
-                  xxs: 0,
-                }}
-                onBreakpointChange={onBreakpointChange}
-                resizeHandles={["ne", "se", "nw", "sw"]}
-                margin={[8, 8]}
-                cols={{ lg: 8, md: 6, sm: 5, xs: 4, xxs: 3 }}
-                rowHeight={32}
-                allowOverlap={false}
-              >
-                {pageConfig?.widgets?.map((widgetKey, index) => (
-                  <div key={widgetKey} draggable={false}>
-                    <AppPageWidgetSlot
-                      tenantID={tenantID}
-                      widgetKey={widgetKey}
-                      index={index}
-                      editable={false}
-                    />
-                  </div>
-                ))}
-              </ResponsiveReactGridLayout>
+              {migratedPageConfig.layout && (
+                <LayoutRenderer
+                  node={migratedPageConfig.layout}
+                  renderWidget={renderWidget}
+                  mode="view"
+                />
+              )}
             </div>
           </AppPageRuntimeProvider>
         )}
