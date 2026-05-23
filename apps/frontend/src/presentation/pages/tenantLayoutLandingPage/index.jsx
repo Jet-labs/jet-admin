@@ -80,11 +80,11 @@ const TenantLayoutLandingPage = () => {
       action: () => navigate(CONSTANTS.ROUTES.VIEW_WIDGETS.path(tenantID)),
     },
     {
-      title: "Dashboards",
+      title: "App Pages",
       icon: <LayoutDashboard className="w-3.5 h-3.5" />,
       count: tenant?.tenantDashboardCount || 0,
       description: "Composed widget layouts and views",
-      action: () => navigate(CONSTANTS.ROUTES.VIEW_DASHBOARDS.path(tenantID)),
+      action: () => navigate(CONSTANTS.ROUTES.VIEW_APP_PAGES.path(tenantID)),
     },
     {
       title: "Roles",

@@ -7,6 +7,7 @@ import { DataQueryLayout } from "../layouts/dataQueryLayout";
 import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
 import { DashboardLayout } from "../layouts/dashboardLayout";
+import { AppPageLayout } from "../layouts/appPageLayout";
 import { WidgetLayout } from "../layouts/widgetLayout";
 import { APIKeyLayout } from "../layouts/apiKeyLayout";
 import { CronJobLayout } from "../layouts/cronJobLayout";
@@ -39,6 +40,13 @@ const WidgetLayoutLandingPage = lazy(() =>
 const AddDashboardPage = lazy(() => import("../../pages/addDashboardPage"));
 const UpdateDashboardPage = lazy(() =>
   import("../../pages/updateDashboardPage")
+);
+const AppPageLayoutLandingPage = lazy(() =>
+  import("../../pages/appPageLayoutLandingPage")
+);
+const AddAppPagePage = lazy(() => import("../../pages/addAppPagePage"));
+const UpdateAppPagePage = lazy(() =>
+  import("../../pages/updateAppPagePage")
 );
 const UserManagementPage = lazy(() => import("../../pages/userManagementPage"));
 const UpdateTenantUserByIDPage = lazy(() =>
@@ -249,6 +257,23 @@ const router = createBrowserRouter([
               {
                 path: CONSTANTS.ROUTES.UPDATE_DASHBOARD_BY_ID.code,
                 element: <UpdateDashboardPage />,
+              },
+            ],
+          },
+          {
+            element: <AppPageLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_APP_PAGES.code,
+                element: <AppPageLayoutLandingPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.ADD_APP_PAGE.code,
+                element: <AddAppPagePage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.UPDATE_APP_PAGE_BY_ID.code,
+                element: <UpdateAppPagePage />,
               },
             ],
           },

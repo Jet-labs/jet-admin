@@ -6,6 +6,7 @@ const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { authService } = require("./auth.service");
 const { AUTH_TYPES } = require("../../types/auth.types");
+const { verifyAPIKeyHash } = require("../../utils/crypto.util");
 
 //auth middlewares
 const authMiddleware = {};
@@ -34,7 +35,7 @@ authMiddleware.authProviderSocket = async function (socket, next) {
     } catch (error) {
       Logger.log("error", {
         message: "authMiddleware:authProviderSocket:catch-2",
-        params: { error },
+        params: { errorMessage: error.message },
       });
       next(new Error(error.message));
     }
@@ -78,7 +79,6 @@ authMiddleware.authProvider = async function (req, res, next) {
           req.user = await authService.getUserFromFirebaseID({
             firebaseID: decodedIdToken.uid,
           });
-          // Set auth context for user authentication
           req.authContext = {
             authType: AUTH_TYPES.USER,
             user: req.user,
@@ -87,7 +87,7 @@ authMiddleware.authProvider = async function (req, res, next) {
         } catch (error) {
           Logger.log("error", {
             message: "authMiddleware:authProvider:catch-3",
-            params: { error },
+            params: { errorMessage: error.message },
           });
         }
         return next();
@@ -95,7 +95,7 @@ authMiddleware.authProvider = async function (req, res, next) {
     } catch (error) {
       Logger.log("error", {
         message: "authMiddleware:authProvider:catch-2",
-        params: { error },
+        params: { errorMessage: error.message },
       });
       return expressUtils.sendResponse(
         res,
@@ -110,21 +110,26 @@ authMiddleware.authProvider = async function (req, res, next) {
   ) {
     try {
       let apiKey = req.headers.authorization.split("api_key ")[1];
-      const apiKeyData = await prisma.tblAPIKeys.findFirst({
+      const prefix = apiKey.substring(0, 8);
+      const candidateKeys = await prisma.tblAPIKeys.findMany({
         where: {
-          apiKey,
+          apiKeyPrefix: prefix,
           isDisabled: false,
         },
-        include:{
-          tblUsers:true
-        }
+        include: {
+          tblUsers: true,
+        },
       });
-      
+
+      const apiKeyData = candidateKeys.find((k) =>
+        verifyAPIKeyHash(apiKey, k.apiKeyHash)
+      );
+
       Logger.log("info", {
         message: "authMiddleware:authProvider:params",
-        params: { creatorID:apiKeyData?.creatorID },
+        params: { authType: AUTH_TYPES.API_KEY },
       });
-      if (!apiKeyData?.creatorID) {
+      if (!apiKeyData) {
         throw constants.ERROR_CODES.INVALID_API_KEY;
       } else {
         Logger.log("success", {
@@ -135,9 +140,7 @@ authMiddleware.authProvider = async function (req, res, next) {
             authType: AUTH_TYPES.API_KEY,
           },
         });
-        // Set user to API key creator for backward compatibility
         req.user = apiKeyData.tblUsers;
-        // Set auth context for API key authentication
         req.authContext = {
           authType: AUTH_TYPES.API_KEY,
           user: apiKeyData.tblUsers,
@@ -155,7 +158,7 @@ authMiddleware.authProvider = async function (req, res, next) {
     } catch (error) {
       Logger.log("error", {
         message: "authMiddleware:authProvider:catch-2",
-        params: { error },
+        params: { errorMessage: error.message },
       });
       return expressUtils.sendResponse(
         res,
@@ -194,7 +197,7 @@ authMiddleware.authProviderTest = async function (req, res, next) {
   } catch (error) {
     Logger.log("error", {
       message: "authMiddleware:authProviderTest:catch-2",
-      params: { error },
+      params: { errorMessage: error.message },
     });
     return expressUtils.sendResponse(
       res,
@@ -217,14 +220,6 @@ authMiddleware.checkUserPermissions = (
   requiredPermissions,
   { requireAll = true } = {}
 ) => {
-  /**
-   * Express middleware to check user permissions.
-   *
-   * @param {import("express").Request} req - The Express request object.
-   * @param {import("express").Response} res - The Express response object.
-   * @param {import("express").NextFunction} next - The Express next function.
-   * @returns {Promise<void>}
-   */
   return async (req, res, next) => {
     try {
       const { user, authContext } = req;
@@ -233,13 +228,11 @@ authMiddleware.checkUserPermissions = (
       const authType = authContext?.authType || AUTH_TYPES.USER;
       const apiKeyID = authContext?.apiKey?.apiKeyID;
 
-      // Log the incoming request for debugging
       Logger.log("info", {
         message: "authMiddleware:checkUserPermissions:params",
         params: { userID, tenantID, requiredPermissions, requireAll, authType, apiKeyID },
       });
 
-      // Validate tenant information
       if (!tenantID) {
         Logger.log("error", {
           message: "authMiddleware:checkUserPermissions:missing-tenant",
@@ -255,9 +248,7 @@ authMiddleware.checkUserPermissions = (
 
       let permissionCheck;
 
-      // Check permissions based on auth type
       if (authType === AUTH_TYPES.API_KEY && apiKeyID) {
-        // API Key authentication - check API key's assigned roles
         Logger.log("info", {
           message: "authMiddleware:checkUserPermissions:api-key-auth",
           params: { apiKeyID, tenantID, requiredPermissions },
@@ -270,7 +261,6 @@ authMiddleware.checkUserPermissions = (
           requireAll,
         });
       } else {
-        // User authentication - check user's roles
         if (!userID) {
           Logger.log("error", {
             message: "authMiddleware:checkUserPermissions:missing-user",
@@ -292,7 +282,6 @@ authMiddleware.checkUserPermissions = (
         });
       }
 
-      // Log permission check result
       Logger.log("info", {
         message: "authMiddleware:checkUserPermissions:permissionCheck",
         params: {
@@ -342,7 +331,7 @@ authMiddleware.checkUserPermissions = (
     } catch (error) {
       Logger.log("error", {
         message: "authMiddleware:checkUserPermissions:catch-1",
-        params: { error },
+        params: { errorMessage: error.message },
       });
       return expressUtils.sendResponse(
         res,

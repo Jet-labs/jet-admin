@@ -1,6 +1,6 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
-const { generateAPIKey } = require("../../utils/crypto.util");
+const { generateAPIKey, hashAPIKey } = require("../../utils/crypto.util");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 const apiKeyService = {};
@@ -26,14 +26,14 @@ apiKeyService.getAllAPIKeys = async ({ userID, tenantID }) => {
 
     Logger.log("success", {
       message: "apiKeyService:getAllAPIKeys:success",
-      params: { userID, apiKeys },
+      params: { userID, count: apiKeys.length },
     });
 
     return apiKeys;
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:getAllAPIKeys:failure",
-      params: { userID, error },
+      params: { userID, errorMessage: error.message },
     });
     throw error;
   }
@@ -45,7 +45,7 @@ apiKeyService.getAllAPIKeys = async ({ userID, tenantID }) => {
  * @param {number} param0.tenantID
  * @param {Array<number>} param0.roleIDs
  * @param {string} param0.apiKeyTitle
- * @returns {Promise<boolean>}
+ * @returns {Promise<object>}
  */
 apiKeyService.createAPIKey = async ({
   userID,
@@ -56,26 +56,27 @@ apiKeyService.createAPIKey = async ({
 }) => {
   Logger.log("info", {
     message: "apiKeyService:createAPIKey:params",
-    params: { userID, tenantID, apiKeyTitle, authContext },
+    params: { userID, tenantID, apiKeyTitle },
   });
 
   try {
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
-    // Use a transaction for atomicity
+    const rawKey = generateAPIKey();
+    const { prefix, hash } = hashAPIKey(rawKey);
+
     const createdAPIKey = await prisma.$transaction(async (tx) => {
-      // Create the role
-      const apiKey = await prisma.tblAPIKeys.create({
+      const apiKey = await tx.tblAPIKeys.create({
         data: {
           tenantID: tenantID,
           creatorID,
           createdByApiKeyID,
           apiKeyTitle,
-          apiKey: generateAPIKey(),
+          apiKeyHash: hash,
+          apiKeyPrefix: prefix,
           isDisabled: false,
         },
       });
 
-      // Create permission mappings
       const apiKeyRoleMappings = roleIDs.map((roleID) => ({
         roleID: roleID,
         apiKeyID: apiKey.apiKeyID,
@@ -90,14 +91,14 @@ apiKeyService.createAPIKey = async ({
 
     Logger.log("success", {
       message: "apiKeyService:createAPIKey:success",
-      params: { userID, createdAPIKey },
+      params: { userID, apiKeyID: createdAPIKey?.apiKeyID, apiKeyTitle },
     });
 
-    return true;
+    return { apiKey: rawKey };
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:createAPIKey:failure",
-      params: { userID, error },
+      params: { userID, errorMessage: error.message },
     });
     throw error;
   }
@@ -133,14 +134,14 @@ apiKeyService.getAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
 
     Logger.log("success", {
       message: "apiKeyService:getAPIKeyByID:success",
-      params: { userID, apiKey },
+      params: { userID, apiKeyID },
     });
 
     return apiKey;
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:getAPIKeyByID:failure",
-      params: { userID, error },
+      params: { userID, errorMessage: error.message },
     });
     throw error;
   }
@@ -154,9 +155,7 @@ apiKeyService.getAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
  * @param {number} param0.apiKeyID
  * @param {string} param0.apiKeyTitle
  * @param {Array<number>} param0.roleIDs
- * @param {string} param0.apiKeyDescription
- * @param {JSON} param0.apiKey
- * @param {Boolean} param0.runOnLoad
+ * @param {Boolean} param0.isDisabled
  * @returns {Promise<boolean>}
  */
 apiKeyService.updateAPIKeyByID = async ({
@@ -181,7 +180,6 @@ apiKeyService.updateAPIKeyByID = async ({
 
   try {
     const updatedAPIKey = await prisma.$transaction(async (tx) => {
-      // Check if role exists
       const existingAPIKey = await tx.tblAPIKeys.findUnique({
         where: { apiKeyID },
       });
@@ -190,14 +188,13 @@ apiKeyService.updateAPIKeyByID = async ({
       }
       if (existingAPIKey.tenantID !== tenantID) {
         throw new Error(
-          `API Key with ID ${roleID} does not belong to tenant with ID ${tenantID}`
+          `API Key with ID ${apiKeyID} does not belong to tenant with ID ${tenantID}`
         );
       }
 
-      // Update role details
       const apiKeyUpdateData = {
         ...(apiKeyTitle && { apiKeyTitle }),
-        ...(isDisabled && { isDisabled }),
+        ...(isDisabled !== undefined && { isDisabled }),
       };
 
       const updatedAPIKey = await tx.tblAPIKeys.update({
@@ -205,14 +202,11 @@ apiKeyService.updateAPIKeyByID = async ({
         data: apiKeyUpdateData,
       });
 
-      // Update permissions if provided
       if (roleIDs !== undefined) {
-        // Delete existing mappings
         await tx.tblAPIKeyRoleMappings.deleteMany({
           where: { apiKeyID },
         });
 
-        // Create new mappings
         if (roleIDs.length > 0) {
           const newMappings = roleIDs.map((roleID) => ({
             roleID: roleID,
@@ -236,7 +230,6 @@ apiKeyService.updateAPIKeyByID = async ({
         apiKeyID,
         apiKeyTitle,
         roleIDs,
-        updatedAPIKey,
       },
     });
 
@@ -248,7 +241,7 @@ apiKeyService.updateAPIKeyByID = async ({
         userID,
         tenantID,
         apiKeyID,
-        error,
+        errorMessage: error.message,
       },
     });
     throw error;
@@ -270,7 +263,6 @@ apiKeyService.deleteAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
 
   try {
     await prisma.$transaction(async (tx) => {
-      // Check if role exists
       const existingAPIKey = await tx.tblAPIKeys.findUnique({
         where: { apiKeyID },
       });
@@ -304,7 +296,7 @@ apiKeyService.deleteAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:deleteAPIKeyByID:failure",
-      params: { userID, error },
+      params: { userID, errorMessage: error.message },
     });
     throw error;
   }
@@ -315,12 +307,12 @@ apiKeyService.deleteAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
  * @param {number} param0.userID
  * @param {number} param0.tenantID
  * @param {number} param0.apiKeyID
- * @returns {Promise<boolean>}
+ * @returns {Promise<object>}
  */
 apiKeyService.cloneAPIKey = async ({ userID, tenantID, apiKeyID, authContext }) => {
   Logger.log("info", {
     message: "apiKeyService:cloneAPIKey:params",
-    params: { userID, tenantID, apiKeyID, authContext },
+    params: { userID, tenantID, apiKeyID },
   });
 
   try {
@@ -340,6 +332,8 @@ apiKeyService.cloneAPIKey = async ({ userID, tenantID, apiKeyID, authContext }) 
     }
 
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const rawKey = generateAPIKey();
+    const { prefix, hash } = hashAPIKey(rawKey);
 
     const clonedAPIKey = await prisma.$transaction(async (tx) => {
       const apiKey = await tx.tblAPIKeys.create({
@@ -348,8 +342,9 @@ apiKeyService.cloneAPIKey = async ({ userID, tenantID, apiKeyID, authContext }) 
           creatorID,
           createdByApiKeyID,
           apiKeyTitle: existing.apiKeyTitle + " (Copy)",
-          apiKey: generateAPIKey(),
-          isDisabled: true, // Safe default
+          apiKeyHash: hash,
+          apiKeyPrefix: prefix,
+          isDisabled: true,
         },
       });
 
@@ -369,14 +364,14 @@ apiKeyService.cloneAPIKey = async ({ userID, tenantID, apiKeyID, authContext }) 
 
     Logger.log("success", {
       message: "apiKeyService:cloneAPIKey:success",
-      params: { userID, clonedAPIKey },
+      params: { userID, apiKeyID: clonedAPIKey?.apiKeyID, cloneOfApiKeyID: apiKeyID },
     });
 
-    return true;
+    return { apiKey: rawKey };
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:cloneAPIKey:failure",
-      params: { userID, error },
+      params: { userID, errorMessage: error.message },
     });
     throw error;
   }

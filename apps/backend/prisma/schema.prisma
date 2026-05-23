@@ -20,8 +20,7 @@ model tblAPIKeyRoleMappings {
 model tblAPIKeys {
   apiKeyID                                            String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantID                                            String                  @db.Uuid
-  apiKeyHash                                          String                  @db.VarChar(64)
-  apiKeyPrefix                                        String                  @db.VarChar(8)
+  apiKey                                              String                  @db.VarChar
   apiKeyTitle                                         String                  @db.VarChar
   createdAt                                           DateTime                @default(now()) @db.Timestamptz(6)
   isDisabled                                          Boolean
@@ -40,7 +39,6 @@ model tblAPIKeys {
   tblWorkflows                                        tblWorkflows[]
 
   @@index([createdByApiKeyID], map: "idx_tblAPIKeys_createdByApiKeyID")
-  @@index([apiKeyPrefix], map: "idx_tblAPIKeys_apiKeyPrefix")
 }
 
 model tblAuditLogs {

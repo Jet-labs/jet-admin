@@ -189,9 +189,9 @@ export const MainDrawerList = () => {
     },
     {
       type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_DASHBOARDS_TITLE,
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_APP_PAGES_TITLE,
       icon: LayoutDashboard,
-      path: CONSTANTS.ROUTES.VIEW_DASHBOARDS.path(tenantID),
+      path: CONSTANTS.ROUTES.VIEW_APP_PAGES.path(tenantID),
     },
     {
       type: "link",

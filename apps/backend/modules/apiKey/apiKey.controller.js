@@ -18,7 +18,7 @@ apiKeyController.getAllAPIKeys = async (req, res) => {
 
     Logger.log("info", {
       message: "apiKeyController:getAllAPIKeys:params",
-      params: { userID: user.userID, tenantID, authContext },
+      params: { userID: user.userID, tenantID },
     });
 
     const apiKeys = await apiKeyService.getAllAPIKeys({
@@ -34,7 +34,7 @@ apiKeyController.getAllAPIKeys = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:getAllAPIKeys:catch-1",
-      params: { error },
+      params: { errorMessage: error.message },
     });
     return expressUtils.sendResponse(res, false, {}, error);
   }
@@ -53,10 +53,10 @@ apiKeyController.createAPIKey = async (req, res) => {
 
     Logger.log("info", {
       message: "apiKeyController:createAPIKey:params",
-      params: { userID: user.userID, tenantID, apiKeyTitle, authContext },
+      params: { userID: user.userID, tenantID, apiKeyTitle },
     });
 
-    const result = await apiKeyService.createAPIKey({
+    const { apiKey } = await apiKeyService.createAPIKey({
       userID: user.userID,
       tenantID: tenantID,
       roleIDs,
@@ -65,12 +65,13 @@ apiKeyController.createAPIKey = async (req, res) => {
     });
 
     return expressUtils.sendResponse(res, true, {
+      apiKey,
       message: "APIKey created successfully.",
     });
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:createAPIKey:catch-1",
-      params: { error },
+      params: { errorMessage: error.message },
     });
     return expressUtils.sendResponse(res, false, {}, error);
   }
@@ -103,7 +104,7 @@ apiKeyController.getAPIKeyByID = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:getAPIKeyByID:catch-1",
-      params: { error },
+      params: { errorMessage: error.message },
     });
     return expressUtils.sendResponse(res, false, {}, error);
   }
@@ -117,7 +118,7 @@ apiKeyController.getAPIKeyByID = async (req, res) => {
 apiKeyController.updateAPIKeyByID = async (req, res) => {
   try {
     const { user } = req;
-    const { tenantID, apiKeyID } = req.params; // Assuming `apiKeyID` identifies the query to update
+    const { tenantID, apiKeyID } = req.params;
     const { apiKeyTitle, roleIDs, isDisabled } = req.body;
 
     Logger.log("info", {
@@ -132,7 +133,7 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
       },
     });
 
-    const result = await apiKeyService.updateAPIKeyByID({
+    await apiKeyService.updateAPIKeyByID({
       userID: user.userID,
       tenantID: tenantID,
       apiKeyID: apiKeyID,
@@ -148,7 +149,6 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
         tenantID,
         apiKeyID,
         apiKeyTitle,
-        result,
       },
     });
 
@@ -158,7 +158,7 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:updateAPIKeyByID:catch-1",
-      params: { error },
+      params: { errorMessage: error.message },
     });
     return expressUtils.sendResponse(res, false, {}, error);
   }
@@ -190,7 +190,7 @@ apiKeyController.deleteAPIKeyByID = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:deleteAPIKeyByID:catch-1",
-      params: { error },
+      params: { errorMessage: error.message },
     });
     return expressUtils.sendResponse(res, false, {}, error);
   }
@@ -208,10 +208,10 @@ apiKeyController.cloneAPIKey = async (req, res) => {
 
     Logger.log("info", {
       message: "apiKeyController:cloneAPIKey:params",
-      params: { userID: user.userID, tenantID, apiKeyID, authContext },
+      params: { userID: user.userID, tenantID, apiKeyID },
     });
 
-    const result = await apiKeyService.cloneAPIKey({
+    const { apiKey } = await apiKeyService.cloneAPIKey({
       userID: user.userID,
       tenantID: tenantID,
       apiKeyID: apiKeyID,
@@ -219,12 +219,13 @@ apiKeyController.cloneAPIKey = async (req, res) => {
     });
 
     return expressUtils.sendResponse(res, true, {
+      apiKey,
       message: "APIKey cloned successfully.",
     });
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:cloneAPIKey:catch-1",
-      params: { error },
+      params: { errorMessage: error.message },
     });
     return expressUtils.sendResponse(res, false, {}, error);
   }
