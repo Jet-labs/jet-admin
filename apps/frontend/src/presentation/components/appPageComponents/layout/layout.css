@@ -116,3 +116,174 @@
 .layout-stack.sizing-fixed {
   height: var(--fixed-height, 200px);
 }
+
+/* Editor-specific Canvas and Controls styling */
+
+.layout-row-edit {
+  border: 1px dashed rgba(59, 130, 246, 0.2);
+  padding: 12px 8px;
+  border-radius: 6px;
+  position: relative;
+  min-height: 60px;
+  transition: all 0.15s ease;
+}
+
+.layout-row-edit:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.layout-widget-slot-edit {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.layout-widget-slot-edit:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.layout-widget-slot-edit.active-node {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  background-color: rgba(243, 244, 246, 0.3);
+}
+
+.layout-container-edit {
+  border: 1px dashed rgba(59, 130, 246, 0.3);
+  background-color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+}
+
+.layout-container-edit:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.layout-container-edit.active-node {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Drag-and-drop indicators */
+.layout-drop-indicator-row {
+  height: 6px;
+  background-color: transparent;
+  margin: -3px 0;
+  border-radius: 3px;
+  transition: background-color 0.15s ease;
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.layout-drop-indicator-row.drag-over {
+  background-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+.layout-drop-indicator-cell {
+  width: 8px;
+  background-color: transparent;
+  margin: 0 -4px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.layout-drop-indicator-cell.drag-over {
+  background-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+/* Floating Toolbar */
+.layout-node-toolbar {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #1f2937;
+  color: white;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  z-index: 100;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  pointer-events: auto;
+}
+
+.layout-node-toolbar button {
+  background: transparent;
+  border: none;
+  color: #d1d5db;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.layout-node-toolbar button:hover {
+  background-color: #374151;
+  color: white;
+}
+
+.layout-node-toolbar button.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.layout-node-toolbar button.delete-btn:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
+/* Resize Handles */
+.layout-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 20;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+  border-radius: 3px;
+}
+
+.layout-resize-handle:hover,
+.layout-resize-handle.active {
+  background-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+/* Empty row drop target */
+.layout-row-empty-drop {
+  grid-column: span 12;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  border: 1px dashed rgba(156, 163, 175, 0.4);
+  border-radius: 6px;
+  color: #9ca3af;
+  font-size: 13px;
+  transition: all 0.15s ease;
+  background-color: rgba(249, 250, 251, 0.3);
+}
+
+.layout-row-empty-drop.drag-over {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.05);
+  color: #3b82f6;
+}
+
