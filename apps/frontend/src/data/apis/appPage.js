@@ -2,14 +2,13 @@
 import axios from "axios";
 import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
-import { Dashboard } from "../models/dashboard";
+import { AppPage } from "../models/appPage";
 
-export const getAllDashboardsAPI = async ({ tenantID }) => {
-  console.log("hereeee");
+export const getAllAppPagesAPI = async ({ tenantID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.DATABASE.getAllDashboardsAPI(tenantID);
+      CONSTANTS.APIS.DATABASE.getAllAppPagesAPI(tenantID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.get(url, {
@@ -18,7 +17,7 @@ export const getAllDashboardsAPI = async ({ tenantID }) => {
         },
       });
       if (response.data && response.data.success === true) {
-        return Dashboard.toList(response.data.dashboards);
+        return AppPage.toList(response.data.appPages);
       } else if (response.data.error) {
         throw response.data.error;
       } else {
@@ -32,11 +31,11 @@ export const getAllDashboardsAPI = async ({ tenantID }) => {
   }
 };
 
-export const getDashboardByIDAPI = async ({ tenantID, dashboardID }) => {
+export const getAppPageByIDAPI = async ({ tenantID, appPageID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.DATABASE.getDashboardByIDAPI(tenantID, dashboardID);
+      CONSTANTS.APIS.DATABASE.getAppPageByIDAPI(tenantID, appPageID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.get(url, {
@@ -45,7 +44,7 @@ export const getDashboardByIDAPI = async ({ tenantID, dashboardID }) => {
         },
       });
       if (response.data && response.data.success === true) {
-        return new Dashboard(response.data.dashboard);
+        return new AppPage(response.data.appPage);
       } else if (response.data.error) {
         throw response.data.error;
       } else {
@@ -59,17 +58,17 @@ export const getDashboardByIDAPI = async ({ tenantID, dashboardID }) => {
   }
 };
 
-export const createDashboardAPI = async ({ tenantID, dashboardData }) => {
+export const createAppPageAPI = async ({ tenantID, appPageData }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.DATABASE.createDashboardAPI(tenantID);
+      CONSTANTS.APIS.DATABASE.createAppPageAPI(tenantID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.post(
         url,
         {
-          ...dashboardData,
+          ...appPageData,
         },
         {
           headers: {
@@ -92,11 +91,11 @@ export const createDashboardAPI = async ({ tenantID, dashboardData }) => {
   }
 };
 
-export const cloneDashboardByIDAPI = async ({ tenantID, dashboardID }) => {
+export const cloneAppPageByIDAPI = async ({ tenantID, appPageID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.DATABASE.cloneDashboardByIDAPI(tenantID, dashboardID);
+      CONSTANTS.APIS.DATABASE.cloneAppPageByIDAPI(tenantID, appPageID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.post(
@@ -123,22 +122,22 @@ export const cloneDashboardByIDAPI = async ({ tenantID, dashboardID }) => {
   }
 };
 
-export const updateDashboardByIDAPI = async ({
+export const updateAppPageByIDAPI = async ({
   tenantID,
-  dashboardID,
-  dashboardData,
+  appPageID,
+  appPageData,
 }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.DATABASE.updateDashboardByIDAPI(tenantID, dashboardID);
+      CONSTANTS.APIS.DATABASE.updateAppPageByIDAPI(tenantID, appPageID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.patch(
         url,
         {
-          dashboardID,
-          ...dashboardData,
+          appPageID,
+          ...appPageData,
         },
         {
           headers: {
@@ -161,11 +160,11 @@ export const updateDashboardByIDAPI = async ({
   }
 };
 
-export const deleteDashboardByIDAPI = async ({ tenantID, dashboardID }) => {
+export const deleteAppPageByIDAPI = async ({ tenantID, appPageID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.DATABASE.deleteDashboardByID(tenantID, dashboardID);
+      CONSTANTS.APIS.DATABASE.deleteAppPageByID(tenantID, appPageID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.delete(url, {

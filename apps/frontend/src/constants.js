@@ -23,7 +23,7 @@ export const CONSTANTS = {
     },
   },
 
-  DASHBOARD_ITEM_TYPES: {
+  APP_PAGE_ITEM_TYPES: {
     WIDGET: "widget",
   },
 
@@ -78,11 +78,11 @@ export const CONSTANTS = {
     UPDATE_WORKFLOW_BUTTON_TEXT: "Update workflow",
     UPDATE_WORKFLOW_FORM_WORKFLOW_UPDATION_SUCCESS: "Workflow updated successfully!",
     NO_DATABASE_URL: "Please add database URL in the tenant settings",
-    DASHBOARD_DROPPING_ELEMENT_TAG: "__dropping-elem__",
+    APP_PAGE_DROPPING_ELEMENT_TAG: "__dropping-elem__",
     HIDE_QUERY_META_CONTENT_BUTTON_TEXT: "Hide metadata",
     SHOW_QUERY_META_CONTENT_BUTTON_TEXT: "Show metadata",
     MAIN_DRAWER_DATASOURCE_TITLE: "Data sources",
-    MAIN_DRAWER_DASHBOARDS_TITLE: "Dashboards",
+    MAIN_DRAWER_APP_PAGES_TITLE: "App Pages",
     MAIN_DRAWER_WIDGETS_TITLE: "Widgets",
     MAIN_DRAWER_API_KEYS_TITLE: "API Keys",
     MAIN_DRAWER_CRON_JOBS_TITLE: "Scheduled jobs",
@@ -193,7 +193,7 @@ export const CONSTANTS = {
     API_KEY_DRAWER_LIST_NO_API_KEY: "No API Keys found",
     CRON_JOB_DRAWER_LIST_NO_CRON_JOB_FOUND: "No scheduled jobs found",
     WIDGET_DRAWER_LIST_NO_WIDGET: "No widgets found",
-    DASHBOARD_DRAWER_LIST_NO_DASHBOARD: "No dashboards found",
+    APP_PAGE_DRAWER_LIST_NO_APP_PAGE: "No app pages found",
 
     UNTITLED: "Untitled",
 
@@ -384,65 +384,65 @@ export const CONSTANTS = {
     CLONE_WIDGET_DIALOG_MESSAGE:
       "Are you sure you want to clone this item? This action cannot be undone.",
 
-    DASHBOARD_WIDGET_LIST_TITLE: "Widgets",
-    DASHBOARD_WIDGET_LIST_WIDGETS_TITLE: "Widgets",
-    DASHBOARD_WIDGET_LIST_QUERIES_TITLE: "Queries",
-    DASHBOARD_WIDGET_LIST_HELPER_TEXT:
+    APP_PAGE_WIDGET_LIST_TITLE: "Widgets",
+    APP_PAGE_WIDGET_LIST_WIDGETS_TITLE: "Widgets",
+    APP_PAGE_WIDGET_LIST_QUERIES_TITLE: "Queries",
+    APP_PAGE_WIDGET_LIST_HELPER_TEXT:
       "Drag a widget into the canvas or click Add. You can place the same widget more than once.",
-    DASHBOARD_WIDGET_LIST_SEARCH_PLACEHOLDER: "Search widgets",
-    DASHBOARD_WIDGET_LIST_NO_MATCHING_WIDGETS: "No matching widgets found",
+    APP_PAGE_WIDGET_LIST_SEARCH_PLACEHOLDER: "Search widgets",
+    APP_PAGE_WIDGET_LIST_NO_MATCHING_WIDGETS: "No matching widgets found",
 
-    DASHBOARD_DROPZONE_TITLE: "Canvas",
-    DASHBOARD_DROPZONE_HELPER_TEXT:
+    APP_PAGE_DROPZONE_TITLE: "Canvas",
+    APP_PAGE_DROPZONE_HELPER_TEXT:
       "Drag widgets into the canvas, drag placed widgets to reposition them, and resize them from the corners.",
-    DASHBOARD_DROPZONE_SELECTION_HINT:
+    APP_PAGE_DROPZONE_SELECTION_HINT:
       "Select a widget on the canvas to fine-tune its position and size.",
-    DASHBOARD_DROPZONE_SELECTION_HELPER:
+    APP_PAGE_DROPZONE_SELECTION_HELPER:
       "Fine-tuning applies to the current responsive breakpoint only.",
-    DASHBOARD_DROPZONE_EMPTY_MESSAGE:
-      "Drag a widget here to start building your dashboard",
-    DASHBOARD_DROPZONE_EMPTY_HELPER:
+    APP_PAGE_DROPZONE_EMPTY_MESSAGE:
+      "Drag a widget here to start building your app page",
+    APP_PAGE_DROPZONE_EMPTY_HELPER:
       "Widgets snap to the responsive grid so layouts stay aligned across screen sizes.",
 
-    DASHBOARD_WIDGET_CUSTOM_CSS_BUTTON: "Custom CSS",
-    DASHBOARD_WIDGET_CUSTOM_CSS_FORM_TITLE: "Custom CSS",
-    DASHBOARD_WIDGET_CUSTOM_CSS_FORM_DESCRIPTION:
+    APP_PAGE_WIDGET_CUSTOM_CSS_BUTTON: "Custom CSS",
+    APP_PAGE_WIDGET_CUSTOM_CSS_FORM_TITLE: "Custom CSS",
+    APP_PAGE_WIDGET_CUSTOM_CSS_FORM_DESCRIPTION:
       "Enter the custom CSS to be applied to the widget",
-    DASHBOARD_WIDGET_CUSTOM_CSS_FORM_CONFIRM: "Save changes",
-    DASHBOARD_WIDGET_CUSTOM_CSS_FORM_CANCEL: "Discard",
+    APP_PAGE_WIDGET_CUSTOM_CSS_FORM_CONFIRM: "Save changes",
+    APP_PAGE_WIDGET_CUSTOM_CSS_FORM_CANCEL: "Discard",
 
-    DASHBOARD_VIEWER_NO_PINNED_DASHBOARD_TITLE: "No pinned dashboard",
-    DASHBOARD_VIEWER_NO_PINNED_DASHBOARD_DESCRIPTION:
-      "Pin a dashboard to quickly access it from this page.",
+    APP_PAGE_VIEWER_NO_PINNED_APP_PAGE_TITLE: "No pinned app page",
+    APP_PAGE_VIEWER_NO_PINNED_APP_PAGE_DESCRIPTION:
+      "Pin an app page to quickly access it from this page.",
 
-    ADD_DASHBOARD_BUTTON_TEXT: "Add dashboard",
-    ADD_DASHBOARD_FORM_TITLE: "Add dashboard",
-    ADD_DASHBOARD_FORM_DASHBOARD_ADDITION_SUCCESS:
-      "Dashboard added successfully!",
+    ADD_APP_PAGE_BUTTON_TEXT: "Add app page",
+    ADD_APP_PAGE_FORM_TITLE: "Add app page",
+    ADD_APP_PAGE_FORM_APP_PAGE_ADDITION_SUCCESS:
+      "App page added successfully!",
 
-    UPDATE_DASHBOARD_BUTTON_TEXT: "Update dashboard",
-    UPDATE_DASHBOARD_FORM_TITLE: "Update dashboard",
-    UPDATE_DASHBOARD_FORM_DASHBOARD_UPDATION_SUCCESS:
-      "Dashboard updated successfully!",
-    UPDATE_DASHBOARD_FORM_UPDATE_DIALOG_TITLE: "Update dashboard",
-    UPDATE_DASHBOARD_FORM_UPDATE_DIALOG_MESSAGE:
+    UPDATE_APP_PAGE_BUTTON_TEXT: "Update app page",
+    UPDATE_APP_PAGE_FORM_TITLE: "Update app page",
+    UPDATE_APP_PAGE_FORM_APP_PAGE_UPDATION_SUCCESS:
+      "App page updated successfully!",
+    UPDATE_APP_PAGE_FORM_UPDATE_DIALOG_TITLE: "Update app page",
+    UPDATE_APP_PAGE_FORM_UPDATE_DIALOG_MESSAGE:
       "Are you sure you want to update this item? This action cannot be undone.",
 
-    DELETE_DASHBOARD_DELETION_SUCCESS: "Dashboard deleted successfully!",
-    DELETE_DASHBOARD_DIALOG_TITLE: "Delete dashboard",
-    DELETE_DASHBOARD_DIALOG_MESSAGE:
+    DELETE_APP_PAGE_DELETION_SUCCESS: "App page deleted successfully!",
+    DELETE_APP_PAGE_DIALOG_TITLE: "Delete app page",
+    DELETE_APP_PAGE_DIALOG_MESSAGE:
       "Are you sure you want to delete this item? This action cannot be undone.",
 
-    CLONE_DASHBOARD_CLONING_SUCCESS: "Dashboard cloned successfully!",
-    CLONE_DASHBOARD_DIALOG_TITLE: "Clone dashboard",
-    CLONE_DASHBOARD_DIALOG_MESSAGE:
+    CLONE_APP_PAGE_CLONING_SUCCESS: "App page cloned successfully!",
+    CLONE_APP_PAGE_DIALOG_TITLE: "Clone app page",
+    CLONE_APP_PAGE_DIALOG_MESSAGE:
       "Are you sure you want to clone this item? This action cannot be undone.",
 
-    DASHBOARD_EDITOR_FORM_NAME_FIELD_LABEL: "Dashboard name",
-    DASHBOARD_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your dashboard's name",
-    DASHBOARD_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Description",
-    DASHBOARD_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
-      "Descripton (Optional)",
+    APP_PAGE_EDITOR_FORM_NAME_FIELD_LABEL: "App page name",
+    APP_PAGE_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your app page's name",
+    APP_PAGE_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Description",
+    APP_PAGE_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Description (Optional)",
 
     WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings",
     WIDGET_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
@@ -776,18 +776,18 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/widgets/:widgetID",
       path: (tenantID, widgetID) => `/tenants/${tenantID}/widgets/${widgetID}`,
     },
-    ADD_DASHBOARD: {
-      code: "/tenants/:tenantID/dashboards/add",
-      path: (tenantID) => `/tenants/${tenantID}/dashboards/add`,
+    ADD_APP_PAGE: {
+      code: "/tenants/:tenantID/app-pages/add",
+      path: (tenantID) => `/tenants/${tenantID}/app-pages/add`,
     },
-    VIEW_DASHBOARDS: {
-      code: "/tenants/:tenantID/dashboards",
-      path: (tenantID) => `/tenants/${tenantID}/dashboards`,
+    VIEW_APP_PAGES: {
+      code: "/tenants/:tenantID/app-pages",
+      path: (tenantID) => `/tenants/${tenantID}/app-pages`,
     },
-    UPDATE_DASHBOARD_BY_ID: {
-      code: "/tenants/:tenantID/dashboards/:dashboardID",
-      path: (tenantID, dashboardID) =>
-        `/tenants/${tenantID}/dashboards/${dashboardID}`,
+    UPDATE_APP_PAGE_BY_ID: {
+      code: "/tenants/:tenantID/app-pages/:appPageID",
+      path: (tenantID, appPageID) =>
+        `/tenants/${tenantID}/app-pages/${appPageID}`,
     },
     VIEW_TENANT_USERS: {
       code: "/tenants/:tenantID/users/",
@@ -1062,18 +1062,18 @@ export const CONSTANTS = {
       deleteWidgetByID: (tenantID, widgetID) =>
         `/api/v1/tenants/${tenantID}/widgets/${widgetID}`,
 
-      getAllDashboardsAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/`,
-      createDashboardAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/`,
-      getDashboardByIDAPI: (tenantID, dashboardID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/${dashboardID}`,
-      cloneDashboardByIDAPI: (tenantID, dashboardID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/${dashboardID}/clone`,
-      updateDashboardByIDAPI: (tenantID, dashboardID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/${dashboardID}`,
-      deleteDashboardByID: (tenantID, dashboardID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/${dashboardID}`,
+      getAllAppPagesAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/`,
+      createAppPageAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/`,
+      getAppPageByIDAPI: (tenantID, appPageID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/${appPageID}`,
+      cloneAppPageByIDAPI: (tenantID, appPageID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/${appPageID}/clone`,
+      updateAppPageByIDAPI: (tenantID, appPageID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/${appPageID}`,
+      deleteAppPageByID: (tenantID, appPageID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/${appPageID}`,
       getAllDatabaseNotificationsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/notifications`,
       getDatabaseNotificationByIDAPI: (tenantID, databaseNotificationID) =>
@@ -1133,7 +1133,7 @@ export const CONSTANTS = {
   },
 
   USER_CONFIG_KEYS: {
-    DEFAULT_DASHBOARD_ID: "DEFAULT_DASHBOARD_ID",
+    DEFAULT_APP_PAGE_ID: "DEFAULT_APP_PAGE_ID",
   },
   REACT_QUERY_KEYS: {
     DB_USER: "DB_USER",
@@ -1154,7 +1154,7 @@ export const CONSTANTS = {
 
     WORKFLOWS: (tenantID) => `${tenantID}-WORKFLOWS`,
 
-    DASHBOARDS: (tenantID) => `${tenantID}-DASHBOARDS`,
+    APP_PAGES: (tenantID) => `${tenantID}-APP_PAGES`,
 
     CUSTOMER_PLAN: "CUSTOMER_PLAN",
     FORMS: "FORMS",
