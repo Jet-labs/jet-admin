@@ -47,9 +47,20 @@ const generateAPIKey = () => {
   return crypto.randomBytes(32).toString("hex");
 };
 
+const hashAPIKey = (apiKey) => {
+  const hash = crypto.createHash("sha256").update(apiKey).digest("hex");
+  return { prefix: apiKey.substring(0, 8), hash };
+};
+
+const verifyAPIKeyHash = (apiKey, hash) => {
+  return crypto.createHash("sha256").update(apiKey).digest("hex") === hash;
+};
+
 module.exports = {
   generateRandomString,
   comparePasswordWithHash,
   generateSaltAndPasswordHash,
   generateAPIKey,
+  hashAPIKey,
+  verifyAPIKeyHash,
 };
