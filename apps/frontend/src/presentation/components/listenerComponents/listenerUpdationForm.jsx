@@ -35,12 +35,14 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
 
+
   const { data: listener, isLoading: isLoadingListener } = useQuery({
     queryKey: ["LISTENER_DETAIL", tenantID, listenerID],
     queryFn: () => getListenerByIDAPI({ tenantID, listenerID }),
     refetchOnWindowFocus: false,
     enabled: Boolean(tenantID && listenerID),
   });
+
 
   const { isPending: isUpdatingListener, mutate: updateListener } =
     useMutation({
@@ -77,7 +79,6 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
       datasourceID: listener?.datasourceID || "",
       listenerType: listener?.listenerType || "",
       listenerConfig: listener?.listenerConfig || {},
-      transformScript: listener?.transformScript || "",
       status: listener?.status || "inactive",
     },
     enableReinitialize: true,
@@ -119,7 +120,7 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
             <Tabs defaultValue="config" className="w-full">
               <TabsList className="">
                 <TabsTrigger value="config">General Configuration</TabsTrigger>
-                <TabsTrigger value="actions">Pipeline Actions ({listener?.actions?.length || 0})</TabsTrigger>
+                <TabsTrigger value="actions">Pipeline Steps ({listener?.actions?.length || 0})</TabsTrigger>
               </TabsList>
               
               <TabsContent value="config">
@@ -150,7 +151,6 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
               tenantID={tenantID}
               listenerID={listenerID}
               currentStatus={listenerUpdationForm.values.status}
-              transformScript={listenerUpdationForm.values.transformScript}
               onStatusChange={(newStatus) =>
                 listenerUpdationForm.setFieldValue("status", newStatus)
               }

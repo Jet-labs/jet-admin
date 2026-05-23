@@ -166,39 +166,7 @@ export const deactivateListenerAPI = async ({ tenantID, listenerID }) => {
   }
 };
 
-export const updateListenerTestScriptAPI = async ({ tenantID, listenerID, sessionID, transformScript }) => {
-  try {
-    const url = `${CONSTANTS.SERVER_HOST}/api/v1/tenants/${tenantID}/listeners/${listenerID}/test-script`;
-    const headers = await _getHeaders();
-    const response = await axios.post(url, { transformScript, sessionID }, { headers });
-    if (response.data && response.data.success === true) {
-      return true;
-    } else if (response.data.error) {
-      throw response.data.error;
-    } else {
-      throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
-    }
-  } catch (error) {
-    throw error;
-  }
-};
 
-export const removeListenerTestScriptAPI = async ({ tenantID, listenerID, sessionID }) => {
-  try {
-    const url = `${CONSTANTS.SERVER_HOST}/api/v1/tenants/${tenantID}/listeners/${listenerID}/test-script`;
-    const headers = await _getHeaders();
-    const response = await axios.post(url, { transformScript: "", sessionID }, { headers });
-    if (response.data && response.data.success === true) {
-      return true;
-    } else if (response.data.error) {
-      throw response.data.error;
-    } else {
-      throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
-    }
-  } catch (error) {
-    throw error;
-  }
-};
 
 export const createListenerActionAPI = async ({ tenantID, listenerID, actionData }) => {
   try {

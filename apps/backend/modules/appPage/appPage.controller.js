@@ -1,23 +1,23 @@
 const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
-const { dashboardService } = require("./dashboard.service");
+const { appPageService } = require("./appPage.service");
 const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
-const dashboardController = {};
+const appPageController = {};
 
 /**
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-dashboardController.getAllDashboards = async (req, res) => {
+appPageController.getAllAppPages = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
-      message: "dashboardController:getAllDashboards:params",
+      message: "appPageController:getAllAppPages:params",
       params: {
         userID: user.userID,
         tenantID,
@@ -25,28 +25,28 @@ dashboardController.getAllDashboards = async (req, res) => {
       },
     });
 
-    const dashboards = await dashboardService.getAllDashboards({
+    const appPages = await appPageService.getAllAppPages({
       userID: user.userID,
       tenantID,
       authContext,
     });
 
     Logger.log("success", {
-      message: "dashboardController:getAllDashboards:success",
+      message: "appPageController:getAllAppPages:success",
       params: {
         userID: user.userID,
         tenantID,
-        dashboardsLength: dashboards.length,
+        appPagesLength: appPages.length,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      dashboards,
-      message: "Dashboards fetched successfully.",
+      appPages,
+      message: "App pages fetched successfully.",
     });
   } catch (error) {
     Logger.log("error", {
-      message: "dashboardController:getAllDashboards:catch-1",
+      message: "appPageController:getAllAppPages:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -58,52 +58,52 @@ dashboardController.getAllDashboards = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-dashboardController.createDashboard = async (req, res) => {
+appPageController.createAppPage = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
     const authContext = getServiceAuthContext(req);
-    const { dashboardTitle, dashboardDescription, dashboardConfig } = req.body;
+    const { appPageTitle, appPageDescription, appPageConfig } = req.body;
 
     Logger.log("info", {
-      message: "dashboardController:createDashboard:params",
+      message: "appPageController:createAppPage:params",
       params: {
         userID: user.userID,
         tenantID,
-        dashboardTitle,
-        dashboardDescription,
-        dashboardConfig,
+        appPageTitle,
+        appPageDescription,
+        appPageConfig,
         authContext,
       },
     });
 
-    const result = await dashboardService.createDashboard({
+    const result = await appPageService.createAppPage({
       userID: user.userID,
       tenantID,
-      dashboardTitle,
-      dashboardDescription,
-      dashboardConfig,
+      appPageTitle,
+      appPageDescription,
+      appPageConfig,
       authContext,
     });
 
     Logger.log("success", {
-      message: "dashboardController:createDashboard:success",
+      message: "appPageController:createAppPage:success",
       params: {
         userID: user.userID,
         tenantID,
-        dashboardTitle,
-        dashboardDescription,
-        dashboardConfig,
+        appPageTitle,
+        appPageDescription,
+        appPageConfig,
         result,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      message: "Dashboard created successfully.",
+      message: "App page created successfully.",
     });
   } catch (error) {
     Logger.log("error", {
-      message: "dashboardController:createDashboard:catch-1",
+      message: "appPageController:createAppPage:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -115,42 +115,42 @@ dashboardController.createDashboard = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-dashboardController.getDashboardByID = async (req, res) => {
+appPageController.getAppPageByID = async (req, res) => {
   try {
     const { user } = req;
-    const { tenantID, dashboardID } = req.params;
+    const { tenantID, appPageID } = req.params;
     Logger.log("info", {
-      message: "dashboardController:getDashboardByID:params",
+      message: "appPageController:getAppPageByID:params",
       params: {
         userID: user.userID,
         tenantID,
-        dashboardID,
+        appPageID,
       },
     });
 
-    const dashboard = await dashboardService.getDashboardByID({
+    const appPage = await appPageService.getAppPageByID({
       userID: user.userID,
       tenantID,
-      dashboardID,
+      appPageID,
     });
 
     Logger.log("success", {
-      message: "dashboardController:getDashboardByID:success",
+      message: "appPageController:getAppPageByID:success",
       params: {
         userID: user.userID,
         tenantID,
-        dashboardID,
-        dashboard,
+        appPageID,
+        appPage,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      dashboard,
-      message: "Dashboard fetched successfully.",
+      appPage,
+      message: "App page fetched successfully.",
     });
   } catch (error) {
     Logger.log("error", {
-      message: "dashboardController:getDashboardByID:catch-1",
+      message: "appPageController:getAppPageByID:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -161,96 +161,40 @@ dashboardController.getDashboardByID = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-dashboardController.cloneDashboardByID = async (req, res) => {
+appPageController.cloneAppPageByID = async (req, res) => {
   try {
     const { user } = req;
-    const { tenantID, dashboardID } = req.params;
+    const { tenantID, appPageID } = req.params;
     Logger.log("info", {
-      message: "dashboardController:cloneDashboardByID:params",
+      message: "appPageController:cloneAppPageByID:params",
       params: {
         userID: user.userID,
         tenantID,
-        dashboardID,
+        appPageID,
       },
     });
 
-    await dashboardService.cloneDashboardByID({
+    await appPageService.cloneAppPageByID({
       userID: user.userID,
       tenantID,
-      dashboardID,
+      appPageID,
     });
 
     Logger.log("success", {
-      message: "dashboardController:cloneDashboardByID:success",
+      message: "appPageController:cloneAppPageByID:success",
       params: {
         userID: user.userID,
         tenantID,
-        dashboardID,
+        appPageID,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      message: "Dashboard cloned successfully.",
+      message: "App page cloned successfully.",
     });
   } catch (error) {
     Logger.log("error", {
-      message: "dashboardController:cloneDashboardByID:catch-1",
-      params: { error },
-    });
-    return expressUtils.sendResponse(res, false, {}, error);
-  }
-};
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- */
-dashboardController.updateDashboardByID = async (req, res) => {
-  try {
-    const { user } = req;
-    const { tenantID, dashboardID } = req.params; // Assuming `dashboardID` identifies the query to update
-    const { dashboardConfig, dashboardDescription, dashboardTitle } = req.body;
-
-    Logger.log("info", {
-      message: "dashboardController:updateDashboardByID:params",
-      params: {
-        userID: user.userID,
-        tenantID,
-        dashboardID,
-        dashboardConfig,
-        dashboardDescription,
-        dashboardTitle,
-      },
-    });
-
-    const result = await dashboardService.updateDashboardByID({
-      userID: user.userID,
-      tenantID,
-      dashboardID,
-      dashboardConfig,
-      dashboardDescription,
-      dashboardTitle,
-    });
-
-    Logger.log("success", {
-      message: "dashboardController:updateDashboardByID:success",
-      params: {
-        userID: user.userID,
-        tenantID,
-        dashboardID,
-        dashboardConfig,
-        dashboardDescription,
-        dashboardTitle,
-      },
-    });
-
-    return expressUtils.sendResponse(res, true, {
-      message: "Dashboard updated successfully.",
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "dashboardController:updateDashboardByID:catch-1",
+      message: "appPageController:cloneAppPageByID:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -262,46 +206,102 @@ dashboardController.updateDashboardByID = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-dashboardController.deleteDashboardByID = async (req, res) => {
+appPageController.updateAppPageByID = async (req, res) => {
   try {
     const { user } = req;
-    const { tenantID, dashboardID } = req.params; // Assuming `dashboardID` identifies the query to update
+    const { tenantID, appPageID } = req.params;
+    const { appPageConfig, appPageDescription, appPageTitle } = req.body;
 
     Logger.log("info", {
-      message: "dashboardController:deleteDashboardByID:params",
+      message: "appPageController:updateAppPageByID:params",
       params: {
         userID: user.userID,
         tenantID,
-        dashboardID,
+        appPageID,
+        appPageConfig,
+        appPageDescription,
+        appPageTitle,
       },
     });
 
-    const result = await dashboardService.deleteDashboardByID({
+    const result = await appPageService.updateAppPageByID({
       userID: user.userID,
       tenantID,
-      dashboardID,
+      appPageID,
+      appPageConfig,
+      appPageDescription,
+      appPageTitle,
     });
 
     Logger.log("success", {
-      message: "dashboardController:deleteDashboardByID:success",
+      message: "appPageController:updateAppPageByID:success",
       params: {
         userID: user.userID,
         tenantID,
-        dashboardID,
+        appPageID,
+        appPageConfig,
+        appPageDescription,
+        appPageTitle,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      message: "App page updated successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "appPageController:updateAppPageByID:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+appPageController.deleteAppPageByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, appPageID } = req.params;
+
+    Logger.log("info", {
+      message: "appPageController:deleteAppPageByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        appPageID,
+      },
+    });
+
+    const result = await appPageService.deleteAppPageByID({
+      userID: user.userID,
+      tenantID,
+      appPageID,
+    });
+
+    Logger.log("success", {
+      message: "appPageController:deleteAppPageByID:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        appPageID,
         result,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      message: "Dashboard deleted successfully.",
+      message: "App page deleted successfully.",
     });
   } catch (error) {
     Logger.log("error", {
-      message: "dashboardController:deleteDashboardByID:catch-1",
+      message: "appPageController:deleteAppPageByID:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
   }
 };
 
-module.exports = { dashboardController };
+module.exports = { appPageController };

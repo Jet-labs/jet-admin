@@ -25,10 +25,11 @@ import {
   CardFooter,
   CardTitle,
 } from "@jet-admin/ui";
-import { Zap, Search, Save, Smartphone, Plus, Trash2, Edit2, Play, CircleSlash, ArrowRight } from "lucide-react";
+import { Zap, Search, Save, Smartphone, Plus, Trash2, Edit2, Play, CircleSlash, ArrowRight, Wand2 } from "lucide-react";
 import PropTypes from "prop-types";
 import { GitBranch, FileCode2, DatabaseZap, PanelTop } from "lucide-react";
 const ACTION_TYPES = [
+  { value: "transform", label: "Transform Event", icon: Wand2, color: "text-primary", bg: "bg-muted", border: "border-border" },
   { value: "trigger_workflow", label: "Trigger Workflow", icon: GitBranch, color: "text-primary", bg: "bg-muted", border: "border-border" },
   { value: "trigger_query", label: "Trigger Data Query", icon: FileCode2, color: "text-primary", bg: "bg-muted", border: "border-border" },
   { value: "save_to_buffer", label: "Save to Buffer", icon: DatabaseZap, color: "text-primary", bg: "bg-muted", border: "border-border" },
@@ -95,6 +96,8 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
     }).catch(err => displayError(err));
   };
 
+  const allActions = [...actions].sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+
   if (isAdding || editingAction) {
     return (
       <ActionForm
@@ -115,45 +118,48 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold text-foreground tracking-tight">Pipeline Actions</h3>
-          <p className="text-xs text-muted-foreground mt-1">Actions execute sequentially when an event is received.</p>
+          <h3 className="text-sm font-semibold text-foreground">Pipeline Steps</h3>
+          <p className="text-[11px] text-muted-foreground">Steps execute sequentially on each incoming event.</p>
         </div>
-        {actions.length > 0 && (
+        {allActions.length > 0 && (
           <Button size="sm" variant="secondary" onClick={() => setIsAdding(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Action
+            Add Step
           </Button>
         )}
       </div>
 
-      {actions.length === 0 ? (
+      {allActions.length === 0 ? (
         <Card className="flex flex-col items-center justify-center border-dashed border-border/60 bg-background/20 py-16 text-center transition-colors hover:bg-background/40 hover:border-border">
           <div className="mb-4 rounded-full bg-brand-border/40 p-4 ring-1 ring-border shadow-inner">
             <Play className="h-6 w-6 text-muted-foreground/80 pl-1" />
           </div>
-          <h4 className="text-sm font-semibold text-foreground">No actions configured</h4>
+          <h4 className="text-sm font-semibold text-foreground">No pipeline steps configured</h4>
           <p className="mt-2 text-xs text-muted-foreground max-w-sm">
-            Add your first action to start processing, transforming, and routing incoming data events.
+            Add your first step to start processing, transforming, and routing incoming data events.
           </p>
           <Button size="sm" variant="secondary" className="mt-6" onClick={() => setIsAdding(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Configure Action
+            Add Step
           </Button>
         </Card>
       ) : (
         <div className="relative space-y-4 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border/60 before:to-transparent">
-          {actions.map((action, index) => {
+          {allActions.map((action, index) => {
             const typeConfig = ACTION_TYPES.find(t => t.value === action.actionType);
             const Icon = typeConfig?.icon || Zap;
+            const summaryText = action.actionType === 'transform'
+              ? (action.actionConfig?.script ? `${action.actionConfig.script.substring(0, 60)}...` : 'No script')
+              : Object.keys(action.actionConfig).length > 0
+                ? Object.entries(action.actionConfig).slice(0, 2).map(([k, v]) => `${k}: ${typeof v === 'object' ? '{...}' : String(v)}`).join(' · ')
+                : 'No configuration';
             
             return (
               <div key={action.actionID} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                {/* Timeline Node */}
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-[3px] border-brand-dark bg-brand-border/80 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 ring-1 ring-border/20 transition-all group-hover:ring-brand-green/30 group-hover:border-brand-dark/90">
                   <span className="text-[11px] font-bold text-muted-foreground group-hover:text-foreground">{index + 1}</span>
                 </div>
 
-                {/* Card Content */}
                 <Card className={`w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] p-4 transition-all duration-300 border shadow-sm hover:shadow-md ${!action.isEnabled ? 'opacity-60 grayscale-[0.3]' : 'hover:border-border/80 bg-background/60 backdrop-blur-sm'}`}>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 min-w-0">
@@ -173,18 +179,7 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
                           )}
                         </div>
                         <div className="text-[11px] text-muted-foreground font-mono truncate max-w-full opacity-80">
-                          {Object.keys(action.actionConfig).length > 0 ? (
-                            <span className="flex items-center gap-1.5">
-                              {Object.entries(action.actionConfig).slice(0, 2).map(([k, v]) => (
-                                <React.Fragment key={k}>
-                                  <span className="text-muted-foreground">{k}:</span>
-                                  <span className="text-foreground truncate">{typeof v === 'object' ? '{...}' : String(v)}</span>
-                                </React.Fragment>
-                              ))}
-                            </span>
-                          ) : (
-                            "No configuration"
-                          )}
+                          {summaryText}
                         </div>
                       </div>
                     </div>
@@ -211,7 +206,7 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                           onClick={() => {
-                             if (confirm("Are you sure you want to delete this action?")) {
+                             if (confirm("Are you sure you want to delete this step?")) {
                                deleteAction(action.actionID);
                              }
                           }}
@@ -234,7 +229,7 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
 const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries }) => {
   const [formData, setFormData] = useState(
     action || {
-      actionType: "trigger_workflow",
+      actionType: "transform",
       actionConfig: {},
       isEnabled: true,
       orderIndex: 0,
@@ -254,37 +249,36 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
         <div className="flex items-center gap-2">
 
           <h3 className="text-sm font-semibold text-foreground tracking-tight">
-            {action ? "Edit Pipeline Action" : "Add Pipeline Action"}
+            {action ? "Edit Pipeline Step" : "Add Pipeline Step"}
           </h3>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="p-4 space-y-4">
         <div className="space-y-4">
-          <div className="space-y-3">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Action Type</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {ACTION_TYPES.map((t) => {
-                const isSelected = formData.actionType === t.value;
-                const Icon = t.icon;
-                return (
-                  <div
-                    key={t.value}
-                    onClick={() => setFormData({ ...formData, actionType: t.value, actionConfig: {} })}
-                    className={`cursor-pointer rounded-sm border p-4 transition-all duration-200 ${
-                      isSelected 
-                        ? `border-${t.color.split('-')[1]}-500/50 ${t.bg} shadow-sm ring-1 ring-${t.color.split('-')[1]}-500/20` 
-                      : "border-border/50 bg-background/40 hover:border-border hover:bg-brand-border/20"
-                    }`}
-                  >
-                    <Icon className={`h-5 w-5 mb-3 ${isSelected ? t.color : "text-muted-foreground"}`} />
-                    <div className={`text-sm font-medium ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
-                      {t.label}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Step Type</Label>
+            <Select
+              value={formData.actionType}
+              onValueChange={(val) => setFormData({ ...formData, actionType: val, actionConfig: {} })}
+            >
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="Choose a step type..." />
+              </SelectTrigger>
+              <SelectContent>
+                {ACTION_TYPES.map((t) => {
+                  const Icon = t.icon;
+                  return (
+                    <SelectItem key={t.value} value={t.value}>
+                      <span className="flex items-center gap-2">
+                        <Icon className={`h-4 w-4 shrink-0 ${t.color}`} />
+                        {t.label}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="rounded-sm border border-border/50 bg-background/40 p-5">
@@ -326,7 +320,7 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
           </Button>
           <Button type="submit" disabled={isSaving} size="sm" variant="default">
             {isSaving && <Spinner size={14} className="mr-2" />}
-            {action ? "Save Changes" : "Create Action"}
+            {action ? "Save Changes" : "Create Step"}
           </Button>
         </div>
       </form>
@@ -361,6 +355,26 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
   );
 
   switch (type) {
+    case "transform":
+      return (
+        <div className="space-y-4 animate-in fade-in duration-300">
+          <div className="rounded-sm border border-border/60 overflow-hidden shadow-sm">
+            <CodeEditor
+              height={220}
+              language="javascript"
+              value={config.script || ""}
+              onChange={(val) => onChange({ ...config, script: val })}
+              showFormatButton={true}
+              showExpandButton={false}
+              showHeader={true}
+              title="Transform Script (JS)"
+            />
+          </div>
+          <p className="text-[10px] text-muted-foreground italic">
+            Receives <code>event</code> in scope. Return the transformed event object, or return <code>null</code> / <code>undefined</code> to filter out (discard) the event.
+          </p>
+        </div>
+      );
     case "trigger_workflow":
       return (
         <div className="space-y-5 animate-in fade-in duration-300">
@@ -474,7 +488,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               onValueChange={(val) => {
                 const selected = dataQueries.find(q => q.dataQueryID === val);
                 const defaultMapping = {};
-                const args = selected?.dataQueryOptions?.options?.arguments || selected?.dataQueryOptions?.arguments || [];
+                const args = selected?.dataQueryOptions?.args || selected?.dataQueryOptions?.options?.arguments || selected?.dataQueryOptions?.arguments || [];
                 args.forEach(arg => {
                   const key = arg.key || arg.name;
                   if (key) defaultMapping[key] = `{{event.${key}}}`;
@@ -523,7 +537,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               </div>
             ) : (() => {
               const selected = dataQueries.find(q => q.dataQueryID === config.dataQueryID);
-              const args = selected?.dataQueryOptions?.options?.arguments || selected?.dataQueryOptions?.arguments || [];
+              const args = selected?.dataQueryOptions?.args || selected?.dataQueryOptions?.options?.arguments || selected?.dataQueryOptions?.arguments || [];
               
               if (!config.dataQueryID) {
                 return (

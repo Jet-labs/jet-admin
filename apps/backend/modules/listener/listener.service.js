@@ -25,6 +25,12 @@ const listenerService = {
         },
         orderBy: { createdAt: 'desc' },
       });
+
+      for (const listener of listeners) {
+        const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
+        listener.transformScript = transformAction?.actionConfig?.script || null;
+      }
+
       Logger.log("success", {
         message: "listenerService:getAllListeners:success",
         params: { count: listeners.length },
@@ -52,6 +58,12 @@ const listenerService = {
           tblDatasources: { select: { datasourceID: true, datasourceTitle: true, datasourceType: true } },
         },
       });
+
+      if (listener) {
+        const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
+        listener.transformScript = transformAction?.actionConfig?.script || null;
+      }
+
       Logger.log("success", {
         message: "listenerService:getListenerByID:success",
         params: { found: !!listener },
@@ -72,22 +84,39 @@ const listenerService = {
       params: { tenantID, data },
     });
     try {
-      const listener = await prisma.tblListeners.create({
-        data: {
-          tenantID,
-          datasourceID: data.datasourceID,
-          listenerTitle: data.listenerTitle,
-          listenerDescription: data.listenerDescription || null,
-          listenerType: data.listenerType,
-          listenerConfig: data.listenerConfig || {},
-          transformScript: data.transformScript || null,
-          status: data.status || 'inactive',
-          endpointPath: data.endpointPath || null,
-        },
-        include: {
-          tblListenerActions: { orderBy: { orderIndex: 'asc' } },
-          tblDatasources: { select: { datasourceID: true, datasourceTitle: true, datasourceType: true } },
-        },
+      const listener = await prisma.$transaction(async (tx) => {
+        const created = await tx.tblListeners.create({
+          data: {
+            tenantID,
+            datasourceID: data.datasourceID,
+            listenerTitle: data.listenerTitle,
+            listenerDescription: data.listenerDescription || null,
+            listenerType: data.listenerType,
+            listenerConfig: data.listenerConfig || {},
+            status: data.status || 'inactive',
+            endpointPath: data.endpointPath || null,
+          },
+          include: {
+            tblListenerActions: { orderBy: { orderIndex: 'asc' } },
+            tblDatasources: { select: { datasourceID: true, datasourceTitle: true, datasourceType: true } },
+          },
+        });
+
+        if (data.transformScript && data.transformScript.trim()) {
+          const action = await tx.tblListenerActions.create({
+            data: {
+              listenerID: created.listenerID,
+              actionType: 'transform',
+              actionConfig: { script: data.transformScript },
+              orderIndex: 0,
+              isEnabled: true
+            }
+          });
+          created.tblListenerActions.push(action);
+          created.transformScript = data.transformScript;
+        }
+
+        return created;
       });
 
       Logger.log('success', {
@@ -118,25 +147,62 @@ const listenerService = {
     try {
       const existing = await prisma.tblListeners.findFirst({
         where: { listenerID, tenantID },
+        include: { tblListenerActions: true }
       });
       if (!existing) return null;
 
-      const listener = await prisma.tblListeners.update({
-        where: { listenerID },
-        data: {
-          listenerTitle: data.listenerTitle ?? existing.listenerTitle,
-          listenerDescription: data.listenerDescription !== undefined ? data.listenerDescription : existing.listenerDescription,
-          listenerConfig: data.listenerConfig ?? existing.listenerConfig,
-          transformScript: data.transformScript !== undefined ? data.transformScript : existing.transformScript,
-          status: data.status ?? existing.status,
-          endpointPath: data.endpointPath !== undefined ? data.endpointPath : existing.endpointPath,
-          updatedAt: new Date(),
-        },
-        include: {
-          tblListenerActions: { orderBy: { orderIndex: 'asc' } },
-          tblDatasources: { select: { datasourceID: true, datasourceTitle: true, datasourceType: true } },
-        },
+      const listener = await prisma.$transaction(async (tx) => {
+        if (data.transformScript !== undefined) {
+          const existingTransformAction = existing.tblListenerActions?.find(a => a.actionType === 'transform');
+          if (existingTransformAction) {
+            await tx.tblListenerActions.update({
+              where: { actionID: existingTransformAction.actionID },
+              data: {
+                actionConfig: {
+                  ...existingTransformAction.actionConfig,
+                  script: data.transformScript
+                }
+              }
+            });
+          } else if (data.transformScript && data.transformScript.trim()) {
+            // Shift existing actions
+            await tx.tblListenerActions.updateMany({
+              where: { listenerID },
+              data: { orderIndex: { increment: 1 } }
+            });
+
+            // Create new transform action
+            await tx.tblListenerActions.create({
+              data: {
+                listenerID,
+                actionType: 'transform',
+                actionConfig: { script: data.transformScript },
+                orderIndex: 0,
+                isEnabled: true
+              }
+            });
+          }
+        }
+
+        return await tx.tblListeners.update({
+          where: { listenerID },
+          data: {
+            listenerTitle: data.listenerTitle ?? existing.listenerTitle,
+            listenerDescription: data.listenerDescription !== undefined ? data.listenerDescription : existing.listenerDescription,
+            listenerConfig: data.listenerConfig ?? existing.listenerConfig,
+            status: data.status ?? existing.status,
+            endpointPath: data.endpointPath !== undefined ? data.endpointPath : existing.endpointPath,
+            updatedAt: new Date(),
+          },
+          include: {
+            tblListenerActions: { orderBy: { orderIndex: 'asc' } },
+            tblDatasources: { select: { datasourceID: true, datasourceTitle: true, datasourceType: true } },
+          },
+        });
       });
+
+      const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
+      listener.transformScript = transformAction?.actionConfig?.script || null;
 
       Logger.log("success", {
         message: "listenerService:updateListener:success",
@@ -218,7 +284,6 @@ const listenerService = {
             listenerDescription: existing.listenerDescription,
             listenerType: existing.listenerType,
             listenerConfig: existing.listenerConfig,
-            transformScript: existing.transformScript,
             status: "inactive",
           },
         });
@@ -306,13 +371,19 @@ const listenerService = {
       });
       if (!listener) return null;
 
+      // Verify the action belongs to this listener
+      const existingAction = await prisma.tblListenerActions.findFirst({
+        where: { actionID, listenerID },
+      });
+      if (!existingAction) return null;
+
       const action = await prisma.tblListenerActions.update({
         where: { actionID },
         data: {
-          actionType: data.actionType,
-          actionConfig: data.actionConfig,
-          isEnabled: data.isEnabled,
-          orderIndex: data.orderIndex,
+          ...(data.actionType !== undefined && { actionType: data.actionType }),
+          ...(data.actionConfig !== undefined && { actionConfig: data.actionConfig }),
+          ...(data.isEnabled !== undefined && { isEnabled: data.isEnabled }),
+          ...(data.orderIndex !== undefined && { orderIndex: data.orderIndex }),
         },
       });
 
@@ -345,6 +416,12 @@ const listenerService = {
         where: { listenerID, tenantID },
       });
       if (!listener) return null;
+
+      // Verify the action belongs to this listener
+      const existingAction = await prisma.tblListenerActions.findFirst({
+        where: { actionID, listenerID },
+      });
+      if (!existingAction) return null;
 
       await prisma.tblListenerActions.delete({
         where: { actionID },
@@ -379,14 +456,10 @@ const listenerService = {
     return this.updateListener({ tenantID, listenerID, data: { status: 'inactive' } });
   },
 
-  // ─── Status & Testing ───────────────────────────────────────────────────
+  // ─── Status ─────────────────────────────────────────────────────────────
 
   getConnectionStatus() {
     return listenerEngine.getStatus();
-  },
-
-  updateTestScript(listenerID, sessionID, transformScript) {
-    listenerEngine.setTestScript(listenerID, sessionID, transformScript);
   },
 
   // ─── Boot (called from startup.js) ──────────────────────────────────────

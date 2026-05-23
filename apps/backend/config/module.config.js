@@ -10,7 +10,7 @@ const moduleDependencies = {
     constants.MODULES.TENANT,
     constants.MODULES.DATAQUERY,
   ],
-  dashboard: [
+  appPage: [
     constants.MODULES.AUTH,
     constants.MODULES.TENANT,
     constants.MODULES.WIDGET,

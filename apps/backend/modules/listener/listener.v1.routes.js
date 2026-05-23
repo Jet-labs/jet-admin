@@ -29,10 +29,9 @@ router.put('/:listenerID', listenerController.updateListener);
 router.delete('/:listenerID', listenerController.deleteListener);
 router.post('/:listenerID/clone', listenerController.cloneListener);
 
-// Lifecycle & Testing
+// Lifecycle
 router.post('/:listenerID/activate', listenerController.activateListener);
 router.post('/:listenerID/deactivate', listenerController.deactivateListener);
-router.post('/:listenerID/test-script', listenerController.updateTestScript);
 
 // Actions
 router.post('/:listenerID/actions', listenerController.addAction);

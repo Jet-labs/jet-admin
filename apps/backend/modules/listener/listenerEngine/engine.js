@@ -10,6 +10,11 @@
  *
  * All event processing is delegated to the pipeline queue — this class
  * only handles connection lifecycle and event ingestion.
+ *
+ * Test event streaming uses Socket.IO rooms: clients join
+ * `listener_test:<listenerID>` to receive live event previews.
+ * The engine uses the saved transform script from the pipeline actions
+ * (no session-specific overrides).
  */
 const { dataSourceRegistry } = require('@jet-admin/datasources-logic');
 const { addListenerEvent } = require('../../../config/queue.config');
@@ -24,38 +29,7 @@ const HEALTH_CHECK_INTERVAL_MS = 30000;
 class ListenerEngine {
   constructor() {
     this.active = new Map();  // listenerID → { handle, instance, listener, state, retryCount, retryTimer }
-    this.testScripts = new Map(); // listenerID → Map<sessionID, script>
     this.healthCheckTimer = null;
-  }
-
-  setTestScript(listenerID, sessionID, script) {
-    if (!sessionID) return;
-    
-    if (!this.testScripts.has(listenerID)) {
-      this.testScripts.set(listenerID, new Map());
-    }
-    
-    const sessionMap = this.testScripts.get(listenerID);
-
-    if (script === undefined || script === null) {
-      sessionMap.delete(sessionID);
-      if (sessionMap.size === 0) {
-        this.testScripts.delete(listenerID);
-      }
-    } else {
-      sessionMap.set(sessionID, { script, lastUpdated: Date.now() });
-    }
-  }
-
-  clearTestScriptsForSession(sessionID) {
-    for (const [listenerID, sessionMap] of this.testScripts.entries()) {
-      if (sessionMap.has(sessionID)) {
-        sessionMap.delete(sessionID);
-        if (sessionMap.size === 0) {
-          this.testScripts.delete(listenerID);
-        }
-      }
-    }
   }
 
   // ─── Boot ───────────────────────────────────────────────────────────────────
@@ -122,64 +96,41 @@ class ListenerEngine {
       const handle = await instance.subscribe(
         listener.listenerConfig,
         async (rawEvent) => {
-          // Emit a test event for live UI debugging
+          // Emit a test event to clients who joined the listener's test room
           try {
             const { socketIO } = require('../../../config/socket.io');
             const { ListenerTransformerVm } = require('./listenerTransformerVm');
 
-            // Find all active socket sessions currently testing this listener
-            const sessionMap = this.testScripts.get(listener.listenerID);
-            
-            // If there's no unsaved session overrides, emit globally using the saved script
-            if (!sessionMap || sessionMap.size === 0) {
-               let transformedEvent = undefined;
-               let transformError = null;
+            // Check if any clients are in the test room for this listener
+            const testRoom = `listener_test:${listener.listenerID}`;
+            const room = socketIO.sockets.adapter.rooms.get(testRoom);
 
-               if (listener.transformScript && listener.transformScript.trim()) {
-                 const res = ListenerTransformerVm.execute(listener.transformScript, rawEvent);
-                 transformedEvent = res.output;
-                 transformError = res.error;
-               } else {
-                 transformedEvent = rawEvent;
-               }
+            if (room && room.size > 0) {
+              // Find active saved transform script from actions list
+              const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform' && a.isEnabled);
+              const savedScript = transformAction?.actionConfig?.script;
 
-               socketIO.emit('listener_test_event', {
-                 listenerID: listener.listenerID,
-                 rawEvent,
-                 transformedEvent,
-                 transformError,
-                 timestamp: Date.now(),
-               });
-            } else {
-               // If there are specific sessions testing unsaved scripts, execute and emit for each session
-               for (const [sessionID, sessionData] of sessionMap.entries()) {
-                 let transformedEvent = undefined;
-                 let transformError = null;
+              let transformedEvent = undefined;
+              let transformError = null;
 
-                 const script = sessionData.script;
-                 // Use session-specific script if available, fallback to saved script
-                 const effectiveScript = (script && script.trim()) ? script : listener.transformScript;
+              if (savedScript && savedScript.trim()) {
+                const res = ListenerTransformerVm.execute(savedScript, rawEvent);
+                transformedEvent = res.output;
+                transformError = res.error;
+              } else {
+                transformedEvent = rawEvent;
+              }
 
-                 if (effectiveScript && effectiveScript.trim()) {
-                   const res = ListenerTransformerVm.execute(effectiveScript, rawEvent);
-                   transformedEvent = res.output;
-                   transformError = res.error;
-                 } else {
-                   transformedEvent = rawEvent;
-                 }
-
-                 // Emit only to that specific socket session
-                 socketIO.to(sessionID).emit('listener_test_event', {
-                   listenerID: listener.listenerID,
-                   rawEvent,
-                   transformedEvent,
-                   transformError,
-                   timestamp: Date.now(),
-                 });
-               }
+              socketIO.to(testRoom).emit('listener_test_event', {
+                listenerID: listener.listenerID,
+                rawEvent,
+                transformedEvent,
+                transformError,
+                timestamp: Date.now(),
+              });
             }
           } catch (e) {
-            // Ignore socket errors
+            // Ignore socket errors — don't let test emission block event processing
           }
 
           // Don't process inline — enqueue to the pipeline
@@ -188,7 +139,6 @@ class ListenerEngine {
               listenerID: listener.listenerID,
               tenantID: listener.tenantID,
               rawEvent,
-              transformScript: listener.transformScript,
               actions: listener.tblListenerActions,
             });
           } catch (enqueueErr) {
@@ -355,7 +305,6 @@ class ListenerEngine {
   // ─── Health check ───────────────────────────────────────────────────────────
 
   _healthCheck() {
-    // 1. Connection health checks
     for (const [listenerID, entry] of this.active) {
       if (entry.state !== 'running') continue;
 
@@ -364,20 +313,6 @@ class ListenerEngine {
         entry.instance.healthCheck().catch(err => {
           this._handleDisconnect(listenerID, err);
         });
-      }
-    }
-
-    // 2. Test script cleanup (3 minutes timeout)
-    const TIMEOUT_MS = 3 * 60 * 1000;
-    const now = Date.now();
-    for (const [listenerID, sessionMap] of this.testScripts.entries()) {
-      for (const [sessionID, sessionData] of sessionMap.entries()) {
-        if (now - sessionData.lastUpdated > TIMEOUT_MS) {
-          sessionMap.delete(sessionID);
-        }
-      }
-      if (sessionMap.size === 0) {
-        this.testScripts.delete(listenerID);
       }
     }
   }

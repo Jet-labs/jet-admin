@@ -15,7 +15,6 @@ const { cronJobService } = require("./modules/cronJob/cronJob.service");
 const { socketIO } = require("./config/socket.io");
 const { isModuleEnabled } = require("./config/module.config");
 const { widgetSocketController } = require("./modules/widget/widget.socket.controller");
-const { listenerEngine } = require("./modules/listener/listenerEngine/engine");
 // Middleware setup
 expressApp.use(cookieParser());
 const path = require('path');
@@ -161,6 +160,19 @@ socketIO.on("connection", async (socket) => {
     }
   );
 
+  // === Room Management (for listener test streaming, etc.) ===
+  socket.on('join_room', (room) => {
+    if (typeof room === 'string' && room.startsWith('listener_test:')) {
+      socket.join(room);
+    }
+  });
+
+  socket.on('leave_room', (room) => {
+    if (typeof room === 'string' && room.startsWith('listener_test:')) {
+      socket.leave(room);
+    }
+  });
+
   Logger.log("success", {
     message: "user connected to socket",
     params: { firebase_id },
@@ -172,13 +184,6 @@ socketIO.on("connection", async (socket) => {
       socket,
       firebaseID: firebase_id,
     });
-
-    try {
-
-      listenerEngine.clearTestScriptsForSession(socket.id);
-    } catch (e) {
-      // Ignore errors during disconnect cleanup
-    }
 
     Logger.log("info", {
       message: "socket connection disconnected",

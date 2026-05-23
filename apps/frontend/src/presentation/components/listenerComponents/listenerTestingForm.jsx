@@ -5,8 +5,6 @@ import { CONSTANTS } from "../../../constants";
 import {
   activateListenerAPI,
   deactivateListenerAPI,
-  updateListenerTestScriptAPI,
-  removeListenerTestScriptAPI,
 } from "../../../data/apis/listener";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import PropTypes from "prop-types";
@@ -22,7 +20,6 @@ export const ListenerTestingForm = ({
   tenantID,
   listenerID,
   currentStatus,
-  transformScript,
   onStatusChange,
 }) => {
   ListenerTestingForm.propTypes = {
@@ -30,7 +27,6 @@ export const ListenerTestingForm = ({
       .isRequired,
     listenerID: PropTypes.string.isRequired,
     currentStatus: PropTypes.string,
-    transformScript: PropTypes.string,
     onStatusChange: PropTypes.func,
   };
 
@@ -42,26 +38,17 @@ export const ListenerTestingForm = ({
   const scrollRefTransformed = useRef(null);
   const isActive = currentStatus === "active";
 
-  const { isPending: isApplyingScript, mutate: applyScript } = useMutation({
-    mutationFn: () => updateListenerTestScriptAPI({
-      tenantID,
-      listenerID,
-      sessionID: socket?.id,
-      transformScript: transformScript || "",
-    }),
-    onSuccess: () => displaySuccess("Test script applied for live testing"),
-    onError: (error) => displayError(error),
-  });
+  // Join/leave the listener's test room for targeted event streaming
+  useEffect(() => {
+    if (!socket || !listenerID) return;
 
-  const { isPending: isRemovingScript, mutate: removeScript } = useMutation({
-    mutationFn: () => removeListenerTestScriptAPI({
-      tenantID,
-      listenerID,
-      sessionID: socket?.id,
-    }),
-    onSuccess: () => displaySuccess("Test script removed from live testing"),
-    onError: (error) => displayError(error),
-  });
+    const testRoom = `listener_test:${listenerID}`;
+    socket.emit('join_room', testRoom);
+
+    return () => {
+      socket.emit('leave_room', testRoom);
+    };
+  }, [socket, listenerID]);
 
   useEffect(() => {
     if (!socket || !isActive) return;
@@ -149,7 +136,7 @@ export const ListenerTestingForm = ({
       <div className="flex items-center justify-between border-b border-border bg-background px-4 py-2 flex-shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-xs font-semibold text-foreground">
-            Listener Test Result
+            Live Event Stream
           </span>
           <div className="flex items-center gap-1.5 ml-2 border-l border-border pl-3">
             {isActive ? (
@@ -178,24 +165,16 @@ export const ListenerTestingForm = ({
         </div>
 
         <div className="flex gap-2 items-center">
-          <Button
-            onClick={() => applyScript()}
-            disabled={isApplyingScript || !socket?.id}
-            variant="secondary"
-            size="sm"
-            className="h-7 text-[11px]"
-          >
-            {isApplyingScript ? <Spinner size={10} /> : "Update Test Script"}
-          </Button>
-          <Button
-            onClick={() => removeScript()}
-            disabled={isRemovingScript || !socket?.id}
-            variant="secondary"
-            size="sm"
-            className="h-7 text-[11px]"
-          >
-            {isRemovingScript ? <Spinner size={10} /> : "Remove Test Script"}
-          </Button>
+          {liveEvents.length > 0 && (
+            <Button
+              onClick={() => setLiveEvents([])}
+              variant="secondary"
+              size="sm"
+              className="h-7 text-[11px]"
+            >
+              Clear
+            </Button>
+          )}
           <div className="w-px h-4 bg-border mx-1"></div>
           {isActive ? (
             <Button

@@ -31,27 +31,45 @@ async function startPipelineWorker() {
 // ─── Event Processor ──────────────────────────────────────────────────────────
 
 async function _processEvent(job) {
-  const { listenerID, tenantID, rawEvent, transformScript, actions } = job;
+  const { listenerID, tenantID, rawEvent, actions } = job;
 
   try {
-    // 1. Transform
-    const { output: event, error: transformError } =
-      ListenerTransformerVm.execute(transformScript, rawEvent);
+    let currentEvent = rawEvent;
 
-    if (transformError) {
-      Logger.log('warning', {
-        message: 'pipelineWorker:transformError',
-        params: { listenerID, error: transformError },
-      });
-    }
-
-    // null/undefined = filtered out by transform
-    if (!event) return;
-
-    // 2. Dispatch each action in order
+    // Dispatch each action in order
     for (const action of actions) {
+      if (!action.isEnabled) continue;
+
       try {
-        await _dispatchAction(tenantID, listenerID, action, event);
+        if (action.actionType === 'transform') {
+          const script = action.actionConfig?.script;
+          if (script && script.trim()) {
+            const { output, error: transformError } =
+              ListenerTransformerVm.execute(script, currentEvent);
+
+            if (transformError) {
+              Logger.log('warning', {
+                message: 'pipelineWorker:transformActionError',
+                params: { listenerID, actionID: action.actionID, error: transformError },
+              });
+              // Stop pipeline execution on transformation error
+              break;
+            }
+
+            currentEvent = output;
+
+            // null/undefined = filtered out by transform script
+            if (!currentEvent) {
+              Logger.log('info', {
+                message: 'pipelineWorker:eventFilteredOut',
+                params: { listenerID, actionID: action.actionID },
+              });
+              break;
+            }
+          }
+        } else {
+          await _dispatchAction(tenantID, listenerID, action, currentEvent);
+        }
       } catch (actionErr) {
         Logger.log('error', {
           message: 'pipelineWorker:actionError',
@@ -95,7 +113,7 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
 
   switch (actionType) {
     case 'trigger_workflow': {
-      const workflowService = require('../../workflow/workflow.service');
+      const { workflowService } = require('../../workflow/workflow.service');
       const inputArgs = actionConfig.inputMapping
         ? sharedResolveTemplate(actionConfig.inputMapping, { event }, TEMPLATE_OPTIONS, {
             module: 'listener', listenerID,
@@ -110,14 +128,16 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
     }
 
     case 'trigger_query': {
-      const { createQueryEngine } = require('../../dataQuery/dataQuery.service');
-      const args = actionConfig.argMapping
+      const { executeDataQuery } = require('../../dataQuery/dataQuery.service');
+      const inputArgs = actionConfig.argMapping
         ? sharedResolveTemplate(actionConfig.argMapping, { event }, TEMPLATE_OPTIONS, {
             module: 'listener', listenerID,
           })
-        : { event };
-      const engine = createQueryEngine();
-      await engine.executeQuery(actionConfig.dataQueryID, args);
+        : {};
+      await executeDataQuery({
+        dataQueryID: actionConfig.dataQueryID,
+        inputArgs,
+      });
       break;
     }
 
@@ -150,8 +170,8 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
           timestamp: Date.now(),
         });
       } else {
-        // Broadcast to all subscribers of this listener's channel
-        socketIO.emit('listener_event', {
+        // Broadcast to the tenant's room only — prevents cross-tenant data leaks
+        socketIO.to(`tenant:${tenantID}`).emit('listener_event', {
           channelName,
           data,
           mode: actionConfig.mode || 'replace',

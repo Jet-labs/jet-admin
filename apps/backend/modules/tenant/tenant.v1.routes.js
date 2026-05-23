@@ -14,7 +14,7 @@ let
   datasourceRouter,
   dataQueryRouter,
   widgetRouter,
-  dashboardRouter,
+  appPageRouter,
   userManagementRouter,
   tenantRoleRouter,
   tenantAPIKeyRouter,
@@ -53,11 +53,11 @@ if (isModuleEnabled(constants.MODULES.WIDGET)) {
   });
   widgetRouter = require("../widget/widget.v1.routes");
 }
-if (isModuleEnabled(constants.MODULES.DASHBOARD)) {
+if (isModuleEnabled(constants.MODULES.APP_PAGE)) {
   Logger.log("success", {
-    message: `${constants.MODULES.DASHBOARD} module imported`,
+    message: `${constants.MODULES.APP_PAGE} module imported`,
   });
-  dashboardRouter = require("../dashboard/dashboard.v1.routes");
+  appPageRouter = require("../appPage/appPage.v1.routes");
 }
 if (isModuleEnabled(constants.MODULES.USERMANAGEMENT)) {
   Logger.log("success", {
@@ -238,16 +238,16 @@ if (isModuleEnabled(constants.MODULES.WIDGET)) {
   );
 }
 
-// Nested dashboard routes
-if (isModuleEnabled(constants.MODULES.DASHBOARD)) {
+// Nested app page routes
+if (isModuleEnabled(constants.MODULES.APP_PAGE)) {
   Logger.log("success", {
-    message: `${constants.MODULES.DASHBOARD} module enabled`,
+    message: `${constants.MODULES.APP_PAGE} module enabled`,
   });
   router.use(
-    "/:tenantID/dashboards",
+    "/:tenantID/app-pages",
       validate(tenantIdParamSchema, "params"),
-    authMiddleware.checkUserPermissions(["tenant:dashboard"]),
-    dashboardRouter
+    authMiddleware.checkUserPermissions(["tenant:appPage"]),
+    appPageRouter
   );
 }
 

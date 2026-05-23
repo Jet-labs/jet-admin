@@ -1,0 +1,39 @@
+/**
+ * AppPage Validation Schemas
+ */
+
+const { z, schemas } = require("../../utils/validation.utils");
+
+// ============================================================
+// Request Body Schemas
+// ============================================================
+
+const createAppPageSchema = z.object({
+  appPageTitle: z.string().min(1, "appPageTitle is required").max(255),
+  appPageDescription: z.string().optional(),
+  appPageConfig: z.object({}).passthrough(),
+}).passthrough();
+
+const updateAppPageSchema = z.object({
+  appPageTitle: z.string().min(1, "appPageTitle is required").max(255),
+  appPageDescription: z.string().optional(),
+  appPageConfig: z.object({}).passthrough(),
+}).passthrough();
+
+// ============================================================
+// URL Param Schemas
+// ============================================================
+
+const appPageIdParamSchema = z.object({
+  appPageID: schemas.uuidSchema,
+}).passthrough();
+
+// ============================================================
+// Exports
+// ============================================================
+
+module.exports = {
+  createAppPageSchema,
+  updateAppPageSchema,
+  appPageIdParamSchema,
+};

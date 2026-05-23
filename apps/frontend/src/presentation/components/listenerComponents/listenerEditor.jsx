@@ -230,22 +230,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
         </Section>
       )}
 
-      {/* Transform script */}
-      <Section
-        title="Transform Script"
-        description="Optional JavaScript to transform incoming events. Receives 'event' in scope, return the transformed value. Return null to drop the event."
-      >
-        <Textarea
-          name="transformScript"
-          id="transformScript"
-          placeholder={`// Example:\n// const filtered = { ...event, timestamp: Date.now() };\n// return filtered;`}
-          onChange={listenerEditorForm.handleChange}
-          onBlur={listenerEditorForm.handleBlur}
-          value={listenerEditorForm.values.transformScript || ""}
-          rows={6}
-          className="font-mono text-xs"
-        />
-      </Section>
+
 
       {/* Status toggle */}
       <Section title={CONSTANTS.STRINGS.LISTENER_EDITOR_FORM_STATUS_FIELD_LABEL}>

@@ -5,7 +5,7 @@ const constants = {
     DATABASE: "database",
     DATASOURCE: "datasource",
     DATAQUERY: "dataQuery",
-    DASHBOARD: "dashboard",
+    APP_PAGE: "appPage",
     WIDGET: "widget",
     USERMANAGEMENT: "userManagement",
     ROLE: "role",

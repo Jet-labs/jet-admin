@@ -2,7 +2,7 @@ const { prisma } = require("../../config/prisma.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { tenantRoleService } = require("../tenantRole/tenantRole.service");
-const { dashboardService } = require("../dashboard/dashboard.service");
+const { appPageService } = require("../appPage/appPage.service");
 const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { cronJobService } = require("../cronJob/cronJob.service");
 const { apiKeyService } = require("../apiKey/apiKey.service");
@@ -50,7 +50,7 @@ tenantService.getUserTenantByID = async ({ userID, tenantID }) => {
       });
     let tenantRoles = null,
       tenantDatabaseMetadata = null,
-      tenantDashboards = null,
+      tenantAppPages = null,
       tenantDataQueries = null,
       tenantWidgets = null,
       tenantCronJobs = null,
@@ -62,7 +62,7 @@ tenantService.getUserTenantByID = async ({ userID, tenantID }) => {
         tenantID: tenantID,
       });
 
-      tenantDashboards = await dashboardService.getAllDashboards({
+      tenantAppPages = await appPageService.getAllAppPages({
         userID: userID,
         tenantID: tenantID,
       });
@@ -99,7 +99,7 @@ tenantService.getUserTenantByID = async ({ userID, tenantID }) => {
         tenantDatabaseMetadata?.metadata
           ?.map((schema) => (schema.tables ? schema.tables.length : 0))
           .reduce((acc, curr) => acc + curr, 0) || 0,
-      tenantDashboardCount: tenantDashboards?.length || 0,
+      tenantAppPageCount: tenantAppPages?.length || 0,
       tenantDataQueryCount: tenantDataQueries?.length || 0,
       tenantCronJobCount: tenantCronJobs?.length || 0,
       tenantAPIKeyCount: tenantAPIKeys?.length || 0,
@@ -185,7 +185,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
           tenantID: tenantIdToDelete,
         },
       }),
-      prisma.tblDashboards.deleteMany({
+      prisma.tblAppPages.deleteMany({
         where: {
           tenantID: tenantIdToDelete,
         },

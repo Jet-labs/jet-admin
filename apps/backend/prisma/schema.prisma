@@ -31,7 +31,7 @@ model tblAPIKeys {
   other_tblAPIKeys                                    tblAPIKeys[]            @relation("tblAPIKeysTotblAPIKeys")
   tblUsers                                            tblUsers?               @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblAPIKeysCreatorID")
   tblTenants                                          tblTenants              @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAPIKeysTenantID")
-  tblDashboards                                       tblDashboards[]
+  tblAppPages                                         tblAppPages[]
   tblDataQueries                                      tblDataQueries[]
   tblDatasources                                      tblDatasources[]
   tblTenants_tblTenants_createdByApiKeyIDTotblAPIKeys tblTenants[]            @relation("tblTenants_createdByApiKeyIDTotblAPIKeys")
@@ -85,23 +85,6 @@ model tblCronJobs {
   tblCronJobHistory  tblCronJobHistory[]
   tblTenants         tblTenants          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
   tblWorkflows       tblWorkflows?       @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsWorkflowID")
-}
-
-model tblDashboards {
-  dashboardID          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  dashboardDescription String?     @db.VarChar
-  tenantID             String      @db.Uuid
-  createdAt            DateTime?   @default(now()) @db.Timestamptz(6)
-  updatedAt            DateTime?   @default(now()) @db.Timestamptz(6)
-  creatorID            String?     @db.Uuid
-  dashboardConfig      Json?
-  dashboardTitle       String      @db.VarChar
-  createdByApiKeyID    String?     @db.Uuid
-  tblUsers             tblUsers?   @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDashboardCreatorID")
-  tblAPIKeys           tblAPIKeys? @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblDashboardsCreatedByApiKeyID")
-  tblTenants           tblTenants  @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDashboardsTenantIDTenantID")
-
-  @@index([createdByApiKeyID], map: "idx_tblDashboards_createdByApiKeyID")
 }
 
 model tblDataQueries {
@@ -206,8 +189,8 @@ model tblTenants {
   tenantTitle                                         String                        @db.VarChar
   createdByApiKeyID                                   String?                       @db.Uuid
   tblAPIKeys                                          tblAPIKeys[]
+  tblAppPages                                         tblAppPages[]
   tblCronJobs                                         tblCronJobs[]
-  tblDashboards                                       tblDashboards[]
   tblDataQueries                                      tblDataQueries[]
   tblDatabaseNotifications                            tblDatabaseNotifications[]
   tblDatasources                                      tblDatasources[]
@@ -275,7 +258,7 @@ model tblUsers {
   disableReason               String?                       @db.VarChar
   lastSeen                    DateTime?                     @db.Timestamptz(6)
   tblAPIKeys                  tblAPIKeys[]
-  tblDashboards               tblDashboards[]
+  tblAppPages                 tblAppPages[]
   tblDataQueries              tblDataQueries[]
   tblDatasources              tblDatasources[]
   tblTenants                  tblTenants[]
@@ -490,7 +473,6 @@ model tblListeners {
   listenerDescription String?
   listenerType        String               @db.VarChar(50)
   listenerConfig      Json                 @default("{}")
-  transformScript     String?
   status              String               @default("inactive") @db.VarChar(20)
   lastError           String?
   lastEventAt         DateTime?            @db.Timestamptz(6)
@@ -507,4 +489,21 @@ model tblListeners {
   @@index([datasourceID], map: "idx_tblListeners_datasourceID")
   @@index([status], map: "idx_tblListeners_status")
   @@index([tenantID], map: "idx_tblListeners_tenantID")
+}
+
+model tblAppPages {
+  appPageID          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appPageDescription String?     @db.VarChar
+  tenantID           String      @db.Uuid
+  createdAt          DateTime?   @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime?   @default(now()) @db.Timestamptz(6)
+  creatorID          String?     @db.Uuid
+  appPageConfig      Json?
+  appPageTitle       String      @db.VarChar
+  createdByApiKeyID  String?     @db.Uuid
+  tblUsers           tblUsers?   @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAppPageCreatorID")
+  tblAPIKeys         tblAPIKeys? @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblAppPagesCreatedByApiKeyID")
+  tblTenants         tblTenants  @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAppPagesTenantIDTenantID")
+
+  @@index([createdByApiKeyID], map: "idx_tblAppPages_createdByApiKeyID")
 }

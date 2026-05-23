@@ -395,25 +395,6 @@ const listenerController = {
       return expressUtils.sendResponse(res, false, {}, error);
     }
   },
-
-  async updateTestScript(req, res) {
-    try {
-      const { listenerID } = req.params;
-      const { transformScript, sessionID } = req.body;
-
-      listenerService.updateTestScript(listenerID, sessionID, transformScript);
-
-      return expressUtils.sendResponse(res, true, {
-        message: "Test script updated successfully.",
-      });
-    } catch (error) {
-      Logger.log("error", {
-        message: "listenerController:updateTestScript:error",
-        params: { error },
-      });
-      return expressUtils.sendResponse(res, false, {}, error);
-    }
-  },
 };
 
 module.exports = listenerController;
