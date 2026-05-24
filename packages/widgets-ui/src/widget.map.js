@@ -94,7 +94,7 @@ export const WIDGETS_MAP = {
       text: "Click Me",
       variant: "default",
       size: "default",
-      showHeader: true,
+      showHeader: false,
     },
   },
   'table': {
