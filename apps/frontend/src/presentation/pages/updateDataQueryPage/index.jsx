@@ -7,7 +7,7 @@ const UpdateDataQueryPage = () => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-      <DataQueryUpdationForm tenantID={tenantID} dataQueryID={dataQueryID} />
+      <DataQueryUpdationForm key={dataQueryID} tenantID={tenantID} dataQueryID={dataQueryID} />
     </div>
   );
 };

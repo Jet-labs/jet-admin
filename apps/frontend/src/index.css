@@ -15,7 +15,7 @@
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 98%;
     
-    --primary: 153 61% 53%;
+    --primary: 237 100% 74%;
     --primary-foreground: 0 0% 98%;
     
     --secondary: 0 0% 18%;
@@ -32,15 +32,15 @@
     
     --border: 0 0% 18%;
     --input: 0 0% 21%;
-    --ring: 153 61% 53%;
+    --ring: 237 100% 74%;
     
     --radius: 6px;
     
     /* Custom brand properties */
-    --brand-green: #7582ff;
-      --brand-green-rgb: 117 130 255;
-      --brand-green-link: #3e71cf;
-    --brand-green-border: rgba(62, 207, 142, 0.3);
+    --brand-primary: #7582ff;
+      --brand-primary-rgb: 117 130 255;
+      --brand-primary-link: #3e71cf;
+    --brand-primary-border: rgba(117, 130, 255, 0.3);
     
     --brand-black: #0f0f0f;
     --brand-dark: #171717;
@@ -107,21 +107,21 @@ input:-webkit-autofill:focus {
 
 a {
   font-weight: 500;
-  color: var(--brand-green-link);
+  color: var(--brand-primary-link);
   text-decoration: none;
   transition: color 0.15s ease-in-out;
 }
 
 a:hover {
-  color: var(--brand-green);
+  color: var(--brand-primary);
 }
 
 .link-lime {
-  color: var(--brand-green-link);
+  color: var(--brand-primary-link);
   text-decoration: none;
 }
 .link-lime:hover {
-  color: var(--brand-green);
+  color: var(--brand-primary);
 }
 
 .link-purple {
@@ -149,7 +149,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   outline: none !important;
-  box-shadow: 0 0 0 2px var(--brand-green-border);
+  box-shadow: 0 0 0 2px var(--brand-primary-border);
 }
 
 /* MUI overrides to match Supabase Font */

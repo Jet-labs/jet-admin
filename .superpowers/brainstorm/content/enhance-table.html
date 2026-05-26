@@ -1,0 +1,147 @@
+<h2>Enhancing the Data Table Widget</h2>
+<p class="subtitle">Select your preferred interaction patterns for the new advanced Table features.</p>
+
+<div class="section">
+  <h3>1. Row Editing & Column Selectivity</h3>
+  <p>How should inline row editing look and operate?</p>
+  <div class="options" data-multiselect>
+    <div class="option" data-choice="row-edit-inline" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>Row-by-Row Inline Edit</h3>
+        <p>An "Edit" button on each row. Clicking it turns that row's selected editable cells into inputs, with "Save" and "Cancel" buttons. Runs the Save workflow for that row.</p>
+      </div>
+    </div>
+    <div class="option" data-choice="row-edit-excel" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>Bulk Excel-Style Edit</h3>
+        <p>Double-click any editable cell to edit immediately. Changes are staged with a subtle yellow highlight. A global "Save Changes" bar at the bottom triggers the bulk edit workflow.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>2. Search & Export Controls</h3>
+  <p>Where and how should the Search Box and Export buttons be positioned?</p>
+  <div class="options">
+    <div class="option" data-choice="controls-header" onclick="toggleSelect(this)">
+      <div class="letter">C</div>
+      <div class="content">
+        <h3>Integrated Widget Header</h3>
+        <p>Placed in the table header: Search input on the left, Export/Action buttons on the right. Feels like a unified professional data grid.</p>
+      </div>
+    </div>
+    <div class="option" data-choice="controls-external" onclick="toggleSelect(this)">
+      <div class="letter">D</div>
+      <div class="content">
+        <h3>Separate Configuration Toolbar</h3>
+        <p>A floating toolbar right above the table. Highly customizable, allows toggling search visibility, exporting to CSV/Excel, and adding custom action buttons.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>3. Multiple Row Selection & Bulk Actions</h3>
+  <p>How should multiple selection operations (like bulk delete or bulk export) behave?</p>
+  <div class="options">
+    <div class="option" data-choice="bulk-selection-bar" onclick="toggleSelect(this)">
+      <div class="letter">E</div>
+      <div class="content">
+        <h3>Floating Bulk Actions Bar</h3>
+        <p>Selecting multiple checkboxes slides up a sleek floating action bar at the bottom: "Selected X rows: [Delete] [Export]". Highly visible and saves space.</p>
+      </div>
+    </div>
+    <div class="option" data-choice="bulk-selection-header" onclick="toggleSelect(this)">
+      <div class="letter">F</div>
+      <div class="content">
+        <h3>Header Action Dropdowns</h3>
+        <p>Standard checkboxes on rows, with a dedicated "Bulk Actions" dropdown menu appearing in the table header only when one or more rows are selected.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup">
+  <div class="mockup-header">Interactive Table Preview (With All Enhancements Enabled)</div>
+  <div class="mockup-body">
+    
+    <!-- Table Toolbar -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:12px;">
+      <div style="position:relative; flex:1; max-width:320px;">
+        <input class="mock-input" style="width:100%; padding-left:28px;" placeholder="Search table data...">
+        <span style="position:absolute; left:8px; top:8px; opacity:0.5;">🔍</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="mock-button" style="background:#10b981; color:white; border:none;">📥 Export CSV</button>
+        <button class="mock-button" style="background:#3b82f6; color:white; border:none;">➕ Add Row</button>
+      </div>
+    </div>
+
+    <!-- Table Mockup -->
+    <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left; background:rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius:6px; overflow:hidden;">
+      <thead>
+        <tr style="background:rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.1);">
+          <th style="padding:10px; width:40px;"><input type="checkbox" checked></th>
+          <th style="padding:10px;">Name</th>
+          <th style="padding:10px;">Email (Editable)</th>
+          <th style="padding:10px;">Role (Editable)</th>
+          <th style="padding:10px; width:100px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Row 1: Normal Row -->
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(59,130,246,0.08);">
+          <td style="padding:10px;"><input type="checkbox" checked></td>
+          <td style="padding:10px; font-weight:500;">Alice Johnson</td>
+          <td style="padding:10px;">alice@example.com</td>
+          <td style="padding:10px;"><span style="background:rgba(59,130,246,0.2); color:#60a5fa; padding:2px 6px; border-radius:4px; font-size:11px;">Admin</span></td>
+          <td style="padding:10px;"><button class="mock-button" style="padding:3px 8px; font-size:11px;">Edit</button></td>
+        </tr>
+        <!-- Row 2: In-line editing active -->
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(245,158,11,0.06);">
+          <td style="padding:10px;"><input type="checkbox"></td>
+          <td style="padding:10px; font-weight:500; opacity:0.7;">Bob Smith (Read-Only)</td>
+          <td style="padding:6px 10px;"><input class="mock-input" style="width:100%; height:28px; border-color:#f59e0b;" value="bob.smith@example.com"></td>
+          <td style="padding:6px 10px;">
+            <select class="mock-input" style="width:100%; height:28px; border-color:#f59e0b; background:transparent;">
+              <option selected>Member</option>
+              <option>Admin</option>
+            </select>
+          </td>
+          <td style="padding:10px;">
+            <div style="display:flex; gap:4px;">
+              <button class="mock-button" style="padding:3px 8px; font-size:11px; background:#f59e0b; color:black; border:none; font-weight:600;">Save</button>
+              <button class="mock-button" style="padding:3px 8px; font-size:11px;">Cancel</button>
+            </div>
+          </td>
+        </tr>
+        <!-- Row 3: Excel-style dirty/edited cell -->
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:10px;"><input type="checkbox"></td>
+          <td style="padding:10px; font-weight:500;">Charlie Brown</td>
+          <td style="padding:10px; position:relative; background:rgba(234,179,8,0.1); border:1px dashed #eab308;" title="Unsaved modification">
+            charlie.b@gmail.com
+            <span style="position:absolute; top:2px; right:2px; font-size:9px; color:#eab308;">✏️</span>
+          </td>
+          <td style="padding:10px;"><span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:11px;">Guest</span></td>
+          <td style="padding:10px;"><button class="mock-button" style="padding:3px 8px; font-size:11px;">Edit</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Floating Bulk Action Bar Mockup -->
+    <div style="display:flex; justify-content:space-between; align-items:center; background:#1e1b4b; border:1px solid #4338ca; border-radius:8px; padding:12px 16px; margin-top:16px; animation: pulse 2s infinite;">
+      <div style="font-size:13px; color:#c7d2fe;">
+        ⚡ <strong>1 row selected</strong> (Alice Johnson)
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="mock-button" style="background:#e11d48; color:white; border:none; padding:6px 12px; font-size:12px;">🗑️ Bulk Delete</button>
+        <button class="mock-button" style="background:#4f46e5; color:white; border:none; padding:6px 12px; font-size:12px;">📤 Bulk Export</button>
+      </div>
+    </div>
+
+  </div>
+</div>

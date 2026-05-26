@@ -125,10 +125,10 @@ input[type="range"]:focus::-moz-range-thumb {
 }
 
 .MuiDataGrid-cell--editing {
-  background-color: var(--brand-green-border) !important; /* Supabase green overlay */
+  background-color: var(--brand-primary-border) !important; /* Supabase green overlay */
 }
 .changed-cell {
-  background-color: var(--brand-green) !important; /* Brand green */
+  background-color: var(--brand-primary) !important; /* Brand green */
   color: var(--brand-black) !important; /* Contrast text */
   position: relative;
 }

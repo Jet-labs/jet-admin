@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { Loader, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import PropTypes from "prop-types";
 import {
@@ -134,12 +134,12 @@ export const DataSourcesEditor = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <Label className="text-xs font-semibold text-foreground">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           Data Sources
-        </Label>
+        </p>
         <div className="flex items-center gap-1.5">
           {dataSourceResults && (
-            <span className="inline-flex items-center text-[12px] font-medium text-emerald-600 bg-emerald-50/50 px-[10px] h-[24px] rounded-sm border border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+            <span className="inline-flex items-center text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/30">
               Data loaded
             </span>
           )}
@@ -148,7 +148,6 @@ export const DataSourcesEditor = ({
               type="button"
               variant="outline"
               size="sm"
-              // className="h-7 text-xs gap-1"
               onClick={onTestRun}
               disabled={isTestRunning}
             >
@@ -164,10 +163,12 @@ export const DataSourcesEditor = ({
       </div>
 
       {dataSources.length === 0 && (
-        <p className="text-xs text-muted-foreground py-4 text-center border border-dashed rounded-md">
-          No data sources bound. Add a data query or workflow to feed data into
-          this widget.
-        </p>
+        <div className="rounded-md border border-dashed border-border bg-muted/30 p-3 text-center py-6">
+          <p className="text-[10px] text-muted-foreground">
+            No data sources bound. Add a data query or workflow to feed data into
+            this widget.
+          </p>
+        </div>
       )}
 
       {dataSources.map((source, idx) => {
@@ -175,18 +176,18 @@ export const DataSourcesEditor = ({
         return (
           <div
             key={idx}
-            className="space-y-2.5 rounded-md border bg-background/50 p-3"
+            className="rounded-md border border-border bg-card p-3 space-y-2.5"
           >
             {/* Header row */}
             <div className="flex items-center justify-between">
-              <span className="text-[0.65rem] font-medium text-muted-foreground">
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Source {idx + 1}
-              </span>
+              </p>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 text-destructive hover:bg-destructive/10"
+                className="h-6 w-6 p-0 text-destructive hover:bg-destructive/10"
                 onClick={() => handleRemoveSource(idx)}
               >
                 <Trash2 className="w-3 h-3" />
@@ -195,7 +196,7 @@ export const DataSourcesEditor = ({
 
             {/* Type selector */}
             <div className="space-y-1">
-              <Label className="text-[0.65rem] text-muted-foreground">
+              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Type
               </Label>
               <Select
@@ -216,7 +217,7 @@ export const DataSourcesEditor = ({
 
             {/* Source picker */}
             <div className="space-y-1">
-              <Label className="text-[0.65rem] text-muted-foreground">
+              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 {source.type === "query" ? "Data Query" : "Workflow"}
               </Label>
               {source.type === "query" ? (
@@ -260,7 +261,7 @@ export const DataSourcesEditor = ({
 
             {/* Alias */}
             <div className="space-y-1">
-              <Label className="text-[0.65rem] text-muted-foreground">
+              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Alias
               </Label>
               <Input
@@ -272,26 +273,26 @@ export const DataSourcesEditor = ({
                 }
                 placeholder="e.g. orders"
               />
-              <p className="text-[0.6rem] text-muted-foreground">
+              <p className="text-[10px] text-muted-foreground">
                 Used as the key in query results. E.g.{" "}
-                <code className="font-mono">{source.alias || "alias"}.data</code>
+                <code className="bg-background px-1 rounded border border-border font-mono text-xs">{source.alias || "alias"}.data</code>
               </p>
             </div>
 
             {/* Input Arguments */}
             {argDefs.length > 0 && (
-              <div className="space-y-2 mt-2">
-                <Label className="text-[0.6rem] text-muted-foreground font-medium">
+              <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2 mt-2">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Input Arguments
-                </Label>
+                </p>
                 {argDefs.map((arg) => {
                   const argKey = arg.key || arg.name;
                   return (
                     <div key={argKey} className="space-y-0.5">
-                      <Label className="text-[0.6rem] text-muted-foreground">
+                      <Label className="text-[10px] font-medium text-muted-foreground">
                         {argKey}
                         {arg.type && (
-                          <span className="ml-1 text-muted-foreground/60">
+                          <span className="ml-1 text-muted-foreground/50">
                             ({arg.type})
                           </span>
                         )}
@@ -314,7 +315,7 @@ export const DataSourcesEditor = ({
             {/* Query result preview */}
             {dataSourceResults?.[source.alias] && (
               <div className="mt-2">
-                <Label className="text-[0.6rem] text-muted-foreground">
+                <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   {source.type === 'workflow' && dataSourceResults[source.alias]?.instanceID ? 'Execution Status' : 'Result Preview'}
                 </Label>
                 {source.type === 'workflow' && dataSourceResults[source.alias]?.instanceID ? (() => {
@@ -330,7 +331,7 @@ export const DataSourcesEditor = ({
                   };
                   
                   return (
-                    <div className="mt-1 h-48 border border-border rounded-md overflow-hidden shadow-inner flex flex-col">
+                    <div className="mt-1 h-48 border border-border rounded-md overflow-hidden flex flex-col">
                       <WorkflowConsole 
                         logs={executionData.logs}
                         isRunning={executionData.status !== 'COMPLETED' && executionData.status !== 'FAILED'}
@@ -339,7 +340,7 @@ export const DataSourcesEditor = ({
                     </div>
                   );
                 })() : (
-                  <pre className="mt-1 max-h-24 overflow-auto rounded-sm bg-muted p-2 text-[0.6rem] font-mono">
+                  <pre className="mt-1 max-h-24 overflow-auto rounded-md bg-foreground text-background p-2 text-[10px] font-mono leading-relaxed">
                     {JSON.stringify(dataSourceResults[source.alias], null, 2)?.slice(
                       0,
                       500
@@ -357,7 +358,6 @@ export const DataSourcesEditor = ({
           type="button"
           variant="outline"
           size="sm"
-          className="text-xs gap-1"
           onClick={handleAddSource}
         >
           <Plus className="w-3.5 h-3.5" />

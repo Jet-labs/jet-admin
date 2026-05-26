@@ -1037,6 +1037,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/queries/${dataQueryID}/clone`,
       testDataQueryByIDAPI: (tenantID, dataQueryID) =>
         `/api/v1/tenants/${tenantID}/queries/${dataQueryID}/queryTest`,
+      runDataQueryByIDAPI: (tenantID, dataQueryID) =>
+        `/api/v1/tenants/${tenantID}/queries/${dataQueryID}/run`,
       testDataQueryByDataAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/queries/queryTest`,
       generateAIPromptBasedQueryAPI: (tenantID) =>

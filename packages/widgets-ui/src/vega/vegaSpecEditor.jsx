@@ -400,6 +400,18 @@ export const VegaSpecEditor = ({
               detail: "Workflow Context (Runtime)", insertText: "ctx.", range,
             });
           }
+          if ("queries".startsWith(partial)) {
+            suggestions.push({
+              label: "queries", kind: monaco.languages.CompletionItemKind.Module,
+              detail: "Page Queries", insertText: "queries.", range,
+            });
+          }
+          if ("workflows".startsWith(partial)) {
+            suggestions.push({
+              label: "workflows", kind: monaco.languages.CompletionItemKind.Module,
+              detail: "Page Workflows", insertText: "workflows.", range,
+            });
+          }
           if (schema) {
             const add = (items, kind, pfx) =>
               items.forEach((item) => {
@@ -428,6 +440,34 @@ export const VegaSpecEditor = ({
                   label: k, kind: monaco.languages.CompletionItemKind.Variable,
                   detail: getValuePreview(workflowContext, k), insertText: k, range,
                   documentation: `Value: ${getValuePreview(workflowContext, k)}`,
+                })
+              );
+          }
+
+          const queriesMatch = lineText.match(/\{\{queries\.([a-zA-Z0-9_\[\].]*)$/);
+          if (queriesMatch && workflowContext.queries) {
+            const partial = queriesMatch[1];
+            getNestedKeys(workflowContext.queries, "", 4)
+              .filter((k) => k.toLowerCase().includes(partial.toLowerCase()))
+              .forEach((k) =>
+                suggestions.push({
+                  label: k, kind: monaco.languages.CompletionItemKind.Variable,
+                  detail: getValuePreview(workflowContext.queries, k), insertText: k, range,
+                  documentation: `Value: ${getValuePreview(workflowContext.queries, k)}`,
+                })
+              );
+          }
+
+          const workflowsMatch = lineText.match(/\{\{workflows\.([a-zA-Z0-9_\[\].]*)$/);
+          if (workflowsMatch && workflowContext.workflows) {
+            const partial = workflowsMatch[1];
+            getNestedKeys(workflowContext.workflows, "", 4)
+              .filter((k) => k.toLowerCase().includes(partial.toLowerCase()))
+              .forEach((k) =>
+                suggestions.push({
+                  label: k, kind: monaco.languages.CompletionItemKind.Variable,
+                  detail: getValuePreview(workflowContext.workflows, k), insertText: k, range,
+                  documentation: `Value: ${getValuePreview(workflowContext.workflows, k)}`,
                 })
               );
           }
@@ -512,7 +552,7 @@ export const VegaSpecEditor = ({
         footerHint={
           workflowContext ? (
             <>
-              Type <code className="font-mono bg-muted px-1 rounded-sm">{"{{ctx."}</code> for suggestions
+              Type <code className="font-mono bg-muted px-1 rounded-sm">{"{{"}</code> to autocomplete data sources or context
             </>
           ) : null
         }

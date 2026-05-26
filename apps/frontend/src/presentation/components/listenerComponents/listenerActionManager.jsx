@@ -156,7 +156,7 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
             
             return (
               <div key={action.actionID} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border-[3px] border-brand-dark bg-brand-border/80 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 ring-1 ring-border/20 transition-all group-hover:ring-brand-green/30 group-hover:border-brand-dark/90">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full border-[3px] border-brand-dark bg-brand-border/80 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 ring-1 ring-border/20 transition-all group-hover:ring-brand-primary/30 group-hover:border-brand-dark/90">
                   <span className="text-[11px] font-bold text-muted-foreground group-hover:text-foreground">{index + 1}</span>
                 </div>
 

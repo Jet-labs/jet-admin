@@ -9,29 +9,79 @@ const widgetService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-widgetService.getAllWidgets = async ({ authContext, tenantID }) => {
+widgetService.getAllWidgets = async ({ authContext, tenantID, search, page, pageSize }) => {
   Logger.log("info", {
     message: "widgetService:getAllWidgets:params",
     params: {
       authContext,
       tenantID,
+      search,
+      page,
+      pageSize,
     },
   });
 
   try {
-    const widgets = await prisma.tblWidgets.findMany({
-      where: {
-        tenantID: tenantID,
+    const where = {
+      tenantID: tenantID,
+    };
+
+    if (search) {
+      where.OR = [
+        {
+          widgetTitle: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          widgetDescription: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          widgetType: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+    }
+
+    const findManyOptions = {
+      where,
+      orderBy: {
+        createdAt: "desc",
       },
-    });
+    };
+
+    if (page && pageSize) {
+      findManyOptions.skip = (page - 1) * pageSize;
+      findManyOptions.take = pageSize;
+    }
+
+    const [widgets, totalCount] = await Promise.all([
+      prisma.tblWidgets.findMany(findManyOptions),
+      prisma.tblWidgets.count({ where }),
+    ]);
+
     Logger.log("success", {
       message: "widgetService:getAllWidgets:success",
       params: {
         authContext,
-        widgets,
+        widgetsLength: widgets.length,
+        totalCount,
       },
     });
-    return widgets;
+
+    return {
+      widgets,
+      totalCount,
+      page: page || 1,
+      pageSize: pageSize || widgets.length,
+      totalPages: pageSize ? Math.ceil(totalCount / pageSize) : 1,
+    };
   } catch (error) {
     Logger.log("error", {
       message: "widgetService:getAllWidgets:failure",

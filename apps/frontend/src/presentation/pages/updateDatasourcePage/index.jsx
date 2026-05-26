@@ -9,7 +9,7 @@ const UpdateDatasourcePage = () => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-      <DatasourceUpdationForm tenantID={tenantID} datasourceID={datasourceID} />
+      <DatasourceUpdationForm key={datasourceID} tenantID={tenantID} datasourceID={datasourceID} />
     </div>
   );
 };

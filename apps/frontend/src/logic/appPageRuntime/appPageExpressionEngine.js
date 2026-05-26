@@ -32,18 +32,44 @@ export {
  * @param {object} reducerState - The raw state from appPageReducer
  * @returns {object} The namespaced state tree for expression resolution
  */
-export const buildAppPageStateTree = (reducerState) => {
+export const buildAppPageStateTree = (reducerState, dataSources = []) => {
   const {
     queryResults = {},
+    workflowResults = {},
     widgetStates = {},
+    widgetMethods = {},
     variables = {},
     listenerData = {},
     globals = {},
   } = reducerState;
 
+  const queries = {};
+  const workflows = {};
+
+  for (const ds of dataSources) {
+    const alias = ds.alias;
+    if (!alias) continue;
+
+    if (ds.type === "workflow") {
+      workflows[alias] = workflowResults[alias] || {
+        data: null,
+        error: null,
+        isLoading: false,
+      };
+    } else {
+      queries[alias] = queryResults[alias] || {
+        data: null,
+        error: null,
+        isLoading: false,
+      };
+    }
+  }
+
   return {
-    queries: queryResults,
+    queries,
+    workflows,
     widgets: widgetStates,
+    widgetMethods,
     variables,
     listeners: listenerData,
     globals,
@@ -61,7 +87,7 @@ export const buildAppPageStateTree = (reducerState) => {
 export const getChangedPaths = (prevTree, nextTree) => {
   const changed = [];
 
-  const namespaces = ["queries", "widgets", "variables", "listeners", "globals"];
+  const namespaces = ["queries", "workflows", "widgets", "variables", "listeners", "globals"];
 
   for (const ns of namespaces) {
     const prevNs = prevTree[ns] || {};

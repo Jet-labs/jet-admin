@@ -73,6 +73,24 @@ formValidations.updateDashboardFormValidationSchema = Yup.object().shape({
   }),
 });
 
+formValidations.addAppPageFormValidationSchema = Yup.object().shape({
+  appPageTitle: Yup.string().required("App page name is required").trim(),
+  appPageDescription: Yup.string().trim(),
+  appPageConfig: Yup.object().shape({
+    widgets: Yup.array(),
+    layouts: Yup.object(),
+  }),
+});
+
+formValidations.updateAppPageFormValidationSchema = Yup.object().shape({
+  appPageTitle: Yup.string().required("App page name is required").trim(),
+  appPageDescription: Yup.string().trim(),
+  appPageConfig: Yup.object().shape({
+    widgets: Yup.array(),
+    layouts: Yup.object(),
+  }),
+});
+
 formValidations.queryAdditionFormValidationSchema = Yup.object().shape({
   dataQueryTitle: Yup.string()
     .required("Query title is required")

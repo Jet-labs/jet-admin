@@ -54,18 +54,18 @@ export const WidgetCustomCSSForm = ({ tenantID, widgetID, }) => {
         className="text-xs bg-muted text-primary hover:bg-foreground/10 hover:text-primary"
       >
         <FileCode className="text-base mr-1" />
-        {CONSTANTS.STRINGS.DASHBOARD_WIDGET_CUSTOM_CSS_BUTTON}
+        {CONSTANTS.STRINGS.APP_PAGE_WIDGET_CUSTOM_CSS_BUTTON}
       </Button>
       <Dialog open={open} onOpenChange={(v) => { if (!v) _handleClose(); }}>
         <DialogContent className="max-w-lg p-4">
           <DialogHeader className="space-y-1">
             <DialogTitle className="text-sm font-semibold">
-              {CONSTANTS.STRINGS.DASHBOARD_WIDGET_CUSTOM_CSS_FORM_TITLE}
+              {CONSTANTS.STRINGS.APP_PAGE_WIDGET_CUSTOM_CSS_FORM_TITLE}
             </DialogTitle>
           </DialogHeader>
           <div className="px-0">
             <span className="font-normal text-sm">
-              {CONSTANTS.STRINGS.DASHBOARD_WIDGET_CUSTOM_CSS_FORM_DESCRIPTION}
+              {CONSTANTS.STRINGS.APP_PAGE_WIDGET_CUSTOM_CSS_FORM_DESCRIPTION}
             </span>
             {widgetPreviewKey && (
               <div className="mt-4">
@@ -82,7 +82,7 @@ export const WidgetCustomCSSForm = ({ tenantID, widgetID, }) => {
               type="button"
               variant="secondary"
             >
-              {CONSTANTS.STRINGS.DASHBOARD_WIDGET_CUSTOM_CSS_FORM_CANCEL}
+              {CONSTANTS.STRINGS.APP_PAGE_WIDGET_CUSTOM_CSS_FORM_CANCEL}
             </Button>
 
             <Button
@@ -90,7 +90,7 @@ export const WidgetCustomCSSForm = ({ tenantID, widgetID, }) => {
               onClick={_handleOnAccepted}
 
             >
-              {CONSTANTS.STRINGS.DASHBOARD_WIDGET_CUSTOM_CSS_FORM_CONFIRM}
+              {CONSTANTS.STRINGS.APP_PAGE_WIDGET_CUSTOM_CSS_FORM_CONFIRM}
             </Button>
           </DialogFooter>
         </DialogContent>

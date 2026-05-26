@@ -5,22 +5,22 @@ import { inferFieldsFromData } from './chartSpecGenerator';
 import { extractWorkflowSchema } from './variableExplorer';
 
 import { Button, Input, Label } from "@jet-admin/ui";
-import { Database, GitMerge, ArrowRightFromLine } from 'lucide-react';
+import { Database, GitMerge, ArrowRightFromLine, Zap, Search, Plus } from 'lucide-react';
 /**
  * Recursively walk context and collect all array paths.
  */
-const collectArrayPaths = (obj, prefix = 'ctx', depth = 0, maxDepth = 4) => {
+const collectArrayPaths = (obj, prefix = '', depth = 0, maxDepth = 4) => {
   const results = [];
   if (!obj || typeof obj !== 'object' || depth > maxDepth) return results;
 
   for (const key of Object.keys(obj)) {
     const val = obj[key];
-    const fullPath = `${prefix}.${key}`;
+    const fullPath = prefix ? `${prefix}.${key}` : key;
 
     if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
       results.push({
         path: `{{${fullPath}}}`,
-        label: fullPath.replace(/^ctx\./, ''),
+        label: fullPath,
         sampleKeys: Object.keys(val[0]),
         rowCount: val.length,
       });
@@ -100,7 +100,7 @@ export const DataFieldPanel = ({
   // Query result array paths
   const queryResultPaths = useMemo(() => {
     if (!queryResults) return [];
-    return collectArrayPaths(queryResults, 'qr');
+    return collectArrayPaths(queryResults);
   }, [queryResults]);
 
   // All suggestions combined
@@ -154,62 +154,59 @@ export const DataFieldPanel = ({
 
   // Resolve fields from selected data source
   const fields = useMemo(() => {
-    // Try resolving from workflowContext (legacy path)
-    if (workflowContext && dataSource) {
-      const match = dataSource.match(/\{\{ctx\.([^}]+)\}\}/);
-      if (match) {
-        const path = match[1];
-        const parts = path.split('.');
-        let current = workflowContext;
+    if (!dataSource) return [];
 
-        for (const part of parts) {
-          if (current === undefined || current === null) break;
-          const arrMatch = part.match(/^(.+)\[(\d+)\]$/);
-          if (arrMatch) {
-            current = current[arrMatch[1]]?.[parseInt(arrMatch[2])];
-          } else {
-            current = current[part];
-          }
-        }
+    // Extract the inner path from {{...}}
+    const match = dataSource.match(/\{\{([^}]+)\}\}/);
+    if (!match) return [];
 
-        if (Array.isArray(current)) {
-          return inferFieldsFromData(current);
-        }
-        if (current && typeof current === 'object' && !Array.isArray(current)) {
-          return Object.keys(current).map(key => ({
-            name: key,
-            type: typeof current[key] === 'number' ? 'quantitative' : 'nominal',
-            icon: typeof current[key] === 'number' ? '#' : 'Abc',
-          }));
-        }
-      }
-    }
+    const rawPath = match[1];
+    // Strip legacy "ctx." prefix for resolution against workflowContext
+    const cleanPath = rawPath.startsWith('ctx.') ? rawPath.slice(4) : rawPath;
 
-    // Try resolving from queryResults (new data source path)
-    if (queryResults && dataSource) {
-      // Match patterns like {{alias.data}} or {{alias}}
-      const match = dataSource.match(/\{\{([^}]+)\}\}/);
-      if (match) {
-        const fullPath = match[1];
-        const parts = fullPath.split('.');
-        let current = queryResults;
-
-        for (const part of parts) {
-          if (current === undefined || current === null) break;
+    // Helper: walk a dotted path with bracket-index support
+    const resolvePath = (root, pathStr) => {
+      const parts = pathStr.split('.');
+      let current = root;
+      for (const part of parts) {
+        if (current === undefined || current === null) return undefined;
+        const arrMatch = part.match(/^(.+)\[(\d+)\]$/);
+        if (arrMatch) {
+          current = current[arrMatch[1]]?.[parseInt(arrMatch[2])];
+        } else {
           current = current[part];
         }
-
-        if (Array.isArray(current) && current.length > 0) {
-          return inferFieldsFromData(current);
-        }
-        if (current && typeof current === 'object' && !Array.isArray(current)) {
-          return Object.keys(current).map(key => ({
-            name: key,
-            type: typeof current[key] === 'number' ? 'quantitative' : 'nominal',
-            icon: typeof current[key] === 'number' ? '#' : 'Abc',
-          }));
-        }
       }
+      return current;
+    };
+
+    // Helper: convert resolved data into field descriptors
+    const toFields = (data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        return inferFieldsFromData(data);
+      }
+      if (data && typeof data === 'object' && !Array.isArray(data)) {
+        return Object.keys(data).map(key => ({
+          name: key,
+          type: typeof data[key] === 'number' ? 'quantitative' : 'nominal',
+          icon: typeof data[key] === 'number' ? '#' : 'Abc',
+        }));
+      }
+      return null;
+    };
+
+    // Try workflowContext first (covers both legacy ctx. and modern page-level paths)
+    if (workflowContext) {
+      const resolved = resolvePath(workflowContext, cleanPath);
+      const result = toFields(resolved);
+      if (result) return result;
+    }
+
+    // Fallback: try queryResults (may be a different object in non-page-level mode)
+    if (queryResults && queryResults !== workflowContext) {
+      const resolved = resolvePath(queryResults, rawPath);
+      const result = toFields(resolved);
+      if (result) return result;
     }
 
     return [];
@@ -245,7 +242,7 @@ export const DataFieldPanel = ({
     switch (cat) {
       case 'node': return <GitMerge className="w-3 h-3 shrink-0 text-emerald-600" />;
       case 'output': return <ArrowRightFromLine className="w-3 h-3 shrink-0 text-fuchsia-600" />;
-      case 'runtime': return <FiZap className="w-3 h-3 shrink-0 text-amber-600" />;
+      case 'runtime': return <Zap className="w-3 h-3 shrink-0 text-amber-600" />;
       case 'datasource': return <Database className="w-3 h-3 shrink-0 text-blue-600" />;
       default: return <Database className="w-3 h-3 shrink-0 text-brand-text-primary" />;
     }
@@ -331,7 +328,7 @@ export const DataFieldPanel = ({
         {/* Show selected source info */}
         {dataSource && fields.length > 0 && (
           <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm w-fit border border-emerald-100">
-            <FiZap className="w-3 h-3" />
+            <Zap className="w-3 h-3" />
             {fields.length} fields detected
           </div>
         )}
@@ -341,7 +338,7 @@ export const DataFieldPanel = ({
       {fields.length > 5 && (
         <div className="px-2.5 py-1.5 border-b border-border bg-brand-dark">
           <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-sm px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow">
-            <FiSearch className="w-3.5 h-3.5 text-muted-foreground" />
+            <Search className="w-3.5 h-3.5 text-muted-foreground" />
             <Input
               type="text"
               value={searchTerm}
@@ -422,7 +419,7 @@ export const DataFieldPanel = ({
               onClick={() => setShowManualAdd(true)}
               className="w-full h-auto py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 border-dashed border-border hover:bg-muted hover:text-foreground"
             >
-              <FiPlus className="w-3.5 h-3.5 mr-1" />
+                <Plus className="w-3.5 h-3.5 mr-1" />
               <span>Add Field Manually</span>
             </Button>
           )}

@@ -1,7 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../constants";
-import { getUserConfigAPI, getUserInfoAPI, updateUserConfigAPI } from "../../data/apis/auth";
+import { getUserInfoAPI } from "../../data/apis/auth";
 import { useAuthStore } from "../stores/useAuthStore";
 
 export const useAuthState = () => {
@@ -10,6 +9,10 @@ export const useAuthState = () => {
   const signUpState = useAuthStore((state) => state.signUpState);
   const signOutState = useAuthStore((state) => state.signOutState);
   const passwordResetState = useAuthStore((state) => state.passwordResetState);
+
+  const userConfig = useAuthStore((state) => state.userConfig);
+  const isFetchingUserConfig = useAuthStore((state) => state.isFetchingUserConfig);
+  const isUpdatingUserConfig = useAuthStore((state) => state.isUpdatingUserConfig);
 
   const {
     isLoading: isLoadingUser,
@@ -25,46 +28,16 @@ export const useAuthState = () => {
     staleTime: Infinity,
   });
 
-  // For User Config - since hooks can't easily share this piece of state without a context,
-  // we will move userConfig to the Zustand store.
-  // Wait, let's just fetch it here.
-  const [userConfig, setUserConfig] = useState();
-
-  const {
-    isPending: isFetchingUserConfig,
-    isSuccess: isFetchingUserConfigSuccess,
-    isError: isFetchingUserConfigError,
-    error: getUserConfigError,
-  } = useMutation({
-    mutationKey: [CONSTANTS.REACT_QUERY_KEYS.DB_USER_CONFIG],
-    mutationFn: async ({ tenantID }) => await getUserConfigAPI({ tenantID }),
-    retry: false,
-    onSuccess: (data) => setUserConfig(data),
-    onError: (error) => console.error(error),
-  });
-
-  const {
-    isPending: isUpdatingUserConfig,
-    isSuccess: isUpdatingUserConfigSuccess,
-    isError: isUpdatingUserConfigError,
-    error: updateUserConfigError,
-  } = useMutation({
-    mutationFn: ({ tenantID, config }) => updateUserConfigAPI({ tenantID, config }),
-    retry: false,
-    onSuccess: (tenantID) => { /* Requires getUserConfig which is in actions */ },
-    onError: (error) => console.error(error),
-  });
-
   return {
     firebaseUserState,
     user,
     userError,
-    getUserConfigError,
-    updateUserConfigError,
-    isFetchingUserConfigSuccess,
-    isUpdatingUserConfigSuccess,
-    isFetchingUserConfigError,
-    isUpdatingUserConfigError,
+    getUserConfigError: null,
+    updateUserConfigError: null,
+    isFetchingUserConfigSuccess: !isFetchingUserConfig && !!userConfig,
+    isUpdatingUserConfigSuccess: false,
+    isFetchingUserConfigError: false,
+    isUpdatingUserConfigError: false,
     isLoadingUser,
     isFetchingUser,
     signInState,
@@ -84,25 +57,8 @@ export const useAuthActions = () => {
   const resetPassword = useAuthStore((state) => state.resetPassword);
   const signOut = useAuthStore((state) => state.signOut);
   const setFirebaseUserState = useAuthStore((state) => state.setFirebaseUserState);
-
-  const { mutate: getUserConfig } = useMutation({
-    mutationKey: [CONSTANTS.REACT_QUERY_KEYS.DB_USER_CONFIG],
-    mutationFn: async ({ tenantID }) => await getUserConfigAPI({ tenantID }),
-    retry: false,
-  });
-
-  const { mutate: updateUserConfig } = useMutation({
-    mutationFn: ({ tenantID, config }) => updateUserConfigAPI({ tenantID, config }),
-    retry: false,
-  });
-
-  const updateUserConfigKey = useCallback(
-    ({ tenantID, key, value }) => {
-      // Stub - this logic should ideally be centralized if it's heavily used.
-      console.log("updateUserConfigKey", { tenantID, key, value });
-    },
-    []
-  );
+  const fetchUserConfig = useAuthStore((state) => state.fetchUserConfig);
+  const updateUserConfigKey = useAuthStore((state) => state.updateUserConfigKey);
 
   return {
     googleSignIn,
@@ -110,8 +66,8 @@ export const useAuthActions = () => {
     emailSignUp,
     resetPassword,
     signOut,
-    getUserConfig,
-    updateUserConfig,
+    getUserConfig: fetchUserConfig,
+    updateUserConfig: null,
     updateUserConfigKey,
     setFirebaseUserState,
   };

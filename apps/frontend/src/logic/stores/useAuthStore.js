@@ -7,6 +7,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { firebaseAuth } from "../../config/firebase";
+import { getUserConfigAPI, updateUserConfigAPI } from "../../data/apis/auth";
 
 export const useAuthStore = create((set, get) => ({
   firebaseUserState: {
@@ -19,7 +20,35 @@ export const useAuthStore = create((set, get) => ({
   signOutState: { isLoading: false, success: false, error: null },
   passwordResetState: { isLoading: false, success: false, error: null },
 
+  userConfig: null,
+  isFetchingUserConfig: false,
+  isUpdatingUserConfig: false,
+
   setFirebaseUserState: (state) => set({ firebaseUserState: state }),
+
+  fetchUserConfig: async ({ tenantID }) => {
+    set({ isFetchingUserConfig: true });
+    try {
+      const data = await getUserConfigAPI({ tenantID });
+      set({ userConfig: data, isFetchingUserConfig: false });
+    } catch (error) {
+      console.error(error);
+      set({ isFetchingUserConfig: false });
+    }
+  },
+
+  updateUserConfigKey: async ({ tenantID, key, value }) => {
+    set({ isUpdatingUserConfig: true });
+    try {
+      const currentConfig = get().userConfig || {};
+      const newConfig = { ...currentConfig, [key]: value };
+      await updateUserConfigAPI({ tenantID, config: newConfig });
+      set({ userConfig: newConfig, isUpdatingUserConfig: false });
+    } catch (error) {
+      console.error(error);
+      set({ isUpdatingUserConfig: false });
+    }
+  },
   
   googleSignIn: async () => {
     try {

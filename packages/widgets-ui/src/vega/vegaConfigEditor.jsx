@@ -35,6 +35,10 @@ export const VegaConfigEditor = ({
   const [parseWarningsList, setParseWarningsList] = useState([]);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
 
+  const resolvedSelectedWorkflow = selectedWorkflow || (workflows && widgetEditorForm.values.workflowID
+    ? workflows.find(w => String(w.workflowID) === String(widgetEditorForm.values.workflowID))
+    : null);
+
   // Handle mode switch
   const handleModeSwitch = (newMode) => {
     if (newMode === currentMode) return;
@@ -163,7 +167,7 @@ export const VegaConfigEditor = ({
             value={widgetEditorForm.values.widgetConfig?.vegaSpec}
             onChange={(spec) => widgetEditorForm.setFieldValue('widgetConfig.vegaSpec', spec)}
             workflowContext={workflowContext}
-            workflow={selectedWorkflow}
+            workflow={resolvedSelectedWorkflow}
           />
         </div>
       )}

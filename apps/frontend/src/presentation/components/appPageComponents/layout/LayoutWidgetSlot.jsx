@@ -11,7 +11,12 @@ export default function LayoutWidgetSlot({
   const sizingClass = `sizing-${node.sizing || "fill"}`;
   const isActive = activeNodeId === node.id;
 
-  const slotStyle = {};
+  const slotStyle = {
+    padding: node.style?.padding,
+    margin: node.style?.margin,
+    borderRadius: node.style?.borderRadius,
+    ...(node.style || {}),
+  };
   if (node.sizing === "fixed" && node.fixedHeight) {
     slotStyle["--fixed-height"] = `${node.fixedHeight}px`;
   }
@@ -34,7 +39,15 @@ export default function LayoutWidgetSlot({
       onClick={handleClick}
       id={node.id}
     >
-      <div className="layout-widget-wrapper">
+      <div
+        className="layout-widget-wrapper"
+        style={{
+          borderRadius: node.style?.borderRadius,
+          padding: node.style?.padding,
+          margin: node.style?.margin,
+          overflow: node.style?.borderRadius ? "hidden" : undefined,
+        }}
+      >
         {renderWidget(node.widgetKey, node.sizing)}
       </div>
     </div>

@@ -21,6 +21,7 @@ import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DataQueryCloneForm } from "./dataQueryCloneForm";
 import { DataQueryEditor } from "./dataQueryEditor";
+import { useDatasourceOptions } from "../../../logic/hooks/useDatasourceOptions";
 
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
@@ -51,6 +52,8 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
     refetchOnWindowFocus: false,
   });
 
+  const { isLoadingDatasources, loadDatasourcesError } = useDatasourceOptions(tenantID);
+
   const { isPending: isUpdatingDataQuery, mutate: updateDataQuery } =
     useMutation({
       mutationFn: (data) => {
@@ -77,7 +80,7 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
   // Derive initial values from fetched data query
   const initialValues = useMemo(() => ({
     dataQueryTitle: dataQuery?.dataQueryTitle || "Untitled",
-    datasourceID: dataQuery?.datasourceID || "",
+    datasourceID: String(dataQuery?.datasourceID || dataQuery?.datasourceType || ""),
     datasourceType: dataQuery?.datasourceType || "",
     dataQueryOptions: dataQuery?.dataQueryOptions || {},
     runOnLoad: dataQuery?.runOnLoad || false,
@@ -139,8 +142,8 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
       </PageHeader>
 
       <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingDataQuery}
-        error={loadDataQueryError}
+        isLoading={isLoadingDataQuery || isLoadingDatasources}
+        error={loadDataQueryError || loadDatasourcesError}
       >
         <ResizablePanelGroup
           direction="vertical"
@@ -151,24 +154,24 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
         >
           <ResizablePanel defaultSize={20} className="!overflow-y-auto h-full p-8">
             <div className="mx-auto w-full max-w-2xl">
-              <form
-                id="dataquery-update-form"
-                className="space-y-4 w-full"
-                onSubmit={queryUpdationForm.handleSubmit}
-                noValidate
-              >
-
-
-
-
-
-                <DataQueryEditor
-                  key={`dataQueryEditor_${dataQuery?.dataQueryID ? dataQuery.dataQueryID : "new"}`}
-                  dataQueryEditorForm={queryUpdationForm}
-                  tenantID={tenantID}
-                  dataQueryID={dataQueryID}
-                />
-              </form>
+              {/* Only render the form once formik values are in sync with loaded data.
+                  enableReinitialize runs in a useEffect (async), so there's a one-render gap
+                  where form values are stale but the loading wrapper has already unblocked. */}
+              {queryUpdationForm.values.datasourceID === initialValues.datasourceID ? (
+                <form
+                  id="dataquery-update-form"
+                  className="space-y-4 w-full"
+                  onSubmit={queryUpdationForm.handleSubmit}
+                  noValidate
+                >
+                  <DataQueryEditor
+                    key={`dataQueryEditor_${dataQuery?.dataQueryID ? dataQuery.dataQueryID : "new"}`}
+                    dataQueryEditorForm={queryUpdationForm}
+                    tenantID={tenantID}
+                    dataQueryID={dataQueryID}
+                  />
+                </form>
+              ) : null}
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />

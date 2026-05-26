@@ -80,7 +80,7 @@ export const DataQueryEditor = ({
   const uniqueKey = dataQueryID
     ? `dataQueryEditor_${tenantID}_${dataQueryID}`
     : `dataQueryEditor_${tenantID}`;
-  const { datasources } = useDatasourceOptions(tenantID);
+  const { datasources, isLoadingDatasources } = useDatasourceOptions(tenantID);
 
   // Get the current datasource type config
   const currentDatasourceType = getDatasourceTypeByValue(dataQueryEditorForm.values.datasourceType);
@@ -109,12 +109,14 @@ export const DataQueryEditor = ({
     (val) => {
       dataQueryEditorForm.setFieldValue("datasourceID", val);
       const selectedDatasource = datasources.find(
-        (datasource) => datasource.value === val
+        (datasource) => String(datasource.value) === String(val)
       );
-      dataQueryEditorForm.setFieldValue(
-        "datasourceType",
-        selectedDatasource.type
-      );
+      if (selectedDatasource) {
+        dataQueryEditorForm.setFieldValue(
+          "datasourceType",
+          selectedDatasource.type
+        );
+      }
     },
     [dataQueryEditorForm, datasources]
   );
@@ -149,21 +151,27 @@ export const DataQueryEditor = ({
             <Label htmlFor="datasourceID">
               {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL} <span className="text-destructive">*</span>
             </Label>
-            <Select
-              value={dataQueryEditorForm.values.datasourceID}
-              onValueChange={_handleDatasourceTypeChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select datasource" />
-              </SelectTrigger>
-              <SelectContent>
-                {datasources?.map((datasource) => (
-                  <SelectItem key={datasource.value} value={datasource.value}>
-                    {datasource.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isLoadingDatasources ? (
+              <div className="h-10 flex items-center px-3 border border-input bg-background rounded-md text-sm text-muted-foreground italic">
+                Loading data sources...
+              </div>
+            ) : (
+              <Select
+                value={String(dataQueryEditorForm.values.datasourceID || "")}
+                onValueChange={_handleDatasourceTypeChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select datasource" />
+                </SelectTrigger>
+                <SelectContent>
+                  {datasources?.map((datasource) => (
+                    <SelectItem key={datasource.value} value={String(datasource.value)}>
+                      {datasource.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             {dataQueryEditorForm.touched.datasourceID && dataQueryEditorForm.errors.datasourceID && (
               <p className="text-xs text-red-500">
                 {dataQueryEditorForm.errors.datasourceID}

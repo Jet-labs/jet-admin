@@ -154,38 +154,34 @@ var TableWidgetBuilder = class extends BaseWidgetBuilder {
   buildRender({ widgetType = "table", widgetConfig }) {
     if (!widgetConfig) return null;
     const data = Array.isArray(widgetConfig.dataArrayTemplate) ? widgetConfig.dataArrayTemplate : [];
-    const totalRows = typeof widgetConfig.pagination?.totalTemplate === "number" ? widgetConfig.pagination.totalTemplate : data.length;
+    const rawTotal = widgetConfig.pagination?.totalTemplate;
+    const parsedTotal = rawTotal != null ? Number(rawTotal) : NaN;
+    const totalRows = !isNaN(parsedTotal) && parsedTotal >= 0 ? parsedTotal : data.length;
     return {
       data,
       columns: widgetConfig.columns || [],
       pagination: {
         enabled: widgetConfig.pagination?.enabled || false,
-        pageParam: widgetConfig.pagination?.pageParam || "page",
-        pageSizeParam: widgetConfig.pagination?.pageSizeParam || "limit",
         totalRows
-      }
+      },
+      search: widgetConfig.search || { enabled: false },
+      export: widgetConfig.export || { enabled: false },
+      editing: widgetConfig.editing || { enabled: false },
+      multiSelect: widgetConfig.multiSelect || { enabled: false },
+      bulkEdit: widgetConfig.bulkEdit || { enabled: false }
     };
   }
   /**
    * Resolve the data prop for TableWidget from widgetConfig + dataSourceResults.
-   * Expects all template expressions to be resolved by the evaluationEngine.
+   * Delegates to buildRender() to return the full structured output including
+   * pagination config, columns, and total row count.
    *
    * @param {object} widgetConfig - The full widget configuration (already resolved)
    * @param {object|null} dataSourceResults - Executed data source results
-   * @returns {Array|null} Array of row objects for the table, or null
+   * @returns {object|null} { data, columns, pagination } for the table, or null
    */
   resolveData(widgetConfig, dataSourceResults) {
-    if (Array.isArray(widgetConfig?.dataArrayTemplate)) {
-      return widgetConfig.dataArrayTemplate;
-    }
-    if (dataSourceResults && widgetConfig?.dataMapping?.dataArrayPath) {
-      const resolved = getByPath(dataSourceResults, widgetConfig.dataMapping.dataArrayPath);
-      if (Array.isArray(resolved)) return resolved;
-      if (resolved && typeof resolved === "object" && Array.isArray(resolved.data)) {
-        return resolved.data;
-      }
-    }
-    return null;
+    return this.buildRender({ widgetType: "table", widgetConfig });
   }
   static get dataManifest() {
     return {

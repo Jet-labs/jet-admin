@@ -1,0 +1,66 @@
+<h2>ToolJet Layout Architecture</h2>
+<p class="subtitle">ToolJet combines an absolute grid canvas with nestable containers that run their own inner grid instances.</p>
+
+<div class="mockup">
+  <div class="mockup-header">ToolJet-Style Nested Grid Canvas (Visual Representation)</div>
+  <div class="mockup-body" style="background: var(--bg-primary); padding: 1.5rem; border-radius: 8px;">
+    <!-- Main Canvas Grid (represented by grid lines) -->
+    <div style="background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 20px 20px; border: 1px solid var(--border); border-radius: 6px; padding: 1rem; min-height: 250px; position: relative;">
+      
+      <!-- Regular Widget -->
+      <div style="position: absolute; left: 20px; top: 20px; width: 180px; height: 60px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 4px; padding: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase;">Chart Widget</div>
+        <div style="font-size: 0.85rem; font-weight: bold; margin-top: 2px;">Sales Summary</div>
+      </div>
+      
+      <!-- Container Widget (Nestable grid) -->
+      <div style="position: absolute; left: 220px; top: 20px; width: 340px; height: 200px; background: var(--bg-secondary); border: 2px solid var(--accent); border-radius: 8px; padding: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem;">
+          <span style="font-size: 0.75rem; font-weight: bold; color: var(--accent);">Container Widget (Inner Grid)</span>
+          <span style="font-size: 0.65rem; background: var(--accent); color: white; padding: 2px 6px; border-radius: 3px;">Grid: 12 Cols</span>
+        </div>
+        
+        <!-- Inner Grid Area -->
+        <div style="background-image: radial-gradient(var(--accent-hover) 0.5px, transparent 0.5px); background-size: 15px 15px; border: 1px dashed var(--accent); border-radius: 4px; min-height: 140px; position: relative; padding: 0.5rem;">
+          
+          <!-- Nested Input 1 -->
+          <div style="position: absolute; left: 10px; top: 10px; width: 140px; height: 50px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 4px; padding: 0.35rem;">
+            <div style="font-size: 0.6rem; color: var(--text-secondary);">First Name</div>
+            <div style="font-size: 0.75rem; border-bottom: 1px solid var(--text-tertiary); margin-top: 2px;">John</div>
+          </div>
+          
+          <!-- Nested Input 2 -->
+          <div style="position: absolute; left: 160px; top: 10px; width: 140px; height: 50px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 4px; padding: 0.35rem;">
+            <div style="font-size: 0.6rem; color: var(--text-secondary);">Last Name</div>
+            <div style="font-size: 0.75rem; border-bottom: 1px solid var(--text-tertiary); margin-top: 2px;">Doe</div>
+          </div>
+
+          <!-- Nested Button -->
+          <div style="position: absolute; left: 10px; top: 80px; width: 290px; height: 40px; background: var(--accent); color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 500; cursor: pointer;">
+            Submit Form
+          </div>
+          
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="tooljet_grid" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>ToolJet Grid (Absolute Grid with Nestable Containers)</h3>
+      <p>Every component is absolute-positioned using coordinates (x, y, w, h). To group components or create layouts, developers use Container widgets. A Container is placed like any normal widget but contains its own nested grid canvas. Responsiveness is handled via desktop/mobile toggles (re-positioning or hiding components per device viewport).</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="retool_hybrid" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Retool Layout (Hybrid Flow Grid)</h3>
+      <p>Retool mixes absolute coordinates with a horizontal grid-column structure (usually 12 columns). Instead of absolute heights (h), height is often fluid and auto-grows based on component content (e.g., table with varying rows, expandable forms). Sections stack vertically, and elements wrap dynamically on smaller screens without separate mobile configurations.</p>
+    </div>
+  </div>
+</div>

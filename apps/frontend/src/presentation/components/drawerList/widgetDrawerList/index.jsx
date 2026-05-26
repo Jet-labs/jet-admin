@@ -1,24 +1,46 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
-import { Plus } from 'lucide-react';
-import React from "react";
+import { Plus, Search } from 'lucide-react';
+import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useWidgets } from "../../../../logic/hooks/useWidgets";
+import { useInfiniteWidgets } from "../../../../logic/hooks/useWidgets";
 import { NoEntityUI } from "../../ui/noEntityUI";
+import { Button, Input } from "@jet-admin/ui";
+import { useDebounce } from "@uidotdev/usehooks";
 
-import { Button } from "@jet-admin/ui";
 export const WidgetDrawerList = () => {
   const { tenantID } = useParams();
-  const { isLoadingWidgets, widgets, isFetchingWidgets } = useWidgets(tenantID);
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  const {
+    widgets,
+    isLoadingWidgets,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    loadWidgetsError,
+  } = useInfiniteWidgets(tenantID, debouncedSearchQuery);
+
   const routeParam = useParams();
   const navigate = useNavigate();
+
   const _navigateToAddMoreWidget = () => {
     navigate(CONSTANTS.ROUTES.ADD_WIDGET.path(tenantID));
   };
+
+  const _handleScroll = (e) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop - clientHeight < 30) {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }
+  };
+
   const _renderWidgetIcon = (widgetType, isActive) => {
     const widgetConfig = WIDGETS_MAP[widgetType];
     if (!widgetConfig || !widgetConfig.icon) {
-      // Fallback for legacy widget types that no longer exist
       return (
         <span className={`text-xl ${isActive ? "text-primary" : "text-muted-foreground"}`}>
           📊
@@ -42,7 +64,21 @@ export const WidgetDrawerList = () => {
         <Plus className="!w-4 !h-4 !text-primary mr-1" />
         {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
       </Button>
-      {isLoadingWidgets || isFetchingWidgets ? (
+
+      {/* Search Input - Small Size (size="sm") per Section 29 */}
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" />
+        <Input
+          type="text"
+          size="sm"
+          placeholder="Search widgets..."
+          className="pl-8 w-full border-border/50 focus:border-primary/30"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {isLoadingWidgets ? (
         <div role="status" className="animate-pulse w-full space-y-2">
           <div className="h-9 bg-muted rounded-md w-full" />
           <div className="h-9 bg-muted rounded-md w-full" />
@@ -50,7 +86,10 @@ export const WidgetDrawerList = () => {
           <div className="h-9 bg-muted rounded-md w-full" />
         </div>
       ) : widgets && widgets.length > 0 ? (
-          <div className="flex-1 h-full w-full overflow-y-auto pb-10 space-y-1">
+        <div 
+          onScroll={_handleScroll}
+          className="flex-1 h-full w-full overflow-y-auto pb-10 space-y-1"
+        >
           {widgets.map((widget) => {
             const key = `widget_${widget.widgetID}`;
             const isActive = routeParam?.widgetID == widget.widgetID;
@@ -65,16 +104,18 @@ export const WidgetDrawerList = () => {
                 className="block focus:outline-none"
               >
                 <div
-                  className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
-                    ? "bg-primary/5 text-primary"
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${
+                    isActive
+                      ? "bg-primary/5 text-primary"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
                   {_renderWidgetIcon(widget.widgetType, isActive)}
 
                   <span
-                    className={`text-sm truncate ${isActive ? "font-semibold" : "font-medium"
-                      }`}
+                    className={`text-sm truncate ${
+                      isActive ? "font-semibold" : "font-medium"
+                    }`}
                   >
                     {`${widget.widgetTitle}`}
                   </span>
@@ -82,16 +123,23 @@ export const WidgetDrawerList = () => {
               </Link>
             );
           })}
+          {isFetchingNextPage && (
+            <div className="flex justify-center p-2 text-xs text-muted-foreground animate-pulse">
+              Loading more...
+            </div>
+          )}
         </div>
       ) : (
-            <div className="flex flex-1 items-center justify-center p-4 text-muted-foreground">
+        <div className="flex flex-1 items-center justify-center p-4 text-muted-foreground">
           <NoEntityUI
-            message={CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET}
+            message={
+              searchQuery
+                ? "No matching widgets found"
+                : CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET
+            }
           />
         </div>
       )}
-
-      {/* Widget List */}
     </div>
   );
 };

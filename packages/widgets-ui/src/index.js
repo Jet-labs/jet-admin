@@ -13,3 +13,27 @@ export { TableConfigEditor } from "./table/tableConfigEditor";
 // Widget map and configuration
 export * from "./widget.map";
 export { getDemoData, registerWidgets } from "./widget.config";
+
+// Text / Markdown
+export { TextWidget } from "./text/textWidget";
+export { TextConfigEditor } from "./text/textConfigEditor";
+
+// Stat / KPI
+export { StatWidget } from "./stat/statWidget";
+export { StatConfigEditor } from "./stat/statConfigEditor";
+
+// Alert Banner
+export { AlertWidget } from "./alert/alertWidget";
+export { AlertConfigEditor } from "./alert/alertConfigEditor";
+
+// Form
+export { FormWidget } from "./form/formWidget";
+export { FormConfigEditor } from "./form/formConfigEditor";
+
+// Image
+export { ImageWidget } from "./image/imageWidget";
+export { ImageConfigEditor } from "./image/imageConfigEditor";
+
+// IFrame Embed
+export { IframeWidget } from "./iframe/iframeWidget";
+export { IframeConfigEditor } from "./iframe/iframeConfigEditor";

@@ -14,8 +14,12 @@ export default function LayoutStack({
   const stackStyle = {
     flexDirection: node.direction === "horizontal" ? "row" : "column",
     flexWrap: node.wrap ? "wrap" : "nowrap",
-    gap: typeof node.gap === "number" ? `${node.gap}px` : "16px",
-    alignItems: node.align || "stretch",
+    gap: node.style?.gap ?? (typeof node.gap === "number" ? `${node.gap}px` : "16px"),
+    alignItems: node.style?.alignItems ?? node.align ?? "stretch",
+    padding: node.style?.padding,
+    margin: node.style?.margin,
+    borderRadius: node.style?.borderRadius,
+    ...(node.style || {}),
   };
 
   if (node.sizing === "fixed" && node.fixedHeight) {

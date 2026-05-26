@@ -90,6 +90,14 @@ class QueryEngine {
         break;
     }
 
+    if (!datasourceConfig) {
+      Logger.log("error", {
+        message: "QueryEngine:getDataSource:configNotFound",
+        params: { dataQueryID, datasourceID: query.datasourceID },
+      });
+      throw new Error(`Datasource configuration not found or invalid for ID: ${query.datasourceID || 'unspecified'}`);
+    }
+
     const DataSource = dataSourceRegistry.getDataSource(query.datasourceType);
     const instance = new DataSource(datasourceConfig);
 

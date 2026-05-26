@@ -12,8 +12,11 @@ import { APP_PAGE_ACTIONS } from "./appPageActions";
 // ============================================================
 
 export const createAppPageInitialState = () => ({
-  /** Query/workflow results keyed by data source alias */
+  /** Query results keyed by data source alias */
   queryResults: {},
+
+  /** Workflow results keyed by data source alias */
+  workflowResults: {},
 
   /** Widget-local UI state keyed by widgetID */
   widgetStates: {},
@@ -107,6 +110,39 @@ export const appPageReducer = (state, action) => {
             ...state.queryResults[alias],
             isLoading: true,
             error: null,
+          },
+        },
+      };
+    }
+
+    case APP_PAGE_ACTIONS.SET_WORKFLOW_RESULT: {
+      const { alias, data, error, isLoading, instanceID } = action.payload;
+      return {
+        ...state,
+        workflowResults: {
+          ...state.workflowResults,
+          [alias]: {
+            data,
+            error,
+            isLoading,
+            instanceID: instanceID !== null ? instanceID : (state.workflowResults[alias]?.instanceID || null),
+            lastUpdated: Date.now(),
+          },
+        },
+      };
+    }
+
+    case APP_PAGE_ACTIONS.SET_WORKFLOW_LOADING: {
+      const { alias } = action.payload;
+      return {
+        ...state,
+        workflowResults: {
+          ...state.workflowResults,
+          [alias]: {
+            ...state.workflowResults[alias],
+            isLoading: true,
+            error: null,
+            instanceID: null,
           },
         },
       };

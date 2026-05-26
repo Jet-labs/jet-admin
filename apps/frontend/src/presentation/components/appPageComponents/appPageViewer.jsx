@@ -73,7 +73,7 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
       <div className="flex flex-row justify-between items-center w-full px-3 py-2 border-b border-border">
         <div className="w-full flex flex-col justify-center items-start">
           {appPage && (
-            <h1 className="text-lg font-bold leading-tight tracking-tight text-foreground">
+            <h1 className="text-2xl font-medium leading-tight tracking-tight text-foreground">
                {appPage.appPageTitle}
             </h1>
           )}

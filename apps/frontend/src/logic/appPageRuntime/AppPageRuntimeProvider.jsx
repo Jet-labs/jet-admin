@@ -13,12 +13,12 @@
 
 import React, {
   createContext,
-  useContext,
   useReducer,
   useEffect,
   useMemo,
   useRef,
 } from "react";
+import PropTypes from "prop-types";
 import { appPageReducer, createAppPageInitialState } from "./appPageReducer";
 import { appPageActions } from "./appPageActions";
 import { buildAppPageStateTree } from "./appPageExpressionEngine";
@@ -67,8 +67,8 @@ export const AppPageRuntimeProvider = ({
 
   // Build the state tree from reducer state (memoized)
   const stateTree = useMemo(
-    () => buildAppPageStateTree(state),
-    [state]
+    () => buildAppPageStateTree(state, pageConfig.dataSources || []),
+    [state, pageConfig.dataSources]
   );
 
   // Update previous state tree ref after each render
@@ -97,4 +97,11 @@ export const AppPageRuntimeProvider = ({
       </AppPageDispatchContext.Provider>
     </AppPageMetaContext.Provider>
   );
+};
+
+AppPageRuntimeProvider.propTypes = {
+  pageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  pageConfig: PropTypes.object,
+  children: PropTypes.node,
 };

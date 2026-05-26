@@ -7,12 +7,14 @@ const {
   createWidgetSchema,
   updateWidgetSchema,
   widgetIdParamSchema,
+  listWidgetsQuerySchema,
 } = require("./widget.validator");
 
 // Database widget routes
 
 router.get(
   "/",
+  validate(listWidgetsQuerySchema, "query"),
   authMiddleware.checkUserPermissions(["tenant:widget:list"]),
   widgetController.getAllWidgets
 );

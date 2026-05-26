@@ -321,7 +321,7 @@ dataQueryService.runDataQueryByID = async ({
         userID,
         tenantID,
         dataQueryID,
-        results,
+        // results,
       },
     });
     return results;
@@ -731,6 +731,9 @@ async function defaultQueryFetcher(queryID) {
 }
 
 async function defaultDatasourceFetcher(datasourceID) {
+  if (!datasourceID || !isUUID(datasourceID)) {
+    return null;
+  }
   return prisma.tblDatasources.findFirst({
     where: { datasourceID },
   });

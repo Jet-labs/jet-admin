@@ -13,6 +13,7 @@ export { useAppPageStateTree } from "./useAppPageStateTree";
 export { useAppPageDispatch } from "./useAppPageDispatch";
 export { useAppPageVariables } from "./useAppPageVariables";
 export { useAppPageQueries } from "./useAppPageQueries";
+export { useAppPageWorkflows } from "./useAppPageWorkflows";
 
 // Widget hooks
 export { useWidgetState } from "./useWidgetState";
@@ -21,6 +22,9 @@ export { useWidgetEventHandlers } from "./useWidgetEventHandlers";
 
 // Data source manager
 export { useAppPageDataSourceManager } from "./useAppPageDataSourceManager";
+
+// Workflow streaming utility
+export { executeWorkflowWithStreaming } from "./executeWorkflowWithStreaming";
 
 // Expression engine utilities
 export {

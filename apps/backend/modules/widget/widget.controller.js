@@ -15,19 +15,26 @@ widgetController.getAllWidgets = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const { search, page, pageSize } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "widgetController:getAllWidgets:params",
       params: {
         userID: user.userID,
         tenantID,
+        search,
+        page,
+        pageSize,
         authContext,
       },
     });
 
-    const widgets = await widgetService.getAllWidgets({
+    const result = await widgetService.getAllWidgets({
       userID: user.userID,
       tenantID,
+      search,
+      page,
+      pageSize,
       authContext,
     });
 
@@ -36,12 +43,16 @@ widgetController.getAllWidgets = async (req, res) => {
       params: {
         userID: user.userID,
         tenantID,
-        widgetsLength: widgets.length,
+        widgetsLength: result.widgets.length,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      widgets,
+      widgets: result.widgets,
+      totalCount: result.totalCount,
+      totalPages: result.totalPages,
+      page: result.page,
+      pageSize: result.pageSize,
       message: "Widgets fetched successfully.",
     });
   } catch (error) {
@@ -107,6 +118,7 @@ widgetController.createWidget = async (req, res) => {
     });
 
     return expressUtils.sendResponse(res, true, {
+      widget: result,
       message: "Widget created successfully.",
     });
   } catch (error) {

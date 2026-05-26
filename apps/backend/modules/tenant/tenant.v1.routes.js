@@ -33,7 +33,6 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
   });
   datasourceRouter = require("../datasource/datasource.v1.routes");
 }
-// Connector module — disabled during architectural transition
 
 if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
   Logger.log("success", {
@@ -134,6 +133,7 @@ if (isModuleEnabled(constants.MODULES.USERMANAGEMENT)) {
   router.use(
     "/:tenantID/users",
       validate(tenantIdParamSchema, "params"),
+    auditLogMiddleware.audit,
     authMiddleware.checkUserPermissions(["tenant:user"]),
     userManagementRouter
   );
@@ -147,6 +147,7 @@ if (isModuleEnabled(constants.MODULES.ROLE)) {
   router.use(
     "/:tenantID/roles",
       validate(tenantIdParamSchema, "params"),
+    auditLogMiddleware.audit,
     authMiddleware.checkUserPermissions(["tenant:role"]),
     tenantRoleRouter
   );
@@ -160,6 +161,7 @@ if (isModuleEnabled(constants.MODULES.APIKEY)) {
   router.use(
     "/:tenantID/apikeys",
       validate(tenantIdParamSchema, "params"),
+    auditLogMiddleware.audit,
     authMiddleware.checkUserPermissions(["tenant:apikey"]),
     tenantAPIKeyRouter
   );
@@ -173,6 +175,7 @@ if (isModuleEnabled(constants.MODULES.CRONJOB)) {
   router.use(
     "/:tenantID/cronjobs",
       validate(tenantIdParamSchema, "params"),
+    auditLogMiddleware.audit,
     authMiddleware.checkUserPermissions(["tenant:cronjobs"]),
     cronjobRouter
   );
@@ -186,6 +189,7 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
   router.use(
     "/:tenantID/datasources",
       validate(tenantIdParamSchema, "params"),
+    auditLogMiddleware.audit,
     authMiddleware.checkUserPermissions(["tenant:datasource"]),
     datasourceRouter
   );
@@ -195,6 +199,7 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
 router.use(
   "/:tenantID/listeners",
   validate(tenantIdParamSchema, "params"),
+  auditLogMiddleware.audit,
   authMiddleware.checkUserPermissions(["tenant:datasource"]),
   require("../listener/listener.v1.routes")
 );
@@ -207,6 +212,7 @@ if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
   router.use(
     "/:tenantID/queries",
       validate(tenantIdParamSchema, "params"),
+    auditLogMiddleware.audit,
     authMiddleware.checkUserPermissions(["tenant:query"]),
     dataQueryRouter
   );
@@ -220,6 +226,7 @@ if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
   router.use(
     "/:tenantID/workflows",
       validate(tenantIdParamSchema, "params"),
+    auditLogMiddleware.audit,
     authMiddleware.checkUserPermissions(["tenant:workflow"]),
     workflowRouter
   );
@@ -233,6 +240,7 @@ if (isModuleEnabled(constants.MODULES.WIDGET)) {
   router.use(
     "/:tenantID/widgets",
       validate(tenantIdParamSchema, "params"),
+    auditLogMiddleware.audit,
     authMiddleware.checkUserPermissions(["tenant:widget"]),
     widgetRouter
   );
@@ -246,6 +254,7 @@ if (isModuleEnabled(constants.MODULES.APP_PAGE)) {
   router.use(
     "/:tenantID/app-pages",
       validate(tenantIdParamSchema, "params"),
+    auditLogMiddleware.audit,
     authMiddleware.checkUserPermissions(["tenant:appPage"]),
     appPageRouter
   );

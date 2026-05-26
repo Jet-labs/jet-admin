@@ -95,7 +95,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
         message: CONSTANTS.STRINGS.UPDATE_APP_PAGE_FORM_UPDATE_DIALOG_MESSAGE,
         confirmText: "Update",
         cancelText: "Cancel",
-        confirmButtonClass: "!bg-primary",
+        confirmButtonClass: "",
       });
       updateAppPage(values);
     },

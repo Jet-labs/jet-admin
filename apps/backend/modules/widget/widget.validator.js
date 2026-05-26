@@ -38,11 +38,17 @@ const testWidgetDataSchema = z.object({
 }).passthrough();
 
 // ============================================================
-// URL Param Schemas
+// URL Param & Query Schemas
 // ============================================================
 
 const widgetIdParamSchema = z.object({
   widgetID: schemas.uuidSchema,
+}).passthrough();
+
+const listWidgetsQuerySchema = z.object({
+  search: z.string().optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
 }).passthrough();
 
 // ============================================================
@@ -54,4 +60,5 @@ module.exports = {
   updateWidgetSchema,
   testWidgetDataSchema,
   widgetIdParamSchema,
+  listWidgetsQuerySchema,
 };

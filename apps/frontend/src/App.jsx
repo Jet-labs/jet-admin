@@ -11,13 +11,13 @@ const miroTheme = createTheme({
       paper: '#171717',
     },
     primary: {
-      main: '#3ecf8e',
+      main: '#7582ff',
     },
     secondary: {
       main: '#2e2e2e',
     },
     success: {
-      main: '#3ecf8e',
+      main: '#7582ff',
     },
     text: {
       primary: '#fafafa',

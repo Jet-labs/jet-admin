@@ -31,7 +31,7 @@ export const ButtonWidget = ({
       size={size}
       onClick={handleClick}
       disabled={loading || isLoadingWorkflows}
-      className="!w-[calc(100%+1rem)] !h-[calc(100%+0.75rem)] -ml-2 -mr-2 -mb-2 -mt-1 rounded-none flex items-center justify-center text-center px-4 border-0"
+      className="!w-full !h-full rounded-none flex items-center justify-center text-center px-4 border-0"
     >
       {(loading || isLoadingWorkflows) && <Spinner className="mr-2 h-4 w-4" />}
       {text}

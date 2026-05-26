@@ -66,6 +66,16 @@ router.post(
   dataQueryController.runDataQueryByID
 );
 
+router.post(
+  "/:dataQueryID/run",
+  validateAll({
+    params: dataQueryIdParamSchema,
+    body: runDataQueryByIDSchema,
+  }),
+  authMiddleware.checkUserPermissions(["tenant:query:read"]),
+  dataQueryController.runDataQueryByID
+);
+
 router.patch(
   "/:dataQueryID",
   validateAll({

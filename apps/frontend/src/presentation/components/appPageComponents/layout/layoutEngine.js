@@ -72,7 +72,7 @@ export const findParentOf = (root, nodeId) => {
 export const addWidgetToRow = (root, rowId, widgetKey, span = 6, sizing = "fill") => {
   const newRoot = cloneDeep(root);
   const row = findNodeById(newRoot, rowId);
-  if (row && row.type === "row") {
+  if (row && Array.isArray(row.children)) {
     row.children.push(createWidgetNode(widgetKey, span, sizing));
   }
   return newRoot;
@@ -107,12 +107,16 @@ export const moveNode = (root, nodeId, targetRowId, targetIndex) => {
   const parentInfo = findParentOf(newRoot, nodeId);
   if (parentInfo) {
     const { parent, index } = parentInfo;
-    parent.children.splice(index, 1);
+    if (Array.isArray(parent.children)) {
+      parent.children.splice(index, 1);
+    } else {
+      parent.children = null;
+    }
   }
 
   // Insert node into the target row
   const targetRow = findNodeById(newRoot, targetRowId);
-  if (targetRow && targetRow.type === "row") {
+  if (targetRow && Array.isArray(targetRow.children)) {
     const insertIdx = targetIndex === undefined ? targetRow.children.length : targetIndex;
     targetRow.children.splice(insertIdx, 0, node);
   }
@@ -273,4 +277,19 @@ export const unwrapContainer = (root, containerId) => {
   parentRow.children.splice(containerIndex, 1, ...innerNodes);
 
   return removeEmptyRows(newRoot);
+};
+
+/**
+ * Sets node style overrides.
+ */
+export const setNodeStyle = (root, nodeId, style) => {
+  const newRoot = cloneDeep(root);
+  const node = findNodeById(newRoot, nodeId);
+  if (node) {
+    node.style = {
+      ...(node.style || {}),
+      ...style,
+    };
+  }
+  return newRoot;
 };

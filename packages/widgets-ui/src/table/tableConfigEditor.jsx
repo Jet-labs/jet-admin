@@ -10,6 +10,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Checkbox,
 } from "@jet-admin/ui";
 import { Trash2, Plus, ArrowUp, ArrowDown, Sparkles, Zap } from 'lucide-react';
 
@@ -95,10 +96,19 @@ const collectArrayPaths = (obj, prefix = "", depth = 0, maxDepth = 4) => {
   return results;
 };
 
+const isScalarNumeric = (val) => {
+  if (typeof val === "number") return true;
+  if (typeof val === "string") {
+    const trimmed = val.trim();
+    return trimmed !== "" && !isNaN(Number(trimmed)) && !isNaN(parseFloat(trimmed));
+  }
+  return false;
+};
+
 /**
  * Collect numeric/scalar paths from a context object for total row count mapping.
  */
-const collectScalarPaths = (obj, prefix = "", depth = 0, maxDepth = 3) => {
+const collectScalarPaths = (obj, prefix = "", depth = 0, maxDepth = 4) => {
   const results = [];
   if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
 
@@ -107,10 +117,16 @@ const collectScalarPaths = (obj, prefix = "", depth = 0, maxDepth = 3) => {
     const val = obj[key];
     const fullPath = prefix ? `${prefix}.${key}` : key;
 
-    if (typeof val === "number") {
+    if (isScalarNumeric(val)) {
       results.push({ path: fullPath, label: fullPath, value: val });
-    } else if (val && typeof val === "object" && !Array.isArray(val)) {
-      results.push(...collectScalarPaths(val, fullPath, depth + 1, maxDepth));
+    } else if (val && typeof val === "object") {
+      if (Array.isArray(val)) {
+        if (val.length > 0 && typeof val[0] === "object") {
+          results.push(...collectScalarPaths(val[0], `${fullPath}[0]`, depth + 1, maxDepth));
+        }
+      } else {
+        results.push(...collectScalarPaths(val, fullPath, depth + 1, maxDepth));
+      }
     }
   }
   return results;
@@ -149,12 +165,24 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
     pageSizeParam: "limit",
     totalTemplate: "",
   };
+  const search = config.search || { enabled: false, serverSide: false, placeholder: "Search..." };
+  const exportConfig = config.export || { enabled: false, format: "csv", serverSide: false, buttonLabel: "Export" };
+  const editing = config.editing || { enabled: false };
+  const multiSelect = config.multiSelect || { enabled: false, showSelectAll: true, actions: [] };
+  const bulkEdit = config.bulkEdit || { enabled: false, saveLabel: "Save All Changes" };
 
-  // Build alias-based suggestions from bound data sources
+  // Build namespace-based suggestions from previewStateTree (dataSourceResults)
   const aliasSuggestions = useMemo(() => {
-    if (!dataSources?.length) return [];
-    return dataSources.filter((s) => s.alias).map((s) => s.alias);
-  }, [dataSources]);
+    const suggestions = [];
+    if (!dataSourceResults) return suggestions;
+    if (dataSourceResults.queries) {
+      Object.keys(dataSourceResults.queries).forEach(alias => suggestions.push(`queries.${alias}`));
+    }
+    if (dataSourceResults.workflows) {
+      Object.keys(dataSourceResults.workflows).forEach(alias => suggestions.push(`workflows.${alias}`));
+    }
+    return suggestions;
+  }, [dataSourceResults]);
 
   // Discover array paths from live query results
   const arrayPaths = useMemo(() => {
@@ -173,8 +201,8 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
           isSuggestion: true,
         });
         paths.push({
-          path: alias,
-          label: alias,
+          path: `${alias}.data`,
+          label: `${alias}.data`,
           sampleKeys: [],
           rowCount: 0,
           isSuggestion: true,
@@ -297,6 +325,27 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
     [widgetEditorForm, columns]
   );
 
+  // ── Multi-Select Actions helpers ──
+  const handleAddBulkAction = useCallback(() => {
+    const currentActions = multiSelect.actions || [];
+    widgetEditorForm.setFieldValue("widgetConfig.multiSelect.actions", [
+      ...currentActions,
+      { label: "New Action", actionKey: `action_${currentActions.length + 1}`, variant: "default" },
+    ]);
+  }, [widgetEditorForm, multiSelect]);
+
+  const handleUpdateBulkAction = useCallback((index, field, value) => {
+    const updated = [...(multiSelect.actions || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    widgetEditorForm.setFieldValue("widgetConfig.multiSelect.actions", updated);
+  }, [widgetEditorForm, multiSelect]);
+
+  const handleRemoveBulkAction = useCallback((index) => {
+    const updated = [...(multiSelect.actions || [])];
+    updated.splice(index, 1);
+    widgetEditorForm.setFieldValue("widgetConfig.multiSelect.actions", updated);
+  }, [widgetEditorForm, multiSelect]);
+
   // ── Pagination helpers ──
   const handlePaginationToggle = (checked) => {
     widgetEditorForm.setFieldValue("widgetConfig.pagination", {
@@ -397,7 +446,7 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
         {/* No data source hint */}
         {!dataArrayPath && columns.length === 0 && (
           <div className="text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs">
-            Configure a Data Array Path in the Data tab first, then come back
+            Configure a Data Array Template above first, then come back
             here to set up columns.
           </div>
         )}
@@ -406,9 +455,10 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
         {dataArrayPath &&
           discoveredColumns.length === 0 &&
           columns.length === 0 && (
-            <div className="text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs">
-              No columns detected. Click <strong>Load Data</strong> in the
-              Data tab, or add columns manually.
+            <div className="text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs leading-relaxed">
+              No columns detected from <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{dataArrayPath}</code>.
+              <br/><br/>
+              Make sure the expression points to an array of objects and that you have executed the data source in the App Page Editor, or add columns manually.
             </div>
           )}
 
@@ -418,9 +468,10 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
             {columns.map((col, idx) => (
               <div
                 key={idx}
-                className="flex items-end gap-1.5 p-2 border rounded-md bg-muted/30"
+                className="flex flex-col gap-2 p-2 border rounded-md bg-muted/30"
               >
-                {/* Reorder buttons */}
+                <div className="flex items-end gap-1.5">
+                  {/* Reorder buttons */}
                 <div className="flex flex-col gap-0.5 pb-0.5">
                   <Button
                     type="button"
@@ -498,6 +549,19 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
+                </div>
+                {/* Editable toggle */}
+                <div className="flex items-center pl-8">
+                  <Checkbox
+                    id={`col-edit-${idx}`}
+                    checked={!!col.editable}
+                    onCheckedChange={(val) => handleUpdateColumn(idx, "editable", !!val)}
+                    className="h-3.5 w-3.5"
+                  />
+                  <Label htmlFor={`col-edit-${idx}`} className="text-[10px] ml-1.5 text-muted-foreground cursor-pointer">
+                    Editable Column
+                  </Label>
+                </div>
               </div>
             ))}
           </div>
@@ -517,41 +581,200 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
         </div>
 
         {pagination.enabled && (
-          <div className="space-y-3 bg-muted/30 p-3 rounded-md border mt-1">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-[0.65rem]">Page Argument Name</Label>
-                <Input
-                  value={pagination.pageParam || ""}
-                  onChange={(e) =>
-                    handlePaginationChange("pageParam", e.target.value)
-                  }
-                  placeholder="page"
-                  className="h-7 text-xs font-mono"
+          <div className="space-y-2 bg-muted/30 p-3 rounded-md border mt-1">
+            <p className="text-[0.6rem] text-muted-foreground">
+              Configure pagination actions in the <strong>Events</strong> tab
+              using the <strong>On Page Change</strong> event.
+              Event data: <code className="bg-background px-1 rounded border border-border font-mono text-[10px]">{"{{ event.page }}"}</code>,{" "}
+              <code className="bg-background px-1 rounded border border-border font-mono text-[10px]">{"{{ event.offset }}"}</code>,{" "}
+              <code className="bg-background px-1 rounded border border-border font-mono text-[10px]">{"{{ event.pageSize }}"}</code>
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* ═══ Search & Export ═══ */}
+      <div className="grid grid-cols-2 gap-4 border-t pt-4">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-medium text-foreground">Search Box</Label>
+            <Switch
+              checked={search.enabled}
+              onCheckedChange={(v) => handleConfigChange("search", { ...search, enabled: v })}
+            />
+          </div>
+          {search.enabled && (
+            <div className="space-y-2 bg-muted/30 p-2 rounded border">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="search-server"
+                  checked={search.serverSide}
+                  onCheckedChange={(v) => handleConfigChange("search", { ...search, serverSide: !!v })}
                 />
-                <p className="text-[0.6rem] text-muted-foreground">
-                  Input argument that receives the page number.
-                </p>
+                <Label htmlFor="search-server" className="text-[10px] cursor-pointer">Server-side (fires onSearch)</Label>
               </div>
-              <div className="space-y-1">
-                <Label className="text-[0.65rem]">
-                  Page Size Argument Name
-                </Label>
-                <Input
-                  value={pagination.pageSizeParam || ""}
-                  onChange={(e) =>
-                    handlePaginationChange("pageSizeParam", e.target.value)
-                  }
-                  placeholder="limit"
-                  className="h-7 text-xs font-mono"
+              <Input
+                value={search.placeholder || ""}
+                onChange={(e) => handleConfigChange("search", { ...search, placeholder: e.target.value })}
+                placeholder="Search placeholder..."
+                className="h-7 text-xs"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-medium text-foreground">Export Data</Label>
+            <Switch
+              checked={exportConfig.enabled}
+              onCheckedChange={(v) => handleConfigChange("export", { ...exportConfig, enabled: v })}
+            />
+          </div>
+          {exportConfig.enabled && (
+            <div className="space-y-2 bg-muted/30 p-2 rounded border">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="export-server"
+                  checked={exportConfig.serverSide}
+                  onCheckedChange={(v) => handleConfigChange("export", { ...exportConfig, serverSide: !!v })}
                 />
-                <p className="text-[0.6rem] text-muted-foreground">
-                  Input argument that receives rows per page.
-                </p>
+                <Label htmlFor="export-server" className="text-[10px] cursor-pointer">Server-side (fires onExport)</Label>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={exportConfig.buttonLabel || ""}
+                  onChange={(e) => handleConfigChange("export", { ...exportConfig, buttonLabel: e.target.value })}
+                  placeholder="Button Label"
+                  className="h-7 text-xs flex-1"
+                />
+                <Select
+                  value={exportConfig.format || "csv"}
+                  onValueChange={(v) => handleConfigChange("export", { ...exportConfig, format: v })}
+                >
+                  <SelectTrigger className="h-7 text-xs w-[70px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="csv">CSV</SelectItem>
+                    <SelectItem value="json">JSON</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ═══ Multi-Select & Bulk Actions ═══ */}
+      <div className="space-y-3 border-t pt-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs font-medium text-foreground">Multi-Row Selection</Label>
+          <Switch
+            checked={multiSelect.enabled}
+            onCheckedChange={(v) => handleConfigChange("multiSelect", { ...multiSelect, enabled: v })}
+          />
+        </div>
+        {multiSelect.enabled && (
+          <div className="space-y-2 bg-muted/30 p-3 rounded border">
+            <div className="flex items-center gap-2 pb-2 border-b">
+              <Checkbox
+                id="ms-select-all"
+                checked={multiSelect.showSelectAll}
+                onCheckedChange={(v) => handleConfigChange("multiSelect", { ...multiSelect, showSelectAll: !!v })}
+              />
+              <Label htmlFor="ms-select-all" className="text-[10px] cursor-pointer">Show "Select All" Checkbox</Label>
+            </div>
+            
+            <div className="pt-1">
+              <div className="flex justify-between items-center mb-2">
+                <Label className="text-[10px] font-medium">Bulk Actions</Label>
+                <Button type="button" variant="outline" size="sm" onClick={handleAddBulkAction} className="h-6 text-[10px] px-2">
+                  <Plus className="mr-1 h-3 w-3" /> Add Action
+                </Button>
+              </div>
+              {(!multiSelect.actions || multiSelect.actions.length === 0) && (
+                <p className="text-[10px] text-muted-foreground italic">No bulk actions configured. Selection will be tracked in widgetState.</p>
+              )}
+              <div className="space-y-1.5">
+                {(multiSelect.actions || []).map((act, idx) => (
+                  <div key={idx} className="flex items-center gap-1.5 bg-background p-1.5 rounded border">
+                    <Input
+                      value={act.label}
+                      onChange={(e) => handleUpdateBulkAction(idx, "label", e.target.value)}
+                      placeholder="Label"
+                      className="h-6 text-[10px] w-24"
+                    />
+                    <Input
+                      value={act.actionKey}
+                      onChange={(e) => handleUpdateBulkAction(idx, "actionKey", e.target.value)}
+                      placeholder="actionKey"
+                      className="h-6 text-[10px] font-mono flex-1"
+                    />
+                    <Select value={act.variant || "default"} onValueChange={(v) => handleUpdateBulkAction(idx, "variant", v)}>
+                      <SelectTrigger className="h-6 text-[10px] w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Default</SelectItem>
+                        <SelectItem value="destructive">Danger</SelectItem>
+                        <SelectItem value="outline">Outline</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveBulkAction(idx)} className="h-6 w-6 text-destructive shrink-0">
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         )}
+      </div>
+
+      {/* ═══ Row Editing Features ═══ */}
+      <div className="grid grid-cols-2 gap-4 border-t pt-4">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-medium text-foreground">Inline Row Editing</Label>
+            <Switch
+              checked={editing.enabled}
+              onCheckedChange={(v) => {
+                handleConfigChange("editing", { ...editing, enabled: v });
+                if (v && bulkEdit.enabled) handleConfigChange("bulkEdit", { ...bulkEdit, enabled: false }); // Mutual exclusivity
+              }}
+            />
+          </div>
+          <p className="text-[9.5px] text-muted-foreground leading-tight">
+            Adds an Edit button to each row. Fires <code className="bg-background px-1 border rounded">onRowSave</code>.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-medium text-foreground">Excel-Style Bulk Edit</Label>
+            <Switch
+              checked={bulkEdit.enabled}
+              onCheckedChange={(v) => {
+                handleConfigChange("bulkEdit", { ...bulkEdit, enabled: v });
+                if (v && editing.enabled) handleConfigChange("editing", { ...editing, enabled: false }); // Mutual exclusivity
+              }}
+            />
+          </div>
+          <p className="text-[9.5px] text-muted-foreground leading-tight">
+            Double-click cells to edit. Fires <code className="bg-background px-1 border rounded">onBulkEdit</code> on save.
+          </p>
+          {bulkEdit.enabled && (
+            <div className="space-y-1 bg-muted/30 p-2 rounded border mt-2">
+              <Label className="text-[10px]">Save Button Label</Label>
+              <Input
+                value={bulkEdit.saveLabel || "Save All Changes"}
+                onChange={(e) => handleConfigChange("bulkEdit", { ...bulkEdit, saveLabel: e.target.value })}
+                className="h-7 text-xs"
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

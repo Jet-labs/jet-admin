@@ -1,10 +1,11 @@
 /* CSS Grid & Flexbox system for Retool-style Hybrid Flow Grid */
+/* All colors use design-system CSS custom properties from the theme */
 
 .layout-column {
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 16px;
+  gap: 8px;
   box-sizing: border-box;
 }
 
@@ -12,7 +13,7 @@
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   width: 100%;
-  gap: 16px;
+  gap: 8px;
   align-items: stretch;
   box-sizing: border-box;
 }
@@ -77,10 +78,10 @@
 .layout-container {
   display: flex;
   flex-direction: column;
-  background-color: var(--container-bg, #ffffff);
-  border: 1px solid var(--container-border, #e5e7eb);
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
-  padding: 16px;
+  padding: 8px;
   box-sizing: border-box;
   transition: all 0.2s ease;
 }
@@ -120,86 +121,171 @@
 /* Editor-specific Canvas and Controls styling */
 
 .layout-row-edit {
-  border: 1px dashed rgba(59, 130, 246, 0.2);
-  padding: 12px 8px;
+  border: 1px dashed hsl(var(--primary) / 0.2);
+  padding: 6px 4px;
   border-radius: 6px;
   position: relative;
   min-height: 60px;
   transition: all 0.15s ease;
+  padding-top: 14px;
+  /* Give room for the ROW label */
+}
+
+.layout-node-header {
+  position: absolute;
+  top: 1px;
+  left: 6px;
+  display: flex;
+  align-items: center;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.layout-node-grip {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 8px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: hsl(var(--primary) / 0.5);
+  cursor: grab;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background-color: transparent;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.layout-node-grip:hover {
+  color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.1);
+}
+
+.layout-node-grip:active {
+  cursor: grabbing;
 }
 
 .layout-row-edit:hover {
-  border-color: rgba(59, 130, 246, 0.4);
+  border-color: hsl(var(--primary) / 0.4);
 }
 
 .layout-widget-slot-edit {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid hsl(var(--border) / 0.5);
   border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: hsl(var(--background) / 0.6);
   cursor: pointer;
   position: relative;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .layout-widget-slot-edit:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 1px #3b82f6;
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 1px hsl(var(--primary));
 }
 
 .layout-widget-slot-edit.active-node {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-  background-color: rgba(243, 244, 246, 0.3);
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
+  background-color: hsl(var(--muted) / 0.3);
 }
 
 .layout-container-edit {
-  border: 1px dashed rgba(59, 130, 246, 0.3);
-  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px dashed hsl(var(--primary) / 0.3);
+  background-color: hsl(var(--background) / 0.7);
   cursor: pointer;
+  position: relative;
+  padding-top: 16px !important;
+  /* Room for CONTAINER label */
 }
 
+
 .layout-container-edit:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 1px #3b82f6;
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 1px hsl(var(--primary));
 }
 
 .layout-container-edit.active-node {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
 }
 
 /* Drag-and-drop indicators */
 .layout-drop-indicator-row {
   height: 6px;
   background-color: transparent;
-  margin: -3px 0;
   border-radius: 3px;
   transition: background-color 0.15s ease;
   position: relative;
   z-index: 10;
   cursor: pointer;
+  border: 1px dashed hsl(var(--primary) / 0.2);
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 
 .layout-drop-indicator-row.drag-over {
-  background-color: #3b82f6;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+  background-color: hsl(var(--primary));
+  box-shadow: 0 0 8px hsl(var(--primary) / 0.6);
 }
 
 .layout-drop-indicator-cell {
-  width: 8px;
-  background-color: transparent;
-  margin: 0 -4px;
-  border-radius: 4px;
-  transition: background-color 0.15s ease;
+  display: none;
+  /* Decommission direct flow cell indicators */
+}
+
+.layout-drop-indicator-left {
+  position: absolute;
+  left: -8px;
+  top: 0;
+  width: 16px;
   height: 100%;
-  position: relative;
-  z-index: 10;
+  z-index: 40;
+  background-color: transparent;
   cursor: pointer;
 }
 
-.layout-drop-indicator-cell.drag-over {
-  background-color: #3b82f6;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+.layout-drop-indicator-left::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.layout-drop-indicator-left.drag-over::after {
+  background-color: hsl(var(--primary));
+  box-shadow: 0 0 8px hsl(var(--primary) / 0.8);
+}
+
+.layout-drop-indicator-right {
+  position: absolute;
+  right: -8px;
+  top: 0;
+  width: 16px;
+  height: 100%;
+  z-index: 40;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.layout-drop-indicator-right::after {
+  content: "";
+  position: absolute;
+  right: 7px;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.layout-drop-indicator-right.drag-over::after {
+  background-color: hsl(var(--primary));
+  box-shadow: 0 0 8px hsl(var(--primary) / 0.8);
 }
 
 /* Floating Toolbar */
@@ -210,8 +296,8 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background-color: #1f2937;
-  color: white;
+  background-color: hsl(var(--foreground));
+  color: hsl(var(--background));
   border-radius: 6px;
   padding: 4px 8px;
   font-size: 11px;
@@ -223,7 +309,7 @@
 .layout-node-toolbar button {
   background: transparent;
   border: none;
-  color: #d1d5db;
+  color: hsl(var(--muted-foreground));
   padding: 3px 6px;
   border-radius: 4px;
   cursor: pointer;
@@ -232,18 +318,18 @@
 }
 
 .layout-node-toolbar button:hover {
-  background-color: #374151;
-  color: white;
+  background-color: hsl(var(--foreground) / 0.8);
+  color: hsl(var(--background));
 }
 
 .layout-node-toolbar button.active {
-  background-color: #3b82f6;
-  color: white;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--foreground));
 }
 
 .layout-node-toolbar button.delete-btn:hover {
-  background-color: #ef4444;
-  color: white;
+  background-color: hsl(var(--destructive));
+  color: hsl(var(--background));
 }
 
 /* Resize Handles */
@@ -262,8 +348,8 @@
 
 .layout-resize-handle:hover,
 .layout-resize-handle.active {
-  background-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 0 0 4px rgba(59, 130, 246, 0.3);
+  background-color: hsl(var(--primary) / 0.5);
+  box-shadow: 0 0 4px hsl(var(--primary) / 0.3);
 }
 
 /* Empty row drop target */
@@ -272,18 +358,74 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 80px;
-  border: 1px dashed rgba(156, 163, 175, 0.4);
-  border-radius: 6px;
-  color: #9ca3af;
-  font-size: 13px;
+  height: 48px;
+  border: 1px dashed hsl(var(--muted-foreground) / 0.4);
+  color: hsl(var(--muted-foreground));
+  font-size: 11px;
   transition: all 0.15s ease;
-  background-color: rgba(249, 250, 251, 0.3);
+  background-color: transparent;
 }
 
 .layout-row-empty-drop.drag-over {
-  border-color: #3b82f6;
-  background-color: rgba(59, 130, 246, 0.05);
-  color: #3b82f6;
+  border-color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.05);
+  color: hsl(var(--primary));
 }
 
+/* Empty space remaining columns drop target */
+.layout-row-remaining-drop {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px;
+  height: 100%;
+  border: 1px dashed hsl(var(--muted-foreground) / 0.25);
+  border-radius: 4px;
+  color: hsl(var(--muted-foreground));
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  background-color: transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.layout-row-remaining-drop.drag-over {
+  border-color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.06);
+  color: hsl(var(--primary));
+}
+
+/* Interactive locked widgets styling overrides */
+.layout-widget-slot-edit.layout-widget-locked {
+  border-color: transparent !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  cursor: default !important;
+}
+
+.layout-widget-slot-edit.layout-widget-locked:hover {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Stacks in Editor Mode */
+.layout-stack-edit {
+  border: 1px dashed hsl(var(--primary) / 0.3);
+  background-color: hsl(var(--background) / 0.7);
+  cursor: pointer;
+  position: relative;
+  padding-top: 16px !important;
+  /* Room for STACK label */
+}
+
+
+.layout-stack-edit:hover {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 1px hsl(var(--primary));
+}
+
+.layout-stack-edit.active-node {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
+}

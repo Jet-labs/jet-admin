@@ -12,12 +12,65 @@ import {
 
 import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@jet-admin/ui";
 import { Settings, ChevronDown, ChevronRight, Database, TrendingUp } from 'lucide-react';
+
 // Widget-specific string constants (inlined since this is a shared package)
 const VEGA_STRINGS = {
   WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings",
 };
 const PRIMARY_SHELVES = ['x', 'y', 'color', 'size'];
 const SECONDARY_SHELVES = ['row', 'column', 'shape', 'opacity', 'detail', 'text'];
+
+/**
+ * Helper: Flatten namespaced queryResults for the data-source picker.
+ * The WidgetIdeModal passes `{ queries: { alias: {...} }, workflows: { alias: {...} } }`
+ * while legacy callers pass a flat `{ alias: {...} }`.
+ */
+const getQueryResultEntries = (queryResults) => {
+  if (!queryResults) return [];
+  const isNamespaced = queryResults.queries || queryResults.workflows;
+  if (isNamespaced) {
+    const entries = [];
+    if (queryResults.queries) {
+      for (const alias of Object.keys(queryResults.queries)) {
+        entries.push({ alias, namespace: 'queries', data: queryResults.queries[alias] });
+      }
+    }
+    if (queryResults.workflows) {
+      for (const alias of Object.keys(queryResults.workflows)) {
+        entries.push({ alias, namespace: 'workflows', data: queryResults.workflows[alias] });
+      }
+    }
+    return entries;
+  }
+  // Legacy flat format
+  return Object.keys(queryResults).map(alias => ({ alias, namespace: null, data: queryResults[alias] }));
+};
+
+/**
+ * Recursively walk context and collect all array-of-objects paths.
+ * Mirrors the logic in DataFieldPanel so the dropdown offers identical paths.
+ */
+const collectArrayPaths = (obj, prefix = '', depth = 0, maxDepth = 4) => {
+  const results = [];
+  if (!obj || typeof obj !== 'object' || depth > maxDepth) return results;
+
+  for (const key of Object.keys(obj)) {
+    const val = obj[key];
+    const fullPath = prefix ? `${prefix}.${key}` : key;
+
+    if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
+      results.push({
+        path: `{{${fullPath}}}`,
+        label: fullPath,
+        sampleKeys: Object.keys(val[0]),
+        rowCount: val.length,
+      });
+    } else if (val && typeof val === 'object' && !Array.isArray(val)) {
+      results.push(...collectArrayPaths(val, fullPath, depth + 1, maxDepth));
+    }
+  }
+  return results;
+};
 
 /**
  * ShelfBuilder — The main Tableau/Voyager-style visual builder.
@@ -155,8 +208,17 @@ export const ShelfBuilder = ({
     return () => clearTimeout(timer);
   }, [shelfSpec]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Flatten queryResults entries for data source picker
+  const queryResultEntries = useMemo(() => getQueryResultEntries(queryResults), [queryResults]);
+
+  // Discover deep array paths from workflowContext (same logic as DataFieldPanel)
+  const discoveredArrayPaths = useMemo(() => {
+    if (!workflowContext) return [];
+    return collectArrayPaths(workflowContext);
+  }, [workflowContext]);
+
   // Quick fallback if no data source available
-  const hasDataSources = !!(queryResults && Object.keys(queryResults).length > 0);
+  const hasDataSources = queryResultEntries.length > 0 || discoveredArrayPaths.length > 0;
   const isWorkflowSelected = !!selectedWorkflow;
   const hasAnyData = isWorkflowSelected || hasDataSources;
 
@@ -204,12 +266,29 @@ export const ShelfBuilder = ({
                         </SelectTrigger>
                         <SelectContent className="z-[200]">
                           {selectedWorkflow && <SelectItem value="workflow">Workflow Output</SelectItem>}
-                          {workflowContext && Object.keys(workflowContext).map(key => (
+                          {workflowContext && !workflowContext.queries && !workflowContext.workflows && Object.keys(workflowContext).map(key => (
                             <SelectItem key={key} value={`{{ctx.${key}}}`}>{`ctx.${key}`}</SelectItem>
                           ))}
-                          {queryResults && Object.keys(queryResults).map(alias => (
-                            <SelectItem key={`qr-${alias}`} value={`{{${alias}.data}}`}>{alias} (Data Source)</SelectItem>
-                          ))}
+                          {discoveredArrayPaths.length > 0
+                            ? discoveredArrayPaths.map((arr) => (
+                                <SelectItem key={arr.path} value={arr.path}>
+                                  {arr.label} ({arr.rowCount} rows)
+                                </SelectItem>
+                              ))
+                            : queryResultEntries.map(({ alias, namespace }) => {
+                                const valuePath = namespace
+                                  ? `{{${namespace}.${alias}.data}}`
+                                  : `{{${alias}.data}}`;
+                                const label = namespace
+                                  ? `${namespace}.${alias} (Data Source)`
+                                  : `${alias} (Data Source)`;
+                                return (
+                                  <SelectItem key={`qr-${namespace || ''}-${alias}`} value={valuePath}>
+                                    {label}
+                                  </SelectItem>
+                                );
+                              })
+                          }
                         </SelectContent>
                       </Select>
                     </div>

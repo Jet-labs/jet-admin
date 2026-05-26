@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import vegaEmbed from 'vega-embed';
 
 /**
@@ -20,11 +20,36 @@ export const VegaWidget = ({
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const handleError = useCallback((err) => {
-    setError(err.message || 'Visualization error');
-    setLoading(false);
-    onError?.(err);
-  }, [onError]);
+  // Store callbacks in refs to avoid triggering the render effect
+  const onSignalRef = useRef(onSignal);
+  const onWidgetInitRef = useRef(onWidgetInit);
+  const onErrorRef = useRef(onError);
+  useEffect(() => { onSignalRef.current = onSignal; }, [onSignal]);
+  useEffect(() => { onWidgetInitRef.current = onWidgetInit; }, [onWidgetInit]);
+  useEffect(() => { onErrorRef.current = onError; }, [onError]);
+
+  // Serialize spec to a stable string key so the effect only fires
+  // when the spec content actually changes, not on every new object ref
+  const specKey = useMemo(() => {
+    try {
+      return data ? JSON.stringify(data) : null;
+    } catch {
+      return null;
+    }
+  }, [data]);
+
+  // Serialize widgetConfig options to a stable key
+  const configKey = useMemo(() => {
+    try {
+      return widgetConfig ? JSON.stringify({
+        showActions: widgetConfig?.showActions,
+        renderer: widgetConfig?.renderer,
+        theme: widgetConfig?.theme,
+      }) : null;
+    } catch {
+      return null;
+    }
+  }, [widgetConfig]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -71,20 +96,22 @@ export const VegaWidget = ({
         setLoading(false);
 
         // Call init callback
-        onWidgetInit?.(result.view);
+        onWidgetInitRef.current?.(result.view);
 
         // Setup signal listeners for interactivity
-        if (onSignal && data.params) {
+        if (onSignalRef.current && data.params) {
           for (const param of data.params) {
             if (param.name) {
               result.view.addSignalListener(param.name, (name, value) => {
-                onSignal(name, value);
+                onSignalRef.current?.(name, value);
               });
             }
           }
         }
       } catch (err) {
-        handleError(err);
+        setError(err.message || 'Visualization error');
+        setLoading(false);
+        onErrorRef.current?.(err);
       }
     };
 
@@ -96,7 +123,8 @@ export const VegaWidget = ({
         viewRef.current = null;
       }
     };
-  }, [data, widgetConfig, onSignal, onWidgetInit, handleError, isLoadingWorkflows]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [specKey, configKey, isLoadingWorkflows]);
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>

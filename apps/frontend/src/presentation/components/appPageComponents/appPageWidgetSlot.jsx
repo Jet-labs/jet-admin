@@ -1,7 +1,7 @@
 /**
  * AppPageWidgetSlot
  *
- * Runtime-aware widget container that replaces DashboardRenderWidget + DashboardWidget.
+ * Runtime-aware widget container that renders widgets on App Pages.
  * Integrates with the AppPage runtime context to:
  * - Resolve widget config expressions against the page state tree
  * - Execute widget events through the page-level action chain
@@ -29,6 +29,55 @@ import {
   useWidgetEventHandlers,
 } from "../../../logic/appPageRuntime";
 import { resolveConfig } from "../../../logic/evaluationEngine";
+
+/**
+ * Memoized wrapper that stabilizes the data prop for widget components.
+ * Prevents infinite re-render loops caused by resolveWidgetData() creating
+ * new object references (via JSON.parse/stringify) on every render.
+ */
+const MemoizedWidgetContent = React.memo(({
+  RenderedWidgetComponent,
+  widgetTitle,
+  widgetType,
+  resolvedConfig,
+  stateTreeQueries,
+  handleOnWidgetInit,
+  refreshInterval,
+  refetchWidget,
+  fireWidgetEvent,
+  runtimeEventHandlers,
+  widgetState,
+  setWidgetState,
+}) => {
+  const widgetData = useMemo(() => {
+    return resolveWidgetData({
+      widgetType,
+      widgetConfig: resolvedConfig,
+      dataSourceResults: stateTreeQueries,
+    });
+  }, [widgetType, resolvedConfig, stateTreeQueries]);
+
+  const refreshData = useCallback(() => {
+    refetchWidget();
+    fireWidgetEvent("onRefresh");
+  }, [refetchWidget, fireWidgetEvent]);
+
+  return (
+    <RenderedWidgetComponent
+      widgetTitle={widgetTitle}
+      widgetType={widgetType}
+      widgetConfig={resolvedConfig}
+      data={widgetData}
+      onWidgetInit={handleOnWidgetInit}
+      refetchInterval={refreshInterval}
+      refreshData={refreshData}
+      fireWidgetEvent={fireWidgetEvent}
+      widgetState={widgetState}
+      setWidgetState={setWidgetState}
+      {...runtimeEventHandlers}
+    />
+  );
+});
 
 export const AppPageWidgetSlot = ({
   tenantID,
@@ -96,10 +145,26 @@ export const AppPageWidgetSlot = ({
   );
 
   // ── Config Resolution ──
-  // Resolve {{ }} expressions in widget config against the page state tree
+  // Resolve {{ }} expressions in widget config against the page state tree.
+  // We structurally compare via JSON to return a stable reference when content
+  // hasn't changed — this prevents React.memo bypass on child widgets when
+  // unrelated parts of stateTree update (e.g., widgetMethods registration).
+  const resolvedConfigRef = useRef(null);
+  const resolvedConfigKeyRef = useRef(null);
   const resolvedConfig = useMemo(() => {
     if (!widget?.widgetConfig || !stateTree) return widget?.widgetConfig;
-    return resolveConfig(widget.widgetConfig, stateTree);
+    const resolved = resolveConfig(widget.widgetConfig, stateTree);
+    try {
+      const key = JSON.stringify(resolved);
+      if (key === resolvedConfigKeyRef.current) {
+        return resolvedConfigRef.current; // Same content → same reference
+      }
+      resolvedConfigKeyRef.current = key;
+      resolvedConfigRef.current = resolved;
+    } catch {
+      resolvedConfigRef.current = resolved;
+    }
+    return resolved;
   }, [widget?.widgetConfig, stateTree]);
 
   // ── Widget Type Resolution ──
@@ -133,9 +198,7 @@ export const AppPageWidgetSlot = ({
     if (!widget?.widgetConfig?.events) return {};
     const handlers = {};
     for (const eventType of Object.keys(widget.widgetConfig.events)) {
-      handlers[eventType] = (...args) => {
-        fireWidgetEvent(eventType, { args });
-      };
+      handlers[eventType] = (...args) => fireWidgetEvent(eventType, { args });
     }
     return handlers;
   }, [widget?.widgetConfig?.events, fireWidgetEvent]);
@@ -179,12 +242,12 @@ export const AppPageWidgetSlot = ({
             isLoading={isLoadingWidget}
             isFetching={isLoadingWidget}
             error={loadWidgetError}
-            loadingContainerClass="bg-gradient-to-br from-background to-slate-50"
+            loadingContainerClass="bg-gradient-to-br from-background to-muted/50"
             refetch={() => refetchWidget()}
           >
             {/* Widget Header */}
             {widget && showHeader && (
-              <div className="border-b border-border/80 bg-gradient-to-r from-slate-50 to-background px-3 py-1.5">
+              <div className="border-b border-border/80 bg-gradient-to-r from-muted/50 to-background px-3 py-1.5">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2">
@@ -242,31 +305,24 @@ export const AppPageWidgetSlot = ({
 
             {/* Widget Content */}
             {RenderedWidgetComponent
-              ? (() => {
-                  const widgetData = resolveWidgetData({
-                    widgetType: widgetRender.widgetType,
-                    widgetConfig: resolvedConfig,
-                    dataSourceResults: stateTree.queries,
-                  });
-
-                  return (
-                    <div className="min-h-0 flex-1 bg-background px-2 pb-2 pt-1">
-                      <RenderedWidgetComponent
+              ? (
+                <div className="min-h-0 flex-1 bg-background">
+                  <MemoizedWidgetContent
+                    RenderedWidgetComponent={RenderedWidgetComponent}
                         widgetTitle={widget.widgetTitle}
                         widgetType={widgetRender.widgetType}
-                        widgetConfig={resolvedConfig}
-                        data={widgetData}
-                        onWidgetInit={handleOnWidgetInit}
-                        refetchInterval={widget.refreshInterval}
-                        refreshData={() => {
-                          refetchWidget();
-                          fireWidgetEvent("onRefresh");
-                        }}
-                        {...runtimeEventHandlers}
+                    resolvedConfig={resolvedConfig}
+                    stateTreeQueries={stateTree.queries}
+                    handleOnWidgetInit={handleOnWidgetInit}
+                    refreshInterval={widget.refreshInterval}
+                    refetchWidget={refetchWidget}
+                    fireWidgetEvent={fireWidgetEvent}
+                    runtimeEventHandlers={runtimeEventHandlers}
+                    widgetState={widgetState}
+                    setWidgetState={setWidgetState}
                       />
                     </div>
-                  );
-                })()
+              )
               : null}
           </ReactQueryLoadingErrorWrapper>
         </div>

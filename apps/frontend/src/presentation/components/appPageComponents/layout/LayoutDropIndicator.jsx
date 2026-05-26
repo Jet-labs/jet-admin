@@ -26,10 +26,14 @@ export default function LayoutDropIndicator({ type, onDropNode, ...rest }) {
     }
   };
 
-  const className =
-    type === "row"
-      ? "layout-drop-indicator-row"
-      : "layout-drop-indicator-cell";
+  let className = "layout-drop-indicator-cell";
+  if (type === "row") {
+    className = "layout-drop-indicator-row";
+  } else if (type === "cell-left") {
+    className = "layout-drop-indicator-left";
+  } else if (type === "cell-right") {
+    className = "layout-drop-indicator-right";
+  }
 
   return (
     <div

@@ -33,7 +33,7 @@ export const GlobalDialogs = () => {
 
         <AlertDialogFooter>
           <Button
-            variant="outline"
+            variant="destructive"
             size="sm"
             onClick={handleReject}
             disabled={dialogState.isLoading}
@@ -43,7 +43,7 @@ export const GlobalDialogs = () => {
           </Button>
 
           <Button
-            variant="destructive"
+            // variant="default"
             size="sm"
             onClick={handleConfirm}
             disabled={dialogState.isLoading}

@@ -7,7 +7,7 @@ const UpdateListenerPage = () => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-      <ListenerUpdationForm tenantID={tenantID} listenerID={listenerID} />
+      <ListenerUpdationForm key={listenerID} tenantID={tenantID} listenerID={listenerID} />
     </div>
   );
 };

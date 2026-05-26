@@ -6,7 +6,6 @@ import { ProtectedLayout } from "../layouts/protectedLayout";
 import { DataQueryLayout } from "../layouts/dataQueryLayout";
 import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
-import { DashboardLayout } from "../layouts/dashboardLayout";
 import { AppPageLayout } from "../layouts/appPageLayout";
 import { WidgetLayout } from "../layouts/widgetLayout";
 import { APIKeyLayout } from "../layouts/apiKeyLayout";
@@ -29,17 +28,10 @@ const UpdateDataQueryPage = lazy(() =>
 const DataQueryLayoutLandingPage = lazy(() =>
   import("../../pages/dataQueryLayoutLandingPage")
 );
-const DashboardLayoutLandingPage = lazy(() =>
-  import("../../pages/dashboardLayoutLandingPage")
-);
 const AddWidgetPage = lazy(() => import("../../pages/addWidgetPage"));
 const UpdateWidgetPage = lazy(() => import("../../pages/updateWidgetPage"));
 const WidgetLayoutLandingPage = lazy(() =>
   import("../../pages/widgetLayoutLandingPage")
-);
-const AddDashboardPage = lazy(() => import("../../pages/addDashboardPage"));
-const UpdateDashboardPage = lazy(() =>
-  import("../../pages/updateDashboardPage")
 );
 const AppPageLayoutLandingPage = lazy(() =>
   import("../../pages/appPageLayoutLandingPage")
@@ -242,23 +234,6 @@ const router = createBrowserRouter([
           {
             path: CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.code,
             element: <ViewAuditLogsPage />,
-          },
-          {
-            element: <DashboardLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_DASHBOARDS.code,
-                element: <DashboardLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_DASHBOARD.code,
-                element: <AddDashboardPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_DASHBOARD_BY_ID.code,
-                element: <UpdateDashboardPage />,
-              },
-            ],
           },
           {
             element: <AppPageLayout />,

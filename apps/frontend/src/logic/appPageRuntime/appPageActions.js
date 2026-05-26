@@ -19,11 +19,17 @@ export const APP_PAGE_ACTIONS = {
   /** Merge updates into a widget's local state: { widgetID, state } */
   SET_WIDGET_STATE: "APP_PAGE_SET_WIDGET_STATE",
 
-  /** Store a query/workflow result: { alias, data, error, isLoading } */
+  /** Store a query result: { alias, data, error, isLoading } */
   SET_QUERY_RESULT: "APP_PAGE_SET_QUERY_RESULT",
 
-  /** Mark a data source as loading: { alias } */
+  /** Mark a query data source as loading: { alias } */
   SET_QUERY_LOADING: "APP_PAGE_SET_QUERY_LOADING",
+
+  /** Store a workflow result: { alias, data, error, isLoading } */
+  SET_WORKFLOW_RESULT: "APP_PAGE_SET_WORKFLOW_RESULT",
+
+  /** Mark a workflow data source as loading: { alias } */
+  SET_WORKFLOW_LOADING: "APP_PAGE_SET_WORKFLOW_LOADING",
 
   /** Register methods a widget exposes: { widgetID, methods } */
   REGISTER_WIDGET_METHODS: "APP_PAGE_REGISTER_WIDGET_METHODS",
@@ -62,6 +68,16 @@ export const appPageActions = {
 
   setQueryLoading: (alias) => ({
     type: APP_PAGE_ACTIONS.SET_QUERY_LOADING,
+    payload: { alias },
+  }),
+
+  setWorkflowResult: (alias, data, error = null, isLoading = false, instanceID = null) => ({
+    type: APP_PAGE_ACTIONS.SET_WORKFLOW_RESULT,
+    payload: { alias, data, error, isLoading, instanceID },
+  }),
+
+  setWorkflowLoading: (alias) => ({
+    type: APP_PAGE_ACTIONS.SET_WORKFLOW_LOADING,
     payload: { alias },
   }),
 

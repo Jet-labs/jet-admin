@@ -34,7 +34,7 @@ datasourceController.getAllDatasources = async (req, res) => {
     Logger.log("success", {
       message: "datasourceController:getAllDatasources:success",
       params: {
-        datasources,
+        // datasources,
       },
     });
 

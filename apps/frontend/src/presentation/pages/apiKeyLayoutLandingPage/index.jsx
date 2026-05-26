@@ -1,17 +1,17 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { DefaultDashboardSelectionLayout } from "../../components/ui/defaultDashboardSelectionLayout";
+import { DefaultAppPageSelectionLayout } from "../../components/ui/defaultAppPageSelectionLayout";
 
-const CronJobLayoutLandingPage = () => {
+const ApiKeyLayoutLandingPage = () => {
   const { tenantID } = useParams();
 
   return (
-    <DefaultDashboardSelectionLayout
+    <DefaultAppPageSelectionLayout
       tenantID={tenantID}
-      userConfigKey={`${CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID}_cronJobLayoutLandingPage`}
+      userConfigKey={`${CONSTANTS.USER_CONFIG_KEYS.DEFAULT_APP_PAGE_ID}_apiKeyLayoutLandingPage`}
     />
   );
 };
 
-export default CronJobLayoutLandingPage;
+export default ApiKeyLayoutLandingPage;

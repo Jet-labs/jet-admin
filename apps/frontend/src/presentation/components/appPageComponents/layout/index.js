@@ -11,6 +11,7 @@ export {
   removeEmptyRows,
   wrapInContainer,
   unwrapContainer,
+  setNodeStyle,
 } from "./layoutEngine.js";
 
 export { migrateV1ToV2 } from "./layoutMigration.js";

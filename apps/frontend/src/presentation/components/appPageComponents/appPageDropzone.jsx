@@ -58,7 +58,7 @@ export const AppPageDropzone = ({
   );
 
   return (
-    <div className="h-full min-h-full w-full overflow-hidden bg-slate-50/30 p-2">
+    <div className="h-full min-h-full w-full overflow-hidden bg-transparent p-0">
       {migratedConfig.layout && (
         <LayoutEditorCanvas
           layout={migratedConfig.layout}

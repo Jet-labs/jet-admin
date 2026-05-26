@@ -15,8 +15,8 @@ import { useAppPageStateTree } from "./useAppPageStateTree";
 import { useAppPageDispatch } from "./useAppPageDispatch";
 import { appPageActions } from "./appPageActions";
 import { getChangedPaths } from "./appPageExpressionEngine";
-import { testDataQueryByIDAPI } from "../../data/apis/dataQuery";
-import { executeWorkflowAPI } from "../../data/apis/workflow";
+import { runDataQueryByIDAPI } from "../../data/apis/dataQuery";
+import { executeWorkflowWithStreaming } from "./executeWorkflowWithStreaming";
 import { resolveConfig } from "../evaluationEngine";
 
 export const useAppPageDataSourceManager = () => {
@@ -32,8 +32,22 @@ export const useAppPageDataSourceManager = () => {
   const requestCounterRef = useRef({});
   // Track polling intervals for cleanup
   const pollIntervalsRef = useRef({});
-  // Track whether initial auto-fetch has been done
-  const initialFetchDoneRef = useRef(false);
+  // Track which data source aliases have been auto-fetched
+  const fetchedAliasesRef = useRef(new Set());
+  // Track active workflow streaming disconnectors for cleanup
+  const activeDisconnectorsRef = useRef({});
+
+  // Cleanup active workflow streams on unmount
+  useEffect(() => {
+    return () => {
+      for (const alias of Object.keys(activeDisconnectorsRef.current)) {
+        if (typeof activeDisconnectorsRef.current[alias] === "function") {
+          activeDisconnectorsRef.current[alias]();
+        }
+      }
+      activeDisconnectorsRef.current = {};
+    };
+  }, []);
 
   /**
    * Execute a single data source and store the result.
@@ -52,32 +66,70 @@ export const useAppPageDataSourceManager = () => {
         stateTree
       );
 
-      dispatch(appPageActions.setQueryLoading(alias));
+      // If any inputArg template resolved to undefined/null, it means a
+      // referenced variable/path doesn't exist yet (e.g. {{variables.skip}}
+      // before the table widget sets initial pagination variables).
+      // Skip execution — the reactive system will re-trigger once the
+      // variables are set, avoiding SQL errors like "OFFSET  LIMIT".
+      const hasUnresolvedArgs = Object.keys(inputArgs).length > 0 &&
+        Object.entries(resolvedInputArgs).some(
+          ([, val]) => val === undefined || val === null
+        );
+      if (hasUnresolvedArgs) {
+        console.log(
+          `[DataSourceManager] Skipping "${alias}" — has unresolved template args`,
+          resolvedInputArgs
+        );
+        return null;
+      }
+
+      const isWorkflow = type === "workflow";
 
       try {
-        let result;
-        if (type === "workflow") {
-          result = await executeWorkflowAPI({
+        if (isWorkflow) {
+          // Disconnect any existing stream for this alias
+          if (typeof activeDisconnectorsRef.current[alias] === "function") {
+            activeDisconnectorsRef.current[alias]();
+          }
+
+          const { disconnect } = executeWorkflowWithStreaming({
             tenantID,
             workflowID,
             inputArgs: resolvedInputArgs,
+            alias,
+            dispatch,
+            isStale: () => requestCounterRef.current[alias] !== requestID,
           });
+
+          // Store disconnector for cleanup
+          activeDisconnectorsRef.current[alias] = disconnect;
+
+          return null;
         } else {
-          result = await testDataQueryByIDAPI({
+          dispatch(appPageActions.setQueryLoading(alias));
+
+          const result = await runDataQueryByIDAPI({
             tenantID,
             dataQueryID: queryID,
             inputArgs: resolvedInputArgs,
           });
-        }
 
-        // Only store if this is still the latest request for this alias
-        if (requestCounterRef.current[alias] === requestID) {
-          dispatch(appPageActions.setQueryResult(alias, result));
+          // Only store if this is still the latest request for this alias
+          if (requestCounterRef.current[alias] === requestID) {
+            dispatch(appPageActions.setQueryResult(alias, result));
+          }
+          return result;
         }
-        return result;
       } catch (error) {
         if (requestCounterRef.current[alias] === requestID) {
-          dispatch(appPageActions.setQueryResult(alias, null, error));
+          if (isWorkflow) {
+            dispatch(appPageActions.setWorkflowResult(alias, null, error));
+            if (typeof activeDisconnectorsRef.current[alias] === "function") {
+              activeDisconnectorsRef.current[alias]();
+            }
+          } else {
+            dispatch(appPageActions.setQueryResult(alias, null, error));
+          }
         }
         console.error(
           `[DataSourceManager] Failed to execute "${alias}":`,
@@ -90,19 +142,31 @@ export const useAppPageDataSourceManager = () => {
   );
 
   // ============================================================
-  // Auto-fetch on mount
+  // Auto-fetch on mount & when new sources are added
   // ============================================================
   useEffect(() => {
-    if (initialFetchDoneRef.current) return;
+    // Keep fetchedAliasesRef in sync with current dataSources to allow re-fetching if a deleted alias is re-added
+    const currentAliases = new Set(dataSources.map((ds) => ds.alias).filter(Boolean));
+    for (const alias of fetchedAliasesRef.current) {
+      if (!currentAliases.has(alias)) {
+        fetchedAliasesRef.current.delete(alias);
+      }
+    }
+
     if (dataSources.length === 0) return;
 
-    initialFetchDoneRef.current = true;
-
     const autoSources = dataSources.filter(
-      (ds) => ds.triggerMode === "auto" || ds.triggerMode === "reactive"
+      (ds) =>
+        (ds.triggerMode === "auto" || ds.triggerMode === "reactive") &&
+        (ds.queryID || ds.workflowID) &&
+        ds.alias &&
+        !fetchedAliasesRef.current.has(ds.alias)
     );
 
+    if (autoSources.length === 0) return;
+
     for (const ds of autoSources) {
+      fetchedAliasesRef.current.add(ds.alias);
       executeDataSource(ds);
     }
   }, [dataSources, executeDataSource]);

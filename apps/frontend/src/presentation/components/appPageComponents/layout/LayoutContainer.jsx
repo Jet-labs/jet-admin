@@ -11,7 +11,10 @@ export default function LayoutContainer({
   const sizingClass = `sizing-${node.sizing || "auto"}`;
   const isActive = activeNodeId === node.id;
 
-  const containerStyle = { ...(node.style || {}) };
+  const containerStyle = {
+    overflow: node.style?.borderRadius ? "hidden" : undefined,
+    ...(node.style || {}),
+  };
   if (node.sizing === "fixed" && node.fixedHeight) {
     containerStyle["--fixed-height"] = `${node.fixedHeight}px`;
   }

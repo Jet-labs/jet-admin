@@ -6,7 +6,7 @@ const logBuffer = [];
 let flushTimer = null;
 let isFlushing = false; // Prevent multiple concurrent flushes
 
-const BUFFER_SIZE = 10; // Flush when buffer reaches this size
+const BUFFER_SIZE = 50;
 const FLUSH_INTERVAL_MS = 5000; // Flush every 5 seconds
 
 const auditService = {};

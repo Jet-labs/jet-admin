@@ -20,7 +20,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "rgb(var(--brand-green-rgb))",
+          DEFAULT: "rgb(var(--brand-primary-rgb))",
           foreground: "var(--brand-text-primary)",
         },
         secondary: {
@@ -48,9 +48,9 @@ export default {
           foreground: "var(--brand-text-primary)",
         },
         brand: {
-          green: "var(--brand-green)",
-          "green-link": "var(--brand-green-link)",
-          "green-border": "var(--brand-green-border)",
+          green: "var(--brand-primary)",
+          "green-link": "var(--brand-primary-link)",
+          "green-border": "var(--brand-primary-border)",
           black: "var(--brand-black)",
           dark: "var(--brand-dark)",
           "border-dark": "var(--brand-border-dark)",

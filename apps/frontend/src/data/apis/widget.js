@@ -4,7 +4,7 @@ import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import { Widget } from "../models/widget";
 
-export const getAllWidgetsAPI = async ({ tenantID }) => {
+export const getAllWidgetsAPI = async ({ tenantID, search, page, pageSize }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -12,12 +12,27 @@ export const getAllWidgetsAPI = async ({ tenantID }) => {
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.get(url, {
+        params: {
+          search,
+          page,
+          pageSize,
+        },
         headers: {
           authorization: `Bearer ${bearerToken}`,
         },
       });
       if (response.data && response.data.success === true) {
-        return Widget.toList(response.data.widgets);
+        const widgetsList = response.data.widgets ? Widget.toList(response.data.widgets) : [];
+        if (response.data.totalCount !== undefined) {
+          return {
+            widgets: widgetsList,
+            totalCount: response.data.totalCount,
+            totalPages: response.data.totalPages,
+            page: response.data.page,
+            pageSize: response.data.pageSize,
+          };
+        }
+        return widgetsList;
       } else if (response.data.error) {
         throw response.data.error;
       } else {
@@ -76,7 +91,7 @@ export const createWidgetAPI = async ({ tenantID, widgetData }) => {
         }
       );
       if (response.data && response.data.success === true) {
-        return true;
+        return new Widget(response.data.widget);
       } else if (response.data.error) {
         throw response.data.error;
       } else {

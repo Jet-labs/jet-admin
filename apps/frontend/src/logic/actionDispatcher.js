@@ -10,7 +10,7 @@
  * - SHOW_TOAST → calls displaySuccess/displayError
  */
 
-import { testDataQueryByIDAPI } from "../data/apis/dataQuery";
+import { runDataQueryByIDAPI } from "../data/apis/dataQuery";
 import { executeWorkflowAPI } from "../data/apis/workflow";
 import { displaySuccess, displayError } from "../utils/notification";
 import { resolveConfig } from "./evaluationEngine";
@@ -37,7 +37,7 @@ const executeAction = async (action, context) => {
         return null;
       }
       try {
-        const result = await testDataQueryByIDAPI({
+        const result = await runDataQueryByIDAPI({
           tenantID,
           dataQueryID: config.queryID,
           inputArgs: config.inputArgs || {},
