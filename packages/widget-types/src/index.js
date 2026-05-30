@@ -44,6 +44,14 @@ export const WIDGET_TYPES = {
     name: "IFrame Embed",
     value: "iframe",
   },
+  DATE_PICKER: {
+    name: "Date / Time Picker",
+    value: "date-picker",
+  },
+  DATE_RANGE_PICKER: {
+    name: "Date Range Picker",
+    value: "date-range-picker",
+  },
 };
 
 // Advanced options for Vega widgets (using JSON Schema + UI Schema for jsonforms)
@@ -160,6 +168,20 @@ export const WIDGET_EVENT_TYPES = {
   /** Alert-specific events */
   alert: [
     { value: "onDismiss", label: "On Dismiss", desc: "Fires when the alert is dismissed" },
+  ],
+
+  "date-picker": [
+    { value: "onChange", label: "On Change", desc: "Fires when the selected date/time changes." },
+    { value: "onOpen", label: "On Open", desc: "Fires when the picker popover opens" },
+    { value: "onClose", label: "On Close", desc: "Fires when the picker popover closes" },
+    { value: "onClear", label: "On Clear", desc: "Fires when the selected value is cleared" },
+  ],
+
+  "date-range-picker": [
+    { value: "onChange", label: "On Change", desc: "Fires when the selected range changes." },
+    { value: "onOpen", label: "On Open", desc: "Fires when the picker popover opens" },
+    { value: "onClose", label: "On Close", desc: "Fires when the picker popover closes" },
+    { value: "onClear", label: "On Clear", desc: "Fires when the range is cleared" },
   ],
 };
 
