@@ -13,7 +13,9 @@ export function CalendarGrid({
   onDayClick,
   onDayHover,
   onMonthChange,
-  showNavigation = true
+  showNavigation = true,
+  hideLeftArrow = false,
+  hideRightArrow = false,
 }) {
   const days = getCalendarDays(year, month);
   const currentMonthDate = new Date(year, month, 1);
@@ -23,23 +25,31 @@ export function CalendarGrid({
     <div className="w-[252px]">
       {showNavigation && (
         <div className="flex justify-between items-center mb-4 px-1">
-          <button 
-            type="button"
-            onClick={() => onMonthChange(-1)} 
-            className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+          {!hideLeftArrow ? (
+            <button 
+              type="button"
+              onClick={() => onMonthChange(-1)} 
+              className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          ) : (
+            <div className="w-6 h-6" />
+          )}
           <div className="font-semibold text-sm">
             {format(currentMonthDate, 'MMMM yyyy')}
           </div>
-          <button 
-            type="button"
-            onClick={() => onMonthChange(1)} 
-            className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          {!hideRightArrow ? (
+            <button 
+              type="button"
+              onClick={() => onMonthChange(1)} 
+              className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <div className="w-6 h-6" />
+          )}
         </div>
       )}
 

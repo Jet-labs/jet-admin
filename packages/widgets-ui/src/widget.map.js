@@ -10,7 +10,9 @@ import { AlertConfigEditor } from "./alert/alertConfigEditor";
 import { FormConfigEditor } from "./form/formConfigEditor";
 import { ImageConfigEditor } from "./image/imageConfigEditor";
 import { IframeConfigEditor } from "./iframe/iframeConfigEditor";
-import { BarChart, Component, Table, Type, TrendingUp, AlertTriangle, FileText, Image, Globe } from 'lucide-react';
+import { DatePickerConfigEditor } from "./date-picker/datePickerConfigEditor";
+import { DateRangePickerConfigEditor } from "./date-range-picker/dateRangePickerConfigEditor";
+import { BarChart, Component, Table, Type, TrendingUp, AlertTriangle, FileText, Image, Globe, Calendar, CalendarRange } from 'lucide-react';
 
 
 // Register widgets
@@ -52,6 +54,14 @@ const LazyImageWidget = React.lazy(() =>
 
 const LazyIframeWidget = React.lazy(() =>
   import("./iframe/index.js").then(module => ({ default: module.IframeWidget }))
+);
+
+const LazyDatePickerWidget = React.lazy(() =>
+  import("./date-picker/index.js").then(module => ({ default: module.DatePickerWidget }))
+);
+
+const LazyDateRangePickerWidget = React.lazy(() =>
+  import("./date-range-picker/index.js").then(module => ({ default: module.DateRangePickerWidget }))
 );
 
 
@@ -315,6 +325,59 @@ export const WIDGETS_MAP = {
       allowForms: true,
       allowPopups: false,
       allowSameOrigin: false,
+      showHeader: false,
+    },
+  },
+  'date-picker': {
+    label: "Date / Time Picker",
+    value: WIDGET_TYPES.DATE_PICKER.value,
+    datasetFields: [],
+    defaultAutoRun: false,
+    description: "Select a single date and optional time",
+    component: ({ data, ...props }) => {
+      return (
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading picker...</div>}>
+          <LazyDatePickerWidget data={data} {...props} />
+        </React.Suspense>
+      );
+    },
+    configEditor: DatePickerConfigEditor,
+    icon: ({ className }) => <Calendar className={`!text-lg ${className}`} />,
+    sampleConfig: {
+      label: "Select Date",
+      placeholder: "Choose a date...",
+      enableTime: false,
+      defaultValue: "",
+      showHeader: false,
+    },
+  },
+  'date-range-picker': {
+    label: "Date Range Picker",
+    value: WIDGET_TYPES.DATE_RANGE_PICKER.value,
+    datasetFields: [],
+    defaultAutoRun: false,
+    description: "Select a range of dates and optional times",
+    component: ({ data, ...props }) => {
+      return (
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading range picker...</div>}>
+          <LazyDateRangePickerWidget data={data} {...props} />
+        </React.Suspense>
+      );
+    },
+    configEditor: DateRangePickerConfigEditor,
+    icon: ({ className }) => <CalendarRange className={`!text-lg ${className}`} />,
+    sampleConfig: {
+      label: "Select Date Range",
+      placeholderStart: "Start date",
+      placeholderEnd: "End date",
+      enableTime: false,
+      defaultStart: "",
+      defaultEnd: "",
+      presets: [
+        { label: "Today", startOffset: 0, endOffset: 0 },
+        { label: "Last 7 days", startOffset: -7, endOffset: 0 },
+        { label: "This month", startOffset: "startOfMonth", endOffset: "endOfMonth" }
+      ],
       showHeader: false,
     },
   },
