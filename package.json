@@ -2,6 +2,9 @@
   "name": "jet-admin",
   "version": "1.3.0",
   "main": "index.js",
+  "engines": {
+    "node": "20.x"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
