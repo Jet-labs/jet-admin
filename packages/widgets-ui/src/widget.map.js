@@ -155,6 +155,7 @@ export const WIDGETS_MAP = {
     sampleConfig: {
       dataArrayTemplate: "{{ctx.data}}",
       columns: [],
+      isLoading: "",
       pagination: {
         enabled: false,
         pageParam: "page",

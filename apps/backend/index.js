@@ -1,4 +1,5 @@
 require("ignore-styles");
+// Trigger nodemon restart
 
 // Patch BigInt JSON serialization globally
 BigInt.prototype.toJSON = function () {
@@ -234,4 +235,5 @@ process.on("SIGINT", async () => {
     process.exit(0);
   });
 });
+
 

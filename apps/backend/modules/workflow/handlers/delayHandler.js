@@ -3,7 +3,7 @@
  * Computes a bounded queue delay. The orchestrator owns the non-blocking
  * scheduling; this handler only validates and describes the wait.
  */
-const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
+const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
 
 const MAX_DELAY_MS = 24 * 60 * 60 * 1000; // 24 hours: compatible with setTimeout and UI limits
 
@@ -102,7 +102,7 @@ async function execute(nodeConfig, context, helpers) {
       output: {
         delayedMs: 0,
         success: false,
-        error: error.message,
+        error: serializeError(error),
       },
       nextHandle: NEXT_HANDLE.ERROR,
     };

@@ -8,26 +8,31 @@ import { Button, InputArgsForm } from "@jet-admin/ui";
  * Uses the shared InputArgsForm component from @jet-admin/ui.
  */
 export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
-  // Initialize values based on args schema
+  // Initialize values based on args schema, using defaultValue when available
   const initialValues = useMemo(() => {
     const values = {};
     args.forEach((arg) => {
       if (arg.key) {
-        switch (arg.type) {
-          case "number":
-            values[arg.key] = "";
-            break;
-          case "boolean":
-            values[arg.key] = false;
-            break;
-          case "object":
-            values[arg.key] = "";
-            break;
-          case "array":
-            values[arg.key] = [];
-            break;
-          default:
-            values[arg.key] = "";
+        // Use defaultValue if defined, otherwise fall back to type-appropriate empty value
+        if (arg.defaultValue !== undefined && arg.defaultValue !== null) {
+          values[arg.key] = arg.defaultValue;
+        } else {
+          switch (arg.type) {
+            case "number":
+              values[arg.key] = "";
+              break;
+            case "boolean":
+              values[arg.key] = false;
+              break;
+            case "object":
+              values[arg.key] = "";
+              break;
+            case "array":
+              values[arg.key] = [];
+              break;
+            default:
+              values[arg.key] = "";
+          }
         }
       }
     });
@@ -137,7 +142,7 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
               type='button'
               size="sm"
               onClick={handleSubmit}
-              className="bg-green-600 hover:bg-green-700 text-white"
+              // className="bg-green-600 hover:bg-green-700 text-white"
             >
               <Play className="w-3 h-3 mr-1.5" />
               Run Workflow
@@ -155,6 +160,7 @@ WorkflowInputModal.propTypes = {
       key: PropTypes.string,
       type: PropTypes.string,
       required: PropTypes.bool,
+      defaultValue: PropTypes.any,
     })
   ).isRequired,
   onSubmit: PropTypes.func.isRequired,

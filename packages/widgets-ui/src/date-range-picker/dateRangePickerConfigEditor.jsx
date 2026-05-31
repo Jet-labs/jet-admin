@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Input, Label, Checkbox } from '@jet-admin/ui';
+import TemplateAutocompleteInput from '../_shared/TemplateAutocompleteInput';
+import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
 
-export const DateRangePickerConfigEditor = ({ widgetEditorForm }) => {
+export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+
+  const suggestions = useMemo(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail,
+    }));
+  }, [stateTree]);
 
   return (
     <div className="space-y-4">
@@ -56,23 +68,21 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm }) => {
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label className="text-xs font-medium text-foreground">Default Start</Label>
-          <Input
-            type="text"
-            className="text-sm h-8 font-mono"
+          <TemplateAutocompleteInput
             value={config.defaultStart || ''}
-            onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.defaultStart', e.target.value)}
-            placeholder="ISO date string"
+            onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.defaultStart', val)}
+            placeholder="e.g. {{state.variables.startDate}}"
+            suggestions={suggestions}
           />
         </div>
 
         <div className="space-y-1.5">
           <Label className="text-xs font-medium text-foreground">Default End</Label>
-          <Input
-            type="text"
-            className="text-sm h-8 font-mono"
+          <TemplateAutocompleteInput
             value={config.defaultEnd || ''}
-            onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.defaultEnd', e.target.value)}
-            placeholder="ISO date string"
+            onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.defaultEnd', val)}
+            placeholder="e.g. {{state.variables.endDate}}"
+            suggestions={suggestions}
           />
         </div>
       </div>
@@ -82,6 +92,7 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm }) => {
 
 DateRangePickerConfigEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
+  stateTree: PropTypes.object,
 };
 
 export default DateRangePickerConfigEditor;

@@ -41,3 +41,15 @@ export { IframeConfigEditor } from "./iframe/iframeConfigEditor";
 // Date and Time Pickers
 export * from "./date-picker";
 export * from "./date-range-picker";
+
+// Shared components
+export { default as TemplateAutocompleteInput } from "./_shared/TemplateAutocompleteInput";
+
+// Dynamic intellisense
+export {
+  getExpressionSuggestions,
+  getAliasSuggestions,
+  getVariableKeySuggestions,
+  getWidgetIDSuggestions,
+  getMethodSuggestionsForTarget,
+} from "./intellisense/suggestionEngine";

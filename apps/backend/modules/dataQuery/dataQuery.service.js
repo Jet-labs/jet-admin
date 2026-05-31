@@ -439,7 +439,6 @@ dataQueryService.runDataQueryByData = async ({
         userID,
         tenantID,
         tempQueryID,
-        results,
       },
     });
     return results;
@@ -560,6 +559,9 @@ dataQueryService.cloneDataQueryByID = async ({
         dataQueryOptions: dataQuery.dataQueryOptions,
         creatorID: userID,
         runOnLoad: dataQuery.runOnLoad,
+        datasourceID: dataQuery.datasourceID,
+        datasourceType: dataQuery.datasourceType,
+        dataQueryDescription: dataQuery.dataQueryDescription
       },
     });
     Logger.log("success", {

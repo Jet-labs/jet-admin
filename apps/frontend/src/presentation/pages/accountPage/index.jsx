@@ -9,7 +9,6 @@ import { displaySuccess } from "../../../utils/notification";
 import { AccountNotificationList } from "../../components/accountComponents/accountNotificationList";
 import React from "react";
 
-
 import { Button } from "@jet-admin/ui";
 const AccountPage = () => {
   const { user, firebaseUserState } = useAuthState();
@@ -17,22 +16,24 @@ const AccountPage = () => {
   const { showConfirmation } = useGlobalUI();
 
   const _handleSignOut = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.ACCOUNT_PAGE_LOGOUT_CONFIRMATION_TITLE,
       message: CONSTANTS.STRINGS.ACCOUNT_PAGE_LOGOUT_CONFIRMATION_MESSAGE,
     });
+    if (!confirmed) return;
     signOut();
   };
 
   const _handleResetPassword = async () => {
     if (!user?.email) return;
 
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title:
         CONSTANTS.STRINGS.ACCOUNT_PAGE_PASSWORD_RESET_LINK_CONFIRMATION_TITLE,
       message:
         CONSTANTS.STRINGS.ACCOUNT_PAGE_PASSWORD_RESET_LINK_CONFIRMATION_MESSAGE,
     });
+    if (!confirmed) return;
 
     await resetPassword(user.email);
     displaySuccess(

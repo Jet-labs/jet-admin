@@ -41,8 +41,11 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
         console.warn("[AppPageEvents] SET_VARIABLE missing key");
         return null;
       }
-      dispatch(appPageActions.setVariable(config.key, config.value));
-      return { key: config.key, value: config.value };
+      // Strip state.variables. prefix — configs are saved with the full path
+      // (e.g. "state.variables.selectedUserId") but the reducer expects the bare key.
+      const variableKey = config.key.replace(/^state\.variables\./, "");
+      dispatch(appPageActions.setVariable(variableKey, config.value));
+      return { key: variableKey, value: config.value };
     }
 
     case "EXECUTE_QUERY": {

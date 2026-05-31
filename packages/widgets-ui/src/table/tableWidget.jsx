@@ -99,6 +99,16 @@ export const TableWidget = ({
 
   const rows = tableData.data || [];
 
+  const isLoading = useMemo(() => {
+    if (tableData.isLoading !== undefined) {
+      return tableData.isLoading === true || tableData.isLoading === "true";
+    }
+    if (widgetConfig?.isLoading !== undefined) {
+      return widgetConfig.isLoading === true || widgetConfig.isLoading === "true";
+    }
+    return !!isLoadingWorkflows;
+  }, [tableData.isLoading, widgetConfig?.isLoading, isLoadingWorkflows]);
+
   // ── Resolve column definitions ──
   const configColumns = useMemo(() => {
     const cols = tableData.columns?.length ? tableData.columns
@@ -394,7 +404,7 @@ export const TableWidget = ({
   if (!rows.length) {
     return (
       <div className="flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6">
-        {isLoadingWorkflows ? (
+        {isLoading ? (
           <div className="flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm shadow-sm border border-border">
             <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
             Loading data...
@@ -412,7 +422,7 @@ export const TableWidget = ({
   return (
     <div className="flex flex-col w-full h-full min-h-0 overflow-hidden relative">
       {/* Loading overlay */}
-      {isLoadingWorkflows && (
+      {isLoading && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
           <div className="flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
             <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
@@ -576,10 +586,10 @@ export const TableWidget = ({
           <span className="text-xs text-muted-foreground">{serverTotalRows} total row{serverTotalRows !== 1 ? "s" : ""}</span>
           <div className="flex items-center gap-1">
             <span className="text-xs text-muted-foreground mr-2">Page {serverPage} of {serverTotalPages}</span>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleServerPageChange(1)} disabled={serverPage === 1 || isLoadingWorkflows}><ChevronsLeft className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleServerPageChange(serverPage - 1)} disabled={serverPage === 1 || isLoadingWorkflows}><ChevronLeft className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleServerPageChange(serverPage + 1)} disabled={serverPage >= serverTotalPages || isLoadingWorkflows}><ChevronRight className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleServerPageChange(serverTotalPages)} disabled={serverPage >= serverTotalPages || isLoadingWorkflows}><ChevronsRight className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleServerPageChange(1)} disabled={serverPage === 1 || isLoading}><ChevronsLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleServerPageChange(serverPage - 1)} disabled={serverPage === 1 || isLoading}><ChevronLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleServerPageChange(serverPage + 1)} disabled={serverPage >= serverTotalPages || isLoading}><ChevronRight className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleServerPageChange(serverTotalPages)} disabled={serverPage >= serverTotalPages || isLoading}><ChevronsRight className="h-4 w-4" /></Button>
           </div>
         </div>
       ) : rows.length > 10 && (

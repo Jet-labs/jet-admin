@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Checkbox } from "@jet-admin/ui";
+import TemplateAutocompleteInput from "../_shared/TemplateAutocompleteInput";
+import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
-export const AlertConfigEditor = ({ widgetEditorForm }) => {
+export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+
+  const suggestions = useMemo(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail,
+    }));
+  }, [stateTree]);
 
   return (
     <div className="space-y-4">
@@ -29,12 +41,11 @@ export const AlertConfigEditor = ({ widgetEditorForm }) => {
       {/* Alert Title */}
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-foreground">Title (Optional)</Label>
-        <Input
-          type="text"
-          className="text-sm"
+        <TemplateAutocompleteInput
           value={config.title || ""}
-          onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.title", e.target.value)}
+          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.title", val)}
           placeholder="e.g. Warning!"
+          suggestions={suggestions}
         />
       </div>
 
@@ -68,6 +79,7 @@ export const AlertConfigEditor = ({ widgetEditorForm }) => {
 
 AlertConfigEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
+  stateTree: PropTypes.object,
 };
 
 export default AlertConfigEditor;

@@ -46,6 +46,7 @@ export class TableWidgetBuilder extends BaseWidgetBuilder {
       editing: widgetConfig.editing || { enabled: false },
       multiSelect: widgetConfig.multiSelect || { enabled: false },
       bulkEdit: widgetConfig.bulkEdit || { enabled: false },
+      isLoading: widgetConfig.isLoading,
     };
   }
 

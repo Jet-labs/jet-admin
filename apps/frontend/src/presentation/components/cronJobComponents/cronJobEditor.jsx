@@ -110,30 +110,36 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
       >
         <div className="space-y-1.5">
           <Label htmlFor="workflowID">Workflow</Label>
-          <Select
-            value={
-              cronJobEditorForm.values.workflowID
-                ? String(cronJobEditorForm.values.workflowID)
-                : ""
-            }
-            onValueChange={(val) =>
-              cronJobEditorForm.setFieldValue("workflowID", val)
-            }
-          >
-            <SelectTrigger id="workflowID">
-              <SelectValue placeholder="Select a workflow…" />
-            </SelectTrigger>
-            <SelectContent>
-              {workflows?.map((workflow) => (
-                <SelectItem
-                  key={`workflow_item_${workflow.workflowID}`}
-                  value={String(workflow.workflowID)}
-                >
-                  {workflow.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {workflows ? (
+            <Select
+              value={
+                cronJobEditorForm.values.workflowID
+                  ? String(cronJobEditorForm.values.workflowID)
+                  : ""
+              }
+              onValueChange={(val) =>
+                cronJobEditorForm.setFieldValue("workflowID", val)
+              }
+            >
+              <SelectTrigger id="workflowID">
+                <SelectValue placeholder="Select a workflow…" />
+              </SelectTrigger>
+              <SelectContent>
+                {workflows.map((workflow) => (
+                  <SelectItem
+                    key={`workflow_item_${workflow.workflowID}`}
+                    value={String(workflow.workflowID)}
+                  >
+                    {workflow.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <div className="flex h-8 w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom px-2.5 py-1.5 text-sm text-muted-foreground animate-pulse">
+              <span>Loading workflows...</span>
+            </div>
+          )}
           {touched.workflowID && <FieldError message={errors.workflowID} />}
         </div>
 

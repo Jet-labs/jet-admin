@@ -17,7 +17,7 @@ export const TextConfigEditor = ({ widgetEditorForm }) => {
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[120px] resize-y"
           value={config.content || ""}
           onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.content", e.target.value)}
-          placeholder={"# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{queries.myQuery.data[0].name}}"}
+          placeholder={"# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{ state.queries.myQuery.data[0].name }}"}
         />
       </div>
 

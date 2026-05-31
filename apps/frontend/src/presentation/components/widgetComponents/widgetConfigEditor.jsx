@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 
@@ -76,6 +76,38 @@ export const WidgetConfigEditor = ({
     }
   }, [widgetEditorForm.values.widgetConfig]);
 
+  // Build a properly namespaced state tree from flat dataSourceResults.
+  // This mirrors the shape produced by buildAppPageStateTree() at runtime,
+  // so intellisense suggestions and path resolution in widget editors
+  // use exactly the same paths as the live AppPage runtime.
+  //
+  // Widgets don't store a `dataSources` config — they contain raw template
+  // expressions like {{state.queries.alias.data}}. We use the regex-extracted
+  // `referencedDataSources` above to know which aliases are queries vs workflows.
+  const previewStateTree = useMemo(() => {
+    if (!dataSourceResults) return null;
+    const queries = {};
+    const workflows = {};
+
+    // Build a lookup of alias → type from the config's template expressions
+    const typeByAlias = {};
+    for (const ref of referencedDataSources) {
+      typeByAlias[ref.alias] = ref.type; // "query" | "workflow"
+    }
+
+    // Categorise each result under the correct namespace
+    for (const alias of Object.keys(dataSourceResults)) {
+      if (typeByAlias[alias] === "workflow") {
+        workflows[alias] = dataSourceResults[alias];
+      } else {
+        // Default to queries (covers explicit "query" type and unknown aliases)
+        queries[alias] = dataSourceResults[alias];
+      }
+    }
+
+    return { queries, workflows, variables: {}, widgets: {}, globals: {} };
+  }, [dataSourceResults, referencedDataSources]);
+
   return (
     <div className="flex h-full w-full flex-col gap-3">
       {/* Widget Name */}
@@ -149,7 +181,7 @@ export const WidgetConfigEditor = ({
           <div className="space-y-2 rounded-md border border-border bg-muted/20 p-3">
             <Label className="text-xs font-semibold text-foreground">Referenced Page Data Sources</Label>
             <p className="text-[10px] text-muted-foreground leading-normal">
-              This widget consumes page-level data sources reactively using expressions like <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{`{{queries.alias.data}}`}</code> or <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{`{{workflows.alias.data}}`}</code>.
+              This widget consumes page-level data sources reactively using expressions like <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{`{{ state.queries.alias.data }}`}</code> or <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{`{{ state.workflows.alias.data }}`}</code>.
             </p>
             {referencedDataSources.length === 0 ? (
               <div className="text-xs text-muted-foreground italic border border-dashed rounded-md p-4 text-center bg-background/50">
@@ -179,9 +211,9 @@ export const WidgetConfigEditor = ({
           {ConfigEditorComponent && (
             <ConfigEditorComponent
               widgetEditorForm={widgetEditorForm}
-              dataSourceResults={dataSourceResults}
-              workflowContext={dataSourceResults}
-              queryResults={dataSourceResults}
+              stateTree={previewStateTree}
+              workflowContext={previewStateTree}
+              queryResults={previewStateTree}
               workflows={workflows}
             />
           )}
@@ -199,7 +231,7 @@ export const WidgetConfigEditor = ({
         <TabsContent value="events" className="mt-3">
           <WidgetEventsEditor 
             widgetEditorForm={widgetEditorForm} 
-            dataSourceResults={dataSourceResults}
+            stateTree={previewStateTree}
           />
         </TabsContent>
       </Tabs>

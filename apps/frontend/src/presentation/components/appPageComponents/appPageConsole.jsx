@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
 import { useAppPageStateTree } from "../../../logic/appPageRuntime";
+import { CodeEditor } from "@jet-admin/ui";
 
 const safeStringify = (obj, indent = 2) => {
   const seen = new WeakSet();
@@ -72,15 +73,20 @@ export const AppPageConsole = () => {
           <div className="px-3 py-1.5 border-b border-zinc-800 text-[10px] uppercase font-semibold text-zinc-500 tracking-wider flex-shrink-0">
              previewStateTree Context
           </div>
-          <div className="flex-1 overflow-y-auto p-4 font-mono text-[11px] leading-relaxed text-zinc-300">
+          <div className="flex-1 overflow-hidden">
             {!contextTree ? (
-               <div className="text-zinc-600 italic">Console not connected to runtime.</div>
+               <div className="text-zinc-600 italic p-4 text-[11px]">Console not connected to runtime.</div>
             ) : Object.keys(contextTree.queries || {}).length === 0 && Object.keys(contextTree.workflows || {}).length === 0 ? (
-               <div className="text-zinc-600 italic">No data sources configured yet.</div>
+               <div className="text-zinc-600 italic p-4 text-[11px]">No data sources configured yet.</div>
             ) : (
-              <pre className="whitespace-pre-wrap break-words text-emerald-400">
-                {safeStringify(contextTree)}
-              </pre>
+              <CodeEditor
+                language="json"
+                value={safeStringify(contextTree)}
+                readOnly={true}
+                height="100%"
+                showHeader={false}
+                className="h-full border-0 rounded-none bg-zinc-950"
+              />
             )}
           </div>
         </ResizablePanel>

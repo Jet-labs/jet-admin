@@ -67,7 +67,7 @@ export const useUIStore = create((set, get) => ({
     try {
       setDialogLoading(true);
       if (dialogState.resolve) {
-        await dialogState.resolve();
+        await dialogState.resolve(true);
       }
     } finally {
       closeDialog();
@@ -76,8 +76,8 @@ export const useUIStore = create((set, get) => ({
 
   handleReject: () => {
     const { dialogState, closeDialog } = get();
-    if (dialogState.reject) {
-      dialogState.reject();
+    if (dialogState.resolve) {
+      dialogState.resolve(false);
     }
     closeDialog();
   },

@@ -55,6 +55,7 @@
     "eventsource": "^4.1.0",
     "firebase-admin": "^13.6.0",
     "googleapis": "^144.0.0",
+    "graphql": "^16.10.0",
     "graphql-ws": "^6.0.8",
     "ioredis": "^5.4.2",
     "kafkajs": "^2.2.4",

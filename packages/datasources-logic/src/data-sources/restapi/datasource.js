@@ -125,9 +125,13 @@ export default class RestAPIDataSource extends DataSource {
           requestUrl: finalUrl
         },
       });
-      throw new Error(
+      const apiError = new Error(
         `API request failed: ${error.response?.status || "No response"}`
       );
+      apiError.response = error.response;
+      apiError.request = error.request;
+      apiError.config = error.config;
+      throw apiError;
     }
   }
 }

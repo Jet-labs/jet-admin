@@ -3,7 +3,7 @@
  * Executes database queries using the QueryEngine
  */
 const { createQueryEngine } = require("../../dataQuery/dataQuery.service");
-const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
+const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
 
 async function execute(nodeConfig, context, helpers) {
   const { resolveTemplate } = helpers;
@@ -49,7 +49,7 @@ async function execute(nodeConfig, context, helpers) {
       output: {
         [outputVariable]: null,
         success: false,
-        error: error.message,
+        error: serializeError(error),
       },
       nextHandle: NEXT_HANDLE.ERROR,
     };

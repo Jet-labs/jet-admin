@@ -39,12 +39,13 @@ export const APIKeyDeletionForm = ({ tenantID, apiKeyID }) => {
   });
 
   const _handleDeleteNotification = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.DELETE_API_KEY_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_API_KEY_DIALOG_MESSAGE,
       confirmText: "Delete",
       cancelText: "Cancel",
     });
+    if (!confirmed) return;
     deleteAPIKey();
   };
 

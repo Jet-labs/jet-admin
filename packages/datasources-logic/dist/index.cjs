@@ -499,9 +499,13 @@ var RestAPIDataSource = class extends DataSource {
           requestUrl: finalUrl
         }
       });
-      throw new Error(
+      const apiError = new Error(
         `API request failed: ${error.response?.status || "No response"}`
       );
+      apiError.response = error.response;
+      apiError.request = error.request;
+      apiError.config = error.config;
+      throw apiError;
     }
   }
 };
@@ -1322,9 +1326,16 @@ var GraphQLDataSource = class extends DataSource {
       });
       if (error.response?.data?.errors) {
         const errorMessages = error.response.data.errors.map((e) => e.message).join("; ");
-        throw new Error(`GraphQL errors: ${errorMessages}`);
+        const gqlError2 = new Error(`GraphQL errors: ${errorMessages}`);
+        gqlError2.errors = error.response.data.errors;
+        gqlError2.response = error.response;
+        throw gqlError2;
       }
-      throw new Error(`GraphQL request failed: ${error.message}`);
+      const gqlError = new Error(`GraphQL request failed: ${error.message}`);
+      gqlError.response = error.response;
+      gqlError.request = error.request;
+      gqlError.config = error.config;
+      throw gqlError;
     }
   }
   /**

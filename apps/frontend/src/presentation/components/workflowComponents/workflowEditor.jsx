@@ -489,7 +489,6 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 variant="destructive"
                                                 size="sm"
                                                 square
-                                                className="h-8 w-8"
                                                 title="Stop Test"
                                             >
                                                 <Square className="size-3" />

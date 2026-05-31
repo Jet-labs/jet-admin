@@ -17,6 +17,7 @@ const { getHandler } = require('../handlers');
 const { resolveTemplate: sharedResolveTemplate } = require("../../../utils/templateEngine");
 const { stateManager } = require('../workflowEngine/stateManager');
 const Logger = require("../../../utils/logger");
+const { serializeError } = require('../handlers/constants');
 
 const WORKFLOW_TEMPLATE_OPTIONS = {
   allowedRoots: ['ctx'],
@@ -166,7 +167,10 @@ async function _processJob(jobData) {
         status: 'error',
         output: null,
         nextHandle: 'error',
-        taskError: execError.message,
+        taskError: (() => {
+          try { return JSON.stringify(serializeError(execError), null, 2); }
+          catch { return JSON.stringify({ message: execError.message || String(execError) }); }
+        })(),
         nodeAttempt,
       });
     }

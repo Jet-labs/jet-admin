@@ -1,21 +1,32 @@
-import React from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Checkbox } from "@jet-admin/ui";
+import TemplateAutocompleteInput from "../_shared/TemplateAutocompleteInput";
+import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
-export const IframeConfigEditor = ({ widgetEditorForm }) => {
+export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+
+  const suggestions = useMemo(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail,
+    }));
+  }, [stateTree]);
 
   return (
     <div className="space-y-4">
       {/* URL Embed */}
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-foreground">Embed URL / Target Source</Label>
-        <Input
-          type="text"
-          className="text-sm font-mono"
+        <TemplateAutocompleteInput
           value={config.url || ""}
-          onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.url", e.target.value)}
+          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.url", val)}
           placeholder="e.g. https://example.com"
+          suggestions={suggestions}
         />
         <p className="text-[10px] text-muted-foreground">
           Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).
@@ -91,6 +102,7 @@ export const IframeConfigEditor = ({ widgetEditorForm }) => {
 
 IframeConfigEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
+  stateTree: PropTypes.object,
 };
 
 export default IframeConfigEditor;

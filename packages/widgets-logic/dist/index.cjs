@@ -198,7 +198,8 @@ var TableWidgetBuilder = class extends BaseWidgetBuilder {
       export: widgetConfig.export || { enabled: false },
       editing: widgetConfig.editing || { enabled: false },
       multiSelect: widgetConfig.multiSelect || { enabled: false },
-      bulkEdit: widgetConfig.bulkEdit || { enabled: false }
+      bulkEdit: widgetConfig.bulkEdit || { enabled: false },
+      isLoading: widgetConfig.isLoading
     };
   }
   /**

@@ -70,6 +70,11 @@ describe('workflow handler sandboxing', () => {
 
     expect(result.nextHandle).toBe(NEXT_HANDLE.ERROR);
     expect(result.output.success).toBe(false);
-    expect(result.output.error).toEqual(expect.any(String));
+    expect(result.output.error).toEqual(
+      expect.objectContaining({
+        message: expect.any(String),
+        name: expect.any(String),
+      })
+    );
   });
 });

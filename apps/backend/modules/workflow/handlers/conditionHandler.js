@@ -25,7 +25,7 @@
  *   branch = { id, condition: 'ctx.x > 3', expression: '…', … }
  */
 
-const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
+const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
 const { createWorkflowVm } = require('./workflowVm');
 
 // ─── Template resolution ───────────────────────────────────────────────────────
@@ -249,7 +249,7 @@ async function execute(nodeConfig, context, helpers) {
     if (errorHandling === ERROR_HANDLING.FAIL_WORKFLOW) throw err;
 
     return {
-      output: { matched: null, success: false, error: err.message },
+      output: { matched: null, success: false, error: serializeError(err) },
       nextHandle: NEXT_HANDLE.ERROR,
     };
   }

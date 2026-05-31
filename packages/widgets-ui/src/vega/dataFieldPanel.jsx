@@ -2,34 +2,11 @@ import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import PropTypes from 'prop-types';
 import { FieldPill } from './fieldPill';
 import { inferFieldsFromData } from './chartSpecGenerator';
-import { extractWorkflowSchema } from './variableExplorer';
 
 import { Button, Input, Label } from "@jet-admin/ui";
 import { Database, GitMerge, ArrowRightFromLine, Zap, Search, Plus } from 'lucide-react';
-/**
- * Recursively walk context and collect all array paths.
- */
-const collectArrayPaths = (obj, prefix = '', depth = 0, maxDepth = 4) => {
-  const results = [];
-  if (!obj || typeof obj !== 'object' || depth > maxDepth) return results;
-
-  for (const key of Object.keys(obj)) {
-    const val = obj[key];
-    const fullPath = prefix ? `${prefix}.${key}` : key;
-
-    if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
-      results.push({
-        path: `{{${fullPath}}}`,
-        label: fullPath,
-        sampleKeys: Object.keys(val[0]),
-        rowCount: val.length,
-      });
-    } else if (val && typeof val === 'object' && !Array.isArray(val)) {
-      results.push(...collectArrayPaths(val, fullPath, depth + 1, maxDepth));
-    }
-  }
-  return results;
-};
+import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
+import { getValueByPath } from '@jet-admin/template-engine';
 
 /**
  * DataFieldPanel — Left sidebar showing workflow data fields.
@@ -62,95 +39,30 @@ export const DataFieldPanel = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Schema suggestions (static)
-  const schemaSuggestions = useMemo(() => {
-    if (!workflow) return [];
-    const schema = extractWorkflowSchema(workflow);
-    const suggestions = [];
-
-    for (const nodeOut of schema.nodeOutputs) {
-      suggestions.push({
-        path: nodeOut.path,
-        label: nodeOut.name,
-        description: nodeOut.description,
-        category: 'node',
-        nodeTitle: nodeOut.nodeTitle,
-        nodeType: nodeOut.nodeType,
-      });
-    }
-
-    for (const wfOut of schema.workflowOutputs) {
-      suggestions.push({
-        path: wfOut.path,
-        label: wfOut.name,
-        description: wfOut.description,
-        category: 'output',
-      });
-    }
-
-    return suggestions;
-  }, [workflow]);
-
-  // Runtime ctx array paths
-  const ctxArrayPaths = useMemo(() => {
-    if (!workflowContext) return [];
-    return collectArrayPaths(workflowContext);
-  }, [workflowContext]);
-
-  // Query result array paths
-  const queryResultPaths = useMemo(() => {
-    if (!queryResults) return [];
-    return collectArrayPaths(queryResults);
-  }, [queryResults]);
-
-  // All suggestions combined
+  // All suggestions from the live state tree
   const allSuggestions = useMemo(() => {
     const seen = new Set();
     const combined = [];
 
-    for (const arr of ctxArrayPaths) {
-      if (!seen.has(arr.path)) {
-        seen.add(arr.path);
+    // Live Runtime Array Paths from State Tree
+    const stateTreeSuggestions = getSuggestionsFromStateTree(workflowContext);
+    const arraySuggestions = stateTreeSuggestions.filter(s => s.valueType === 'array');
+    
+    for (const arr of arraySuggestions) {
+      const bracePath = `{{${arr.value}}}`;
+      if (!seen.has(bracePath)) {
+        seen.add(bracePath);
         combined.push({
-          ...arr,
+          path: bracePath,
+          label: bracePath,
           source: 'runtime',
-          description: `${arr.rowCount} rows, fields: ${arr.sampleKeys.slice(0, 4).join(', ')}${arr.sampleKeys.length > 4 ? '...' : ''}`,
+          description: arr.detail || 'Runtime data array',
         });
       }
     }
 
-    // Add query result paths
-    if (queryResults) {
-      for (const alias of Object.keys(queryResults)) {
-        const data = queryResults[alias];
-        const isArray = Array.isArray(data);
-        const arrayData = isArray ? data : (data?.data && Array.isArray(data.data) ? data.data : null);
-        if (arrayData && arrayData.length > 0) {
-          const path = isArray ? `{{${alias}}}` : `{{${alias}.data}}`;
-          if (!seen.has(path)) {
-            seen.add(path);
-            combined.push({
-              path,
-              label: `${alias} (Data Source)`,
-              sampleKeys: Object.keys(arrayData[0]),
-              rowCount: arrayData.length,
-              source: 'datasource',
-              description: `${arrayData.length} rows, fields: ${Object.keys(arrayData[0]).slice(0, 4).join(', ')}`,
-            });
-          }
-        }
-      }
-    }
-
-    for (const s of schemaSuggestions) {
-      if (!seen.has(s.path)) {
-        seen.add(s.path);
-        combined.push({ ...s, source: 'schema' });
-      }
-    }
-
     return combined;
-  }, [ctxArrayPaths, queryResultPaths, schemaSuggestions, queryResults]);
+  }, [workflowContext]);
 
   // Resolve fields from selected data source
   const fields = useMemo(() => {
@@ -161,24 +73,6 @@ export const DataFieldPanel = ({
     if (!match) return [];
 
     const rawPath = match[1];
-    // Strip legacy "ctx." prefix for resolution against workflowContext
-    const cleanPath = rawPath.startsWith('ctx.') ? rawPath.slice(4) : rawPath;
-
-    // Helper: walk a dotted path with bracket-index support
-    const resolvePath = (root, pathStr) => {
-      const parts = pathStr.split('.');
-      let current = root;
-      for (const part of parts) {
-        if (current === undefined || current === null) return undefined;
-        const arrMatch = part.match(/^(.+)\[(\d+)\]$/);
-        if (arrMatch) {
-          current = current[arrMatch[1]]?.[parseInt(arrMatch[2])];
-        } else {
-          current = current[part];
-        }
-      }
-      return current;
-    };
 
     // Helper: convert resolved data into field descriptors
     const toFields = (data) => {
@@ -197,14 +91,14 @@ export const DataFieldPanel = ({
 
     // Try workflowContext first (covers both legacy ctx. and modern page-level paths)
     if (workflowContext) {
-      const resolved = resolvePath(workflowContext, cleanPath);
+      const resolved = getValueByPath(workflowContext, rawPath, { allowedRoots: ['state'] });
       const result = toFields(resolved);
       if (result) return result;
     }
 
     // Fallback: try queryResults (may be a different object in non-page-level mode)
     if (queryResults && queryResults !== workflowContext) {
-      const resolved = resolvePath(queryResults, rawPath);
+      const resolved = getValueByPath(queryResults, rawPath, { allowedRoots: ['state'] });
       const result = toFields(resolved);
       if (result) return result;
     }

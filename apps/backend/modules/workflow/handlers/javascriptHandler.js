@@ -6,7 +6,7 @@
  * Both synchronous and async (Promise-returning) results are supported.
  */
 
-const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
+const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
 const { runInSandbox } = require('./workflowVm');
 
 /**
@@ -46,7 +46,7 @@ async function execute(nodeConfig, context) {
     if (errorHandling === ERROR_HANDLING.FAIL_WORKFLOW) throw err;
 
     return {
-      output: { [outputVariable]: null, success: false, error: err.message },
+      output: { [outputVariable]: null, success: false, error: serializeError(err) },
       nextHandle: NEXT_HANDLE.ERROR,
     };
   }

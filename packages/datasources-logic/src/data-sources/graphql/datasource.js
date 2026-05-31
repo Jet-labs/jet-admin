@@ -105,10 +105,17 @@ export default class GraphQLDataSource extends DataSource {
       // Check if it's a GraphQL error response
       if (error.response?.data?.errors) {
         const errorMessages = error.response.data.errors.map(e => e.message).join("; ");
-        throw new Error(`GraphQL errors: ${errorMessages}`);
+        const gqlError = new Error(`GraphQL errors: ${errorMessages}`);
+        gqlError.errors = error.response.data.errors;
+        gqlError.response = error.response;
+        throw gqlError;
       }
 
-      throw new Error(`GraphQL request failed: ${error.message}`);
+      const gqlError = new Error(`GraphQL request failed: ${error.message}`);
+      gqlError.response = error.response;
+      gqlError.request = error.request;
+      gqlError.config = error.config;
+      throw gqlError;
     }
   }
 

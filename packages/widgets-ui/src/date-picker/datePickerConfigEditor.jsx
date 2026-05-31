@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Input, Label, Checkbox } from '@jet-admin/ui';
+import TemplateAutocompleteInput from '../_shared/TemplateAutocompleteInput';
+import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
 
-export const DatePickerConfigEditor = ({ widgetEditorForm }) => {
+export const DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+
+  const suggestions = useMemo(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail,
+    }));
+  }, [stateTree]);
 
   return (
     <div className="space-y-4">
@@ -42,12 +54,11 @@ export const DatePickerConfigEditor = ({ widgetEditorForm }) => {
 
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-foreground">Default Value</Label>
-        <Input
-          type="text"
-          className="text-sm h-8 font-mono"
+        <TemplateAutocompleteInput
           value={config.defaultValue || ''}
-          onChange={(e) => widgetEditorForm.setFieldValue('widgetConfig.defaultValue', e.target.value)}
-          placeholder="e.g. 2026-05-30T14:30:00 or ISO string"
+          onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.defaultValue', val)}
+          placeholder="e.g. {{state.variables.myDate}} or ISO string"
+          suggestions={suggestions}
         />
       </div>
     </div>
@@ -56,6 +67,7 @@ export const DatePickerConfigEditor = ({ widgetEditorForm }) => {
 
 DatePickerConfigEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
+  stateTree: PropTypes.object,
 };
 
 export default DatePickerConfigEditor;

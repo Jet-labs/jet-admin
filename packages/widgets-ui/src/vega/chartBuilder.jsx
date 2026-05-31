@@ -6,6 +6,7 @@ import { VariablePathPicker } from './variablePathPicker';
 import { CollapseComponent } from '../ui/collapseComponent';
 import { generateVegaLiteSpec, getDefaultChartConfig } from './chartSpecGenerator';
 import { Input, Label, Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { getValueByPath } from '@jet-admin/template-engine';
 
 // ─── Section card wrapper (matches UI_GUIDELINES_V3 section card pattern) ────
 
@@ -44,17 +45,13 @@ export const ChartBuilder = ({ widgetEditorForm, workflowContext, workflows }) =
   const availableFields = useMemo(() => {
     if (!workflowContext || !builderSpec.data?.source) return [];
     
-    let path = builderSpec.data.source;
-    if (path.startsWith('{{ctx.')) path = path.replace('{{ctx.', '').replace('}}', '');
-    else if (path.startsWith('{{')) path = path.replace('{{', '').replace('}}', '');
-    
-    let current = workflowContext;
-    for (const part of path.split('.')) {
-      if (current === undefined || current === null) break;
-      current = current[part];
-    }
-    if (Array.isArray(current) && current.length > 0 && typeof current[0] === 'object') {
-      return Object.keys(current[0]);
+    // Extract the inner path from {{...}}
+    const match = builderSpec.data.source.match(/\{\{([^}]+)\}\}/);
+    const rawPath = match ? match[1] : builderSpec.data.source;
+
+    const resolved = getValueByPath(workflowContext, rawPath, { allowedRoots: ['state'] });
+    if (Array.isArray(resolved) && resolved.length > 0 && typeof resolved[0] === 'object') {
+      return Object.keys(resolved[0]);
     }
     return [];
   }, [workflowContext, builderSpec.data?.source]);

@@ -43,13 +43,14 @@ export const AppPageCloneForm = ({ tenantID, appPageID }) => {
   );
 
   const _handleCloneAppPage = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.CLONE_APP_PAGE_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.CLONE_APP_PAGE_DIALOG_MESSAGE,
       confirmText: "Clone",
       cancelText: "Cancel",
       confirmButtonClass: "!bg-primary",
     });
+    if (!confirmed) return;
     cloneAppPage();
   };
 

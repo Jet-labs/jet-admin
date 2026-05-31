@@ -40,13 +40,14 @@ export const WidgetCloneForm = ({ tenantID, widgetID }) => {
   });
 
   const _handleCloneWidget = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.CLONE_WIDGET_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.CLONE_WIDGET_DIALOG_MESSAGE,
       confirmText: "Clone",
       cancelText: "Cancel",
       confirmButtonClass: "!bg-primary",
     });
+    if (!confirmed) return;
     cloneWidget();
   };
 

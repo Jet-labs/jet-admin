@@ -75,13 +75,14 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
     validateOnChange: false,
     validationSchema: formValidations.apiKeyUpdationFormValidationSchema,
     onSubmit: async (values) => {
-      await showConfirmation({
+      const confirmed = await showConfirmation({
         title: CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_UPDATE_DIALOG_TITLE,
         message: CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_UPDATE_DIALOG_MESSAGE,
         confirmText: "Update",
         cancelText: "Cancel",
         confirmButtonClass: "!bg-primary",
       });
+      if (!confirmed) return;
       updateAPIKey(values);
     },
   });

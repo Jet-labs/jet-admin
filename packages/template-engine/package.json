@@ -1,0 +1,22 @@
+{
+  "name": "@jet-admin/template-engine",
+  "version": "1.0.0",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --format=esm --sourcemap --packages=external && esbuild src/index.js --bundle --outfile=dist/index.cjs --format=cjs --sourcemap --packages=external",
+    "dev": "npm run build -- --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.3"
+  }
+}

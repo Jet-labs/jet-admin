@@ -1,21 +1,32 @@
-import React from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import TemplateAutocompleteInput from "../_shared/TemplateAutocompleteInput";
+import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
-export const ImageConfigEditor = ({ widgetEditorForm }) => {
+export const ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+
+  const suggestions = useMemo(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail,
+    }));
+  }, [stateTree]);
 
   return (
     <div className="space-y-4">
       {/* Image Source */}
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-foreground">Image URL / Source</Label>
-        <Input
-          type="text"
-          className="text-sm font-mono"
+        <TemplateAutocompleteInput
           value={config.src || ""}
-          onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.src", e.target.value)}
-          placeholder="e.g. {{queries.user.data.avatar_url}}"
+          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.src", val)}
+          placeholder="e.g. {{state.queries.user.data.avatar_url}}"
+          suggestions={suggestions}
         />
         <p className="text-[10px] text-muted-foreground">
           Supports template expressions for dynamic content.
@@ -80,6 +91,7 @@ export const ImageConfigEditor = ({ widgetEditorForm }) => {
 
 ImageConfigEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
+  stateTree: PropTypes.object,
 };
 
 export default ImageConfigEditor;

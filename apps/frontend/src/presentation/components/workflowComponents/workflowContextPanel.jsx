@@ -1,133 +1,8 @@
 import React, { useState } from 'react';
-import { Check, ChevronDown, ChevronRight, Copy, FileJson } from 'lucide-react';
+import { Check, Copy, FileJson } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-import { Button } from "@jet-admin/ui";
-
-/**
- * Collapsible JSON node for rendering nested objects/arrays
- * Standardized for semantic design tokens and dark mode support.
- */
-const JsonNode = ({ name, value, depth = 0 }) => {
-  const [isExpanded, setIsExpanded] = useState(depth < 2);
-  const [copied, setCopied] = useState(false);
-
-  const isObject = value !== null && typeof value === 'object';
-  const isArray = Array.isArray(value);
-  const isEmpty = isObject && Object.keys(value).length === 0;
-
-  const handleCopy = (e) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(JSON.stringify(value, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
-
-  // Render primitive values
-  if (!isObject) {
-    let displayValue;
-    let colorClass = 'text-foreground/80';
-    
-    if (typeof value === 'string') {
-      displayValue = `"${value}"`;
-      colorClass = 'text-emerald-500 font-medium';
-    } else if (typeof value === 'number') {
-      displayValue = String(value);
-      colorClass = 'text-amber-500 font-medium';
-    } else if (typeof value === 'boolean') {
-      displayValue = String(value);
-      colorClass = 'text-indigo-500 font-medium';
-    } else if (value === null) {
-      displayValue = 'null';
-      colorClass = 'text-muted-foreground/60 italic';
-    } else {
-      displayValue = String(value);
-    }
-
-    return (
-      <div className="flex items-center py-0.5 group" style={{ paddingLeft: `${depth * 16}px` }}>
-        {name && (
-          <span className="text-blue-500 font-medium mr-1.5">{name}:</span>
-        )}
-        <span className={colorClass}>{displayValue}</span>
-      </div>
-    );
-  }
-
-  // Render object/array
-  const keys = Object.keys(value);
-  const brackets = isArray ? ['[', ']'] : ['{', '}'];
-  const typeLabel = isArray ? `Array(${keys.length})` : `Object`;
-
-  return (
-    <div>
-      <div 
-        className="flex items-center py-0.5 cursor-pointer hover:bg-muted/50 rounded-sm transition-colors group"
-        style={{ paddingLeft: `${depth * 16}px` }}
-        onClick={() => !isEmpty && setIsExpanded(!isExpanded)}
-      >
-        {!isEmpty && (
-          isExpanded 
-            ? <ChevronDown className="size-3.5 text-muted-foreground shrink-0" />
-            : <ChevronRight className="size-3.5 text-muted-foreground shrink-0" />
-        )}
-        {isEmpty && <span className="size-3.5 shrink-0" />}
-        
-        {name && (
-          <span className="text-blue-500 font-semibold ml-1 mr-1.5">{name}:</span>
-        )}
-        
-        {isEmpty ? (
-          <span className="text-muted-foreground/50 font-mono">{brackets[0]}{brackets[1]}</span>
-        ) : !isExpanded ? (
-            <span className="text-muted-foreground font-mono">
-            {brackets[0]}...{brackets[1]} 
-              <span className="text-[10px] text-muted-foreground font-sans ml-2 opacity-60 uppercase tracking-tighter">{typeLabel}</span>
-          </span>
-        ) : (
-              <span className="text-muted-foreground font-mono">
-            {brackets[0]}
-                <span className="text-[10px] text-muted-foreground font-sans ml-2 opacity-60 uppercase tracking-tighter">{typeLabel}</span>
-          </span>
-        )}
-
-        {/* Copy button */}
-        <Button
-          onClick={handleCopy}
-          variant="ghost"
-          size="sm"
-          square
-          className="ml-2 h-5 w-5 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all duration-200"
-          title="Copy value"
-        >
-          {copied ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
-        </Button>
-      </div>
-
-      {isExpanded && !isEmpty && (
-        <div className="border-l border-border/10 ml-1.5">
-          {keys.map((key) => (
-            <JsonNode 
-              key={key} 
-              name={isArray ? undefined : key} 
-              value={value[key]} 
-              depth={depth + 1} 
-            />
-          ))}
-          <div style={{ paddingLeft: `${depth * 16}px` }} className="text-muted-foreground/50 font-mono py-0.5">
-            {brackets[1]}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-JsonNode.propTypes = {
-  name: PropTypes.string,
-  value: PropTypes.any,
-  depth: PropTypes.number,
-};
+import { Button, CodeEditor } from "@jet-admin/ui";
 
 /**
  * WorkflowContextPanel - Panel to display workflow context during test runs
@@ -193,17 +68,20 @@ export const WorkflowContextPanel = ({
       </div>
 
       {/* Context tree */}
-      <div className="flex-1 overflow-y-auto p-4 font-mono text-xs bg-background/50">
+      <div className="flex-1 overflow-hidden bg-background/50">
         {isEmpty ? (
           <div className="flex items-center justify-center h-full text-muted-foreground/50 italic text-center px-4">
             <span>No context data yet. Run the workflow to see variables.</span>
           </div>
         ) : (
-            <div className="space-y-1">
-            {contextKeys.map((key) => (
-              <JsonNode key={key} name={key} value={displayContext[key]} />
-            ))}
-          </div>
+          <CodeEditor
+            language="json"
+            value={JSON.stringify(displayContext, null, 2)}
+            readOnly={true}
+            height="100%"
+            showHeader={false}
+            className="h-full border-0 rounded-none bg-transparent"
+          />
         )}
       </div>
 

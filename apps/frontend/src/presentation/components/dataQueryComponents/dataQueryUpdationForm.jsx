@@ -93,13 +93,14 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
     validateOnChange: false,
     validationSchema: formValidations.queryUpdationFormValidationSchema,
     onSubmit: async (values) => {
-      await showConfirmation({
+      const confirmed = await showConfirmation({
         title: CONSTANTS.STRINGS.UPDATE_QUERY_FORM_UPDATE_DIALOG_TITLE,
         message: CONSTANTS.STRINGS.UPDATE_QUERY_FORM_UPDATE_DIALOG_MESSAGE,
         confirmText: "Update",
         cancelText: "Cancel",
         confirmButtonClass: "!bg-primary",
       });
+      if (!confirmed) return;
       updateDataQuery(values);
     },
   });
@@ -154,24 +155,19 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
         >
           <ResizablePanel defaultSize={20} className="!overflow-y-auto h-full p-8">
             <div className="mx-auto w-full max-w-2xl">
-              {/* Only render the form once formik values are in sync with loaded data.
-                  enableReinitialize runs in a useEffect (async), so there's a one-render gap
-                  where form values are stale but the loading wrapper has already unblocked. */}
-              {queryUpdationForm.values.datasourceID === initialValues.datasourceID ? (
-                <form
-                  id="dataquery-update-form"
-                  className="space-y-4 w-full"
-                  onSubmit={queryUpdationForm.handleSubmit}
-                  noValidate
-                >
-                  <DataQueryEditor
-                    key={`dataQueryEditor_${dataQuery?.dataQueryID ? dataQuery.dataQueryID : "new"}`}
-                    dataQueryEditorForm={queryUpdationForm}
-                    tenantID={tenantID}
-                    dataQueryID={dataQueryID}
-                  />
-                </form>
-              ) : null}
+              <form
+                id="dataquery-update-form"
+                className="space-y-4 w-full"
+                onSubmit={queryUpdationForm.handleSubmit}
+                noValidate
+              >
+                <DataQueryEditor
+                  key={`dataQueryEditor_${dataQuery?.dataQueryID ? dataQuery.dataQueryID : "new"}`}
+                  dataQueryEditorForm={queryUpdationForm}
+                  tenantID={tenantID}
+                  dataQueryID={dataQueryID}
+                />
+              </form>
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />

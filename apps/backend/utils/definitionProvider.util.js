@@ -43,7 +43,7 @@ function normalizeDefinitions(rawArgs, options = {}) {
       key: arg.key,
       type: arg.type || 'string',
       required: arg.required === true,
-      default: arg.default !== undefined ? arg.default : undefined,
+      default: arg.default !== undefined ? arg.default : (arg.defaultValue !== undefined ? arg.defaultValue : undefined),
       supportsTemplate,
       definitionSource,
     }));

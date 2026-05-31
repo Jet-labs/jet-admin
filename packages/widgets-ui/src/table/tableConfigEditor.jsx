@@ -14,136 +14,20 @@ import {
 } from "@jet-admin/ui";
 import { Trash2, Plus, ArrowUp, ArrowDown, Sparkles, Zap } from 'lucide-react';
 
-const TemplateAutocompleteInput = ({ value, onChange, placeholder, suggestions }) => {
-  const [showSuggestions, setShowSuggestions] = React.useState(false);
-
-  const handleFocus = () => {
-    if (suggestions.length > 0) setShowSuggestions(true);
-  };
-
-  const handleBlur = () => {
-    setTimeout(() => setShowSuggestions(false), 200);
-  };
-
-  const handleChange = (e) => {
-    onChange(e.target.value);
-    setShowSuggestions(true);
-  };
-
-  const handleSelect = (path) => {
-    onChange(path);
-    setShowSuggestions(false);
-  };
-
-  // Filter suggestions based on current input
-  const filteredSuggestions = suggestions.filter(s =>
-    !value || s.value.toLowerCase().includes(value.toLowerCase()) || value === "{{"
-  );
-
-  return (
-    <div className="relative flex flex-col gap-1">
-      <Input
-        type="text"
-        className="text-xs font-mono h-8 w-full"
-        value={value || ""}
-        onChange={handleChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        placeholder={placeholder}
-      />
-      {showSuggestions && filteredSuggestions.length > 0 && (
-        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-brand-dark border border-border rounded-md shadow-lg max-h-48 overflow-auto">
-          {filteredSuggestions.map((s, idx) => (
-            <div
-              key={idx}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => handleSelect(s.value)}
-              className="w-full px-2 py-1.5 text-left text-xs hover:bg-muted flex items-center justify-between gap-2 border-b border-border last:border-0 cursor-pointer transition-colors"
-            >
-              <span className="font-mono text-foreground">{s.label}</span>
-              {s.detail && <span className="text-[10px] text-muted-foreground">{s.detail}</span>}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-/**
- * Recursively walk a context object and collect all array-of-objects paths.
- */
-const collectArrayPaths = (obj, prefix = "", depth = 0, maxDepth = 4) => {
-  const results = [];
-  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-
-  for (const key of Object.keys(obj)) {
-    if (key.startsWith("__")) continue;
-    const val = obj[key];
-    const fullPath = prefix ? `${prefix}.${key}` : key;
-
-    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
-      results.push({
-        path: fullPath,
-        label: fullPath,
-        sampleKeys: Object.keys(val[0]),
-        rowCount: val.length,
-      });
-    } else if (val && typeof val === "object" && !Array.isArray(val)) {
-      results.push(...collectArrayPaths(val, fullPath, depth + 1, maxDepth));
-    }
-  }
-  return results;
-};
-
-const isScalarNumeric = (val) => {
-  if (typeof val === "number") return true;
-  if (typeof val === "string") {
-    const trimmed = val.trim();
-    return trimmed !== "" && !isNaN(Number(trimmed)) && !isNaN(parseFloat(trimmed));
-  }
-  return false;
-};
-
-/**
- * Collect numeric/scalar paths from a context object for total row count mapping.
- */
-const collectScalarPaths = (obj, prefix = "", depth = 0, maxDepth = 4) => {
-  const results = [];
-  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-
-  for (const key of Object.keys(obj)) {
-    if (key.startsWith("__")) continue;
-    const val = obj[key];
-    const fullPath = prefix ? `${prefix}.${key}` : key;
-
-    if (isScalarNumeric(val)) {
-      results.push({ path: fullPath, label: fullPath, value: val });
-    } else if (val && typeof val === "object") {
-      if (Array.isArray(val)) {
-        if (val.length > 0 && typeof val[0] === "object") {
-          results.push(...collectScalarPaths(val[0], `${fullPath}[0]`, depth + 1, maxDepth));
-        }
-      } else {
-        results.push(...collectScalarPaths(val, fullPath, depth + 1, maxDepth));
-      }
-    }
-  }
-  return results;
-};
+import TemplateAutocompleteInput from '../_shared/TemplateAutocompleteInput';
+import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
+import { getValueByPath } from "@jet-admin/template-engine";
 
 /**
  * Resolve a dotted path against an object (e.g. "alias.data" -> obj.alias.data).
  */
+/**
+ * Resolve a dotted path against an object, stripping "state." prefix.
+ * Uses the shared template engine tokenizer with allowedRoots.
+ */
 const resolvePath = (obj, path) => {
   if (!obj || !path) return undefined;
-  const parts = path.split(".");
-  let current = obj;
-  for (const part of parts) {
-    if (current == null) return undefined;
-    current = current[part];
-  }
-  return current;
+  return getValueByPath(obj, path, { allowedRoots: ['state'] });
 };
 
 /**
@@ -155,7 +39,7 @@ const resolvePath = (obj, path) => {
  *
  * Data source binding and path mapping are handled in the "Data" tab.
  */
-export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
+export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const dataSources = config.dataSources || [];
   const columns = config.columns || [];
@@ -171,91 +55,91 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
   const multiSelect = config.multiSelect || { enabled: false, showSelectAll: true, actions: [] };
   const bulkEdit = config.bulkEdit || { enabled: false, saveLabel: "Save All Changes" };
 
-  // Build namespace-based suggestions from previewStateTree (dataSourceResults)
+  // Build namespace-based suggestions from the state tree
   const aliasSuggestions = useMemo(() => {
     const suggestions = [];
-    if (!dataSourceResults) return suggestions;
-    if (dataSourceResults.queries) {
-      Object.keys(dataSourceResults.queries).forEach(alias => suggestions.push(`queries.${alias}`));
+    if (!stateTree) return suggestions;
+    if (stateTree.queries) {
+      Object.keys(stateTree.queries).forEach(alias => suggestions.push(`state.queries.${alias}`));
     }
-    if (dataSourceResults.workflows) {
-      Object.keys(dataSourceResults.workflows).forEach(alias => suggestions.push(`workflows.${alias}`));
+    if (stateTree.workflows) {
+      Object.keys(stateTree.workflows).forEach(alias => suggestions.push(`state.workflows.${alias}`));
     }
     return suggestions;
-  }, [dataSourceResults]);
+  }, [stateTree]);
 
-  // Discover array paths from live query results
-  const arrayPaths = useMemo(() => {
-    const paths = [];
-    if (dataSourceResults) {
-      paths.push(...collectArrayPaths(dataSourceResults));
-    }
-    // If no discovered paths, generate suggestions from aliases
-    if (paths.length === 0 && aliasSuggestions.length > 0) {
-      for (const alias of aliasSuggestions) {
-        paths.push({
-          path: `${alias}.data`,
-          label: `${alias}.data`,
-          sampleKeys: [],
-          rowCount: 0,
-          isSuggestion: true,
-        });
-        paths.push({
-          path: `${alias}.data`,
-          label: `${alias}.data`,
-          sampleKeys: [],
-          rowCount: 0,
-          isSuggestion: true,
-        });
-      }
-    }
-    return paths;
-  }, [dataSourceResults, aliasSuggestions]);
-
-  // Discover scalar (number) paths for total rows
-  const scalarPaths = useMemo(() => {
-    const paths = [];
-    if (dataSourceResults) {
-      paths.push(...collectScalarPaths(dataSourceResults));
-    }
-    if (paths.length === 0 && aliasSuggestions.length > 0) {
-      for (const alias of aliasSuggestions) {
-        paths.push({
-          path: `${alias}.total`,
-          label: `${alias}.total`,
-          value: null,
-          isSuggestion: true,
-        });
-      }
-    }
-    return paths;
-  }, [dataSourceResults, aliasSuggestions]);
+  // ── Unified Intellisense from State Tree ──
+  const stateTreeSuggestions = useMemo(() => {
+    return getSuggestionsFromStateTree(stateTree);
+  }, [stateTree]);
 
   const arraySuggestions = useMemo(() => {
-    return arrayPaths.map(arr => ({
-      label: `{{ ${arr.path} }}`,
-      value: `{{ ${arr.path} }}`,
-      detail: arr.isSuggestion ? "suggested" : `${arr.rowCount} rows`
-    }));
-  }, [arrayPaths]);
+    const fromTree = stateTreeSuggestions
+      .filter(s => s.valueType === 'array')
+      .map(s => ({
+        label: `{{${s.value}}}`,
+        value: `{{${s.value}}}`,
+        detail: s.detail || "Runtime data array"
+      }));
+    
+    // Add alias fallbacks if tree is empty
+    if (fromTree.length === 0 && aliasSuggestions.length > 0) {
+      return aliasSuggestions.map(alias => ({
+        label: `{{${alias}.data}}`,
+        value: `{{${alias}.data}}`,
+        detail: "suggested"
+      }));
+    }
+    return fromTree;
+  }, [stateTreeSuggestions, aliasSuggestions]);
 
   const scalarSuggestions = useMemo(() => {
-    return scalarPaths.map(s => ({
-      label: `{{ ${s.path} }}`,
-      value: `{{ ${s.path} }}`,
-      detail: s.isSuggestion ? "" : `= ${s.value}`
-    }));
-  }, [scalarPaths]);
+    const fromTree = stateTreeSuggestions
+      .filter(s => s.valueType === 'scalar' && !isNaN(Number(s.rawValue)))
+      .map(s => ({
+        label: `{{${s.value}}}`,
+        value: `{{${s.value}}}`,
+        detail: `= ${s.rawValue}`
+      }));
+      
+    if (fromTree.length === 0 && aliasSuggestions.length > 0) {
+      return aliasSuggestions.map(alias => ({
+        label: `{{${alias}.total}}`,
+        value: `{{${alias}.total}}`,
+        detail: "suggested"
+      }));
+    }
+    return fromTree;
+  }, [stateTreeSuggestions, aliasSuggestions]);
+
+  const loadingSuggestions = useMemo(() => {
+    const fromTree = stateTreeSuggestions
+      .filter(s => s.valueType === 'boolean')
+      .map(s => ({
+        label: `{{${s.value}}}`,
+        value: `{{${s.value}}}`,
+        detail: `= ${s.rawValue}`
+      }));
+      
+    if (fromTree.length === 0 && aliasSuggestions.length > 0) {
+      return aliasSuggestions.map(alias => ({
+        label: `{{${alias}.isLoading}}`,
+        value: `{{${alias}.isLoading}}`,
+        detail: "suggested"
+      }));
+    }
+    return fromTree;
+  }, [stateTreeSuggestions, aliasSuggestions]);
 
   // Discover column keys from queryResults using dataArrayTemplate
   // We need to strip {{ }} to resolve the path in the builder
   const dataArrayPathStr = config.dataArrayTemplate || config.dataMapping?.dataArrayPath || "";
-  const dataArrayPath = dataArrayPathStr.replace(/^{{\s*/, '').replace(/\s*}}$/, '');
+  const dataArrayPath = dataArrayPathStr.replace(/^\{{\s*/, '').replace(/\s*}}$/, '');
 
   const discoveredColumns = useMemo(() => {
-    if (!dataSourceResults || !dataArrayPath) return [];
+    if (!stateTree || !dataArrayPath) return [];
 
-    const resolved = resolvePath(dataSourceResults, dataArrayPath);
+    const resolved = resolvePath(stateTree, dataArrayPath);
 
     if (
       Array.isArray(resolved) &&
@@ -271,7 +155,7 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
       }));
     }
     return [];
-  }, [dataSourceResults, dataArrayPath]);
+  }, [stateTree, dataArrayPath]);
 
   // All available field keys for dropdown suggestions in column key inputs
   const availableKeys = useMemo(() => {
@@ -376,7 +260,7 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
           <TemplateAutocompleteInput
             value={config.dataArrayTemplate || config.dataMapping?.dataArrayPath || ""}
             onChange={(val) => handleConfigChange("dataArrayTemplate", val)}
-            placeholder="e.g. {{ queries.my_query.data }}"
+            placeholder="e.g. {{ state.queries.my_query.data }}"
             suggestions={arraySuggestions}
           />
           <p className="text-[0.65rem] text-muted-foreground">
@@ -391,11 +275,26 @@ export const TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
           <TemplateAutocompleteInput
             value={pagination.totalTemplate || config.dataMapping?.totalCountPath || ""}
             onChange={(val) => handlePaginationChange("totalTemplate", val)}
-            placeholder="e.g. {{ queries.my_query.total }}"
+            placeholder="e.g. {{ state.queries.my_query.total }}"
             suggestions={scalarSuggestions}
           />
           <p className="text-[0.6rem] text-muted-foreground">
             Used for server-side pagination. Leave empty to use array length.
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-foreground">
+            Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span>
+          </Label>
+          <TemplateAutocompleteInput
+            value={config.isLoading || ""}
+            onChange={(val) => handleConfigChange("isLoading", val)}
+            placeholder="e.g. {{ state.queries.my_query.isLoading }}"
+            suggestions={loadingSuggestions}
+          />
+          <p className="text-[0.6rem] text-muted-foreground">
+            Mustache template evaluating to a boolean loading state.
           </p>
         </div>
       </div>

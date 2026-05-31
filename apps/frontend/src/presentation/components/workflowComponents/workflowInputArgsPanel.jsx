@@ -105,6 +105,34 @@ export const WorkflowInputArgsPanel = ({ workflowForm }) => {
                   Required
                 </label>
               </div>
+              {/* Default value input */}
+              <div className="flex flex-col gap-1">
+                <span className="text-[9px] text-muted-foreground font-medium">Default value</span>
+                {(arg.type || "string") === "boolean" ? (
+                  <label className="flex items-center gap-1.5 text-[10px] text-foreground">
+                    <Checkbox
+                      checked={arg.defaultValue === true}
+                      onCheckedChange={(checked) => _handleUpdateArg(index, "defaultValue", checked)}
+                    />
+                    {arg.defaultValue === true ? "true" : "false"}
+                  </label>
+                ) : (
+                  <Input
+                    type={(arg.type || "string") === "number" ? "number" : "text"}
+                    placeholder={`Default ${arg.key || "value"}`}
+                    className="text-[10px]"
+                    size="sm"
+                    value={arg.defaultValue ?? ""}
+                    onChange={(e) => _handleUpdateArg(
+                      index,
+                      "defaultValue",
+                      (arg.type || "string") === "number"
+                        ? (e.target.value === "" ? undefined : Number(e.target.value))
+                        : e.target.value
+                    )}
+                  />
+                )}
+              </div>
             </div>
           ))}
         </div>

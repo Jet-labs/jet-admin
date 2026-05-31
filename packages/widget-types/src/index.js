@@ -129,59 +129,170 @@ export const WIDGET_DATASET_ADVANCED_OPTIONS = [];
 // Canonical map of supported events per widget type.
 // "COMMON" events are available to ALL widget types.
 // Widget-specific keys (e.g. "table") add extra events on top of COMMON.
+//
+// Each event entry may include an `args` array describing the event payload
+// shape available in templates via {{ state.event.<key> }}.
+// Always-available keys: state.event.type, state.event.widgetID
 
 /**
- * @type {Record<string, Array<{ value: string, label: string, desc: string }>>}
+ * @type {Record<string, Array<{ value: string, label: string, desc: string, args?: Array<{ key: string, description: string }> }>>}
  */
 export const WIDGET_EVENT_TYPES = {
   /** Events available to every widget type */
   COMMON: [
-    { value: "onClick", label: "On Click", desc: "Fires when the widget is clicked" },
+    {
+      value: "onClick", label: "On Click", desc: "Fires when the widget is clicked",
+      args: [
+        { key: "event.args[0]", description: "Native click event" },
+      ],
+    },
     { value: "onRefresh", label: "On Refresh", desc: "Fires when the widget refreshes data" },
     { value: "onLoad", label: "On Load", desc: "Fires when the widget finishes mounting" },
   ],
 
   /** Table-specific events */
   table: [
-    { value: "onRowSelect", label: "On Row Select", desc: "Fires when a table row is selected" },
-    { value: "onPageChange", label: "On Page Change", desc: "Fires when the table page changes. Event data: page, pageSize, offset" },
-    { value: "onSearch", label: "On Search", desc: "Fires when search term changes (debounced). Event data: { searchTerm }" },
-    { value: "onExport", label: "On Export", desc: "Fires when export is triggered (server-side mode). Event data: { format, rowCount }" },
-    { value: "onRowSave", label: "On Row Save", desc: "Fires when an edited row is saved. Event data: { rowIndex, originalRow, updatedRow, changes }" },
-    { value: "onBulkDelete", label: "On Bulk Delete", desc: "Fires when bulk delete is triggered. Event data: { selectedRows, selectedRowIndices }" },
-    { value: "onBulkExport", label: "On Bulk Export", desc: "Fires when bulk export is triggered. Event data: { selectedRows, format }" },
-    { value: "onBulkAction", label: "On Bulk Action", desc: "Fires for custom bulk actions. Event data: { actionKey, selectedRows }" },
-    { value: "onBulkEdit", label: "On Bulk Edit", desc: "Fires when bulk edits are saved. Event data: { edits: [{ rowIndex, originalRow, changes }] }" },
+    {
+      value: "onRowSelect", label: "On Row Select", desc: "Fires when a table row is selected",
+      args: [
+        { key: "event.row", description: "Selected row object" },
+        { key: "event.rowIndex", description: "Zero-based row index" },
+      ],
+    },
+    {
+      value: "onPageChange", label: "On Page Change", desc: "Fires when the table page changes",
+      args: [
+        { key: "event.page", description: "Current page number" },
+        { key: "event.pageSize", description: "Rows per page (limit)" },
+        { key: "event.offset", description: "Row offset (skip)" },
+      ],
+    },
+    {
+      value: "onSearch", label: "On Search", desc: "Fires when search term changes (debounced)",
+      args: [
+        { key: "event.searchTerm", description: "Debounced search term" },
+      ],
+    },
+    {
+      value: "onExport", label: "On Export", desc: "Fires when export is triggered",
+      args: [
+        { key: "event.format", description: "Export format (csv / json)" },
+        { key: "event.rowCount", description: "Total rows exported" },
+      ],
+    },
+    {
+      value: "onRowSave", label: "On Row Save", desc: "Fires when an edited row is saved",
+      args: [
+        { key: "event.rowIndex", description: "Edited row index" },
+        { key: "event.originalRow", description: "Row before edit" },
+        { key: "event.updatedRow", description: "Row after edit" },
+        { key: "event.changes", description: "Changed fields object" },
+      ],
+    },
+    {
+      value: "onBulkDelete", label: "On Bulk Delete", desc: "Fires when bulk delete is triggered",
+      args: [
+        { key: "event.selectedRows", description: "Array of selected row objects" },
+        { key: "event.selectedRowIndices", description: "Array of selected row indices" },
+      ],
+    },
+    {
+      value: "onBulkExport", label: "On Bulk Export", desc: "Fires when bulk export is triggered",
+      args: [
+        { key: "event.selectedRows", description: "Array of selected row objects" },
+        { key: "event.format", description: "Export format (csv / json)" },
+      ],
+    },
+    {
+      value: "onBulkAction", label: "On Bulk Action", desc: "Fires for custom bulk actions",
+      args: [
+        { key: "event.actionKey", description: "Custom action key" },
+        { key: "event.selectedRows", description: "Array of selected row objects" },
+      ],
+    },
+    {
+      value: "onBulkEdit", label: "On Bulk Edit", desc: "Fires when bulk edits are saved",
+      args: [
+        { key: "event.edits", description: "Array of { rowIndex, originalRow, changes } objects" },
+      ],
+    },
   ],
 
   /** Button-specific events */
   button: [
-    { value: "onSubmit", label: "On Submit", desc: "Fires when the button is submitted" },
+    {
+      value: "onSubmit", label: "On Submit", desc: "Fires when the button is submitted",
+      args: [
+        { key: "event.args[0]", description: "Submit payload" },
+      ],
+    },
   ],
 
   /** Form-specific events */
   form: [
-    { value: "onSubmit", label: "On Submit", desc: "Fires when the form is submitted. Event data: { formData }" },
-    { value: "onFieldChange", label: "On Field Change", desc: "Fires when any form field changes. Event data: { field, value }" },
+    {
+      value: "onSubmit", label: "On Submit", desc: "Fires when the form is submitted",
+      args: [
+        { key: "event.formData", description: "Submitted form data object" },
+      ],
+    },
+    {
+      value: "onFieldChange", label: "On Field Change", desc: "Fires when any form field changes",
+      args: [
+        { key: "event.field", description: "Changed field name" },
+        { key: "event.value", description: "New field value" },
+        { key: "event.formData", description: "Current form data" },
+      ],
+    },
   ],
 
   /** Alert-specific events */
   alert: [
-    { value: "onDismiss", label: "On Dismiss", desc: "Fires when the alert is dismissed" },
+    {
+      value: "onDismiss", label: "On Dismiss", desc: "Fires when the alert is dismissed",
+      args: [
+        { key: "event.args[0]", description: "Dismiss payload" },
+      ],
+    },
   ],
 
   "date-picker": [
-    { value: "onChange", label: "On Change", desc: "Fires when the selected date/time changes." },
+    {
+      value: "onChange", label: "On Change", desc: "Fires when the selected date/time changes",
+      args: [
+        { key: "event.value", description: "ISO datetime string" },
+        { key: "event.date", description: "ISO date string (YYYY-MM-DD)" },
+        { key: "event.time", description: "Time portion (HH:mm:ss) when enableTime is on" },
+      ],
+    },
     { value: "onOpen", label: "On Open", desc: "Fires when the picker popover opens" },
     { value: "onClose", label: "On Close", desc: "Fires when the picker popover closes" },
-    { value: "onClear", label: "On Clear", desc: "Fires when the selected value is cleared" },
+    {
+      value: "onClear", label: "On Clear", desc: "Fires when the selected value is cleared",
+      args: [
+        { key: "event.value", description: "Cleared value (empty string)" },
+      ],
+    },
   ],
 
   "date-range-picker": [
-    { value: "onChange", label: "On Change", desc: "Fires when the selected range changes." },
+    {
+      value: "onChange", label: "On Change", desc: "Fires when the selected range changes",
+      args: [
+        { key: "event.start", description: "ISO start datetime" },
+        { key: "event.end", description: "ISO end datetime" },
+        { key: "event.startDate", description: "ISO start date (YYYY-MM-DD)" },
+        { key: "event.endDate", description: "ISO end date (YYYY-MM-DD)" },
+      ],
+    },
     { value: "onOpen", label: "On Open", desc: "Fires when the picker popover opens" },
     { value: "onClose", label: "On Close", desc: "Fires when the picker popover closes" },
-    { value: "onClear", label: "On Clear", desc: "Fires when the range is cleared" },
+    {
+      value: "onClear", label: "On Clear", desc: "Fires when the range is cleared",
+      args: [
+        { key: "event.start", description: "Cleared start (empty string)" },
+      ],
+    },
   ],
 };
 
@@ -190,10 +301,70 @@ export const WIDGET_EVENT_TYPES = {
  * Returns COMMON events + widget-specific events.
  *
  * @param {string} widgetType - e.g. "table", "vega-lite", "button"
- * @returns {Array<{ value: string, label: string, desc: string }>}
+ * @returns {Array<{ value: string, label: string, desc: string, args?: Array<{ key: string, description: string }> }>}
  */
 export const getWidgetEventTypes = (widgetType) => {
   const common = WIDGET_EVENT_TYPES.COMMON || [];
   const specific = WIDGET_EVENT_TYPES[widgetType] || [];
   return [...common, ...specific];
+};
+
+/**
+ * Get the event arguments for a specific event type on a specific widget type.
+ * Checks the widget-specific entry first, then falls back to COMMON events.
+ * Returns the args array if found, otherwise an empty array.
+ *
+ * @param {string} widgetType - e.g. "table", "date-picker"
+ * @param {string} eventType - e.g. "onClick", "onChange"
+ * @returns {Array<{ key: string, description: string }>}
+ */
+export const getEventArgs = (widgetType, eventType) => {
+  // Check widget-specific events first
+  const specific = WIDGET_EVENT_TYPES[widgetType] || [];
+  const specificEvent = specific.find((e) => e.value === eventType);
+  if (specificEvent?.args) return specificEvent.args;
+
+  // Check COMMON events
+  const common = WIDGET_EVENT_TYPES.COMMON || [];
+  const commonEvent = common.find((e) => e.value === eventType);
+  if (commonEvent?.args) return commonEvent.args;
+
+  // No args defined for this event
+  return [];
+};
+
+// ─── Widget Methods ─────────────────────────────────────────────────────────
+// Canonical map of callable methods exposed by each widget type.
+// These are referenced in CALL_WIDGET_METHOD event actions.
+
+/**
+ * @type {Record<string, Array<{ name: string, description: string }>>}
+ */
+export const WIDGET_METHODS = {
+  table: [
+    { name: "refresh", description: "Reload table data" },
+    { name: "setSelectedRow", description: "Select a row by index" },
+    { name: "clearSelection", description: "Clear row selection" },
+  ],
+  "vega-lite": [
+    { name: "refresh", description: "Redraw visual chart" },
+    { name: "resize", description: "Resize chart to fit container" },
+  ],
+  vega: [
+    { name: "refresh", description: "Redraw visual chart" },
+    { name: "resize", description: "Resize chart to fit container" },
+  ],
+  button: [
+    { name: "click", description: "Trigger button action" },
+  ],
+};
+
+/**
+ * Get the list of callable methods for a widget type.
+ *
+ * @param {string} widgetType - e.g. "table", "vega-lite"
+ * @returns {Array<{ name: string, description: string }>}
+ */
+export const getWidgetMethods = (widgetType) => {
+  return WIDGET_METHODS[widgetType] || [];
 };

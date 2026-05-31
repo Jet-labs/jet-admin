@@ -38,12 +38,13 @@ export const WidgetDeletionForm = ({ tenantID, widgetID }) => {
   });
 
   const _handleDeleteWidget = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.DELETE_WIDGET_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_WIDGET_DIALOG_MESSAGE,
       confirmText: "Delete",
       cancelText: "Cancel",
     });
+    if (!confirmed) return;
     deleteWidget();
   };
 

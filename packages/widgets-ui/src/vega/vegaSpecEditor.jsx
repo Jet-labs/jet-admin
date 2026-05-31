@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 
 
-import { extractWorkflowSchema } from "./variableExplorer";
+import { getValueByPath } from "@jet-admin/template-engine";
 import { CodeEditor } from "@jet-admin/ui";
 import { BarChart, Code, LineChart, PieChart, ScatterChart } from 'lucide-react';
 
@@ -163,16 +163,7 @@ const getNestedKeys = (obj, prefix = "", maxDepth = 4, depth = 0) => {
   return keys;
 };
 
-const getValueByPath = (obj, path) => {
-  if (!obj || !path) return undefined;
-  let cur = obj;
-  for (const part of path.split(".")) {
-    const m = part.match(/^(.+)\[(\d+)\]$/);
-    cur = m ? cur?.[m[1]]?.[parseInt(m[2])] : cur?.[part];
-    if (cur === undefined) break;
-  }
-  return cur;
-};
+// getValueByPath is imported from @jet-admin/template-engine
 
 const getValuePreview = (obj, path) => {
   const v = getValueByPath(obj, path);
@@ -375,7 +366,6 @@ export const VegaSpecEditor = ({
   useEffect(() => {
     if (!monacoRef.current) return;
     const monaco = monacoRef.current;
-    const schema = workflow ? extractWorkflowSchema(workflow) : null;
 
     const disposable = monaco.languages.registerCompletionItemProvider("json", {
       triggerCharacters: [".", "{"],
@@ -391,48 +381,23 @@ export const VegaSpecEditor = ({
         };
         const suggestions = [];
 
+        // After "{{" — offer "state." namespace root
         const bracketMatch = lineText.match(/\{\{([a-zA-Z0-9_]*)$/);
         if (bracketMatch) {
           const partial = bracketMatch[1].toLowerCase();
-          if ("ctx".startsWith(partial)) {
+          if ("state".startsWith(partial)) {
             suggestions.push({
-              label: "ctx", kind: monaco.languages.CompletionItemKind.Module,
-              detail: "Workflow Context (Runtime)", insertText: "ctx.", range,
+              label: "state", kind: monaco.languages.CompletionItemKind.Module,
+              detail: "Global State Tree", insertText: "state.", range,
             });
-          }
-          if ("queries".startsWith(partial)) {
-            suggestions.push({
-              label: "queries", kind: monaco.languages.CompletionItemKind.Module,
-              detail: "Page Queries", insertText: "queries.", range,
-            });
-          }
-          if ("workflows".startsWith(partial)) {
-            suggestions.push({
-              label: "workflows", kind: monaco.languages.CompletionItemKind.Module,
-              detail: "Page Workflows", insertText: "workflows.", range,
-            });
-          }
-          if (schema) {
-            const add = (items, kind, pfx) =>
-              items.forEach((item) => {
-                const p = item.path.replace(/\{\{|\}\}/g, "");
-                if (p.toLowerCase().includes(partial))
-                  suggestions.push({
-                    label: item.name, kind,
-                    detail: `${pfx}: ${item.type}${item.nodeTitle ? ` (${item.nodeTitle})` : ""}`,
-                    insertText: p, range,
-                  });
-              });
-            add(schema.inputs, monaco.languages.CompletionItemKind.Property, "Input");
-            add(schema.nodeOutputs, monaco.languages.CompletionItemKind.Variable, "Node Output");
-            add(schema.workflowOutputs, monaco.languages.CompletionItemKind.Event, "Workflow Output");
           }
         }
 
+        // After "{{state." — walk the stateTree and offer nested keys
         if (workflowContext) {
-          const ctxMatch = lineText.match(/\{\{ctx\.([a-zA-Z0-9_\[\].]*)$/);
-          if (ctxMatch) {
-            const partial = ctxMatch[1];
+          const stateMatch = lineText.match(/\{\{state\.([a-zA-Z0-9_\[\].]*)$/);
+          if (stateMatch) {
+            const partial = stateMatch[1];
             getNestedKeys(workflowContext, "", 4)
               .filter((k) => k.toLowerCase().includes(partial.toLowerCase()))
               .forEach((k) =>
@@ -443,40 +408,12 @@ export const VegaSpecEditor = ({
                 })
               );
           }
-
-          const queriesMatch = lineText.match(/\{\{queries\.([a-zA-Z0-9_\[\].]*)$/);
-          if (queriesMatch && workflowContext.queries) {
-            const partial = queriesMatch[1];
-            getNestedKeys(workflowContext.queries, "", 4)
-              .filter((k) => k.toLowerCase().includes(partial.toLowerCase()))
-              .forEach((k) =>
-                suggestions.push({
-                  label: k, kind: monaco.languages.CompletionItemKind.Variable,
-                  detail: getValuePreview(workflowContext.queries, k), insertText: k, range,
-                  documentation: `Value: ${getValuePreview(workflowContext.queries, k)}`,
-                })
-              );
-          }
-
-          const workflowsMatch = lineText.match(/\{\{workflows\.([a-zA-Z0-9_\[\].]*)$/);
-          if (workflowsMatch && workflowContext.workflows) {
-            const partial = workflowsMatch[1];
-            getNestedKeys(workflowContext.workflows, "", 4)
-              .filter((k) => k.toLowerCase().includes(partial.toLowerCase()))
-              .forEach((k) =>
-                suggestions.push({
-                  label: k, kind: monaco.languages.CompletionItemKind.Variable,
-                  detail: getValuePreview(workflowContext.workflows, k), insertText: k, range,
-                  documentation: `Value: ${getValuePreview(workflowContext.workflows, k)}`,
-                })
-              );
-          }
         }
         return { suggestions };
       },
     });
     return () => disposable.dispose();
-  }, [workflowContext, workflow]);
+  }, [workflowContext]);
 
   const applyTemplate = useCallback((key) => {
     const t = VEGA_TEMPLATES[key];

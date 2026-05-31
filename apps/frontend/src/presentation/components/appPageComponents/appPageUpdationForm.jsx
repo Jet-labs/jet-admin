@@ -90,13 +90,14 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
     validateOnChange: false,
     validationSchema: formValidations.updateAppPageFormValidationSchema,
     onSubmit: async (values) => {
-      await showConfirmation({
+      const confirmed = await showConfirmation({
         title: CONSTANTS.STRINGS.UPDATE_APP_PAGE_FORM_UPDATE_DIALOG_TITLE,
         message: CONSTANTS.STRINGS.UPDATE_APP_PAGE_FORM_UPDATE_DIALOG_MESSAGE,
         confirmText: "Update",
         cancelText: "Cancel",
         confirmButtonClass: "",
       });
+      if (!confirmed) return;
       updateAppPage(values);
     },
   });

@@ -216,15 +216,223 @@ var init_vega = __esm({
   }
 });
 
+// src/intellisense/suggestionEngine.js
+function collectLeaves(shape, prefix) {
+  const leaves = [];
+  if (shape === "__WILDCARD__") return leaves;
+  if (typeof shape !== "object" || shape === null) {
+    leaves.push({ path: prefix, ...typeof shape === "object" ? shape : {} });
+    return leaves;
+  }
+  for (const [key, value] of Object.entries(shape)) {
+    if (key === "__WILDCARD__") continue;
+    const childPrefix = prefix ? `${prefix}.${key}` : key;
+    if (typeof value === "object" && value !== null && !value.type) {
+      leaves.push(...collectLeaves(value, childPrefix));
+    } else if (typeof value === "object" && value !== null && value.type) {
+      leaves.push({
+        path: childPrefix,
+        type: value.type,
+        detail: value.detail || ""
+      });
+    }
+  }
+  return leaves;
+}
+function expandWildcard(shape, wildcardValues, root) {
+  const results = [];
+  const wildcardShape = shape.__WILDCARD__;
+  if (!wildcardShape) return results;
+  for (const { alias, label } of wildcardValues) {
+    const childLeaves = collectLeaves(wildcardShape, "");
+    for (const leaf of childLeaves) {
+      const fullPath = `state.${root}.${alias}.${leaf.path}`;
+      results.push({
+        label: `{{${fullPath}}}`,
+        value: `{{${fullPath}}}`,
+        detail: leaf.detail || `${label} ${leaf.path}`
+      });
+    }
+  }
+  return results;
+}
+function getExpressionSuggestions({ dataSources = [], variableDefinitions = [], widgetType, eventType } = {}) {
+  const suggestions = [];
+  const queryAliases = dataSources.filter((ds) => ds.type !== "workflow" && ds.alias).map((ds) => ({ alias: ds.alias, label: ds.alias }));
+  suggestions.push(
+    ...expandWildcard(STATE_TREE_SHAPE.queries, queryAliases, "queries")
+  );
+  const workflowAliases = dataSources.filter((ds) => ds.type === "workflow" && ds.alias).map((ds) => ({ alias: ds.alias, label: ds.alias }));
+  suggestions.push(
+    ...expandWildcard(STATE_TREE_SHAPE.workflows, workflowAliases, "workflows")
+  );
+  for (const def of variableDefinitions) {
+    if (def.key) {
+      suggestions.push({
+        label: `{{state.variables.${def.key}}}`,
+        value: `{{state.variables.${def.key}}}`,
+        detail: "page variable"
+      });
+    }
+  }
+  const eventArgs = (0, import_widget_types.getEventArgs)(widgetType, eventType);
+  for (const arg of eventArgs) {
+    const fullPath = `state.${arg.key}`;
+    suggestions.push({
+      label: `{{${fullPath}}}`,
+      value: `{{${fullPath}}}`,
+      detail: arg.description
+    });
+  }
+  for (const g of COMMON_GLOBALS) {
+    suggestions.push({
+      label: `{{${g.key}}}`,
+      value: `{{${g.key}}}`,
+      detail: g.detail
+    });
+  }
+  return suggestions;
+}
+function getAliasSuggestions(dataSources = []) {
+  return dataSources.filter((ds) => ds.alias).map((ds) => ({
+    label: ds.alias,
+    value: ds.alias,
+    detail: ds.type || "data source"
+  }));
+}
+function getVariableKeySuggestions(variableDefinitions = []) {
+  const suggestions = [];
+  const existing = /* @__PURE__ */ new Set();
+  for (const def of variableDefinitions) {
+    if (def.key && !existing.has(def.key)) {
+      existing.add(def.key);
+      suggestions.push({
+        label: `state.variables.${def.key}`,
+        value: `state.variables.${def.key}`,
+        detail: "page variable"
+      });
+    }
+  }
+  for (const common of COMMON_PAGINATION_VARIABLES) {
+    if (!existing.has(common)) {
+      suggestions.push({
+        label: `state.variables.${common}`,
+        value: `state.variables.${common}`,
+        detail: "pagination"
+      });
+    }
+  }
+  return suggestions;
+}
+function getWidgetIDSuggestions(widgets = [], pageConfig) {
+  if (!widgets || !Array.isArray(widgets)) return [];
+  const placedWidgetIDs = (pageConfig?.widgets || []).map((k) => {
+    const parts = String(k).split("_");
+    return parts.length > 1 ? parts[1] : parts[0];
+  }).filter(Boolean);
+  const filtered = placedWidgetIDs.length > 0 ? widgets.filter((w) => placedWidgetIDs.includes(w.widgetID)) : widgets;
+  return filtered.map((w) => ({
+    label: w.widgetTitle || w.widgetID,
+    value: w.widgetID,
+    detail: w.widgetType
+  }));
+}
+function getMethodSuggestionsForTarget(targetWidgetID, widgets = []) {
+  const widget = widgets?.find((w) => w.widgetID === targetWidgetID);
+  if (!widget) return [];
+  const methods = (0, import_widget_types.getWidgetMethods)(widget.widgetType);
+  return methods.map((m) => ({
+    label: m.name,
+    value: m.name,
+    detail: m.description
+  }));
+}
+function getSuggestionsFromStateTree(obj, prefix = "state", depth = 0, maxDepth = 4) {
+  const results = [];
+  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith("__")) continue;
+    const val = obj[key];
+    const fullPath = prefix ? `${prefix}.${key}` : key;
+    let valueType = "object";
+    let detail = "";
+    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
+      valueType = "array";
+      detail = `${val.length} rows, fields: ${Object.keys(val[0]).slice(0, 4).join(", ")}`;
+    } else if (isScalarNumeric(val)) {
+      valueType = "scalar";
+      detail = `= ${val}`;
+    } else if (isBooleanValue(val)) {
+      valueType = "boolean";
+      detail = `= ${val}`;
+    } else if (typeof val === "string") {
+      valueType = "string";
+      detail = `"${val.slice(0, 20)}${val.length > 20 ? "..." : ""}"`;
+    }
+    results.push({
+      value: fullPath,
+      path: fullPath,
+      valueType,
+      rawValue: val,
+      detail
+    });
+    if (val && typeof val === "object" && !Array.isArray(val)) {
+      results.push(...getSuggestionsFromStateTree(val, fullPath, depth + 1, maxDepth));
+    }
+  }
+  return results;
+}
+var import_widget_types, STATE_TREE_SHAPE, COMMON_PAGINATION_VARIABLES, COMMON_GLOBALS, isScalarNumeric, isBooleanValue;
+var init_suggestionEngine = __esm({
+  "src/intellisense/suggestionEngine.js"() {
+    import_widget_types = require("@jet-admin/widget-types");
+    STATE_TREE_SHAPE = {
+      queries: {
+        __WILDCARD__: {
+          data: { type: "any", detail: "Query result data" },
+          isLoading: { type: "boolean", detail: "Loading state" },
+          error: { type: "string|null", detail: "Error message if failed" },
+          lastUpdated: { type: "string", detail: "ISO timestamp of last result" }
+        }
+      },
+      workflows: {
+        __WILDCARD__: {
+          data: { type: "any", detail: "Workflow result data" },
+          isLoading: { type: "boolean", detail: "Loading state" },
+          error: { type: "string|null", detail: "Error message if failed" },
+          instanceID: { type: "string", detail: "Workflow instance ID" },
+          lastUpdated: { type: "string", detail: "ISO timestamp of last result" }
+        }
+      }
+    };
+    COMMON_PAGINATION_VARIABLES = ["skip", "limit", "page", "pageSize"];
+    COMMON_GLOBALS = [
+      { key: "state.globals.tenantID", detail: "Current tenant ID" },
+      { key: "state.globals.pageID", detail: "Current page ID" }
+    ];
+    isScalarNumeric = (val) => {
+      if (typeof val === "number") return true;
+      if (typeof val === "string") {
+        const trimmed = val.trim();
+        return trimmed !== "" && !isNaN(Number(trimmed)) && !isNaN(parseFloat(trimmed));
+      }
+      return false;
+    };
+    isBooleanValue = (val) => {
+      return typeof val === "boolean" || val === "true" || val === "false";
+    };
+  }
+});
+
 // src/table/tableWidget.jsx
-var import_react10, import_prop_types9, import_react_table, import_ui9, import_lucide_react6, exportToCSV, exportToJSON, EditableCell, TableWidget;
+var import_react9, import_prop_types8, import_react_table, import_ui8, import_lucide_react5, exportToCSV, exportToJSON, EditableCell, TableWidget;
 var init_tableWidget = __esm({
   "src/table/tableWidget.jsx"() {
-    import_react10 = __toESM(require("react"));
-    import_prop_types9 = __toESM(require("prop-types"));
+    import_react9 = __toESM(require("react"));
+    import_prop_types8 = __toESM(require("prop-types"));
     import_react_table = require("@tanstack/react-table");
-    import_ui9 = require("@jet-admin/ui");
-    import_lucide_react6 = require("lucide-react");
+    import_ui8 = require("@jet-admin/ui");
+    import_lucide_react5 = require("lucide-react");
     exportToCSV = (columns, rows, filename = "export.csv") => {
       const headers = columns.map((c) => `"${(c.label || c.key || c.id).replace(/"/g, '""')}"`).join(",");
       const body = rows.map(
@@ -260,19 +468,19 @@ var init_tableWidget = __esm({
     };
     EditableCell = ({ getValue, row, column, table }) => {
       const initialValue = getValue();
-      const [value, setValue] = (0, import_react10.useState)(initialValue);
-      const inputRef = (0, import_react10.useRef)(null);
-      (0, import_react10.useEffect)(() => {
+      const [value, setValue] = (0, import_react9.useState)(initialValue);
+      const inputRef = (0, import_react9.useRef)(null);
+      (0, import_react9.useEffect)(() => {
         setValue(initialValue);
       }, [initialValue]);
-      (0, import_react10.useEffect)(() => {
+      (0, import_react9.useEffect)(() => {
         if (inputRef.current) inputRef.current.focus();
       }, []);
       const onBlur = () => {
         table.options.meta?.updateCellData(row.index, column.id, value);
       };
-      return /* @__PURE__ */ import_react10.default.createElement(
-        import_ui9.Input,
+      return /* @__PURE__ */ import_react9.default.createElement(
+        import_ui8.Input,
         {
           ref: inputRef,
           value: value ?? "",
@@ -308,13 +516,22 @@ var init_tableWidget = __esm({
       setWidgetState,
       onRowSelect
     }) => {
-      const tableData = (0, import_react10.useMemo)(() => {
+      const tableData = (0, import_react9.useMemo)(() => {
         if (processedData && typeof processedData === "object" && !Array.isArray(processedData)) return processedData;
         if (Array.isArray(processedData)) return { data: processedData, columns: [], pagination: { enabled: false } };
         return { data: [], columns: [], pagination: { enabled: false } };
       }, [processedData]);
       const rows = tableData.data || [];
-      const configColumns = (0, import_react10.useMemo)(() => {
+      const isLoading = (0, import_react9.useMemo)(() => {
+        if (tableData.isLoading !== void 0) {
+          return tableData.isLoading === true || tableData.isLoading === "true";
+        }
+        if (widgetConfig?.isLoading !== void 0) {
+          return widgetConfig.isLoading === true || widgetConfig.isLoading === "true";
+        }
+        return !!isLoadingWorkflows;
+      }, [tableData.isLoading, widgetConfig?.isLoading, isLoadingWorkflows]);
+      const configColumns = (0, import_react9.useMemo)(() => {
         const cols = tableData.columns?.length ? tableData.columns : widgetConfig?.columns?.length ? widgetConfig.columns : [];
         if (cols.length > 0) return cols;
         if (rows.length > 0 && typeof rows[0] === "object" && rows[0] !== null) {
@@ -328,27 +545,27 @@ var init_tableWidget = __esm({
       const editingConfig = tableData.editing || widgetConfig?.editing || { enabled: false };
       const multiSelectConfig = tableData.multiSelect || widgetConfig?.multiSelect || { enabled: false };
       const bulkEditConfig = tableData.bulkEdit || widgetConfig?.bulkEdit || { enabled: false };
-      const [globalFilter, setGlobalFilter] = (0, import_react10.useState)("");
-      const [editingRowId, setEditingRowId] = (0, import_react10.useState)(null);
-      const [rowDraft, setRowDraft] = (0, import_react10.useState)({});
-      const [pendingEdits, setPendingEdits] = (0, import_react10.useState)({});
-      const [editingCell, setEditingCell] = (0, import_react10.useState)(null);
-      const [rowSelection, setRowSelection] = (0, import_react10.useState)({});
-      const [pagination, setPagination] = (0, import_react10.useState)({ pageIndex: 0, pageSize: 10 });
-      const clickTimeoutRef = (0, import_react10.useRef)(null);
-      (0, import_react10.useEffect)(() => {
+      const [globalFilter, setGlobalFilter] = (0, import_react9.useState)("");
+      const [editingRowId, setEditingRowId] = (0, import_react9.useState)(null);
+      const [rowDraft, setRowDraft] = (0, import_react9.useState)({});
+      const [pendingEdits, setPendingEdits] = (0, import_react9.useState)({});
+      const [editingCell, setEditingCell] = (0, import_react9.useState)(null);
+      const [rowSelection, setRowSelection] = (0, import_react9.useState)({});
+      const [pagination, setPagination] = (0, import_react9.useState)({ pageIndex: 0, pageSize: 10 });
+      const clickTimeoutRef = (0, import_react9.useRef)(null);
+      (0, import_react9.useEffect)(() => {
         return () => {
           if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
         };
       }, []);
-      (0, import_react10.useEffect)(() => {
+      (0, import_react9.useEffect)(() => {
         if (!searchConfig.enabled || !searchConfig.serverSide) return;
         const timer = setTimeout(() => {
           if (fireWidgetEvent) fireWidgetEvent("onSearch", { searchTerm: globalFilter });
         }, 300);
         return () => clearTimeout(timer);
       }, [globalFilter, searchConfig.serverSide, searchConfig.enabled, fireWidgetEvent]);
-      (0, import_react10.useEffect)(() => {
+      (0, import_react9.useEffect)(() => {
         if (!setWidgetState) return;
         const selectedIndices = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number);
         setWidgetState((prev) => ({
@@ -359,13 +576,13 @@ var init_tableWidget = __esm({
           pendingEdits
         }));
       }, [globalFilter, rowSelection, rows, pendingEdits, setWidgetState]);
-      const columnDefs = (0, import_react10.useMemo)(() => {
+      const columnDefs = (0, import_react9.useMemo)(() => {
         const defs = [];
         if (multiSelectConfig.enabled) {
           defs.push({
             id: "_select",
-            header: ({ table: table2 }) => multiSelectConfig.showSelectAll ? /* @__PURE__ */ import_react10.default.createElement(
-              import_ui9.Checkbox,
+            header: ({ table: table2 }) => multiSelectConfig.showSelectAll ? /* @__PURE__ */ import_react9.default.createElement(
+              import_ui8.Checkbox,
               {
                 checked: table2.getIsAllPageRowsSelected(),
                 onCheckedChange: (v) => table2.toggleAllPageRowsSelected(!!v),
@@ -373,8 +590,8 @@ var init_tableWidget = __esm({
                 className: "h-3.5 w-3.5"
               }
             ) : null,
-            cell: ({ row }) => /* @__PURE__ */ import_react10.default.createElement(
-              import_ui9.Checkbox,
+            cell: ({ row }) => /* @__PURE__ */ import_react9.default.createElement(
+              import_ui8.Checkbox,
               {
                 checked: row.getIsSelected(),
                 onCheckedChange: (v) => row.toggleSelected(!!v),
@@ -392,7 +609,7 @@ var init_tableWidget = __esm({
           defs.push({
             id: col.key,
             accessorKey: col.key,
-            header: () => /* @__PURE__ */ import_react10.default.createElement("span", { className: "flex items-center gap-1" }, col.label || col.key, col.editable && (editingConfig.enabled || bulkEditConfig.enabled) && /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.Pencil, { className: "w-3 h-3 opacity-40" })),
+            header: () => /* @__PURE__ */ import_react9.default.createElement("span", { className: "flex items-center gap-1" }, col.label || col.key, col.editable && (editingConfig.enabled || bulkEditConfig.enabled) && /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.Pencil, { className: "w-3 h-3 opacity-40" })),
             cell: ({ getValue, row, column, table: table2 }) => {
               const rowIdx = row.index;
               const colId = column.id;
@@ -401,8 +618,8 @@ var init_tableWidget = __esm({
               const pendingVal = pendingEdits[rowIdx]?.[colId];
               const hasPending = pendingVal !== void 0;
               if (isRowEditing && col.editable) {
-                return /* @__PURE__ */ import_react10.default.createElement(
-                  import_ui9.Input,
+                return /* @__PURE__ */ import_react9.default.createElement(
+                  import_ui8.Input,
                   {
                     value: rowDraft[colId] ?? "",
                     onChange: (e) => setRowDraft((prev) => ({ ...prev, [colId]: e.target.value })),
@@ -412,10 +629,10 @@ var init_tableWidget = __esm({
                 );
               }
               if (isCellEditing && col.editable) {
-                return /* @__PURE__ */ import_react10.default.createElement(EditableCell, { getValue, row, column, table: table2 });
+                return /* @__PURE__ */ import_react9.default.createElement(EditableCell, { getValue, row, column, table: table2 });
               }
               const displayVal = hasPending ? pendingVal : getValue();
-              return /* @__PURE__ */ import_react10.default.createElement("span", { className: hasPending ? "text-primary font-medium" : "" }, displayVal != null ? String(displayVal) : "\u2014", hasPending && /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.Pencil, { className: "inline-block w-3 h-3 ml-1 text-primary/60" }));
+              return /* @__PURE__ */ import_react9.default.createElement("span", { className: hasPending ? "text-primary font-medium" : "" }, displayVal != null ? String(displayVal) : "\u2014", hasPending && /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.Pencil, { className: "inline-block w-3 h-3 ml-1 text-primary/60" }));
             },
             meta: { editable: col.editable }
           });
@@ -428,28 +645,28 @@ var init_tableWidget = __esm({
               const rowIdx = row.index;
               const isEditing = editingRowId === rowIdx;
               if (isEditing) {
-                return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-end gap-1", onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ import_react10.default.createElement(
-                  import_ui9.Button,
+                return /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center justify-end gap-1", onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ import_react9.default.createElement(
+                  import_ui8.Button,
                   {
                     size: "icon",
                     variant: "ghost",
                     className: "h-6 w-6 text-primary hover:bg-primary/10",
                     onClick: () => handleSaveRow(rowIdx, row.original)
                   },
-                  /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.Check, { className: "h-3.5 w-3.5" })
-                ), /* @__PURE__ */ import_react10.default.createElement(
-                  import_ui9.Button,
+                  /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.Check, { className: "h-3.5 w-3.5" })
+                ), /* @__PURE__ */ import_react9.default.createElement(
+                  import_ui8.Button,
                   {
                     size: "icon",
                     variant: "ghost",
                     className: "h-6 w-6 text-muted-foreground hover:text-foreground",
                     onClick: () => setEditingRowId(null)
                   },
-                  /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.X, { className: "h-3.5 w-3.5" })
+                  /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.X, { className: "h-3.5 w-3.5" })
                 ));
               }
-              return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex justify-end", onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ import_react10.default.createElement(
-                import_ui9.Button,
+              return /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex justify-end", onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ import_react9.default.createElement(
+                import_ui8.Button,
                 {
                   size: "icon",
                   variant: "ghost",
@@ -459,7 +676,7 @@ var init_tableWidget = __esm({
                     setRowDraft({ ...row.original });
                   }
                 },
-                /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.Pencil, { className: "h-3.5 w-3.5" })
+                /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.Pencil, { className: "h-3.5 w-3.5" })
               ));
             },
             size: 70,
@@ -494,27 +711,27 @@ var init_tableWidget = __esm({
           }
         }
       });
-      const [serverPage, setServerPage] = (0, import_react10.useState)(1);
+      const [serverPage, setServerPage] = (0, import_react9.useState)(1);
       const serverPageSize = paginationConfig && rows.length > 0 ? rows.length : 10;
       const serverTotalRows = paginationConfig?.totalRows ?? rows.length;
       const serverTotalPages = paginationConfig ? Math.max(1, Math.ceil(serverTotalRows / serverPageSize)) : 1;
-      const handleServerPageChange = (0, import_react10.useCallback)((newPage) => {
+      const handleServerPageChange = (0, import_react9.useCallback)((newPage) => {
         if (newPage < 1 || newPage > serverTotalPages) return;
         setServerPage(newPage);
         const offset = (newPage - 1) * serverPageSize;
         if (fireWidgetEvent) fireWidgetEvent("onPageChange", { page: newPage, pageSize: serverPageSize, offset });
       }, [serverTotalPages, serverPageSize, fireWidgetEvent]);
-      const handleExport = (0, import_react10.useCallback)(() => {
-        const format = exportConfig.format || "csv";
+      const handleExport = (0, import_react9.useCallback)(() => {
+        const format3 = exportConfig.format || "csv";
         if (exportConfig.serverSide) {
-          if (fireWidgetEvent) fireWidgetEvent("onExport", { format, rowCount: rows.length });
+          if (fireWidgetEvent) fireWidgetEvent("onExport", { format: format3, rowCount: rows.length });
           return;
         }
         const visibleRows = table.getFilteredRowModel().rows.map((r) => r.original);
-        if (format === "json") exportToJSON(configColumns, visibleRows, `export-${Date.now()}.json`);
+        if (format3 === "json") exportToJSON(configColumns, visibleRows, `export-${Date.now()}.json`);
         else exportToCSV(configColumns, visibleRows, `export-${Date.now()}.csv`);
       }, [exportConfig, fireWidgetEvent, rows, table, configColumns]);
-      const handleSaveRow = (0, import_react10.useCallback)((idx, originalRow) => {
+      const handleSaveRow = (0, import_react9.useCallback)((idx, originalRow) => {
         const changes = {};
         configColumns.forEach((c) => {
           if (c.editable && String(originalRow[c.key]) !== String(rowDraft[c.key])) {
@@ -524,7 +741,7 @@ var init_tableWidget = __esm({
         if (fireWidgetEvent) fireWidgetEvent("onRowSave", { rowIndex: idx, originalRow, updatedRow: { ...rowDraft }, changes });
         setEditingRowId(null);
       }, [configColumns, rowDraft, fireWidgetEvent]);
-      const handleSaveBulkEdits = (0, import_react10.useCallback)(() => {
+      const handleSaveBulkEdits = (0, import_react9.useCallback)(() => {
         const edits = Object.entries(pendingEdits).map(([rIdx, changes]) => ({
           rowIndex: Number(rIdx),
           originalRow: rows[Number(rIdx)],
@@ -533,7 +750,7 @@ var init_tableWidget = __esm({
         if (fireWidgetEvent) fireWidgetEvent("onBulkEdit", { edits });
         setPendingEdits({});
       }, [pendingEdits, rows, fireWidgetEvent]);
-      const handleBulkAction = (0, import_react10.useCallback)((actionKey) => {
+      const handleBulkAction = (0, import_react9.useCallback)((actionKey) => {
         const selectedIndices = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number);
         const selectedRows = selectedIndices.map((i) => rows[i]);
         if (actionKey === "delete") {
@@ -544,12 +761,12 @@ var init_tableWidget = __esm({
           if (fireWidgetEvent) fireWidgetEvent("onBulkAction", { actionKey, selectedRows });
         }
       }, [rowSelection, rows, fireWidgetEvent]);
-      const handleRowSelect = (0, import_react10.useCallback)((rowOriginal, rowIdx) => {
+      const handleRowSelect = (0, import_react9.useCallback)((rowOriginal, rowIdx) => {
         if (setWidgetState) setWidgetState((prev) => ({ ...prev, selectedRowIndex: rowIdx, selectedRow: rowOriginal }));
         if (onRowSelect) onRowSelect(rowOriginal, rowIdx);
         if (fireWidgetEvent) fireWidgetEvent("onRowSelect", { row: rowOriginal, rowIndex: rowIdx });
       }, [setWidgetState, onRowSelect, fireWidgetEvent]);
-      (0, import_react10.useEffect)(() => {
+      (0, import_react9.useEffect)(() => {
         if (onWidgetInit) {
           onWidgetInit({
             refresh: () => {
@@ -571,17 +788,17 @@ var init_tableWidget = __esm({
       const pendingEditCount = Object.values(pendingEdits).reduce((s, c) => s + Object.keys(c).length, 0);
       const displayRowModels = paginationConfig ? table.getCoreRowModel().rows : table.getRowModel().rows;
       if (!rows.length) {
-        return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6" }, isLoadingWorkflows ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm shadow-sm border border-border" }, /* @__PURE__ */ import_react10.default.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ import_react10.default.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Loading data...") : /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, /* @__PURE__ */ import_react10.default.createElement("p", null, "No data available."), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-xs mt-1" }, "Ensure the data array template resolves to a non-empty array.")));
+        return /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6" }, isLoading ? /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm shadow-sm border border-border" }, /* @__PURE__ */ import_react9.default.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ import_react9.default.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Loading data...") : /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement("p", null, "No data available."), /* @__PURE__ */ import_react9.default.createElement("p", { className: "text-xs mt-1" }, "Ensure the data array template resolves to a non-empty array.")));
       }
-      return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex flex-col w-full h-full min-h-0 overflow-hidden relative" }, isLoadingWorkflows && /* @__PURE__ */ import_react10.default.createElement("div", { className: "absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border" }, /* @__PURE__ */ import_react10.default.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ import_react10.default.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Updating...")), showToolbar && /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30 gap-3 flex-shrink-0" }, searchConfig.enabled ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "relative flex-1 max-w-xs" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.Search, { className: "absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground/50" }), /* @__PURE__ */ import_react10.default.createElement(
-        import_ui9.Input,
+      return /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex flex-col w-full h-full min-h-0 overflow-hidden relative" }, isLoading && /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border" }, /* @__PURE__ */ import_react9.default.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ import_react9.default.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Updating...")), showToolbar && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30 gap-3 flex-shrink-0" }, searchConfig.enabled ? /* @__PURE__ */ import_react9.default.createElement("div", { className: "relative flex-1 max-w-xs" }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.Search, { className: "absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground/50" }), /* @__PURE__ */ import_react9.default.createElement(
+        import_ui8.Input,
         {
           value: globalFilter ?? "",
           onChange: (e) => setGlobalFilter(e.target.value),
           placeholder: searchConfig.placeholder || "Search...",
           className: "h-7 text-xs pl-8 bg-background border-border rounded"
         }
-      )) : /* @__PURE__ */ import_react10.default.createElement("div", null), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2" }, exportConfig.enabled && /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { size: "sm", variant: "outline", className: "h-7 text-xs", onClick: handleExport }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.FileDown, { className: "h-3.5 w-3.5 mr-1.5" }), exportConfig.buttonLabel || "Export"))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-1 overflow-auto min-h-0" }, /* @__PURE__ */ import_react10.default.createElement("table", { className: "w-full text-sm border-collapse" }, /* @__PURE__ */ import_react10.default.createElement("thead", { className: "sticky top-0 z-10 bg-muted/50 backdrop-blur-sm" }, table.getHeaderGroups().map((hg) => /* @__PURE__ */ import_react10.default.createElement("tr", { key: hg.id }, hg.headers.map((header) => /* @__PURE__ */ import_react10.default.createElement(
+      )) : /* @__PURE__ */ import_react9.default.createElement("div", null), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center gap-2" }, exportConfig.enabled && /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { size: "sm", variant: "outline", className: "h-7 text-xs", onClick: handleExport }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.FileDown, { className: "h-3.5 w-3.5 mr-1.5" }), exportConfig.buttonLabel || "Export"))), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex-1 overflow-auto min-h-0" }, /* @__PURE__ */ import_react9.default.createElement("table", { className: "w-full text-sm border-collapse" }, /* @__PURE__ */ import_react9.default.createElement("thead", { className: "sticky top-0 z-10 bg-muted/50 backdrop-blur-sm" }, table.getHeaderGroups().map((hg) => /* @__PURE__ */ import_react9.default.createElement("tr", { key: hg.id }, hg.headers.map((header) => /* @__PURE__ */ import_react9.default.createElement(
         "th",
         {
           key: header.id,
@@ -589,12 +806,12 @@ var init_tableWidget = __esm({
           style: header.column.getSize() ? { width: header.column.getSize() } : void 0
         },
         header.isPlaceholder ? null : (0, import_react_table.flexRender)(header.column.columnDef.header, header.getContext())
-      ))))), /* @__PURE__ */ import_react10.default.createElement("tbody", null, displayRowModels.map((row) => {
+      ))))), /* @__PURE__ */ import_react9.default.createElement("tbody", null, displayRowModels.map((row) => {
         const rowIdx = row.index;
         const isRowEditing = editingConfig.enabled && editingRowId === rowIdx;
         const hasPendingEdits = !!pendingEdits[rowIdx];
         const isRowSelected = row.getIsSelected();
-        return /* @__PURE__ */ import_react10.default.createElement(
+        return /* @__PURE__ */ import_react9.default.createElement(
           "tr",
           {
             key: row.id,
@@ -604,7 +821,7 @@ var init_tableWidget = __esm({
             const isEditable = cell.column.columnDef.meta?.editable;
             const colId = cell.column.id;
             const isSpecialCol = colId === "_select" || colId === "_actions";
-            return /* @__PURE__ */ import_react10.default.createElement(
+            return /* @__PURE__ */ import_react9.default.createElement(
               "td",
               {
                 key: cell.id,
@@ -640,8 +857,8 @@ var init_tableWidget = __esm({
             );
           })
         );
-      })))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "absolute bottom-12 left-0 right-0 px-4 flex flex-col gap-2 pointer-events-none z-30" }, multiSelectConfig.enabled && selectedCount > 0 && /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between bg-card border border-border shadow-md rounded-lg p-3 pointer-events-auto" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-xs font-medium text-foreground px-2" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-primary font-medium" }, selectedCount), " row", selectedCount !== 1 ? "s" : "", " selected"), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2" }, (multiSelectConfig.actions || []).map((act, i) => /* @__PURE__ */ import_react10.default.createElement(
-        import_ui9.Button,
+      })))), /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute bottom-12 left-0 right-0 px-4 flex flex-col gap-2 pointer-events-none z-30" }, multiSelectConfig.enabled && selectedCount > 0 && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center justify-between bg-card border border-border shadow-md rounded-lg p-3 pointer-events-auto" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-xs font-medium text-foreground px-2" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-primary font-medium" }, selectedCount), " row", selectedCount !== 1 ? "s" : "", " selected"), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center gap-2" }, (multiSelectConfig.actions || []).map((act, i) => /* @__PURE__ */ import_react9.default.createElement(
+        import_ui8.Button,
         {
           key: i,
           size: "sm",
@@ -650,33 +867,31 @@ var init_tableWidget = __esm({
           onClick: () => handleBulkAction(act.actionKey)
         },
         act.label
-      )))), bulkEditConfig.enabled && pendingEditCount > 0 && /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between bg-card border border-primary/30 shadow-md rounded-lg p-3 pointer-events-auto" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-xs font-medium text-foreground px-2" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-primary font-medium" }, pendingEditCount), " unsaved change", pendingEditCount !== 1 ? "s" : ""), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { size: "sm", variant: "ghost", className: "h-7 text-xs text-muted-foreground", onClick: () => setPendingEdits({}) }, "Discard"), /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { size: "sm", className: "h-7 text-xs", onClick: handleSaveBulkEdits }, bulkEditConfig.saveLabel || "Save All Changes")))), paginationConfig ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-xs text-muted-foreground" }, serverTotalRows, " total row", serverTotalRows !== 1 ? "s" : ""), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", serverPage, " of ", serverTotalPages), /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(1), disabled: serverPage === 1 || isLoadingWorkflows }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronsLeft, { className: "h-4 w-4" })), /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverPage - 1), disabled: serverPage === 1 || isLoadingWorkflows }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronLeft, { className: "h-4 w-4" })), /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverPage + 1), disabled: serverPage >= serverTotalPages || isLoadingWorkflows }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronRight, { className: "h-4 w-4" })), /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverTotalPages), disabled: serverPage >= serverTotalPages || isLoadingWorkflows }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronsRight, { className: "h-4 w-4" })))) : rows.length > 10 && /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-xs text-muted-foreground" }, table.getFilteredRowModel().rows.length, " total row", table.getFilteredRowModel().rows.length !== 1 ? "s" : ""), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", table.getState().pagination.pageIndex + 1, " of ", table.getPageCount()), /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.setPageIndex(0), disabled: !table.getCanPreviousPage() }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronsLeft, { className: "h-4 w-4" })), /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.previousPage(), disabled: !table.getCanPreviousPage() }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronLeft, { className: "h-4 w-4" })), /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.nextPage(), disabled: !table.getCanNextPage() }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronRight, { className: "h-4 w-4" })), /* @__PURE__ */ import_react10.default.createElement(import_ui9.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.setPageIndex(table.getPageCount() - 1), disabled: !table.getCanNextPage() }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react6.ChevronsRight, { className: "h-4 w-4" })))));
+      )))), bulkEditConfig.enabled && pendingEditCount > 0 && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center justify-between bg-card border border-primary/30 shadow-md rounded-lg p-3 pointer-events-auto" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-xs font-medium text-foreground px-2" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-primary font-medium" }, pendingEditCount), " unsaved change", pendingEditCount !== 1 ? "s" : ""), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { size: "sm", variant: "ghost", className: "h-7 text-xs text-muted-foreground", onClick: () => setPendingEdits({}) }, "Discard"), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { size: "sm", className: "h-7 text-xs", onClick: handleSaveBulkEdits }, bulkEditConfig.saveLabel || "Save All Changes")))), paginationConfig ? /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-xs text-muted-foreground" }, serverTotalRows, " total row", serverTotalRows !== 1 ? "s" : ""), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", serverPage, " of ", serverTotalPages), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(1), disabled: serverPage === 1 || isLoading }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.ChevronsLeft, { className: "h-4 w-4" })), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverPage - 1), disabled: serverPage === 1 || isLoading }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.ChevronLeft, { className: "h-4 w-4" })), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverPage + 1), disabled: serverPage >= serverTotalPages || isLoading }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.ChevronRight, { className: "h-4 w-4" })), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverTotalPages), disabled: serverPage >= serverTotalPages || isLoading }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.ChevronsRight, { className: "h-4 w-4" })))) : rows.length > 10 && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-xs text-muted-foreground" }, table.getFilteredRowModel().rows.length, " total row", table.getFilteredRowModel().rows.length !== 1 ? "s" : ""), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", table.getState().pagination.pageIndex + 1, " of ", table.getPageCount()), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.setPageIndex(0), disabled: !table.getCanPreviousPage() }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.ChevronsLeft, { className: "h-4 w-4" })), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.previousPage(), disabled: !table.getCanPreviousPage() }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.ChevronLeft, { className: "h-4 w-4" })), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.nextPage(), disabled: !table.getCanNextPage() }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.ChevronRight, { className: "h-4 w-4" })), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.setPageIndex(table.getPageCount() - 1), disabled: !table.getCanNextPage() }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.ChevronsRight, { className: "h-4 w-4" })))));
     };
     TableWidget.propTypes = {
-      widgetConfig: import_prop_types9.default.object,
-      data: import_prop_types9.default.oneOfType([import_prop_types9.default.array, import_prop_types9.default.object]),
-      runWorkflow: import_prop_types9.default.func,
-      isLoadingWorkflows: import_prop_types9.default.bool,
-      onWidgetInit: import_prop_types9.default.func,
-      refreshData: import_prop_types9.default.func,
-      widgetState: import_prop_types9.default.object,
-      setWidgetState: import_prop_types9.default.func,
-      onRowSelect: import_prop_types9.default.func,
-      fireWidgetEvent: import_prop_types9.default.func
+      widgetConfig: import_prop_types8.default.object,
+      data: import_prop_types8.default.oneOfType([import_prop_types8.default.array, import_prop_types8.default.object]),
+      runWorkflow: import_prop_types8.default.func,
+      isLoadingWorkflows: import_prop_types8.default.bool,
+      onWidgetInit: import_prop_types8.default.func,
+      refreshData: import_prop_types8.default.func,
+      widgetState: import_prop_types8.default.object,
+      setWidgetState: import_prop_types8.default.func,
+      onRowSelect: import_prop_types8.default.func,
+      fireWidgetEvent: import_prop_types8.default.func
     };
   }
 });
 
-// src/table/tableConfigEditor.jsx
-var import_react11, import_prop_types10, import_ui10, import_lucide_react7, TemplateAutocompleteInput, collectArrayPaths3, isScalarNumeric, collectScalarPaths, resolvePath, TableConfigEditor;
-var init_tableConfigEditor = __esm({
-  "src/table/tableConfigEditor.jsx"() {
-    import_react11 = __toESM(require("react"));
-    import_prop_types10 = __toESM(require("prop-types"));
-    import_ui10 = require("@jet-admin/ui");
-    import_lucide_react7 = require("lucide-react");
-    TemplateAutocompleteInput = ({ value, onChange, placeholder, suggestions }) => {
-      const [showSuggestions, setShowSuggestions] = import_react11.default.useState(false);
+// src/_shared/TemplateAutocompleteInput.jsx
+var import_react10, import_ui9, TemplateAutocompleteInput, TemplateAutocompleteInput_default;
+var init_TemplateAutocompleteInput = __esm({
+  "src/_shared/TemplateAutocompleteInput.jsx"() {
+    import_react10 = __toESM(require("react"));
+    import_ui9 = require("@jet-admin/ui");
+    TemplateAutocompleteInput = ({ value, onChange, placeholder, suggestions = [] }) => {
+      const [showSuggestions, setShowSuggestions] = (0, import_react10.useState)(false);
       const handleFocus = () => {
         if (suggestions.length > 0) setShowSuggestions(true);
       };
@@ -687,15 +902,15 @@ var init_tableConfigEditor = __esm({
         onChange(e.target.value);
         setShowSuggestions(true);
       };
-      const handleSelect = (path) => {
-        onChange(path);
+      const handleSelect = (val) => {
+        onChange(val);
         setShowSuggestions(false);
       };
       const filteredSuggestions = suggestions.filter(
         (s) => !value || s.value.toLowerCase().includes(value.toLowerCase()) || value === "{{"
       );
-      return /* @__PURE__ */ import_react11.default.createElement("div", { className: "relative flex flex-col gap-1" }, /* @__PURE__ */ import_react11.default.createElement(
-        import_ui10.Input,
+      return /* @__PURE__ */ import_react10.default.createElement("div", { className: "relative flex flex-col gap-1" }, /* @__PURE__ */ import_react10.default.createElement(
+        import_ui9.Input,
         {
           type: "text",
           className: "text-xs font-mono h-8 w-full",
@@ -705,78 +920,37 @@ var init_tableConfigEditor = __esm({
           onBlur: handleBlur,
           placeholder
         }
-      ), showSuggestions && filteredSuggestions.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "absolute z-50 top-full left-0 right-0 mt-1 bg-brand-dark border border-border rounded-md shadow-lg max-h-48 overflow-auto" }, filteredSuggestions.map((s, idx) => /* @__PURE__ */ import_react11.default.createElement(
+      ), showSuggestions && filteredSuggestions.length > 0 && /* @__PURE__ */ import_react10.default.createElement("div", { className: "absolute top-full left-0 mt-1 w-full max-h-48 overflow-y-auto bg-popover border border-border rounded-md shadow-lg z-50" }, filteredSuggestions.map((s, i) => /* @__PURE__ */ import_react10.default.createElement(
         "div",
         {
-          key: idx,
-          onMouseDown: (e) => e.preventDefault(),
-          onClick: () => handleSelect(s.value),
-          className: "w-full px-2 py-1.5 text-left text-xs hover:bg-muted flex items-center justify-between gap-2 border-b border-border last:border-0 cursor-pointer transition-colors"
+          key: i,
+          className: "px-2 py-1.5 text-xs hover:bg-muted cursor-pointer flex justify-between items-center",
+          onClick: () => handleSelect(s.value)
         },
-        /* @__PURE__ */ import_react11.default.createElement("span", { className: "font-mono text-foreground" }, s.label),
-        s.detail && /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-[10px] text-muted-foreground" }, s.detail)
+        /* @__PURE__ */ import_react10.default.createElement("span", { className: "font-mono text-foreground" }, s.label),
+        s.detail && /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-[10px] text-muted-foreground" }, s.detail)
       ))));
     };
-    collectArrayPaths3 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
-      const results = [];
-      if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-      for (const key of Object.keys(obj)) {
-        if (key.startsWith("__")) continue;
-        const val = obj[key];
-        const fullPath = prefix ? `${prefix}.${key}` : key;
-        if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
-          results.push({
-            path: fullPath,
-            label: fullPath,
-            sampleKeys: Object.keys(val[0]),
-            rowCount: val.length
-          });
-        } else if (val && typeof val === "object" && !Array.isArray(val)) {
-          results.push(...collectArrayPaths3(val, fullPath, depth + 1, maxDepth));
-        }
-      }
-      return results;
-    };
-    isScalarNumeric = (val) => {
-      if (typeof val === "number") return true;
-      if (typeof val === "string") {
-        const trimmed = val.trim();
-        return trimmed !== "" && !isNaN(Number(trimmed)) && !isNaN(parseFloat(trimmed));
-      }
-      return false;
-    };
-    collectScalarPaths = (obj, prefix = "", depth = 0, maxDepth = 4) => {
-      const results = [];
-      if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-      for (const key of Object.keys(obj)) {
-        if (key.startsWith("__")) continue;
-        const val = obj[key];
-        const fullPath = prefix ? `${prefix}.${key}` : key;
-        if (isScalarNumeric(val)) {
-          results.push({ path: fullPath, label: fullPath, value: val });
-        } else if (val && typeof val === "object") {
-          if (Array.isArray(val)) {
-            if (val.length > 0 && typeof val[0] === "object") {
-              results.push(...collectScalarPaths(val[0], `${fullPath}[0]`, depth + 1, maxDepth));
-            }
-          } else {
-            results.push(...collectScalarPaths(val, fullPath, depth + 1, maxDepth));
-          }
-        }
-      }
-      return results;
-    };
+    TemplateAutocompleteInput_default = TemplateAutocompleteInput;
+  }
+});
+
+// src/table/tableConfigEditor.jsx
+var import_react11, import_prop_types9, import_ui10, import_lucide_react6, import_template_engine3, resolvePath, TableConfigEditor;
+var init_tableConfigEditor = __esm({
+  "src/table/tableConfigEditor.jsx"() {
+    import_react11 = __toESM(require("react"));
+    import_prop_types9 = __toESM(require("prop-types"));
+    import_ui10 = require("@jet-admin/ui");
+    import_lucide_react6 = require("lucide-react");
+    init_TemplateAutocompleteInput();
+    init_suggestionEngine();
+    import_template_engine3 = require("@jet-admin/template-engine");
     resolvePath = (obj, path) => {
       if (!obj || !path) return void 0;
-      const parts = path.split(".");
-      let current = obj;
-      for (const part of parts) {
-        if (current == null) return void 0;
-        current = current[part];
-      }
-      return current;
+      return (0, import_template_engine3.getValueByPath)(obj, path, { allowedRoots: ["state"] });
     };
-    TableConfigEditor = ({ widgetEditorForm, dataSourceResults }) => {
+    TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
       const dataSources = config.dataSources || [];
       const columns = config.columns || [];
@@ -793,76 +967,68 @@ var init_tableConfigEditor = __esm({
       const bulkEdit = config.bulkEdit || { enabled: false, saveLabel: "Save All Changes" };
       const aliasSuggestions = (0, import_react11.useMemo)(() => {
         const suggestions = [];
-        if (!dataSourceResults) return suggestions;
-        if (dataSourceResults.queries) {
-          Object.keys(dataSourceResults.queries).forEach((alias) => suggestions.push(`queries.${alias}`));
+        if (!stateTree) return suggestions;
+        if (stateTree.queries) {
+          Object.keys(stateTree.queries).forEach((alias) => suggestions.push(`state.queries.${alias}`));
         }
-        if (dataSourceResults.workflows) {
-          Object.keys(dataSourceResults.workflows).forEach((alias) => suggestions.push(`workflows.${alias}`));
+        if (stateTree.workflows) {
+          Object.keys(stateTree.workflows).forEach((alias) => suggestions.push(`state.workflows.${alias}`));
         }
         return suggestions;
-      }, [dataSourceResults]);
-      const arrayPaths = (0, import_react11.useMemo)(() => {
-        const paths = [];
-        if (dataSourceResults) {
-          paths.push(...collectArrayPaths3(dataSourceResults));
-        }
-        if (paths.length === 0 && aliasSuggestions.length > 0) {
-          for (const alias of aliasSuggestions) {
-            paths.push({
-              path: `${alias}.data`,
-              label: `${alias}.data`,
-              sampleKeys: [],
-              rowCount: 0,
-              isSuggestion: true
-            });
-            paths.push({
-              path: `${alias}.data`,
-              label: `${alias}.data`,
-              sampleKeys: [],
-              rowCount: 0,
-              isSuggestion: true
-            });
-          }
-        }
-        return paths;
-      }, [dataSourceResults, aliasSuggestions]);
-      const scalarPaths = (0, import_react11.useMemo)(() => {
-        const paths = [];
-        if (dataSourceResults) {
-          paths.push(...collectScalarPaths(dataSourceResults));
-        }
-        if (paths.length === 0 && aliasSuggestions.length > 0) {
-          for (const alias of aliasSuggestions) {
-            paths.push({
-              path: `${alias}.total`,
-              label: `${alias}.total`,
-              value: null,
-              isSuggestion: true
-            });
-          }
-        }
-        return paths;
-      }, [dataSourceResults, aliasSuggestions]);
+      }, [stateTree]);
+      const stateTreeSuggestions = (0, import_react11.useMemo)(() => {
+        return getSuggestionsFromStateTree(stateTree);
+      }, [stateTree]);
       const arraySuggestions = (0, import_react11.useMemo)(() => {
-        return arrayPaths.map((arr) => ({
-          label: `{{ ${arr.path} }}`,
-          value: `{{ ${arr.path} }}`,
-          detail: arr.isSuggestion ? "suggested" : `${arr.rowCount} rows`
+        const fromTree = stateTreeSuggestions.filter((s) => s.valueType === "array").map((s) => ({
+          label: `{{${s.value}}}`,
+          value: `{{${s.value}}}`,
+          detail: s.detail || "Runtime data array"
         }));
-      }, [arrayPaths]);
+        if (fromTree.length === 0 && aliasSuggestions.length > 0) {
+          return aliasSuggestions.map((alias) => ({
+            label: `{{${alias}.data}}`,
+            value: `{{${alias}.data}}`,
+            detail: "suggested"
+          }));
+        }
+        return fromTree;
+      }, [stateTreeSuggestions, aliasSuggestions]);
       const scalarSuggestions = (0, import_react11.useMemo)(() => {
-        return scalarPaths.map((s) => ({
-          label: `{{ ${s.path} }}`,
-          value: `{{ ${s.path} }}`,
-          detail: s.isSuggestion ? "" : `= ${s.value}`
+        const fromTree = stateTreeSuggestions.filter((s) => s.valueType === "scalar" && !isNaN(Number(s.rawValue))).map((s) => ({
+          label: `{{${s.value}}}`,
+          value: `{{${s.value}}}`,
+          detail: `= ${s.rawValue}`
         }));
-      }, [scalarPaths]);
+        if (fromTree.length === 0 && aliasSuggestions.length > 0) {
+          return aliasSuggestions.map((alias) => ({
+            label: `{{${alias}.total}}`,
+            value: `{{${alias}.total}}`,
+            detail: "suggested"
+          }));
+        }
+        return fromTree;
+      }, [stateTreeSuggestions, aliasSuggestions]);
+      const loadingSuggestions = (0, import_react11.useMemo)(() => {
+        const fromTree = stateTreeSuggestions.filter((s) => s.valueType === "boolean").map((s) => ({
+          label: `{{${s.value}}}`,
+          value: `{{${s.value}}}`,
+          detail: `= ${s.rawValue}`
+        }));
+        if (fromTree.length === 0 && aliasSuggestions.length > 0) {
+          return aliasSuggestions.map((alias) => ({
+            label: `{{${alias}.isLoading}}`,
+            value: `{{${alias}.isLoading}}`,
+            detail: "suggested"
+          }));
+        }
+        return fromTree;
+      }, [stateTreeSuggestions, aliasSuggestions]);
       const dataArrayPathStr = config.dataArrayTemplate || config.dataMapping?.dataArrayPath || "";
-      const dataArrayPath = dataArrayPathStr.replace(/^{{\s*/, "").replace(/\s*}}$/, "");
+      const dataArrayPath = dataArrayPathStr.replace(/^\{{\s*/, "").replace(/\s*}}$/, "");
       const discoveredColumns = (0, import_react11.useMemo)(() => {
-        if (!dataSourceResults || !dataArrayPath) return [];
-        const resolved = resolvePath(dataSourceResults, dataArrayPath);
+        if (!stateTree || !dataArrayPath) return [];
+        const resolved = resolvePath(stateTree, dataArrayPath);
         if (Array.isArray(resolved) && resolved.length > 0 && typeof resolved[0] === "object") {
           return Object.keys(resolved[0]).map((key) => ({
             key,
@@ -871,7 +1037,7 @@ var init_tableConfigEditor = __esm({
           }));
         }
         return [];
-      }, [dataSourceResults, dataArrayPath]);
+      }, [stateTree, dataArrayPath]);
       const availableKeys = (0, import_react11.useMemo)(() => {
         return discoveredColumns.map((c) => c.key);
       }, [discoveredColumns]);
@@ -949,22 +1115,30 @@ var init_tableConfigEditor = __esm({
         });
       };
       return /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Data Array Template"), /* @__PURE__ */ import_react11.default.createElement(
-        TemplateAutocompleteInput,
+        TemplateAutocompleteInput_default,
         {
           value: config.dataArrayTemplate || config.dataMapping?.dataArrayPath || "",
           onChange: (val) => handleConfigChange("dataArrayTemplate", val),
-          placeholder: "e.g. {{ queries.my_query.data }}",
+          placeholder: "e.g. {{ state.queries.my_query.data }}",
           suggestions: arraySuggestions
         }
       ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.65rem] text-muted-foreground" }, "Mustache template evaluating to an array of objects.")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Total Count Template ", /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react11.default.createElement(
-        TemplateAutocompleteInput,
+        TemplateAutocompleteInput_default,
         {
           value: pagination.totalTemplate || config.dataMapping?.totalCountPath || "",
           onChange: (val) => handlePaginationChange("totalTemplate", val),
-          placeholder: "e.g. {{ queries.my_query.total }}",
+          placeholder: "e.g. {{ state.queries.my_query.total }}",
           suggestions: scalarSuggestions
         }
-      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use array length."))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Table Columns"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex gap-1" }, discoveredColumns.length > 0 && /* @__PURE__ */ import_react11.default.createElement(
+      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use array length.")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react11.default.createElement(
+        TemplateAutocompleteInput_default,
+        {
+          value: config.isLoading || "",
+          onChange: (val) => handleConfigChange("isLoading", val),
+          placeholder: "e.g. {{ state.queries.my_query.isLoading }}",
+          suggestions: loadingSuggestions
+        }
+      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Mustache template evaluating to a boolean loading state."))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Table Columns"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex gap-1" }, discoveredColumns.length > 0 && /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Button,
         {
           type: "button",
@@ -974,7 +1148,7 @@ var init_tableConfigEditor = __esm({
           className: "h-7 text-xs px-2",
           title: "Auto-detect columns from data"
         },
-        /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Sparkles, { className: "mr-1 text-amber-500" }),
+        /* @__PURE__ */ import_react11.default.createElement(import_lucide_react6.Sparkles, { className: "mr-1 text-amber-500" }),
         " Auto-detect"
       ), /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Button,
@@ -985,9 +1159,9 @@ var init_tableConfigEditor = __esm({
           onClick: handleAddColumn,
           className: "h-7 text-xs px-2"
         },
-        /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Plus, { className: "mr-1" }),
+        /* @__PURE__ */ import_react11.default.createElement(import_lucide_react6.Plus, { className: "mr-1" }),
         " Add"
-      ))), discoveredColumns.length > 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Zap, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ import_react11.default.createElement("span", null, /* @__PURE__ */ import_react11.default.createElement("strong", null, discoveredColumns.length), " fields detected from loaded data. Click ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Auto-detect"), " to populate columns.")), !dataArrayPath && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "Configure a Data Array Template above first, then come back here to set up columns."), dataArrayPath && discoveredColumns.length === 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs leading-relaxed" }, "No columns detected from ", /* @__PURE__ */ import_react11.default.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary" }, dataArrayPath), ".", /* @__PURE__ */ import_react11.default.createElement("br", null), /* @__PURE__ */ import_react11.default.createElement("br", null), "Make sure the expression points to an array of objects and that you have executed the data source in the App Page Editor, or add columns manually."), columns.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, columns.map((col, idx) => /* @__PURE__ */ import_react11.default.createElement(
+      ))), discoveredColumns.length > 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react6.Zap, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ import_react11.default.createElement("span", null, /* @__PURE__ */ import_react11.default.createElement("strong", null, discoveredColumns.length), " fields detected from loaded data. Click ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Auto-detect"), " to populate columns.")), !dataArrayPath && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "Configure a Data Array Template above first, then come back here to set up columns."), dataArrayPath && discoveredColumns.length === 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs leading-relaxed" }, "No columns detected from ", /* @__PURE__ */ import_react11.default.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary" }, dataArrayPath), ".", /* @__PURE__ */ import_react11.default.createElement("br", null), /* @__PURE__ */ import_react11.default.createElement("br", null), "Make sure the expression points to an array of objects and that you have executed the data source in the App Page Editor, or add columns manually."), columns.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, columns.map((col, idx) => /* @__PURE__ */ import_react11.default.createElement(
         "div",
         {
           key: idx,
@@ -1004,7 +1178,7 @@ var init_tableConfigEditor = __esm({
             disabled: idx === 0,
             title: "Move up"
           },
-          /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.ArrowUp, { className: "h-3.5 w-3.5" })
+          /* @__PURE__ */ import_react11.default.createElement(import_lucide_react6.ArrowUp, { className: "h-3.5 w-3.5" })
         ), /* @__PURE__ */ import_react11.default.createElement(
           import_ui10.Button,
           {
@@ -1016,7 +1190,7 @@ var init_tableConfigEditor = __esm({
             disabled: idx === columns.length - 1,
             title: "Move down"
           },
-          /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.ArrowDown, { className: "h-3.5 w-3.5" })
+          /* @__PURE__ */ import_react11.default.createElement(import_lucide_react6.ArrowDown, { className: "h-3.5 w-3.5" })
         )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Header Label"), /* @__PURE__ */ import_react11.default.createElement(
           import_ui10.Input,
           {
@@ -1051,7 +1225,7 @@ var init_tableConfigEditor = __esm({
             onClick: () => handleRemoveColumn(idx),
             title: "Remove column"
           },
-          /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Trash2, { className: "h-4 w-4" })
+          /* @__PURE__ */ import_react11.default.createElement(import_lucide_react6.Trash2, { className: "h-4 w-4" })
         )),
         /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center pl-8" }, /* @__PURE__ */ import_react11.default.createElement(
           import_ui10.Checkbox,
@@ -1131,7 +1305,7 @@ var init_tableConfigEditor = __esm({
           checked: multiSelect.showSelectAll,
           onCheckedChange: (v) => handleConfigChange("multiSelect", { ...multiSelect, showSelectAll: !!v })
         }
-      ), /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { htmlFor: "ms-select-all", className: "text-[10px] cursor-pointer" }, 'Show "Select All" Checkbox')), /* @__PURE__ */ import_react11.default.createElement("div", { className: "pt-1" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex justify-between items-center mb-2" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[10px] font-medium" }, "Bulk Actions"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.Button, { type: "button", variant: "outline", size: "sm", onClick: handleAddBulkAction, className: "h-6 text-[10px] px-2" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Plus, { className: "mr-1 h-3 w-3" }), " Add Action")), (!multiSelect.actions || multiSelect.actions.length === 0) && /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No bulk actions configured. Selection will be tracked in widgetState."), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, (multiSelect.actions || []).map((act, idx) => /* @__PURE__ */ import_react11.default.createElement("div", { key: idx, className: "flex items-center gap-1.5 bg-background p-1.5 rounded border" }, /* @__PURE__ */ import_react11.default.createElement(
+      ), /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { htmlFor: "ms-select-all", className: "text-[10px] cursor-pointer" }, 'Show "Select All" Checkbox')), /* @__PURE__ */ import_react11.default.createElement("div", { className: "pt-1" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex justify-between items-center mb-2" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[10px] font-medium" }, "Bulk Actions"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.Button, { type: "button", variant: "outline", size: "sm", onClick: handleAddBulkAction, className: "h-6 text-[10px] px-2" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react6.Plus, { className: "mr-1 h-3 w-3" }), " Add Action")), (!multiSelect.actions || multiSelect.actions.length === 0) && /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No bulk actions configured. Selection will be tracked in widgetState."), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, (multiSelect.actions || []).map((act, idx) => /* @__PURE__ */ import_react11.default.createElement("div", { key: idx, className: "flex items-center gap-1.5 bg-background p-1.5 rounded border" }, /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Input,
         {
           value: act.label,
@@ -1147,7 +1321,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "actionKey",
           className: "h-6 text-[10px] font-mono flex-1"
         }
-      ), /* @__PURE__ */ import_react11.default.createElement(import_ui10.Select, { value: act.variant || "default", onValueChange: (v) => handleUpdateBulkAction(idx, "variant", v) }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectTrigger, { className: "h-6 text-[10px] w-20" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectValue, null)), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectContent, null, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "destructive" }, "Danger"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "outline" }, "Outline"))), /* @__PURE__ */ import_react11.default.createElement(import_ui10.Button, { type: "button", variant: "ghost", size: "icon", onClick: () => handleRemoveBulkAction(idx), className: "h-6 w-6 text-destructive shrink-0" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react7.Trash2, { className: "h-3 w-3" })))))))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Inline Row Editing"), /* @__PURE__ */ import_react11.default.createElement(
+      ), /* @__PURE__ */ import_react11.default.createElement(import_ui10.Select, { value: act.variant || "default", onValueChange: (v) => handleUpdateBulkAction(idx, "variant", v) }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectTrigger, { className: "h-6 text-[10px] w-20" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectValue, null)), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectContent, null, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "destructive" }, "Danger"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "outline" }, "Outline"))), /* @__PURE__ */ import_react11.default.createElement(import_ui10.Button, { type: "button", variant: "ghost", size: "icon", onClick: () => handleRemoveBulkAction(idx), className: "h-6 w-6 text-destructive shrink-0" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react6.Trash2, { className: "h-3 w-3" })))))))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Inline Row Editing"), /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Switch,
         {
           checked: editing.enabled,
@@ -1175,18 +1349,18 @@ var init_tableConfigEditor = __esm({
       )))));
     };
     TableConfigEditor.propTypes = {
-      widgetEditorForm: import_prop_types10.default.object.isRequired,
-      dataSourceResults: import_prop_types10.default.object
+      widgetEditorForm: import_prop_types9.default.object.isRequired,
+      dataSourceResults: import_prop_types9.default.object
     };
   }
 });
 
 // src/button/buttonConfigEditor.jsx
-var import_react12, import_prop_types11, import_ui11, ButtonConfigEditor;
+var import_react12, import_prop_types10, import_ui11, ButtonConfigEditor;
 var init_buttonConfigEditor = __esm({
   "src/button/buttonConfigEditor.jsx"() {
     import_react12 = __toESM(require("react"));
-    import_prop_types11 = __toESM(require("prop-types"));
+    import_prop_types10 = __toESM(require("prop-types"));
     import_ui11 = require("@jet-admin/ui");
     ButtonConfigEditor = ({ widgetEditorForm }) => {
       return /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.Label, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ import_react12.default.createElement(
@@ -1217,18 +1391,159 @@ var init_buttonConfigEditor = __esm({
       ))));
     };
     ButtonConfigEditor.propTypes = {
-      widgetEditorForm: import_prop_types11.default.object.isRequired
+      widgetEditorForm: import_prop_types10.default.object.isRequired
+    };
+  }
+});
+
+// src/date-picker/datePickerConfigEditor.jsx
+var import_react19, import_prop_types17, import_ui18, DatePickerConfigEditor;
+var init_datePickerConfigEditor = __esm({
+  "src/date-picker/datePickerConfigEditor.jsx"() {
+    import_react19 = __toESM(require("react"));
+    import_prop_types17 = __toESM(require("prop-types"));
+    import_ui18 = require("@jet-admin/ui");
+    init_TemplateAutocompleteInput();
+    init_suggestionEngine();
+    DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
+      const config = widgetEditorForm.values.widgetConfig || {};
+      const suggestions = (0, import_react19.useMemo)(() => {
+        if (!stateTree) return [];
+        const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+        return rawSuggestions.map((s) => ({
+          label: `{{${s.value}}}`,
+          value: `{{${s.value}}}`,
+          detail: s.detail
+        }));
+      }, [stateTree]);
+      return /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react19.default.createElement(import_ui18.Label, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ import_react19.default.createElement(
+        import_ui18.Input,
+        {
+          type: "text",
+          className: "text-sm h-8",
+          value: config.label || "",
+          onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
+          placeholder: "e.g. Select date"
+        }
+      )), /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react19.default.createElement(import_ui18.Label, { className: "text-xs font-medium text-foreground" }, "Placeholder"), /* @__PURE__ */ import_react19.default.createElement(
+        import_ui18.Input,
+        {
+          type: "text",
+          className: "text-sm h-8",
+          value: config.placeholder || "",
+          onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.placeholder", e.target.value),
+          placeholder: "Pick a date..."
+        }
+      )), /* @__PURE__ */ import_react19.default.createElement("div", { className: "flex items-center gap-2 pt-1" }, /* @__PURE__ */ import_react19.default.createElement(
+        import_ui18.Checkbox,
+        {
+          id: "date-picker-enable-time",
+          checked: !!config.enableTime,
+          onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
+        }
+      ), /* @__PURE__ */ import_react19.default.createElement(import_ui18.Label, { htmlFor: "date-picker-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react19.default.createElement(import_ui18.Label, { className: "text-xs font-medium text-foreground" }, "Default Value"), /* @__PURE__ */ import_react19.default.createElement(
+        TemplateAutocompleteInput_default,
+        {
+          value: config.defaultValue || "",
+          onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.defaultValue", val),
+          placeholder: "e.g. {{state.variables.myDate}} or ISO string",
+          suggestions
+        }
+      )));
+    };
+    DatePickerConfigEditor.propTypes = {
+      widgetEditorForm: import_prop_types17.default.object.isRequired,
+      stateTree: import_prop_types17.default.object
+    };
+  }
+});
+
+// src/date-range-picker/dateRangePickerConfigEditor.jsx
+var import_react20, import_prop_types18, import_ui19, DateRangePickerConfigEditor;
+var init_dateRangePickerConfigEditor = __esm({
+  "src/date-range-picker/dateRangePickerConfigEditor.jsx"() {
+    import_react20 = __toESM(require("react"));
+    import_prop_types18 = __toESM(require("prop-types"));
+    import_ui19 = require("@jet-admin/ui");
+    init_TemplateAutocompleteInput();
+    init_suggestionEngine();
+    DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
+      const config = widgetEditorForm.values.widgetConfig || {};
+      const suggestions = (0, import_react20.useMemo)(() => {
+        if (!stateTree) return [];
+        const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+        return rawSuggestions.map((s) => ({
+          label: `{{${s.value}}}`,
+          value: `{{${s.value}}}`,
+          detail: s.detail
+        }));
+      }, [stateTree]);
+      return /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react20.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ import_react20.default.createElement(
+        import_ui19.Input,
+        {
+          type: "text",
+          className: "text-sm h-8",
+          value: config.label || "",
+          onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
+          placeholder: "e.g. Select date range"
+        }
+      )), /* @__PURE__ */ import_react20.default.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react20.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Start Placeholder"), /* @__PURE__ */ import_react20.default.createElement(
+        import_ui19.Input,
+        {
+          type: "text",
+          className: "text-sm h-8",
+          value: config.placeholderStart || "",
+          onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.placeholderStart", e.target.value),
+          placeholder: "Start date"
+        }
+      )), /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react20.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "End Placeholder"), /* @__PURE__ */ import_react20.default.createElement(
+        import_ui19.Input,
+        {
+          type: "text",
+          className: "text-sm h-8",
+          value: config.placeholderEnd || "",
+          onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.placeholderEnd", e.target.value),
+          placeholder: "End date"
+        }
+      ))), /* @__PURE__ */ import_react20.default.createElement("div", { className: "flex items-center gap-2 pt-1" }, /* @__PURE__ */ import_react20.default.createElement(
+        import_ui19.Checkbox,
+        {
+          id: "date-range-enable-time",
+          checked: !!config.enableTime,
+          onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
+        }
+      ), /* @__PURE__ */ import_react20.default.createElement(import_ui19.Label, { htmlFor: "date-range-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ import_react20.default.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react20.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Default Start"), /* @__PURE__ */ import_react20.default.createElement(
+        TemplateAutocompleteInput_default,
+        {
+          value: config.defaultStart || "",
+          onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.defaultStart", val),
+          placeholder: "e.g. {{state.variables.startDate}}",
+          suggestions
+        }
+      )), /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react20.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Default End"), /* @__PURE__ */ import_react20.default.createElement(
+        TemplateAutocompleteInput_default,
+        {
+          value: config.defaultEnd || "",
+          onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.defaultEnd", val),
+          placeholder: "e.g. {{state.variables.endDate}}",
+          suggestions
+        }
+      ))));
+    };
+    DateRangePickerConfigEditor.propTypes = {
+      widgetEditorForm: import_prop_types18.default.object.isRequired,
+      stateTree: import_prop_types18.default.object
     };
   }
 });
 
 // src/button/buttonWidget.jsx
-var import_react19, import_prop_types18, import_ui18, ButtonWidget;
+var import_react21, import_prop_types19, import_ui20, ButtonWidget;
 var init_buttonWidget = __esm({
   "src/button/buttonWidget.jsx"() {
-    import_react19 = __toESM(require("react"));
-    import_prop_types18 = __toESM(require("prop-types"));
-    import_ui18 = require("@jet-admin/ui");
+    import_react21 = __toESM(require("react"));
+    import_prop_types19 = __toESM(require("prop-types"));
+    import_ui20 = require("@jet-admin/ui");
     ButtonWidget = ({
       widgetTitle,
       // Title of the widget (optional usage here)
@@ -1241,7 +1556,7 @@ var init_buttonWidget = __esm({
       isLoadingWorkflows
       // Loading state of the workflow
     }) => {
-      const [loading, setLoading] = (0, import_react19.useState)(false);
+      const [loading, setLoading] = (0, import_react21.useState)(false);
       const text = widgetConfig?.text || "Click Me";
       const variant = widgetConfig?.variant || "default";
       const size = widgetConfig?.size || "default";
@@ -1255,8 +1570,8 @@ var init_buttonWidget = __esm({
           }
         }
       };
-      return /* @__PURE__ */ import_react19.default.createElement(
-        import_ui18.Button,
+      return /* @__PURE__ */ import_react21.default.createElement(
+        import_ui20.Button,
         {
           variant,
           size,
@@ -1264,16 +1579,16 @@ var init_buttonWidget = __esm({
           disabled: loading || isLoadingWorkflows,
           className: "!w-full !h-full rounded-none flex items-center justify-center text-center px-4 border-0"
         },
-        (loading || isLoadingWorkflows) && /* @__PURE__ */ import_react19.default.createElement(import_ui18.Spinner, { className: "mr-2 h-4 w-4" }),
+        (loading || isLoadingWorkflows) && /* @__PURE__ */ import_react21.default.createElement(import_ui20.Spinner, { className: "mr-2 h-4 w-4" }),
         text
       );
     };
     ButtonWidget.propTypes = {
-      widgetTitle: import_prop_types18.default.string,
-      widgetType: import_prop_types18.default.string,
-      widgetConfig: import_prop_types18.default.object,
-      onClick: import_prop_types18.default.func,
-      isLoadingWorkflows: import_prop_types18.default.bool
+      widgetTitle: import_prop_types19.default.string,
+      widgetType: import_prop_types19.default.string,
+      widgetConfig: import_prop_types19.default.object,
+      onClick: import_prop_types19.default.func,
+      isLoadingWorkflows: import_prop_types19.default.bool
     };
   }
 });
@@ -1305,11 +1620,11 @@ var init_table = __esm({
 });
 
 // src/text/textWidget.jsx
-var import_react20, import_prop_types19, parseMarkdown, inlineFormat, TextWidget;
+var import_react22, import_prop_types20, parseMarkdown, inlineFormat, TextWidget;
 var init_textWidget = __esm({
   "src/text/textWidget.jsx"() {
-    import_react20 = __toESM(require("react"));
-    import_prop_types19 = __toESM(require("prop-types"));
+    import_react22 = __toESM(require("react"));
+    import_prop_types20 = __toESM(require("prop-types"));
     parseMarkdown = (md) => {
       if (!md) return "";
       let html = md;
@@ -1395,15 +1710,15 @@ var init_textWidget = __esm({
       data
     }) => {
       const content = widgetConfig?.content || "";
-      const format = widgetConfig?.format || "markdown";
+      const format3 = widgetConfig?.format || "markdown";
       const textAlign = widgetConfig?.textAlign || "left";
       const fontSize = widgetConfig?.fontSize || "sm";
-      const renderedHTML = (0, import_react20.useMemo)(() => {
-        if (format === "plain") {
+      const renderedHTML = (0, import_react22.useMemo)(() => {
+        if (format3 === "plain") {
           return content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />");
         }
         return parseMarkdown(content);
-      }, [content, format]);
+      }, [content, format3]);
       const fontSizeClass = {
         xs: "text-xs",
         sm: "text-sm",
@@ -1411,13 +1726,13 @@ var init_textWidget = __esm({
         lg: "text-lg",
         xl: "text-xl"
       }[fontSize] || "text-sm";
-      return /* @__PURE__ */ import_react20.default.createElement(
+      return /* @__PURE__ */ import_react22.default.createElement(
         "div",
         {
           className: `jet-md-root w-full h-full overflow-auto p-3 ${fontSizeClass}`,
           style: { textAlign }
         },
-        /* @__PURE__ */ import_react20.default.createElement("style", null, `
+        /* @__PURE__ */ import_react22.default.createElement("style", null, `
         .jet-md-root { color: var(--foreground, hsl(0 0% 98%)); line-height: 1.65; }
         .jet-md-h1 { font-size: 1.5em; font-weight: 700; margin: 0.6em 0 0.3em; color: var(--foreground); }
         .jet-md-h2 { font-size: 1.3em; font-weight: 700; margin: 0.5em 0 0.25em; color: var(--foreground); }
@@ -1435,12 +1750,12 @@ var init_textWidget = __esm({
         .jet-md-list li { margin: 0.15em 0; }
         .jet-md-img { max-width: 100%; border-radius: 6px; margin: 0.5em 0; }
       `),
-        /* @__PURE__ */ import_react20.default.createElement("div", { dangerouslySetInnerHTML: { __html: renderedHTML } })
+        /* @__PURE__ */ import_react22.default.createElement("div", { dangerouslySetInnerHTML: { __html: renderedHTML } })
       );
     };
     TextWidget.propTypes = {
-      widgetConfig: import_prop_types19.default.object,
-      data: import_prop_types19.default.any
+      widgetConfig: import_prop_types20.default.object,
+      data: import_prop_types20.default.any
     };
   }
 });
@@ -1457,12 +1772,12 @@ var init_text = __esm({
 });
 
 // src/stat/statWidget.jsx
-var import_react21, import_prop_types20, import_lucide_react9, StatWidget;
+var import_react23, import_prop_types21, import_lucide_react8, StatWidget;
 var init_statWidget = __esm({
   "src/stat/statWidget.jsx"() {
-    import_react21 = __toESM(require("react"));
-    import_prop_types20 = __toESM(require("prop-types"));
-    import_lucide_react9 = require("lucide-react");
+    import_react23 = __toESM(require("react"));
+    import_prop_types21 = __toESM(require("prop-types"));
+    import_lucide_react8 = require("lucide-react");
     StatWidget = ({
       widgetConfig,
       data
@@ -1474,7 +1789,7 @@ var init_statWidget = __esm({
       const rawTrend = widgetConfig?.trendTemplate ?? "";
       const trendDirection = widgetConfig?.trendDirection || "up-is-good";
       const align = widgetConfig?.textAlign || "center";
-      const displayValue = (0, import_react21.useMemo)(() => {
+      const displayValue = (0, import_react23.useMemo)(() => {
         if (rawValue === "" || rawValue === null || rawValue === void 0) return "\u2014";
         const num = Number(rawValue);
         if (!isNaN(num) && typeof rawValue !== "boolean") {
@@ -1482,7 +1797,7 @@ var init_statWidget = __esm({
         }
         return String(rawValue);
       }, [rawValue]);
-      const trend = (0, import_react21.useMemo)(() => {
+      const trend = (0, import_react23.useMemo)(() => {
         if (rawTrend === "" || rawTrend === null || rawTrend === void 0) return null;
         const num = parseFloat(rawTrend);
         if (isNaN(num)) return { value: rawTrend, direction: "neutral" };
@@ -1491,7 +1806,7 @@ var init_statWidget = __esm({
           direction: num > 0 ? "up" : num < 0 ? "down" : "neutral"
         };
       }, [rawTrend]);
-      const trendColor = (0, import_react21.useMemo)(() => {
+      const trendColor = (0, import_react23.useMemo)(() => {
         if (!trend) return "";
         const { direction } = trend;
         if (direction === "neutral") return "text-muted-foreground";
@@ -1500,21 +1815,21 @@ var init_statWidget = __esm({
         }
         return direction === "down" ? "text-emerald-500" : "text-red-500";
       }, [trend, trendDirection]);
-      const TrendIcon = trend?.direction === "up" ? import_lucide_react9.TrendingUp : trend?.direction === "down" ? import_lucide_react9.TrendingDown : import_lucide_react9.Minus;
-      return /* @__PURE__ */ import_react21.default.createElement(
+      const TrendIcon = trend?.direction === "up" ? import_lucide_react8.TrendingUp : trend?.direction === "down" ? import_lucide_react8.TrendingDown : import_lucide_react8.Minus;
+      return /* @__PURE__ */ import_react23.default.createElement(
         "div",
         {
           className: "flex flex-col items-center justify-center w-full h-full p-4 gap-1",
           style: { textAlign: align, alignItems: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start" }
         },
-        /* @__PURE__ */ import_react21.default.createElement("span", { className: "text-xs font-medium text-muted-foreground uppercase tracking-wider leading-none" }, label),
-        /* @__PURE__ */ import_react21.default.createElement("div", { className: "flex items-baseline gap-1" }, prefix && /* @__PURE__ */ import_react21.default.createElement("span", { className: "text-lg font-medium text-muted-foreground" }, prefix), /* @__PURE__ */ import_react21.default.createElement("span", { className: "text-3xl font-bold text-foreground tabular-nums tracking-tight" }, displayValue), suffix && /* @__PURE__ */ import_react21.default.createElement("span", { className: "text-lg font-medium text-muted-foreground" }, suffix)),
-        trend && /* @__PURE__ */ import_react21.default.createElement("div", { className: `flex items-center gap-1 mt-0.5 ${trendColor}` }, /* @__PURE__ */ import_react21.default.createElement(TrendIcon, { className: "h-3.5 w-3.5" }), /* @__PURE__ */ import_react21.default.createElement("span", { className: "text-xs font-semibold" }, trend.value))
+        /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-xs font-medium text-muted-foreground uppercase tracking-wider leading-none" }, label),
+        /* @__PURE__ */ import_react23.default.createElement("div", { className: "flex items-baseline gap-1" }, prefix && /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-lg font-medium text-muted-foreground" }, prefix), /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-3xl font-bold text-foreground tabular-nums tracking-tight" }, displayValue), suffix && /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-lg font-medium text-muted-foreground" }, suffix)),
+        trend && /* @__PURE__ */ import_react23.default.createElement("div", { className: `flex items-center gap-1 mt-0.5 ${trendColor}` }, /* @__PURE__ */ import_react23.default.createElement(TrendIcon, { className: "h-3.5 w-3.5" }), /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-xs font-semibold" }, trend.value))
       );
     };
     StatWidget.propTypes = {
-      widgetConfig: import_prop_types20.default.object,
-      data: import_prop_types20.default.any
+      widgetConfig: import_prop_types21.default.object,
+      data: import_prop_types21.default.any
     };
   }
 });
@@ -1531,18 +1846,18 @@ var init_stat = __esm({
 });
 
 // src/alert/alertWidget.jsx
-var import_react22, import_prop_types21, import_lucide_react10, import_ui19, AlertWidget;
+var import_react24, import_prop_types22, import_lucide_react9, import_ui21, AlertWidget;
 var init_alertWidget = __esm({
   "src/alert/alertWidget.jsx"() {
-    import_react22 = __toESM(require("react"));
-    import_prop_types21 = __toESM(require("prop-types"));
-    import_lucide_react10 = require("lucide-react");
-    import_ui19 = require("@jet-admin/ui");
+    import_react24 = __toESM(require("react"));
+    import_prop_types22 = __toESM(require("prop-types"));
+    import_lucide_react9 = require("lucide-react");
+    import_ui21 = require("@jet-admin/ui");
     AlertWidget = ({
       widgetConfig,
       fireWidgetEvent
     }) => {
-      const [dismissed, setDismissed] = (0, import_react22.useState)(false);
+      const [dismissed, setDismissed] = (0, import_react24.useState)(false);
       const message = widgetConfig?.message || "Something requires your attention.";
       const title = widgetConfig?.title || "";
       const variant = widgetConfig?.variant || "info";
@@ -1555,27 +1870,27 @@ var init_alertWidget = __esm({
         }
       };
       const IconMap = {
-        info: import_lucide_react10.Info,
-        success: import_lucide_react10.CheckCircle,
-        warning: import_lucide_react10.AlertTriangle,
-        error: import_lucide_react10.AlertCircle
+        info: import_lucide_react9.Info,
+        success: import_lucide_react9.CheckCircle,
+        warning: import_lucide_react9.AlertTriangle,
+        error: import_lucide_react9.AlertCircle
       };
-      const Icon = IconMap[variant] || import_lucide_react10.Info;
+      const Icon = IconMap[variant] || import_lucide_react9.Info;
       const styles = {
         info: "bg-blue-500/10 border-blue-500/20 text-blue-400",
         success: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
         warning: "bg-amber-500/10 border-amber-500/20 text-amber-400",
         error: "bg-rose-500/10 border-rose-500/20 text-rose-400"
       }[variant] || "bg-blue-500/10 border-blue-500/20 text-blue-400";
-      return /* @__PURE__ */ import_react22.default.createElement(
+      return /* @__PURE__ */ import_react24.default.createElement(
         "div",
         {
           className: `flex items-start gap-3 p-3.5 border rounded-none w-full h-full min-h-0 overflow-auto relative ${styles}`
         },
-        /* @__PURE__ */ import_react22.default.createElement(Icon, { className: "h-5 w-5 shrink-0 mt-0.5" }),
-        /* @__PURE__ */ import_react22.default.createElement("div", { className: "flex-1 min-w-0" }, title && /* @__PURE__ */ import_react22.default.createElement("h5", { className: "text-sm font-semibold mb-1 leading-none text-current" }, title), /* @__PURE__ */ import_react22.default.createElement("p", { className: "text-xs leading-relaxed text-current/80" }, message)),
-        dismissible && /* @__PURE__ */ import_react22.default.createElement(
-          import_ui19.Button,
+        /* @__PURE__ */ import_react24.default.createElement(Icon, { className: "h-5 w-5 shrink-0 mt-0.5" }),
+        /* @__PURE__ */ import_react24.default.createElement("div", { className: "flex-1 min-w-0" }, title && /* @__PURE__ */ import_react24.default.createElement("h5", { className: "text-sm font-semibold mb-1 leading-none text-current" }, title), /* @__PURE__ */ import_react24.default.createElement("p", { className: "text-xs leading-relaxed text-current/80" }, message)),
+        dismissible && /* @__PURE__ */ import_react24.default.createElement(
+          import_ui21.Button,
           {
             variant: "ghost",
             size: "icon",
@@ -1583,13 +1898,13 @@ var init_alertWidget = __esm({
             onClick: handleDismiss,
             "aria-label": "Dismiss alert"
           },
-          /* @__PURE__ */ import_react22.default.createElement(import_lucide_react10.X, { className: "h-4 w-4" })
+          /* @__PURE__ */ import_react24.default.createElement(import_lucide_react9.X, { className: "h-4 w-4" })
         )
       );
     };
     AlertWidget.propTypes = {
-      widgetConfig: import_prop_types21.default.object,
-      fireWidgetEvent: import_prop_types21.default.func
+      widgetConfig: import_prop_types22.default.object,
+      fireWidgetEvent: import_prop_types22.default.func
     };
   }
 });
@@ -1606,12 +1921,12 @@ var init_alert = __esm({
 });
 
 // src/form/formWidget.jsx
-var import_react23, import_prop_types22, import_ui20, FormWidget;
+var import_react25, import_prop_types23, import_ui22, FormWidget;
 var init_formWidget = __esm({
   "src/form/formWidget.jsx"() {
-    import_react23 = __toESM(require("react"));
-    import_prop_types22 = __toESM(require("prop-types"));
-    import_ui20 = require("@jet-admin/ui");
+    import_react25 = __toESM(require("react"));
+    import_prop_types23 = __toESM(require("prop-types"));
+    import_ui22 = require("@jet-admin/ui");
     FormWidget = ({
       widgetConfig,
       fireWidgetEvent
@@ -1620,8 +1935,8 @@ var init_formWidget = __esm({
       const submitLabel = widgetConfig?.submitLabel || "Submit";
       const size = widgetConfig?.size || "default";
       const showReset = widgetConfig?.showReset ?? false;
-      const [formData, setFormData] = (0, import_react23.useState)({});
-      (0, import_react23.useEffect)(() => {
+      const [formData, setFormData] = (0, import_react25.useState)({});
+      (0, import_react25.useEffect)(() => {
         const defaults = {};
         fields.forEach((field) => {
           if (field.key) {
@@ -1659,44 +1974,44 @@ var init_formWidget = __esm({
         setFormData(defaults);
       };
       if (fields.length === 0) {
-        return /* @__PURE__ */ import_react23.default.createElement("div", { className: "flex items-center justify-center w-full h-full p-4 border border-dashed border-border bg-muted/20 text-muted-foreground text-xs text-center" }, "No fields configured in form properties.");
+        return /* @__PURE__ */ import_react25.default.createElement("div", { className: "flex items-center justify-center w-full h-full p-4 border border-dashed border-border bg-muted/20 text-muted-foreground text-xs text-center" }, "No fields configured in form properties.");
       }
       const formSizeClass = {
         sm: "space-y-2.5 p-3 text-xs",
         default: "space-y-4 p-4 text-sm",
         lg: "space-y-5.5 p-5 text-base"
       }[size] || "space-y-4 p-4 text-sm";
-      return /* @__PURE__ */ import_react23.default.createElement(
+      return /* @__PURE__ */ import_react25.default.createElement(
         "form",
         {
           onSubmit: handleSubmit,
           className: `w-full h-full overflow-auto flex flex-col justify-between ${formSizeClass}`
         },
-        /* @__PURE__ */ import_react23.default.createElement("div", { className: "space-y-3.5" }, fields.map((field, idx) => {
+        /* @__PURE__ */ import_react25.default.createElement("div", { className: "space-y-3.5" }, fields.map((field, idx) => {
           if (!field.key) return null;
           const fieldType = field.type || "text";
           const inputId = `form-field-${field.key}-${idx}`;
-          return /* @__PURE__ */ import_react23.default.createElement("div", { key: idx, className: "space-y-1.5" }, fieldType !== "checkbox" && /* @__PURE__ */ import_react23.default.createElement(import_ui20.Label, { htmlFor: inputId, className: "text-xs font-semibold text-foreground" }, field.label || field.key, field.required && /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-rose-500 ml-0.5" }, "*")), fieldType === "select" ? /* @__PURE__ */ import_react23.default.createElement(
-            import_ui20.Select,
+          return /* @__PURE__ */ import_react25.default.createElement("div", { key: idx, className: "space-y-1.5" }, fieldType !== "checkbox" && /* @__PURE__ */ import_react25.default.createElement(import_ui22.Label, { htmlFor: inputId, className: "text-xs font-semibold text-foreground" }, field.label || field.key, field.required && /* @__PURE__ */ import_react25.default.createElement("span", { className: "text-rose-500 ml-0.5" }, "*")), fieldType === "select" ? /* @__PURE__ */ import_react25.default.createElement(
+            import_ui22.Select,
             {
               value: String(formData[field.key] ?? ""),
               onValueChange: (val) => handleFieldChange(field.key, val)
             },
-            /* @__PURE__ */ import_react23.default.createElement(import_ui20.SelectTrigger, { id: inputId, className: "w-full text-xs" }, /* @__PURE__ */ import_react23.default.createElement(import_ui20.SelectValue, { placeholder: field.placeholder || "Select option..." })),
-            /* @__PURE__ */ import_react23.default.createElement(import_ui20.SelectContent, null, (field.options || []).map((opt, oIdx) => {
+            /* @__PURE__ */ import_react25.default.createElement(import_ui22.SelectTrigger, { id: inputId, className: "w-full text-xs" }, /* @__PURE__ */ import_react25.default.createElement(import_ui22.SelectValue, { placeholder: field.placeholder || "Select option..." })),
+            /* @__PURE__ */ import_react25.default.createElement(import_ui22.SelectContent, null, (field.options || []).map((opt, oIdx) => {
               const val = typeof opt === "object" ? opt.value : opt;
               const lbl = typeof opt === "object" ? opt.label : opt;
-              return /* @__PURE__ */ import_react23.default.createElement(import_ui20.SelectItem, { key: oIdx, value: String(val) }, lbl);
+              return /* @__PURE__ */ import_react25.default.createElement(import_ui22.SelectItem, { key: oIdx, value: String(val) }, lbl);
             }))
-          ) : fieldType === "checkbox" ? /* @__PURE__ */ import_react23.default.createElement("div", { className: "flex items-center gap-2 py-1" }, /* @__PURE__ */ import_react23.default.createElement(
-            import_ui20.Checkbox,
+          ) : fieldType === "checkbox" ? /* @__PURE__ */ import_react25.default.createElement("div", { className: "flex items-center gap-2 py-1" }, /* @__PURE__ */ import_react25.default.createElement(
+            import_ui22.Checkbox,
             {
               id: inputId,
               checked: !!formData[field.key],
               onCheckedChange: (checked) => handleFieldChange(field.key, !!checked)
             }
-          ), /* @__PURE__ */ import_react23.default.createElement(import_ui20.Label, { htmlFor: inputId, className: "text-xs text-muted-foreground cursor-pointer" }, field.label || field.key, field.required && /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-rose-500 ml-0.5" }, "*"))) : /* @__PURE__ */ import_react23.default.createElement(
-            import_ui20.Input,
+          ), /* @__PURE__ */ import_react25.default.createElement(import_ui22.Label, { htmlFor: inputId, className: "text-xs text-muted-foreground cursor-pointer" }, field.label || field.key, field.required && /* @__PURE__ */ import_react25.default.createElement("span", { className: "text-rose-500 ml-0.5" }, "*"))) : /* @__PURE__ */ import_react25.default.createElement(
+            import_ui22.Input,
             {
               id: inputId,
               type: fieldType,
@@ -1708,8 +2023,8 @@ var init_formWidget = __esm({
             }
           ));
         })),
-        /* @__PURE__ */ import_react23.default.createElement("div", { className: "flex items-center justify-end gap-2 pt-4 border-t border-border/40 mt-4" }, showReset && /* @__PURE__ */ import_react23.default.createElement(
-          import_ui20.Button,
+        /* @__PURE__ */ import_react25.default.createElement("div", { className: "flex items-center justify-end gap-2 pt-4 border-t border-border/40 mt-4" }, showReset && /* @__PURE__ */ import_react25.default.createElement(
+          import_ui22.Button,
           {
             type: "button",
             variant: "outline",
@@ -1717,8 +2032,8 @@ var init_formWidget = __esm({
             onClick: handleReset
           },
           "Reset"
-        ), /* @__PURE__ */ import_react23.default.createElement(
-          import_ui20.Button,
+        ), /* @__PURE__ */ import_react25.default.createElement(
+          import_ui22.Button,
           {
             type: "submit",
             className: "h-8 text-xs font-semibold px-4 bg-primary text-primary-foreground hover:bg-primary/95"
@@ -1728,8 +2043,8 @@ var init_formWidget = __esm({
       );
     };
     FormWidget.propTypes = {
-      widgetConfig: import_prop_types22.default.object,
-      fireWidgetEvent: import_prop_types22.default.func
+      widgetConfig: import_prop_types23.default.object,
+      fireWidgetEvent: import_prop_types23.default.func
     };
   }
 });
@@ -1746,12 +2061,12 @@ var init_form = __esm({
 });
 
 // src/image/imageWidget.jsx
-var import_react24, import_prop_types23, import_lucide_react11, ImageWidget;
+var import_react26, import_prop_types24, import_lucide_react10, ImageWidget;
 var init_imageWidget = __esm({
   "src/image/imageWidget.jsx"() {
-    import_react24 = __toESM(require("react"));
-    import_prop_types23 = __toESM(require("prop-types"));
-    import_lucide_react11 = require("lucide-react");
+    import_react26 = __toESM(require("react"));
+    import_prop_types24 = __toESM(require("prop-types"));
+    import_lucide_react10 = require("lucide-react");
     ImageWidget = ({
       widgetConfig,
       fireWidgetEvent
@@ -1766,7 +2081,7 @@ var init_imageWidget = __esm({
         }
       };
       if (!src) {
-        return /* @__PURE__ */ import_react24.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full p-4 border border-dashed border-border bg-muted/20 text-muted-foreground text-xs gap-1.5" }, /* @__PURE__ */ import_react24.default.createElement(import_lucide_react11.Image, { className: "h-5 w-5 opacity-60" }), /* @__PURE__ */ import_react24.default.createElement("span", null, "No image URL configured"));
+        return /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full p-4 border border-dashed border-border bg-muted/20 text-muted-foreground text-xs gap-1.5" }, /* @__PURE__ */ import_react26.default.createElement(import_lucide_react10.Image, { className: "h-5 w-5 opacity-60" }), /* @__PURE__ */ import_react26.default.createElement("span", null, "No image URL configured"));
       }
       const radiusClass = {
         none: "rounded-none",
@@ -1775,7 +2090,7 @@ var init_imageWidget = __esm({
         lg: "rounded-lg",
         full: "rounded-full"
       }[borderRadius] || "rounded-none";
-      return /* @__PURE__ */ import_react24.default.createElement("div", { className: "w-full h-full relative overflow-hidden flex items-center justify-center p-1 bg-transparent" }, /* @__PURE__ */ import_react24.default.createElement(
+      return /* @__PURE__ */ import_react26.default.createElement("div", { className: "w-full h-full relative overflow-hidden flex items-center justify-center p-1 bg-transparent" }, /* @__PURE__ */ import_react26.default.createElement(
         "img",
         {
           src,
@@ -1787,8 +2102,8 @@ var init_imageWidget = __esm({
       ));
     };
     ImageWidget.propTypes = {
-      widgetConfig: import_prop_types23.default.object,
-      fireWidgetEvent: import_prop_types23.default.func
+      widgetConfig: import_prop_types24.default.object,
+      fireWidgetEvent: import_prop_types24.default.func
     };
   }
 });
@@ -1805,12 +2120,12 @@ var init_image = __esm({
 });
 
 // src/iframe/iframeWidget.jsx
-var import_react25, import_prop_types24, import_lucide_react12, IframeWidget;
+var import_react27, import_prop_types25, import_lucide_react11, IframeWidget;
 var init_iframeWidget = __esm({
   "src/iframe/iframeWidget.jsx"() {
-    import_react25 = __toESM(require("react"));
-    import_prop_types24 = __toESM(require("prop-types"));
-    import_lucide_react12 = require("lucide-react");
+    import_react27 = __toESM(require("react"));
+    import_prop_types25 = __toESM(require("prop-types"));
+    import_lucide_react11 = require("lucide-react");
     IframeWidget = ({
       widgetConfig
     }) => {
@@ -1820,7 +2135,7 @@ var init_iframeWidget = __esm({
       const allowForms = widgetConfig?.allowForms ?? true;
       const allowPopups = widgetConfig?.allowPopups ?? false;
       if (!url) {
-        return /* @__PURE__ */ import_react25.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full p-4 border border-dashed border-border bg-muted/20 text-muted-foreground text-xs gap-1.5" }, /* @__PURE__ */ import_react25.default.createElement(import_lucide_react12.Globe, { className: "h-5 w-5 opacity-60" }), /* @__PURE__ */ import_react25.default.createElement("span", null, "No iframe URL configured"));
+        return /* @__PURE__ */ import_react27.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full p-4 border border-dashed border-border bg-muted/20 text-muted-foreground text-xs gap-1.5" }, /* @__PURE__ */ import_react27.default.createElement(import_lucide_react11.Globe, { className: "h-5 w-5 opacity-60" }), /* @__PURE__ */ import_react27.default.createElement("span", null, "No iframe URL configured"));
       }
       const sandboxTokens = [];
       if (allowSameOrigin) sandboxTokens.push("allow-same-origin");
@@ -1828,7 +2143,7 @@ var init_iframeWidget = __esm({
       if (allowForms) sandboxTokens.push("allow-forms");
       if (allowPopups) sandboxTokens.push("allow-popups");
       const sandboxValue = sandboxTokens.join(" ");
-      return /* @__PURE__ */ import_react25.default.createElement("div", { className: "w-full h-full p-0 bg-background overflow-hidden relative" }, /* @__PURE__ */ import_react25.default.createElement(
+      return /* @__PURE__ */ import_react27.default.createElement("div", { className: "w-full h-full p-0 bg-background overflow-hidden relative" }, /* @__PURE__ */ import_react27.default.createElement(
         "iframe",
         {
           src: url,
@@ -1840,7 +2155,7 @@ var init_iframeWidget = __esm({
       ));
     };
     IframeWidget.propTypes = {
-      widgetConfig: import_prop_types24.default.object
+      widgetConfig: import_prop_types25.default.object
     };
   }
 });
@@ -1856,11 +2171,563 @@ var init_iframe = __esm({
   }
 });
 
+// src/_shared/calendarUtils.js
+function getCalendarDays(year, month) {
+  const date = new Date(year, month, 1);
+  const start = (0, import_date_fns.startOfWeek)((0, import_date_fns.startOfMonth)(date));
+  const end = (0, import_date_fns.endOfWeek)((0, import_date_fns.endOfMonth)(date));
+  return (0, import_date_fns.eachDayOfInterval)({ start, end });
+}
+function formatDateISO(date) {
+  if (!date || !(0, import_date_fns.isValid)(date)) return "";
+  return (0, import_date_fns.format)(date, "yyyy-MM-dd");
+}
+function formatDateTimeISO(date) {
+  if (!date || !(0, import_date_fns.isValid)(date)) return "";
+  return (0, import_date_fns.format)(date, "yyyy-MM-dd'T'HH:mm:ss");
+}
+function formatDisplayDate(date) {
+  if (!date || !(0, import_date_fns.isValid)(date)) return "";
+  return (0, import_date_fns.format)(date, "MMM d, yyyy");
+}
+function formatDisplayDateTime(date) {
+  if (!date || !(0, import_date_fns.isValid)(date)) return "";
+  return (0, import_date_fns.format)(date, "MMM d, yyyy \xB7 h:mm a");
+}
+function checkIsSameDay(a, b) {
+  if (!a || !b || !(0, import_date_fns.isValid)(a) || !(0, import_date_fns.isValid)(b)) return false;
+  return (0, import_date_fns.isSameDay)(a, b);
+}
+function checkIsInRange(date, start, end) {
+  if (!date || !start || !end || !(0, import_date_fns.isValid)(date) || !(0, import_date_fns.isValid)(start) || !(0, import_date_fns.isValid)(end)) return false;
+  return (0, import_date_fns.isWithinInterval)(date, { start, end });
+}
+function parseISOSafe(str) {
+  if (!str) return null;
+  const parsed = (0, import_date_fns.parseISO)(str);
+  return (0, import_date_fns.isValid)(parsed) ? parsed : null;
+}
+var import_date_fns;
+var init_calendarUtils = __esm({
+  "src/_shared/calendarUtils.js"() {
+    import_date_fns = require("date-fns");
+  }
+});
+
+// src/_shared/calendarGrid.jsx
+function CalendarGrid({
+  month,
+  year,
+  selectedDate,
+  rangeStart,
+  rangeEnd,
+  hoverDate,
+  onDayClick,
+  onDayHover,
+  onMonthChange,
+  showNavigation = true,
+  hideLeftArrow = false,
+  hideRightArrow = false
+}) {
+  const days = getCalendarDays(year, month);
+  const currentMonthDate = new Date(year, month, 1);
+  const today = /* @__PURE__ */ new Date();
+  return /* @__PURE__ */ import_react28.default.createElement("div", { className: "w-[252px]" }, showNavigation && /* @__PURE__ */ import_react28.default.createElement("div", { className: "flex justify-between items-center mb-4 px-1" }, !hideLeftArrow ? /* @__PURE__ */ import_react28.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => onMonthChange(-1),
+      className: "p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+    },
+    /* @__PURE__ */ import_react28.default.createElement(import_lucide_react12.ChevronLeft, { className: "w-4 h-4" })
+  ) : /* @__PURE__ */ import_react28.default.createElement("div", { className: "w-6 h-6" }), /* @__PURE__ */ import_react28.default.createElement("div", { className: "font-semibold text-sm" }, (0, import_date_fns2.format)(currentMonthDate, "MMMM yyyy")), !hideRightArrow ? /* @__PURE__ */ import_react28.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => onMonthChange(1),
+      className: "p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+    },
+    /* @__PURE__ */ import_react28.default.createElement(import_lucide_react12.ChevronRight, { className: "w-4 h-4" })
+  ) : /* @__PURE__ */ import_react28.default.createElement("div", { className: "w-6 h-6" })), /* @__PURE__ */ import_react28.default.createElement("div", { className: "grid grid-cols-7 gap-1 text-center mb-2" }, ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => /* @__PURE__ */ import_react28.default.createElement("div", { key: day, className: "text-xs text-muted-foreground font-medium" }, day))), /* @__PURE__ */ import_react28.default.createElement("div", { className: "grid grid-cols-7 gap-y-1 text-center" }, days.map((day, i) => {
+    const isCurrentMonth = (0, import_date_fns2.isSameMonth)(day, currentMonthDate);
+    const isSelected = checkIsSameDay(day, selectedDate);
+    const isStart = checkIsSameDay(day, rangeStart);
+    const isEnd = checkIsSameDay(day, rangeEnd);
+    const isRange = rangeStart && rangeEnd && checkIsInRange(day, rangeStart, rangeEnd);
+    const isHoverRange = rangeStart && !rangeEnd && hoverDate && checkIsInRange(day, rangeStart, hoverDate) && day > rangeStart;
+    const isToday = checkIsSameDay(day, today);
+    let bgClass = "";
+    let textClass = isCurrentMonth ? "text-foreground" : "text-muted-foreground/50";
+    let roundedClass = "rounded-md";
+    if (isSelected || isStart || isEnd) {
+      bgClass = "bg-primary";
+      textClass = "text-primary-foreground font-medium";
+      if (isStart && rangeEnd) roundedClass = "rounded-l-md rounded-r-none";
+      if (isEnd && rangeStart) roundedClass = "rounded-r-md rounded-l-none";
+    } else if (isRange || isHoverRange) {
+      bgClass = "bg-primary/20";
+      roundedClass = "rounded-none";
+    }
+    return /* @__PURE__ */ import_react28.default.createElement(
+      "button",
+      {
+        key: i,
+        type: "button",
+        onClick: () => onDayClick?.(day),
+        onMouseEnter: () => onDayHover?.(day),
+        className: `h-8 w-8 text-sm flex items-center justify-center ${bgClass} ${textClass} ${roundedClass} ${isToday && !isSelected && !isStart && !isEnd ? "border border-primary/50" : ""} hover:bg-primary/80 hover:text-primary-foreground transition-colors`
+      },
+      (0, import_date_fns2.format)(day, "d")
+    );
+  })));
+}
+var import_react28, import_lucide_react12, import_date_fns2;
+var init_calendarGrid = __esm({
+  "src/_shared/calendarGrid.jsx"() {
+    import_react28 = __toESM(require("react"));
+    import_lucide_react12 = require("lucide-react");
+    import_date_fns2 = require("date-fns");
+    init_calendarUtils();
+  }
+});
+
+// src/_shared/timeInput.jsx
+function TimeInput({ hours = 0, minutes = 0, seconds = 0, onChange }) {
+  const handleChange = (field, value) => {
+    let num = parseInt(value, 10);
+    if (isNaN(num)) num = 0;
+    if (field === "hours") {
+      if (num > 23) num = 0;
+      if (num < 0) num = 23;
+    } else {
+      if (num > 59) num = 0;
+      if (num < 0) num = 59;
+    }
+    onChange({ hours, minutes, seconds, [field]: num });
+  };
+  const handleKeyDown = (e, field, value) => {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      handleChange(field, value + 1);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      handleChange(field, value - 1);
+    }
+  };
+  const pad = (n) => String(n).padStart(2, "0");
+  return /* @__PURE__ */ import_react29.default.createElement("div", { className: "flex items-center gap-2 justify-center border-t border-border pt-3 mt-3" }, /* @__PURE__ */ import_react29.default.createElement(import_lucide_react13.Clock, { className: "w-4 h-4 text-muted-foreground mr-1" }), /* @__PURE__ */ import_react29.default.createElement(
+    import_ui23.Input,
+    {
+      type: "text",
+      value: pad(hours),
+      onChange: (e) => handleChange("hours", e.target.value),
+      onKeyDown: (e) => handleKeyDown(e, "hours", hours),
+      className: "w-12 h-8 text-center px-1"
+    }
+  ), /* @__PURE__ */ import_react29.default.createElement("span", { className: "text-muted-foreground" }, ":"), /* @__PURE__ */ import_react29.default.createElement(
+    import_ui23.Input,
+    {
+      type: "text",
+      value: pad(minutes),
+      onChange: (e) => handleChange("minutes", e.target.value),
+      onKeyDown: (e) => handleKeyDown(e, "minutes", minutes),
+      className: "w-12 h-8 text-center px-1"
+    }
+  ), /* @__PURE__ */ import_react29.default.createElement("span", { className: "text-muted-foreground" }, ":"), /* @__PURE__ */ import_react29.default.createElement(
+    import_ui23.Input,
+    {
+      type: "text",
+      value: pad(seconds),
+      onChange: (e) => handleChange("seconds", e.target.value),
+      onKeyDown: (e) => handleKeyDown(e, "seconds", seconds),
+      className: "w-12 h-8 text-center px-1"
+    }
+  ));
+}
+var import_react29, import_ui23, import_lucide_react13;
+var init_timeInput = __esm({
+  "src/_shared/timeInput.jsx"() {
+    import_react29 = __toESM(require("react"));
+    import_ui23 = require("@jet-admin/ui");
+    import_lucide_react13 = require("lucide-react");
+  }
+});
+
+// src/date-picker/datePickerWidget.jsx
+function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}, setWidgetState }) {
+  const [currentDate, setCurrentDate] = (0, import_react30.useState)(/* @__PURE__ */ new Date());
+  const parsedValue = (0, import_react30.useMemo)(() => parseISOSafe(widgetState?.value), [widgetState?.value]);
+  (0, import_react30.useEffect)(() => {
+    if (!widgetState?.value && widgetConfig.defaultValue) {
+      const parsed = parseISOSafe(widgetConfig.defaultValue);
+      if (parsed) {
+        updateState(parsed);
+      }
+    }
+  }, [widgetConfig.defaultValue, widgetState?.value]);
+  (0, import_react30.useEffect)(() => {
+    if (parsedValue) {
+      setCurrentDate(parsedValue);
+    }
+  }, [parsedValue]);
+  const updateState = (date) => {
+    if (!date) {
+      if (setWidgetState) {
+        setWidgetState({ value: "", date: "", time: "", isOpen: false });
+      }
+      if (fireWidgetEvent) {
+        fireWidgetEvent("onClear");
+        fireWidgetEvent("onChange", { value: "", date: "", time: "" });
+      }
+      return;
+    }
+    const enableTime = !!widgetConfig.enableTime;
+    const value = enableTime ? formatDateTimeISO(date) : formatDateISO(date);
+    const dateStr = formatDateISO(date);
+    const timeStr = enableTime ? formatDateTimeISO(date).split("T")[1] : "";
+    if (setWidgetState) {
+      setWidgetState({ value, date: dateStr, time: timeStr });
+    }
+    if (fireWidgetEvent) {
+      fireWidgetEvent("onChange", { value, date: dateStr, time: timeStr });
+    }
+  };
+  const handleDayClick = (day) => {
+    let newDate = day;
+    if (parsedValue && widgetConfig.enableTime) {
+      newDate = (0, import_date_fns3.setHours)(newDate, parsedValue.getHours());
+      newDate = (0, import_date_fns3.setMinutes)(newDate, parsedValue.getMinutes());
+      newDate = (0, import_date_fns3.setSeconds)(newDate, parsedValue.getSeconds());
+    }
+    updateState(newDate);
+    if (!widgetConfig.enableTime) {
+      if (setWidgetState) {
+        setWidgetState({ isOpen: false });
+      }
+      if (fireWidgetEvent) {
+        fireWidgetEvent("onClose");
+      }
+    }
+  };
+  const handleTimeChange = ({ hours, minutes, seconds }) => {
+    let newDate = parsedValue || /* @__PURE__ */ new Date();
+    newDate = (0, import_date_fns3.setHours)(newDate, hours);
+    newDate = (0, import_date_fns3.setMinutes)(newDate, minutes);
+    newDate = (0, import_date_fns3.setSeconds)(newDate, seconds);
+    updateState(newDate);
+  };
+  const displayValue = parsedValue ? widgetConfig.enableTime ? formatDisplayDateTime(parsedValue) : formatDisplayDate(parsedValue) : "";
+  return /* @__PURE__ */ import_react30.default.createElement("div", { className: "flex flex-col gap-1.5 w-full" }, widgetConfig.label && /* @__PURE__ */ import_react30.default.createElement(import_ui24.Label, null, widgetConfig.label), /* @__PURE__ */ import_react30.default.createElement(import_ui24.Popover, { open: !!widgetState?.isOpen, onOpenChange: (open) => {
+    if (setWidgetState) {
+      setWidgetState({ isOpen: open });
+    }
+    if (fireWidgetEvent) {
+      fireWidgetEvent(open ? "onOpen" : "onClose");
+    }
+  } }, /* @__PURE__ */ import_react30.default.createElement(import_ui24.PopoverTrigger, { asChild: true }, /* @__PURE__ */ import_react30.default.createElement("div", { className: "relative w-full" }, /* @__PURE__ */ import_react30.default.createElement(
+    import_ui24.Input,
+    {
+      readOnly: true,
+      placeholder: widgetConfig.placeholder || "Select date...",
+      value: displayValue,
+      className: "pl-9 pr-8 cursor-pointer"
+    }
+  ), /* @__PURE__ */ import_react30.default.createElement(import_lucide_react14.Calendar, { className: "absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" }), parsedValue && /* @__PURE__ */ import_react30.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: (e) => {
+        e.stopPropagation();
+        updateState(null);
+      },
+      className: "absolute right-2 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground flex items-center justify-center"
+    },
+    /* @__PURE__ */ import_react30.default.createElement(import_lucide_react14.X, { className: "h-4 w-4" })
+  ))), /* @__PURE__ */ import_react30.default.createElement(import_ui24.PopoverContent, { className: "w-auto p-3", align: "start" }, /* @__PURE__ */ import_react30.default.createElement(
+    CalendarGrid,
+    {
+      month: currentDate.getMonth(),
+      year: currentDate.getFullYear(),
+      selectedDate: parsedValue,
+      onDayClick: handleDayClick,
+      onMonthChange: (delta) => setCurrentDate((0, import_date_fns3.setMonth)(currentDate, currentDate.getMonth() + delta))
+    }
+  ), widgetConfig.enableTime && /* @__PURE__ */ import_react30.default.createElement(
+    TimeInput,
+    {
+      hours: parsedValue?.getHours() || 0,
+      minutes: parsedValue?.getMinutes() || 0,
+      seconds: parsedValue?.getSeconds() || 0,
+      onChange: handleTimeChange
+    }
+  ))));
+}
+var import_react30, import_prop_types26, import_ui24, import_lucide_react14, import_date_fns3;
+var init_datePickerWidget = __esm({
+  "src/date-picker/datePickerWidget.jsx"() {
+    import_react30 = __toESM(require("react"));
+    import_prop_types26 = __toESM(require("prop-types"));
+    import_ui24 = require("@jet-admin/ui");
+    import_lucide_react14 = require("lucide-react");
+    init_calendarGrid();
+    init_timeInput();
+    init_calendarUtils();
+    import_date_fns3 = require("date-fns");
+    DatePickerWidget.propTypes = {
+      widgetConfig: import_prop_types26.default.object,
+      fireWidgetEvent: import_prop_types26.default.func,
+      widgetState: import_prop_types26.default.object,
+      setWidgetState: import_prop_types26.default.func
+    };
+  }
+});
+
+// src/date-picker/index.js
+var date_picker_exports = {};
+__export(date_picker_exports, {
+  DatePickerConfigEditor: () => DatePickerConfigEditor,
+  DatePickerWidget: () => DatePickerWidget
+});
+var init_date_picker = __esm({
+  "src/date-picker/index.js"() {
+    init_datePickerWidget();
+    init_datePickerConfigEditor();
+  }
+});
+
+// src/date-range-picker/dateRangePickerWidget.jsx
+function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}, setWidgetState }) {
+  const [currentDate, setCurrentDate] = (0, import_react31.useState)(/* @__PURE__ */ new Date());
+  const [hoverDate, setHoverDate] = (0, import_react31.useState)(null);
+  const parsedStart = (0, import_react31.useMemo)(() => parseISOSafe(widgetState?.start), [widgetState?.start]);
+  const parsedEnd = (0, import_react31.useMemo)(() => parseISOSafe(widgetState?.end), [widgetState?.end]);
+  (0, import_react31.useEffect)(() => {
+    if (!widgetState?.start && !widgetState?.end && (widgetConfig.defaultStart || widgetConfig.defaultEnd)) {
+      const start = parseISOSafe(widgetConfig.defaultStart);
+      const end = parseISOSafe(widgetConfig.defaultEnd);
+      if (start || end) {
+        updateState(start, end);
+      }
+    }
+  }, [widgetConfig.defaultStart, widgetConfig.defaultEnd, widgetState?.start, widgetState?.end]);
+  (0, import_react31.useEffect)(() => {
+    if (parsedStart) {
+      setCurrentDate(parsedStart);
+    }
+  }, [parsedStart]);
+  const updateState = (start, end) => {
+    if (!start && !end) {
+      if (setWidgetState) {
+        setWidgetState({ start: "", end: "", startDate: "", endDate: "", isOpen: false });
+      }
+      if (fireWidgetEvent) {
+        fireWidgetEvent("onClear");
+        fireWidgetEvent("onChange", { start: "", end: "", startDate: "", endDate: "" });
+      }
+      return;
+    }
+    const enableTime = !!widgetConfig.enableTime;
+    const startVal = start ? enableTime ? formatDateTimeISO(start) : formatDateISO(start) : "";
+    const endVal = end ? enableTime ? formatDateTimeISO(end) : formatDateISO(end) : "";
+    const startDateStr = start ? formatDateISO(start) : "";
+    const endDateStr = end ? formatDateISO(end) : "";
+    if (setWidgetState) {
+      setWidgetState({ start: startVal, end: endVal, startDate: startDateStr, endDate: endDateStr });
+    }
+    if (start && end && fireWidgetEvent) {
+      fireWidgetEvent("onChange", { start: startVal, end: endVal, startDate: startDateStr, endDate: endDateStr });
+    }
+  };
+  const handleDayClick = (day) => {
+    if (!parsedStart || parsedStart && parsedEnd) {
+      let newStart = day;
+      if (parsedStart && widgetConfig.enableTime) {
+        newStart = (0, import_date_fns4.setHours)(newStart, parsedStart.getHours());
+        newStart = (0, import_date_fns4.setMinutes)(newStart, parsedStart.getMinutes());
+        newStart = (0, import_date_fns4.setSeconds)(newStart, parsedStart.getSeconds());
+      }
+      updateState(newStart, null);
+    } else {
+      let newEnd = day;
+      let newStart = parsedStart;
+      if (day < parsedStart) {
+        newEnd = parsedStart;
+        newStart = day;
+      }
+      if (widgetConfig.enableTime) {
+        newEnd = (0, import_date_fns4.setHours)(newEnd, parsedEnd ? parsedEnd.getHours() : 23);
+        newEnd = (0, import_date_fns4.setMinutes)(newEnd, parsedEnd ? parsedEnd.getMinutes() : 59);
+        newEnd = (0, import_date_fns4.setSeconds)(newEnd, parsedEnd ? parsedEnd.getSeconds() : 59);
+      }
+      updateState(newStart, newEnd);
+      if (!widgetConfig.enableTime) {
+        if (setWidgetState) {
+          setWidgetState({ isOpen: false });
+        }
+        if (fireWidgetEvent) {
+          fireWidgetEvent("onClose");
+        }
+      }
+    }
+  };
+  const handleTimeChange = (type, { hours, minutes, seconds }) => {
+    if (type === "start" && parsedStart) {
+      let newStart = (0, import_date_fns4.setHours)(parsedStart, hours);
+      newStart = (0, import_date_fns4.setMinutes)(newStart, minutes);
+      newStart = (0, import_date_fns4.setSeconds)(newStart, seconds);
+      updateState(newStart, parsedEnd);
+    } else if (type === "end" && parsedEnd) {
+      let newEnd = (0, import_date_fns4.setHours)(parsedEnd, hours);
+      newEnd = (0, import_date_fns4.setMinutes)(newEnd, minutes);
+      newEnd = (0, import_date_fns4.setSeconds)(newEnd, seconds);
+      updateState(parsedStart, newEnd);
+    }
+  };
+  const handlePresetClick = (preset) => {
+    const today = /* @__PURE__ */ new Date();
+    let start, end;
+    if (preset.startOffset === "startOfMonth") start = (0, import_date_fns4.startOfMonth)(today);
+    else if (preset.startOffset === "startOfYear") start = (0, import_date_fns4.startOfYear)(today);
+    else start = (0, import_date_fns4.addDays)(today, preset.startOffset || 0);
+    if (preset.endOffset === "endOfMonth") end = (0, import_date_fns4.endOfMonth)(today);
+    else if (preset.endOffset === "endOfYear") end = (0, import_date_fns4.endOfYear)(today);
+    else end = (0, import_date_fns4.addDays)(today, preset.endOffset || 0);
+    if (end) {
+      end = (0, import_date_fns4.setHours)(end, 23);
+      end = (0, import_date_fns4.setMinutes)(end, 59);
+      end = (0, import_date_fns4.setSeconds)(end, 59);
+    }
+    updateState(start, end);
+    if (setWidgetState) {
+      setWidgetState({ isOpen: false });
+    }
+    if (fireWidgetEvent) {
+      fireWidgetEvent("onClose");
+    }
+  };
+  const displayStart = parsedStart ? widgetConfig.enableTime ? formatDisplayDateTime(parsedStart) : formatDisplayDate(parsedStart) : "";
+  const displayEnd = parsedEnd ? widgetConfig.enableTime ? formatDisplayDateTime(parsedEnd) : formatDisplayDate(parsedEnd) : "";
+  const nextMonthDate = (0, import_date_fns4.setMonth)(new Date(currentDate), currentDate.getMonth() + 1);
+  return /* @__PURE__ */ import_react31.default.createElement("div", { className: "flex flex-col gap-1.5 w-full" }, widgetConfig.label && /* @__PURE__ */ import_react31.default.createElement(import_ui25.Label, null, widgetConfig.label), /* @__PURE__ */ import_react31.default.createElement(import_ui25.Popover, { open: !!widgetState?.isOpen, onOpenChange: (open) => {
+    if (setWidgetState) {
+      setWidgetState({ isOpen: open });
+    }
+    if (fireWidgetEvent) {
+      fireWidgetEvent(open ? "onOpen" : "onClose");
+    }
+  } }, /* @__PURE__ */ import_react31.default.createElement(import_ui25.PopoverTrigger, { asChild: true }, /* @__PURE__ */ import_react31.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react31.default.createElement("div", { className: "relative flex-1" }, /* @__PURE__ */ import_react31.default.createElement(
+    import_ui25.Input,
+    {
+      readOnly: true,
+      placeholder: widgetConfig.placeholderStart || "Start date",
+      value: displayStart,
+      className: "pl-9 cursor-pointer"
+    }
+  ), /* @__PURE__ */ import_react31.default.createElement(import_lucide_react15.CalendarRange, { className: "absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" })), /* @__PURE__ */ import_react31.default.createElement(import_lucide_react15.ArrowRight, { className: "h-4 w-4 text-muted-foreground shrink-0" }), /* @__PURE__ */ import_react31.default.createElement("div", { className: "relative flex-1" }, /* @__PURE__ */ import_react31.default.createElement(
+    import_ui25.Input,
+    {
+      readOnly: true,
+      placeholder: widgetConfig.placeholderEnd || "End date",
+      value: displayEnd,
+      className: "pl-9 pr-8 cursor-pointer"
+    }
+  ), /* @__PURE__ */ import_react31.default.createElement(import_lucide_react15.CalendarRange, { className: "absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" }), (parsedStart || parsedEnd) && /* @__PURE__ */ import_react31.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: (e) => {
+        e.stopPropagation();
+        updateState(null, null);
+      },
+      className: "absolute right-2 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground flex items-center justify-center"
+    },
+    /* @__PURE__ */ import_react31.default.createElement(import_lucide_react15.X, { className: "h-4 w-4" })
+  )))), /* @__PURE__ */ import_react31.default.createElement(import_ui25.PopoverContent, { className: "w-auto p-0 flex flex-col", align: "start" }, /* @__PURE__ */ import_react31.default.createElement("div", { className: "flex p-3 gap-4" }, /* @__PURE__ */ import_react31.default.createElement("div", { className: "flex flex-col" }, /* @__PURE__ */ import_react31.default.createElement(
+    CalendarGrid,
+    {
+      month: currentDate.getMonth(),
+      year: currentDate.getFullYear(),
+      rangeStart: parsedStart,
+      rangeEnd: parsedEnd,
+      hoverDate,
+      onDayClick: handleDayClick,
+      onDayHover: setHoverDate,
+      onMonthChange: (delta) => setCurrentDate((0, import_date_fns4.setMonth)(new Date(currentDate), currentDate.getMonth() + delta)),
+      hideRightArrow: true
+    }
+  ), widgetConfig.enableTime && parsedStart && /* @__PURE__ */ import_react31.default.createElement(
+    TimeInput,
+    {
+      hours: parsedStart.getHours(),
+      minutes: parsedStart.getMinutes(),
+      seconds: parsedStart.getSeconds(),
+      onChange: (time) => handleTimeChange("start", time)
+    }
+  )), /* @__PURE__ */ import_react31.default.createElement("div", { className: "flex flex-col" }, /* @__PURE__ */ import_react31.default.createElement(
+    CalendarGrid,
+    {
+      month: nextMonthDate.getMonth(),
+      year: nextMonthDate.getFullYear(),
+      rangeStart: parsedStart,
+      rangeEnd: parsedEnd,
+      hoverDate,
+      onDayClick: handleDayClick,
+      onDayHover: setHoverDate,
+      onMonthChange: (delta) => setCurrentDate((0, import_date_fns4.setMonth)(new Date(currentDate), currentDate.getMonth() + delta)),
+      hideLeftArrow: true
+    }
+  ), widgetConfig.enableTime && parsedEnd && /* @__PURE__ */ import_react31.default.createElement(
+    TimeInput,
+    {
+      hours: parsedEnd.getHours(),
+      minutes: parsedEnd.getMinutes(),
+      seconds: parsedEnd.getSeconds(),
+      onChange: (time) => handleTimeChange("end", time)
+    }
+  ))), widgetConfig.presets && widgetConfig.presets.length > 0 && /* @__PURE__ */ import_react31.default.createElement("div", { className: "border-t border-border p-3 flex flex-wrap gap-2 bg-muted/30" }, widgetConfig.presets.map((preset, i) => /* @__PURE__ */ import_react31.default.createElement(import_ui25.Button, { key: i, variant: "outline", size: "sm", onClick: () => handlePresetClick(preset) }, preset.label))))));
+}
+var import_react31, import_prop_types27, import_ui25, import_lucide_react15, import_date_fns4;
+var init_dateRangePickerWidget = __esm({
+  "src/date-range-picker/dateRangePickerWidget.jsx"() {
+    import_react31 = __toESM(require("react"));
+    import_prop_types27 = __toESM(require("prop-types"));
+    import_ui25 = require("@jet-admin/ui");
+    import_lucide_react15 = require("lucide-react");
+    init_calendarGrid();
+    init_timeInput();
+    init_calendarUtils();
+    import_date_fns4 = require("date-fns");
+    DateRangePickerWidget.propTypes = {
+      widgetConfig: import_prop_types27.default.object,
+      fireWidgetEvent: import_prop_types27.default.func,
+      widgetState: import_prop_types27.default.object,
+      setWidgetState: import_prop_types27.default.func
+    };
+  }
+});
+
+// src/date-range-picker/index.js
+var date_range_picker_exports = {};
+__export(date_range_picker_exports, {
+  DateRangePickerConfigEditor: () => DateRangePickerConfigEditor,
+  DateRangePickerWidget: () => DateRangePickerWidget
+});
+var init_date_range_picker = __esm({
+  "src/date-range-picker/index.js"() {
+    init_dateRangePickerWidget();
+    init_dateRangePickerConfigEditor();
+  }
+});
+
 // src/index.js
 var index_exports = {};
 __export(index_exports, {
   AlertConfigEditor: () => AlertConfigEditor,
   AlertWidget: () => AlertWidget,
+  DatePickerConfigEditor: () => DatePickerConfigEditor,
+  DatePickerWidget: () => DatePickerWidget,
+  DateRangePickerConfigEditor: () => DateRangePickerConfigEditor,
+  DateRangePickerWidget: () => DateRangePickerWidget,
   FormConfigEditor: () => FormConfigEditor,
   FormWidget: () => FormWidget,
   IframeConfigEditor: () => IframeConfigEditor,
@@ -1871,20 +2738,26 @@ __export(index_exports, {
   StatWidget: () => StatWidget,
   TableConfigEditor: () => TableConfigEditor,
   TableWidget: () => TableWidget,
+  TemplateAutocompleteInput: () => TemplateAutocompleteInput_default,
   TextConfigEditor: () => TextConfigEditor,
   TextWidget: () => TextWidget,
   VegaConfigEditor: () => VegaConfigEditor,
   VegaWidget: () => VegaWidget,
   WIDGETS_MAP: () => WIDGETS_MAP,
+  getAliasSuggestions: () => getAliasSuggestions,
   getDemoData: () => getDemoData,
+  getExpressionSuggestions: () => getExpressionSuggestions,
+  getMethodSuggestionsForTarget: () => getMethodSuggestionsForTarget,
+  getVariableKeySuggestions: () => getVariableKeySuggestions,
+  getWidgetIDSuggestions: () => getWidgetIDSuggestions,
   registerWidgets: () => registerWidgets
 });
 module.exports = __toCommonJS(index_exports);
 init_vega();
 
 // src/vega/vegaConfigEditor.jsx
-var import_react9 = __toESM(require("react"));
-var import_prop_types8 = __toESM(require("prop-types"));
+var import_react8 = __toESM(require("react"));
+var import_prop_types7 = __toESM(require("prop-types"));
 
 // src/vega/chartSpecParser.js
 var MARK_TO_CHART_TYPE = {
@@ -2054,271 +2927,18 @@ var parseStyle = (spec) => {
 };
 
 // src/vega/vegaConfigEditor.jsx
-var import_ui8 = require("@jet-admin/ui");
+var import_ui7 = require("@jet-admin/ui");
 
 // src/vega/vegaSpecEditor.jsx
-var import_react3 = __toESM(require("react"));
-var import_prop_types2 = __toESM(require("prop-types"));
-
-// src/vega/variableExplorer.jsx
 var import_react2 = __toESM(require("react"));
 var import_prop_types = __toESM(require("prop-types"));
+var import_template_engine = require("@jet-admin/template-engine");
 var import_ui = require("@jet-admin/ui");
 var import_lucide_react = require("lucide-react");
-var getCategoryIcon = (category) => {
-  switch (category) {
-    case "input":
-      return /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.ArrowRightToLine, { className: "w-3.5 h-3.5 text-emerald-500" });
-    case "nodeOutput":
-      return /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.GitMerge, { className: "w-3.5 h-3.5 text-primary" });
-    case "workflowOutput":
-      return /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.ArrowRightFromLine, { className: "w-3.5 h-3.5 text-purple-500" });
-    default:
-      return null;
-  }
-};
-var VariableItem = ({ variable, onSelect, isSelected }) => {
-  const [copied, setCopied] = (0, import_react2.useState)(false);
-  const handleCopy = (0, import_react2.useCallback)((e) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(variable.path);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }, [variable.path]);
-  const handleClick = (0, import_react2.useCallback)(() => {
-    if (onSelect) onSelect(variable.path, variable);
-  }, [onSelect, variable]);
-  return /* @__PURE__ */ import_react2.default.createElement(
-    "div",
-    {
-      onClick: handleClick,
-      className: `
-        flex items-center gap-2 py-1.5 px-2 cursor-pointer rounded-sm text-xs group
-        transition-colors
-        ${isSelected ? "bg-primary/10 text-primary border-l-2 border-primary" : "hover:bg-muted text-foreground"}
-      `
-    },
-    /* @__PURE__ */ import_react2.default.createElement("span", { className: "font-medium truncate flex-1" }, variable.name),
-    variable.nodeTitle && /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[10px] truncate max-w-[80px] text-muted-foreground" }, variable.nodeTitle),
-    /* @__PURE__ */ import_react2.default.createElement(
-      import_ui.Button,
-      {
-        onClick: handleCopy,
-        variant: "ghost",
-        size: "icon",
-        className: "h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity",
-        title: "Copy path",
-        type: "button"
-      },
-      copied ? /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.Check, { className: "w-3 h-3 text-emerald-500" }) : /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.Copy, { className: "w-3 h-3 text-muted-foreground" })
-    )
-  );
-};
-VariableItem.propTypes = {
-  variable: import_prop_types.default.shape({
-    path: import_prop_types.default.string.isRequired,
-    name: import_prop_types.default.string.isRequired,
-    type: import_prop_types.default.string,
-    description: import_prop_types.default.string
-  }).isRequired,
-  onSelect: import_prop_types.default.func,
-  isSelected: import_prop_types.default.bool
-};
-var VariableCategory = ({
-  category,
-  title,
-  variables,
-  onSelect,
-  selectedPath,
-  defaultExpanded = true
-}) => {
-  const [isExpanded, setIsExpanded] = (0, import_react2.useState)(defaultExpanded);
-  if (!variables || variables.length === 0) return null;
-  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-1" }, /* @__PURE__ */ import_react2.default.createElement(
-    "div",
-    {
-      onClick: () => setIsExpanded(!isExpanded),
-      className: "flex items-center gap-1.5 w-full px-2 py-1.5 rounded-sm cursor-pointer bg-muted/50 border border-border hover:bg-muted transition-colors"
-    },
-    isExpanded ? /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.ChevronDown, { className: "w-3 h-3 text-muted-foreground" }) : /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.ChevronRight, { className: "w-3 h-3 text-muted-foreground" }),
-    getCategoryIcon(category),
-    /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[11px] font-medium uppercase tracking-wide flex-1 text-muted-foreground" }, title),
-    /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[10px] px-1.5 py-0.5 rounded-sm bg-brand-dark border border-border text-muted-foreground" }, variables.length)
-  ), isExpanded && /* @__PURE__ */ import_react2.default.createElement("div", { className: "ml-3 mt-1 pl-2 border-l border-border" }, variables.map((variable) => /* @__PURE__ */ import_react2.default.createElement(
-    VariableItem,
-    {
-      key: variable.path,
-      variable,
-      onSelect,
-      isSelected: selectedPath === variable.path
-    }
-  ))));
-};
-VariableCategory.propTypes = {
-  category: import_prop_types.default.string.isRequired,
-  title: import_prop_types.default.string.isRequired,
-  variables: import_prop_types.default.array.isRequired,
-  onSelect: import_prop_types.default.func,
-  selectedPath: import_prop_types.default.string,
-  defaultExpanded: import_prop_types.default.bool
-};
-var extractWorkflowSchema = (workflow) => {
-  if (!workflow) return { inputs: [], nodeOutputs: [], workflowOutputs: [] };
-  const schema = { inputs: [], nodeOutputs: [], workflowOutputs: [] };
-  const args = workflow.workflowOptions?.args || workflow.inputs || [];
-  schema.inputs = args.map((arg) => ({
-    path: `{{ctx.input.${arg.name}}}`,
-    name: arg.name,
-    type: arg.type || "string",
-    description: arg.description || `Workflow input parameter: ${arg.name}`,
-    category: "input",
-    required: arg.required || false,
-    defaultValue: arg.defaultValue
-  }));
-  const nodes = workflow.nodes || [];
-  for (const node of nodes) {
-    const hasOutput = node.hasOutput !== void 0 ? node.hasOutput : node.outputVariable && node.type !== "start" && node.type !== "end";
-    if (hasOutput) {
-      const outputVar = node.outputVariable || node.data?.outputVariable;
-      const nodeTitle = node.title || node.data?.title || node.type;
-      schema.nodeOutputs.push({
-        path: `{{ctx.${outputVar}}}`,
-        name: outputVar,
-        type: getNodeOutputType(node.type),
-        description: `Output from ${nodeTitle} node`,
-        category: "nodeOutput",
-        nodeType: node.type,
-        nodeTitle,
-        nodeID: node.id
-      });
-    }
-  }
-  const outputs = workflow.outputs || [];
-  const endNode = nodes.find((n) => n.isEnd || n.type === "end");
-  const endOutputs = outputs.length > 0 ? outputs : endNode?.data?.outputs || [];
-  for (const output of endOutputs) {
-    if (output.name) {
-      schema.workflowOutputs.push({
-        path: `{{ctx.output.${output.name}}}`,
-        name: output.name,
-        type: output.type || "any",
-        description: `Workflow output: ${output.name}`,
-        category: "workflowOutput",
-        sourceVariable: output.value
-      });
-    }
-  }
-  if (schema.workflowOutputs.length === 0 && schema.nodeOutputs.length > 0) {
-    schema.workflowOutputs.push({
-      path: `{{ctx.output}}`,
-      name: "output",
-      type: "any",
-      description: "Final workflow output (from end node)",
-      category: "workflowOutput"
-    });
-  }
-  return schema;
-};
-var getNodeOutputType = (nodeType) => {
-  switch (nodeType) {
-    case "dataQuery":
-      return "object";
-    case "javascript":
-      return "any";
-    case "condition":
-      return "boolean";
-    case "restapi":
-      return "object";
-    case "loop":
-      return "array";
-    default:
-      return "any";
-  }
-};
-var VariableExplorer = ({
-  workflow,
-  context,
-  onSelect,
-  selectedPath = null,
-  title = "Workflow Variables",
-  showSearch = true,
-  className = ""
-}) => {
-  const [searchQuery, setSearchQuery] = (0, import_react2.useState)("");
-  const schema = (0, import_react2.useMemo)(() => extractWorkflowSchema(workflow), [workflow]);
-  const allVariables = (0, import_react2.useMemo)(() => ({
-    inputs: [...schema.inputs],
-    nodeOutputs: [...schema.nodeOutputs],
-    workflowOutputs: [...schema.workflowOutputs]
-  }), [schema]);
-  const filteredVariables = (0, import_react2.useMemo)(() => {
-    if (!searchQuery) return allVariables;
-    const q = searchQuery.toLowerCase();
-    return {
-      inputs: allVariables.inputs.filter((v) => v.path.toLowerCase().includes(q) || v.name.toLowerCase().includes(q)),
-      nodeOutputs: allVariables.nodeOutputs.filter((v) => v.path.toLowerCase().includes(q) || v.name.toLowerCase().includes(q) || v.nodeTitle?.toLowerCase().includes(q)),
-      workflowOutputs: allVariables.workflowOutputs.filter((v) => v.path.toLowerCase().includes(q) || v.name.toLowerCase().includes(q))
-    };
-  }, [allVariables, searchQuery]);
-  const hasVariables = schema.inputs.length > 0 || schema.nodeOutputs.length > 0 || schema.workflowOutputs.length > 0;
-  return /* @__PURE__ */ import_react2.default.createElement("div", { className: `flex flex-col rounded-md border border-border bg-brand-dark ${className}` }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 rounded-t-lg border-b border-border bg-muted/50" }, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "text-xs font-medium text-muted-foreground" }, title)), showSearch && hasVariables && /* @__PURE__ */ import_react2.default.createElement("div", { className: "px-2 py-2 border-b border-border" }, /* @__PURE__ */ import_react2.default.createElement(
-    import_ui.Input,
-    {
-      type: "text",
-      placeholder: "Search variables...",
-      value: searchQuery,
-      onChange: (e) => setSearchQuery(e.target.value),
-      className: "w-full text-xs"
-    }
-  )), /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex-1 overflow-auto max-h-64 py-2 px-1" }, !hasVariables ? /* @__PURE__ */ import_react2.default.createElement("div", { className: "text-center py-4 text-xs text-muted-foreground" }, /* @__PURE__ */ import_react2.default.createElement("p", null, "No variables defined"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "mt-1 text-[10px]" }, "Add workflow inputs or nodes with output variables")) : /* @__PURE__ */ import_react2.default.createElement(import_react2.default.Fragment, null, /* @__PURE__ */ import_react2.default.createElement(
-    VariableCategory,
-    {
-      category: "input",
-      title: "Workflow Inputs",
-      variables: filteredVariables.inputs,
-      onSelect,
-      selectedPath,
-      defaultExpanded: true
-    }
-  ), /* @__PURE__ */ import_react2.default.createElement(
-    VariableCategory,
-    {
-      category: "nodeOutput",
-      title: "Node Outputs",
-      variables: filteredVariables.nodeOutputs,
-      onSelect,
-      selectedPath,
-      defaultExpanded: true
-    }
-  ), /* @__PURE__ */ import_react2.default.createElement(
-    VariableCategory,
-    {
-      category: "workflowOutput",
-      title: "Workflow Outputs",
-      variables: filteredVariables.workflowOutputs,
-      onSelect,
-      selectedPath,
-      defaultExpanded: true
-    }
-  ))));
-};
-VariableExplorer.propTypes = {
-  workflow: import_prop_types.default.object,
-  context: import_prop_types.default.object,
-  onSelect: import_prop_types.default.func,
-  selectedPath: import_prop_types.default.string,
-  title: import_prop_types.default.string,
-  showSearch: import_prop_types.default.bool,
-  className: import_prop_types.default.string
-};
-
-// src/vega/vegaSpecEditor.jsx
-var import_ui2 = require("@jet-admin/ui");
-var import_lucide_react2 = require("lucide-react");
 var VEGA_TEMPLATES = {
   empty: {
     name: "Empty",
-    icon: import_lucide_react2.Code,
+    icon: import_lucide_react.Code,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       description: "Custom visualization",
@@ -2332,7 +2952,7 @@ var VEGA_TEMPLATES = {
   },
   bar: {
     name: "Bar",
-    icon: import_lucide_react2.BarChart,
+    icon: import_lucide_react.BarChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -2354,7 +2974,7 @@ var VEGA_TEMPLATES = {
   },
   line: {
     name: "Line",
-    icon: import_lucide_react2.LineChart,
+    icon: import_lucide_react.LineChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -2376,7 +2996,7 @@ var VEGA_TEMPLATES = {
   },
   pie: {
     name: "Pie",
-    icon: import_lucide_react2.PieChart,
+    icon: import_lucide_react.PieChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -2396,7 +3016,7 @@ var VEGA_TEMPLATES = {
   },
   scatter: {
     name: "Scatter",
-    icon: import_lucide_react2.ScatterChart,
+    icon: import_lucide_react.ScatterChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -2420,7 +3040,7 @@ var VEGA_TEMPLATES = {
   },
   heatmap: {
     name: "Heatmap",
-    icon: import_lucide_react2.BarChart,
+    icon: import_lucide_react.BarChart,
     spec: {
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       data: {
@@ -2465,18 +3085,8 @@ var getNestedKeys = (obj, prefix = "", maxDepth = 4, depth = 0) => {
   }
   return keys;
 };
-var getValueByPath = (obj, path) => {
-  if (!obj || !path) return void 0;
-  let cur = obj;
-  for (const part of path.split(".")) {
-    const m = part.match(/^(.+)\[(\d+)\]$/);
-    cur = m ? cur?.[m[1]]?.[parseInt(m[2])] : cur?.[part];
-    if (cur === void 0) break;
-  }
-  return cur;
-};
 var getValuePreview = (obj, path) => {
-  const v = getValueByPath(obj, path);
+  const v = (0, import_template_engine.getValueByPath)(obj, path);
   if (v === void 0) return "undefined";
   if (v === null) return "null";
   if (Array.isArray(v)) return `Array(${v.length})`;
@@ -2626,12 +3236,12 @@ var VegaSpecEditor = ({
   workflow = null,
   disabled = false
 }) => {
-  const [showTemplates, setShowTemplates] = (0, import_react3.useState)(false);
-  const [parseError, setParseError] = (0, import_react3.useState)(null);
-  const monacoRef = (0, import_react3.useRef)(null);
-  const valueRef = (0, import_react3.useRef)(value);
-  const isInternalChange = (0, import_react3.useRef)(false);
-  (0, import_react3.useEffect)(() => {
+  const [showTemplates, setShowTemplates] = (0, import_react2.useState)(false);
+  const [parseError, setParseError] = (0, import_react2.useState)(null);
+  const monacoRef = (0, import_react2.useRef)(null);
+  const valueRef = (0, import_react2.useRef)(value);
+  const isInternalChange = (0, import_react2.useRef)(false);
+  (0, import_react2.useEffect)(() => {
     valueRef.current = value;
   }, [value]);
   const toJson = (v) => {
@@ -2642,8 +3252,8 @@ var VegaSpecEditor = ({
       return "";
     }
   };
-  const valueString = (0, import_react3.useMemo)(() => toJson(value), [value]);
-  const handleEditorChange = (0, import_react3.useCallback)((newValue) => {
+  const valueString = (0, import_react2.useMemo)(() => toJson(value), [value]);
+  const handleEditorChange = (0, import_react2.useCallback)((newValue) => {
     isInternalChange.current = true;
     if (!newValue?.trim()) {
       setParseError(null);
@@ -2663,10 +3273,9 @@ var VegaSpecEditor = ({
       isInternalChange.current = false;
     });
   }, [onChange, onError]);
-  (0, import_react3.useEffect)(() => {
+  (0, import_react2.useEffect)(() => {
     if (!monacoRef.current) return;
     const monaco = monacoRef.current;
-    const schema = workflow ? extractWorkflowSchema(workflow) : null;
     const disposable = monaco.languages.registerCompletionItemProvider("json", {
       triggerCharacters: [".", "{"],
       provideCompletionItems: (model, position) => {
@@ -2687,54 +3296,20 @@ var VegaSpecEditor = ({
         const bracketMatch = lineText.match(/\{\{([a-zA-Z0-9_]*)$/);
         if (bracketMatch) {
           const partial = bracketMatch[1].toLowerCase();
-          if ("ctx".startsWith(partial)) {
+          if ("state".startsWith(partial)) {
             suggestions.push({
-              label: "ctx",
+              label: "state",
               kind: monaco.languages.CompletionItemKind.Module,
-              detail: "Workflow Context (Runtime)",
-              insertText: "ctx.",
+              detail: "Global State Tree",
+              insertText: "state.",
               range
             });
-          }
-          if ("queries".startsWith(partial)) {
-            suggestions.push({
-              label: "queries",
-              kind: monaco.languages.CompletionItemKind.Module,
-              detail: "Page Queries",
-              insertText: "queries.",
-              range
-            });
-          }
-          if ("workflows".startsWith(partial)) {
-            suggestions.push({
-              label: "workflows",
-              kind: monaco.languages.CompletionItemKind.Module,
-              detail: "Page Workflows",
-              insertText: "workflows.",
-              range
-            });
-          }
-          if (schema) {
-            const add = (items, kind, pfx) => items.forEach((item) => {
-              const p = item.path.replace(/\{\{|\}\}/g, "");
-              if (p.toLowerCase().includes(partial))
-                suggestions.push({
-                  label: item.name,
-                  kind,
-                  detail: `${pfx}: ${item.type}${item.nodeTitle ? ` (${item.nodeTitle})` : ""}`,
-                  insertText: p,
-                  range
-                });
-            });
-            add(schema.inputs, monaco.languages.CompletionItemKind.Property, "Input");
-            add(schema.nodeOutputs, monaco.languages.CompletionItemKind.Variable, "Node Output");
-            add(schema.workflowOutputs, monaco.languages.CompletionItemKind.Event, "Workflow Output");
           }
         }
         if (workflowContext) {
-          const ctxMatch = lineText.match(/\{\{ctx\.([a-zA-Z0-9_\[\].]*)$/);
-          if (ctxMatch) {
-            const partial = ctxMatch[1];
+          const stateMatch = lineText.match(/\{\{state\.([a-zA-Z0-9_\[\].]*)$/);
+          if (stateMatch) {
+            const partial = stateMatch[1];
             getNestedKeys(workflowContext, "", 4).filter((k) => k.toLowerCase().includes(partial.toLowerCase())).forEach(
               (k) => suggestions.push({
                 label: k,
@@ -2746,41 +3321,13 @@ var VegaSpecEditor = ({
               })
             );
           }
-          const queriesMatch = lineText.match(/\{\{queries\.([a-zA-Z0-9_\[\].]*)$/);
-          if (queriesMatch && workflowContext.queries) {
-            const partial = queriesMatch[1];
-            getNestedKeys(workflowContext.queries, "", 4).filter((k) => k.toLowerCase().includes(partial.toLowerCase())).forEach(
-              (k) => suggestions.push({
-                label: k,
-                kind: monaco.languages.CompletionItemKind.Variable,
-                detail: getValuePreview(workflowContext.queries, k),
-                insertText: k,
-                range,
-                documentation: `Value: ${getValuePreview(workflowContext.queries, k)}`
-              })
-            );
-          }
-          const workflowsMatch = lineText.match(/\{\{workflows\.([a-zA-Z0-9_\[\].]*)$/);
-          if (workflowsMatch && workflowContext.workflows) {
-            const partial = workflowsMatch[1];
-            getNestedKeys(workflowContext.workflows, "", 4).filter((k) => k.toLowerCase().includes(partial.toLowerCase())).forEach(
-              (k) => suggestions.push({
-                label: k,
-                kind: monaco.languages.CompletionItemKind.Variable,
-                detail: getValuePreview(workflowContext.workflows, k),
-                insertText: k,
-                range,
-                documentation: `Value: ${getValuePreview(workflowContext.workflows, k)}`
-              })
-            );
-          }
         }
         return { suggestions };
       }
     });
     return () => disposable.dispose();
-  }, [workflowContext, workflow]);
-  const applyTemplate = (0, import_react3.useCallback)((key) => {
+  }, [workflowContext]);
+  const applyTemplate = (0, import_react2.useCallback)((key) => {
     const t = VEGA_TEMPLATES[key];
     if (t) {
       onChange(t.spec);
@@ -2789,7 +3336,7 @@ var VegaSpecEditor = ({
   }, [onChange]);
   const contextVarCount = workflowContext ? Object.keys(workflowContext).length : 0;
   const hasError = Boolean(parseError);
-  const headerExtra = /* @__PURE__ */ import_react3.default.createElement(
+  const headerExtra = /* @__PURE__ */ import_react2.default.createElement(
     "button",
     {
       type: "button",
@@ -2800,13 +3347,13 @@ var VegaSpecEditor = ({
       className: "hover:bg-muted hover:text-foreground",
       onClick: () => setShowTemplates((v) => !v)
     },
-    /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.BarChart, { size: 9 }),
+    /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.BarChart, { size: 9 }),
     "Templates"
   );
-  const headerLeft = contextVarCount > 0 ? /* @__PURE__ */ import_react3.default.createElement("span", { style: S.badge("accent") }, contextVarCount, " ctx vars") : null;
-  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex flex-col" }, showTemplates && /* @__PURE__ */ import_react3.default.createElement("div", { style: S.templateGrid, className: "border border-b-0 rounded-t-md" }, Object.entries(VEGA_TEMPLATES).map(([key, tpl]) => {
+  const headerLeft = contextVarCount > 0 ? /* @__PURE__ */ import_react2.default.createElement("span", { style: S.badge("accent") }, contextVarCount, " ctx vars") : null;
+  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex flex-col" }, showTemplates && /* @__PURE__ */ import_react2.default.createElement("div", { style: S.templateGrid, className: "border border-b-0 rounded-t-md" }, Object.entries(VEGA_TEMPLATES).map(([key, tpl]) => {
     const Icon = tpl.icon;
-    return /* @__PURE__ */ import_react3.default.createElement(
+    return /* @__PURE__ */ import_react2.default.createElement(
       "button",
       {
         key,
@@ -2827,18 +3374,18 @@ var VegaSpecEditor = ({
           e.currentTarget.style.color = "#6b7280";
         }
       },
-      /* @__PURE__ */ import_react3.default.createElement(Icon, { size: 14 }),
+      /* @__PURE__ */ import_react2.default.createElement(Icon, { size: 14 }),
       tpl.name
     );
-  })), /* @__PURE__ */ import_react3.default.createElement(
-    import_ui2.CodeEditor,
+  })), /* @__PURE__ */ import_react2.default.createElement(
+    import_ui.CodeEditor,
     {
       value: valueString,
       onChange: handleEditorChange,
       language: "json",
       disabled,
       title: "Vega-Lite",
-      titleIcon: /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.Code, { style: { color: "var(--we-bg-accent, #6366f1)", fontSize: 13 } }),
+      titleIcon: /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.Code, { style: { color: "var(--we-bg-accent, #6366f1)", fontSize: 13 } }),
       status: hasError ? "error" : "valid",
       statusMessage: parseError ? `Parse error: ${parseError}` : null,
       headerLeft,
@@ -2847,32 +3394,32 @@ var VegaSpecEditor = ({
       onMount: (e, m) => {
         monacoRef.current = m;
       },
-      footerHint: workflowContext ? /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, "Type ", /* @__PURE__ */ import_react3.default.createElement("code", { className: "font-mono bg-muted px-1 rounded-sm" }, "{{"), " to autocomplete data sources or context") : null
+      footerHint: workflowContext ? /* @__PURE__ */ import_react2.default.createElement(import_react2.default.Fragment, null, "Type ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "font-mono bg-muted px-1 rounded-sm" }, "{{"), " to autocomplete data sources or context") : null
     }
   ));
 };
 VegaSpecEditor.propTypes = {
-  value: import_prop_types2.default.object,
-  onChange: import_prop_types2.default.func.isRequired,
-  onError: import_prop_types2.default.func,
-  workflowContext: import_prop_types2.default.object,
-  workflow: import_prop_types2.default.object,
-  placeholder: import_prop_types2.default.string,
-  disabled: import_prop_types2.default.bool,
-  theme: import_prop_types2.default.oneOf(["light", "dark"])
+  value: import_prop_types.default.object,
+  onChange: import_prop_types.default.func.isRequired,
+  onError: import_prop_types.default.func,
+  workflowContext: import_prop_types.default.object,
+  workflow: import_prop_types.default.object,
+  placeholder: import_prop_types.default.string,
+  disabled: import_prop_types.default.bool,
+  theme: import_prop_types.default.oneOf(["light", "dark"])
 };
 
 // src/vega/shelfBuilder.jsx
-var import_react8 = __toESM(require("react"));
-var import_prop_types7 = __toESM(require("prop-types"));
+var import_react7 = __toESM(require("react"));
+var import_prop_types6 = __toESM(require("prop-types"));
 
 // src/vega/dataFieldPanel.jsx
-var import_react5 = __toESM(require("react"));
-var import_prop_types4 = __toESM(require("prop-types"));
-
-// src/vega/fieldPill.jsx
 var import_react4 = __toESM(require("react"));
 var import_prop_types3 = __toESM(require("prop-types"));
+
+// src/vega/fieldPill.jsx
+var import_react3 = __toESM(require("react"));
+var import_prop_types2 = __toESM(require("prop-types"));
 
 // src/vega/chartSpecGenerator.js
 var MARK_TYPES = {
@@ -3159,7 +3706,7 @@ var getFieldTypeIcon = (type) => {
 };
 
 // src/vega/fieldPill.jsx
-var import_ui3 = require("@jet-admin/ui");
+var import_ui2 = require("@jet-admin/ui");
 var getTypeClass = (type) => {
   switch (type) {
     case "quantitative":
@@ -3186,15 +3733,15 @@ var FieldPill = ({
 }) => {
   const icon = field.icon || getFieldTypeIcon(field.type);
   const typeClass = getTypeClass(field.type);
-  const handleDragStart = (0, import_react4.useCallback)((e) => {
+  const handleDragStart = (0, import_react3.useCallback)((e) => {
     e.dataTransfer.setData("application/json", JSON.stringify(field));
     e.dataTransfer.effectAllowed = "move";
     e.currentTarget.style.opacity = "0.5";
   }, [field]);
-  const handleDragEnd = (0, import_react4.useCallback)((e) => {
+  const handleDragEnd = (0, import_react3.useCallback)((e) => {
     e.currentTarget.style.opacity = "1";
   }, []);
-  return /* @__PURE__ */ import_react4.default.createElement(
+  return /* @__PURE__ */ import_react3.default.createElement(
     "div",
     {
       draggable: true,
@@ -3204,11 +3751,11 @@ var FieldPill = ({
       className: `flex items-center gap-1.5 rounded-sm font-medium cursor-grab shadow-sm border transition-shadow hover:shadow-md ${typeClass} ${isCompact ? "px-1.5 py-0.5 text-[11px]" : "px-2.5 py-1.5 text-xs"} ${isDragging ? "opacity-50" : ""} ${className}`,
       title: `${field.name} (${field.type})`
     },
-    /* @__PURE__ */ import_react4.default.createElement("span", { className: "opacity-70 font-mono scale-90" }, icon),
-    /* @__PURE__ */ import_react4.default.createElement("span", { className: "truncate" }, field.name),
-    field.aggregate && field.aggregate !== "none" && /* @__PURE__ */ import_react4.default.createElement("span", { className: "text-[9px] uppercase tracking-wider bg-brand-black/50 px-1 rounded-sm ml-1 font-bold", title: `Aggregate: ${field.aggregate}` }, field.aggregate.slice(0, 3)),
-    onRemove && /* @__PURE__ */ import_react4.default.createElement(
-      import_ui3.Button,
+    /* @__PURE__ */ import_react3.default.createElement("span", { className: "opacity-70 font-mono scale-90" }, icon),
+    /* @__PURE__ */ import_react3.default.createElement("span", { className: "truncate" }, field.name),
+    field.aggregate && field.aggregate !== "none" && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[9px] uppercase tracking-wider bg-brand-black/50 px-1 rounded-sm ml-1 font-bold", title: `Aggregate: ${field.aggregate}` }, field.aggregate.slice(0, 3)),
+    onRemove && /* @__PURE__ */ import_react3.default.createElement(
+      import_ui2.Button,
       {
         type: "button",
         variant: "ghost",
@@ -3225,41 +3772,24 @@ var FieldPill = ({
   );
 };
 FieldPill.propTypes = {
-  field: import_prop_types3.default.shape({
-    name: import_prop_types3.default.string.isRequired,
-    type: import_prop_types3.default.string.isRequired,
-    icon: import_prop_types3.default.string,
-    aggregate: import_prop_types3.default.string
+  field: import_prop_types2.default.shape({
+    name: import_prop_types2.default.string.isRequired,
+    type: import_prop_types2.default.string.isRequired,
+    icon: import_prop_types2.default.string,
+    aggregate: import_prop_types2.default.string
   }).isRequired,
-  onRemove: import_prop_types3.default.func,
-  onClick: import_prop_types3.default.func,
-  isDragging: import_prop_types3.default.bool,
-  isCompact: import_prop_types3.default.bool,
-  className: import_prop_types3.default.string
+  onRemove: import_prop_types2.default.func,
+  onClick: import_prop_types2.default.func,
+  isDragging: import_prop_types2.default.bool,
+  isCompact: import_prop_types2.default.bool,
+  className: import_prop_types2.default.string
 };
 
 // src/vega/dataFieldPanel.jsx
-var import_ui4 = require("@jet-admin/ui");
-var import_lucide_react3 = require("lucide-react");
-var collectArrayPaths = (obj, prefix = "", depth = 0, maxDepth = 4) => {
-  const results = [];
-  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-  for (const key of Object.keys(obj)) {
-    const val = obj[key];
-    const fullPath = prefix ? `${prefix}.${key}` : key;
-    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
-      results.push({
-        path: `{{${fullPath}}}`,
-        label: fullPath,
-        sampleKeys: Object.keys(val[0]),
-        rowCount: val.length
-      });
-    } else if (val && typeof val === "object" && !Array.isArray(val)) {
-      results.push(...collectArrayPaths(val, fullPath, depth + 1, maxDepth));
-    }
-  }
-  return results;
-};
+var import_ui3 = require("@jet-admin/ui");
+var import_lucide_react2 = require("lucide-react");
+init_suggestionEngine();
+var import_template_engine2 = require("@jet-admin/template-engine");
 var DataFieldPanel = ({
   workflowContext,
   queryResults,
@@ -3269,12 +3799,12 @@ var DataFieldPanel = ({
   workflow,
   className = ""
 }) => {
-  const [searchTerm, setSearchTerm] = (0, import_react5.useState)("");
-  const [manualField, setManualField] = (0, import_react5.useState)("");
-  const [showManualAdd, setShowManualAdd] = (0, import_react5.useState)(false);
-  const [showSuggestions, setShowSuggestions] = (0, import_react5.useState)(false);
-  const suggestionsRef = (0, import_react5.useRef)(null);
-  (0, import_react5.useEffect)(() => {
+  const [searchTerm, setSearchTerm] = (0, import_react4.useState)("");
+  const [manualField, setManualField] = (0, import_react4.useState)("");
+  const [showManualAdd, setShowManualAdd] = (0, import_react4.useState)(false);
+  const [showSuggestions, setShowSuggestions] = (0, import_react4.useState)(false);
+  const suggestionsRef = (0, import_react4.useRef)(null);
+  (0, import_react4.useEffect)(() => {
     const handleClickOutside = (e) => {
       if (suggestionsRef.current && !suggestionsRef.current.contains(e.target)) {
         setShowSuggestions(false);
@@ -3283,100 +3813,30 @@ var DataFieldPanel = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  const schemaSuggestions = (0, import_react5.useMemo)(() => {
-    if (!workflow) return [];
-    const schema = extractWorkflowSchema(workflow);
-    const suggestions = [];
-    for (const nodeOut of schema.nodeOutputs) {
-      suggestions.push({
-        path: nodeOut.path,
-        label: nodeOut.name,
-        description: nodeOut.description,
-        category: "node",
-        nodeTitle: nodeOut.nodeTitle,
-        nodeType: nodeOut.nodeType
-      });
-    }
-    for (const wfOut of schema.workflowOutputs) {
-      suggestions.push({
-        path: wfOut.path,
-        label: wfOut.name,
-        description: wfOut.description,
-        category: "output"
-      });
-    }
-    return suggestions;
-  }, [workflow]);
-  const ctxArrayPaths = (0, import_react5.useMemo)(() => {
-    if (!workflowContext) return [];
-    return collectArrayPaths(workflowContext);
-  }, [workflowContext]);
-  const queryResultPaths = (0, import_react5.useMemo)(() => {
-    if (!queryResults) return [];
-    return collectArrayPaths(queryResults);
-  }, [queryResults]);
-  const allSuggestions = (0, import_react5.useMemo)(() => {
+  const allSuggestions = (0, import_react4.useMemo)(() => {
     const seen = /* @__PURE__ */ new Set();
     const combined = [];
-    for (const arr of ctxArrayPaths) {
-      if (!seen.has(arr.path)) {
-        seen.add(arr.path);
+    const stateTreeSuggestions = getSuggestionsFromStateTree(workflowContext);
+    const arraySuggestions = stateTreeSuggestions.filter((s) => s.valueType === "array");
+    for (const arr of arraySuggestions) {
+      const bracePath = `{{${arr.value}}}`;
+      if (!seen.has(bracePath)) {
+        seen.add(bracePath);
         combined.push({
-          ...arr,
+          path: bracePath,
+          label: bracePath,
           source: "runtime",
-          description: `${arr.rowCount} rows, fields: ${arr.sampleKeys.slice(0, 4).join(", ")}${arr.sampleKeys.length > 4 ? "..." : ""}`
+          description: arr.detail || "Runtime data array"
         });
       }
     }
-    if (queryResults) {
-      for (const alias of Object.keys(queryResults)) {
-        const data = queryResults[alias];
-        const isArray = Array.isArray(data);
-        const arrayData = isArray ? data : data?.data && Array.isArray(data.data) ? data.data : null;
-        if (arrayData && arrayData.length > 0) {
-          const path = isArray ? `{{${alias}}}` : `{{${alias}.data}}`;
-          if (!seen.has(path)) {
-            seen.add(path);
-            combined.push({
-              path,
-              label: `${alias} (Data Source)`,
-              sampleKeys: Object.keys(arrayData[0]),
-              rowCount: arrayData.length,
-              source: "datasource",
-              description: `${arrayData.length} rows, fields: ${Object.keys(arrayData[0]).slice(0, 4).join(", ")}`
-            });
-          }
-        }
-      }
-    }
-    for (const s of schemaSuggestions) {
-      if (!seen.has(s.path)) {
-        seen.add(s.path);
-        combined.push({ ...s, source: "schema" });
-      }
-    }
     return combined;
-  }, [ctxArrayPaths, queryResultPaths, schemaSuggestions, queryResults]);
-  const fields = (0, import_react5.useMemo)(() => {
+  }, [workflowContext]);
+  const fields = (0, import_react4.useMemo)(() => {
     if (!dataSource) return [];
     const match = dataSource.match(/\{\{([^}]+)\}\}/);
     if (!match) return [];
     const rawPath = match[1];
-    const cleanPath = rawPath.startsWith("ctx.") ? rawPath.slice(4) : rawPath;
-    const resolvePath2 = (root, pathStr) => {
-      const parts = pathStr.split(".");
-      let current = root;
-      for (const part of parts) {
-        if (current === void 0 || current === null) return void 0;
-        const arrMatch = part.match(/^(.+)\[(\d+)\]$/);
-        if (arrMatch) {
-          current = current[arrMatch[1]]?.[parseInt(arrMatch[2])];
-        } else {
-          current = current[part];
-        }
-      }
-      return current;
-    };
     const toFields = (data) => {
       if (Array.isArray(data) && data.length > 0) {
         return inferFieldsFromData(data);
@@ -3391,30 +3851,30 @@ var DataFieldPanel = ({
       return null;
     };
     if (workflowContext) {
-      const resolved = resolvePath2(workflowContext, cleanPath);
+      const resolved = (0, import_template_engine2.getValueByPath)(workflowContext, rawPath, { allowedRoots: ["state"] });
       const result = toFields(resolved);
       if (result) return result;
     }
     if (queryResults && queryResults !== workflowContext) {
-      const resolved = resolvePath2(queryResults, rawPath);
+      const resolved = (0, import_template_engine2.getValueByPath)(queryResults, rawPath, { allowedRoots: ["state"] });
       const result = toFields(resolved);
       if (result) return result;
     }
     return [];
   }, [workflowContext, queryResults, dataSource]);
-  const filteredFields = (0, import_react5.useMemo)(() => {
+  const filteredFields = (0, import_react4.useMemo)(() => {
     if (!searchTerm) return fields;
     const lower = searchTerm.toLowerCase();
     return fields.filter((f) => f.name.toLowerCase().includes(lower));
   }, [fields, searchTerm]);
-  const quantFields = (0, import_react5.useMemo)(() => filteredFields.filter((f) => f.type === "quantitative"), [filteredFields]);
-  const catFields = (0, import_react5.useMemo)(() => filteredFields.filter((f) => f.type === "nominal" || f.type === "ordinal"), [filteredFields]);
-  const tempFields = (0, import_react5.useMemo)(() => filteredFields.filter((f) => f.type === "temporal"), [filteredFields]);
-  const handleSelectSuggestion = (0, import_react5.useCallback)((suggestion) => {
+  const quantFields = (0, import_react4.useMemo)(() => filteredFields.filter((f) => f.type === "quantitative"), [filteredFields]);
+  const catFields = (0, import_react4.useMemo)(() => filteredFields.filter((f) => f.type === "nominal" || f.type === "ordinal"), [filteredFields]);
+  const tempFields = (0, import_react4.useMemo)(() => filteredFields.filter((f) => f.type === "temporal"), [filteredFields]);
+  const handleSelectSuggestion = (0, import_react4.useCallback)((suggestion) => {
     onDataSourceChange?.(suggestion.path);
     setShowSuggestions(false);
   }, [onDataSourceChange]);
-  const handleAddManualField = (0, import_react5.useCallback)(() => {
+  const handleAddManualField = (0, import_react4.useCallback)(() => {
     if (!manualField.trim()) return;
     if (onFieldClick) {
       onFieldClick({ name: manualField.trim(), type: "nominal", icon: "Abc" });
@@ -3422,23 +3882,23 @@ var DataFieldPanel = ({
     setManualField("");
     setShowManualAdd(false);
   }, [manualField, onFieldClick]);
-  const getCategoryIcon2 = (cat) => {
+  const getCategoryIcon = (cat) => {
     switch (cat) {
       case "node":
-        return /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.GitMerge, { className: "w-3 h-3 shrink-0 text-emerald-600" });
+        return /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.GitMerge, { className: "w-3 h-3 shrink-0 text-emerald-600" });
       case "output":
-        return /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.ArrowRightFromLine, { className: "w-3 h-3 shrink-0 text-fuchsia-600" });
+        return /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.ArrowRightFromLine, { className: "w-3 h-3 shrink-0 text-fuchsia-600" });
       case "runtime":
-        return /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Zap, { className: "w-3 h-3 shrink-0 text-amber-600" });
+        return /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.Zap, { className: "w-3 h-3 shrink-0 text-amber-600" });
       case "datasource":
-        return /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Database, { className: "w-3 h-3 shrink-0 text-blue-600" });
+        return /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.Database, { className: "w-3 h-3 shrink-0 text-blue-600" });
       default:
-        return /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Database, { className: "w-3 h-3 shrink-0 text-brand-text-primary" });
+        return /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.Database, { className: "w-3 h-3 shrink-0 text-brand-text-primary" });
     }
   };
   const renderFieldGroup = (groupFields, label, colorClass) => {
     if (groupFields.length === 0) return null;
-    return /* @__PURE__ */ import_react5.default.createElement("div", { className: "mb-4" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: `text-[10px] font-bold uppercase tracking-widest mb-2 px-1 ${colorClass}` }, label, " (", groupFields.length, ")"), /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex flex-col gap-1.5 px-1" }, groupFields.map((field) => /* @__PURE__ */ import_react5.default.createElement(
+    return /* @__PURE__ */ import_react4.default.createElement("div", { className: "mb-4" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: `text-[10px] font-bold uppercase tracking-widest mb-2 px-1 ${colorClass}` }, label, " (", groupFields.length, ")"), /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex flex-col gap-1.5 px-1" }, groupFields.map((field) => /* @__PURE__ */ import_react4.default.createElement(
       FieldPill,
       {
         key: field.name,
@@ -3448,8 +3908,8 @@ var DataFieldPanel = ({
       }
     ))));
   };
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: `flex flex-col h-full bg-brand-dark ${className}` }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "p-2.5 border-b border-border bg-muted/30" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Database, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement("span", null, "Data Source")), /* @__PURE__ */ import_react5.default.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ import_react5.default.createElement(
-    import_ui4.Input,
+  return /* @__PURE__ */ import_react4.default.createElement("div", { className: `flex flex-col h-full bg-brand-dark ${className}` }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "p-2.5 border-b border-border bg-muted/30" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.Database, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react4.default.createElement("span", null, "Data Source")), /* @__PURE__ */ import_react4.default.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ import_react4.default.createElement(
+    import_ui3.Input,
     {
       type: "text",
       value: dataSource || "",
@@ -3459,18 +3919,18 @@ var DataFieldPanel = ({
       className: "w-full text-xs font-mono",
       title: "Workflow data source path"
     }
-  ), showSuggestions && allSuggestions.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "absolute left-0 right-0 top-full mt-1 bg-brand-dark border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted sticky top-0" }, "Available Variables (", allSuggestions.length, ")"), allSuggestions.map((s, i) => /* @__PURE__ */ import_react5.default.createElement(
+  ), showSuggestions && allSuggestions.length > 0 && /* @__PURE__ */ import_react4.default.createElement("div", { className: "absolute left-0 right-0 top-full mt-1 bg-brand-dark border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted sticky top-0" }, "Available Variables (", allSuggestions.length, ")"), allSuggestions.map((s, i) => /* @__PURE__ */ import_react4.default.createElement(
     "div",
     {
       key: `${s.path}-${i}`,
       onClick: () => handleSelectSuggestion(s),
       className: `w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? "bg-primary/5 border-l-2 border-l-primary" : "bg-brand-dark hover:bg-muted"}`
     },
-    /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-0.5" }, getCategoryIcon2(s.source || s.category)),
-    /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-[11px] font-medium text-foreground font-mono truncate" }, s.label), /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-[10px] text-muted-foreground truncate mt-0.5", title: s.description }, s.description), s.nodeTitle && /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-[9px] text-emerald-600 mt-1 uppercase tracking-wider font-semibold" }, "from: ", s.nodeTitle)),
-    s.source === "runtime" && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-sm uppercase tracking-wider shrink-0" }, "LIVE")
-  )))), dataSource && fields.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm w-fit border border-emerald-100" }, /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Zap, { className: "w-3 h-3" }), fields.length, " fields detected")), fields.length > 5 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-2.5 py-1.5 border-b border-border bg-brand-dark" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 bg-muted/50 border border-border rounded-sm px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow" }, /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Search, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement(
-    import_ui4.Input,
+    /* @__PURE__ */ import_react4.default.createElement("div", { className: "mt-0.5" }, getCategoryIcon(s.source || s.category)),
+    /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "text-[11px] font-medium text-foreground font-mono truncate" }, s.label), /* @__PURE__ */ import_react4.default.createElement("div", { className: "text-[10px] text-muted-foreground truncate mt-0.5", title: s.description }, s.description), s.nodeTitle && /* @__PURE__ */ import_react4.default.createElement("div", { className: "text-[9px] text-emerald-600 mt-1 uppercase tracking-wider font-semibold" }, "from: ", s.nodeTitle)),
+    s.source === "runtime" && /* @__PURE__ */ import_react4.default.createElement("span", { className: "text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-sm uppercase tracking-wider shrink-0" }, "LIVE")
+  )))), dataSource && fields.length > 0 && /* @__PURE__ */ import_react4.default.createElement("div", { className: "mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm w-fit border border-emerald-100" }, /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.Zap, { className: "w-3 h-3" }), fields.length, " fields detected")), fields.length > 5 && /* @__PURE__ */ import_react4.default.createElement("div", { className: "px-2.5 py-1.5 border-b border-border bg-brand-dark" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex items-center gap-2 bg-muted/50 border border-border rounded-sm px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow" }, /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.Search, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react4.default.createElement(
+    import_ui3.Input,
     {
       type: "text",
       value: searchTerm,
@@ -3478,8 +3938,8 @@ var DataFieldPanel = ({
       placeholder: "Filter fields...",
       className: "flex-1 text-xs bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-6 p-0"
     }
-  ))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1 overflow-y-auto p-2.5 min-h-0" }, fields.length > 0 ? /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, renderFieldGroup(quantFields, "Measures", "text-emerald-600"), renderFieldGroup(catFields, "Dimensions", "text-blue-600"), renderFieldGroup(tempFields, "Temporal", "text-amber-600")) : /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex flex-col items-center justify-center h-full py-6 text-center px-3" }, /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Database, { className: "w-8 h-8 mb-2 text-muted-foreground/30" }), /* @__PURE__ */ import_react5.default.createElement("p", { className: "text-xs text-muted-foreground leading-relaxed mb-3" }, dataSource ? "Run the workflow to detect fields from the data" : "Choose a data source above or type a ctx path"), !dataSource && allSuggestions.length > 0 && /* @__PURE__ */ import_react5.default.createElement(
-    import_ui4.Button,
+  ))), /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex-1 overflow-y-auto p-2.5 min-h-0" }, fields.length > 0 ? /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, renderFieldGroup(quantFields, "Measures", "text-emerald-600"), renderFieldGroup(catFields, "Dimensions", "text-blue-600"), renderFieldGroup(tempFields, "Temporal", "text-amber-600")) : /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex flex-col items-center justify-center h-full py-6 text-center px-3" }, /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.Database, { className: "w-8 h-8 mb-2 text-muted-foreground/30" }), /* @__PURE__ */ import_react4.default.createElement("p", { className: "text-xs text-muted-foreground leading-relaxed mb-3" }, dataSource ? "Run the workflow to detect fields from the data" : "Choose a data source above or type a ctx path"), !dataSource && allSuggestions.length > 0 && /* @__PURE__ */ import_react4.default.createElement(
+    import_ui3.Button,
     {
       type: "button",
       size: "sm",
@@ -3489,8 +3949,8 @@ var DataFieldPanel = ({
     "Browse ",
     allSuggestions.length,
     " Variables"
-  )), /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-3" }, showManualAdd ? /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex flex-col gap-2" }, /* @__PURE__ */ import_react5.default.createElement(
-    import_ui4.Input,
+  )), /* @__PURE__ */ import_react4.default.createElement("div", { className: "mt-3" }, showManualAdd ? /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex flex-col gap-2" }, /* @__PURE__ */ import_react4.default.createElement(
+    import_ui3.Input,
     {
       type: "text",
       value: manualField,
@@ -3500,8 +3960,8 @@ var DataFieldPanel = ({
       className: "w-full text-xs font-mono",
       autoFocus: true
     }
-  ), /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 justify-end" }, /* @__PURE__ */ import_react5.default.createElement(
-    import_ui4.Button,
+  ), /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex items-center gap-2 justify-end" }, /* @__PURE__ */ import_react4.default.createElement(
+    import_ui3.Button,
     {
       type: "button",
       variant: "ghost",
@@ -3510,8 +3970,8 @@ var DataFieldPanel = ({
       className: "h-6 px-2 text-xs text-muted-foreground hover:text-foreground font-medium"
     },
     "Cancel"
-  ), /* @__PURE__ */ import_react5.default.createElement(
-    import_ui4.Button,
+  ), /* @__PURE__ */ import_react4.default.createElement(
+    import_ui3.Button,
     {
       type: "button",
       size: "sm",
@@ -3519,32 +3979,32 @@ var DataFieldPanel = ({
       className: "h-6 px-2 text-xs font-semibold"
     },
     "Add Field"
-  ))) : /* @__PURE__ */ import_react5.default.createElement(
-    import_ui4.Button,
+  ))) : /* @__PURE__ */ import_react4.default.createElement(
+    import_ui3.Button,
     {
       type: "button",
       variant: "outline",
       onClick: () => setShowManualAdd(true),
       className: "w-full h-auto py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 border-dashed border-border hover:bg-muted hover:text-foreground"
     },
-    /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.Plus, { className: "w-3.5 h-3.5 mr-1" }),
-    /* @__PURE__ */ import_react5.default.createElement("span", null, "Add Field Manually")
+    /* @__PURE__ */ import_react4.default.createElement(import_lucide_react2.Plus, { className: "w-3.5 h-3.5 mr-1" }),
+    /* @__PURE__ */ import_react4.default.createElement("span", null, "Add Field Manually")
   ))));
 };
 DataFieldPanel.propTypes = {
-  workflowContext: import_prop_types4.default.object,
-  queryResults: import_prop_types4.default.object,
-  dataSource: import_prop_types4.default.string,
-  onDataSourceChange: import_prop_types4.default.func,
-  onFieldClick: import_prop_types4.default.func,
-  workflow: import_prop_types4.default.object,
-  className: import_prop_types4.default.string
+  workflowContext: import_prop_types3.default.object,
+  queryResults: import_prop_types3.default.object,
+  dataSource: import_prop_types3.default.string,
+  onDataSourceChange: import_prop_types3.default.func,
+  onFieldClick: import_prop_types3.default.func,
+  workflow: import_prop_types3.default.object,
+  className: import_prop_types3.default.string
 };
 
 // src/vega/encodingShelf.jsx
-var import_react6 = __toESM(require("react"));
-var import_prop_types5 = __toESM(require("prop-types"));
-var import_ui5 = require("@jet-admin/ui");
+var import_react5 = __toESM(require("react"));
+var import_prop_types4 = __toESM(require("prop-types"));
+var import_ui4 = require("@jet-admin/ui");
 var CHANNEL_LABELS = {
   x: "X Axis",
   y: "Y Axis",
@@ -3578,19 +4038,19 @@ var EncodingShelf = ({
   onRemove,
   className = ""
 }) => {
-  const [isDragOver, setIsDragOver] = (0, import_react6.useState)(false);
-  const dropRef = (0, import_react6.useRef)(null);
+  const [isDragOver, setIsDragOver] = (0, import_react5.useState)(false);
+  const dropRef = (0, import_react5.useRef)(null);
   const label = CHANNEL_LABELS[channel] || channel;
   const icon = CHANNEL_ICONS[channel] || "\u2022";
-  const handleDragOver = (0, import_react6.useCallback)((e) => {
+  const handleDragOver = (0, import_react5.useCallback)((e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
     setIsDragOver(true);
   }, []);
-  const handleDragLeave = (0, import_react6.useCallback)(() => {
+  const handleDragLeave = (0, import_react5.useCallback)(() => {
     setIsDragOver(false);
   }, []);
-  const handleDrop = (0, import_react6.useCallback)((e) => {
+  const handleDrop = (0, import_react5.useCallback)((e) => {
     e.preventDefault();
     setIsDragOver(false);
     try {
@@ -3611,13 +4071,13 @@ var EncodingShelf = ({
     } catch (err) {
     }
   }, [channel, onChange]);
-  const handleTypeChange = (0, import_react6.useCallback)((newType) => {
+  const handleTypeChange = (0, import_react5.useCallback)((newType) => {
     if (value) onChange({ ...value, type: newType });
   }, [value, onChange]);
-  const handleAggChange = (0, import_react6.useCallback)((newAgg) => {
+  const handleAggChange = (0, import_react5.useCallback)((newAgg) => {
     if (value) onChange({ ...value, aggregate: newAgg === "none" ? void 0 : newAgg });
   }, [value, onChange]);
-  const handleSortToggle = (0, import_react6.useCallback)(() => {
+  const handleSortToggle = (0, import_react5.useCallback)(() => {
     if (!value) return;
     const sortStates = [null, "ascending", "descending"];
     const current = sortStates.indexOf(value.sort);
@@ -3631,7 +4091,7 @@ var EncodingShelf = ({
     isDragOver ? "border-primary bg-primary/5 shadow-inner" : "",
     className
   ].filter(Boolean).join(" ");
-  return /* @__PURE__ */ import_react6.default.createElement(
+  return /* @__PURE__ */ import_react5.default.createElement(
     "div",
     {
       ref: dropRef,
@@ -3640,16 +4100,16 @@ var EncodingShelf = ({
       onDrop: handleDrop,
       className: shelfClass
     },
-    /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex items-center justify-start w-24 shrink-0 px-2 py-1 text-[11px] font-bold text-muted-foreground uppercase tracking-widest gap-2 border-r border-border" }, /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-muted-foreground/50 text-sm" }, icon), /* @__PURE__ */ import_react6.default.createElement("span", { className: "truncate" }, label)),
-    /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex-1 flex flex-wrap items-center gap-2 min-w-0 pr-1" }, isEmpty ? /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-xs text-muted-foreground italic px-2" }, isDragOver ? "Release to assign" : "Drop a field here") : /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(
+    /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center justify-start w-24 shrink-0 px-2 py-1 text-[11px] font-bold text-muted-foreground uppercase tracking-widest gap-2 border-r border-border" }, /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground/50 text-sm" }, icon), /* @__PURE__ */ import_react5.default.createElement("span", { className: "truncate" }, label)),
+    /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1 flex flex-wrap items-center gap-2 min-w-0 pr-1" }, isEmpty ? /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-xs text-muted-foreground italic px-2" }, isDragOver ? "Release to assign" : "Drop a field here") : /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(
       FieldPill,
       {
         field: { ...value, name: value.field },
         onRemove,
         isCompact: true
       }
-    ), /* @__PURE__ */ import_react6.default.createElement(import_ui5.Select, { value: value.type || "nominal", onValueChange: (val) => handleTypeChange(val) }, /* @__PURE__ */ import_react6.default.createElement(import_ui5.SelectTrigger, { className: "h-6 px-1.5 py-0.5 text-[11px]", title: "Data type" }, /* @__PURE__ */ import_react6.default.createElement(import_ui5.SelectValue, { placeholder: "Select type" })), /* @__PURE__ */ import_react6.default.createElement(import_ui5.SelectContent, { className: "z-[200]" }, FIELD_TYPES.map((t) => /* @__PURE__ */ import_react6.default.createElement(import_ui5.SelectItem, { key: t, value: t }, t.charAt(0).toUpperCase() + t.slice(1))))), (value.type === "quantitative" || value.aggregate) && /* @__PURE__ */ import_react6.default.createElement(import_ui5.Select, { value: value.aggregate || "none", onValueChange: (val) => handleAggChange(val) }, /* @__PURE__ */ import_react6.default.createElement(import_ui5.SelectTrigger, { className: "h-6 px-1.5 py-0.5 text-[11px]", title: "Aggregation" }, /* @__PURE__ */ import_react6.default.createElement(import_ui5.SelectValue, { placeholder: "Select agg" })), /* @__PURE__ */ import_react6.default.createElement(import_ui5.SelectContent, { className: "z-[200]" }, /* @__PURE__ */ import_react6.default.createElement(import_ui5.SelectItem, { value: "none" }, "no agg"), AGGREGATE_TYPES.map((a) => /* @__PURE__ */ import_react6.default.createElement(import_ui5.SelectItem, { key: a, value: a }, a)))), /* @__PURE__ */ import_react6.default.createElement(
-      import_ui5.Button,
+    ), /* @__PURE__ */ import_react5.default.createElement(import_ui4.Select, { value: value.type || "nominal", onValueChange: (val) => handleTypeChange(val) }, /* @__PURE__ */ import_react5.default.createElement(import_ui4.SelectTrigger, { className: "h-6 px-1.5 py-0.5 text-[11px]", title: "Data type" }, /* @__PURE__ */ import_react5.default.createElement(import_ui4.SelectValue, { placeholder: "Select type" })), /* @__PURE__ */ import_react5.default.createElement(import_ui4.SelectContent, { className: "z-[200]" }, FIELD_TYPES.map((t) => /* @__PURE__ */ import_react5.default.createElement(import_ui4.SelectItem, { key: t, value: t }, t.charAt(0).toUpperCase() + t.slice(1))))), (value.type === "quantitative" || value.aggregate) && /* @__PURE__ */ import_react5.default.createElement(import_ui4.Select, { value: value.aggregate || "none", onValueChange: (val) => handleAggChange(val) }, /* @__PURE__ */ import_react5.default.createElement(import_ui4.SelectTrigger, { className: "h-6 px-1.5 py-0.5 text-[11px]", title: "Aggregation" }, /* @__PURE__ */ import_react5.default.createElement(import_ui4.SelectValue, { placeholder: "Select agg" })), /* @__PURE__ */ import_react5.default.createElement(import_ui4.SelectContent, { className: "z-[200]" }, /* @__PURE__ */ import_react5.default.createElement(import_ui4.SelectItem, { value: "none" }, "no agg"), AGGREGATE_TYPES.map((a) => /* @__PURE__ */ import_react5.default.createElement(import_ui4.SelectItem, { key: a, value: a }, a)))), /* @__PURE__ */ import_react5.default.createElement(
+      import_ui4.Button,
       {
         type: "button",
         variant: "ghost",
@@ -3663,23 +4123,23 @@ var EncodingShelf = ({
   );
 };
 EncodingShelf.propTypes = {
-  channel: import_prop_types5.default.string.isRequired,
-  value: import_prop_types5.default.shape({
-    field: import_prop_types5.default.string,
-    type: import_prop_types5.default.string,
-    aggregate: import_prop_types5.default.string,
-    sort: import_prop_types5.default.string,
-    title: import_prop_types5.default.string
+  channel: import_prop_types4.default.string.isRequired,
+  value: import_prop_types4.default.shape({
+    field: import_prop_types4.default.string,
+    type: import_prop_types4.default.string,
+    aggregate: import_prop_types4.default.string,
+    sort: import_prop_types4.default.string,
+    title: import_prop_types4.default.string
   }),
-  onChange: import_prop_types5.default.func.isRequired,
-  onRemove: import_prop_types5.default.func,
-  className: import_prop_types5.default.string
+  onChange: import_prop_types4.default.func.isRequired,
+  onRemove: import_prop_types4.default.func,
+  className: import_prop_types4.default.string
 };
 
 // src/vega/markSelector.jsx
-var import_react7 = __toESM(require("react"));
-var import_prop_types6 = __toESM(require("prop-types"));
-var import_ui6 = require("@jet-admin/ui");
+var import_react6 = __toESM(require("react"));
+var import_prop_types5 = __toESM(require("prop-types"));
+var import_ui5 = require("@jet-admin/ui");
 var MARK_OPTIONS = [
   { key: "auto", label: "Auto", icon: "\u2726", desc: "Best fit based on field types" },
   { key: "bar", label: "Bar", icon: "\u25A5", desc: "Compare categories" },
@@ -3693,10 +4153,10 @@ var MARK_OPTIONS = [
   { key: "circle", label: "Bubble", icon: "\u25CF", desc: "Sized circles" }
 ];
 var MarkSelector = ({ value, onChange, className = "" }) => {
-  return /* @__PURE__ */ import_react7.default.createElement("div", { className: `flex flex-wrap gap-1 w-full ${className}` }, MARK_OPTIONS.map((opt) => {
+  return /* @__PURE__ */ import_react6.default.createElement("div", { className: `flex flex-wrap gap-1 w-full ${className}` }, MARK_OPTIONS.map((opt) => {
     const isSelected = value === opt.key;
-    return /* @__PURE__ */ import_react7.default.createElement(
-      import_ui6.Button,
+    return /* @__PURE__ */ import_react6.default.createElement(
+      import_ui5.Button,
       {
         key: opt.key,
         type: "button",
@@ -3706,70 +4166,33 @@ var MarkSelector = ({ value, onChange, className = "" }) => {
         className: `h-auto py-1.5 flex-1 min-w-[60px] px-2 text-xs font-medium ${isSelected ? "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm hover:text-indigo-800 hover:bg-indigo-100" : "text-brand-text-primary border-transparent hover:bg-brand-border-dark"}`,
         title: `${opt.label}: ${opt.desc}`
       },
-      /* @__PURE__ */ import_react7.default.createElement("span", { className: `mr-1.5 ${isSelected ? "text-indigo-500" : "text-brand-text-primary"}` }, opt.icon),
-      /* @__PURE__ */ import_react7.default.createElement("span", { className: "hidden lg:inline" }, opt.label)
+      /* @__PURE__ */ import_react6.default.createElement("span", { className: `mr-1.5 ${isSelected ? "text-indigo-500" : "text-brand-text-primary"}` }, opt.icon),
+      /* @__PURE__ */ import_react6.default.createElement("span", { className: "hidden lg:inline" }, opt.label)
     );
   }));
 };
 MarkSelector.propTypes = {
-  value: import_prop_types6.default.string,
-  onChange: import_prop_types6.default.func.isRequired,
-  className: import_prop_types6.default.string
+  value: import_prop_types5.default.string,
+  onChange: import_prop_types5.default.func.isRequired,
+  className: import_prop_types5.default.string
 };
 
 // src/vega/shelfBuilder.jsx
-var import_ui7 = require("@jet-admin/ui");
-var import_lucide_react4 = require("lucide-react");
+init_suggestionEngine();
+var import_ui6 = require("@jet-admin/ui");
+var import_lucide_react3 = require("lucide-react");
 var VEGA_STRINGS = {
   WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings"
 };
 var PRIMARY_SHELVES = ["x", "y", "color", "size"];
 var SECONDARY_SHELVES = ["row", "column", "shape", "opacity", "detail", "text"];
-var getQueryResultEntries = (queryResults) => {
-  if (!queryResults) return [];
-  const isNamespaced = queryResults.queries || queryResults.workflows;
-  if (isNamespaced) {
-    const entries = [];
-    if (queryResults.queries) {
-      for (const alias of Object.keys(queryResults.queries)) {
-        entries.push({ alias, namespace: "queries", data: queryResults.queries[alias] });
-      }
-    }
-    if (queryResults.workflows) {
-      for (const alias of Object.keys(queryResults.workflows)) {
-        entries.push({ alias, namespace: "workflows", data: queryResults.workflows[alias] });
-      }
-    }
-    return entries;
-  }
-  return Object.keys(queryResults).map((alias) => ({ alias, namespace: null, data: queryResults[alias] }));
-};
-var collectArrayPaths2 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
-  const results = [];
-  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-  for (const key of Object.keys(obj)) {
-    const val = obj[key];
-    const fullPath = prefix ? `${prefix}.${key}` : key;
-    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
-      results.push({
-        path: `{{${fullPath}}}`,
-        label: fullPath,
-        sampleKeys: Object.keys(val[0]),
-        rowCount: val.length
-      });
-    } else if (val && typeof val === "object" && !Array.isArray(val)) {
-      results.push(...collectArrayPaths2(val, fullPath, depth + 1, maxDepth));
-    }
-  }
-  return results;
-};
 var ShelfBuilder = ({
   widgetEditorForm,
   workflowContext,
   workflows,
   queryResults
 }) => {
-  const [shelfSpec, setShelfSpec] = (0, import_react8.useState)(() => {
+  const [shelfSpec, setShelfSpec] = (0, import_react7.useState)(() => {
     let savedSpec = widgetEditorForm.values.widgetConfig?.shelfSpec;
     if (typeof savedSpec === "string") {
       try {
@@ -3780,7 +4203,7 @@ var ShelfBuilder = ({
     }
     return savedSpec || getDefaultShelfSpec();
   });
-  (0, import_react8.useEffect)(() => {
+  (0, import_react7.useEffect)(() => {
     let savedSpec = widgetEditorForm.values.widgetConfig?.shelfSpec;
     if (savedSpec) {
       if (typeof savedSpec === "string") {
@@ -3795,20 +4218,20 @@ var ShelfBuilder = ({
       }
     }
   }, [widgetEditorForm.values.widgetConfig?.shelfSpec]);
-  const [showSecondary, setShowSecondary] = (0, import_react8.useState)(false);
-  const [showStyle, setShowStyle] = (0, import_react8.useState)(false);
-  const selectedWorkflow = (0, import_react8.useMemo)(() => {
+  const [showSecondary, setShowSecondary] = (0, import_react7.useState)(false);
+  const [showStyle, setShowStyle] = (0, import_react7.useState)(false);
+  const selectedWorkflow = (0, import_react7.useMemo)(() => {
     const wID = widgetEditorForm.values.workflowID;
     if (!wID || !workflows) return null;
     return workflows.find((w) => String(w.workflowID) === String(wID));
   }, [widgetEditorForm.values.workflowID, workflows]);
-  const resolvedMark = (0, import_react8.useMemo)(() => {
+  const resolvedMark = (0, import_react7.useMemo)(() => {
     if (shelfSpec.mark === "auto" || !shelfSpec.mark) {
       return inferMarkType(shelfSpec.encoding);
     }
     return shelfSpec.mark;
   }, [shelfSpec.mark, shelfSpec.encoding]);
-  const handleChannelChange = (0, import_react8.useCallback)((channel, value) => {
+  const handleChannelChange = (0, import_react7.useCallback)((channel, value) => {
     setShelfSpec((prev) => ({
       ...prev,
       encoding: {
@@ -3817,7 +4240,7 @@ var ShelfBuilder = ({
       }
     }));
   }, []);
-  const handleChannelRemove = (0, import_react8.useCallback)((channel) => {
+  const handleChannelRemove = (0, import_react7.useCallback)((channel) => {
     setShelfSpec((prev) => ({
       ...prev,
       encoding: {
@@ -3826,19 +4249,19 @@ var ShelfBuilder = ({
       }
     }));
   }, []);
-  const handleMarkChange = (0, import_react8.useCallback)((mark) => {
+  const handleMarkChange = (0, import_react7.useCallback)((mark) => {
     setShelfSpec((prev) => ({ ...prev, mark }));
   }, []);
-  const handleDataSourceChange = (0, import_react8.useCallback)((newSource) => {
+  const handleDataSourceChange = (0, import_react7.useCallback)((newSource) => {
     setShelfSpec((prev) => ({ ...prev, dataSource: newSource }));
   }, []);
-  const handleConfigChange = (0, import_react8.useCallback)((key, value) => {
+  const handleConfigChange = (0, import_react7.useCallback)((key, value) => {
     setShelfSpec((prev) => ({
       ...prev,
       config: { ...prev.config, [key]: value }
     }));
   }, []);
-  const handleFieldQuickAdd = (0, import_react8.useCallback)((field) => {
+  const handleFieldQuickAdd = (0, import_react7.useCallback)((field) => {
     setShelfSpec((prev) => {
       const enc = { ...prev.encoding };
       if (!enc.x?.field) {
@@ -3854,8 +4277,8 @@ var ShelfBuilder = ({
       return { ...prev, encoding: enc };
     });
   }, []);
-  const [isOpen, setIsOpen] = (0, import_react8.useState)(false);
-  (0, import_react8.useEffect)(() => {
+  const [isOpen, setIsOpen] = (0, import_react7.useState)(false);
+  (0, import_react7.useEffect)(() => {
     const timer = setTimeout(() => {
       const vegaSpec = generateVegaLiteSpec(shelfSpec);
       if (shelfSpec.dataSource) {
@@ -3866,29 +4289,36 @@ var ShelfBuilder = ({
     }, 200);
     return () => clearTimeout(timer);
   }, [shelfSpec]);
-  const queryResultEntries = (0, import_react8.useMemo)(() => getQueryResultEntries(queryResults), [queryResults]);
-  const discoveredArrayPaths = (0, import_react8.useMemo)(() => {
-    if (!workflowContext) return [];
-    return collectArrayPaths2(workflowContext);
-  }, [workflowContext]);
-  const hasDataSources = queryResultEntries.length > 0 || discoveredArrayPaths.length > 0;
+  const stateTreeSuggestions = (0, import_react7.useMemo)(
+    () => getSuggestionsFromStateTree(workflowContext),
+    [workflowContext]
+  );
+  const discoveredArrayPaths = (0, import_react7.useMemo)(() => {
+    return stateTreeSuggestions.filter((s) => s.valueType === "array").map((s) => {
+      const bracePath = `{{${s.value}}}`;
+      return {
+        path: bracePath,
+        // {{state.queries.alias.data}}
+        label: bracePath,
+        // {{state.queries.alias.data}}
+        description: s.detail
+      };
+    });
+  }, [stateTreeSuggestions]);
+  const hasDataSources = discoveredArrayPaths.length > 0;
   const isWorkflowSelected = !!selectedWorkflow;
   const hasAnyData = isWorkflowSelected || hasDataSources;
-  return /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Dialog, { open: isOpen, onOpenChange: setIsOpen }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogTrigger, { asChild: true }, /* @__PURE__ */ import_react8.default.createElement(
-    import_ui7.Button,
+  return /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement(import_ui6.Dialog, { open: isOpen, onOpenChange: setIsOpen }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.DialogTrigger, { asChild: true }, /* @__PURE__ */ import_react7.default.createElement(
+    import_ui6.Button,
     {
       type: "button",
       variant: "outline",
       size: "sm",
       className: "h-8 text-xs"
     },
-    /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.TrendingUp, { className: "inline-block h-3 w-3 mr-2" }),
+    /* @__PURE__ */ import_react7.default.createElement(import_lucide_react3.TrendingUp, { className: "inline-block h-3 w-3 mr-2" }),
     VEGA_STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON
-  )), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogContent, { className: "max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-brand-dark border-border shadow-2xl" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogHeader, { className: "flex flex-row items-center px-4 py-3 border-b border-border bg-brand-dark shrink-0 space-y-0" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 text-foreground" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.TrendingUp, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogTitle, { className: "text-base font-bold m-0 p-0 text-left" }, "Visual Chart Editor"))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0" }, !hasAnyData ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded-sm bg-brand-dark" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.Database, { className: "w-10 h-10 mb-3 text-muted-foreground/40" }), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm font-semibold text-foreground mb-1" }, "No Data Source Selected"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Add a Data Source in the Data tab and run a Test, or select a Workflow.")) : /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col w-56 shrink-0 bg-brand-dark border border-border rounded-md overflow-hidden min-h-0 h-full" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-2 border-b border-border bg-brand-dark" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Select, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectTrigger, { className: "text-xs font-medium" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectValue, { placeholder: "Select Data Input" })), /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectContent, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { value: "workflow" }, "Workflow Output"), workflowContext && !workflowContext.queries && !workflowContext.workflows && Object.keys(workflowContext).map((key) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key, value: `{{ctx.${key}}}` }, `ctx.${key}`)), discoveredArrayPaths.length > 0 ? discoveredArrayPaths.map((arr) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key: arr.path, value: arr.path }, arr.label, " (", arr.rowCount, " rows)")) : queryResultEntries.map(({ alias, namespace }) => {
-    const valuePath = namespace ? `{{${namespace}.${alias}.data}}` : `{{${alias}.data}}`;
-    const label = namespace ? `${namespace}.${alias} (Data Source)` : `${alias} (Data Source)`;
-    return /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key: `qr-${namespace || ""}-${alias}`, value: valuePath }, label);
-  })))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden outline-none min-h-0" }, /* @__PURE__ */ import_react8.default.createElement(
+  )), /* @__PURE__ */ import_react7.default.createElement(import_ui6.DialogContent, { className: "max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-brand-dark border-border shadow-2xl" }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.DialogHeader, { className: "flex flex-row items-center px-4 py-3 border-b border-border bg-brand-dark shrink-0 space-y-0" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex items-center gap-2 text-foreground" }, /* @__PURE__ */ import_react7.default.createElement(import_lucide_react3.TrendingUp, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ import_react7.default.createElement(import_ui6.DialogTitle, { className: "text-base font-bold m-0 p-0 text-left" }, "Visual Chart Editor"))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0" }, !hasAnyData ? /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded-sm bg-brand-dark" }, /* @__PURE__ */ import_react7.default.createElement(import_lucide_react3.Database, { className: "w-10 h-10 mb-3 text-muted-foreground/40" }), /* @__PURE__ */ import_react7.default.createElement("p", { className: "text-sm font-semibold text-foreground mb-1" }, "No Data Source Selected"), /* @__PURE__ */ import_react7.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Add a Data Source in the Data tab and run a Test, or select a Workflow.")) : /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex flex-col w-56 shrink-0 bg-brand-dark border border-border rounded-md overflow-hidden min-h-0 h-full" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "p-2 border-b border-border bg-brand-dark" }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.Select, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectTrigger, { className: "text-xs font-medium" }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectValue, { placeholder: "Select Data Input" })), /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectContent, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectItem, { value: `{{state.workflows.${selectedWorkflow.alias}.data}}` }, "Workflow Output (", selectedWorkflow.alias, ")"), discoveredArrayPaths.map((arr) => /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectItem, { key: arr.path, value: arr.path }, arr.label))))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex-1 overflow-hidden outline-none min-h-0" }, /* @__PURE__ */ import_react7.default.createElement(
     DataFieldPanel,
     {
       workflowContext,
@@ -3899,7 +4329,7 @@ var ShelfBuilder = ({
       workflow: selectedWorkflow,
       className: "h-full"
     }
-  ))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 flex flex-col h-full overflow-y-auto min-h-0 pr-1 gap-1.5" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1" }, "Encoding Shelves"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 flex flex-col gap-3" }, PRIMARY_SHELVES.map((ch) => /* @__PURE__ */ import_react8.default.createElement(
+  ))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex-1 flex flex-col h-full overflow-y-auto min-h-0 pr-1 gap-1.5" }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.Label, { className: "text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1" }, "Encoding Shelves"), /* @__PURE__ */ import_react7.default.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 flex flex-col gap-3" }, PRIMARY_SHELVES.map((ch) => /* @__PURE__ */ import_react7.default.createElement(
     EncodingShelf,
     {
       key: ch,
@@ -3908,15 +4338,15 @@ var ShelfBuilder = ({
       onChange: (val) => handleChannelChange(ch, val),
       onRemove: () => handleChannelRemove(ch)
     }
-  ))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-brand-dark border border-border rounded-md mt-2" }, /* @__PURE__ */ import_react8.default.createElement(
+  ))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "bg-brand-dark border border-border rounded-md mt-2" }, /* @__PURE__ */ import_react7.default.createElement(
     "div",
     {
       onClick: () => setShowSecondary(!showSecondary),
       className: "w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-brand-dark font-medium cursor-pointer"
     },
-    showSecondary ? /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.ChevronDown, { className: "w-4 h-4 mr-2 text-muted-foreground" }) : /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.ChevronRight, { className: "w-4 h-4 mr-2 text-muted-foreground" }),
-    /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-[10px] font-bold uppercase tracking-wider text-foreground" }, "More Channels ", /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-primary ml-1" }, "(", SECONDARY_SHELVES.filter((ch) => shelfSpec.encoding[ch]?.field).length, " active)"))
-  ), showSecondary && /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-3 flex flex-col gap-3 bg-muted/30" }, SECONDARY_SHELVES.map((ch) => /* @__PURE__ */ import_react8.default.createElement(
+    showSecondary ? /* @__PURE__ */ import_react7.default.createElement(import_lucide_react3.ChevronDown, { className: "w-4 h-4 mr-2 text-muted-foreground" }) : /* @__PURE__ */ import_react7.default.createElement(import_lucide_react3.ChevronRight, { className: "w-4 h-4 mr-2 text-muted-foreground" }),
+    /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] font-bold uppercase tracking-wider text-foreground" }, "More Channels ", /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-primary ml-1" }, "(", SECONDARY_SHELVES.filter((ch) => shelfSpec.encoding[ch]?.field).length, " active)"))
+  ), showSecondary && /* @__PURE__ */ import_react7.default.createElement("div", { className: "p-3 flex flex-col gap-3 bg-muted/30" }, SECONDARY_SHELVES.map((ch) => /* @__PURE__ */ import_react7.default.createElement(
     EncodingShelf,
     {
       key: ch,
@@ -3925,16 +4355,16 @@ var ShelfBuilder = ({
       onChange: (val) => handleChannelChange(ch, val),
       onRemove: () => handleChannelRemove(ch)
     }
-  ))))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col w-64 shrink-0 h-full overflow-y-auto min-h-0 pl-1 gap-1.5 pb-4" }, /* @__PURE__ */ import_react8.default.createElement(
+  ))))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex flex-col w-64 shrink-0 h-full overflow-y-auto min-h-0 pl-1 gap-1.5 pb-4" }, /* @__PURE__ */ import_react7.default.createElement(
     "div",
     {
       onClick: () => setShowStyle(!showStyle),
       className: "flex items-center gap-2 p-1 text-muted-foreground hover:text-foreground focus:outline-none transition-colors bg-transparent cursor-pointer"
     },
-    showStyle ? /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.ChevronRight, { className: "w-4 h-4" }),
-    /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-[10px] font-bold uppercase tracking-widest" }, "Chart Style & Settings")
-  ), showStyle && /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 space-y-4" }, /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, "Marks"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-muted/30 border border-border rounded-md p-2" }, /* @__PURE__ */ import_react8.default.createElement(MarkSelector, { value: shelfSpec.mark || "auto", onChange: handleMarkChange }), shelfSpec.mark === "auto" && /* @__PURE__ */ import_react8.default.createElement("div", { className: "text-[10px] text-muted-foreground italic p-1 text-center mt-1" }, "Auto-resolved to: ", /* @__PURE__ */ import_react8.default.createElement("span", { className: "font-semibold text-foreground not-italic ml-1" }, resolvedMark)))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "mt-2 space-y-3" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest" }, "Appearance"), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Chart Title"), /* @__PURE__ */ import_react8.default.createElement(
-    import_ui7.Input,
+    showStyle ? /* @__PURE__ */ import_react7.default.createElement(import_lucide_react3.ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react7.default.createElement(import_lucide_react3.ChevronRight, { className: "w-4 h-4" }),
+    /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] font-bold uppercase tracking-widest" }, "Chart Style & Settings")
+  ), showStyle && /* @__PURE__ */ import_react7.default.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 space-y-4" }, /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement(import_ui6.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, "Marks"), /* @__PURE__ */ import_react7.default.createElement("div", { className: "bg-muted/30 border border-border rounded-md p-2" }, /* @__PURE__ */ import_react7.default.createElement(MarkSelector, { value: shelfSpec.mark || "auto", onChange: handleMarkChange }), shelfSpec.mark === "auto" && /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-[10px] text-muted-foreground italic p-1 text-center mt-1" }, "Auto-resolved to: ", /* @__PURE__ */ import_react7.default.createElement("span", { className: "font-semibold text-foreground not-italic ml-1" }, resolvedMark)))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "mt-2 space-y-3" }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest" }, "Appearance"), /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement(import_ui6.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Chart Title"), /* @__PURE__ */ import_react7.default.createElement(
+    import_ui6.Input,
     {
       type: "text",
       value: shelfSpec.config?.title || "",
@@ -3942,16 +4372,16 @@ var ShelfBuilder = ({
       placeholder: "Untitled Chart",
       className: "w-full text-xs"
     }
-  )), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Color Palette"), /* @__PURE__ */ import_react8.default.createElement(import_ui7.Select, { value: shelfSpec.config?.colorScheme || "tableau10", onValueChange: (val) => handleConfigChange("colorScheme", val) }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectValue, { placeholder: "Select an option" })), /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectContent, { className: "z-[200]" }, COLOR_SCHEMES.map((s) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key: s, value: s }, s))))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Width"), /* @__PURE__ */ import_react8.default.createElement(import_ui7.Select, { value: shelfSpec.config?.width === "container" ? "container" : "custom", onValueChange: (val) => handleConfigChange("width", val === "container" ? "container" : 400) }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectValue, { placeholder: "Select an option" })), /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectContent, { className: "z-[200]" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { value: "container" }, "Fill"), /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { value: "custom" }, "Fixed")))), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Height"), /* @__PURE__ */ import_react8.default.createElement(
-    import_ui7.Input,
+  )), /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement(import_ui6.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Color Palette"), /* @__PURE__ */ import_react7.default.createElement(import_ui6.Select, { value: shelfSpec.config?.colorScheme || "tableau10", onValueChange: (val) => handleConfigChange("colorScheme", val) }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectValue, { placeholder: "Select an option" })), /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectContent, { className: "z-[200]" }, COLOR_SCHEMES.map((s) => /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectItem, { key: s, value: s }, s))))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement(import_ui6.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Width"), /* @__PURE__ */ import_react7.default.createElement(import_ui6.Select, { value: shelfSpec.config?.width === "container" ? "container" : "custom", onValueChange: (val) => handleConfigChange("width", val === "container" ? "container" : 400) }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectValue, { placeholder: "Select an option" })), /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectContent, { className: "z-[200]" }, /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectItem, { value: "container" }, "Fill"), /* @__PURE__ */ import_react7.default.createElement(import_ui6.SelectItem, { value: "custom" }, "Fixed")))), /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement(import_ui6.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Height"), /* @__PURE__ */ import_react7.default.createElement(
+    import_ui6.Input,
     {
       type: "number",
       value: shelfSpec.config?.height || 300,
       onChange: (e) => handleConfigChange("height", parseInt(e.target.value) || 300),
       className: "w-full text-xs"
     }
-  )))))))), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogFooter, { className: "px-4 py-2.5 bg-brand-dark shrink-0 mt-2" }, /* @__PURE__ */ import_react8.default.createElement(
-    import_ui7.Button,
+  )))))))), /* @__PURE__ */ import_react7.default.createElement(import_ui6.DialogFooter, { className: "px-4 py-2.5 bg-brand-dark shrink-0 mt-2" }, /* @__PURE__ */ import_react7.default.createElement(
+    import_ui6.Button,
     {
       type: "button",
       onClick: () => setIsOpen(false)
@@ -3960,14 +4390,14 @@ var ShelfBuilder = ({
   )))));
 };
 ShelfBuilder.propTypes = {
-  widgetEditorForm: import_prop_types7.default.object.isRequired,
-  workflowContext: import_prop_types7.default.object,
-  workflows: import_prop_types7.default.array,
-  queryResults: import_prop_types7.default.object
+  widgetEditorForm: import_prop_types6.default.object.isRequired,
+  workflowContext: import_prop_types6.default.object,
+  workflows: import_prop_types6.default.array,
+  queryResults: import_prop_types6.default.object
 };
 
 // src/vega/vegaConfigEditor.jsx
-var import_lucide_react5 = require("lucide-react");
+var import_lucide_react4 = require("lucide-react");
 var VEGA_STRINGS2 = {
   WIDGET_EDITOR_FORM_SETTINGS_BUTTON: "Settings",
   WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL: "Refresh interval"
@@ -3981,9 +4411,9 @@ var VegaConfigEditor = ({
 }) => {
   const isVegaLite = widgetEditorForm.values.widgetType === "vega-lite";
   const currentMode = widgetEditorForm.values.widgetConfig?.editorMode || (isVegaLite ? "visual" : "raw");
-  const [showParseWarning, setShowParseWarning] = (0, import_react9.useState)(false);
-  const [parseWarningsList, setParseWarningsList] = (0, import_react9.useState)([]);
-  const [isSettingsDialogOpen, setIsSettingsDialogOpen] = (0, import_react9.useState)(false);
+  const [showParseWarning, setShowParseWarning] = (0, import_react8.useState)(false);
+  const [parseWarningsList, setParseWarningsList] = (0, import_react8.useState)([]);
+  const [isSettingsDialogOpen, setIsSettingsDialogOpen] = (0, import_react8.useState)(false);
   const resolvedSelectedWorkflow = selectedWorkflow || (workflows && widgetEditorForm.values.workflowID ? workflows.find((w) => String(w.workflowID) === String(widgetEditorForm.values.workflowID)) : null);
   const handleModeSwitch = (newMode) => {
     if (newMode === currentMode) return;
@@ -4013,7 +4443,7 @@ var VegaConfigEditor = ({
     widgetEditorForm.setFieldValue("widgetConfig.editorMode", "visual");
     setShowParseWarning(false);
   };
-  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 flex flex-col gap-3" }, isVegaLite && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex flex-row items-center justify-stretch gap-3" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ import_react9.default.createElement(
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 flex flex-col gap-3" }, isVegaLite && /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ import_react8.default.createElement(import_ui7.Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-row items-center justify-stretch gap-3" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ import_react8.default.createElement(
     ShelfBuilder,
     {
       widgetEditorForm,
@@ -4021,8 +4451,8 @@ var VegaConfigEditor = ({
       workflows,
       queryResults
     }
-  ), /* @__PURE__ */ import_react9.default.createElement(
-    import_ui8.Button,
+  ), /* @__PURE__ */ import_react8.default.createElement(
+    import_ui7.Button,
     {
       type: "button",
       variant: "outline",
@@ -4030,10 +4460,10 @@ var VegaConfigEditor = ({
       className: "h-8 text-xs",
       onClick: () => setIsSettingsDialogOpen(true)
     },
-    /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.Settings, { className: "inline-block h-3 w-3 mr-2" }),
+    /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.Settings, { className: "inline-block h-3 w-3 mr-2" }),
     VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON
-  ), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Dialog, { open: isSettingsDialogOpen, onOpenChange: setIsSettingsDialogOpen }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.DialogContent, { className: "max-w-lg" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.DialogHeader, null, /* @__PURE__ */ import_react9.default.createElement(import_ui8.DialogTitle, null, VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON)), /* @__PURE__ */ import_react9.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, `${VEGA_STRINGS2.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL} (ms)`), /* @__PURE__ */ import_react9.default.createElement(
-    import_ui8.Input,
+  ), /* @__PURE__ */ import_react8.default.createElement(import_ui7.Dialog, { open: isSettingsDialogOpen, onOpenChange: setIsSettingsDialogOpen }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogContent, { className: "max-w-lg" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogHeader, null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogTitle, null, VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON)), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "text-xs font-medium text-foreground" }, `${VEGA_STRINGS2.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL} (ms)`), /* @__PURE__ */ import_react8.default.createElement(
+    import_ui7.Input,
     {
       type: "number",
       name: "widgetConfig.refetchInterval",
@@ -4041,7 +4471,7 @@ var VegaConfigEditor = ({
       onChange: widgetEditorForm.handleChange,
       value: widgetEditorForm.values.widgetConfig?.refetchInterval || ""
     }
-  )), /* @__PURE__ */ import_react9.default.createElement("div", { className: "mt-2" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Label, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ import_react9.default.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react9.default.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ import_react9.default.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ import_react9.default.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ import_react9.default.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ import_react9.default.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-brand-dark" }, /* @__PURE__ */ import_react9.default.createElement(
+  )), /* @__PURE__ */ import_react8.default.createElement("div", { className: "mt-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ import_react8.default.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react4.AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react8.default.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ import_react8.default.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ import_react8.default.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Button, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ import_react8.default.createElement(import_ui7.Button, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ import_react8.default.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-brand-dark" }, /* @__PURE__ */ import_react8.default.createElement(
     VegaSpecEditor,
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,
@@ -4052,11 +4482,11 @@ var VegaConfigEditor = ({
   )));
 };
 VegaConfigEditor.propTypes = {
-  widgetEditorForm: import_prop_types8.default.object.isRequired,
-  workflowContext: import_prop_types8.default.object,
-  workflows: import_prop_types8.default.array,
-  selectedWorkflow: import_prop_types8.default.object,
-  queryResults: import_prop_types8.default.object
+  widgetEditorForm: import_prop_types7.default.object.isRequired,
+  workflowContext: import_prop_types7.default.object,
+  workflows: import_prop_types7.default.array,
+  selectedWorkflow: import_prop_types7.default.object,
+  queryResults: import_prop_types7.default.object
 };
 
 // src/index.js
@@ -4064,7 +4494,7 @@ init_tableWidget();
 init_tableConfigEditor();
 
 // src/widget.map.js
-var import_react26 = __toESM(require("react"));
+var import_react32 = __toESM(require("react"));
 
 // src/widget.config.js
 var registerWidgets = () => {
@@ -4169,13 +4599,13 @@ var getDemoData = (type) => {
 };
 
 // src/widget.map.js
-var import_widget_types = require("@jet-admin/widget-types");
+var import_widget_types2 = require("@jet-admin/widget-types");
 init_buttonConfigEditor();
 init_tableConfigEditor();
 
 // src/text/textConfigEditor.jsx
 var import_react13 = __toESM(require("react"));
-var import_prop_types12 = __toESM(require("prop-types"));
+var import_prop_types11 = __toESM(require("prop-types"));
 var import_ui12 = require("@jet-admin/ui");
 var TextConfigEditor = ({ widgetEditorForm }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
@@ -4185,7 +4615,7 @@ var TextConfigEditor = ({ widgetEditorForm }) => {
       className: "w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[120px] resize-y",
       value: config.content || "",
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.content", e.target.value),
-      placeholder: "# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{queries.myQuery.data[0].name}}"
+      placeholder: "# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{ state.queries.myQuery.data[0].name }}"
     }
   )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "grid grid-cols-3 gap-3" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Format"), /* @__PURE__ */ import_react13.default.createElement(
     import_ui12.Select,
@@ -4214,15 +4644,26 @@ var TextConfigEditor = ({ widgetEditorForm }) => {
   ))));
 };
 TextConfigEditor.propTypes = {
-  widgetEditorForm: import_prop_types12.default.object.isRequired
+  widgetEditorForm: import_prop_types11.default.object.isRequired
 };
 
 // src/stat/statConfigEditor.jsx
 var import_react14 = __toESM(require("react"));
-var import_prop_types13 = __toESM(require("prop-types"));
+var import_prop_types12 = __toESM(require("prop-types"));
 var import_ui13 = require("@jet-admin/ui");
-var StatConfigEditor = ({ widgetEditorForm }) => {
+init_TemplateAutocompleteInput();
+init_suggestionEngine();
+var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+  const suggestions = (0, import_react14.useMemo)(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail
+    }));
+  }, [stateTree]);
   return /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ import_react14.default.createElement(
     import_ui13.Input,
     {
@@ -4233,13 +4674,12 @@ var StatConfigEditor = ({ widgetEditorForm }) => {
       placeholder: "e.g. Total Revenue"
     }
   )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Value"), /* @__PURE__ */ import_react14.default.createElement(
-    import_ui13.Input,
+    TemplateAutocompleteInput_default,
     {
-      type: "text",
-      className: "text-sm font-mono",
       value: config.valueTemplate || "",
-      onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.valueTemplate", e.target.value),
-      placeholder: "e.g. {{queries.stats.data[0].count}}"
+      onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.valueTemplate", val),
+      placeholder: "e.g. {{state.queries.stats.data[0].count}}",
+      suggestions
     }
   ), /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "The primary metric value. Use template expressions to bind to data sources.")), /* @__PURE__ */ import_react14.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Prefix"), /* @__PURE__ */ import_react14.default.createElement(
     import_ui13.Input,
@@ -4260,13 +4700,12 @@ var StatConfigEditor = ({ widgetEditorForm }) => {
       placeholder: "e.g. users"
     }
   ))), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Trend Value"), /* @__PURE__ */ import_react14.default.createElement(
-    import_ui13.Input,
+    TemplateAutocompleteInput_default,
     {
-      type: "text",
-      className: "text-sm font-mono",
       value: config.trendTemplate || "",
-      onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.trendTemplate", e.target.value),
-      placeholder: "e.g. {{queries.stats.data[0].change_pct}}"
+      onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.trendTemplate", val),
+      placeholder: "e.g. {{state.queries.stats.data[0].change_pct}}",
+      suggestions
     }
   ), /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Optional percentage change. Positive = up trend, negative = down trend.")), /* @__PURE__ */ import_react14.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Trend Semantics"), /* @__PURE__ */ import_react14.default.createElement(
     import_ui13.Select,
@@ -4287,15 +4726,27 @@ var StatConfigEditor = ({ widgetEditorForm }) => {
   ))));
 };
 StatConfigEditor.propTypes = {
-  widgetEditorForm: import_prop_types13.default.object.isRequired
+  widgetEditorForm: import_prop_types12.default.object.isRequired,
+  stateTree: import_prop_types12.default.object
 };
 
 // src/alert/alertConfigEditor.jsx
 var import_react15 = __toESM(require("react"));
-var import_prop_types14 = __toESM(require("prop-types"));
+var import_prop_types13 = __toESM(require("prop-types"));
 var import_ui14 = require("@jet-admin/ui");
-var AlertConfigEditor = ({ widgetEditorForm }) => {
+init_TemplateAutocompleteInput();
+init_suggestionEngine();
+var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+  const suggestions = (0, import_react15.useMemo)(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail
+    }));
+  }, [stateTree]);
   return /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react15.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Type / Variant"), /* @__PURE__ */ import_react15.default.createElement(
     import_ui14.Select,
     {
@@ -4305,13 +4756,12 @@ var AlertConfigEditor = ({ widgetEditorForm }) => {
     /* @__PURE__ */ import_react15.default.createElement(import_ui14.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react15.default.createElement(import_ui14.SelectValue, null)),
     /* @__PURE__ */ import_react15.default.createElement(import_ui14.SelectContent, null, /* @__PURE__ */ import_react15.default.createElement(import_ui14.SelectItem, { value: "info" }, "Info (Blue)"), /* @__PURE__ */ import_react15.default.createElement(import_ui14.SelectItem, { value: "success" }, "Success (Green)"), /* @__PURE__ */ import_react15.default.createElement(import_ui14.SelectItem, { value: "warning" }, "Warning (Amber)"), /* @__PURE__ */ import_react15.default.createElement(import_ui14.SelectItem, { value: "error" }, "Error (Red)"))
   )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react15.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Title (Optional)"), /* @__PURE__ */ import_react15.default.createElement(
-    import_ui14.Input,
+    TemplateAutocompleteInput_default,
     {
-      type: "text",
-      className: "text-sm",
       value: config.title || "",
-      onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.title", e.target.value),
-      placeholder: "e.g. Warning!"
+      onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.title", val),
+      placeholder: "e.g. Warning!",
+      suggestions
     }
   )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react15.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Message"), /* @__PURE__ */ import_react15.default.createElement(
     "textarea",
@@ -4331,13 +4781,14 @@ var AlertConfigEditor = ({ widgetEditorForm }) => {
   ), /* @__PURE__ */ import_react15.default.createElement(import_ui14.Label, { htmlFor: "alert-dismissible", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow user to dismiss/close the banner")));
 };
 AlertConfigEditor.propTypes = {
-  widgetEditorForm: import_prop_types14.default.object.isRequired
+  widgetEditorForm: import_prop_types13.default.object.isRequired,
+  stateTree: import_prop_types13.default.object
 };
 
 // src/form/formConfigEditor.jsx
 var import_react16 = __toESM(require("react"));
-var import_prop_types15 = __toESM(require("prop-types"));
-var import_lucide_react8 = require("lucide-react");
+var import_prop_types14 = __toESM(require("prop-types"));
+var import_lucide_react7 = require("lucide-react");
 var import_ui15 = require("@jet-admin/ui");
 var FormConfigEditor = ({ widgetEditorForm }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
@@ -4391,7 +4842,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       className: "h-7 px-2 text-[10px] gap-1",
       onClick: handleAddField
     },
-    /* @__PURE__ */ import_react16.default.createElement(import_lucide_react8.Plus, { className: "h-3 w-3" }),
+    /* @__PURE__ */ import_react16.default.createElement(import_lucide_react7.Plus, { className: "h-3 w-3" }),
     " Add Field"
   )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-3 max-h-[350px] overflow-y-auto pr-1" }, fields.map((field, idx) => /* @__PURE__ */ import_react16.default.createElement("div", { key: idx, className: "p-3 border rounded bg-muted/10 relative space-y-2" }, /* @__PURE__ */ import_react16.default.createElement(
     import_ui15.Button,
@@ -4402,7 +4853,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       className: "absolute top-1 right-1 h-6 w-6 text-muted-foreground hover:text-destructive",
       onClick: () => handleRemoveField(idx)
     },
-    /* @__PURE__ */ import_react16.default.createElement(import_lucide_react8.Trash2, { className: "h-3.5 w-3.5" })
+    /* @__PURE__ */ import_react16.default.createElement(import_lucide_react7.Trash2, { className: "h-3.5 w-3.5" })
   ), /* @__PURE__ */ import_react16.default.createElement("div", { className: "grid grid-cols-2 gap-2 pr-5" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui15.Label, { className: "text-[10px] text-muted-foreground font-medium" }, "Label"), /* @__PURE__ */ import_react16.default.createElement(
     import_ui15.Input,
     {
@@ -4473,23 +4924,33 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
   ), /* @__PURE__ */ import_react16.default.createElement(import_ui15.Label, { htmlFor: "form-show-reset", className: "text-xs text-muted-foreground cursor-pointer" }, "Show form reset button alongside submit")));
 };
 FormConfigEditor.propTypes = {
-  widgetEditorForm: import_prop_types15.default.object.isRequired
+  widgetEditorForm: import_prop_types14.default.object.isRequired
 };
 
 // src/image/imageConfigEditor.jsx
 var import_react17 = __toESM(require("react"));
-var import_prop_types16 = __toESM(require("prop-types"));
+var import_prop_types15 = __toESM(require("prop-types"));
 var import_ui16 = require("@jet-admin/ui");
-var ImageConfigEditor = ({ widgetEditorForm }) => {
+init_TemplateAutocompleteInput();
+init_suggestionEngine();
+var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+  const suggestions = (0, import_react17.useMemo)(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail
+    }));
+  }, [stateTree]);
   return /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react17.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ import_react17.default.createElement(
-    import_ui16.Input,
+    TemplateAutocompleteInput_default,
     {
-      type: "text",
-      className: "text-sm font-mono",
       value: config.src || "",
-      onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.src", e.target.value),
-      placeholder: "e.g. {{queries.user.data.avatar_url}}"
+      onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.src", val),
+      placeholder: "e.g. {{state.queries.user.data.avatar_url}}",
+      suggestions
     }
   ), /* @__PURE__ */ import_react17.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content.")), /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react17.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ import_react17.default.createElement(
     import_ui16.Input,
@@ -4519,23 +4980,34 @@ var ImageConfigEditor = ({ widgetEditorForm }) => {
   ))));
 };
 ImageConfigEditor.propTypes = {
-  widgetEditorForm: import_prop_types16.default.object.isRequired
+  widgetEditorForm: import_prop_types15.default.object.isRequired,
+  stateTree: import_prop_types15.default.object
 };
 
 // src/iframe/iframeConfigEditor.jsx
 var import_react18 = __toESM(require("react"));
-var import_prop_types17 = __toESM(require("prop-types"));
+var import_prop_types16 = __toESM(require("prop-types"));
 var import_ui17 = require("@jet-admin/ui");
-var IframeConfigEditor = ({ widgetEditorForm }) => {
+init_TemplateAutocompleteInput();
+init_suggestionEngine();
+var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+  const suggestions = (0, import_react18.useMemo)(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail
+    }));
+  }, [stateTree]);
   return /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react18.default.createElement(import_ui17.Label, { className: "text-xs font-medium text-foreground" }, "Embed URL / Target Source"), /* @__PURE__ */ import_react18.default.createElement(
-    import_ui17.Input,
+    TemplateAutocompleteInput_default,
     {
-      type: "text",
-      className: "text-sm font-mono",
       value: config.url || "",
-      onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.url", e.target.value),
-      placeholder: "e.g. https://example.com"
+      onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.url", val),
+      placeholder: "e.g. https://example.com",
+      suggestions
     }
   ), /* @__PURE__ */ import_react18.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).")), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-2 border-t pt-3" }, /* @__PURE__ */ import_react18.default.createElement(import_ui17.Label, { className: "text-xs font-medium text-foreground" }, "Sandbox Security Options"), /* @__PURE__ */ import_react18.default.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug mb-2" }, "Toggle capabilities granted to the embedded page. Restricted by default."), /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react18.default.createElement(
     import_ui17.Checkbox,
@@ -4568,51 +5040,60 @@ var IframeConfigEditor = ({ widgetEditorForm }) => {
   ), /* @__PURE__ */ import_react18.default.createElement(import_ui17.Label, { htmlFor: "iframe-origin", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow sharing local storage/cookies (allow-same-origin)"))));
 };
 IframeConfigEditor.propTypes = {
-  widgetEditorForm: import_prop_types17.default.object.isRequired
+  widgetEditorForm: import_prop_types16.default.object.isRequired,
+  stateTree: import_prop_types16.default.object
 };
 
 // src/widget.map.js
-var import_lucide_react13 = require("lucide-react");
+init_datePickerConfigEditor();
+init_dateRangePickerConfigEditor();
+var import_lucide_react16 = require("lucide-react");
 registerWidgets();
-var LazyVegaWidget = import_react26.default.lazy(
+var LazyVegaWidget = import_react32.default.lazy(
   () => Promise.resolve().then(() => (init_vega(), vega_exports)).then((module2) => ({ default: module2.VegaWidget }))
 );
-var LazyButtonWidget = import_react26.default.lazy(
+var LazyButtonWidget = import_react32.default.lazy(
   () => Promise.resolve().then(() => (init_button(), button_exports)).then((module2) => ({ default: module2.ButtonWidget }))
 );
-var LazyTableWidget = import_react26.default.lazy(
+var LazyTableWidget = import_react32.default.lazy(
   () => Promise.resolve().then(() => (init_table(), table_exports)).then((module2) => ({ default: module2.TableWidget }))
 );
-var LazyTextWidget = import_react26.default.lazy(
+var LazyTextWidget = import_react32.default.lazy(
   () => Promise.resolve().then(() => (init_text(), text_exports)).then((module2) => ({ default: module2.TextWidget }))
 );
-var LazyStatWidget = import_react26.default.lazy(
+var LazyStatWidget = import_react32.default.lazy(
   () => Promise.resolve().then(() => (init_stat(), stat_exports)).then((module2) => ({ default: module2.StatWidget }))
 );
-var LazyAlertWidget = import_react26.default.lazy(
+var LazyAlertWidget = import_react32.default.lazy(
   () => Promise.resolve().then(() => (init_alert(), alert_exports)).then((module2) => ({ default: module2.AlertWidget }))
 );
-var LazyFormWidget = import_react26.default.lazy(
+var LazyFormWidget = import_react32.default.lazy(
   () => Promise.resolve().then(() => (init_form(), form_exports)).then((module2) => ({ default: module2.FormWidget }))
 );
-var LazyImageWidget = import_react26.default.lazy(
+var LazyImageWidget = import_react32.default.lazy(
   () => Promise.resolve().then(() => (init_image(), image_exports)).then((module2) => ({ default: module2.ImageWidget }))
 );
-var LazyIframeWidget = import_react26.default.lazy(
+var LazyIframeWidget = import_react32.default.lazy(
   () => Promise.resolve().then(() => (init_iframe(), iframe_exports)).then((module2) => ({ default: module2.IframeWidget }))
+);
+var LazyDatePickerWidget = import_react32.default.lazy(
+  () => Promise.resolve().then(() => (init_date_picker(), date_picker_exports)).then((module2) => ({ default: module2.DatePickerWidget }))
+);
+var LazyDateRangePickerWidget = import_react32.default.lazy(
+  () => Promise.resolve().then(() => (init_date_range_picker(), date_range_picker_exports)).then((module2) => ({ default: module2.DateRangePickerWidget }))
 );
 var WIDGETS_MAP = {
   "vega-lite": {
     label: "Vega-Lite",
-    value: import_widget_types.WIDGET_TYPES.VEGA_LITE.value,
+    value: import_widget_types2.WIDGET_TYPES.VEGA_LITE.value,
     datasetFields: [],
     defaultAutoRun: true,
     description: "Declarative visualization grammar",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading chart...") }, /* @__PURE__ */ import_react26.default.createElement(LazyVegaWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading chart...") }, /* @__PURE__ */ import_react32.default.createElement(LazyVegaWidget, { data, ...props }));
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.BarChart, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.BarChart, { className: `!text-lg ${className}` }),
     sampleConfig: {
       options: {
         showActions: false,
@@ -4624,15 +5105,15 @@ var WIDGETS_MAP = {
   },
   "vega": {
     label: "Vega",
-    value: import_widget_types.WIDGET_TYPES.VEGA.value,
+    value: import_widget_types2.WIDGET_TYPES.VEGA.value,
     datasetFields: [],
     defaultAutoRun: true,
     description: "Low-level visualization grammar",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading chart...") }, /* @__PURE__ */ import_react26.default.createElement(LazyVegaWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading chart...") }, /* @__PURE__ */ import_react32.default.createElement(LazyVegaWidget, { data, ...props }));
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.BarChart, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.BarChart, { className: `!text-lg ${className}` }),
     sampleConfig: {
       options: {
         showActions: false,
@@ -4644,15 +5125,15 @@ var WIDGETS_MAP = {
   },
   "button": {
     label: "Button",
-    value: import_widget_types.WIDGET_TYPES.BUTTON.value,
+    value: import_widget_types2.WIDGET_TYPES.BUTTON.value,
     datasetFields: [],
     defaultAutoRun: false,
     description: "Trigger a workflow",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading button...") }, /* @__PURE__ */ import_react26.default.createElement(LazyButtonWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading button...") }, /* @__PURE__ */ import_react32.default.createElement(LazyButtonWidget, { data, ...props }));
     },
     configEditor: ButtonConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.Component, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.Component, { className: `!text-lg ${className}` }),
     sampleConfig: {
       text: "Click Me",
       variant: "default",
@@ -4662,18 +5143,19 @@ var WIDGETS_MAP = {
   },
   "table": {
     label: "Data Table",
-    value: import_widget_types.WIDGET_TYPES.TABLE.value,
+    value: import_widget_types2.WIDGET_TYPES.TABLE.value,
     datasetFields: [],
     defaultAutoRun: true,
     description: "Tabular data display with pagination",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading table...") }, /* @__PURE__ */ import_react26.default.createElement(LazyTableWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading table...") }, /* @__PURE__ */ import_react32.default.createElement(LazyTableWidget, { data, ...props }));
     },
     configEditor: TableConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.Table, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.Table, { className: `!text-lg ${className}` }),
     sampleConfig: {
       dataArrayTemplate: "{{ctx.data}}",
       columns: [],
+      isLoading: "",
       pagination: {
         enabled: false,
         pageParam: "page",
@@ -4707,15 +5189,15 @@ var WIDGETS_MAP = {
   },
   "text": {
     label: "Text / Markdown",
-    value: import_widget_types.WIDGET_TYPES.TEXT.value,
+    value: import_widget_types2.WIDGET_TYPES.TEXT.value,
     datasetFields: [],
     defaultAutoRun: false,
     description: "Display text or markdown",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading text...") }, /* @__PURE__ */ import_react26.default.createElement(LazyTextWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading text...") }, /* @__PURE__ */ import_react32.default.createElement(LazyTextWidget, { data, ...props }));
     },
     configEditor: TextConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.Type, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.Type, { className: `!text-lg ${className}` }),
     sampleConfig: {
       content: "### Heading\n\nEdit this markdown in the properties tab.",
       format: "markdown",
@@ -4726,15 +5208,15 @@ var WIDGETS_MAP = {
   },
   "stat": {
     label: "Stat / KPI",
-    value: import_widget_types.WIDGET_TYPES.STAT.value,
+    value: import_widget_types2.WIDGET_TYPES.STAT.value,
     datasetFields: [],
     defaultAutoRun: true,
     description: "Display a metric / KPI card",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading stat...") }, /* @__PURE__ */ import_react26.default.createElement(LazyStatWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading stat...") }, /* @__PURE__ */ import_react32.default.createElement(LazyStatWidget, { data, ...props }));
     },
     configEditor: StatConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.TrendingUp, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.TrendingUp, { className: `!text-lg ${className}` }),
     sampleConfig: {
       label: "Metric Label",
       valueTemplate: "42",
@@ -4748,15 +5230,15 @@ var WIDGETS_MAP = {
   },
   "alert": {
     label: "Alert Banner",
-    value: import_widget_types.WIDGET_TYPES.ALERT.value,
+    value: import_widget_types2.WIDGET_TYPES.ALERT.value,
     datasetFields: [],
     defaultAutoRun: false,
     description: "Display a colored banner message",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading alert...") }, /* @__PURE__ */ import_react26.default.createElement(LazyAlertWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading alert...") }, /* @__PURE__ */ import_react32.default.createElement(LazyAlertWidget, { data, ...props }));
     },
     configEditor: AlertConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.AlertTriangle, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.AlertTriangle, { className: `!text-lg ${className}` }),
     sampleConfig: {
       title: "Notice",
       message: "This is a banner notice.",
@@ -4767,15 +5249,15 @@ var WIDGETS_MAP = {
   },
   "form": {
     label: "Form",
-    value: import_widget_types.WIDGET_TYPES.FORM.value,
+    value: import_widget_types2.WIDGET_TYPES.FORM.value,
     datasetFields: [],
     defaultAutoRun: false,
     description: "Capture user input and trigger workflows",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading form...") }, /* @__PURE__ */ import_react26.default.createElement(LazyFormWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading form...") }, /* @__PURE__ */ import_react32.default.createElement(LazyFormWidget, { data, ...props }));
     },
     configEditor: FormConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.FileText, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.FileText, { className: `!text-lg ${className}` }),
     sampleConfig: {
       fields: [],
       submitLabel: "Submit",
@@ -4786,15 +5268,15 @@ var WIDGETS_MAP = {
   },
   "image": {
     label: "Image",
-    value: import_widget_types.WIDGET_TYPES.IMAGE.value,
+    value: import_widget_types2.WIDGET_TYPES.IMAGE.value,
     datasetFields: [],
     defaultAutoRun: false,
     description: "Display an image",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading image...") }, /* @__PURE__ */ import_react26.default.createElement(LazyImageWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading image...") }, /* @__PURE__ */ import_react32.default.createElement(LazyImageWidget, { data, ...props }));
     },
     configEditor: ImageConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.Image, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.Image, { className: `!text-lg ${className}` }),
     sampleConfig: {
       src: "",
       alt: "Image Content",
@@ -4805,21 +5287,66 @@ var WIDGETS_MAP = {
   },
   "iframe": {
     label: "IFrame Embed",
-    value: import_widget_types.WIDGET_TYPES.IFRAME.value,
+    value: import_widget_types2.WIDGET_TYPES.IFRAME.value,
     datasetFields: [],
     defaultAutoRun: false,
     description: "Embed an external webpage",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react26.default.createElement(import_react26.default.Suspense, { fallback: /* @__PURE__ */ import_react26.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading embed...") }, /* @__PURE__ */ import_react26.default.createElement(LazyIframeWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading embed...") }, /* @__PURE__ */ import_react32.default.createElement(LazyIframeWidget, { data, ...props }));
     },
     configEditor: IframeConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react26.default.createElement(import_lucide_react13.Globe, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.Globe, { className: `!text-lg ${className}` }),
     sampleConfig: {
       url: "",
       allowScripts: true,
       allowForms: true,
       allowPopups: false,
       allowSameOrigin: false,
+      showHeader: false
+    }
+  },
+  "date-picker": {
+    label: "Date / Time Picker",
+    value: import_widget_types2.WIDGET_TYPES.DATE_PICKER.value,
+    datasetFields: [],
+    defaultAutoRun: false,
+    description: "Select a single date and optional time",
+    component: ({ data, ...props }) => {
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading picker...") }, /* @__PURE__ */ import_react32.default.createElement(LazyDatePickerWidget, { data, ...props }));
+    },
+    configEditor: DatePickerConfigEditor,
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.Calendar, { className: `!text-lg ${className}` }),
+    sampleConfig: {
+      label: "Select Date",
+      placeholder: "Choose a date...",
+      enableTime: false,
+      defaultValue: "",
+      showHeader: false
+    }
+  },
+  "date-range-picker": {
+    label: "Date Range Picker",
+    value: import_widget_types2.WIDGET_TYPES.DATE_RANGE_PICKER.value,
+    datasetFields: [],
+    defaultAutoRun: false,
+    description: "Select a range of dates and optional times",
+    component: ({ data, ...props }) => {
+      return /* @__PURE__ */ import_react32.default.createElement(import_react32.default.Suspense, { fallback: /* @__PURE__ */ import_react32.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading range picker...") }, /* @__PURE__ */ import_react32.default.createElement(LazyDateRangePickerWidget, { data, ...props }));
+    },
+    configEditor: DateRangePickerConfigEditor,
+    icon: ({ className }) => /* @__PURE__ */ import_react32.default.createElement(import_lucide_react16.CalendarRange, { className: `!text-lg ${className}` }),
+    sampleConfig: {
+      label: "Select Date Range",
+      placeholderStart: "Start date",
+      placeholderEnd: "End date",
+      enableTime: false,
+      defaultStart: "",
+      defaultEnd: "",
+      presets: [
+        { label: "Today", startOffset: 0, endOffset: 0 },
+        { label: "Last 7 days", startOffset: -7, endOffset: 0 },
+        { label: "This month", startOffset: "startOfMonth", endOffset: "endOfMonth" }
+      ],
       showHeader: false
     }
   }
@@ -4832,4 +5359,8 @@ init_alertWidget();
 init_formWidget();
 init_imageWidget();
 init_iframeWidget();
+init_date_picker();
+init_date_range_picker();
+init_TemplateAutocompleteInput();
+init_suggestionEngine();
 //# sourceMappingURL=index.cjs.map

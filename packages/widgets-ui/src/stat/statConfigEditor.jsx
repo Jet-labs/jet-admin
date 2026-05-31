@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import TemplateAutocompleteInput from "../_shared/TemplateAutocompleteInput";
+import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
-export const StatConfigEditor = ({ widgetEditorForm }) => {
+export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+
+  const suggestions = useMemo(() => {
+    if (!stateTree) return [];
+    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
+    return rawSuggestions.map((s) => ({
+      label: `{{${s.value}}}`,
+      value: `{{${s.value}}}`,
+      detail: s.detail,
+    }));
+  }, [stateTree]);
 
   return (
     <div className="space-y-4">
@@ -22,12 +34,11 @@ export const StatConfigEditor = ({ widgetEditorForm }) => {
       {/* Value Template */}
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-foreground">Value</Label>
-        <Input
-          type="text"
-          className="text-sm font-mono"
+        <TemplateAutocompleteInput
           value={config.valueTemplate || ""}
-          onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.valueTemplate", e.target.value)}
-          placeholder="e.g. {{queries.stats.data[0].count}}"
+          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.valueTemplate", val)}
+          placeholder="e.g. {{state.queries.stats.data[0].count}}"
+          suggestions={suggestions}
         />
         <p className="text-[10px] text-muted-foreground">
           The primary metric value. Use template expressions to bind to data sources.
@@ -61,12 +72,11 @@ export const StatConfigEditor = ({ widgetEditorForm }) => {
       {/* Trend */}
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-foreground">Trend Value</Label>
-        <Input
-          type="text"
-          className="text-sm font-mono"
+        <TemplateAutocompleteInput
           value={config.trendTemplate || ""}
-          onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.trendTemplate", e.target.value)}
-          placeholder="e.g. {{queries.stats.data[0].change_pct}}"
+          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.trendTemplate", val)}
+          placeholder="e.g. {{state.queries.stats.data[0].change_pct}}"
+          suggestions={suggestions}
         />
         <p className="text-[10px] text-muted-foreground">
           Optional percentage change. Positive = up trend, negative = down trend.
@@ -115,6 +125,7 @@ export const StatConfigEditor = ({ widgetEditorForm }) => {
 
 StatConfigEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
+  stateTree: PropTypes.object,
 };
 
 export default StatConfigEditor;

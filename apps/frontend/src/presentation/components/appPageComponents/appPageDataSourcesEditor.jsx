@@ -13,9 +13,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  InputArgsForm,
   Checkbox,
 } from "@jet-admin/ui";
+import { TemplateAutocompleteInput, getExpressionSuggestions } from "@jet-admin/widgets-ui";
 import { Plus, Trash2, Edit2, Play, Square, Database, GitBranch, Layers, Loader2, ArrowLeft } from "lucide-react";
 import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { stopTestWorkflowAPI } from "../../../data/apis/workflow";
@@ -254,8 +254,8 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     }
     if (source.type === "workflow" && source.workflowID) {
       const wf = workflows.find((w) => String(w.workflowID) === String(source.workflowID));
-      const inputSchema = wf?.workflowOptions?.inputSchema;
-      if (Array.isArray(inputSchema)) return inputSchema;
+      const args = wf?.workflowOptions?.args;
+      if (Array.isArray(args)) return args;
       return [];
     }
     return [];
@@ -306,7 +306,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               />
               <p className="text-[10px] text-muted-foreground">
                 Accessible via expression engine, e.g.{" "}
-                <code className="bg-background px-1 rounded border border-border font-mono text-xs">{`{{queries.${selectedSource.alias || "alias"}.data}}`}</code>
+                <code className="bg-background px-1 rounded border border-border font-mono text-xs">{`{{ state.${selectedSource.type === "workflow" ? "workflows" : "queries"}.${selectedSource.alias || "alias"}.data }}`}</code>
               </p>
             </div>
 
@@ -454,15 +454,23 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Parameters / Arguments
                 </p>
-                <InputArgsForm
-                  args={getSourceArgDefs(selectedSource)}
-                  values={selectedSource.inputArgs || {}}
-                  onChange={(argKey, argValue) => {
-                    const currentArgs = selectedSource.inputArgs || {};
-                    const updatedArgs = { ...currentArgs, [argKey]: argValue };
-                    handleSourceChange(editingIndex, "inputArgs", updatedArgs);
-                  }}
-                />
+                {getSourceArgDefs(selectedSource).map((argDef) => (
+                  <div key={argDef.key} className="space-y-1">
+                    <Label className="text-[10px] text-muted-foreground font-mono">{argDef.key}</Label>
+                    <TemplateAutocompleteInput
+                      value={selectedSource.inputArgs?.[argDef.key] || ""}
+                      onChange={(val) => {
+                        const updatedArgs = { ...(selectedSource.inputArgs || {}), [argDef.key]: val };
+                        handleSourceChange(editingIndex, "inputArgs", updatedArgs);
+                      }}
+                      placeholder={`e.g. {{ state.variables.${argDef.key} }}`}
+                      suggestions={getExpressionSuggestions({
+                        dataSources,
+                        variableDefinitions: variables,
+                      })}
+                    />
+                  </div>
+                ))}
               </div>
             )}
           </div>

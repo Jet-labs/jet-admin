@@ -42,12 +42,13 @@ export const AppPageDeletionForm = ({ tenantID, appPageID }) => {
     });
 
   const _handleDeleteAppPage = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.DELETE_APP_PAGE_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_APP_PAGE_DIALOG_MESSAGE,
       confirmText: "Delete",
       cancelText: "Cancel",
     });
+    if (!confirmed) return;
     deleteAppPage();
   };
 
