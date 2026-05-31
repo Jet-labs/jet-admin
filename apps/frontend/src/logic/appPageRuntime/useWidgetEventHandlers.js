@@ -139,17 +139,6 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
       return null;
     }
 
-    // Passthrough to the existing action dispatcher for backwards compat
-    case "EXECUTE_QUERY_LEGACY":
-    case "TRIGGER_WORKFLOW": {
-      // Delegate to existing actionDispatcher
-      const { dispatchEvent } = await import("../actionDispatcher");
-      return dispatchEvent(actionType, { events: { [actionType]: [action] } }, {
-        tenantID: meta.tenantID,
-        stateTree,
-      });
-    }
-
     default:
       console.warn(`[AppPageEvents] Unknown action type: ${actionType}`);
       return null;
@@ -185,22 +174,24 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
         return [];
       }
 
-      // Augment state tree with event context
-      const eventStateTree = {
-        ...currentStateTree,
-        event: {
-          type: eventType,
-          widgetID,
-          ...eventArgs,
-        },
-      };
-
       const results = [];
       for (const action of actions) {
+        // Dynamically rebuild the state tree with the latest global state
+        // to ensure sequential actions see previous mutations (e.g., SET_VARIABLE)
+        const currentLiveStateTree = stateTreeRef.current;
+        const dynamicEventStateTree = {
+          ...currentLiveStateTree,
+          event: {
+            type: eventType,
+            widgetID,
+            ...eventArgs,
+          },
+        };
+
         try {
           const result = await executeAppPageAction(
             action,
-            eventStateTree,
+            dynamicEventStateTree,
             dispatch,
             currentMeta
           );

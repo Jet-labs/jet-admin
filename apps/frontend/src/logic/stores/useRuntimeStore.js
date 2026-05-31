@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { resolveConfig, extractDependencies } from "../evaluationEngine";
-import { createEventHandlers } from "../actionDispatcher";
 
 function buildStateTree(state) {
   const {
@@ -230,16 +229,6 @@ export const useRuntimeStore = create((set, get) => ({
   // Utilities
   resolveWidgetConfig: (widgetConfig) => {
     return resolveConfig(widgetConfig, get().stateTree);
-  },
-
-  getEventHandlers: (widgetConfig) => {
-    const state = get();
-    return createEventHandlers(widgetConfig, {
-      tenantID: state.tenantID,
-      stateTree: state.stateTree,
-      onQueryResult: (queryID, result) => state.setQueryResult(queryID, result),
-      onWorkflowResult: (workflowID, result) => state.setWorkflowResult(workflowID, result),
-    });
   },
 
   getDependencies: (widgetConfig) => {

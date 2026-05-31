@@ -27,11 +27,9 @@ export const useRuntime = (tenantID) => {
     }
   }, [tenantID, dataQueries, workflows, widgets, listeners, syncCatalog]);
 
-  // We return the reactive state tree and all bound actions
   return {
     stateTree: useRuntimeStore((state) => state.stateTree),
     resolveWidgetConfig: useRuntimeStore((state) => state.resolveWidgetConfig),
-    getEventHandlers: useRuntimeStore((state) => state.getEventHandlers),
     getDependencies: useRuntimeStore((state) => state.getDependencies),
     setQueryResult: useRuntimeStore((state) => state.setQueryResult),
     setQueryLoading: useRuntimeStore((state) => state.setQueryLoading),
