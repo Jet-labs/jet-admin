@@ -26,6 +26,7 @@ export default function LayoutEditorCanvas({
   tenantID,
   widgets,
   setWidgets,
+  onEditWidget,
 }) {
   const [activeNode, setActiveNode] = useState(null);
   const [lockedNodeIds, setLockedNodeIds] = useState(new Set());
@@ -103,7 +104,7 @@ export default function LayoutEditorCanvas({
   };
 
   const handleDropNewWidget = (widgetKey, targetRowId, targetIndex) => {
-    let updated = addWidgetToRow(layout, targetRowId, widgetKey, 6, "fill");
+    let updated = addWidgetToRow(layout, targetRowId, widgetKey, 6, "fill", targetIndex);
     onChangeLayout(updated);
 
     // Add to widgets list
@@ -239,25 +240,57 @@ export default function LayoutEditorCanvas({
             )}
 
             {hasChildren ? (
-              <>
-                {node.children.map((child, idx) => (
-                  <React.Fragment key={child.id}>
-                    {renderEditorNode(child, node.id, idx)}
-                  </React.Fragment>
-                ))}
-                {totalSpan < 12 && (
-                  <LayoutDropIndicator
-                    type="cell"
-                    className={`layout-row-remaining-drop col-span-${12 - totalSpan}`}
-                    onDropNode={(action) => {
-                      if (action.type === "new") handleDropNewWidget(action.widgetKey, node.id, node.children.length);
-                      else handleMoveWidget(action.nodeId, node.id, node.children.length);
-                    }}
-                  >
-                    + Add Widget
-                  </LayoutDropIndicator>
-                )}
-              </>
+              (() => {
+                let currentLineSpan = 0;
+                const gridCells = [];
+                node.children.forEach((child, idx) => {
+                  const childSpan = child.span || 6;
+                  if (currentLineSpan + childSpan > 12) {
+                    const holeSpan = 12 - currentLineSpan;
+                    if (holeSpan > 0) {
+                      gridCells.push(
+                        <LayoutDropIndicator
+                          key={`hole-before-${child.id}`}
+                          type="cell"
+                          className={`layout-row-remaining-drop col-span-${holeSpan}`}
+                          onDropNode={(action) => {
+                            if (action.type === "new") handleDropNewWidget(action.widgetKey, node.id, idx);
+                            else handleMoveWidget(action.nodeId, node.id, idx);
+                          }}
+                        >
+                          + Add Widget
+                        </LayoutDropIndicator>
+                      );
+                    }
+                    currentLineSpan = 0;
+                  }
+                  
+                  currentLineSpan += childSpan;
+                  gridCells.push(
+                    <React.Fragment key={child.id}>
+                      {renderEditorNode(child, node.id, idx)}
+                    </React.Fragment>
+                  );
+                });
+
+                const finalHoleSpan = 12 - currentLineSpan;
+                if (finalHoleSpan > 0) {
+                  gridCells.push(
+                    <LayoutDropIndicator
+                      key="hole-trailing"
+                      type="cell"
+                      className={`layout-row-remaining-drop col-span-${finalHoleSpan}`}
+                      onDropNode={(action) => {
+                        if (action.type === "new") handleDropNewWidget(action.widgetKey, node.id, node.children.length);
+                        else handleMoveWidget(action.nodeId, node.id, node.children.length);
+                      }}
+                    >
+                      + Add Widget
+                    </LayoutDropIndicator>
+                  );
+                }
+                return <>{gridCells}</>;
+              })()
             ) : (
               <LayoutDropIndicator
                 type="cell"
@@ -360,6 +393,7 @@ export default function LayoutEditorCanvas({
                 onToggleLock={handleToggleLock}
                 onUpdateStyle={handleUpdateStyle}
                 onClose={() => setActiveNode(null)}
+                onEditWidget={onEditWidget}
               />
             )}
 

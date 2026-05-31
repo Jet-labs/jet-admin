@@ -236,9 +236,9 @@
 
 .layout-drop-indicator-left {
   position: absolute;
-  left: -8px;
+  left: -16px;
   top: 0;
-  width: 16px;
+  width: 32px;
   height: 100%;
   z-index: 40;
   background-color: transparent;
@@ -248,24 +248,25 @@
 .layout-drop-indicator-left::after {
   content: "";
   position: absolute;
-  left: 7px;
+  left: 14px;
   top: 0;
-  width: 2px;
+  width: 4px;
   height: 100%;
   background-color: transparent;
-  transition: background-color 0.15s ease;
+  border-radius: 2px;
+  transition: all 0.15s ease;
 }
 
 .layout-drop-indicator-left.drag-over::after {
   background-color: hsl(var(--primary));
-  box-shadow: 0 0 8px hsl(var(--primary) / 0.8);
+  box-shadow: 0 0 12px hsl(var(--primary) / 0.8);
 }
 
 .layout-drop-indicator-right {
   position: absolute;
-  right: -8px;
+  right: -16px;
   top: 0;
-  width: 16px;
+  width: 32px;
   height: 100%;
   z-index: 40;
   background-color: transparent;
@@ -275,17 +276,18 @@
 .layout-drop-indicator-right::after {
   content: "";
   position: absolute;
-  right: 7px;
+  right: 14px;
   top: 0;
-  width: 2px;
+  width: 4px;
   height: 100%;
   background-color: transparent;
-  transition: background-color 0.15s ease;
+  border-radius: 2px;
+  transition: all 0.15s ease;
 }
 
 .layout-drop-indicator-right.drag-over::after {
   background-color: hsl(var(--primary));
-  box-shadow: 0 0 8px hsl(var(--primary) / 0.8);
+  box-shadow: 0 0 12px hsl(var(--primary) / 0.8);
 }
 
 /* Floating Toolbar */
@@ -340,7 +342,7 @@
   width: 6px;
   height: 100%;
   cursor: col-resize;
-  z-index: 20;
+  z-index: 50;
   background-color: transparent;
   transition: background-color 0.15s ease;
   border-radius: 3px;

@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { migrateV1ToV2, LayoutEditorCanvas } from "./layout/index.js";
 import { AppPageWidgetSlot } from "./appPageWidgetSlot";
+import { WidgetIdeModal } from "./WidgetIdeModal";
 
 export const AppPageDropzone = ({
   tenantID,
@@ -29,6 +30,14 @@ export const AppPageDropzone = ({
   const migratedConfig = useMemo(() => {
     return migrateV1ToV2(pageConfig);
   }, [pageConfig]);
+
+  const [isIdeOpen, setIsIdeOpen] = useState(false);
+  const [selectedWidgetID, setSelectedWidgetID] = useState(null);
+
+  const handleEditWidget = (widgetID) => {
+    setSelectedWidgetID(widgetID);
+    setIsIdeOpen(true);
+  };
 
   const handleLayoutChange = (newLayout) => {
     if (onChangePageConfig) {
@@ -67,8 +76,16 @@ export const AppPageDropzone = ({
           tenantID={tenantID}
           widgets={widgets}
           setWidgets={setWidgets}
+          onEditWidget={handleEditWidget}
         />
       )}
+
+      <WidgetIdeModal
+        isOpen={isIdeOpen}
+        onClose={() => setIsIdeOpen(false)}
+        tenantID={tenantID}
+        widgetID={selectedWidgetID}
+      />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function LayoutDropIndicator({ type, onDropNode, ...rest }) {
+export default function LayoutDropIndicator({ type, onDropNode, className: customClassName, ...rest }) {
   const [isOver, setIsOver] = useState(false);
 
   const handleDragOver = (e) => {
@@ -26,18 +26,20 @@ export default function LayoutDropIndicator({ type, onDropNode, ...rest }) {
     }
   };
 
-  let className = "layout-drop-indicator-cell";
+  let baseClassName = "layout-drop-indicator-cell";
   if (type === "row") {
-    className = "layout-drop-indicator-row";
+    baseClassName = "layout-drop-indicator-row";
   } else if (type === "cell-left") {
-    className = "layout-drop-indicator-left";
+    baseClassName = "layout-drop-indicator-left";
   } else if (type === "cell-right") {
-    className = "layout-drop-indicator-right";
+    baseClassName = "layout-drop-indicator-right";
   }
+
+  const finalClassName = `${baseClassName} ${isOver ? "drag-over" : ""} ${customClassName || ""}`.trim();
 
   return (
     <div
-      className={`${className} ${isOver ? "drag-over" : ""}`}
+      className={finalClassName}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}

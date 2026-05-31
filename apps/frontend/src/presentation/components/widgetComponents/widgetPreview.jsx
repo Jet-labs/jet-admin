@@ -4,7 +4,7 @@ import { resolveWidgetData } from "@jet-admin/widgets-logic";
 import PropTypes from "prop-types";
 import { useCallback, useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
-import { Spinner } from "@jet-admin/ui";
+import { Spinner, CodeEditor } from "@jet-admin/ui";
 
 export const WidgetPreview = ({
   tenantID,
@@ -125,14 +125,20 @@ export const WidgetPreview = ({
           <span>Debug: Widget Config</span>
         </button>
         {showDebug && (
-          <div className="px-3 pb-3 max-h-64 overflow-auto">
-            <pre className="text-[0.6rem] font-mono leading-relaxed text-muted-foreground bg-background border border-border rounded-sm p-2 whitespace-pre-wrap break-all">
-              {JSON.stringify(debugInfo, null, 2)}
-            </pre>
+                    <div className="h-64 border-t border-border">
+            <CodeEditor
+              language="json"
+              value={JSON.stringify(debugInfo, null, 2)}
+              readOnly={true}
+              height="100%"
+              showHeader={false}
+              className="h-full border-0 rounded-none bg-zinc-950"
+            />
           </div>
         )}
       </div>
     </div>
   );
 };
+
 

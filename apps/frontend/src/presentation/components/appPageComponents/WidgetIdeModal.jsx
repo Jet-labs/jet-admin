@@ -51,7 +51,6 @@ export const WidgetIdeModal = ({
   onClose,
   tenantID,
   widgetID = null,
-  appPageEditorForm,
   onAddWidget,
 }) => {
   const queryClient = useQueryClient();
@@ -138,7 +137,7 @@ export const WidgetIdeModal = ({
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open && !isSaving) onClose();
     }}>
-      <DialogContent className="max-w-7xl w-[95vw] h-[90vh] flex flex-col p-0 overflow-hidden bg-background border border-border">
+      <DialogContent hideCloseIcon={true} className="max-w-7xl w-[95vw] h-[90vh] flex flex-col p-0 overflow-hidden bg-background border border-border [&>button]:hidden">
         <DialogHeader className="px-6 py-4 border-b border-border/80 flex flex-row items-center justify-between shrink-0">
           <div>
             <DialogTitle className="text-base font-semibold text-foreground">
@@ -229,6 +228,5 @@ WidgetIdeModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   widgetID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  appPageEditorForm: PropTypes.object.isRequired,
   onAddWidget: PropTypes.func,
 };

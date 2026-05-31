@@ -192,6 +192,20 @@ export const AppPageWidgetSlot = ({
       ? `${widget.refreshInterval}s refresh`
       : null;
   const showHeader = resolvedConfig?.properties?.showHeader ?? true;
+  
+  const widgetStyleProps = resolvedConfig?.properties?.style || {};
+  const customCSS = widgetStyleProps.customCSS;
+  const customCSSClassName = customCSS ? `custom-widget-${widgetID}` : "";
+
+  const widgetInlineStyle = {
+    ...(widgetStyleProps.backgroundColor && { backgroundColor: widgetStyleProps.backgroundColor }),
+    ...(widgetStyleProps.textColor && { color: widgetStyleProps.textColor }),
+    ...(widgetStyleProps.padding && { padding: widgetStyleProps.padding }),
+    ...(widgetStyleProps.borderWidth && { borderWidth: widgetStyleProps.borderWidth }),
+    ...(widgetStyleProps.borderColor && { borderColor: widgetStyleProps.borderColor }),
+    ...(widgetStyleProps.borderRadius && { borderRadius: widgetStyleProps.borderRadius }),
+    ...(widgetStyleProps.showBorder === false && { border: "none", boxShadow: "none" }),
+  };
 
   // ── Create event handlers that bridge widget events to the runtime ──
   const runtimeEventHandlers = useMemo(() => {
@@ -204,15 +218,20 @@ export const AppPageWidgetSlot = ({
   }, [widget?.widgetConfig?.events, fireWidgetEvent]);
 
   return (
-    <Card
-      className={`!h-full !w-full flex-grow relative rounded-none overflow-hidden border bg-background/95 transition-all duration-200 ${
-        isMouseHover ? "border-primary" : "border-border/80 shadow-sm"
-      }`}
-      onMouseEnter={editable ? () => setIsMouseHover(true) : null}
-      onMouseLeave={editable ? () => setIsMouseHover(false) : null}
-      onClick={editable ? (e) => e.stopPropagation() : null}
-    >
-      {/* Delete button (editor mode only) */}
+    <>
+      {customCSS && (
+        <style dangerouslySetInnerHTML={{ __html: `.${customCSSClassName} { ${customCSS} }` }} />
+      )}
+      <Card
+        className={`!h-full !w-full flex-grow relative rounded-none overflow-hidden bg-background/95 transition-all duration-200 ${
+          widgetStyleProps.showBorder !== false ? "border shadow-sm" : ""
+        } ${isMouseHover ? "border-primary" : "border-border/80"} ${customCSSClassName}`}
+        style={widgetInlineStyle}
+        onMouseEnter={editable ? () => setIsMouseHover(true) : null}
+        onMouseLeave={editable ? () => setIsMouseHover(false) : null}
+        onClick={editable ? (e) => e.stopPropagation() : null}
+      >
+        {/* Delete button (editor mode only) */}
       {handleDelete && isMouseHover && editable && (
         <div className="absolute right-0 top-0 z-50">
           <Button
@@ -328,5 +347,6 @@ export const AppPageWidgetSlot = ({
         </div>
       </div>
     </Card>
+    </>
   );
 };

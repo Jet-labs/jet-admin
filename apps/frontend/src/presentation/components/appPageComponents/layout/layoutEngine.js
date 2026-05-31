@@ -67,13 +67,72 @@ export const findParentOf = (root, nodeId) => {
 };
 
 /**
+ * Helper to ensure a row's children never exceed a total span of 12.
+ * It will proportionally shrink the largest widgets to make room.
+ * @param {Object} row 
+ * @param {string} priorityNodeId ID of the node that was just added/moved/resized, so we avoid shrinking it if possible.
+ */
+export const balanceRow = (row, priorityNodeId = null) => {
+  if (!row || !Array.isArray(row.children)) return row;
+
+  let sum = row.children.reduce((acc, c) => acc + (c.span || 6), 0);
+  let excess = sum - 12;
+
+  // Enforce absolute max of 12 per widget
+  row.children.forEach((c) => {
+    if ((c.span || 6) > 12) c.span = 12;
+  });
+
+  // Iteratively reduce the largest span until excess is 0
+  while (excess > 0) {
+    let candidateIdx = -1;
+    let maxScore = -9999;
+
+    for (let i = 0; i < row.children.length; i++) {
+      const c = row.children[i];
+      const span = c.span || 6;
+      if (span > 1) {
+        // Heavily penalize shrinking the priority node
+        const isPriority = c.id === priorityNodeId;
+        const score = span - (isPriority ? 100 : 0);
+        if (score > maxScore) {
+          maxScore = score;
+          candidateIdx = i;
+        }
+      }
+    }
+
+    // If we can't shrink anything further (all are 1), we must stop to prevent infinite loops.
+    // In a 12-col grid, we shouldn't have > 12 widgets anyway, but if we do, they will wrap.
+    if (candidateIdx === -1) break;
+
+    row.children[candidateIdx].span--;
+    excess--;
+  }
+
+  return row;
+};
+
+/**
  * Adds a new widget to a specific row.
  */
-export const addWidgetToRow = (root, rowId, widgetKey, span = 6, sizing = "fill") => {
+export const addWidgetToRow = (root, rowId, widgetKey, span = 6, sizing = "fill", targetIndex = -1) => {
   const newRoot = cloneDeep(root);
   const row = findNodeById(newRoot, rowId);
   if (row && Array.isArray(row.children)) {
-    row.children.push(createWidgetNode(widgetKey, span, sizing));
+    // If there's limited space, shrink the initial span of the new widget first
+    const currentSpan = row.children.reduce((acc, c) => acc + (c.span || 6), 0);
+    const available = Math.max(1, 12 - currentSpan);
+    const initialSpan = Math.min(span, available);
+
+    const node = createWidgetNode(widgetKey, initialSpan, sizing);
+    if (targetIndex >= 0 && targetIndex <= row.children.length) {
+      row.children.splice(targetIndex, 0, node);
+    } else {
+      row.children.push(node);
+    }
+    
+    balanceRow(row, node.id);
   }
   return newRoot;
 };
@@ -103,10 +162,15 @@ export const moveNode = (root, nodeId, targetRowId, targetIndex) => {
   const node = findNodeById(newRoot, nodeId);
   if (!node) return root;
 
+  let originParentId = null;
+  let originIndex = -1;
+
   // Remove node from its current place
   const parentInfo = findParentOf(newRoot, nodeId);
   if (parentInfo) {
     const { parent, index } = parentInfo;
+    originParentId = parent.id;
+    originIndex = index;
     if (Array.isArray(parent.children)) {
       parent.children.splice(index, 1);
     } else {
@@ -117,8 +181,12 @@ export const moveNode = (root, nodeId, targetRowId, targetIndex) => {
   // Insert node into the target row
   const targetRow = findNodeById(newRoot, targetRowId);
   if (targetRow && Array.isArray(targetRow.children)) {
-    const insertIdx = targetIndex === undefined ? targetRow.children.length : targetIndex;
+    let insertIdx = targetIndex === undefined ? targetRow.children.length : targetIndex;
+    if (originParentId === targetRowId && originIndex !== -1 && originIndex < insertIdx) {
+      insertIdx--;
+    }
     targetRow.children.splice(insertIdx, 0, node);
+    balanceRow(targetRow, node.id);
   }
 
   return removeEmptyRows(newRoot);
@@ -149,6 +217,11 @@ export const setNodeSpan = (root, nodeId, span) => {
   const node = findNodeById(newRoot, nodeId);
   if (node && typeof node.span === "number") {
     node.span = Math.max(1, Math.min(12, span));
+    
+    const parentInfo = findParentOf(newRoot, nodeId);
+    if (parentInfo && parentInfo.parent.type === "row") {
+      balanceRow(parentInfo.parent, nodeId);
+    }
   }
   return newRoot;
 };

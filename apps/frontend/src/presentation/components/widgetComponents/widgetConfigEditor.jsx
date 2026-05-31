@@ -109,7 +109,7 @@ export const WidgetConfigEditor = ({
   }, [dataSourceResults, referencedDataSources]);
 
   return (
-    <div className="flex h-full w-full flex-col gap-3">
+    <div className="flex w-full flex-col gap-3">
       {/* Widget Name */}
       <div className="space-y-1.5">
         <Label

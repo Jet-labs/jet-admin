@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Trash, Box, Layout, Lock, Paintbrush, X } from "lucide-react";
+import { Trash, Box, Layout, Lock, Paintbrush, X, Settings } from "lucide-react";
 
 export default function LayoutNodeToolbar({
   node,
@@ -11,6 +11,7 @@ export default function LayoutNodeToolbar({
   onToggleLock,
   onUpdateStyle,
   onClose,
+  onEditWidget,
 }) {
   const [showStyles, setShowStyles] = useState(false);
   const [position, setPosition] = useState("top");
@@ -128,18 +129,35 @@ export default function LayoutNodeToolbar({
         </div>
       )}
 
-      {/* Interaction lock */}
-      {node.type === "widget" && onToggleLock && (
+      {/* Interaction lock and Edit */}
+      {node.type === "widget" && (
         <div className="flex items-center border-r border-muted-foreground/30 pr-1 mr-1 gap-1">
-          <button
-            type="button"
-            onClick={() => onToggleLock(node.id)}
-            title="Interact Mode (Lock & Test Widget)"
-            className="flex items-center gap-1 text-xs text-primary font-semibold"
-          >
-            <Lock className="h-3 w-3" />
-            Lock & Interact
-          </button>
+          {onEditWidget && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditWidget(node.widgetKey.split("_")[1]);
+                if (onClose) onClose();
+              }}
+              title="Edit Widget Configuration"
+              className="flex items-center gap-1 text-xs text-primary font-semibold"
+            >
+              <Settings className="h-3 w-3" />
+              Edit Widget
+            </button>
+          )}
+          {onToggleLock && (
+            <button
+              type="button"
+              onClick={() => onToggleLock(node.id)}
+              title="Interact Mode (Lock & Test Widget)"
+              className="flex items-center gap-1 text-xs text-primary font-semibold"
+            >
+              <Lock className="h-3 w-3" />
+              Lock
+            </button>
+          )}
         </div>
       )}
 
