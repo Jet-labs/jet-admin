@@ -3,10 +3,6 @@ import PropTypes from "prop-types";
 import { parseVegaLiteSpec } from "./chartSpecParser";
 import {
   Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
   Input,
   Label,
   Switch,
@@ -14,7 +10,7 @@ import {
 
 import { VegaSpecEditor } from "./vegaSpecEditor";
 import { ShelfBuilder } from "./shelfBuilder";
-import { AlertTriangle, Settings } from 'lucide-react';
+import { AlertTriangle, Settings, ChevronDown, ChevronRight } from 'lucide-react';
 
 const VEGA_STRINGS = {
   WIDGET_EDITOR_FORM_SETTINGS_BUTTON: "Settings",
@@ -33,7 +29,7 @@ export const VegaConfigEditor = ({
   
   const [showParseWarning, setShowParseWarning] = useState(false);
   const [parseWarningsList, setParseWarningsList] = useState([]);
-  const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const resolvedSelectedWorkflow = selectedWorkflow || (workflows && widgetEditorForm.values.workflowID
     ? workflows.find(w => String(w.workflowID) === String(widgetEditorForm.values.workflowID))
@@ -77,7 +73,7 @@ export const VegaConfigEditor = ({
   };
 
   return (
-    <div className="bg-brand-dark border border-border rounded-md p-3 flex flex-col gap-3">
+    <div className="flex flex-col gap-3 w-full">
       {isVegaLite && (
         <div className="flex flex-row items-center gap-2">
           <span className="text-xs font-medium text-muted-foreground">Visual Editor</span>
@@ -86,7 +82,7 @@ export const VegaConfigEditor = ({
       )}
 
       {isVegaLite && (
-        <div className="flex flex-row items-center justify-stretch gap-3">
+        <div className="flex flex-col gap-2 w-full">
           {currentMode === 'visual' && !showParseWarning && (
             <ShelfBuilder
               widgetEditorForm={widgetEditorForm}
@@ -95,44 +91,6 @@ export const VegaConfigEditor = ({
               queryResults={queryResults}
             />
           )}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="h-8 text-xs"
-            onClick={() => setIsSettingsDialogOpen(true)}
-          >
-            <Settings className="inline-block h-3 w-3 mr-2" />
-            {VEGA_STRINGS.WIDGET_EDITOR_FORM_SETTINGS_BUTTON}
-          </Button>
-          <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle>
-                  {VEGA_STRINGS.WIDGET_EDITOR_FORM_SETTINGS_BUTTON}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-medium text-foreground">
-                    {`${VEGA_STRINGS.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL} (ms)`}
-                  </Label>
-                  <Input
-                    type="number"
-                    name="widgetConfig.refetchInterval"
-                    className="text-sm"
-                    onChange={widgetEditorForm.handleChange}
-                    value={widgetEditorForm.values.widgetConfig?.refetchInterval || ""}
-                  />
-                </div>
-                <div className="mt-2">
-                  <Label className="text-xs text-muted-foreground italic">
-                    Additional options moved to Widget Settings.
-                  </Label>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
         </div>
       )}
 
@@ -162,7 +120,7 @@ export const VegaConfigEditor = ({
       )}
 
       {!showParseWarning && currentMode === 'raw' && (
-        <div className="min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-brand-dark">
+        <div className="min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background">
           <VegaSpecEditor
             value={widgetEditorForm.values.widgetConfig?.vegaSpec}
             onChange={(spec) => widgetEditorForm.setFieldValue('widgetConfig.vegaSpec', spec)}

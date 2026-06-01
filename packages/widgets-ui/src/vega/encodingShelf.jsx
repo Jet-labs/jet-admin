@@ -2,40 +2,27 @@ import React, { useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { FieldPill } from './fieldPill';
 import { FIELD_TYPES, AGGREGATE_TYPES } from './chartSpecGenerator';
+import { MoveHorizontal, MoveVertical, Palette, Circle, Diamond, Contrast, Rows, Columns, CircleDot, Type, Minus, ArrowUpDown } from 'lucide-react';
 
-import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
-const CHANNEL_LABELS = {
-  x: 'X Axis',
-  y: 'Y Axis',
-  color: 'Color',
-  size: 'Size',
-  shape: 'Shape',
-  opacity: 'Opacity',
-  row: 'Row',
-  column: 'Column',
-  detail: 'Detail',
-  text: 'Text',
-  strokeDash: 'Dash',
-};
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 
-const CHANNEL_ICONS = {
-  x: '↔',
-  y: '↕',
-  color: '🎨',
-  size: '◉',
-  shape: '◆',
-  opacity: '◐',
-  row: '▦',
-  column: '▥',
-  detail: '⊙',
-  text: 'T',
-  strokeDash: '╌',
+const CHANNEL_CONFIG = {
+  x:          { label: 'X',       Icon: MoveHorizontal },
+  y:          { label: 'Y',       Icon: MoveVertical },
+  color:      { label: 'Color',   Icon: Palette },
+  size:       { label: 'Size',    Icon: Circle },
+  shape:      { label: 'Shape',   Icon: Diamond },
+  opacity:    { label: 'Opacity', Icon: Contrast },
+  row:        { label: 'Row',     Icon: Rows },
+  column:     { label: 'Col',     Icon: Columns },
+  detail:     { label: 'Detail',  Icon: CircleDot },
+  text:       { label: 'Text',    Icon: Type },
+  strokeDash: { label: 'Dash',    Icon: Minus },
 };
 
 /**
  * EncodingShelf — A drop zone for an encoding channel.
- * Accepts dragged FieldPills and shows inline configuration.
- * Uses scoped CSS classes to prevent dark-theme bleed.
+ * Compact vertical layout for sidebar rendering.
  */
 export const EncodingShelf = ({
   channel,
@@ -47,8 +34,8 @@ export const EncodingShelf = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const dropRef = useRef(null);
 
-  const label = CHANNEL_LABELS[channel] || channel;
-  const icon = CHANNEL_ICONS[channel] || '•';
+  const config = CHANNEL_CONFIG[channel] || { label: channel, Icon: CircleDot };
+  const { label, Icon } = config;
 
   // Drag events
   const handleDragOver = useCallback((e) => {
@@ -105,32 +92,32 @@ export const EncodingShelf = ({
 
   const isEmpty = !value || !value.field;
 
-  const shelfClass = [
-    'flex items-center w-full min-h-[36px] bg-brand-dark border border-border rounded-md p-1 gap-2 transition-colors',
-    isEmpty ? 'border-dashed border-border bg-muted/30' : '',
-    isDragOver ? 'border-primary bg-primary/5 shadow-inner' : '',
-    className,
-  ].filter(Boolean).join(' ');
-
   return (
     <div
       ref={dropRef}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={shelfClass}
+      className={[
+        'flex items-center w-full min-h-[32px] rounded border transition-colors gap-1.5 px-2 py-1',
+        isEmpty
+          ? 'border-dashed border-border/60 bg-muted/20'
+          : 'border-border bg-card',
+        isDragOver ? 'border-primary bg-primary/5 shadow-inner' : '',
+        className,
+      ].filter(Boolean).join(' ')}
     >
-      {/* Channel label */}
-      <div className="flex items-center justify-start w-24 shrink-0 px-2 py-1 text-[11px] font-bold text-muted-foreground uppercase tracking-widest gap-2 border-r border-border">
-        <span className="text-muted-foreground/50 text-sm">{icon}</span>
-        <span className="truncate">{label}</span>
+      {/* Channel icon + label */}
+      <div className="flex items-center gap-1.5 w-14 shrink-0">
+        <Icon className="w-3 h-3 text-muted-foreground shrink-0" />
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide truncate">{label}</span>
       </div>
 
-      {/* Content area */}
-      <div className="flex-1 flex flex-wrap items-center gap-2 min-w-0 pr-1">
+      {/* Content */}
+      <div className="flex-1 flex flex-nowrap items-center gap-1 min-w-0 overflow-hidden">
         {isEmpty ? (
-          <span className="text-xs text-muted-foreground italic px-2">
-            {isDragOver ? 'Release to assign' : 'Drop a field here'}
+          <span className="text-[10px] text-muted-foreground/60 italic">
+            {isDragOver ? 'Release' : 'Drop field'}
           </span>
         ) : (
           <>
@@ -139,46 +126,45 @@ export const EncodingShelf = ({
               field={{ ...value, name: value.field }}
               onRemove={onRemove}
               isCompact
+              className="flex-1 min-w-0"
             />
 
-            {/* Inline type select */}
-            <Select value={value.type || 'nominal'} onValueChange={(val) => handleTypeChange(val)}>
-              <SelectTrigger className="h-6 px-1.5 py-0.5 text-[11px]" title="Data type">
-                <SelectValue placeholder="Select type" />
+            {/* Type select */}
+            <Select value={value.type || 'nominal'} onValueChange={handleTypeChange}>
+              <SelectTrigger className="h-5 w-auto min-w-0 px-1 text-[10px] border-border/50 bg-transparent gap-0.5 shrink-0" title="Type">
+                <SelectValue />
               </SelectTrigger>
               <SelectContent className="z-[200]">
                 {FIELD_TYPES.map(t => (
-                  <SelectItem key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</SelectItem>
+                  <SelectItem key={t} value={t} className="text-[11px]">{t.charAt(0).toUpperCase() + t.slice(1)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            {/* Aggregate (for quantitative) */}
+            {/* Aggregate */}
             {(value.type === 'quantitative' || value.aggregate) && (
-              <Select value={value.aggregate || 'none'} onValueChange={(val) => handleAggChange(val)}>
-                <SelectTrigger className="h-6 px-1.5 py-0.5 text-[11px]" title="Aggregation">
-                  <SelectValue placeholder="Select agg" />
+              <Select value={value.aggregate || 'none'} onValueChange={handleAggChange}>
+                <SelectTrigger className="h-5 w-auto min-w-0 px-1 text-[10px] border-border/50 bg-transparent gap-0.5 shrink-0" title="Aggregate">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="z-[200]">
-                  <SelectItem value="none">no agg</SelectItem>
+                  <SelectItem value="none" className="text-[11px]">raw</SelectItem>
                   {AGGREGATE_TYPES.map(a => (
-                    <SelectItem key={a} value={a}>{a}</SelectItem>
+                    <SelectItem key={a} value={a} className="text-[11px]">{a}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             )}
 
-            {/* Sort toggle */}
-            <Button
+            {/* Sort */}
+            <button
               type="button"
-              variant="ghost"
-              size="icon"
               onClick={handleSortToggle}
-              className="ml-auto h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/5 text-xs"
+              className="ml-auto h-5 w-5 flex items-center justify-center rounded text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
               title={`Sort: ${value.sort || 'default'}`}
             >
-              {value.sort === 'ascending' ? '↑' : value.sort === 'descending' ? '↓' : '↕'}
-            </Button>
+              <ArrowUpDown className="w-3 h-3" />
+            </button>
           </>
         )}
       </div>

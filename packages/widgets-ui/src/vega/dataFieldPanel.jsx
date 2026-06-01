@@ -3,15 +3,16 @@ import PropTypes from 'prop-types';
 import { FieldPill } from './fieldPill';
 import { inferFieldsFromData } from './chartSpecGenerator';
 
-import { Button, Input, Label } from "@jet-admin/ui";
+import { Button, Input } from "@jet-admin/ui";
 import { Database, GitMerge, ArrowRightFromLine, Zap, Search, Plus } from 'lucide-react';
 import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
 import { getValueByPath } from '@jet-admin/template-engine';
 
 /**
- * DataFieldPanel — Left sidebar showing workflow data fields.
- * Tableau-style data panel with auto-discovery and suggestions.
- * Uses scoped CSS classes to prevent dark-theme bleed.
+ * DataFieldPanel — Inline field list for Vega visual builder.
+ * 
+ * compact=true  → Slim mode for inside ShelfBuilder (no header/source picker).
+ * compact=false → Full panel with data source picker header.
  */
 export const DataFieldPanel = ({
   workflowContext,
@@ -21,6 +22,7 @@ export const DataFieldPanel = ({
   onFieldClick,
   workflow,
   className = '',
+  compact = false,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [manualField, setManualField] = useState('');
@@ -43,8 +45,6 @@ export const DataFieldPanel = ({
   const allSuggestions = useMemo(() => {
     const seen = new Set();
     const combined = [];
-
-    // Live Runtime Array Paths from State Tree
     const stateTreeSuggestions = getSuggestionsFromStateTree(workflowContext);
     const arraySuggestions = stateTreeSuggestions.filter(s => s.valueType === 'array');
     
@@ -60,60 +60,41 @@ export const DataFieldPanel = ({
         });
       }
     }
-
     return combined;
   }, [workflowContext]);
 
   // Resolve fields from selected data source
   const fields = useMemo(() => {
     if (!dataSource) return [];
-
-    // Extract the inner path from {{...}}
     const match = dataSource.match(/\{\{([^}]+)\}\}/);
     if (!match) return [];
-
     const rawPath = match[1];
 
-    // Helper: convert resolved data into field descriptors
     const toFields = (data) => {
-      if (Array.isArray(data) && data.length > 0) {
-        return inferFieldsFromData(data);
-      }
-      if (data && typeof data === 'object' && !Array.isArray(data)) {
-        return Object.keys(data).map(key => ({
-          name: key,
-          type: typeof data[key] === 'number' ? 'quantitative' : 'nominal',
-          icon: typeof data[key] === 'number' ? '#' : 'Abc',
-        }));
-      }
+      if (Array.isArray(data) && data.length > 0) return inferFieldsFromData(data);
+      if (data && typeof data === 'object' && !Array.isArray(data)) return inferFieldsFromData([data]);
       return null;
     };
 
-    // Try workflowContext first (covers both legacy ctx. and modern page-level paths)
     if (workflowContext) {
       const resolved = getValueByPath(workflowContext, rawPath, { allowedRoots: ['state'] });
       const result = toFields(resolved);
       if (result) return result;
     }
-
-    // Fallback: try queryResults (may be a different object in non-page-level mode)
     if (queryResults && queryResults !== workflowContext) {
       const resolved = getValueByPath(queryResults, rawPath, { allowedRoots: ['state'] });
       const result = toFields(resolved);
       if (result) return result;
     }
-
     return [];
   }, [workflowContext, queryResults, dataSource]);
 
-  // Filter fields
   const filteredFields = useMemo(() => {
     if (!searchTerm) return fields;
     const lower = searchTerm.toLowerCase();
     return fields.filter(f => f.name.toLowerCase().includes(lower));
   }, [fields, searchTerm]);
 
-  // Categorize
   const quantFields = useMemo(() => filteredFields.filter(f => f.type === 'quantitative'), [filteredFields]);
   const catFields = useMemo(() => filteredFields.filter(f => f.type === 'nominal' || f.type === 'ordinal'), [filteredFields]);
   const tempFields = useMemo(() => filteredFields.filter(f => f.type === 'temporal'), [filteredFields]);
@@ -134,28 +115,28 @@ export const DataFieldPanel = ({
 
   const getCategoryIcon = (cat) => {
     switch (cat) {
-      case 'node': return <GitMerge className="w-3 h-3 shrink-0 text-emerald-600" />;
-      case 'output': return <ArrowRightFromLine className="w-3 h-3 shrink-0 text-fuchsia-600" />;
-      case 'runtime': return <Zap className="w-3 h-3 shrink-0 text-amber-600" />;
-      case 'datasource': return <Database className="w-3 h-3 shrink-0 text-blue-600" />;
-      default: return <Database className="w-3 h-3 shrink-0 text-brand-text-primary" />;
+      case 'node': return <GitMerge className="w-3 h-3 shrink-0 text-emerald-500" />;
+      case 'output': return <ArrowRightFromLine className="w-3 h-3 shrink-0 text-fuchsia-500" />;
+      case 'runtime': return <Zap className="w-3 h-3 shrink-0 text-amber-500" />;
+      case 'datasource': return <Database className="w-3 h-3 shrink-0 text-blue-500" />;
+      default: return <Database className="w-3 h-3 shrink-0 text-muted-foreground" />;
     }
   };
 
   const renderFieldGroup = (groupFields, label, colorClass) => {
     if (groupFields.length === 0) return null;
     return (
-      <div className="mb-4">
-        <div className={`text-[10px] font-bold uppercase tracking-widest mb-2 px-1 ${colorClass}`}>
-          {label} ({groupFields.length})
+      <div className="mb-2.5 last:mb-0">
+        <div className={`text-[9px] font-bold uppercase tracking-widest mb-1 px-0.5 ${colorClass}`}>
+          {label} <span className="opacity-60">({groupFields.length})</span>
         </div>
-        <div className="flex flex-col gap-1.5 px-1">
+        <div className="flex flex-col gap-0.5">
           {groupFields.map((field) => (
             <FieldPill
               key={field.name}
               field={field}
               onClick={() => onFieldClick?.(field)}
-              className="w-full justify-start hover:scale-[1.02] transition-transform"
+              className="w-full justify-start"
             />
           ))}
         </div>
@@ -164,160 +145,131 @@ export const DataFieldPanel = ({
   };
 
   return (
-    <div className={`flex flex-col h-full bg-brand-dark ${className}`}>
-      {/* Header */}
-      <div className="p-2.5 border-b border-border bg-muted/30">
-        <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-          <Database className="w-3.5 h-3.5 text-muted-foreground" />
-          <span>Data Source</span>
-        </div>
-
-        {/* Data source picker with suggestions */}
-        <div className="relative" ref={suggestionsRef}>
-          <Input
-            type="text"
-            value={dataSource || ''}
-            onChange={(e) => onDataSourceChange?.(e.target.value)}
-            onFocus={() => setShowSuggestions(true)}
-            placeholder="Select or type a data path..."
-            className="w-full text-xs font-mono"
-            title="Workflow data source path"
-          />
-
-          {/* Suggestions dropdown */}
-          {showSuggestions && allSuggestions.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-1 bg-brand-dark border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80">
-              <div className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted sticky top-0">
-                Available Variables ({allSuggestions.length})
-              </div>
-              {allSuggestions.map((s, i) => (
-                <div
-                  key={`${s.path}-${i}`}
-                  onClick={() => handleSelectSuggestion(s)}
-                  className={`w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? 'bg-primary/5 border-l-2 border-l-primary' : 'bg-brand-dark hover:bg-muted'}`}
-                >
-                  <div className="mt-0.5">{getCategoryIcon(s.source || s.category)}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] font-medium text-foreground font-mono truncate">
-                      {s.label}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground truncate mt-0.5" title={s.description}>
-                      {s.description}
-                    </div>
-                    {s.nodeTitle && (
-                      <div className="text-[9px] text-emerald-600 mt-1 uppercase tracking-wider font-semibold">
-                        from: {s.nodeTitle}
-                      </div>
+    <div className={`flex flex-col bg-background ${className}`}>
+      {/* Header — full mode only */}
+      {!compact && (
+        <div className="px-2.5 py-2 border-b border-border/50 bg-muted/20">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Database className="w-3 h-3 text-muted-foreground" />
+            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Data Source</span>
+          </div>
+          <div className="relative" ref={suggestionsRef}>
+            <Input
+              type="text"
+              value={dataSource || ''}
+              onChange={(e) => onDataSourceChange?.(e.target.value)}
+              onFocus={() => setShowSuggestions(true)}
+              placeholder="Select or type a data path..."
+              className="w-full text-[11px] font-mono h-7"
+              title="Workflow data source path"
+            />
+            {showSuggestions && allSuggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1 bg-popover border border-border rounded-md shadow-xl z-50 max-h-48 overflow-y-auto">
+                <div className="px-2.5 py-1 text-[9px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted/50 sticky top-0">
+                  Variables ({allSuggestions.length})
+                </div>
+                {allSuggestions.map((s, i) => (
+                  <div
+                    key={`${s.path}-${i}`}
+                    onClick={() => handleSelectSuggestion(s)}
+                    className={`w-full text-left px-2.5 py-1.5 text-[11px] border-b border-border/30 flex items-center gap-2 transition-colors cursor-pointer ${dataSource === s.path ? 'bg-primary/10 border-l-2 border-l-primary' : 'hover:bg-muted'}`}
+                  >
+                    {getCategoryIcon(s.source || s.category)}
+                    <span className="font-mono truncate flex-1 min-w-0 text-foreground">{s.label}</span>
+                    {s.source === 'runtime' && (
+                      <span className="text-[8px] font-bold text-amber-500 bg-amber-500/15 px-1 py-px rounded shrink-0 uppercase tracking-wider">LIVE</span>
                     )}
                   </div>
-                  {s.source === 'runtime' && (
-                    <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-sm uppercase tracking-wider shrink-0">LIVE</span>
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+          {dataSource && fields.length > 0 && (
+            <div className="mt-1.5 flex items-center gap-1 text-[9px] font-semibold text-primary">
+              <Zap className="w-2.5 h-2.5" />
+              {fields.length} fields
             </div>
           )}
         </div>
+      )}
 
-        {/* Show selected source info */}
-        {dataSource && fields.length > 0 && (
-          <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm w-fit border border-emerald-100">
-            <Zap className="w-3 h-3" />
-            {fields.length} fields detected
+      {/* Compact header */}
+      {compact && fields.length > 0 && (
+        <div className="px-2.5 py-1.5 flex items-center justify-between bg-muted/20">
+          <div className="flex items-center gap-1.5">
+            <Database className="w-3 h-3 text-muted-foreground" />
+            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Fields</span>
           </div>
-        )}
-      </div>
+          <span className="text-[9px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
+            {fields.length}
+          </span>
+        </div>
+      )}
 
       {/* Search */}
       {fields.length > 5 && (
-        <div className="px-2.5 py-1.5 border-b border-border bg-brand-dark">
-          <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-sm px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow">
-            <Search className="w-3.5 h-3.5 text-muted-foreground" />
+        <div className="px-2.5 py-1.5 border-b border-border/30">
+          <div className="flex items-center gap-1.5 bg-muted/40 border border-border/50 rounded px-2 py-1 focus-within:ring-1 focus-within:ring-ring transition-shadow">
+            <Search className="w-3 h-3 text-muted-foreground shrink-0" />
             <Input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filter fields..."
-              className="flex-1 text-xs bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-6 p-0"
+              placeholder="Filter..."
+              className="flex-1 text-[10px] bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-4 p-0"
             />
           </div>
         </div>
       )}
 
       {/* Field List */}
-      <div className="flex-1 overflow-y-auto p-2.5 min-h-0">
+      <div className="flex-1 overflow-y-auto px-2.5 py-2 min-h-0">
         {fields.length > 0 ? (
           <>
-            {renderFieldGroup(quantFields, 'Measures', 'text-emerald-600')}
-            {renderFieldGroup(catFields, 'Dimensions', 'text-blue-600')}
-            {renderFieldGroup(tempFields, 'Temporal', 'text-amber-600')}
+            {renderFieldGroup(quantFields, 'Measures', 'text-emerald-500')}
+            {renderFieldGroup(catFields, 'Dimensions', 'text-blue-500')}
+            {renderFieldGroup(tempFields, 'Temporal', 'text-amber-500')}
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full py-6 text-center px-3">
-            <Database className="w-8 h-8 mb-2 text-muted-foreground/30" />
-            <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-              {dataSource
-                ? 'Run the workflow to detect fields from the data'
-                : 'Choose a data source above or type a ctx path'}
+          <div className="flex flex-col items-center justify-center py-3 text-center">
+            <Database className="w-5 h-5 mb-1 text-muted-foreground/25" />
+            <p className="text-[10px] text-muted-foreground">
+              {dataSource ? 'Run workflow to detect fields' : 'Select a data source'}
             </p>
-            {!dataSource && allSuggestions.length > 0 && (
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => setShowSuggestions(true)}
-                className="h-7 px-3 text-[10px] font-semibold text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 uppercase tracking-wider"
-              >
-                Browse {allSuggestions.length} Variables
-              </Button>
-            )}
           </div>
         )}
 
         {/* Manual field add */}
-        <div className="mt-3">
-          {showManualAdd ? (
-            <div className="flex flex-col gap-2">
-              <Input
-                type="text"
-                value={manualField}
-                onChange={(e) => setManualField(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddManualField()}
-                placeholder="Type field_name & press Enter..."
-                className="w-full text-xs font-mono"
-                autoFocus
-              />
-              <div className="flex items-center gap-2 justify-end">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowManualAdd(false)}
-                  className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground font-medium"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleAddManualField}
-                  className="h-6 px-2 text-xs font-semibold"
-                >
-                  Add Field
-                </Button>
-              </div>
+        {showManualAdd ? (
+          <div className="mt-2 flex flex-col gap-1">
+            <Input
+              type="text"
+              value={manualField}
+              onChange={(e) => setManualField(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddManualField()}
+              placeholder="field_name"
+              className="w-full text-[10px] font-mono h-6"
+              autoFocus
+            />
+            <div className="flex items-center gap-1 justify-end">
+              <Button type="button" variant="ghost" size="sm" onClick={() => setShowManualAdd(false)} className="h-5 px-1.5 text-[9px] text-muted-foreground">
+                Cancel
+              </Button>
+              <Button type="button" size="sm" onClick={handleAddManualField} className="h-5 px-1.5 text-[9px]">
+                Add
+              </Button>
             </div>
-          ) : (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowManualAdd(true)}
-              className="w-full h-auto py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 border-dashed border-border hover:bg-muted hover:text-foreground"
-            >
-                <Plus className="w-3.5 h-3.5 mr-1" />
-              <span>Add Field Manually</span>
-            </Button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowManualAdd(true)}
+            className="w-full mt-2 flex items-center justify-center gap-1 py-1 rounded border border-dashed border-border/50 text-[9px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 hover:border-border transition-colors"
+          >
+            <Plus className="w-3 h-3" />
+            Add Field
+          </button>
+        )}
       </div>
     </div>
   );
@@ -331,4 +283,5 @@ DataFieldPanel.propTypes = {
   onFieldClick: PropTypes.func,
   workflow: PropTypes.object,
   className: PropTypes.string,
+  compact: PropTypes.bool,
 };

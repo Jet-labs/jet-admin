@@ -335,7 +335,86 @@ export const getDefaultShelfSpec = () => ({
 // ============================================================
 
 /**
- * Infer field types from a sample data row.
+ * Recursively flatten nested objects/arrays into dot-notation field paths.
+ * Follows Vega's field access conventions:
+ *   - Object keys: parent.child
+ *   - Array indices: parent.0.child (uses first element as representative)
+ * 
+ * @param {*} value - The value to explore
+ * @param {string} prefix - Current dot-notation path prefix
+ * @param {Set} visited - Circular reference guard
+ * @param {number} maxDepth - Maximum nesting depth to prevent runaway recursion
+ * @returns {Array<{name: string, type: string, icon: string}>}
+ */
+const flattenFieldsRecursive = (value, prefix = '', visited = new WeakSet(), maxDepth = 5) => {
+  const results = [];
+  if (maxDepth <= 0) return results;
+
+  if (value === null || value === undefined) return results;
+
+  // Circular reference guard for objects
+  if (typeof value === 'object') {
+    if (visited.has(value)) return results;
+    visited.add(value);
+  }
+
+  if (Array.isArray(value)) {
+    // Add the array field itself as nominal (the raw array)
+    if (prefix) {
+      results.push({
+        name: prefix,
+        type: 'nominal',
+        icon: '[]',
+      });
+    }
+    // Recurse into first element with index 0
+    if (value.length > 0 && typeof value[0] === 'object' && value[0] !== null) {
+      const nested = flattenFieldsRecursive(value[0], prefix ? `${prefix}.0` : '0', visited, maxDepth - 1);
+      results.push(...nested);
+    }
+    return results;
+  }
+
+  if (typeof value === 'object') {
+    // Add the object field itself as nominal
+    if (prefix) {
+      results.push({
+        name: prefix,
+        type: 'nominal',
+        icon: '{}',
+      });
+    }
+    // Recurse into each key
+    for (const key of Object.keys(value)) {
+      const childPath = prefix ? `${prefix}.${key}` : key;
+      const childVal = value[key];
+
+      if (childVal === null || childVal === undefined) {
+        results.push({ name: childPath, type: 'nominal', icon: getFieldTypeIcon('nominal') });
+      } else if (Array.isArray(childVal) || (typeof childVal === 'object')) {
+        // Recurse deeper
+        const nested = flattenFieldsRecursive(childVal, childPath, visited, maxDepth - 1);
+        results.push(...nested);
+      } else {
+        // Leaf primitive
+        const type = inferFieldType(childVal, key, []);
+        results.push({ name: childPath, type, icon: getFieldTypeIcon(type) });
+      }
+    }
+    return results;
+  }
+
+  // Leaf primitive with prefix
+  if (prefix) {
+    const type = inferFieldType(value, prefix, []);
+    results.push({ name: prefix, type, icon: getFieldTypeIcon(type) });
+  }
+
+  return results;
+};
+
+/**
+ * Infer field types from sample data, including nested dot-notation paths.
  * Returns an array of { name, type, icon } objects.
  */
 export const inferFieldsFromData = (data) => {
@@ -344,15 +423,20 @@ export const inferFieldsFromData = (data) => {
   const sample = data[0];
   if (typeof sample !== 'object' || sample === null) return [];
 
-  return Object.keys(sample).map(key => {
-    const value = sample[key];
-    const type = inferFieldType(value, key, data);
-    return {
-      name: key,
-      type,
-      icon: getFieldTypeIcon(type),
-    };
-  });
+  // Use multiple sample rows (up to 5) to handle nulls in first row
+  const sampleRows = data.slice(0, 5);
+  const mergedSample = {};
+  for (const row of sampleRows) {
+    if (row && typeof row === 'object') {
+      for (const key of Object.keys(row)) {
+        if (mergedSample[key] === undefined || mergedSample[key] === null) {
+          mergedSample[key] = row[key];
+        }
+      }
+    }
+  }
+
+  return flattenFieldsRecursive(mergedSample);
 };
 
 /**

@@ -413,17 +413,17 @@ import {
   getPaginationRowModel,
   flexRender
 } from "@tanstack/react-table";
-import { Button as Button7, Input as Input4, Checkbox } from "@jet-admin/ui";
+import { Button as Button4, Input as Input4, Checkbox } from "@jet-admin/ui";
 import {
   ChevronLeft,
-  ChevronRight as ChevronRight2,
+  ChevronRight as ChevronRight3,
   ChevronsLeft,
   ChevronsRight,
   Search as Search2,
   Download,
   Pencil,
   Check,
-  X,
+  X as X2,
   FileDown
 } from "lucide-react";
 var exportToCSV, exportToJSON, EditableCell, TableWidget;
@@ -642,7 +642,7 @@ var init_tableWidget = __esm({
               const isEditing = editingRowId === rowIdx;
               if (isEditing) {
                 return /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-end gap-1", onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React9.createElement(
-                  Button7,
+                  Button4,
                   {
                     size: "icon",
                     variant: "ghost",
@@ -651,18 +651,18 @@ var init_tableWidget = __esm({
                   },
                   /* @__PURE__ */ React9.createElement(Check, { className: "h-3.5 w-3.5" })
                 ), /* @__PURE__ */ React9.createElement(
-                  Button7,
+                  Button4,
                   {
                     size: "icon",
                     variant: "ghost",
                     className: "h-6 w-6 text-muted-foreground hover:text-foreground",
                     onClick: () => setEditingRowId(null)
                   },
-                  /* @__PURE__ */ React9.createElement(X, { className: "h-3.5 w-3.5" })
+                  /* @__PURE__ */ React9.createElement(X2, { className: "h-3.5 w-3.5" })
                 ));
               }
               return /* @__PURE__ */ React9.createElement("div", { className: "flex justify-end", onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React9.createElement(
-                Button7,
+                Button4,
                 {
                   size: "icon",
                   variant: "ghost",
@@ -794,7 +794,7 @@ var init_tableWidget = __esm({
           placeholder: searchConfig.placeholder || "Search...",
           className: "h-7 text-xs pl-8 bg-background border-border rounded"
         }
-      )) : /* @__PURE__ */ React9.createElement("div", null), /* @__PURE__ */ React9.createElement("div", { className: "flex items-center gap-2" }, exportConfig.enabled && /* @__PURE__ */ React9.createElement(Button7, { size: "sm", variant: "outline", className: "h-7 text-xs", onClick: handleExport }, /* @__PURE__ */ React9.createElement(FileDown, { className: "h-3.5 w-3.5 mr-1.5" }), exportConfig.buttonLabel || "Export"))), /* @__PURE__ */ React9.createElement("div", { className: "flex-1 overflow-auto min-h-0" }, /* @__PURE__ */ React9.createElement("table", { className: "w-full text-sm border-collapse" }, /* @__PURE__ */ React9.createElement("thead", { className: "sticky top-0 z-10 bg-muted/50 backdrop-blur-sm" }, table.getHeaderGroups().map((hg) => /* @__PURE__ */ React9.createElement("tr", { key: hg.id }, hg.headers.map((header) => /* @__PURE__ */ React9.createElement(
+      )) : /* @__PURE__ */ React9.createElement("div", null), /* @__PURE__ */ React9.createElement("div", { className: "flex items-center gap-2" }, exportConfig.enabled && /* @__PURE__ */ React9.createElement(Button4, { size: "sm", variant: "outline", className: "h-7 text-xs", onClick: handleExport }, /* @__PURE__ */ React9.createElement(FileDown, { className: "h-3.5 w-3.5 mr-1.5" }), exportConfig.buttonLabel || "Export"))), /* @__PURE__ */ React9.createElement("div", { className: "flex-1 overflow-auto min-h-0" }, /* @__PURE__ */ React9.createElement("table", { className: "w-full text-sm border-collapse" }, /* @__PURE__ */ React9.createElement("thead", { className: "sticky top-0 z-10 bg-muted/50 backdrop-blur-sm" }, table.getHeaderGroups().map((hg) => /* @__PURE__ */ React9.createElement("tr", { key: hg.id }, hg.headers.map((header) => /* @__PURE__ */ React9.createElement(
         "th",
         {
           key: header.id,
@@ -854,7 +854,7 @@ var init_tableWidget = __esm({
           })
         );
       })))), /* @__PURE__ */ React9.createElement("div", { className: "absolute bottom-12 left-0 right-0 px-4 flex flex-col gap-2 pointer-events-none z-30" }, multiSelectConfig.enabled && selectedCount > 0 && /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-between bg-card border border-border shadow-md rounded-lg p-3 pointer-events-auto" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs font-medium text-foreground px-2" }, /* @__PURE__ */ React9.createElement("span", { className: "text-primary font-medium" }, selectedCount), " row", selectedCount !== 1 ? "s" : "", " selected"), /* @__PURE__ */ React9.createElement("div", { className: "flex items-center gap-2" }, (multiSelectConfig.actions || []).map((act, i) => /* @__PURE__ */ React9.createElement(
-        Button7,
+        Button4,
         {
           key: i,
           size: "sm",
@@ -863,7 +863,7 @@ var init_tableWidget = __esm({
           onClick: () => handleBulkAction(act.actionKey)
         },
         act.label
-      )))), bulkEditConfig.enabled && pendingEditCount > 0 && /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-between bg-card border border-primary/30 shadow-md rounded-lg p-3 pointer-events-auto" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs font-medium text-foreground px-2" }, /* @__PURE__ */ React9.createElement("span", { className: "text-primary font-medium" }, pendingEditCount), " unsaved change", pendingEditCount !== 1 ? "s" : ""), /* @__PURE__ */ React9.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React9.createElement(Button7, { size: "sm", variant: "ghost", className: "h-7 text-xs text-muted-foreground", onClick: () => setPendingEdits({}) }, "Discard"), /* @__PURE__ */ React9.createElement(Button7, { size: "sm", className: "h-7 text-xs", onClick: handleSaveBulkEdits }, bulkEditConfig.saveLabel || "Save All Changes")))), paginationConfig ? /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs text-muted-foreground" }, serverTotalRows, " total row", serverTotalRows !== 1 ? "s" : ""), /* @__PURE__ */ React9.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", serverPage, " of ", serverTotalPages), /* @__PURE__ */ React9.createElement(Button7, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(1), disabled: serverPage === 1 || isLoading }, /* @__PURE__ */ React9.createElement(ChevronsLeft, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button7, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverPage - 1), disabled: serverPage === 1 || isLoading }, /* @__PURE__ */ React9.createElement(ChevronLeft, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button7, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverPage + 1), disabled: serverPage >= serverTotalPages || isLoading }, /* @__PURE__ */ React9.createElement(ChevronRight2, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button7, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverTotalPages), disabled: serverPage >= serverTotalPages || isLoading }, /* @__PURE__ */ React9.createElement(ChevronsRight, { className: "h-4 w-4" })))) : rows.length > 10 && /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs text-muted-foreground" }, table.getFilteredRowModel().rows.length, " total row", table.getFilteredRowModel().rows.length !== 1 ? "s" : ""), /* @__PURE__ */ React9.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", table.getState().pagination.pageIndex + 1, " of ", table.getPageCount()), /* @__PURE__ */ React9.createElement(Button7, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.setPageIndex(0), disabled: !table.getCanPreviousPage() }, /* @__PURE__ */ React9.createElement(ChevronsLeft, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button7, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.previousPage(), disabled: !table.getCanPreviousPage() }, /* @__PURE__ */ React9.createElement(ChevronLeft, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button7, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.nextPage(), disabled: !table.getCanNextPage() }, /* @__PURE__ */ React9.createElement(ChevronRight2, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button7, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.setPageIndex(table.getPageCount() - 1), disabled: !table.getCanNextPage() }, /* @__PURE__ */ React9.createElement(ChevronsRight, { className: "h-4 w-4" })))));
+      )))), bulkEditConfig.enabled && pendingEditCount > 0 && /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-between bg-card border border-primary/30 shadow-md rounded-lg p-3 pointer-events-auto" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs font-medium text-foreground px-2" }, /* @__PURE__ */ React9.createElement("span", { className: "text-primary font-medium" }, pendingEditCount), " unsaved change", pendingEditCount !== 1 ? "s" : ""), /* @__PURE__ */ React9.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React9.createElement(Button4, { size: "sm", variant: "ghost", className: "h-7 text-xs text-muted-foreground", onClick: () => setPendingEdits({}) }, "Discard"), /* @__PURE__ */ React9.createElement(Button4, { size: "sm", className: "h-7 text-xs", onClick: handleSaveBulkEdits }, bulkEditConfig.saveLabel || "Save All Changes")))), paginationConfig ? /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs text-muted-foreground" }, serverTotalRows, " total row", serverTotalRows !== 1 ? "s" : ""), /* @__PURE__ */ React9.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", serverPage, " of ", serverTotalPages), /* @__PURE__ */ React9.createElement(Button4, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(1), disabled: serverPage === 1 || isLoading }, /* @__PURE__ */ React9.createElement(ChevronsLeft, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button4, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverPage - 1), disabled: serverPage === 1 || isLoading }, /* @__PURE__ */ React9.createElement(ChevronLeft, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button4, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverPage + 1), disabled: serverPage >= serverTotalPages || isLoading }, /* @__PURE__ */ React9.createElement(ChevronRight3, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button4, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => handleServerPageChange(serverTotalPages), disabled: serverPage >= serverTotalPages || isLoading }, /* @__PURE__ */ React9.createElement(ChevronsRight, { className: "h-4 w-4" })))) : rows.length > 10 && /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs text-muted-foreground" }, table.getFilteredRowModel().rows.length, " total row", table.getFilteredRowModel().rows.length !== 1 ? "s" : ""), /* @__PURE__ */ React9.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", table.getState().pagination.pageIndex + 1, " of ", table.getPageCount()), /* @__PURE__ */ React9.createElement(Button4, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.setPageIndex(0), disabled: !table.getCanPreviousPage() }, /* @__PURE__ */ React9.createElement(ChevronsLeft, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button4, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.previousPage(), disabled: !table.getCanPreviousPage() }, /* @__PURE__ */ React9.createElement(ChevronLeft, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button4, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.nextPage(), disabled: !table.getCanNextPage() }, /* @__PURE__ */ React9.createElement(ChevronRight3, { className: "h-4 w-4" })), /* @__PURE__ */ React9.createElement(Button4, { variant: "ghost", size: "icon", className: "h-7 w-7", onClick: () => table.setPageIndex(table.getPageCount() - 1), disabled: !table.getCanNextPage() }, /* @__PURE__ */ React9.createElement(ChevronsRight, { className: "h-4 w-4" })))));
     };
     TableWidget.propTypes = {
       widgetConfig: PropTypes8.object,
@@ -936,9 +936,9 @@ import React11, { useMemo as useMemo6, useCallback as useCallback7 } from "react
 import PropTypes9 from "prop-types";
 import {
   Input as Input6,
-  Label as Label4,
+  Label as Label3,
   Switch as Switch2,
-  Button as Button8,
+  Button as Button5,
   Select as Select3,
   SelectContent as SelectContent3,
   SelectItem as SelectItem3,
@@ -946,7 +946,7 @@ import {
   SelectValue as SelectValue3,
   Checkbox as Checkbox2
 } from "@jet-admin/ui";
-import { Trash2, Plus as Plus2, ArrowUp, ArrowDown, Sparkles, Zap as Zap2 } from "lucide-react";
+import { Trash2, Plus as Plus2, ArrowUp, ArrowDown, Sparkles as Sparkles2, Zap as Zap2 } from "lucide-react";
 import { getValueByPath as getValueByPath3 } from "@jet-admin/template-engine";
 var resolvePath, TableConfigEditor;
 var init_tableConfigEditor = __esm({
@@ -1121,7 +1121,7 @@ var init_tableConfigEditor = __esm({
           [field]: value
         });
       };
-      return /* @__PURE__ */ React11.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Data Array Template"), /* @__PURE__ */ React11.createElement(
+      return /* @__PURE__ */ React11.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Data Array Template"), /* @__PURE__ */ React11.createElement(
         TemplateAutocompleteInput_default,
         {
           value: config.dataArrayTemplate || config.dataMapping?.dataArrayPath || "",
@@ -1129,7 +1129,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "e.g. {{ state.queries.my_query.data }}",
           suggestions: arraySuggestions
         }
-      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.65rem] text-muted-foreground" }, "Mustache template evaluating to an array of objects.")), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Total Count Template ", /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React11.createElement(
+      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.65rem] text-muted-foreground" }, "Mustache template evaluating to an array of objects.")), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Total Count Template ", /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React11.createElement(
         TemplateAutocompleteInput_default,
         {
           value: pagination.totalTemplate || config.dataMapping?.totalCountPath || "",
@@ -1137,7 +1137,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "e.g. {{ state.queries.my_query.total }}",
           suggestions: scalarSuggestions
         }
-      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use array length.")), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React11.createElement(
+      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use array length.")), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React11.createElement(
         TemplateAutocompleteInput_default,
         {
           value: config.isLoading || "",
@@ -1145,8 +1145,8 @@ var init_tableConfigEditor = __esm({
           placeholder: "e.g. {{ state.queries.my_query.isLoading }}",
           suggestions: loadingSuggestions
         }
-      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Mustache template evaluating to a boolean loading state."))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React11.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Table Columns"), /* @__PURE__ */ React11.createElement("div", { className: "flex gap-1" }, discoveredColumns.length > 0 && /* @__PURE__ */ React11.createElement(
-        Button8,
+      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Mustache template evaluating to a boolean loading state."))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React11.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Table Columns"), /* @__PURE__ */ React11.createElement("div", { className: "flex gap-1" }, discoveredColumns.length > 0 && /* @__PURE__ */ React11.createElement(
+        Button5,
         {
           type: "button",
           variant: "outline",
@@ -1155,10 +1155,10 @@ var init_tableConfigEditor = __esm({
           className: "h-7 text-xs px-2",
           title: "Auto-detect columns from data"
         },
-        /* @__PURE__ */ React11.createElement(Sparkles, { className: "mr-1 text-amber-500" }),
+        /* @__PURE__ */ React11.createElement(Sparkles2, { className: "mr-1 text-amber-500" }),
         " Auto-detect"
       ), /* @__PURE__ */ React11.createElement(
-        Button8,
+        Button5,
         {
           type: "button",
           variant: "outline",
@@ -1175,7 +1175,7 @@ var init_tableConfigEditor = __esm({
           className: "flex flex-col gap-2 p-2 border rounded-md bg-muted/30"
         },
         /* @__PURE__ */ React11.createElement("div", { className: "flex items-end gap-1.5" }, /* @__PURE__ */ React11.createElement("div", { className: "flex flex-col gap-0.5 pb-0.5" }, /* @__PURE__ */ React11.createElement(
-          Button8,
+          Button5,
           {
             type: "button",
             variant: "ghost",
@@ -1187,7 +1187,7 @@ var init_tableConfigEditor = __esm({
           },
           /* @__PURE__ */ React11.createElement(ArrowUp, { className: "h-3.5 w-3.5" })
         ), /* @__PURE__ */ React11.createElement(
-          Button8,
+          Button5,
           {
             type: "button",
             variant: "ghost",
@@ -1198,7 +1198,7 @@ var init_tableConfigEditor = __esm({
             title: "Move down"
           },
           /* @__PURE__ */ React11.createElement(ArrowDown, { className: "h-3.5 w-3.5" })
-        )), /* @__PURE__ */ React11.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[0.65rem]" }, "Header Label"), /* @__PURE__ */ React11.createElement(
+        )), /* @__PURE__ */ React11.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-[0.65rem]" }, "Header Label"), /* @__PURE__ */ React11.createElement(
           Input6,
           {
             value: col.label,
@@ -1206,7 +1206,7 @@ var init_tableConfigEditor = __esm({
             className: "h-7 text-xs",
             placeholder: "User Name"
           }
-        )), /* @__PURE__ */ React11.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[0.65rem]" }, "Data Key"), availableKeys.length > 0 ? /* @__PURE__ */ React11.createElement(
+        )), /* @__PURE__ */ React11.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-[0.65rem]" }, "Data Key"), availableKeys.length > 0 ? /* @__PURE__ */ React11.createElement(
           Select3,
           {
             value: col.key || "",
@@ -1223,7 +1223,7 @@ var init_tableConfigEditor = __esm({
             placeholder: "user_name"
           }
         )), /* @__PURE__ */ React11.createElement(
-          Button8,
+          Button5,
           {
             type: "button",
             variant: "ghost",
@@ -1242,14 +1242,14 @@ var init_tableConfigEditor = __esm({
             onCheckedChange: (val) => handleUpdateColumn(idx, "editable", !!val),
             className: "h-3.5 w-3.5"
           }
-        ), /* @__PURE__ */ React11.createElement(Label4, { htmlFor: `col-edit-${idx}`, className: "text-[10px] ml-1.5 text-muted-foreground cursor-pointer" }, "Editable Column"))
-      )))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ React11.createElement(
+        ), /* @__PURE__ */ React11.createElement(Label3, { htmlFor: `col-edit-${idx}`, className: "text-[10px] ml-1.5 text-muted-foreground cursor-pointer" }, "Editable Column"))
+      )))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ React11.createElement(
         Switch2,
         {
           checked: pagination.enabled,
           onCheckedChange: handlePaginationToggle
         }
-      )), pagination.enabled && /* @__PURE__ */ React11.createElement("div", { className: "space-y-2 bg-muted/30 p-3 rounded-md border mt-1" }, /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Configure pagination actions in the ", /* @__PURE__ */ React11.createElement("strong", null, "Events"), " tab using the ", /* @__PURE__ */ React11.createElement("strong", null, "On Page Change"), " event. Event data: ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.page }}"), ",", " ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.offset }}"), ",", " ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.pageSize }}")))), /* @__PURE__ */ React11.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Search Box"), /* @__PURE__ */ React11.createElement(
+      )), pagination.enabled && /* @__PURE__ */ React11.createElement("div", { className: "space-y-2 bg-muted/30 p-3 rounded-md border mt-1" }, /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Configure pagination actions in the ", /* @__PURE__ */ React11.createElement("strong", null, "Events"), " tab using the ", /* @__PURE__ */ React11.createElement("strong", null, "On Page Change"), " event. Event data: ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.page }}"), ",", " ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.offset }}"), ",", " ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.pageSize }}")))), /* @__PURE__ */ React11.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Search Box"), /* @__PURE__ */ React11.createElement(
         Switch2,
         {
           checked: search.enabled,
@@ -1262,7 +1262,7 @@ var init_tableConfigEditor = __esm({
           checked: search.serverSide,
           onCheckedChange: (v) => handleConfigChange("search", { ...search, serverSide: !!v })
         }
-      ), /* @__PURE__ */ React11.createElement(Label4, { htmlFor: "search-server", className: "text-[10px] cursor-pointer" }, "Server-side (fires onSearch)")), /* @__PURE__ */ React11.createElement(
+      ), /* @__PURE__ */ React11.createElement(Label3, { htmlFor: "search-server", className: "text-[10px] cursor-pointer" }, "Server-side (fires onSearch)")), /* @__PURE__ */ React11.createElement(
         Input6,
         {
           value: search.placeholder || "",
@@ -1270,7 +1270,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "Search placeholder...",
           className: "h-7 text-xs"
         }
-      ))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Export Data"), /* @__PURE__ */ React11.createElement(
+      ))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Export Data"), /* @__PURE__ */ React11.createElement(
         Switch2,
         {
           checked: exportConfig.enabled,
@@ -1283,7 +1283,7 @@ var init_tableConfigEditor = __esm({
           checked: exportConfig.serverSide,
           onCheckedChange: (v) => handleConfigChange("export", { ...exportConfig, serverSide: !!v })
         }
-      ), /* @__PURE__ */ React11.createElement(Label4, { htmlFor: "export-server", className: "text-[10px] cursor-pointer" }, "Server-side (fires onExport)")), /* @__PURE__ */ React11.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React11.createElement(
+      ), /* @__PURE__ */ React11.createElement(Label3, { htmlFor: "export-server", className: "text-[10px] cursor-pointer" }, "Server-side (fires onExport)")), /* @__PURE__ */ React11.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React11.createElement(
         Input6,
         {
           value: exportConfig.buttonLabel || "",
@@ -1299,7 +1299,7 @@ var init_tableConfigEditor = __esm({
         },
         /* @__PURE__ */ React11.createElement(SelectTrigger3, { className: "h-7 text-xs w-[70px]" }, /* @__PURE__ */ React11.createElement(SelectValue3, null)),
         /* @__PURE__ */ React11.createElement(SelectContent3, null, /* @__PURE__ */ React11.createElement(SelectItem3, { value: "csv" }, "CSV"), /* @__PURE__ */ React11.createElement(SelectItem3, { value: "json" }, "JSON"))
-      ))))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-3 border-t pt-4" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Multi-Row Selection"), /* @__PURE__ */ React11.createElement(
+      ))))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-3 border-t pt-4" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Multi-Row Selection"), /* @__PURE__ */ React11.createElement(
         Switch2,
         {
           checked: multiSelect.enabled,
@@ -1312,7 +1312,7 @@ var init_tableConfigEditor = __esm({
           checked: multiSelect.showSelectAll,
           onCheckedChange: (v) => handleConfigChange("multiSelect", { ...multiSelect, showSelectAll: !!v })
         }
-      ), /* @__PURE__ */ React11.createElement(Label4, { htmlFor: "ms-select-all", className: "text-[10px] cursor-pointer" }, 'Show "Select All" Checkbox')), /* @__PURE__ */ React11.createElement("div", { className: "pt-1" }, /* @__PURE__ */ React11.createElement("div", { className: "flex justify-between items-center mb-2" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[10px] font-medium" }, "Bulk Actions"), /* @__PURE__ */ React11.createElement(Button8, { type: "button", variant: "outline", size: "sm", onClick: handleAddBulkAction, className: "h-6 text-[10px] px-2" }, /* @__PURE__ */ React11.createElement(Plus2, { className: "mr-1 h-3 w-3" }), " Add Action")), (!multiSelect.actions || multiSelect.actions.length === 0) && /* @__PURE__ */ React11.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No bulk actions configured. Selection will be tracked in widgetState."), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, (multiSelect.actions || []).map((act, idx) => /* @__PURE__ */ React11.createElement("div", { key: idx, className: "flex items-center gap-1.5 bg-background p-1.5 rounded border" }, /* @__PURE__ */ React11.createElement(
+      ), /* @__PURE__ */ React11.createElement(Label3, { htmlFor: "ms-select-all", className: "text-[10px] cursor-pointer" }, 'Show "Select All" Checkbox')), /* @__PURE__ */ React11.createElement("div", { className: "pt-1" }, /* @__PURE__ */ React11.createElement("div", { className: "flex justify-between items-center mb-2" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-[10px] font-medium" }, "Bulk Actions"), /* @__PURE__ */ React11.createElement(Button5, { type: "button", variant: "outline", size: "sm", onClick: handleAddBulkAction, className: "h-6 text-[10px] px-2" }, /* @__PURE__ */ React11.createElement(Plus2, { className: "mr-1 h-3 w-3" }), " Add Action")), (!multiSelect.actions || multiSelect.actions.length === 0) && /* @__PURE__ */ React11.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No bulk actions configured. Selection will be tracked in widgetState."), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, (multiSelect.actions || []).map((act, idx) => /* @__PURE__ */ React11.createElement("div", { key: idx, className: "flex items-center gap-1.5 bg-background p-1.5 rounded border" }, /* @__PURE__ */ React11.createElement(
         Input6,
         {
           value: act.label,
@@ -1328,7 +1328,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "actionKey",
           className: "h-6 text-[10px] font-mono flex-1"
         }
-      ), /* @__PURE__ */ React11.createElement(Select3, { value: act.variant || "default", onValueChange: (v) => handleUpdateBulkAction(idx, "variant", v) }, /* @__PURE__ */ React11.createElement(SelectTrigger3, { className: "h-6 text-[10px] w-20" }, /* @__PURE__ */ React11.createElement(SelectValue3, null)), /* @__PURE__ */ React11.createElement(SelectContent3, null, /* @__PURE__ */ React11.createElement(SelectItem3, { value: "default" }, "Default"), /* @__PURE__ */ React11.createElement(SelectItem3, { value: "destructive" }, "Danger"), /* @__PURE__ */ React11.createElement(SelectItem3, { value: "outline" }, "Outline"))), /* @__PURE__ */ React11.createElement(Button8, { type: "button", variant: "ghost", size: "icon", onClick: () => handleRemoveBulkAction(idx), className: "h-6 w-6 text-destructive shrink-0" }, /* @__PURE__ */ React11.createElement(Trash2, { className: "h-3 w-3" })))))))), /* @__PURE__ */ React11.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Inline Row Editing"), /* @__PURE__ */ React11.createElement(
+      ), /* @__PURE__ */ React11.createElement(Select3, { value: act.variant || "default", onValueChange: (v) => handleUpdateBulkAction(idx, "variant", v) }, /* @__PURE__ */ React11.createElement(SelectTrigger3, { className: "h-6 text-[10px] w-20" }, /* @__PURE__ */ React11.createElement(SelectValue3, null)), /* @__PURE__ */ React11.createElement(SelectContent3, null, /* @__PURE__ */ React11.createElement(SelectItem3, { value: "default" }, "Default"), /* @__PURE__ */ React11.createElement(SelectItem3, { value: "destructive" }, "Danger"), /* @__PURE__ */ React11.createElement(SelectItem3, { value: "outline" }, "Outline"))), /* @__PURE__ */ React11.createElement(Button5, { type: "button", variant: "ghost", size: "icon", onClick: () => handleRemoveBulkAction(idx), className: "h-6 w-6 text-destructive shrink-0" }, /* @__PURE__ */ React11.createElement(Trash2, { className: "h-3 w-3" })))))))), /* @__PURE__ */ React11.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Inline Row Editing"), /* @__PURE__ */ React11.createElement(
         Switch2,
         {
           checked: editing.enabled,
@@ -1337,7 +1337,7 @@ var init_tableConfigEditor = __esm({
             if (v && bulkEdit.enabled) handleConfigChange("bulkEdit", { ...bulkEdit, enabled: false });
           }
         }
-      )), /* @__PURE__ */ React11.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Adds an Edit button to each row. Fires ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 border rounded" }, "onRowSave"), ".")), /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Excel-Style Bulk Edit"), /* @__PURE__ */ React11.createElement(
+      )), /* @__PURE__ */ React11.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Adds an Edit button to each row. Fires ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 border rounded" }, "onRowSave"), ".")), /* @__PURE__ */ React11.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Excel-Style Bulk Edit"), /* @__PURE__ */ React11.createElement(
         Switch2,
         {
           checked: bulkEdit.enabled,
@@ -1346,7 +1346,7 @@ var init_tableConfigEditor = __esm({
             if (v && editing.enabled) handleConfigChange("editing", { ...editing, enabled: false });
           }
         }
-      )), /* @__PURE__ */ React11.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Double-click cells to edit. Fires ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 border rounded" }, "onBulkEdit"), " on save."), bulkEdit.enabled && /* @__PURE__ */ React11.createElement("div", { className: "space-y-1 bg-muted/30 p-2 rounded border mt-2" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[10px]" }, "Save Button Label"), /* @__PURE__ */ React11.createElement(
+      )), /* @__PURE__ */ React11.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Double-click cells to edit. Fires ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 border rounded" }, "onBulkEdit"), " on save."), bulkEdit.enabled && /* @__PURE__ */ React11.createElement("div", { className: "space-y-1 bg-muted/30 p-2 rounded border mt-2" }, /* @__PURE__ */ React11.createElement(Label3, { className: "text-[10px]" }, "Save Button Label"), /* @__PURE__ */ React11.createElement(
         Input6,
         {
           value: bulkEdit.saveLabel || "Save All Changes",
@@ -1365,12 +1365,12 @@ var init_tableConfigEditor = __esm({
 // src/button/buttonConfigEditor.jsx
 import React12 from "react";
 import PropTypes10 from "prop-types";
-import { Input as Input7, Label as Label5, Select as Select4, SelectContent as SelectContent4, SelectItem as SelectItem4, SelectTrigger as SelectTrigger4, SelectValue as SelectValue4 } from "@jet-admin/ui";
+import { Input as Input7, Label as Label4, Select as Select4, SelectContent as SelectContent4, SelectItem as SelectItem4, SelectTrigger as SelectTrigger4, SelectValue as SelectValue4 } from "@jet-admin/ui";
 var ButtonConfigEditor;
 var init_buttonConfigEditor = __esm({
   "src/button/buttonConfigEditor.jsx"() {
     ButtonConfigEditor = ({ widgetEditorForm }) => {
-      return /* @__PURE__ */ React12.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ React12.createElement(
+      return /* @__PURE__ */ React12.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ React12.createElement(
         Input7,
         {
           type: "text",
@@ -1379,7 +1379,7 @@ var init_buttonConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.text", e.target.value),
           placeholder: "Click Me"
         }
-      )), /* @__PURE__ */ React12.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ React12.createElement(
+      )), /* @__PURE__ */ React12.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ React12.createElement(
         Select4,
         {
           value: widgetEditorForm.values.widgetConfig?.variant || "default",
@@ -1387,7 +1387,7 @@ var init_buttonConfigEditor = __esm({
         },
         /* @__PURE__ */ React12.createElement(SelectTrigger4, { className: "text-xs" }, /* @__PURE__ */ React12.createElement(SelectValue4, { placeholder: "Select variant" })),
         /* @__PURE__ */ React12.createElement(SelectContent4, null, /* @__PURE__ */ React12.createElement(SelectItem4, { value: "default" }, "Default"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "destructive" }, "Destructive"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "outline" }, "Outline"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "secondary" }, "Secondary"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "ghost" }, "Ghost"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "link" }, "Link"))
-      )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React12.createElement(
+      )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React12.createElement(
         Select4,
         {
           value: widgetEditorForm.values.widgetConfig?.size || "default",
@@ -1406,7 +1406,7 @@ var init_buttonConfigEditor = __esm({
 // src/date-picker/datePickerConfigEditor.jsx
 import React19, { useMemo as useMemo11 } from "react";
 import PropTypes17 from "prop-types";
-import { Input as Input13, Label as Label12, Checkbox as Checkbox6 } from "@jet-admin/ui";
+import { Input as Input13, Label as Label11, Checkbox as Checkbox6 } from "@jet-admin/ui";
 var DatePickerConfigEditor;
 var init_datePickerConfigEditor = __esm({
   "src/date-picker/datePickerConfigEditor.jsx"() {
@@ -1423,7 +1423,7 @@ var init_datePickerConfigEditor = __esm({
           detail: s.detail
         }));
       }, [stateTree]);
-      return /* @__PURE__ */ React19.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React19.createElement(
+      return /* @__PURE__ */ React19.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React19.createElement(
         Input13,
         {
           type: "text",
@@ -1432,7 +1432,7 @@ var init_datePickerConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
           placeholder: "e.g. Select date"
         }
-      )), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Placeholder"), /* @__PURE__ */ React19.createElement(
+      )), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Placeholder"), /* @__PURE__ */ React19.createElement(
         Input13,
         {
           type: "text",
@@ -1448,7 +1448,7 @@ var init_datePickerConfigEditor = __esm({
           checked: !!config.enableTime,
           onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
         }
-      ), /* @__PURE__ */ React19.createElement(Label12, { htmlFor: "date-picker-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Default Value"), /* @__PURE__ */ React19.createElement(
+      ), /* @__PURE__ */ React19.createElement(Label11, { htmlFor: "date-picker-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Default Value"), /* @__PURE__ */ React19.createElement(
         TemplateAutocompleteInput_default,
         {
           value: config.defaultValue || "",
@@ -1468,7 +1468,7 @@ var init_datePickerConfigEditor = __esm({
 // src/date-range-picker/dateRangePickerConfigEditor.jsx
 import React20, { useMemo as useMemo12 } from "react";
 import PropTypes18 from "prop-types";
-import { Input as Input14, Label as Label13, Checkbox as Checkbox7 } from "@jet-admin/ui";
+import { Input as Input14, Label as Label12, Checkbox as Checkbox7 } from "@jet-admin/ui";
 var DateRangePickerConfigEditor;
 var init_dateRangePickerConfigEditor = __esm({
   "src/date-range-picker/dateRangePickerConfigEditor.jsx"() {
@@ -1485,7 +1485,7 @@ var init_dateRangePickerConfigEditor = __esm({
           detail: s.detail
         }));
       }, [stateTree]);
-      return /* @__PURE__ */ React20.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React20.createElement(
+      return /* @__PURE__ */ React20.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React20.createElement(
         Input14,
         {
           type: "text",
@@ -1494,7 +1494,7 @@ var init_dateRangePickerConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
           placeholder: "e.g. Select date range"
         }
-      )), /* @__PURE__ */ React20.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "Start Placeholder"), /* @__PURE__ */ React20.createElement(
+      )), /* @__PURE__ */ React20.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Start Placeholder"), /* @__PURE__ */ React20.createElement(
         Input14,
         {
           type: "text",
@@ -1503,7 +1503,7 @@ var init_dateRangePickerConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.placeholderStart", e.target.value),
           placeholder: "Start date"
         }
-      )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "End Placeholder"), /* @__PURE__ */ React20.createElement(
+      )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "End Placeholder"), /* @__PURE__ */ React20.createElement(
         Input14,
         {
           type: "text",
@@ -1519,7 +1519,7 @@ var init_dateRangePickerConfigEditor = __esm({
           checked: !!config.enableTime,
           onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
         }
-      ), /* @__PURE__ */ React20.createElement(Label13, { htmlFor: "date-range-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React20.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "Default Start"), /* @__PURE__ */ React20.createElement(
+      ), /* @__PURE__ */ React20.createElement(Label12, { htmlFor: "date-range-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React20.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Default Start"), /* @__PURE__ */ React20.createElement(
         TemplateAutocompleteInput_default,
         {
           value: config.defaultStart || "",
@@ -1527,7 +1527,7 @@ var init_dateRangePickerConfigEditor = __esm({
           placeholder: "e.g. {{state.variables.startDate}}",
           suggestions
         }
-      )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "Default End"), /* @__PURE__ */ React20.createElement(
+      )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Default End"), /* @__PURE__ */ React20.createElement(
         TemplateAutocompleteInput_default,
         {
           value: config.defaultEnd || "",
@@ -1547,7 +1547,7 @@ var init_dateRangePickerConfigEditor = __esm({
 // src/button/buttonWidget.jsx
 import React21, { useState as useState9 } from "react";
 import PropTypes19 from "prop-types";
-import { Button as Button10, Spinner } from "@jet-admin/ui";
+import { Button as Button7, Spinner } from "@jet-admin/ui";
 var ButtonWidget;
 var init_buttonWidget = __esm({
   "src/button/buttonWidget.jsx"() {
@@ -1578,7 +1578,7 @@ var init_buttonWidget = __esm({
         }
       };
       return /* @__PURE__ */ React21.createElement(
-        Button10,
+        Button7,
         {
           variant,
           size,
@@ -1781,7 +1781,7 @@ var init_text = __esm({
 // src/stat/statWidget.jsx
 import React23, { useMemo as useMemo14 } from "react";
 import PropTypes21 from "prop-types";
-import { TrendingUp as TrendingUp2, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp as TrendingUp3, TrendingDown, Minus as Minus2 } from "lucide-react";
 var StatWidget;
 var init_statWidget = __esm({
   "src/stat/statWidget.jsx"() {
@@ -1822,7 +1822,7 @@ var init_statWidget = __esm({
         }
         return direction === "down" ? "text-emerald-500" : "text-red-500";
       }, [trend, trendDirection]);
-      const TrendIcon = trend?.direction === "up" ? TrendingUp2 : trend?.direction === "down" ? TrendingDown : Minus;
+      const TrendIcon = trend?.direction === "up" ? TrendingUp3 : trend?.direction === "down" ? TrendingDown : Minus2;
       return /* @__PURE__ */ React23.createElement(
         "div",
         {
@@ -1855,8 +1855,8 @@ var init_stat = __esm({
 // src/alert/alertWidget.jsx
 import React24, { useState as useState10 } from "react";
 import PropTypes22 from "prop-types";
-import { AlertCircle, CheckCircle, Info, X as X2, AlertTriangle as AlertTriangle2 } from "lucide-react";
-import { Button as Button11 } from "@jet-admin/ui";
+import { AlertCircle, CheckCircle, Info, X as X3, AlertTriangle as AlertTriangle2 } from "lucide-react";
+import { Button as Button8 } from "@jet-admin/ui";
 var AlertWidget;
 var init_alertWidget = __esm({
   "src/alert/alertWidget.jsx"() {
@@ -1897,7 +1897,7 @@ var init_alertWidget = __esm({
         /* @__PURE__ */ React24.createElement(Icon, { className: "h-5 w-5 shrink-0 mt-0.5" }),
         /* @__PURE__ */ React24.createElement("div", { className: "flex-1 min-w-0" }, title && /* @__PURE__ */ React24.createElement("h5", { className: "text-sm font-semibold mb-1 leading-none text-current" }, title), /* @__PURE__ */ React24.createElement("p", { className: "text-xs leading-relaxed text-current/80" }, message)),
         dismissible && /* @__PURE__ */ React24.createElement(
-          Button11,
+          Button8,
           {
             variant: "ghost",
             size: "icon",
@@ -1905,7 +1905,7 @@ var init_alertWidget = __esm({
             onClick: handleDismiss,
             "aria-label": "Dismiss alert"
           },
-          /* @__PURE__ */ React24.createElement(X2, { className: "h-4 w-4" })
+          /* @__PURE__ */ React24.createElement(X3, { className: "h-4 w-4" })
         )
       );
     };
@@ -1930,7 +1930,7 @@ var init_alert = __esm({
 // src/form/formWidget.jsx
 import React25, { useState as useState11, useEffect as useEffect6 } from "react";
 import PropTypes23 from "prop-types";
-import { Button as Button12, Input as Input15, Label as Label14, Select as Select10, SelectContent as SelectContent10, SelectItem as SelectItem10, SelectTrigger as SelectTrigger10, SelectValue as SelectValue10, Checkbox as Checkbox8 } from "@jet-admin/ui";
+import { Button as Button9, Input as Input15, Label as Label13, Select as Select10, SelectContent as SelectContent10, SelectItem as SelectItem10, SelectTrigger as SelectTrigger10, SelectValue as SelectValue10, Checkbox as Checkbox8 } from "@jet-admin/ui";
 var FormWidget;
 var init_formWidget = __esm({
   "src/form/formWidget.jsx"() {
@@ -1998,7 +1998,7 @@ var init_formWidget = __esm({
           if (!field.key) return null;
           const fieldType = field.type || "text";
           const inputId = `form-field-${field.key}-${idx}`;
-          return /* @__PURE__ */ React25.createElement("div", { key: idx, className: "space-y-1.5" }, fieldType !== "checkbox" && /* @__PURE__ */ React25.createElement(Label14, { htmlFor: inputId, className: "text-xs font-semibold text-foreground" }, field.label || field.key, field.required && /* @__PURE__ */ React25.createElement("span", { className: "text-rose-500 ml-0.5" }, "*")), fieldType === "select" ? /* @__PURE__ */ React25.createElement(
+          return /* @__PURE__ */ React25.createElement("div", { key: idx, className: "space-y-1.5" }, fieldType !== "checkbox" && /* @__PURE__ */ React25.createElement(Label13, { htmlFor: inputId, className: "text-xs font-semibold text-foreground" }, field.label || field.key, field.required && /* @__PURE__ */ React25.createElement("span", { className: "text-rose-500 ml-0.5" }, "*")), fieldType === "select" ? /* @__PURE__ */ React25.createElement(
             Select10,
             {
               value: String(formData[field.key] ?? ""),
@@ -2017,7 +2017,7 @@ var init_formWidget = __esm({
               checked: !!formData[field.key],
               onCheckedChange: (checked) => handleFieldChange(field.key, !!checked)
             }
-          ), /* @__PURE__ */ React25.createElement(Label14, { htmlFor: inputId, className: "text-xs text-muted-foreground cursor-pointer" }, field.label || field.key, field.required && /* @__PURE__ */ React25.createElement("span", { className: "text-rose-500 ml-0.5" }, "*"))) : /* @__PURE__ */ React25.createElement(
+          ), /* @__PURE__ */ React25.createElement(Label13, { htmlFor: inputId, className: "text-xs text-muted-foreground cursor-pointer" }, field.label || field.key, field.required && /* @__PURE__ */ React25.createElement("span", { className: "text-rose-500 ml-0.5" }, "*"))) : /* @__PURE__ */ React25.createElement(
             Input15,
             {
               id: inputId,
@@ -2031,7 +2031,7 @@ var init_formWidget = __esm({
           ));
         })),
         /* @__PURE__ */ React25.createElement("div", { className: "flex items-center justify-end gap-2 pt-4 border-t border-border/40 mt-4" }, showReset && /* @__PURE__ */ React25.createElement(
-          Button12,
+          Button9,
           {
             type: "button",
             variant: "outline",
@@ -2040,7 +2040,7 @@ var init_formWidget = __esm({
           },
           "Reset"
         ), /* @__PURE__ */ React25.createElement(
-          Button12,
+          Button9,
           {
             type: "submit",
             className: "h-8 text-xs font-semibold px-4 bg-primary text-primary-foreground hover:bg-primary/95"
@@ -2233,7 +2233,7 @@ var init_calendarUtils = __esm({
 
 // src/_shared/calendarGrid.jsx
 import React28 from "react";
-import { ChevronLeft as ChevronLeft2, ChevronRight as ChevronRight3 } from "lucide-react";
+import { ChevronLeft as ChevronLeft2, ChevronRight as ChevronRight4 } from "lucide-react";
 import { format as format2, isSameMonth } from "date-fns";
 function CalendarGrid({
   month,
@@ -2267,7 +2267,7 @@ function CalendarGrid({
       onClick: () => onMonthChange(1),
       className: "p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
     },
-    /* @__PURE__ */ React28.createElement(ChevronRight3, { className: "w-4 h-4" })
+    /* @__PURE__ */ React28.createElement(ChevronRight4, { className: "w-4 h-4" })
   ) : /* @__PURE__ */ React28.createElement("div", { className: "w-6 h-6" })), /* @__PURE__ */ React28.createElement("div", { className: "grid grid-cols-7 gap-1 text-center mb-2" }, ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => /* @__PURE__ */ React28.createElement("div", { key: day, className: "text-xs text-muted-foreground font-medium" }, day))), /* @__PURE__ */ React28.createElement("div", { className: "grid grid-cols-7 gap-y-1 text-center" }, days.map((day, i) => {
     const isCurrentMonth = isSameMonth(day, currentMonthDate);
     const isSelected = checkIsSameDay(day, selectedDate);
@@ -2371,8 +2371,8 @@ var init_timeInput = __esm({
 // src/date-picker/datePickerWidget.jsx
 import React30, { useState as useState12, useEffect as useEffect7, useMemo as useMemo15 } from "react";
 import PropTypes26 from "prop-types";
-import { Popover, PopoverContent, PopoverTrigger, Label as Label15, Input as Input17 } from "@jet-admin/ui";
-import { Calendar as CalendarIcon, X as X3 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger, Label as Label14, Input as Input17 } from "@jet-admin/ui";
+import { Calendar as CalendarIcon, X as X4 } from "lucide-react";
 import { setMonth, setHours, setMinutes, setSeconds } from "date-fns";
 function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}, setWidgetState }) {
   const [currentDate, setCurrentDate] = useState12(/* @__PURE__ */ new Date());
@@ -2437,7 +2437,7 @@ function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}
     updateState(newDate);
   };
   const displayValue = parsedValue ? widgetConfig.enableTime ? formatDisplayDateTime(parsedValue) : formatDisplayDate(parsedValue) : "";
-  return /* @__PURE__ */ React30.createElement("div", { className: "flex flex-col gap-1.5 w-full" }, widgetConfig.label && /* @__PURE__ */ React30.createElement(Label15, null, widgetConfig.label), /* @__PURE__ */ React30.createElement(Popover, { open: !!widgetState?.isOpen, onOpenChange: (open) => {
+  return /* @__PURE__ */ React30.createElement("div", { className: "flex flex-col gap-1.5 w-full" }, widgetConfig.label && /* @__PURE__ */ React30.createElement(Label14, null, widgetConfig.label), /* @__PURE__ */ React30.createElement(Popover, { open: !!widgetState?.isOpen, onOpenChange: (open) => {
     if (setWidgetState) {
       setWidgetState({ isOpen: open });
     }
@@ -2462,7 +2462,7 @@ function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}
       },
       className: "absolute right-2 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground flex items-center justify-center"
     },
-    /* @__PURE__ */ React30.createElement(X3, { className: "h-4 w-4" })
+    /* @__PURE__ */ React30.createElement(X4, { className: "h-4 w-4" })
   ))), /* @__PURE__ */ React30.createElement(PopoverContent, { className: "w-auto p-3", align: "start" }, /* @__PURE__ */ React30.createElement(
     CalendarGrid,
     {
@@ -2512,8 +2512,8 @@ var init_date_picker = __esm({
 // src/date-range-picker/dateRangePickerWidget.jsx
 import React31, { useState as useState13, useEffect as useEffect8, useMemo as useMemo16 } from "react";
 import PropTypes27 from "prop-types";
-import { Popover as Popover2, PopoverContent as PopoverContent2, PopoverTrigger as PopoverTrigger2, Label as Label16, Input as Input18, Button as Button13 } from "@jet-admin/ui";
-import { CalendarRange, ArrowRight, X as X4 } from "lucide-react";
+import { Popover as Popover2, PopoverContent as PopoverContent2, PopoverTrigger as PopoverTrigger2, Label as Label15, Input as Input18, Button as Button10 } from "@jet-admin/ui";
+import { CalendarRange, ArrowRight, X as X5 } from "lucide-react";
 import { setMonth as setMonth2, setHours as setHours2, setMinutes as setMinutes2, setSeconds as setSeconds2, addDays, startOfMonth as startOfMonth2, endOfMonth as endOfMonth2, startOfYear, endOfYear } from "date-fns";
 function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}, setWidgetState }) {
   const [currentDate, setCurrentDate] = useState13(/* @__PURE__ */ new Date());
@@ -2627,7 +2627,7 @@ function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState
   const displayStart = parsedStart ? widgetConfig.enableTime ? formatDisplayDateTime(parsedStart) : formatDisplayDate(parsedStart) : "";
   const displayEnd = parsedEnd ? widgetConfig.enableTime ? formatDisplayDateTime(parsedEnd) : formatDisplayDate(parsedEnd) : "";
   const nextMonthDate = setMonth2(new Date(currentDate), currentDate.getMonth() + 1);
-  return /* @__PURE__ */ React31.createElement("div", { className: "flex flex-col gap-1.5 w-full" }, widgetConfig.label && /* @__PURE__ */ React31.createElement(Label16, null, widgetConfig.label), /* @__PURE__ */ React31.createElement(Popover2, { open: !!widgetState?.isOpen, onOpenChange: (open) => {
+  return /* @__PURE__ */ React31.createElement("div", { className: "flex flex-col gap-1.5 w-full" }, widgetConfig.label && /* @__PURE__ */ React31.createElement(Label15, null, widgetConfig.label), /* @__PURE__ */ React31.createElement(Popover2, { open: !!widgetState?.isOpen, onOpenChange: (open) => {
     if (setWidgetState) {
       setWidgetState({ isOpen: open });
     }
@@ -2660,7 +2660,7 @@ function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState
       },
       className: "absolute right-2 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground flex items-center justify-center"
     },
-    /* @__PURE__ */ React31.createElement(X4, { className: "h-4 w-4" })
+    /* @__PURE__ */ React31.createElement(X5, { className: "h-4 w-4" })
   )))), /* @__PURE__ */ React31.createElement(PopoverContent2, { className: "w-auto p-0 flex flex-col", align: "start" }, /* @__PURE__ */ React31.createElement("div", { className: "flex p-3 gap-4" }, /* @__PURE__ */ React31.createElement("div", { className: "flex flex-col" }, /* @__PURE__ */ React31.createElement(
     CalendarGrid,
     {
@@ -2703,7 +2703,7 @@ function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState
       seconds: parsedEnd.getSeconds(),
       onChange: (time) => handleTimeChange("end", time)
     }
-  ))), widgetConfig.presets && widgetConfig.presets.length > 0 && /* @__PURE__ */ React31.createElement("div", { className: "border-t border-border p-3 flex flex-wrap gap-2 bg-muted/30" }, widgetConfig.presets.map((preset, i) => /* @__PURE__ */ React31.createElement(Button13, { key: i, variant: "outline", size: "sm", onClick: () => handlePresetClick(preset) }, preset.label))))));
+  ))), widgetConfig.presets && widgetConfig.presets.length > 0 && /* @__PURE__ */ React31.createElement("div", { className: "border-t border-border p-3 flex flex-wrap gap-2 bg-muted/30" }, widgetConfig.presets.map((preset, i) => /* @__PURE__ */ React31.createElement(Button10, { key: i, variant: "outline", size: "sm", onClick: () => handlePresetClick(preset) }, preset.label))))));
 }
 var init_dateRangePickerWidget = __esm({
   "src/date-range-picker/dateRangePickerWidget.jsx"() {
@@ -2908,13 +2908,9 @@ var parseStyle = (spec) => {
 
 // src/vega/vegaConfigEditor.jsx
 import {
-  Button as Button6,
-  Dialog as Dialog2,
-  DialogContent as DialogContent2,
-  DialogHeader as DialogHeader2,
-  DialogTitle as DialogTitle2,
+  Button as Button3,
   Input as Input3,
-  Label as Label3,
+  Label as Label2,
   Switch
 } from "@jet-admin/ui";
 
@@ -3643,19 +3639,73 @@ var getDefaultShelfSpec = () => ({
     height: 300
   }
 });
+var flattenFieldsRecursive = (value, prefix = "", visited = /* @__PURE__ */ new WeakSet(), maxDepth = 5) => {
+  const results = [];
+  if (maxDepth <= 0) return results;
+  if (value === null || value === void 0) return results;
+  if (typeof value === "object") {
+    if (visited.has(value)) return results;
+    visited.add(value);
+  }
+  if (Array.isArray(value)) {
+    if (prefix) {
+      results.push({
+        name: prefix,
+        type: "nominal",
+        icon: "[]"
+      });
+    }
+    if (value.length > 0 && typeof value[0] === "object" && value[0] !== null) {
+      const nested = flattenFieldsRecursive(value[0], prefix ? `${prefix}.0` : "0", visited, maxDepth - 1);
+      results.push(...nested);
+    }
+    return results;
+  }
+  if (typeof value === "object") {
+    if (prefix) {
+      results.push({
+        name: prefix,
+        type: "nominal",
+        icon: "{}"
+      });
+    }
+    for (const key of Object.keys(value)) {
+      const childPath = prefix ? `${prefix}.${key}` : key;
+      const childVal = value[key];
+      if (childVal === null || childVal === void 0) {
+        results.push({ name: childPath, type: "nominal", icon: getFieldTypeIcon("nominal") });
+      } else if (Array.isArray(childVal) || typeof childVal === "object") {
+        const nested = flattenFieldsRecursive(childVal, childPath, visited, maxDepth - 1);
+        results.push(...nested);
+      } else {
+        const type = inferFieldType(childVal, key, []);
+        results.push({ name: childPath, type, icon: getFieldTypeIcon(type) });
+      }
+    }
+    return results;
+  }
+  if (prefix) {
+    const type = inferFieldType(value, prefix, []);
+    results.push({ name: prefix, type, icon: getFieldTypeIcon(type) });
+  }
+  return results;
+};
 var inferFieldsFromData = (data) => {
   if (!Array.isArray(data) || data.length === 0) return [];
   const sample = data[0];
   if (typeof sample !== "object" || sample === null) return [];
-  return Object.keys(sample).map((key) => {
-    const value = sample[key];
-    const type = inferFieldType(value, key, data);
-    return {
-      name: key,
-      type,
-      icon: getFieldTypeIcon(type)
-    };
-  });
+  const sampleRows = data.slice(0, 5);
+  const mergedSample = {};
+  for (const row of sampleRows) {
+    if (row && typeof row === "object") {
+      for (const key of Object.keys(row)) {
+        if (mergedSample[key] === void 0 || mergedSample[key] === null) {
+          mergedSample[key] = row[key];
+        }
+      }
+    }
+  }
+  return flattenFieldsRecursive(mergedSample);
 };
 var inferFieldType = (value, key, data) => {
   if (value === null || value === void 0) {
@@ -3695,18 +3745,31 @@ var getFieldTypeIcon = (type) => {
 };
 
 // src/vega/fieldPill.jsx
-import { Button } from "@jet-admin/ui";
+import { Hash, Type, Calendar, ArrowUpDown, X } from "lucide-react";
+var getTypeIconComponent = (type) => {
+  switch (type) {
+    case "quantitative":
+      return /* @__PURE__ */ React3.createElement(Hash, { className: "w-3 h-3 shrink-0" });
+    case "temporal":
+      return /* @__PURE__ */ React3.createElement(Calendar, { className: "w-3 h-3 shrink-0" });
+    case "ordinal":
+      return /* @__PURE__ */ React3.createElement(ArrowUpDown, { className: "w-3 h-3 shrink-0" });
+    case "nominal":
+    default:
+      return /* @__PURE__ */ React3.createElement(Type, { className: "w-3 h-3 shrink-0" });
+  }
+};
 var getTypeClass = (type) => {
   switch (type) {
     case "quantitative":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      return "bg-emerald-500/15 text-emerald-400 border-emerald-500/25";
     case "temporal":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "bg-amber-500/15 text-amber-400 border-amber-500/25";
     case "ordinal":
-      return "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200";
+      return "bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-500/25";
     case "nominal":
     default:
-      return "bg-blue-50 text-blue-700 border-blue-200";
+      return "bg-blue-500/15 text-blue-400 border-blue-500/25";
   }
 };
 var FieldPill = ({
@@ -3720,7 +3783,6 @@ var FieldPill = ({
   isCompact = false,
   className = ""
 }) => {
-  const icon = field.icon || getFieldTypeIcon(field.type);
   const typeClass = getTypeClass(field.type);
   const handleDragStart = useCallback2((e) => {
     e.dataTransfer.setData("application/json", JSON.stringify(field));
@@ -3737,26 +3799,24 @@ var FieldPill = ({
       onDragStart: handleDragStart,
       onDragEnd: handleDragEnd,
       onClick,
-      className: `flex items-center gap-1.5 rounded-sm font-medium cursor-grab shadow-sm border transition-shadow hover:shadow-md ${typeClass} ${isCompact ? "px-1.5 py-0.5 text-[11px]" : "px-2.5 py-1.5 text-xs"} ${isDragging ? "opacity-50" : ""} ${className}`,
+      className: `flex items-center gap-1.5 rounded font-medium cursor-grab border transition-colors hover:brightness-110 max-w-full min-w-0 ${typeClass} ${isCompact ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-1 text-[11px]"} ${isDragging ? "opacity-50" : ""} ${className}`,
       title: `${field.name} (${field.type})`
     },
-    /* @__PURE__ */ React3.createElement("span", { className: "opacity-70 font-mono scale-90" }, icon),
-    /* @__PURE__ */ React3.createElement("span", { className: "truncate" }, field.name),
-    field.aggregate && field.aggregate !== "none" && /* @__PURE__ */ React3.createElement("span", { className: "text-[9px] uppercase tracking-wider bg-brand-black/50 px-1 rounded-sm ml-1 font-bold", title: `Aggregate: ${field.aggregate}` }, field.aggregate.slice(0, 3)),
+    getTypeIconComponent(field.type),
+    /* @__PURE__ */ React3.createElement("span", { className: "truncate min-w-0" }, field.name),
+    field.aggregate && field.aggregate !== "none" && /* @__PURE__ */ React3.createElement("span", { className: "text-[8px] uppercase tracking-wider bg-white/10 px-1 py-px rounded font-bold ml-auto shrink-0", title: `Aggregate: ${field.aggregate}` }, field.aggregate.slice(0, 3)),
     onRemove && /* @__PURE__ */ React3.createElement(
-      Button,
+      "button",
       {
         type: "button",
-        variant: "ghost",
-        size: "icon",
         onClick: (e) => {
           e.stopPropagation();
           onRemove();
         },
-        className: "ml-auto h-4 w-4 rounded-full hover:bg-black/10 text-xs text-muted-foreground",
+        className: "ml-auto h-3.5 w-3.5 rounded-sm flex items-center justify-center hover:bg-white/20 shrink-0",
         title: "Remove"
       },
-      "\xD7"
+      /* @__PURE__ */ React3.createElement(X, { className: "w-2.5 h-2.5" })
     )
   );
 };
@@ -3776,7 +3836,7 @@ FieldPill.propTypes = {
 
 // src/vega/dataFieldPanel.jsx
 init_suggestionEngine();
-import { Button as Button2, Input, Label } from "@jet-admin/ui";
+import { Button, Input } from "@jet-admin/ui";
 import { Database, GitMerge, ArrowRightFromLine, Zap, Search, Plus } from "lucide-react";
 import { getValueByPath as getValueByPath2 } from "@jet-admin/template-engine";
 var DataFieldPanel = ({
@@ -3786,7 +3846,8 @@ var DataFieldPanel = ({
   onDataSourceChange,
   onFieldClick,
   workflow,
-  className = ""
+  className = "",
+  compact = false
 }) => {
   const [searchTerm, setSearchTerm] = useState3("");
   const [manualField, setManualField] = useState3("");
@@ -3827,16 +3888,8 @@ var DataFieldPanel = ({
     if (!match) return [];
     const rawPath = match[1];
     const toFields = (data) => {
-      if (Array.isArray(data) && data.length > 0) {
-        return inferFieldsFromData(data);
-      }
-      if (data && typeof data === "object" && !Array.isArray(data)) {
-        return Object.keys(data).map((key) => ({
-          name: key,
-          type: typeof data[key] === "number" ? "quantitative" : "nominal",
-          icon: typeof data[key] === "number" ? "#" : "Abc"
-        }));
-      }
+      if (Array.isArray(data) && data.length > 0) return inferFieldsFromData(data);
+      if (data && typeof data === "object" && !Array.isArray(data)) return inferFieldsFromData([data]);
       return null;
     };
     if (workflowContext) {
@@ -3874,30 +3927,30 @@ var DataFieldPanel = ({
   const getCategoryIcon = (cat) => {
     switch (cat) {
       case "node":
-        return /* @__PURE__ */ React4.createElement(GitMerge, { className: "w-3 h-3 shrink-0 text-emerald-600" });
+        return /* @__PURE__ */ React4.createElement(GitMerge, { className: "w-3 h-3 shrink-0 text-emerald-500" });
       case "output":
-        return /* @__PURE__ */ React4.createElement(ArrowRightFromLine, { className: "w-3 h-3 shrink-0 text-fuchsia-600" });
+        return /* @__PURE__ */ React4.createElement(ArrowRightFromLine, { className: "w-3 h-3 shrink-0 text-fuchsia-500" });
       case "runtime":
-        return /* @__PURE__ */ React4.createElement(Zap, { className: "w-3 h-3 shrink-0 text-amber-600" });
+        return /* @__PURE__ */ React4.createElement(Zap, { className: "w-3 h-3 shrink-0 text-amber-500" });
       case "datasource":
-        return /* @__PURE__ */ React4.createElement(Database, { className: "w-3 h-3 shrink-0 text-blue-600" });
+        return /* @__PURE__ */ React4.createElement(Database, { className: "w-3 h-3 shrink-0 text-blue-500" });
       default:
-        return /* @__PURE__ */ React4.createElement(Database, { className: "w-3 h-3 shrink-0 text-brand-text-primary" });
+        return /* @__PURE__ */ React4.createElement(Database, { className: "w-3 h-3 shrink-0 text-muted-foreground" });
     }
   };
   const renderFieldGroup = (groupFields, label, colorClass) => {
     if (groupFields.length === 0) return null;
-    return /* @__PURE__ */ React4.createElement("div", { className: "mb-4" }, /* @__PURE__ */ React4.createElement("div", { className: `text-[10px] font-bold uppercase tracking-widest mb-2 px-1 ${colorClass}` }, label, " (", groupFields.length, ")"), /* @__PURE__ */ React4.createElement("div", { className: "flex flex-col gap-1.5 px-1" }, groupFields.map((field) => /* @__PURE__ */ React4.createElement(
+    return /* @__PURE__ */ React4.createElement("div", { className: "mb-2.5 last:mb-0" }, /* @__PURE__ */ React4.createElement("div", { className: `text-[9px] font-bold uppercase tracking-widest mb-1 px-0.5 ${colorClass}` }, label, " ", /* @__PURE__ */ React4.createElement("span", { className: "opacity-60" }, "(", groupFields.length, ")")), /* @__PURE__ */ React4.createElement("div", { className: "flex flex-col gap-0.5" }, groupFields.map((field) => /* @__PURE__ */ React4.createElement(
       FieldPill,
       {
         key: field.name,
         field,
         onClick: () => onFieldClick?.(field),
-        className: "w-full justify-start hover:scale-[1.02] transition-transform"
+        className: "w-full justify-start"
       }
     ))));
   };
-  return /* @__PURE__ */ React4.createElement("div", { className: `flex flex-col h-full bg-brand-dark ${className}` }, /* @__PURE__ */ React4.createElement("div", { className: "p-2.5 border-b border-border bg-muted/30" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, /* @__PURE__ */ React4.createElement(Database, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ React4.createElement("span", null, "Data Source")), /* @__PURE__ */ React4.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ React4.createElement(
+  return /* @__PURE__ */ React4.createElement("div", { className: `flex flex-col bg-background ${className}` }, !compact && /* @__PURE__ */ React4.createElement("div", { className: "px-2.5 py-2 border-b border-border/50 bg-muted/20" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-1.5 mb-1.5" }, /* @__PURE__ */ React4.createElement(Database, { className: "w-3 h-3 text-muted-foreground" }), /* @__PURE__ */ React4.createElement("span", { className: "text-[9px] font-bold text-muted-foreground uppercase tracking-widest" }, "Data Source")), /* @__PURE__ */ React4.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ React4.createElement(
     Input,
     {
       type: "text",
@@ -3905,80 +3958,49 @@ var DataFieldPanel = ({
       onChange: (e) => onDataSourceChange?.(e.target.value),
       onFocus: () => setShowSuggestions(true),
       placeholder: "Select or type a data path...",
-      className: "w-full text-xs font-mono",
+      className: "w-full text-[11px] font-mono h-7",
       title: "Workflow data source path"
     }
-  ), showSuggestions && allSuggestions.length > 0 && /* @__PURE__ */ React4.createElement("div", { className: "absolute left-0 right-0 top-full mt-1 bg-brand-dark border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80" }, /* @__PURE__ */ React4.createElement("div", { className: "px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted sticky top-0" }, "Available Variables (", allSuggestions.length, ")"), allSuggestions.map((s, i) => /* @__PURE__ */ React4.createElement(
+  ), showSuggestions && allSuggestions.length > 0 && /* @__PURE__ */ React4.createElement("div", { className: "absolute left-0 right-0 top-full mt-1 bg-popover border border-border rounded-md shadow-xl z-50 max-h-48 overflow-y-auto" }, /* @__PURE__ */ React4.createElement("div", { className: "px-2.5 py-1 text-[9px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted/50 sticky top-0" }, "Variables (", allSuggestions.length, ")"), allSuggestions.map((s, i) => /* @__PURE__ */ React4.createElement(
     "div",
     {
       key: `${s.path}-${i}`,
       onClick: () => handleSelectSuggestion(s),
-      className: `w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? "bg-primary/5 border-l-2 border-l-primary" : "bg-brand-dark hover:bg-muted"}`
+      className: `w-full text-left px-2.5 py-1.5 text-[11px] border-b border-border/30 flex items-center gap-2 transition-colors cursor-pointer ${dataSource === s.path ? "bg-primary/10 border-l-2 border-l-primary" : "hover:bg-muted"}`
     },
-    /* @__PURE__ */ React4.createElement("div", { className: "mt-0.5" }, getCategoryIcon(s.source || s.category)),
-    /* @__PURE__ */ React4.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React4.createElement("div", { className: "text-[11px] font-medium text-foreground font-mono truncate" }, s.label), /* @__PURE__ */ React4.createElement("div", { className: "text-[10px] text-muted-foreground truncate mt-0.5", title: s.description }, s.description), s.nodeTitle && /* @__PURE__ */ React4.createElement("div", { className: "text-[9px] text-emerald-600 mt-1 uppercase tracking-wider font-semibold" }, "from: ", s.nodeTitle)),
-    s.source === "runtime" && /* @__PURE__ */ React4.createElement("span", { className: "text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-sm uppercase tracking-wider shrink-0" }, "LIVE")
-  )))), dataSource && fields.length > 0 && /* @__PURE__ */ React4.createElement("div", { className: "mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm w-fit border border-emerald-100" }, /* @__PURE__ */ React4.createElement(Zap, { className: "w-3 h-3" }), fields.length, " fields detected")), fields.length > 5 && /* @__PURE__ */ React4.createElement("div", { className: "px-2.5 py-1.5 border-b border-border bg-brand-dark" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-2 bg-muted/50 border border-border rounded-sm px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow" }, /* @__PURE__ */ React4.createElement(Search, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ React4.createElement(
+    getCategoryIcon(s.source || s.category),
+    /* @__PURE__ */ React4.createElement("span", { className: "font-mono truncate flex-1 min-w-0 text-foreground" }, s.label),
+    s.source === "runtime" && /* @__PURE__ */ React4.createElement("span", { className: "text-[8px] font-bold text-amber-500 bg-amber-500/15 px-1 py-px rounded shrink-0 uppercase tracking-wider" }, "LIVE")
+  )))), dataSource && fields.length > 0 && /* @__PURE__ */ React4.createElement("div", { className: "mt-1.5 flex items-center gap-1 text-[9px] font-semibold text-primary" }, /* @__PURE__ */ React4.createElement(Zap, { className: "w-2.5 h-2.5" }), fields.length, " fields")), compact && fields.length > 0 && /* @__PURE__ */ React4.createElement("div", { className: "px-2.5 py-1.5 flex items-center justify-between bg-muted/20" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-1.5" }, /* @__PURE__ */ React4.createElement(Database, { className: "w-3 h-3 text-muted-foreground" }), /* @__PURE__ */ React4.createElement("span", { className: "text-[9px] font-bold text-muted-foreground uppercase tracking-widest" }, "Fields")), /* @__PURE__ */ React4.createElement("span", { className: "text-[9px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full" }, fields.length)), fields.length > 5 && /* @__PURE__ */ React4.createElement("div", { className: "px-2.5 py-1.5 border-b border-border/30" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-1.5 bg-muted/40 border border-border/50 rounded px-2 py-1 focus-within:ring-1 focus-within:ring-ring transition-shadow" }, /* @__PURE__ */ React4.createElement(Search, { className: "w-3 h-3 text-muted-foreground shrink-0" }), /* @__PURE__ */ React4.createElement(
     Input,
     {
       type: "text",
       value: searchTerm,
       onChange: (e) => setSearchTerm(e.target.value),
-      placeholder: "Filter fields...",
-      className: "flex-1 text-xs bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-6 p-0"
+      placeholder: "Filter...",
+      className: "flex-1 text-[10px] bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-4 p-0"
     }
-  ))), /* @__PURE__ */ React4.createElement("div", { className: "flex-1 overflow-y-auto p-2.5 min-h-0" }, fields.length > 0 ? /* @__PURE__ */ React4.createElement(React4.Fragment, null, renderFieldGroup(quantFields, "Measures", "text-emerald-600"), renderFieldGroup(catFields, "Dimensions", "text-blue-600"), renderFieldGroup(tempFields, "Temporal", "text-amber-600")) : /* @__PURE__ */ React4.createElement("div", { className: "flex flex-col items-center justify-center h-full py-6 text-center px-3" }, /* @__PURE__ */ React4.createElement(Database, { className: "w-8 h-8 mb-2 text-muted-foreground/30" }), /* @__PURE__ */ React4.createElement("p", { className: "text-xs text-muted-foreground leading-relaxed mb-3" }, dataSource ? "Run the workflow to detect fields from the data" : "Choose a data source above or type a ctx path"), !dataSource && allSuggestions.length > 0 && /* @__PURE__ */ React4.createElement(
-    Button2,
-    {
-      type: "button",
-      size: "sm",
-      onClick: () => setShowSuggestions(true),
-      className: "h-7 px-3 text-[10px] font-semibold text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 uppercase tracking-wider"
-    },
-    "Browse ",
-    allSuggestions.length,
-    " Variables"
-  )), /* @__PURE__ */ React4.createElement("div", { className: "mt-3" }, showManualAdd ? /* @__PURE__ */ React4.createElement("div", { className: "flex flex-col gap-2" }, /* @__PURE__ */ React4.createElement(
+  ))), /* @__PURE__ */ React4.createElement("div", { className: "flex-1 overflow-y-auto px-2.5 py-2 min-h-0" }, fields.length > 0 ? /* @__PURE__ */ React4.createElement(React4.Fragment, null, renderFieldGroup(quantFields, "Measures", "text-emerald-500"), renderFieldGroup(catFields, "Dimensions", "text-blue-500"), renderFieldGroup(tempFields, "Temporal", "text-amber-500")) : /* @__PURE__ */ React4.createElement("div", { className: "flex flex-col items-center justify-center py-3 text-center" }, /* @__PURE__ */ React4.createElement(Database, { className: "w-5 h-5 mb-1 text-muted-foreground/25" }), /* @__PURE__ */ React4.createElement("p", { className: "text-[10px] text-muted-foreground" }, dataSource ? "Run workflow to detect fields" : "Select a data source")), showManualAdd ? /* @__PURE__ */ React4.createElement("div", { className: "mt-2 flex flex-col gap-1" }, /* @__PURE__ */ React4.createElement(
     Input,
     {
       type: "text",
       value: manualField,
       onChange: (e) => setManualField(e.target.value),
       onKeyDown: (e) => e.key === "Enter" && handleAddManualField(),
-      placeholder: "Type field_name & press Enter...",
-      className: "w-full text-xs font-mono",
+      placeholder: "field_name",
+      className: "w-full text-[10px] font-mono h-6",
       autoFocus: true
     }
-  ), /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-2 justify-end" }, /* @__PURE__ */ React4.createElement(
-    Button2,
+  ), /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-1 justify-end" }, /* @__PURE__ */ React4.createElement(Button, { type: "button", variant: "ghost", size: "sm", onClick: () => setShowManualAdd(false), className: "h-5 px-1.5 text-[9px] text-muted-foreground" }, "Cancel"), /* @__PURE__ */ React4.createElement(Button, { type: "button", size: "sm", onClick: handleAddManualField, className: "h-5 px-1.5 text-[9px]" }, "Add"))) : /* @__PURE__ */ React4.createElement(
+    "button",
     {
       type: "button",
-      variant: "ghost",
-      size: "sm",
-      onClick: () => setShowManualAdd(false),
-      className: "h-6 px-2 text-xs text-muted-foreground hover:text-foreground font-medium"
-    },
-    "Cancel"
-  ), /* @__PURE__ */ React4.createElement(
-    Button2,
-    {
-      type: "button",
-      size: "sm",
-      onClick: handleAddManualField,
-      className: "h-6 px-2 text-xs font-semibold"
-    },
-    "Add Field"
-  ))) : /* @__PURE__ */ React4.createElement(
-    Button2,
-    {
-      type: "button",
-      variant: "outline",
       onClick: () => setShowManualAdd(true),
-      className: "w-full h-auto py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 border-dashed border-border hover:bg-muted hover:text-foreground"
+      className: "w-full mt-2 flex items-center justify-center gap-1 py-1 rounded border border-dashed border-border/50 text-[9px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 hover:border-border transition-colors"
     },
-    /* @__PURE__ */ React4.createElement(Plus, { className: "w-3.5 h-3.5 mr-1" }),
-    /* @__PURE__ */ React4.createElement("span", null, "Add Field Manually")
-  ))));
+    /* @__PURE__ */ React4.createElement(Plus, { className: "w-3 h-3" }),
+    "Add Field"
+  )));
 };
 DataFieldPanel.propTypes = {
   workflowContext: PropTypes3.object,
@@ -3987,38 +4009,27 @@ DataFieldPanel.propTypes = {
   onDataSourceChange: PropTypes3.func,
   onFieldClick: PropTypes3.func,
   workflow: PropTypes3.object,
-  className: PropTypes3.string
+  className: PropTypes3.string,
+  compact: PropTypes3.bool
 };
 
 // src/vega/encodingShelf.jsx
 import React5, { useState as useState4, useCallback as useCallback4, useRef as useRef4 } from "react";
 import PropTypes4 from "prop-types";
-import { Button as Button3, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
-var CHANNEL_LABELS = {
-  x: "X Axis",
-  y: "Y Axis",
-  color: "Color",
-  size: "Size",
-  shape: "Shape",
-  opacity: "Opacity",
-  row: "Row",
-  column: "Column",
-  detail: "Detail",
-  text: "Text",
-  strokeDash: "Dash"
-};
-var CHANNEL_ICONS = {
-  x: "\u2194",
-  y: "\u2195",
-  color: "\u{1F3A8}",
-  size: "\u25C9",
-  shape: "\u25C6",
-  opacity: "\u25D0",
-  row: "\u25A6",
-  column: "\u25A5",
-  detail: "\u2299",
-  text: "T",
-  strokeDash: "\u254C"
+import { MoveHorizontal, MoveVertical, Palette, Circle, Diamond, Contrast, Rows, Columns, CircleDot, Type as Type2, Minus, ArrowUpDown as ArrowUpDown2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+var CHANNEL_CONFIG = {
+  x: { label: "X", Icon: MoveHorizontal },
+  y: { label: "Y", Icon: MoveVertical },
+  color: { label: "Color", Icon: Palette },
+  size: { label: "Size", Icon: Circle },
+  shape: { label: "Shape", Icon: Diamond },
+  opacity: { label: "Opacity", Icon: Contrast },
+  row: { label: "Row", Icon: Rows },
+  column: { label: "Col", Icon: Columns },
+  detail: { label: "Detail", Icon: CircleDot },
+  text: { label: "Text", Icon: Type2 },
+  strokeDash: { label: "Dash", Icon: Minus }
 };
 var EncodingShelf = ({
   channel,
@@ -4029,8 +4040,8 @@ var EncodingShelf = ({
 }) => {
   const [isDragOver, setIsDragOver] = useState4(false);
   const dropRef = useRef4(null);
-  const label = CHANNEL_LABELS[channel] || channel;
-  const icon = CHANNEL_ICONS[channel] || "\u2022";
+  const config = CHANNEL_CONFIG[channel] || { label: channel, Icon: CircleDot };
+  const { label, Icon } = config;
   const handleDragOver = useCallback4((e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
@@ -4074,12 +4085,6 @@ var EncodingShelf = ({
     onChange({ ...value, sort: next });
   }, [value, onChange]);
   const isEmpty = !value || !value.field;
-  const shelfClass = [
-    "flex items-center w-full min-h-[36px] bg-brand-dark border border-border rounded-md p-1 gap-2 transition-colors",
-    isEmpty ? "border-dashed border-border bg-muted/30" : "",
-    isDragOver ? "border-primary bg-primary/5 shadow-inner" : "",
-    className
-  ].filter(Boolean).join(" ");
   return /* @__PURE__ */ React5.createElement(
     "div",
     {
@@ -4087,27 +4092,31 @@ var EncodingShelf = ({
       onDragOver: handleDragOver,
       onDragLeave: handleDragLeave,
       onDrop: handleDrop,
-      className: shelfClass
+      className: [
+        "flex items-center w-full min-h-[32px] rounded border transition-colors gap-1.5 px-2 py-1",
+        isEmpty ? "border-dashed border-border/60 bg-muted/20" : "border-border bg-card",
+        isDragOver ? "border-primary bg-primary/5 shadow-inner" : "",
+        className
+      ].filter(Boolean).join(" ")
     },
-    /* @__PURE__ */ React5.createElement("div", { className: "flex items-center justify-start w-24 shrink-0 px-2 py-1 text-[11px] font-bold text-muted-foreground uppercase tracking-widest gap-2 border-r border-border" }, /* @__PURE__ */ React5.createElement("span", { className: "text-muted-foreground/50 text-sm" }, icon), /* @__PURE__ */ React5.createElement("span", { className: "truncate" }, label)),
-    /* @__PURE__ */ React5.createElement("div", { className: "flex-1 flex flex-wrap items-center gap-2 min-w-0 pr-1" }, isEmpty ? /* @__PURE__ */ React5.createElement("span", { className: "text-xs text-muted-foreground italic px-2" }, isDragOver ? "Release to assign" : "Drop a field here") : /* @__PURE__ */ React5.createElement(React5.Fragment, null, /* @__PURE__ */ React5.createElement(
+    /* @__PURE__ */ React5.createElement("div", { className: "flex items-center gap-1.5 w-14 shrink-0" }, /* @__PURE__ */ React5.createElement(Icon, { className: "w-3 h-3 text-muted-foreground shrink-0" }), /* @__PURE__ */ React5.createElement("span", { className: "text-[10px] font-semibold text-muted-foreground uppercase tracking-wide truncate" }, label)),
+    /* @__PURE__ */ React5.createElement("div", { className: "flex-1 flex flex-nowrap items-center gap-1 min-w-0 overflow-hidden" }, isEmpty ? /* @__PURE__ */ React5.createElement("span", { className: "text-[10px] text-muted-foreground/60 italic" }, isDragOver ? "Release" : "Drop field") : /* @__PURE__ */ React5.createElement(React5.Fragment, null, /* @__PURE__ */ React5.createElement(
       FieldPill,
       {
         field: { ...value, name: value.field },
         onRemove,
-        isCompact: true
+        isCompact: true,
+        className: "flex-1 min-w-0"
       }
-    ), /* @__PURE__ */ React5.createElement(Select, { value: value.type || "nominal", onValueChange: (val) => handleTypeChange(val) }, /* @__PURE__ */ React5.createElement(SelectTrigger, { className: "h-6 px-1.5 py-0.5 text-[11px]", title: "Data type" }, /* @__PURE__ */ React5.createElement(SelectValue, { placeholder: "Select type" })), /* @__PURE__ */ React5.createElement(SelectContent, { className: "z-[200]" }, FIELD_TYPES.map((t) => /* @__PURE__ */ React5.createElement(SelectItem, { key: t, value: t }, t.charAt(0).toUpperCase() + t.slice(1))))), (value.type === "quantitative" || value.aggregate) && /* @__PURE__ */ React5.createElement(Select, { value: value.aggregate || "none", onValueChange: (val) => handleAggChange(val) }, /* @__PURE__ */ React5.createElement(SelectTrigger, { className: "h-6 px-1.5 py-0.5 text-[11px]", title: "Aggregation" }, /* @__PURE__ */ React5.createElement(SelectValue, { placeholder: "Select agg" })), /* @__PURE__ */ React5.createElement(SelectContent, { className: "z-[200]" }, /* @__PURE__ */ React5.createElement(SelectItem, { value: "none" }, "no agg"), AGGREGATE_TYPES.map((a) => /* @__PURE__ */ React5.createElement(SelectItem, { key: a, value: a }, a)))), /* @__PURE__ */ React5.createElement(
-      Button3,
+    ), /* @__PURE__ */ React5.createElement(Select, { value: value.type || "nominal", onValueChange: handleTypeChange }, /* @__PURE__ */ React5.createElement(SelectTrigger, { className: "h-5 w-auto min-w-0 px-1 text-[10px] border-border/50 bg-transparent gap-0.5 shrink-0", title: "Type" }, /* @__PURE__ */ React5.createElement(SelectValue, null)), /* @__PURE__ */ React5.createElement(SelectContent, { className: "z-[200]" }, FIELD_TYPES.map((t) => /* @__PURE__ */ React5.createElement(SelectItem, { key: t, value: t, className: "text-[11px]" }, t.charAt(0).toUpperCase() + t.slice(1))))), (value.type === "quantitative" || value.aggregate) && /* @__PURE__ */ React5.createElement(Select, { value: value.aggregate || "none", onValueChange: handleAggChange }, /* @__PURE__ */ React5.createElement(SelectTrigger, { className: "h-5 w-auto min-w-0 px-1 text-[10px] border-border/50 bg-transparent gap-0.5 shrink-0", title: "Aggregate" }, /* @__PURE__ */ React5.createElement(SelectValue, null)), /* @__PURE__ */ React5.createElement(SelectContent, { className: "z-[200]" }, /* @__PURE__ */ React5.createElement(SelectItem, { value: "none", className: "text-[11px]" }, "raw"), AGGREGATE_TYPES.map((a) => /* @__PURE__ */ React5.createElement(SelectItem, { key: a, value: a, className: "text-[11px]" }, a)))), /* @__PURE__ */ React5.createElement(
+      "button",
       {
         type: "button",
-        variant: "ghost",
-        size: "icon",
         onClick: handleSortToggle,
-        className: "ml-auto h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/5 text-xs",
+        className: "ml-auto h-5 w-5 flex items-center justify-center rounded text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0",
         title: `Sort: ${value.sort || "default"}`
       },
-      value.sort === "ascending" ? "\u2191" : value.sort === "descending" ? "\u2193" : "\u2195"
+      /* @__PURE__ */ React5.createElement(ArrowUpDown2, { className: "w-3 h-3" })
     )))
   );
 };
@@ -4128,35 +4137,33 @@ EncodingShelf.propTypes = {
 // src/vega/markSelector.jsx
 import React6 from "react";
 import PropTypes5 from "prop-types";
-import { Button as Button4 } from "@jet-admin/ui";
+import { BarChart3, TrendingUp, AreaChart, ScatterChart as ScatterChart2, PieChart as PieChart2, CircleDot as CircleDot2, Grid3X3, GripVertical, Circle as Circle2, Sparkles } from "lucide-react";
 var MARK_OPTIONS = [
-  { key: "auto", label: "Auto", icon: "\u2726", desc: "Best fit based on field types" },
-  { key: "bar", label: "Bar", icon: "\u25A5", desc: "Compare categories" },
-  { key: "line", label: "Line", icon: "\u27CB", desc: "Trends over time" },
-  { key: "area", label: "Area", icon: "\u25A4", desc: "Volume over time" },
-  { key: "point", label: "Scatter", icon: "\u2299", desc: "Correlation" },
-  { key: "arc", label: "Pie", icon: "\u25D5", desc: "Part of whole" },
-  { key: "donut", label: "Donut", icon: "\u25D1", desc: "Part of whole (ring)" },
-  { key: "rect", label: "Heat", icon: "\u25A6", desc: "Density matrix" },
-  { key: "tick", label: "Tick", icon: "|", desc: "Distribution marks" },
-  { key: "circle", label: "Bubble", icon: "\u25CF", desc: "Sized circles" }
+  { key: "auto", label: "Auto", Icon: Sparkles, desc: "Best fit" },
+  { key: "bar", label: "Bar", Icon: BarChart3, desc: "Compare" },
+  { key: "line", label: "Line", Icon: TrendingUp, desc: "Trends" },
+  { key: "area", label: "Area", Icon: AreaChart, desc: "Volume" },
+  { key: "point", label: "Scatter", Icon: ScatterChart2, desc: "Correlate" },
+  { key: "arc", label: "Pie", Icon: PieChart2, desc: "Parts" },
+  { key: "donut", label: "Donut", Icon: CircleDot2, desc: "Ring" },
+  { key: "rect", label: "Heat", Icon: Grid3X3, desc: "Density" },
+  { key: "tick", label: "Tick", Icon: GripVertical, desc: "Dist" },
+  { key: "circle", label: "Bubble", Icon: Circle2, desc: "Sized" }
 ];
 var MarkSelector = ({ value, onChange, className = "" }) => {
-  return /* @__PURE__ */ React6.createElement("div", { className: `flex flex-wrap gap-1 w-full ${className}` }, MARK_OPTIONS.map((opt) => {
+  return /* @__PURE__ */ React6.createElement("div", { className: `grid grid-cols-5 gap-1.5 ${className}` }, MARK_OPTIONS.map((opt) => {
     const isSelected = value === opt.key;
     return /* @__PURE__ */ React6.createElement(
-      Button4,
+      "button",
       {
         key: opt.key,
         type: "button",
-        variant: isSelected ? "outline" : "ghost",
-        size: "sm",
         onClick: () => onChange(opt.key),
-        className: `h-auto py-1.5 flex-1 min-w-[60px] px-2 text-xs font-medium ${isSelected ? "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm hover:text-indigo-800 hover:bg-indigo-100" : "text-brand-text-primary border-transparent hover:bg-brand-border-dark"}`,
+        className: `flex flex-col items-center justify-center gap-0.5 rounded py-1.5 px-1 transition-colors ${isSelected ? "bg-primary/15 text-primary ring-1 ring-primary/30" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`,
         title: `${opt.label}: ${opt.desc}`
       },
-      /* @__PURE__ */ React6.createElement("span", { className: `mr-1.5 ${isSelected ? "text-indigo-500" : "text-brand-text-primary"}` }, opt.icon),
-      /* @__PURE__ */ React6.createElement("span", { className: "hidden lg:inline" }, opt.label)
+      /* @__PURE__ */ React6.createElement(opt.Icon, { className: `w-3.5 h-3.5 ${isSelected ? "text-primary" : ""}` }),
+      /* @__PURE__ */ React6.createElement("span", { className: "text-[8px] font-medium leading-none" }, opt.label)
     );
   }));
 };
@@ -4168,11 +4175,8 @@ MarkSelector.propTypes = {
 
 // src/vega/shelfBuilder.jsx
 init_suggestionEngine();
-import { Button as Button5, Input as Input2, Label as Label2, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@jet-admin/ui";
-import { Settings, ChevronDown, ChevronRight, Database as Database2, TrendingUp } from "lucide-react";
-var VEGA_STRINGS = {
-  WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings"
-};
+import { Button as Button2, Input as Input2, Label, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2 } from "@jet-admin/ui";
+import { ChevronDown, ChevronRight, Database as Database2, TrendingUp as TrendingUp2, Layers, Palette as Palette2 } from "lucide-react";
 var PRIMARY_SHELVES = ["x", "y", "color", "size"];
 var SECONDARY_SHELVES = ["row", "column", "shape", "opacity", "detail", "text"];
 var ShelfBuilder = ({
@@ -4266,7 +4270,7 @@ var ShelfBuilder = ({
       return { ...prev, encoding: enc };
     });
   }, []);
-  const [isOpen, setIsOpen] = useState5(false);
+  const [isExpanded, setIsExpanded] = useState5(false);
   useEffect4(() => {
     const timer = setTimeout(() => {
       const vegaSpec = generateVegaLiteSpec(shelfSpec);
@@ -4297,17 +4301,22 @@ var ShelfBuilder = ({
   const hasDataSources = discoveredArrayPaths.length > 0;
   const isWorkflowSelected = !!selectedWorkflow;
   const hasAnyData = isWorkflowSelected || hasDataSources;
-  return /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement(Dialog, { open: isOpen, onOpenChange: setIsOpen }, /* @__PURE__ */ React7.createElement(DialogTrigger, { asChild: true }, /* @__PURE__ */ React7.createElement(
-    Button5,
+  const activeCount = [...PRIMARY_SHELVES, ...SECONDARY_SHELVES].filter((ch) => shelfSpec.encoding[ch]?.field).length;
+  return /* @__PURE__ */ React7.createElement("div", { className: "w-full" }, /* @__PURE__ */ React7.createElement(
+    "button",
     {
       type: "button",
-      variant: "outline",
-      size: "sm",
-      className: "h-8 text-xs"
+      onClick: () => setIsExpanded(!isExpanded),
+      className: "w-full flex items-center gap-2 px-2.5 py-2 rounded-md border border-border bg-muted/30 hover:bg-muted/60 cursor-pointer transition-colors text-left"
     },
-    /* @__PURE__ */ React7.createElement(TrendingUp, { className: "inline-block h-3 w-3 mr-2" }),
-    VEGA_STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON
-  )), /* @__PURE__ */ React7.createElement(DialogContent, { className: "max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-brand-dark border-border shadow-2xl" }, /* @__PURE__ */ React7.createElement(DialogHeader, { className: "flex flex-row items-center px-4 py-3 border-b border-border bg-brand-dark shrink-0 space-y-0" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center gap-2 text-foreground" }, /* @__PURE__ */ React7.createElement(TrendingUp, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ React7.createElement(DialogTitle, { className: "text-base font-bold m-0 p-0 text-left" }, "Visual Chart Editor"))), /* @__PURE__ */ React7.createElement("div", { className: "flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0" }, !hasAnyData ? /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded-sm bg-brand-dark" }, /* @__PURE__ */ React7.createElement(Database2, { className: "w-10 h-10 mb-3 text-muted-foreground/40" }), /* @__PURE__ */ React7.createElement("p", { className: "text-sm font-semibold text-foreground mb-1" }, "No Data Source Selected"), /* @__PURE__ */ React7.createElement("p", { className: "text-xs text-muted-foreground" }, "Add a Data Source in the Data tab and run a Test, or select a Workflow.")) : /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col w-56 shrink-0 bg-brand-dark border border-border rounded-md overflow-hidden min-h-0 h-full" }, /* @__PURE__ */ React7.createElement("div", { className: "p-2 border-b border-border bg-brand-dark" }, /* @__PURE__ */ React7.createElement(Select2, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ React7.createElement(SelectTrigger2, { className: "text-xs font-medium" }, /* @__PURE__ */ React7.createElement(SelectValue2, { placeholder: "Select Data Input" })), /* @__PURE__ */ React7.createElement(SelectContent2, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ React7.createElement(SelectItem2, { value: `{{state.workflows.${selectedWorkflow.alias}.data}}` }, "Workflow Output (", selectedWorkflow.alias, ")"), discoveredArrayPaths.map((arr) => /* @__PURE__ */ React7.createElement(SelectItem2, { key: arr.path, value: arr.path }, arr.label))))), /* @__PURE__ */ React7.createElement("div", { className: "flex-1 overflow-hidden outline-none min-h-0" }, /* @__PURE__ */ React7.createElement(
+    isExpanded ? /* @__PURE__ */ React7.createElement(ChevronDown, { className: "w-3.5 h-3.5 text-muted-foreground shrink-0" }) : /* @__PURE__ */ React7.createElement(ChevronRight, { className: "w-3.5 h-3.5 text-muted-foreground shrink-0" }),
+    /* @__PURE__ */ React7.createElement(TrendingUp2, { className: "h-3.5 w-3.5 text-primary shrink-0" }),
+    /* @__PURE__ */ React7.createElement("span", { className: "text-xs font-medium text-foreground flex-1" }, "Mappings"),
+    activeCount > 0 && /* @__PURE__ */ React7.createElement("span", { className: "text-[9px] font-bold text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded-full" }, activeCount)
+  ), isExpanded && /* @__PURE__ */ React7.createElement("div", { className: "mt-1.5 rounded-md border border-border bg-card overflow-hidden" }, !hasAnyData ? (
+    /* ── Empty State ── */
+    /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col items-center justify-center p-6 text-center" }, /* @__PURE__ */ React7.createElement(Database2, { className: "w-7 h-7 mb-2 text-muted-foreground/30" }), /* @__PURE__ */ React7.createElement("p", { className: "text-xs font-medium text-foreground mb-0.5" }, "No Data Source"), /* @__PURE__ */ React7.createElement("p", { className: "text-[10px] text-muted-foreground leading-relaxed" }, "Add a Data Source in the Data tab and run a Test, or select a Workflow."))
+  ) : /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement("div", { className: "px-2.5 py-2 border-b border-border/50 bg-muted/20" }, /* @__PURE__ */ React7.createElement(Label, { className: "font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground mb-1 block" }, "Data Source"), /* @__PURE__ */ React7.createElement(Select2, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ React7.createElement(SelectTrigger2, { className: "h-7 text-[11px] font-mono" }, /* @__PURE__ */ React7.createElement(SelectValue2, { placeholder: "Select data input..." })), /* @__PURE__ */ React7.createElement(SelectContent2, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ React7.createElement(SelectItem2, { value: `{{state.workflows.${selectedWorkflow.alias}.data}}` }, "Workflow: ", selectedWorkflow.alias), discoveredArrayPaths.map((arr) => /* @__PURE__ */ React7.createElement(SelectItem2, { key: arr.path, value: arr.path }, arr.label))))), /* @__PURE__ */ React7.createElement("div", { className: "border-b border-border/50 max-h-[220px] overflow-y-auto" }, /* @__PURE__ */ React7.createElement(
     DataFieldPanel,
     {
       workflowContext,
@@ -4316,9 +4325,9 @@ var ShelfBuilder = ({
       onDataSourceChange: handleDataSourceChange,
       onFieldClick: handleFieldQuickAdd,
       workflow: selectedWorkflow,
-      className: "h-full"
+      compact: true
     }
-  ))), /* @__PURE__ */ React7.createElement("div", { className: "flex-1 flex flex-col h-full overflow-y-auto min-h-0 pr-1 gap-1.5" }, /* @__PURE__ */ React7.createElement(Label2, { className: "text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1" }, "Encoding Shelves"), /* @__PURE__ */ React7.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 flex flex-col gap-3" }, PRIMARY_SHELVES.map((ch) => /* @__PURE__ */ React7.createElement(
+  )), /* @__PURE__ */ React7.createElement("div", { className: "border-b border-border/50" }, /* @__PURE__ */ React7.createElement("div", { className: "px-2.5 py-1.5 bg-muted/20 flex items-center gap-1.5" }, /* @__PURE__ */ React7.createElement(Layers, { className: "w-3 h-3 text-muted-foreground" }), /* @__PURE__ */ React7.createElement("span", { className: "font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Encodings")), /* @__PURE__ */ React7.createElement("div", { className: "p-2 flex flex-col gap-1.5" }, PRIMARY_SHELVES.map((ch) => /* @__PURE__ */ React7.createElement(
     EncodingShelf,
     {
       key: ch,
@@ -4327,15 +4336,17 @@ var ShelfBuilder = ({
       onChange: (val) => handleChannelChange(ch, val),
       onRemove: () => handleChannelRemove(ch)
     }
-  ))), /* @__PURE__ */ React7.createElement("div", { className: "bg-brand-dark border border-border rounded-md mt-2" }, /* @__PURE__ */ React7.createElement(
-    "div",
+  ))), /* @__PURE__ */ React7.createElement("div", { className: "border-t border-border/50" }, /* @__PURE__ */ React7.createElement(
+    "button",
     {
+      type: "button",
       onClick: () => setShowSecondary(!showSecondary),
-      className: "w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-brand-dark font-medium cursor-pointer"
+      className: "w-full flex items-center gap-1.5 px-2.5 py-1.5 bg-muted/10 hover:bg-muted/30 transition-colors text-left"
     },
-    showSecondary ? /* @__PURE__ */ React7.createElement(ChevronDown, { className: "w-4 h-4 mr-2 text-muted-foreground" }) : /* @__PURE__ */ React7.createElement(ChevronRight, { className: "w-4 h-4 mr-2 text-muted-foreground" }),
-    /* @__PURE__ */ React7.createElement("span", { className: "text-[10px] font-bold uppercase tracking-wider text-foreground" }, "More Channels ", /* @__PURE__ */ React7.createElement("span", { className: "text-primary ml-1" }, "(", SECONDARY_SHELVES.filter((ch) => shelfSpec.encoding[ch]?.field).length, " active)"))
-  ), showSecondary && /* @__PURE__ */ React7.createElement("div", { className: "p-3 flex flex-col gap-3 bg-muted/30" }, SECONDARY_SHELVES.map((ch) => /* @__PURE__ */ React7.createElement(
+    showSecondary ? /* @__PURE__ */ React7.createElement(ChevronDown, { className: "w-3 h-3 text-muted-foreground" }) : /* @__PURE__ */ React7.createElement(ChevronRight, { className: "w-3 h-3 text-muted-foreground" }),
+    /* @__PURE__ */ React7.createElement("span", { className: "font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground flex-1" }, "More Channels"),
+    /* @__PURE__ */ React7.createElement("span", { className: "text-[9px] text-primary font-bold" }, SECONDARY_SHELVES.filter((ch) => shelfSpec.encoding[ch]?.field).length, " active")
+  ), showSecondary && /* @__PURE__ */ React7.createElement("div", { className: "p-2 flex flex-col gap-1.5" }, SECONDARY_SHELVES.map((ch) => /* @__PURE__ */ React7.createElement(
     EncodingShelf,
     {
       key: ch,
@@ -4344,39 +4355,34 @@ var ShelfBuilder = ({
       onChange: (val) => handleChannelChange(ch, val),
       onRemove: () => handleChannelRemove(ch)
     }
-  ))))), /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col w-64 shrink-0 h-full overflow-y-auto min-h-0 pl-1 gap-1.5 pb-4" }, /* @__PURE__ */ React7.createElement(
-    "div",
+  ))))), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(
+    "button",
     {
+      type: "button",
       onClick: () => setShowStyle(!showStyle),
-      className: "flex items-center gap-2 p-1 text-muted-foreground hover:text-foreground focus:outline-none transition-colors bg-transparent cursor-pointer"
+      className: "w-full flex items-center gap-1.5 px-2.5 py-1.5 bg-muted/10 hover:bg-muted/30 transition-colors text-left"
     },
-    showStyle ? /* @__PURE__ */ React7.createElement(ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ React7.createElement(ChevronRight, { className: "w-4 h-4" }),
-    /* @__PURE__ */ React7.createElement("span", { className: "text-[10px] font-bold uppercase tracking-widest" }, "Chart Style & Settings")
-  ), showStyle && /* @__PURE__ */ React7.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 space-y-4" }, /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label2, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, "Marks"), /* @__PURE__ */ React7.createElement("div", { className: "bg-muted/30 border border-border rounded-md p-2" }, /* @__PURE__ */ React7.createElement(MarkSelector, { value: shelfSpec.mark || "auto", onChange: handleMarkChange }), shelfSpec.mark === "auto" && /* @__PURE__ */ React7.createElement("div", { className: "text-[10px] text-muted-foreground italic p-1 text-center mt-1" }, "Auto-resolved to: ", /* @__PURE__ */ React7.createElement("span", { className: "font-semibold text-foreground not-italic ml-1" }, resolvedMark)))), /* @__PURE__ */ React7.createElement("div", { className: "mt-2 space-y-3" }, /* @__PURE__ */ React7.createElement(Label2, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest" }, "Appearance"), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label2, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Chart Title"), /* @__PURE__ */ React7.createElement(
+    showStyle ? /* @__PURE__ */ React7.createElement(ChevronDown, { className: "w-3 h-3 text-muted-foreground" }) : /* @__PURE__ */ React7.createElement(ChevronRight, { className: "w-3 h-3 text-muted-foreground" }),
+    /* @__PURE__ */ React7.createElement(Palette2, { className: "w-3 h-3 text-muted-foreground" }),
+    /* @__PURE__ */ React7.createElement("span", { className: "font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Style")
+  ), showStyle && /* @__PURE__ */ React7.createElement("div", { className: "p-2.5 space-y-2.5 border-t border-border/50" }, /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label, { className: "font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground mb-1 block" }, "Mark Type"), /* @__PURE__ */ React7.createElement(MarkSelector, { value: shelfSpec.mark || "auto", onChange: handleMarkChange }), shelfSpec.mark === "auto" && /* @__PURE__ */ React7.createElement("div", { className: "text-[9px] text-muted-foreground italic mt-0.5" }, "Resolved: ", /* @__PURE__ */ React7.createElement("span", { className: "font-medium text-foreground not-italic" }, resolvedMark))), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label, { className: "text-[10px] font-medium text-muted-foreground mb-0.5 block" }, "Title"), /* @__PURE__ */ React7.createElement(
     Input2,
     {
       type: "text",
       value: shelfSpec.config?.title || "",
       onChange: (e) => handleConfigChange("title", e.target.value),
-      placeholder: "Untitled Chart",
-      className: "w-full text-xs"
+      placeholder: "Untitled",
+      className: "w-full text-[11px] h-7"
     }
-  )), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label2, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Color Palette"), /* @__PURE__ */ React7.createElement(Select2, { value: shelfSpec.config?.colorScheme || "tableau10", onValueChange: (val) => handleConfigChange("colorScheme", val) }, /* @__PURE__ */ React7.createElement(SelectTrigger2, { className: "text-xs" }, /* @__PURE__ */ React7.createElement(SelectValue2, { placeholder: "Select an option" })), /* @__PURE__ */ React7.createElement(SelectContent2, { className: "z-[200]" }, COLOR_SCHEMES.map((s) => /* @__PURE__ */ React7.createElement(SelectItem2, { key: s, value: s }, s))))), /* @__PURE__ */ React7.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label2, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Width"), /* @__PURE__ */ React7.createElement(Select2, { value: shelfSpec.config?.width === "container" ? "container" : "custom", onValueChange: (val) => handleConfigChange("width", val === "container" ? "container" : 400) }, /* @__PURE__ */ React7.createElement(SelectTrigger2, { className: "text-xs" }, /* @__PURE__ */ React7.createElement(SelectValue2, { placeholder: "Select an option" })), /* @__PURE__ */ React7.createElement(SelectContent2, { className: "z-[200]" }, /* @__PURE__ */ React7.createElement(SelectItem2, { value: "container" }, "Fill"), /* @__PURE__ */ React7.createElement(SelectItem2, { value: "custom" }, "Fixed")))), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label2, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Height"), /* @__PURE__ */ React7.createElement(
+  )), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label, { className: "text-[10px] font-medium text-muted-foreground mb-0.5 block" }, "Colors"), /* @__PURE__ */ React7.createElement(Select2, { value: shelfSpec.config?.colorScheme || "tableau10", onValueChange: (val) => handleConfigChange("colorScheme", val) }, /* @__PURE__ */ React7.createElement(SelectTrigger2, { className: "text-[11px] h-7" }, /* @__PURE__ */ React7.createElement(SelectValue2, null)), /* @__PURE__ */ React7.createElement(SelectContent2, { className: "z-[200]" }, COLOR_SCHEMES.map((s) => /* @__PURE__ */ React7.createElement(SelectItem2, { key: s, value: s }, s))))), /* @__PURE__ */ React7.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label, { className: "text-[10px] font-medium text-muted-foreground mb-0.5 block" }, "Width"), /* @__PURE__ */ React7.createElement(Select2, { value: shelfSpec.config?.width === "container" ? "container" : "custom", onValueChange: (val) => handleConfigChange("width", val === "container" ? "container" : 400) }, /* @__PURE__ */ React7.createElement(SelectTrigger2, { className: "text-[11px] h-7" }, /* @__PURE__ */ React7.createElement(SelectValue2, null)), /* @__PURE__ */ React7.createElement(SelectContent2, { className: "z-[200]" }, /* @__PURE__ */ React7.createElement(SelectItem2, { value: "container" }, "Fill"), /* @__PURE__ */ React7.createElement(SelectItem2, { value: "custom" }, "Fixed")))), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement(Label, { className: "text-[10px] font-medium text-muted-foreground mb-0.5 block" }, "Height"), /* @__PURE__ */ React7.createElement(
     Input2,
     {
       type: "number",
       value: shelfSpec.config?.height || 300,
       onChange: (e) => handleConfigChange("height", parseInt(e.target.value) || 300),
-      className: "w-full text-xs"
+      className: "w-full text-[11px] h-7"
     }
-  )))))))), /* @__PURE__ */ React7.createElement(DialogFooter, { className: "px-4 py-2.5 bg-brand-dark shrink-0 mt-2" }, /* @__PURE__ */ React7.createElement(
-    Button5,
-    {
-      type: "button",
-      onClick: () => setIsOpen(false)
-    },
-    "Done"
-  )))));
+  ))))))));
 };
 ShelfBuilder.propTypes = {
   widgetEditorForm: PropTypes6.object.isRequired,
@@ -4386,11 +4392,7 @@ ShelfBuilder.propTypes = {
 };
 
 // src/vega/vegaConfigEditor.jsx
-import { AlertTriangle, Settings as Settings2 } from "lucide-react";
-var VEGA_STRINGS2 = {
-  WIDGET_EDITOR_FORM_SETTINGS_BUTTON: "Settings",
-  WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL: "Refresh interval"
-};
+import { AlertTriangle, Settings, ChevronDown as ChevronDown2, ChevronRight as ChevronRight2 } from "lucide-react";
 var VegaConfigEditor = ({
   widgetEditorForm,
   workflowContext,
@@ -4402,7 +4404,7 @@ var VegaConfigEditor = ({
   const currentMode = widgetEditorForm.values.widgetConfig?.editorMode || (isVegaLite ? "visual" : "raw");
   const [showParseWarning, setShowParseWarning] = useState6(false);
   const [parseWarningsList, setParseWarningsList] = useState6([]);
-  const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState6(false);
+  const [showSettings, setShowSettings] = useState6(false);
   const resolvedSelectedWorkflow = selectedWorkflow || (workflows && widgetEditorForm.values.workflowID ? workflows.find((w) => String(w.workflowID) === String(widgetEditorForm.values.workflowID)) : null);
   const handleModeSwitch = (newMode) => {
     if (newMode === currentMode) return;
@@ -4432,7 +4434,7 @@ var VegaConfigEditor = ({
     widgetEditorForm.setFieldValue("widgetConfig.editorMode", "visual");
     setShowParseWarning(false);
   };
-  return /* @__PURE__ */ React8.createElement("div", { className: "bg-brand-dark border border-border rounded-md p-3 flex flex-col gap-3" }, isVegaLite && /* @__PURE__ */ React8.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ React8.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ React8.createElement(Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ React8.createElement("div", { className: "flex flex-row items-center justify-stretch gap-3" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ React8.createElement(
+  return /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-3 w-full" }, isVegaLite && /* @__PURE__ */ React8.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ React8.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ React8.createElement(Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-2 w-full" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ React8.createElement(
     ShelfBuilder,
     {
       widgetEditorForm,
@@ -4440,27 +4442,7 @@ var VegaConfigEditor = ({
       workflows,
       queryResults
     }
-  ), /* @__PURE__ */ React8.createElement(
-    Button6,
-    {
-      type: "button",
-      variant: "outline",
-      size: "sm",
-      className: "h-8 text-xs",
-      onClick: () => setIsSettingsDialogOpen(true)
-    },
-    /* @__PURE__ */ React8.createElement(Settings2, { className: "inline-block h-3 w-3 mr-2" }),
-    VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON
-  ), /* @__PURE__ */ React8.createElement(Dialog2, { open: isSettingsDialogOpen, onOpenChange: setIsSettingsDialogOpen }, /* @__PURE__ */ React8.createElement(DialogContent2, { className: "max-w-lg" }, /* @__PURE__ */ React8.createElement(DialogHeader2, null, /* @__PURE__ */ React8.createElement(DialogTitle2, null, VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON)), /* @__PURE__ */ React8.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React8.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React8.createElement(Label3, { className: "text-xs font-medium text-foreground" }, `${VEGA_STRINGS2.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL} (ms)`), /* @__PURE__ */ React8.createElement(
-    Input3,
-    {
-      type: "number",
-      name: "widgetConfig.refetchInterval",
-      className: "text-sm",
-      onChange: widgetEditorForm.handleChange,
-      value: widgetEditorForm.values.widgetConfig?.refetchInterval || ""
-    }
-  )), /* @__PURE__ */ React8.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React8.createElement(Label3, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ React8.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React8.createElement(AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React8.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React8.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React8.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React8.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React8.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React8.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React8.createElement(Button6, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React8.createElement(Button6, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React8.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-brand-dark" }, /* @__PURE__ */ React8.createElement(
+  )), showParseWarning && /* @__PURE__ */ React8.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React8.createElement(AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React8.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React8.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React8.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React8.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React8.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React8.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React8.createElement(Button3, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React8.createElement(Button3, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React8.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ React8.createElement(
     VegaSpecEditor,
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,
@@ -4595,10 +4577,10 @@ init_tableConfigEditor();
 // src/text/textConfigEditor.jsx
 import React13 from "react";
 import PropTypes11 from "prop-types";
-import { Label as Label6, Select as Select5, SelectContent as SelectContent5, SelectItem as SelectItem5, SelectTrigger as SelectTrigger5, SelectValue as SelectValue5 } from "@jet-admin/ui";
+import { Label as Label5, Select as Select5, SelectContent as SelectContent5, SelectItem as SelectItem5, SelectTrigger as SelectTrigger5, SelectValue as SelectValue5 } from "@jet-admin/ui";
 var TextConfigEditor = ({ widgetEditorForm }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Content"), /* @__PURE__ */ React13.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports Markdown formatting and ", /* @__PURE__ */ React13.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates."), /* @__PURE__ */ React13.createElement(
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Content"), /* @__PURE__ */ React13.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports Markdown formatting and ", /* @__PURE__ */ React13.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates."), /* @__PURE__ */ React13.createElement(
     "textarea",
     {
       className: "w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[120px] resize-y",
@@ -4606,7 +4588,7 @@ var TextConfigEditor = ({ widgetEditorForm }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.content", e.target.value),
       placeholder: "# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{ state.queries.myQuery.data[0].name }}"
     }
-  )), /* @__PURE__ */ React13.createElement("div", { className: "grid grid-cols-3 gap-3" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Format"), /* @__PURE__ */ React13.createElement(
+  )), /* @__PURE__ */ React13.createElement("div", { className: "grid grid-cols-3 gap-3" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Format"), /* @__PURE__ */ React13.createElement(
     Select5,
     {
       value: config.format || "markdown",
@@ -4614,7 +4596,7 @@ var TextConfigEditor = ({ widgetEditorForm }) => {
     },
     /* @__PURE__ */ React13.createElement(SelectTrigger5, { className: "text-xs" }, /* @__PURE__ */ React13.createElement(SelectValue5, null)),
     /* @__PURE__ */ React13.createElement(SelectContent5, null, /* @__PURE__ */ React13.createElement(SelectItem5, { value: "markdown" }, "Markdown"), /* @__PURE__ */ React13.createElement(SelectItem5, { value: "plain" }, "Plain Text"))
-  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ React13.createElement(
+  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ React13.createElement(
     Select5,
     {
       value: config.textAlign || "left",
@@ -4622,7 +4604,7 @@ var TextConfigEditor = ({ widgetEditorForm }) => {
     },
     /* @__PURE__ */ React13.createElement(SelectTrigger5, { className: "text-xs" }, /* @__PURE__ */ React13.createElement(SelectValue5, null)),
     /* @__PURE__ */ React13.createElement(SelectContent5, null, /* @__PURE__ */ React13.createElement(SelectItem5, { value: "left" }, "Left"), /* @__PURE__ */ React13.createElement(SelectItem5, { value: "center" }, "Center"), /* @__PURE__ */ React13.createElement(SelectItem5, { value: "right" }, "Right"))
-  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React13.createElement(
+  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React13.createElement(
     Select5,
     {
       value: config.fontSize || "sm",
@@ -4641,7 +4623,7 @@ init_TemplateAutocompleteInput();
 init_suggestionEngine();
 import React14, { useMemo as useMemo7 } from "react";
 import PropTypes12 from "prop-types";
-import { Input as Input8, Label as Label7, Select as Select6, SelectContent as SelectContent6, SelectItem as SelectItem6, SelectTrigger as SelectTrigger6, SelectValue as SelectValue6 } from "@jet-admin/ui";
+import { Input as Input8, Label as Label6, Select as Select6, SelectContent as SelectContent6, SelectItem as SelectItem6, SelectTrigger as SelectTrigger6, SelectValue as SelectValue6 } from "@jet-admin/ui";
 var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const suggestions = useMemo7(() => {
@@ -4653,7 +4635,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       detail: s.detail
     }));
   }, [stateTree]);
-  return /* @__PURE__ */ React14.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React14.createElement(
+  return /* @__PURE__ */ React14.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React14.createElement(
     Input8,
     {
       type: "text",
@@ -4662,7 +4644,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
       placeholder: "e.g. Total Revenue"
     }
-  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Value"), /* @__PURE__ */ React14.createElement(
+  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Value"), /* @__PURE__ */ React14.createElement(
     TemplateAutocompleteInput_default,
     {
       value: config.valueTemplate || "",
@@ -4670,7 +4652,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.stats.data[0].count}}",
       suggestions
     }
-  ), /* @__PURE__ */ React14.createElement("p", { className: "text-[10px] text-muted-foreground" }, "The primary metric value. Use template expressions to bind to data sources.")), /* @__PURE__ */ React14.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Prefix"), /* @__PURE__ */ React14.createElement(
+  ), /* @__PURE__ */ React14.createElement("p", { className: "text-[10px] text-muted-foreground" }, "The primary metric value. Use template expressions to bind to data sources.")), /* @__PURE__ */ React14.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Prefix"), /* @__PURE__ */ React14.createElement(
     Input8,
     {
       type: "text",
@@ -4679,7 +4661,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.prefix", e.target.value),
       placeholder: "e.g. $"
     }
-  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Suffix"), /* @__PURE__ */ React14.createElement(
+  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Suffix"), /* @__PURE__ */ React14.createElement(
     Input8,
     {
       type: "text",
@@ -4688,7 +4670,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.suffix", e.target.value),
       placeholder: "e.g. users"
     }
-  ))), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Trend Value"), /* @__PURE__ */ React14.createElement(
+  ))), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Trend Value"), /* @__PURE__ */ React14.createElement(
     TemplateAutocompleteInput_default,
     {
       value: config.trendTemplate || "",
@@ -4696,7 +4678,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.stats.data[0].change_pct}}",
       suggestions
     }
-  ), /* @__PURE__ */ React14.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Optional percentage change. Positive = up trend, negative = down trend.")), /* @__PURE__ */ React14.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Trend Semantics"), /* @__PURE__ */ React14.createElement(
+  ), /* @__PURE__ */ React14.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Optional percentage change. Positive = up trend, negative = down trend.")), /* @__PURE__ */ React14.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Trend Semantics"), /* @__PURE__ */ React14.createElement(
     Select6,
     {
       value: config.trendDirection || "up-is-good",
@@ -4704,7 +4686,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React14.createElement(SelectTrigger6, { className: "text-xs" }, /* @__PURE__ */ React14.createElement(SelectValue6, null)),
     /* @__PURE__ */ React14.createElement(SelectContent6, null, /* @__PURE__ */ React14.createElement(SelectItem6, { value: "up-is-good" }, "Up = Good (green)"), /* @__PURE__ */ React14.createElement(SelectItem6, { value: "down-is-good" }, "Down = Good (green)"))
-  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ React14.createElement(
+  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ React14.createElement(
     Select6,
     {
       value: config.textAlign || "center",
@@ -4724,7 +4706,7 @@ init_TemplateAutocompleteInput();
 init_suggestionEngine();
 import React15, { useMemo as useMemo8 } from "react";
 import PropTypes13 from "prop-types";
-import { Input as Input9, Label as Label8, Select as Select7, SelectContent as SelectContent7, SelectItem as SelectItem7, SelectTrigger as SelectTrigger7, SelectValue as SelectValue7, Checkbox as Checkbox3 } from "@jet-admin/ui";
+import { Input as Input9, Label as Label7, Select as Select7, SelectContent as SelectContent7, SelectItem as SelectItem7, SelectTrigger as SelectTrigger7, SelectValue as SelectValue7, Checkbox as Checkbox3 } from "@jet-admin/ui";
 var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const suggestions = useMemo8(() => {
@@ -4736,7 +4718,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       detail: s.detail
     }));
   }, [stateTree]);
-  return /* @__PURE__ */ React15.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Type / Variant"), /* @__PURE__ */ React15.createElement(
+  return /* @__PURE__ */ React15.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React15.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Type / Variant"), /* @__PURE__ */ React15.createElement(
     Select7,
     {
       value: config.variant || "info",
@@ -4744,7 +4726,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React15.createElement(SelectTrigger7, { className: "text-xs" }, /* @__PURE__ */ React15.createElement(SelectValue7, null)),
     /* @__PURE__ */ React15.createElement(SelectContent7, null, /* @__PURE__ */ React15.createElement(SelectItem7, { value: "info" }, "Info (Blue)"), /* @__PURE__ */ React15.createElement(SelectItem7, { value: "success" }, "Success (Green)"), /* @__PURE__ */ React15.createElement(SelectItem7, { value: "warning" }, "Warning (Amber)"), /* @__PURE__ */ React15.createElement(SelectItem7, { value: "error" }, "Error (Red)"))
-  )), /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Title (Optional)"), /* @__PURE__ */ React15.createElement(
+  )), /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React15.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Title (Optional)"), /* @__PURE__ */ React15.createElement(
     TemplateAutocompleteInput_default,
     {
       value: config.title || "",
@@ -4752,7 +4734,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. Warning!",
       suggestions
     }
-  )), /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Message"), /* @__PURE__ */ React15.createElement(
+  )), /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React15.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Message"), /* @__PURE__ */ React15.createElement(
     "textarea",
     {
       className: "w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[80px] resize-y",
@@ -4767,7 +4749,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       checked: config.dismissible ?? true,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.dismissible", !!checked)
     }
-  ), /* @__PURE__ */ React15.createElement(Label8, { htmlFor: "alert-dismissible", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow user to dismiss/close the banner")));
+  ), /* @__PURE__ */ React15.createElement(Label7, { htmlFor: "alert-dismissible", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow user to dismiss/close the banner")));
 };
 AlertConfigEditor.propTypes = {
   widgetEditorForm: PropTypes13.object.isRequired,
@@ -4778,7 +4760,7 @@ AlertConfigEditor.propTypes = {
 import React16 from "react";
 import PropTypes14 from "prop-types";
 import { Plus as Plus3, Trash2 as Trash22 } from "lucide-react";
-import { Label as Label9, Input as Input10, Button as Button9, Select as Select8, SelectContent as SelectContent8, SelectItem as SelectItem8, SelectTrigger as SelectTrigger8, SelectValue as SelectValue8, Checkbox as Checkbox4 } from "@jet-admin/ui";
+import { Label as Label8, Input as Input10, Button as Button6, Select as Select8, SelectContent as SelectContent8, SelectItem as SelectItem8, SelectTrigger as SelectTrigger8, SelectValue as SelectValue8, Checkbox as Checkbox4 } from "@jet-admin/ui";
 var FormConfigEditor = ({ widgetEditorForm }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const fields = config.fields || [];
@@ -4806,7 +4788,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
     const list = optionsStr.split(",").map((s) => s.trim()).filter(Boolean);
     handleFieldChange(idx, "options", list);
   };
-  return /* @__PURE__ */ React16.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React16.createElement("div", { className: "grid grid-cols-2 gap-3 pb-3 border-b" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Submit Button Text"), /* @__PURE__ */ React16.createElement(
+  return /* @__PURE__ */ React16.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React16.createElement("div", { className: "grid grid-cols-2 gap-3 pb-3 border-b" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Submit Button Text"), /* @__PURE__ */ React16.createElement(
     Input10,
     {
       type: "text",
@@ -4814,7 +4796,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       value: config.submitLabel || "Submit",
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.submitLabel", e.target.value)
     }
-  )), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Size / Spacing"), /* @__PURE__ */ React16.createElement(
+  )), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Size / Spacing"), /* @__PURE__ */ React16.createElement(
     Select8,
     {
       value: config.size || "default",
@@ -4822,8 +4804,8 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
     },
     /* @__PURE__ */ React16.createElement(SelectTrigger8, { className: "text-xs h-8" }, /* @__PURE__ */ React16.createElement(SelectValue8, null)),
     /* @__PURE__ */ React16.createElement(SelectContent8, null, /* @__PURE__ */ React16.createElement(SelectItem8, { value: "sm" }, "Compact (Small)"), /* @__PURE__ */ React16.createElement(SelectItem8, { value: "default" }, "Normal (Default)"), /* @__PURE__ */ React16.createElement(SelectItem8, { value: "lg" }, "Spacious (Large)"))
-  ))), /* @__PURE__ */ React16.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-semibold text-foreground" }, "Fields list"), /* @__PURE__ */ React16.createElement(
-    Button9,
+  ))), /* @__PURE__ */ React16.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React16.createElement(Label8, { className: "text-xs font-semibold text-foreground" }, "Fields list"), /* @__PURE__ */ React16.createElement(
+    Button6,
     {
       type: "button",
       variant: "outline",
@@ -4834,7 +4816,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
     /* @__PURE__ */ React16.createElement(Plus3, { className: "h-3 w-3" }),
     " Add Field"
   )), /* @__PURE__ */ React16.createElement("div", { className: "space-y-3 max-h-[350px] overflow-y-auto pr-1" }, fields.map((field, idx) => /* @__PURE__ */ React16.createElement("div", { key: idx, className: "p-3 border rounded bg-muted/10 relative space-y-2" }, /* @__PURE__ */ React16.createElement(
-    Button9,
+    Button6,
     {
       type: "button",
       variant: "ghost",
@@ -4843,7 +4825,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       onClick: () => handleRemoveField(idx)
     },
     /* @__PURE__ */ React16.createElement(Trash22, { className: "h-3.5 w-3.5" })
-  ), /* @__PURE__ */ React16.createElement("div", { className: "grid grid-cols-2 gap-2 pr-5" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-[10px] text-muted-foreground font-medium" }, "Label"), /* @__PURE__ */ React16.createElement(
+  ), /* @__PURE__ */ React16.createElement("div", { className: "grid grid-cols-2 gap-2 pr-5" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label8, { className: "text-[10px] text-muted-foreground font-medium" }, "Label"), /* @__PURE__ */ React16.createElement(
     Input10,
     {
       type: "text",
@@ -4852,7 +4834,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       onChange: (e) => handleFieldChange(idx, "label", e.target.value),
       placeholder: "e.g. Email Address"
     }
-  )), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-[10px] text-muted-foreground font-medium" }, "Key (Unique ID)"), /* @__PURE__ */ React16.createElement(
+  )), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label8, { className: "text-[10px] text-muted-foreground font-medium" }, "Key (Unique ID)"), /* @__PURE__ */ React16.createElement(
     Input10,
     {
       type: "text",
@@ -4861,7 +4843,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       onChange: (e) => handleFieldChange(idx, "key", e.target.value),
       placeholder: "e.g. email"
     }
-  ))), /* @__PURE__ */ React16.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-[10px] text-muted-foreground font-medium" }, "Input Type"), /* @__PURE__ */ React16.createElement(
+  ))), /* @__PURE__ */ React16.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label8, { className: "text-[10px] text-muted-foreground font-medium" }, "Input Type"), /* @__PURE__ */ React16.createElement(
     Select8,
     {
       value: field.type || "text",
@@ -4869,7 +4851,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
     },
     /* @__PURE__ */ React16.createElement(SelectTrigger8, { className: "text-[11px] h-7 bg-background" }, /* @__PURE__ */ React16.createElement(SelectValue8, null)),
     /* @__PURE__ */ React16.createElement(SelectContent8, null, /* @__PURE__ */ React16.createElement(SelectItem8, { value: "text" }, "Text (Single line)"), /* @__PURE__ */ React16.createElement(SelectItem8, { value: "email" }, "Email"), /* @__PURE__ */ React16.createElement(SelectItem8, { value: "password" }, "Password"), /* @__PURE__ */ React16.createElement(SelectItem8, { value: "number" }, "Number"), /* @__PURE__ */ React16.createElement(SelectItem8, { value: "checkbox" }, "Checkbox"), /* @__PURE__ */ React16.createElement(SelectItem8, { value: "select" }, "Select / Dropdown"))
-  )), field.type !== "checkbox" && /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-[10px] text-muted-foreground font-medium" }, "Placeholder"), /* @__PURE__ */ React16.createElement(
+  )), field.type !== "checkbox" && /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label8, { className: "text-[10px] text-muted-foreground font-medium" }, "Placeholder"), /* @__PURE__ */ React16.createElement(
     Input10,
     {
       type: "text",
@@ -4878,7 +4860,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       onChange: (e) => handleFieldChange(idx, "placeholder", e.target.value),
       placeholder: "Hint text..."
     }
-  ))), field.type === "select" && /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-[10px] text-muted-foreground font-medium" }, "Options (comma-separated)"), /* @__PURE__ */ React16.createElement(
+  ))), field.type === "select" && /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label8, { className: "text-[10px] text-muted-foreground font-medium" }, "Options (comma-separated)"), /* @__PURE__ */ React16.createElement(
     Input10,
     {
       type: "text",
@@ -4894,7 +4876,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       checked: !!field.required,
       onCheckedChange: (val) => handleFieldChange(idx, "required", !!val)
     }
-  ), /* @__PURE__ */ React16.createElement(Label9, { htmlFor: `field-req-${idx}`, className: "text-[10px] text-muted-foreground cursor-pointer font-medium" }, "Required field")), /* @__PURE__ */ React16.createElement("div", { className: "space-y-0.5" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-[9px] text-muted-foreground block leading-none" }, "Default Value"), /* @__PURE__ */ React16.createElement(
+  ), /* @__PURE__ */ React16.createElement(Label8, { htmlFor: `field-req-${idx}`, className: "text-[10px] text-muted-foreground cursor-pointer font-medium" }, "Required field")), /* @__PURE__ */ React16.createElement("div", { className: "space-y-0.5" }, /* @__PURE__ */ React16.createElement(Label8, { className: "text-[9px] text-muted-foreground block leading-none" }, "Default Value"), /* @__PURE__ */ React16.createElement(
     Input10,
     {
       type: "text",
@@ -4910,7 +4892,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       checked: config.showReset ?? false,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.showReset", !!checked)
     }
-  ), /* @__PURE__ */ React16.createElement(Label9, { htmlFor: "form-show-reset", className: "text-xs text-muted-foreground cursor-pointer" }, "Show form reset button alongside submit")));
+  ), /* @__PURE__ */ React16.createElement(Label8, { htmlFor: "form-show-reset", className: "text-xs text-muted-foreground cursor-pointer" }, "Show form reset button alongside submit")));
 };
 FormConfigEditor.propTypes = {
   widgetEditorForm: PropTypes14.object.isRequired
@@ -4921,7 +4903,7 @@ init_TemplateAutocompleteInput();
 init_suggestionEngine();
 import React17, { useMemo as useMemo9 } from "react";
 import PropTypes15 from "prop-types";
-import { Input as Input11, Label as Label10, Select as Select9, SelectContent as SelectContent9, SelectItem as SelectItem9, SelectTrigger as SelectTrigger9, SelectValue as SelectValue9 } from "@jet-admin/ui";
+import { Input as Input11, Label as Label9, Select as Select9, SelectContent as SelectContent9, SelectItem as SelectItem9, SelectTrigger as SelectTrigger9, SelectValue as SelectValue9 } from "@jet-admin/ui";
 var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const suggestions = useMemo9(() => {
@@ -4933,7 +4915,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       detail: s.detail
     }));
   }, [stateTree]);
-  return /* @__PURE__ */ React17.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ React17.createElement(
+  return /* @__PURE__ */ React17.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ React17.createElement(
     TemplateAutocompleteInput_default,
     {
       value: config.src || "",
@@ -4941,7 +4923,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.user.data.avatar_url}}",
       suggestions
     }
-  ), /* @__PURE__ */ React17.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content.")), /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ React17.createElement(
+  ), /* @__PURE__ */ React17.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content.")), /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ React17.createElement(
     Input11,
     {
       type: "text",
@@ -4950,7 +4932,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.alt", e.target.value),
       placeholder: "e.g. Profile photo"
     }
-  )), /* @__PURE__ */ React17.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Object Fit"), /* @__PURE__ */ React17.createElement(
+  )), /* @__PURE__ */ React17.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Object Fit"), /* @__PURE__ */ React17.createElement(
     Select9,
     {
       value: config.objectFit || "cover",
@@ -4958,7 +4940,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React17.createElement(SelectTrigger9, { className: "text-xs" }, /* @__PURE__ */ React17.createElement(SelectValue9, null)),
     /* @__PURE__ */ React17.createElement(SelectContent9, null, /* @__PURE__ */ React17.createElement(SelectItem9, { value: "cover" }, "Cover (crop to fit)"), /* @__PURE__ */ React17.createElement(SelectItem9, { value: "contain" }, "Contain (show all)"), /* @__PURE__ */ React17.createElement(SelectItem9, { value: "fill" }, "Fill (stretch)"), /* @__PURE__ */ React17.createElement(SelectItem9, { value: "none" }, "Original Size"))
-  )), /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Corner Radius"), /* @__PURE__ */ React17.createElement(
+  )), /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Corner Radius"), /* @__PURE__ */ React17.createElement(
     Select9,
     {
       value: config.borderRadius || "none",
@@ -4978,7 +4960,7 @@ init_TemplateAutocompleteInput();
 init_suggestionEngine();
 import React18, { useMemo as useMemo10 } from "react";
 import PropTypes16 from "prop-types";
-import { Input as Input12, Label as Label11, Checkbox as Checkbox5 } from "@jet-admin/ui";
+import { Input as Input12, Label as Label10, Checkbox as Checkbox5 } from "@jet-admin/ui";
 var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const suggestions = useMemo10(() => {
@@ -4990,7 +4972,7 @@ var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
       detail: s.detail
     }));
   }, [stateTree]);
-  return /* @__PURE__ */ React18.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React18.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Embed URL / Target Source"), /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React18.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React18.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React18.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Embed URL / Target Source"), /* @__PURE__ */ React18.createElement(
     TemplateAutocompleteInput_default,
     {
       value: config.url || "",
@@ -4998,35 +4980,35 @@ var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. https://example.com",
       suggestions
     }
-  ), /* @__PURE__ */ React18.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).")), /* @__PURE__ */ React18.createElement("div", { className: "space-y-2 border-t pt-3" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Sandbox Security Options"), /* @__PURE__ */ React18.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug mb-2" }, "Toggle capabilities granted to the embedded page. Restricted by default."), /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React18.createElement(
+  ), /* @__PURE__ */ React18.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).")), /* @__PURE__ */ React18.createElement("div", { className: "space-y-2 border-t pt-3" }, /* @__PURE__ */ React18.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Sandbox Security Options"), /* @__PURE__ */ React18.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug mb-2" }, "Toggle capabilities granted to the embedded page. Restricted by default."), /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React18.createElement(
     Checkbox5,
     {
       id: "iframe-scripts",
       checked: config.allowScripts ?? true,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowScripts", !!checked)
     }
-  ), /* @__PURE__ */ React18.createElement(Label11, { htmlFor: "iframe-scripts", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow JavaScript execution (allow-scripts)")), /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ React18.createElement(
+  ), /* @__PURE__ */ React18.createElement(Label10, { htmlFor: "iframe-scripts", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow JavaScript execution (allow-scripts)")), /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ React18.createElement(
     Checkbox5,
     {
       id: "iframe-forms",
       checked: config.allowForms ?? true,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowForms", !!checked)
     }
-  ), /* @__PURE__ */ React18.createElement(Label11, { htmlFor: "iframe-forms", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow form submission (allow-forms)")), /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ React18.createElement(
+  ), /* @__PURE__ */ React18.createElement(Label10, { htmlFor: "iframe-forms", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow form submission (allow-forms)")), /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ React18.createElement(
     Checkbox5,
     {
       id: "iframe-popups",
       checked: config.allowPopups ?? false,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowPopups", !!checked)
     }
-  ), /* @__PURE__ */ React18.createElement(Label11, { htmlFor: "iframe-popups", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow popups & new windows (allow-popups)")), /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ React18.createElement(
+  ), /* @__PURE__ */ React18.createElement(Label10, { htmlFor: "iframe-popups", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow popups & new windows (allow-popups)")), /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ React18.createElement(
     Checkbox5,
     {
       id: "iframe-origin",
       checked: config.allowSameOrigin ?? false,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowSameOrigin", !!checked)
     }
-  ), /* @__PURE__ */ React18.createElement(Label11, { htmlFor: "iframe-origin", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow sharing local storage/cookies (allow-same-origin)"))));
+  ), /* @__PURE__ */ React18.createElement(Label10, { htmlFor: "iframe-origin", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow sharing local storage/cookies (allow-same-origin)"))));
 };
 IframeConfigEditor.propTypes = {
   widgetEditorForm: PropTypes16.object.isRequired,
@@ -5036,7 +5018,7 @@ IframeConfigEditor.propTypes = {
 // src/widget.map.js
 init_datePickerConfigEditor();
 init_dateRangePickerConfigEditor();
-import { BarChart as BarChart2, Component, Table, Type, TrendingUp as TrendingUp3, AlertTriangle as AlertTriangle3, FileText, Image, Globe as Globe2, Calendar, CalendarRange as CalendarRange2 } from "lucide-react";
+import { BarChart as BarChart2, Component, Table, Type as Type3, TrendingUp as TrendingUp4, AlertTriangle as AlertTriangle3, FileText, Image, Globe as Globe2, Calendar as Calendar2, CalendarRange as CalendarRange2 } from "lucide-react";
 registerWidgets();
 var LazyVegaWidget = React32.lazy(
   () => Promise.resolve().then(() => (init_vega(), vega_exports)).then((module) => ({ default: module.VegaWidget }))
@@ -5186,7 +5168,7 @@ var WIDGETS_MAP = {
       return /* @__PURE__ */ React32.createElement(React32.Suspense, { fallback: /* @__PURE__ */ React32.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading text...") }, /* @__PURE__ */ React32.createElement(LazyTextWidget, { data, ...props }));
     },
     configEditor: TextConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ React32.createElement(Type, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React32.createElement(Type3, { className: `!text-lg ${className}` }),
     sampleConfig: {
       content: "### Heading\n\nEdit this markdown in the properties tab.",
       format: "markdown",
@@ -5205,7 +5187,7 @@ var WIDGETS_MAP = {
       return /* @__PURE__ */ React32.createElement(React32.Suspense, { fallback: /* @__PURE__ */ React32.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading stat...") }, /* @__PURE__ */ React32.createElement(LazyStatWidget, { data, ...props }));
     },
     configEditor: StatConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ React32.createElement(TrendingUp3, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React32.createElement(TrendingUp4, { className: `!text-lg ${className}` }),
     sampleConfig: {
       label: "Metric Label",
       valueTemplate: "42",
@@ -5304,7 +5286,7 @@ var WIDGETS_MAP = {
       return /* @__PURE__ */ React32.createElement(React32.Suspense, { fallback: /* @__PURE__ */ React32.createElement("div", { className: "flex justify-center items-center h-full text-xs text-brand-text-primary" }, "Loading picker...") }, /* @__PURE__ */ React32.createElement(LazyDatePickerWidget, { data, ...props }));
     },
     configEditor: DatePickerConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ React32.createElement(Calendar, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React32.createElement(Calendar2, { className: `!text-lg ${className}` }),
     sampleConfig: {
       label: "Select Date",
       placeholder: "Choose a date...",

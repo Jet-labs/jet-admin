@@ -1,26 +1,37 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { getFieldTypeIcon } from './chartSpecGenerator';
+import { Hash, Type, Calendar, ArrowUpDown, X } from 'lucide-react';
 
-import { Button } from "@jet-admin/ui";
 /**
- * Get Tailwind CSS class for field type (Tableau-style color coding)
+ * Get consistent Lucide icon for field type
+ */
+const getTypeIconComponent = (type) => {
+  switch (type) {
+    case 'quantitative': return <Hash className="w-3 h-3 shrink-0" />;
+    case 'temporal': return <Calendar className="w-3 h-3 shrink-0" />;
+    case 'ordinal': return <ArrowUpDown className="w-3 h-3 shrink-0" />;
+    case 'nominal':
+    default: return <Type className="w-3 h-3 shrink-0" />;
+  }
+};
+
+/**
+ * Get Tailwind CSS class for field type — dark-mode compatible
  */
 const getTypeClass = (type) => {
   switch (type) {
-    case 'quantitative': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-    case 'temporal': return 'bg-amber-50 text-amber-700 border-amber-200';
-    case 'ordinal': return 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200';
+    case 'quantitative': return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25';
+    case 'temporal': return 'bg-amber-500/15 text-amber-400 border-amber-500/25';
+    case 'ordinal': return 'bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-500/25';
     case 'nominal':
-    default: return 'bg-blue-50 text-blue-700 border-blue-200';
+    default: return 'bg-blue-500/15 text-blue-400 border-blue-500/25';
   }
 };
 
 /**
  * FieldPill — A draggable, color-coded pill representing a data field.
  * Used in both the Data Panel (as source) and Encoding Shelves (as assigned fields).
- * 
- * Uses Tailwind CSS
  */
 export const FieldPill = ({
   field,        // { name, type, icon? }
@@ -30,7 +41,6 @@ export const FieldPill = ({
   isCompact = false,
   className = '',
 }) => {
-  const icon = field.icon || getFieldTypeIcon(field.type);
   const typeClass = getTypeClass(field.type);
 
   // Drag start — transfer field data
@@ -50,34 +60,32 @@ export const FieldPill = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={onClick}
-      className={`flex items-center gap-1.5 rounded-sm font-medium cursor-grab shadow-sm border transition-shadow hover:shadow-md ${typeClass} ${isCompact ? 'px-1.5 py-0.5 text-[11px]' : 'px-2.5 py-1.5 text-xs'} ${isDragging ? 'opacity-50' : ''} ${className}`}
+      className={`flex items-center gap-1.5 rounded font-medium cursor-grab border transition-colors hover:brightness-110 max-w-full min-w-0 ${typeClass} ${isCompact ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-[11px]'} ${isDragging ? 'opacity-50' : ''} ${className}`}
       title={`${field.name} (${field.type})`}
     >
       {/* Type icon */}
-      <span className="opacity-70 font-mono scale-90">{icon}</span>
+      {getTypeIconComponent(field.type)}
 
       {/* Field name */}
-      <span className="truncate">{field.name}</span>
+      <span className="truncate min-w-0">{field.name}</span>
 
       {/* Aggregate badge */}
       {field.aggregate && field.aggregate !== 'none' && (
-        <span className="text-[9px] uppercase tracking-wider bg-brand-black/50 px-1 rounded-sm ml-1 font-bold" title={`Aggregate: ${field.aggregate}`}>
+        <span className="text-[8px] uppercase tracking-wider bg-white/10 px-1 py-px rounded font-bold ml-auto shrink-0" title={`Aggregate: ${field.aggregate}`}>
           {field.aggregate.slice(0, 3)}
         </span>
       )}
 
       {/* Remove button */}
       {onRemove && (
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="icon"
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
-          className="ml-auto h-4 w-4 rounded-full hover:bg-black/10 text-xs text-muted-foreground"
+          className="ml-auto h-3.5 w-3.5 rounded-sm flex items-center justify-center hover:bg-white/20 shrink-0"
           title="Remove"
         >
-          &times;
-        </Button>
+          <X className="w-2.5 h-2.5" />
+        </button>
       )}
     </div>
   );
