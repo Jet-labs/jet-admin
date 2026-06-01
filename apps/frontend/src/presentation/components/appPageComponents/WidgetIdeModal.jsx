@@ -191,7 +191,6 @@ export const WidgetIdeModal = ({
                   widgetEditorForm={widgetForm}
                   dataSourceResults={previewStateTree}
                   onDataSourceResults={() => {}}
-                  isPageLevelMode={true}
                 />
               </div>
             </ResizablePanel>

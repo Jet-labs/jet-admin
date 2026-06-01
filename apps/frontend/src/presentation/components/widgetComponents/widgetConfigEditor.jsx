@@ -32,13 +32,11 @@ export const WidgetConfigEditor = ({
   widgetEditorForm,
   dataSourceResults,
   onDataSourceResults,
-  isPageLevelMode = false,
 }) => {
   WidgetConfigEditor.propTypes = {
     widgetEditorForm: PropTypes.object.isRequired,
     dataSourceResults: PropTypes.object,
     onDataSourceResults: PropTypes.func,
-    isPageLevelMode: PropTypes.bool,
   };
 
   const { tenantID } = useParams();
@@ -76,37 +74,7 @@ export const WidgetConfigEditor = ({
     }
   }, [widgetEditorForm.values.widgetConfig]);
 
-  // Build a properly namespaced state tree from flat dataSourceResults.
-  // This mirrors the shape produced by buildAppPageStateTree() at runtime,
-  // so intellisense suggestions and path resolution in widget editors
-  // use exactly the same paths as the live AppPage runtime.
-  //
-  // Widgets don't store a `dataSources` config — they contain raw template
-  // expressions like {{state.queries.alias.data}}. We use the regex-extracted
-  // `referencedDataSources` above to know which aliases are queries vs workflows.
-  const previewStateTree = useMemo(() => {
-    if (!dataSourceResults) return null;
-    const queries = {};
-    const workflows = {};
-
-    // Build a lookup of alias → type from the config's template expressions
-    const typeByAlias = {};
-    for (const ref of referencedDataSources) {
-      typeByAlias[ref.alias] = ref.type; // "query" | "workflow"
-    }
-
-    // Categorise each result under the correct namespace
-    for (const alias of Object.keys(dataSourceResults)) {
-      if (typeByAlias[alias] === "workflow") {
-        workflows[alias] = dataSourceResults[alias];
-      } else {
-        // Default to queries (covers explicit "query" type and unknown aliases)
-        queries[alias] = dataSourceResults[alias];
-      }
-    }
-
-    return { queries, workflows, variables: {}, widgets: {}, globals: {} };
-  }, [dataSourceResults, referencedDataSources]);
+  const previewStateTree = dataSourceResults;
 
   return (
     <div className="flex w-full flex-col gap-3">
