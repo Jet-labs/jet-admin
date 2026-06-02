@@ -2,6 +2,129 @@ export class StringUtils {
   static truncateName = (str, length) => {
     return str.length > length ? `${str.substring(0, length)}...` : str;
   };
+
+  /**
+   * Safely stringifies a JSON object, truncating large arrays and strings
+   * to prevent browser freezing when displaying massive data in CodeEditors.
+   * Also strips internal React nodes, DOM elements, and functions.
+   * @param {any} obj - The object to stringify
+   * @param {number} maxArrayLength - Max elements to show in an array (default 50)
+   * @param {number} maxStringLength - Max length of strings (default 1000)
+   * @param {number} maxNodes - Absolute maximum number of nodes to process (default 5000)
+   * @returns {string} - Pretty-printed JSON string
+   */
+  static safeJsonStringify(obj, maxArrayLength = 50, maxStringLength = 1000, maxNodes = 5000) {
+    const cache = new WeakSet();
+    let nodeCount = 0;
+    let nodeLimitHit = false;
+
+    const truncateString = (str) => {
+      if (typeof str === "string" && str.length > maxStringLength) {
+        return `${str.substring(0, maxStringLength)}... [Truncated ${str.length - maxStringLength} chars]`;
+      }
+      return str;
+    };
+
+    // Recursively sanitize a value through the full pipeline,
+    // so nested structures inside arrays/objects are always cleaned.
+    const sanitize = (value, depth = 0) => {
+      // Hard depth guard — catches degenerate recursive structures
+      if (depth > 50) return "[MaxDepth]";
+
+      if (nodeLimitHit) return `... [Max nodes (${maxNodes}) reached]`;
+
+      nodeCount++;
+      if (nodeCount > maxNodes) {
+        nodeLimitHit = true;
+        return `... [Max nodes (${maxNodes}) reached]`;
+      }
+
+      // Primitives
+      if (value === null) return null;
+      if (typeof value === "undefined") return undefined;
+      if (typeof value === "function") return "[Function]";
+      if (typeof value === "symbol") return value.toString();
+      if (typeof value === "string") return truncateString(value);
+      if (typeof value === "number" || typeof value === "boolean") return value;
+
+      // Objects
+      if (typeof value === "object") {
+        // Circular reference check
+        if (cache.has(value)) return "[Circular]";
+
+        // DOM elements — guard against missing HTMLElement in non-browser envs
+        if (typeof HTMLElement !== "undefined" && value instanceof HTMLElement) {
+          return `[HTMLElement <${value.tagName.toLowerCase()}>]`;
+        }
+
+        // React fiber / internal nodes by constructor name
+        const ctorName = value.constructor?.name ?? "";
+        if (ctorName === "FiberNode" || ctorName === "ReactElement") {
+          return "[ReactInternal]";
+        }
+
+        cache.add(value);
+
+        // Array
+        if (Array.isArray(value)) {
+          const visible = value.slice(0, maxArrayLength);
+          const result = visible.map((item) => sanitize(item, depth + 1));
+          if (value.length > maxArrayLength) {
+            result.push(`... [Truncated ${value.length - maxArrayLength} items]`);
+          }
+          return result;
+        }
+
+        // widgetMethods special case
+        if ("widgetMethods" in value && typeof value.widgetMethods === "object") {
+          // handled below as a normal object; the key-level hook was unreliable
+        }
+
+        // Plain object
+        const keys = Object.keys(value);
+        const visibleKeys = keys.slice(0, maxArrayLength);
+        const result = {};
+
+        for (const k of visibleKeys) {
+          // Drop React internals
+          if (k.startsWith("__react") || k.startsWith("$$typeof")) continue;
+
+          // widgetMethods: collapse to method name lists
+          if (k === "widgetMethods") {
+            const wm = value[k];
+            if (wm && typeof wm === "object") {
+              result[k] = Object.fromEntries(
+                Object.entries(wm).map(([wid, methods]) => [
+                  wid,
+                  methods && typeof methods === "object"
+                    ? Object.keys(methods).filter((m) => typeof methods[m] === "function")
+                    : sanitize(methods, depth + 1),
+                ])
+              );
+            }
+            continue;
+          }
+
+          result[k] = sanitize(value[k], depth + 1);
+        }
+
+        if (keys.length > maxArrayLength) {
+          result["_truncated_info"] = `... [Truncated ${keys.length - maxArrayLength} keys]`;
+        }
+
+        return result;
+      }
+
+      return value;
+    };
+
+    try {
+      const sanitized = sanitize(obj);
+      return JSON.stringify(sanitized, null, 2);
+    } catch (e) {
+      return `[Error stringifying data: ${e.message}]`;
+    }
+  }
   static containsWhitespace = (str) => /\s/.test(str);
   static getImageSizeInKB = (base64Image) => {
     const yourBase64String = base64Image.substring(

@@ -23,6 +23,8 @@ export const CustomCodeEditorControl = ({
     height = "140px",
     placeholder,
     hint,
+    intellisenseFeed = [],
+    showHeader = false,
   } = uischema.options || {};
   
   const format = schema?.format || "";
@@ -53,6 +55,7 @@ export const CustomCodeEditorControl = ({
 
   const schemaRef = useRef(tablesMap);
   const queryArgsRef = useRef(queryArgs);
+  const intellisenseFeedRef = useRef(intellisenseFeed);
 
   useEffect(() => {
     schemaRef.current = tablesMap;
@@ -61,6 +64,10 @@ export const CustomCodeEditorControl = ({
   useEffect(() => {
     queryArgsRef.current = queryArgs;
   }, [queryArgs]);
+
+  useEffect(() => {
+    intellisenseFeedRef.current = intellisenseFeed;
+  }, [intellisenseFeed]);
 
   const handleBeforeMount = (monaco) => {
     // Register completion providers based on language
@@ -164,22 +171,54 @@ export const CustomCodeEditorControl = ({
           
           const suggestions = [];
           
-          // Check if we're typing after 'ctx.'
-          const textBefore = model.getValueInRange({
+          // Extract the text immediately before the current word being typed
+          const textBeforeWord = model.getValueInRange({
             startLineNumber: position.lineNumber,
             startColumn: 1,
             endLineNumber: position.lineNumber,
-            endColumn: position.column,
+            endColumn: wordInfo.startColumn,
           });
           
-          if (textBefore.endsWith('ctx.')) {
-            // Context variable suggestions
-            suggestions.push({
-              label: '/* Available context variables */',
-              kind: monaco.languages.CompletionItemKind.Text,
-              insertText: '',
-              detail: 'Access results from previous nodes using ctx.variableName',
-              range,
+          // Match paths like "ctx.", "ctx.input.", "data."
+          const pathMatch = textBeforeWord.match(/([a-zA-Z0-9_$]+(?:\.[a-zA-Z0-9_$]+)*)\.$/);
+          const feed = intellisenseFeedRef.current || [];
+          
+          if (pathMatch) {
+            const parentPath = pathMatch[1];
+            const matchingItems = feed.filter(item => item.parentPath === parentPath);
+            
+            if (matchingItems.length > 0) {
+              matchingItems.forEach((item) => {
+                let priority = "03";
+                if (item.kind === 'Property') priority = "01";
+                if (item.kind === 'Field') priority = "02";
+                
+                suggestions.push({
+                  label: item.label,
+                  kind: monaco.languages.CompletionItemKind[item.kind] || monaco.languages.CompletionItemKind.Property,
+                  insertText: item.insertText || item.label,
+                  detail: item.detail,
+                  sortText: `${priority}_${item.label}`,
+                  range,
+                });
+              });
+            }
+          } else {
+            // Root level generic items
+            const rootItems = feed.filter(item => !item.parentPath);
+            rootItems.forEach((item) => {
+              let priority = "03";
+              if (item.kind === 'Property') priority = "01";
+              if (item.kind === 'Field') priority = "02";
+              
+              suggestions.push({
+                label: item.label,
+                kind: monaco.languages.CompletionItemKind[item.kind] || monaco.languages.CompletionItemKind.Variable,
+                insertText: item.insertText || item.label,
+                detail: item.detail,
+                sortText: `${priority}_${item.label}`,
+                range,
+              });
             });
           }
           
@@ -203,6 +242,7 @@ export const CustomCodeEditorControl = ({
               kind: monaco.languages.CompletionItemKind.Keyword,
               insertText: kw.label,
               detail: kw.detail,
+              sortText: `09_${kw.label}`,
               range,
             });
           });
@@ -236,7 +276,7 @@ export const CustomCodeEditorControl = ({
         language={language}
         height={height}
         disabled={!enabled}
-        showHeader={false}
+        showHeader={showHeader}
         beforeMount={handleBeforeMount}
         status={hasErrors ? "error" : null}
       />

@@ -384,7 +384,9 @@ var CustomCodeEditorControl = ({
     queryArgs = [],
     height = "140px",
     placeholder,
-    hint
+    hint,
+    intellisenseFeed = [],
+    showHeader = false
   } = uischema.options || {};
   const format = schema?.format || "";
   const language = useMemo(() => {
@@ -408,12 +410,16 @@ var CustomCodeEditorControl = ({
   }, [databaseMetadata, language]);
   const schemaRef = useRef(tablesMap);
   const queryArgsRef = useRef(queryArgs);
+  const intellisenseFeedRef = useRef(intellisenseFeed);
   useEffect(() => {
     schemaRef.current = tablesMap;
   }, [tablesMap]);
   useEffect(() => {
     queryArgsRef.current = queryArgs;
   }, [queryArgs]);
+  useEffect(() => {
+    intellisenseFeedRef.current = intellisenseFeed;
+  }, [intellisenseFeed]);
   const handleBeforeMount = (monaco) => {
     if (language === "sql") {
       monaco.languages.registerCompletionItemProvider("sql", {
@@ -538,19 +544,46 @@ var CustomCodeEditorControl = ({
             endColumn: wordInfo.endColumn
           };
           const suggestions = [];
-          const textBefore = model.getValueInRange({
+          const textBeforeWord = model.getValueInRange({
             startLineNumber: position.lineNumber,
             startColumn: 1,
             endLineNumber: position.lineNumber,
-            endColumn: position.column
+            endColumn: wordInfo.startColumn
           });
-          if (textBefore.endsWith("ctx.")) {
-            suggestions.push({
-              label: "/* Available context variables */",
-              kind: monaco.languages.CompletionItemKind.Text,
-              insertText: "",
-              detail: "Access results from previous nodes using ctx.variableName",
-              range
+          const pathMatch = textBeforeWord.match(/([a-zA-Z0-9_$]+(?:\.[a-zA-Z0-9_$]+)*)\.$/);
+          const feed = intellisenseFeedRef.current || [];
+          if (pathMatch) {
+            const parentPath = pathMatch[1];
+            const matchingItems = feed.filter((item) => item.parentPath === parentPath);
+            if (matchingItems.length > 0) {
+              matchingItems.forEach((item) => {
+                let priority = "03";
+                if (item.kind === "Property") priority = "01";
+                if (item.kind === "Field") priority = "02";
+                suggestions.push({
+                  label: item.label,
+                  kind: monaco.languages.CompletionItemKind[item.kind] || monaco.languages.CompletionItemKind.Property,
+                  insertText: item.insertText || item.label,
+                  detail: item.detail,
+                  sortText: `${priority}_${item.label}`,
+                  range
+                });
+              });
+            }
+          } else {
+            const rootItems = feed.filter((item) => !item.parentPath);
+            rootItems.forEach((item) => {
+              let priority = "03";
+              if (item.kind === "Property") priority = "01";
+              if (item.kind === "Field") priority = "02";
+              suggestions.push({
+                label: item.label,
+                kind: monaco.languages.CompletionItemKind[item.kind] || monaco.languages.CompletionItemKind.Variable,
+                insertText: item.insertText || item.label,
+                detail: item.detail,
+                sortText: `${priority}_${item.label}`,
+                range
+              });
             });
           }
           const jsKeywords = [
@@ -571,6 +604,7 @@ var CustomCodeEditorControl = ({
               kind: monaco.languages.CompletionItemKind.Keyword,
               insertText: kw.label,
               detail: kw.detail,
+              sortText: `09_${kw.label}`,
               range
             });
           });
@@ -595,7 +629,7 @@ var CustomCodeEditorControl = ({
       language,
       height,
       disabled: !enabled,
-      showHeader: false,
+      showHeader,
       beforeMount: handleBeforeMount,
       status: hasErrors ? "error" : null
     }

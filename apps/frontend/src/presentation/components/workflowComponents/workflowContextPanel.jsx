@@ -3,6 +3,7 @@ import { Check, Copy, FileJson } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 import { Button, CodeEditor } from "@jet-admin/ui";
+import { StringUtils } from "../../../utils/string";
 
 /**
  * WorkflowContextPanel - Panel to display workflow context during test runs
@@ -14,6 +15,7 @@ export const WorkflowContextPanel = ({
   className = '',
 }) => {
   const [copied, setCopied] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(true);
 
   // Filter out internal properties (starting with __)
   const displayContext = Object.entries(context).reduce((acc, [key, value]) => {
@@ -51,7 +53,16 @@ export const WorkflowContextPanel = ({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-1.5 cursor-pointer" title="Truncate massive arrays/strings to prevent browser freeze">
+            <input 
+              type="checkbox" 
+              checked={isTruncated} 
+              onChange={(e) => setIsTruncated(e.target.checked)}
+              className="w-3 h-3 accent-primary"
+            />
+            <span className="text-[10px] text-muted-foreground font-medium">Truncate</span>
+          </label>
           <Button
             onClick={handleCopyAll}
             type='button'
@@ -76,7 +87,12 @@ export const WorkflowContextPanel = ({
         ) : (
           <CodeEditor
             language="json"
-            value={JSON.stringify(displayContext, null, 2)}
+            value={StringUtils.safeJsonStringify(
+              displayContext,
+              isTruncated ? 50 : Infinity,
+              isTruncated ? 1000 : Infinity,
+              isTruncated ? 5000 : Infinity
+            )}
             readOnly={true}
             height="100%"
             showHeader={false}

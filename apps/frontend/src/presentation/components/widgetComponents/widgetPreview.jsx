@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import { useCallback, useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import { Spinner, CodeEditor } from "@jet-admin/ui";
+import { StringUtils } from "../../../utils/string";
 
 export const WidgetPreview = ({
   tenantID,
@@ -36,6 +37,7 @@ export const WidgetPreview = ({
   const uniqueKey = `widgetPreview_${tenantID}_${widgetID}`;
   const widgetRef = useRef();
   const [showDebug, setShowDebug] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(true);
 
   const _handleOnWidgetInit = useCallback(
     (ref) => {
@@ -114,21 +116,41 @@ export const WidgetPreview = ({
       )}
 
       {/* Debug Panel */}
-      <div className="shrink-0 border-t border-border bg-background">
-        <button
-          type="button"
-          onClick={() => setShowDebug(!showDebug)}
-          className="w-full flex items-center gap-1.5 px-3 py-1.5 text-[0.65rem] font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-          {showDebug ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-          <Code className="w-3 h-3" />
-          <span>Debug: Widget Config</span>
-        </button>
+      <div className="shrink-0 border-t border-border bg-background flex flex-col">
+        <div className="flex items-center justify-between w-full hover:bg-muted transition-colors pr-3">
+          <button
+            type="button"
+            onClick={() => setShowDebug(!showDebug)}
+            className="flex-1 flex items-center gap-1.5 px-3 py-1.5 text-[0.65rem] font-medium text-muted-foreground hover:text-foreground focus:outline-none text-left"
+          >
+            {showDebug ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+            <Code className="w-3 h-3" />
+            <span>Debug: Widget Config</span>
+          </button>
+          
+          {showDebug && (
+            <label className="flex items-center gap-1.5 cursor-pointer" onClick={(e) => e.stopPropagation()}>
+              <input 
+                type="checkbox" 
+                checked={isTruncated} 
+                onChange={(e) => setIsTruncated(e.target.checked)}
+                className="w-3 h-3 accent-primary"
+              />
+              <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">Truncate Large Data</span>
+            </label>
+          )}
+        </div>
+
         {showDebug && (
-                    <div className="h-64 border-t border-border">
+          <div className="h-64 border-t border-border">
             <CodeEditor
               language="json"
-              value={JSON.stringify(debugInfo, null, 2)}
+              value={StringUtils.safeJsonStringify(
+                debugInfo,
+                isTruncated ? 50 : Infinity,
+                isTruncated ? 1000 : Infinity,
+                isTruncated ? 5000 : Infinity
+              )}
               readOnly={true}
               height="100%"
               showHeader={false}

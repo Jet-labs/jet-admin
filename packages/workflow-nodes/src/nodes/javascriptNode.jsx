@@ -20,7 +20,7 @@ const ERROR_HANDLING_OPTIONS = {
 // JavascriptNodeConfigurator - JSON Forms based configuration
 // ============================================================================
 export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { strings, workflowNodes } = useWorkflowNodes();
+  const { strings, workflowNodes, workflowInputArgs, workflowContext } = useWorkflowNodes();
   const [formData, setFormData] = useState({
     title: data?.title || '',
     description: data?.description || '',
@@ -61,6 +61,96 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         variable: n.data.outputVariable,
       }));
   }, [workflowNodes, nodeId]);
+
+  const intellisenseFeed = useMemo(() => {
+    const feed = [];
+    
+    // Fallback/base intellisense using workflowNodes and workflowInputArgs (for when context is empty before run)
+    feed.push({ parentPath: "", label: "ctx", kind: "Variable", insertText: "ctx", detail: "Workflow context object" });
+    feed.push({ parentPath: "ctx", label: "input", kind: "Property", insertText: "input", detail: "Workflow Input Parameters" });
+    feed.push({ parentPath: "ctx", label: "item", kind: "Property", insertText: "item", detail: "Current loop item (if inside loop)" });
+
+    if (workflowInputArgs && workflowInputArgs.length > 0) {
+      workflowInputArgs.forEach(arg => {
+        feed.push({
+          parentPath: "ctx.input",
+          label: arg.key,
+          kind: "Field",
+          insertText: arg.key,
+          detail: arg.type ? `Input arg (${arg.type})` : 'Workflow Input Parameter'
+        });
+      });
+    }
+
+    if (workflowNodes) {
+      workflowNodes
+        .filter(n => n.id !== nodeId && n.data?.outputVariable)
+        .forEach(n => {
+          feed.push({
+            parentPath: "ctx",
+            label: n.data.outputVariable,
+            kind: "Variable",
+            insertText: n.data.outputVariable,
+            detail: (n.data?.title || n.type) ? `From: ${n.data?.title || n.type}` : 'Context variable'
+          });
+        });
+    }
+
+    // Traverse the actual runtime workflowContext to provide deep intellisense
+    const traverse = (obj, currentPath, depth = 0) => {
+      // Limit recursion depth to avoid huge feeds
+      if (depth > 4 || obj === null || obj === undefined) return;
+
+      if (Array.isArray(obj)) {
+        if (obj.length > 0 && typeof obj[0] === 'object' && obj[0] !== null) {
+          Object.entries(obj[0]).forEach(([key, value]) => {
+             const type = Array.isArray(value) ? 'Array' : typeof value;
+             feed.push({
+               parentPath: currentPath,
+               label: key,
+               kind: type === 'object' || type === 'Array' ? 'Property' : 'Field',
+               insertText: key,
+               detail: `${type} (from array item)`
+             });
+             if (type === 'object' || type === 'Array') {
+               traverse(value, `${currentPath}.${key}`, depth + 1);
+             }
+          });
+        }
+      } else if (typeof obj === 'object') {
+        Object.entries(obj).forEach(([key, value]) => {
+           const type = Array.isArray(value) ? 'Array' : typeof value;
+           feed.push({
+             parentPath: currentPath,
+             label: key,
+             kind: type === 'object' || type === 'Array' ? 'Property' : 'Field',
+             insertText: key,
+             detail: type
+           });
+           if (type === 'object' || type === 'Array') {
+             traverse(value, `${currentPath}.${key}`, depth + 1);
+           }
+        });
+      }
+    };
+
+    if (workflowContext && Object.keys(workflowContext).length > 0) {
+      traverse(workflowContext, "ctx", 0);
+    }
+
+    // Deduplicate
+    const uniqueFeed = [];
+    const seen = new Set();
+    feed.forEach(item => {
+      const key = `${item.parentPath}.${item.label}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueFeed.push(item);
+      }
+    });
+
+    return uniqueFeed;
+  }, [workflowNodes, nodeId, workflowInputArgs, workflowContext]);
 
   // Build schema
   const schema = useMemo(() => {
@@ -166,6 +256,8 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
                 rows: 12,
                 placeholder: '// Your JavaScript code here\n// Access context: ctx.variableName\n// Return a value to store in outputVariable\nreturn true;',
                 hint: contextHint,
+                intellisenseFeed: intellisenseFeed,
+                showHeader: true,
               },
             },
           ],

@@ -371,6 +371,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             workflowEdges={values.edges}
             workflowInputArgs={workflowArgs}
             nodeExecutionStatus={nodeExecutionStatus}
+            workflowContext={workflowContext}
             tenantID={tenantID}
             onQueryTest={handleQueryTest}
         >
