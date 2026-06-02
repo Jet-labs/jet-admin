@@ -17,7 +17,7 @@ import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 import { getWidgetByIDAPI } from "../../../data/apis/widget";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-import { Badge, Button, Card } from "@jet-admin/ui";
+import { Badge, Button, Card, ErrorBoundary } from "@jet-admin/ui";
 import { resolveWidgetData } from "@jet-admin/widgets-logic";
 import { useComponentSize } from "../../../logic/hooks/useComponentSize";
 
@@ -326,21 +326,23 @@ export const AppPageWidgetSlot = ({
             {RenderedWidgetComponent
               ? (
                 <div className="min-h-0 flex-1 bg-background">
-                  <MemoizedWidgetContent
-                    RenderedWidgetComponent={RenderedWidgetComponent}
-                        widgetTitle={widget.widgetTitle}
-                        widgetType={widgetRender.widgetType}
-                    resolvedConfig={resolvedConfig}
-                    stateTreeQueries={stateTree.queries}
-                    handleOnWidgetInit={handleOnWidgetInit}
-                    refreshInterval={widget.refreshInterval}
-                    refetchWidget={refetchWidget}
-                    fireWidgetEvent={fireWidgetEvent}
-                    runtimeEventHandlers={runtimeEventHandlers}
-                    widgetState={widgetState}
-                    setWidgetState={setWidgetState}
-                      />
-                    </div>
+                  <ErrorBoundary title="Widget Render Error">
+                    <MemoizedWidgetContent
+                      RenderedWidgetComponent={RenderedWidgetComponent}
+                      widgetTitle={widget.widgetTitle}
+                      widgetType={widgetRender.widgetType}
+                      resolvedConfig={resolvedConfig}
+                      stateTreeQueries={stateTree.queries}
+                      handleOnWidgetInit={handleOnWidgetInit}
+                      refreshInterval={widget.refreshInterval}
+                      refetchWidget={refetchWidget}
+                      fireWidgetEvent={fireWidgetEvent}
+                      runtimeEventHandlers={runtimeEventHandlers}
+                      widgetState={widgetState}
+                      setWidgetState={setWidgetState}
+                    />
+                  </ErrorBoundary>
+                </div>
               )
               : null}
           </ReactQueryLoadingErrorWrapper>

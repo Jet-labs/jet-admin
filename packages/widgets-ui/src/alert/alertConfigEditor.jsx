@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Checkbox } from "@jet-admin/ui";
-import TemplateAutocompleteInput from "../_shared/TemplateAutocompleteInput";
+import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
 export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
@@ -52,11 +52,12 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       {/* Alert Message */}
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-foreground">Message</Label>
-        <textarea
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[80px] resize-y"
+        <TemplateAutocompleteInput
+          isTextArea={true}
           value={config.message || ""}
-          onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.message", e.target.value)}
+          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.message", val)}
           placeholder="e.g. Action completed successfully."
+          suggestions={suggestions}
         />
       </div>
 

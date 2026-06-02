@@ -4,7 +4,7 @@ import { resolveWidgetData } from "@jet-admin/widgets-logic";
 import PropTypes from "prop-types";
 import { useCallback, useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
-import { Spinner, CodeEditor } from "@jet-admin/ui";
+import { Spinner, CodeEditor, ErrorBoundary } from "@jet-admin/ui";
 import { StringUtils } from "../../../utils/string";
 
 export const WidgetPreview = ({
@@ -110,7 +110,9 @@ export const WidgetPreview = ({
           id={uniqueKey}
         >
             <div className="flex-1 min-h-0 overflow-hidden">
-              {resolveComponent()}
+              <ErrorBoundary title="Widget Render Error">
+                {resolveComponent()}
+              </ErrorBoundary>
             </div>
         </div>
       )}

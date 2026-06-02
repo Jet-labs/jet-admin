@@ -129,69 +129,21 @@ export const VegaWidget = ({
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       {(loading || isLoadingWorkflows) && !error && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10,
-            color: '#94a3b8',
-            fontSize: '13px',
-            pointerEvents: 'none',
-          }}
-        >
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            backgroundColor: 'rgba(241, 245, 249, 0.9)',
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite' }}>
+        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+          <div className="flex items-center gap-2 rounded-lg  bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground shadow-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" />
             </svg>
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             Loading visualization…
           </div>
         </div>
       )}
 
       {error && !isLoadingWorkflows && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px',
-            textAlign: 'center',
-            zIndex: 20,
-            pointerEvents: 'none',
-          }}
-        >
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            backgroundColor: 'rgba(254, 242, 242, 0.95)',
-            color: '#dc2626',
-            fontSize: '13px',
-            border: '1px solid rgba(220, 38, 38, 0.2)',
-          }}>
-            <span>⚠</span>
-            <span>{error}</span>
+        <div className="absolute inset-0 z-20 flex items-center justify-center p-4 text-center pointer-events-none">
+          <div className="flex items-center gap-1.5 rounded-lg  bg-muted/30 px-4 py-2 text-xs font-medium text-foreground shadow-sm">
+            <span className="text-muted-foreground">⚠</span>
+            <span className="text-muted-foreground">{error}</span>
           </div>
         </div>
       )}

@@ -42,8 +42,7 @@ export { IframeConfigEditor } from "./iframe/iframeConfigEditor";
 export * from "./date-picker";
 export * from "./date-range-picker";
 
-// Shared components
-export { default as TemplateAutocompleteInput } from "./_shared/TemplateAutocompleteInput";
+// Shared components removed, TemplateAutocompleteInput moved to @jet-admin/ui
 
 // Dynamic intellisense
 export {
@@ -52,4 +51,5 @@ export {
   getVariableKeySuggestions,
   getWidgetIDSuggestions,
   getMethodSuggestionsForTarget,
+  getSuggestionsFromStateTree,
 } from "./intellisense/suggestionEngine";

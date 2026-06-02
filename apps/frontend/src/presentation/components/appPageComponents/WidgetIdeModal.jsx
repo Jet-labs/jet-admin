@@ -137,7 +137,7 @@ export const WidgetIdeModal = ({
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open && !isSaving) onClose();
     }}>
-      <DialogContent hideCloseIcon={true} className="max-w-7xl w-[95vw] h-[90vh] flex flex-col p-0 overflow-hidden bg-background border border-border [&>button]:hidden">
+      <DialogContent hideCloseIcon={true} className="max-w-7xl w-[95vw] h-[90vh] flex flex-col gap-0 p-0 overflow-hidden bg-background border border-border [&>button]:hidden">
         <DialogHeader className="px-6 py-4 border-b border-border/80 flex flex-row items-center justify-between shrink-0">
           <div>
             <DialogTitle className="text-base font-semibold text-foreground">

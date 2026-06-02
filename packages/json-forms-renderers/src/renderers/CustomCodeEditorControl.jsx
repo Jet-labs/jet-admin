@@ -271,7 +271,7 @@ export const CustomCodeEditorControl = ({
       )}
       
       <CodeEditor
-        value={data || placeholder || ''}
+        value={typeof data === 'object' ? JSON.stringify(data, null, 2) : data || placeholder || ''}
         onChange={(val) => handleChange(path, val || '')}
         language={language}
         height={height}

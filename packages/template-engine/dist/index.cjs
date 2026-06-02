@@ -17,8 +17,8 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.js
-var src_exports = {};
-__export(src_exports, {
+var index_exports = {};
+__export(index_exports, {
   BLOCKED_PATH_SEGMENTS: () => BLOCKED_PATH_SEGMENTS,
   MUSTACHE_ONLY_TEMPLATE_MESSAGE: () => MUSTACHE_ONLY_TEMPLATE_MESSAGE,
   TEMPLATE_BLOCK_REGEX: () => TEMPLATE_BLOCK_REGEX,
@@ -32,7 +32,7 @@ __export(src_exports, {
   resolveTemplate: () => resolveTemplate,
   tokenizeObjectPath: () => tokenizeObjectPath
 });
-module.exports = __toCommonJS(src_exports);
+module.exports = __toCommonJS(index_exports);
 
 // src/parsers.js
 var TEMPLATE_BLOCK_REGEX = /\{\{([\s\S]+?)\}\}/g;

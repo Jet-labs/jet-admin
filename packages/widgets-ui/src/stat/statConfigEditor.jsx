@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
-import TemplateAutocompleteInput from "../_shared/TemplateAutocompleteInput";
+import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
 export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {

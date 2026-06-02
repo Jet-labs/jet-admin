@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Input, Label, Checkbox } from '@jet-admin/ui';
-import TemplateAutocompleteInput from '../_shared/TemplateAutocompleteInput';
+import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
 
 export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {

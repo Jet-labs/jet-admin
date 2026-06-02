@@ -6,13 +6,13 @@ import { useWidgets } from "../../../logic/hooks/useWidgets";
 import { AppPageMetaContext } from "../../../logic/appPageRuntime/AppPageRuntimeProvider";
 import { getWidgetEventTypes, getEventArgs } from "@jet-admin/widget-types";
 import {
-  TemplateAutocompleteInput,
   getExpressionSuggestions,
   getAliasSuggestions,
   getVariableKeySuggestions,
   getWidgetIDSuggestions,
   getMethodSuggestionsForTarget,
 } from "@jet-admin/widgets-ui";
+import { TemplateAutocompleteInput } from "@jet-admin/ui";
 
 import {
   Button,

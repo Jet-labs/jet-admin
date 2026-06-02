@@ -1,9 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { getSuggestionsFromStateTree } from "@jet-admin/widgets-ui";
+import { TemplateAutocompleteInput } from "@jet-admin/ui";
 
-export const TextConfigEditor = ({ widgetEditorForm }) => {
+export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
+  const suggestions = getSuggestionsFromStateTree(stateTree);
 
   return (
     <div className="space-y-4">
@@ -13,11 +16,13 @@ export const TextConfigEditor = ({ widgetEditorForm }) => {
         <p className="text-[10px] text-muted-foreground leading-snug">
           Supports Markdown formatting and <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]">{"{{expression}}"}</code> templates.
         </p>
-        <textarea
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[120px] resize-y"
+        <TemplateAutocompleteInput
+          isTextArea={true}
+          className=""
           value={config.content || ""}
-          onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.content", e.target.value)}
+          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.content", val)}
           placeholder={"# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{ state.queries.myQuery.data[0].name }}"}
+          suggestions={suggestions}
         />
       </div>
 
@@ -83,6 +88,7 @@ export const TextConfigEditor = ({ widgetEditorForm }) => {
 
 TextConfigEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
+  stateTree: PropTypes.object,
 };
 
 export default TextConfigEditor;

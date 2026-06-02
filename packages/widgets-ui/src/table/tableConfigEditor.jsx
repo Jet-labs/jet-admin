@@ -14,7 +14,7 @@ import {
 } from "@jet-admin/ui";
 import { Trash2, Plus, ArrowUp, ArrowDown, Sparkles, Zap } from 'lucide-react';
 
-import TemplateAutocompleteInput from '../_shared/TemplateAutocompleteInput';
+import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
 import { getValueByPath } from "@jet-admin/template-engine";
 

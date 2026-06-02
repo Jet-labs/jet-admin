@@ -15,7 +15,8 @@ import {
   SelectValue,
   Checkbox,
 } from "@jet-admin/ui";
-import { TemplateAutocompleteInput, getExpressionSuggestions } from "@jet-admin/widgets-ui";
+import { getExpressionSuggestions } from "@jet-admin/widgets-ui";
+import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { Plus, Trash2, Edit2, Play, Square, Database, GitBranch, Layers, Loader2, ArrowLeft } from "lucide-react";
 import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { stopTestWorkflowAPI } from "../../../data/apis/workflow";

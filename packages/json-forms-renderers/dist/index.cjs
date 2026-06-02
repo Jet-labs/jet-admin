@@ -184,7 +184,7 @@ var CustomTextInput = (props) => {
       className: hasErrors ? "border-red-500 focus:border-red-500" : "",
       placeholder: hasErrors ? errors : uischema?.options?.placeholder || "",
       onChange: (ev) => handleChange(path, ev.target.value),
-      value: data || "",
+      value: typeof data === "object" ? JSON.stringify(data) : data || "",
       rows: uischema?.options?.rows || 3
     }
   ) : /* @__PURE__ */ import_react2.default.createElement(
@@ -198,7 +198,7 @@ var CustomTextInput = (props) => {
       className: hasErrors ? "border-red-500 focus:border-red-500" : "",
       placeholder: hasErrors ? errors : uischema?.options?.placeholder || "",
       onChange: (ev) => handleChange(path, ev.target.value),
-      value: data || ""
+      value: typeof data === "object" ? JSON.stringify(data) : data || ""
     }
   ), hasErrors && /* @__PURE__ */ import_react2.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
 };
@@ -716,7 +716,7 @@ var CustomCodeEditorControl = ({
   ), hint && /* @__PURE__ */ import_react5.default.createElement("p", { className: "text-[10px] text-muted-foreground mb-1" }, hint), /* @__PURE__ */ import_react5.default.createElement(
     import_ui5.CodeEditor,
     {
-      value: data || placeholder || "",
+      value: typeof data === "object" ? JSON.stringify(data, null, 2) : data || placeholder || "",
       onChange: (val) => handleChange(path, val || ""),
       language,
       height,

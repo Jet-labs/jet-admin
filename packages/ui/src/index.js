@@ -30,4 +30,5 @@ export { ArrayInput } from './components/array-input';
 export { InputArgsForm } from './components/input-args-form';
 export { PageHeader } from './components/pageHeader';
 export { Section } from './components/section';
-
+export { ErrorBoundary } from './components/error-boundary';
+export { TemplateAutocompleteInput } from './components/template-autocomplete-input';

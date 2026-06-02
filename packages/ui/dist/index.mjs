@@ -367,7 +367,7 @@ var DialogOverlay = React8.forwardRef(({ className, ...props }, ref) => /* @__PU
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 var DialogContent = React8.forwardRef(
-  ({ className, children, ...props }, ref) => /* @__PURE__ */ React8.createElement(DialogPortal, null, /* @__PURE__ */ React8.createElement(DialogOverlay, null), /* @__PURE__ */ React8.createElement(
+  ({ className, children, hideCloseIcon = false, ...props }, ref) => /* @__PURE__ */ React8.createElement(DialogPortal, null, /* @__PURE__ */ React8.createElement(DialogOverlay, null), /* @__PURE__ */ React8.createElement(
     DialogPrimitive.Content,
     {
       ref,
@@ -378,7 +378,7 @@ var DialogContent = React8.forwardRef(
       ...props
     },
     children,
-    /* @__PURE__ */ React8.createElement(DialogPrimitive.Close, { className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground" }, /* @__PURE__ */ React8.createElement(X, { className: "h-4 w-4" }), /* @__PURE__ */ React8.createElement("span", { className: "sr-only" }, "Close"))
+    !hideCloseIcon && /* @__PURE__ */ React8.createElement(DialogPrimitive.Close, { className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground" }, /* @__PURE__ */ React8.createElement(X, { className: "h-4 w-4" }), /* @__PURE__ */ React8.createElement("span", { className: "sr-only" }, "Close"))
   ))
 );
 DialogContent.displayName = DialogPrimitive.Content.displayName;
@@ -1785,6 +1785,292 @@ var Section = React27.forwardRef(
   }
 );
 Section.displayName = "Section";
+
+// src/components/error-boundary.jsx
+import React28 from "react";
+import { AlertTriangle as AlertTriangle2 } from "lucide-react";
+import PropTypes5 from "prop-types";
+var ErrorBoundary = class extends React28.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback(this.state.error);
+      }
+      return /* @__PURE__ */ React28.createElement("div", { className: "flex h-full w-full items-center justify-center p-4" }, /* @__PURE__ */ React28.createElement("div", { className: "bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2 text-center" }, /* @__PURE__ */ React28.createElement("div", { className: "flex justify-center" }, /* @__PURE__ */ React28.createElement(AlertTriangle2, { className: "h-4 w-4 text-foreground/80" })), /* @__PURE__ */ React28.createElement("div", { className: "font-medium text-xs text-foreground" }, this.props.title || "Component Error"), /* @__PURE__ */ React28.createElement("div", { className: "max-w-xs break-words" }, this.state.error?.message || "Something went wrong while rendering this component.")));
+    }
+    return this.props.children;
+  }
+};
+ErrorBoundary.propTypes = {
+  children: PropTypes5.node.isRequired,
+  fallback: PropTypes5.func,
+  title: PropTypes5.string
+};
+
+// src/components/template-autocomplete-input.jsx
+import React29, { useState as useState3, useRef as useRef2, useEffect as useEffect2, useMemo, useCallback } from "react";
+function deriveContextSuggestions(obj, prefix = "", depth = 0, maxDepth = 8) {
+  if (depth > maxDepth || obj === null || obj === void 0) return [];
+  const suggestions = [];
+  if (Array.isArray(obj)) {
+    if (prefix) {
+      suggestions.push({ value: prefix, label: prefix, detail: `Array[${obj.length}]`, type: "array" });
+      suggestions.push({ value: `${prefix}.length`, label: `${prefix}.length`, detail: "Number", type: "property" });
+    }
+    if (obj.length > 0 && typeof obj[0] === "object" && obj[0] !== null) {
+      suggestions.push(...deriveContextSuggestions(obj[0], prefix ? `${prefix}[0]` : "[0]", depth + 1, maxDepth));
+    }
+    return suggestions;
+  }
+  if (typeof obj === "object") {
+    if (prefix) suggestions.push({ value: prefix, label: prefix, detail: "Object", type: "object" });
+    for (const [key, val] of Object.entries(obj)) {
+      if (typeof val === "function") continue;
+      const childPath = prefix ? `${prefix}.${key}` : key;
+      if (val === null || val === void 0) {
+        suggestions.push({ value: childPath, label: childPath, detail: "null", type: "null" });
+      } else if (Array.isArray(val)) {
+        suggestions.push(...deriveContextSuggestions(val, childPath, depth + 1, maxDepth));
+      } else if (typeof val === "object") {
+        suggestions.push(...deriveContextSuggestions(val, childPath, depth + 1, maxDepth));
+      } else {
+        suggestions.push({ value: childPath, label: childPath, detail: inferType(val), type: "primitive" });
+      }
+    }
+    return suggestions;
+  }
+  if (prefix) suggestions.push({ value: prefix, label: prefix, detail: inferType(obj), type: "primitive" });
+  return suggestions;
+}
+function inferType(val) {
+  if (val === null || val === void 0) return "null";
+  if (typeof val === "boolean") return "Boolean";
+  if (typeof val === "number") return Number.isInteger(val) ? "Integer" : "Float";
+  if (typeof val === "string") return "String";
+  return typeof val;
+}
+function typeIcon(type) {
+  return { object: "{ }", array: "[ ]", primitive: "ab", null: "\u2205", property: "#", ctx: "\u2B1F", form: "\u25A3", widget: "\u25C8" }[type] || "\u25C6";
+}
+function highlightMatch(text, query) {
+  if (!query) return /* @__PURE__ */ React29.createElement("span", null, text);
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return /* @__PURE__ */ React29.createElement("span", null, text);
+  return /* @__PURE__ */ React29.createElement("span", null, text.slice(0, idx), /* @__PURE__ */ React29.createElement("mark", { className: "bg-primary/20 text-primary rounded-[2px] font-semibold px-[1px]" }, text.slice(idx, idx + query.length)), text.slice(idx + query.length));
+}
+function getFilterAtCaret(el) {
+  const pos = el.selectionStart ?? 0;
+  const before = (el.value ?? "").substring(0, pos);
+  const match = before.match(/\{\{([^}]*)$/);
+  return match ? match[1] : null;
+}
+function SuggestionDropdown({ items, totalItems, filterText, activeIdx, onSelect, onActiveChange, style }) {
+  const listRef = useRef2(null);
+  useEffect2(() => {
+    if (!listRef.current || activeIdx < 0) return;
+    listRef.current.querySelectorAll(".tpl-item")[activeIdx]?.scrollIntoView({ block: "nearest" });
+  }, [activeIdx]);
+  return /* @__PURE__ */ React29.createElement("div", { className: "absolute left-0 right-0 z-[9999] bg-background border border-border rounded-md shadow-lg flex flex-col overflow-hidden", style }, /* @__PURE__ */ React29.createElement("div", { className: "flex items-center justify-between px-2.5 py-1.5 border-b border-border bg-muted/50 shrink-0" }, /* @__PURE__ */ React29.createElement("span", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground font-mono" }, "Bindings"), filterText ? /* @__PURE__ */ React29.createElement("span", { className: "text-[10px] text-muted-foreground font-mono truncate ml-2" }, "filtering ", /* @__PURE__ */ React29.createElement("code", { className: "font-mono text-[10px] bg-primary/10 px-1 py-[1.5px] rounded-[3px] border border-primary/20 text-primary" }, filterText), "\xA0\xB7\xA0", totalItems, " result", totalItems !== 1 ? "s" : "") : /* @__PURE__ */ React29.createElement("span", { className: "text-[10px] text-muted-foreground font-mono" }, totalItems, " available")), /* @__PURE__ */ React29.createElement("div", { className: "max-h-[200px] overflow-y-auto overflow-x-hidden", ref: listRef }, items.length === 0 ? /* @__PURE__ */ React29.createElement("div", { className: "p-3 text-[11px] text-center text-muted-foreground font-mono" }, 'No bindings match "', filterText, '"') : items.map((s, i) => {
+    const cleanVal = (s.value || "").replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
+    const cleanLabel = (s.label || cleanVal).replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
+    return /* @__PURE__ */ React29.createElement(
+      "div",
+      {
+        key: i,
+        className: `tpl-item flex items-center gap-2 px-2.5 py-1.5 cursor-pointer border-b border-border last:border-0 transition-colors ${i === activeIdx ? "bg-primary/10" : "hover:bg-muted/50"}`,
+        onMouseDown: (e) => {
+          e.preventDefault();
+          onSelect(i);
+        },
+        onMouseEnter: () => onActiveChange(i)
+      },
+      /* @__PURE__ */ React29.createElement("div", { className: `w-5 h-5 rounded-[3px] flex items-center justify-center shrink-0 text-[9px] font-bold tracking-tighter font-mono ${s.type === "object" ? "bg-muted text-foreground border border-border/50" : s.type === "array" ? "bg-muted/50 text-foreground border border-border/50" : s.type === "null" ? "bg-transparent text-muted-foreground border border-dashed border-border/50" : "bg-primary/10 text-primary border border-primary/20"}` }, typeIcon(s.type)),
+      /* @__PURE__ */ React29.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React29.createElement("div", { className: "text-xs font-mono text-foreground whitespace-nowrap overflow-hidden text-ellipsis" }, highlightMatch(cleanLabel, filterText))),
+      s.detail && /* @__PURE__ */ React29.createElement("span", { className: "text-[10px] text-muted-foreground font-mono whitespace-nowrap shrink-0" }, s.detail),
+      s.type && /* @__PURE__ */ React29.createElement("span", { className: "text-[9px] font-semibold uppercase tracking-[0.04em] px-1.5 py-px rounded-[3px] border border-border text-muted-foreground bg-muted shrink-0" }, s.type)
+    );
+  })), /* @__PURE__ */ React29.createElement("div", { className: "flex items-center justify-between px-2.5 py-1 border-t border-border bg-muted/50 shrink-0" }, /* @__PURE__ */ React29.createElement("span", { className: "text-[10px] text-muted-foreground font-mono flex items-center gap-0.5" }, /* @__PURE__ */ React29.createElement("kbd", { className: "inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground" }, "\u2191"), /* @__PURE__ */ React29.createElement("kbd", { className: "inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground" }, "\u2193"), " navigate"), /* @__PURE__ */ React29.createElement("span", { className: "text-[10px] text-muted-foreground font-mono flex items-center gap-0.5" }, /* @__PURE__ */ React29.createElement("kbd", { className: "inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground" }, "\u21B5"), " select \xB7 ", /* @__PURE__ */ React29.createElement("kbd", { className: "inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground" }, "Esc"), " close")));
+}
+function extractTokens(value) {
+  const matches = [...(value || "").matchAll(/\{\{([^}]+)\}\}/g)];
+  const seen = /* @__PURE__ */ new Set();
+  return matches.reduce((acc, m) => {
+    const key = m[1].trim();
+    if (!seen.has(key)) {
+      seen.add(key);
+      acc.push(key);
+    }
+    return acc;
+  }, []);
+}
+var TemplateAutocompleteInput = ({
+  value,
+  onChange,
+  placeholder,
+  suggestions = [],
+  context,
+  isTextArea = false,
+  isParagraph = false,
+  rows = 4,
+  className = ""
+}) => {
+  const multiline = isTextArea || isParagraph;
+  const [showSuggestions, setShowSuggestions] = useState3(false);
+  const [filterText, setFilterText] = useState3("");
+  const [activeIdx, setActiveIdx] = useState3(-1);
+  const [dropdownTop, setDropdownTop] = useState3(null);
+  const fieldRef = useRef2(null);
+  const effectiveSuggestions = useMemo(() => {
+    if (suggestions?.length > 0) return suggestions;
+    if (context && typeof context === "object") return deriveContextSuggestions(context);
+    return [];
+  }, [suggestions, context]);
+  const filteredSuggestions = useMemo(() => {
+    if (!filterText) return effectiveSuggestions;
+    const lower = filterText.toLowerCase();
+    return effectiveSuggestions.filter((s) => {
+      const v = (s.value || "").replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
+      const l = (s.label || v).replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
+      return v.toLowerCase().includes(lower) || l.toLowerCase().includes(lower);
+    });
+  }, [effectiveSuggestions, filterText]);
+  const displayedSuggestions = useMemo(() => filteredSuggestions.slice(0, 100), [filteredSuggestions]);
+  const boundTokens = useMemo(() => extractTokens(value), [value]);
+  const computeDropdownTop = useCallback(() => {
+    const el = fieldRef.current;
+    if (!el || !multiline) return null;
+    const pos = el.selectionStart ?? 0;
+    const textBefore = (el.value ?? "").substring(0, pos);
+    const linesBefore = textBefore.split("\n").length;
+    const lineH = parseFloat(getComputedStyle(el).lineHeight) || 20;
+    const paddingTop = parseFloat(getComputedStyle(el).paddingTop) || 8;
+    return paddingTop + linesBefore * lineH;
+  }, [multiline]);
+  const openWith = useCallback((filter) => {
+    setFilterText(filter);
+    setActiveIdx(-1);
+    setShowSuggestions(true);
+    if (multiline) setDropdownTop(computeDropdownTop());
+  }, [multiline, computeDropdownTop]);
+  const close = useCallback(() => {
+    setShowSuggestions(false);
+    setActiveIdx(-1);
+  }, []);
+  const handleSelect = useCallback((idx) => {
+    const s = displayedSuggestions[idx];
+    if (!s) return;
+    const el = fieldRef.current;
+    const pos = el?.selectionStart ?? (value || "").length;
+    const before = (value || "").substring(0, pos);
+    const after = (value || "").substring(pos);
+    const match = before.match(/\{\{([^}]*)$/);
+    const cleanVal = (s.value || "").replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
+    let newValue;
+    if (match) {
+      const strippedAfter = after.replace(/^\s*\}\}/, "");
+      newValue = before.substring(0, match.index) + "{{" + cleanVal + "}}" + strippedAfter;
+    } else {
+      newValue = "{{" + cleanVal + "}}";
+    }
+    onChange(newValue);
+    close();
+    setTimeout(() => {
+      if (el) {
+        el.focus();
+        const newPos = match ? match.index + 2 + cleanVal.length + 2 : newValue.length;
+        el.setSelectionRange(newPos, newPos);
+      }
+    }, 0);
+  }, [displayedSuggestions, value, onChange, close]);
+  const handleChange = (e) => {
+    onChange(e.target.value);
+    const filter = getFilterAtCaret(e.target);
+    if (filter !== null) openWith(filter);
+    else close();
+  };
+  const handleKeyDown = (e) => {
+    if (!showSuggestions) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIdx((i) => Math.min(i + 1, displayedSuggestions.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIdx((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && activeIdx >= 0) {
+      e.preventDefault();
+      handleSelect(activeIdx);
+    } else if (e.key === "Escape") {
+      close();
+    }
+  };
+  const handleClick = () => {
+    const el = fieldRef.current;
+    if (!el) return;
+    const filter = getFilterAtCaret(el);
+    if (filter !== null) openWith(filter);
+  };
+  const handleBlur = () => {
+    setTimeout(close, 150);
+  };
+  const dropdownStyle = multiline && dropdownTop != null ? { top: dropdownTop } : { top: "calc(100% + 4px)" };
+  return /* @__PURE__ */ React29.createElement("div", { className: `relative w-full ${className}` }, /* @__PURE__ */ React29.createElement("div", { className: "bg-input-custom border border-input-custom rounded-sm overflow-hidden transition-shadow duration-150 focus-within:border-border/80 focus-within:ring-2 focus-within:ring-primary/30" }, multiline ? /* @__PURE__ */ React29.createElement(React29.Fragment, null, /* @__PURE__ */ React29.createElement(
+    "textarea",
+    {
+      ref: fieldRef,
+      className: "block w-full p-2 text-xs leading-[1.6] font-mono text-foreground bg-transparent border-none outline-none resize-y min-h-[80px] placeholder:text-muted-foreground",
+      value: value || "",
+      rows,
+      placeholder,
+      onChange: handleChange,
+      onKeyDown: handleKeyDown,
+      onClick: handleClick,
+      onBlur: handleBlur,
+      autoComplete: "off",
+      spellCheck: false
+    }
+  ), boundTokens.length > 0 && /* @__PURE__ */ React29.createElement("div", { className: "flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50" }, /* @__PURE__ */ React29.createElement("span", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0" }, "bound"), boundTokens.map((tok, i) => {
+    const match = effectiveSuggestions.find(
+      (s) => s.value.replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "") === tok
+    );
+    return /* @__PURE__ */ React29.createElement("span", { key: i, className: "inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-[10px] font-mono text-primary cursor-default max-w-full", title: match?.detail || "" }, /* @__PURE__ */ React29.createElement("span", { className: "truncate min-w-0" }, tok), match?.detail && /* @__PURE__ */ React29.createElement("span", { className: "text-[9px] text-primary/70 shrink-0" }, match.detail));
+  }))) : /* @__PURE__ */ React29.createElement(
+    "input",
+    {
+      ref: fieldRef,
+      type: "text",
+      className: "block w-full h-8 px-2 text-xs font-mono text-foreground bg-transparent border-none outline-none placeholder:text-muted-foreground",
+      value: value || "",
+      placeholder,
+      onChange: handleChange,
+      onKeyDown: handleKeyDown,
+      onClick: handleClick,
+      onBlur: handleBlur,
+      autoComplete: "off",
+      spellCheck: false
+    }
+  )), showSuggestions && /* @__PURE__ */ React29.createElement(
+    SuggestionDropdown,
+    {
+      items: displayedSuggestions,
+      totalItems: filteredSuggestions.length,
+      filterText,
+      activeIdx,
+      onSelect: handleSelect,
+      onActiveChange: setActiveIdx,
+      style: dropdownStyle
+    }
+  ));
+};
 export {
   Accordion,
   AccordionContent,
@@ -1840,6 +2126,7 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  ErrorBoundary,
   Input,
   InputArgsForm,
   Label2 as Label,
@@ -1869,6 +2156,7 @@ export {
   TabsContent,
   TabsList,
   TabsTrigger,
+  TemplateAutocompleteInput,
   Textarea,
   Tooltip,
   TooltipContent,

@@ -31,7 +31,7 @@ export const CustomTextInput = (props) => {
               : uischema?.options?.placeholder || ""
           }
           onChange={(ev) => handleChange(path, ev.target.value)}
-          value={data || ""}
+          value={typeof data === 'object' ? JSON.stringify(data) : data || ""}
           rows={uischema?.options?.rows || 3}
         />
       ) : (
@@ -48,7 +48,7 @@ export const CustomTextInput = (props) => {
               : uischema?.options?.placeholder || ""
           }
           onChange={(ev) => handleChange(path, ev.target.value)}
-          value={data || ""}
+          value={typeof data === 'object' ? JSON.stringify(data) : data || ""}
         />
       )}
       {hasErrors && (
