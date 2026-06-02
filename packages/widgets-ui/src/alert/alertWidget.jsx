@@ -47,10 +47,22 @@ export const AlertWidget = ({
     error: "bg-rose-500/10 border-rose-500/20 text-rose-400",
   }[variant] || "bg-blue-500/10 border-blue-500/20 text-blue-400";
 
+  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+
   return (
     <div
       className={`flex items-start gap-3 p-3.5 border rounded-none w-full h-full min-h-0 overflow-auto relative ${styles}`}
     >
+      {/* Loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
+          <div className="flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
+            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
+            Updating...
+          </div>
+        </div>
+      )}
+
       <Icon className="h-5 w-5 shrink-0 mt-0.5" />
       
       <div className="flex-1 min-w-0">

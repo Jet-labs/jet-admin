@@ -259,19 +259,6 @@ export function getMethodSuggestionsForTarget(targetWidgetID, widgets = []) {
 
 // ─── Live State Tree Introspection ──────────────────────────────────────────
 
-const isScalarNumeric = (val) => {
-  if (typeof val === "number") return true;
-  if (typeof val === "string") {
-    const trimmed = val.trim();
-    return trimmed !== "" && !isNaN(Number(trimmed)) && !isNaN(parseFloat(trimmed));
-  }
-  return false;
-};
-
-const isBooleanValue = (val) => {
-  return typeof val === "boolean" || val === "true" || val === "false";
-};
-
 /**
  * Recursively walk the live state tree to discover variables and their types.
  * @param {object} obj - The state tree to walk
@@ -289,21 +276,39 @@ export function getSuggestionsFromStateTree(obj, prefix = "state", depth = 0, ma
     const val = obj[key];
     const fullPath = prefix ? `${prefix}.${key}` : key;
 
-    let valueType = "object";
+    let valueType = typeof val;
     let detail = "";
 
-    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
+    if (val === null) {
+      valueType = "null";
+      detail = "null";
+    } else if (val === undefined) {
+      valueType = "undefined";
+      detail = "undefined";
+    } else if (Array.isArray(val)) {
       valueType = "array";
-      detail = `${val.length} rows, fields: ${Object.keys(val[0]).slice(0, 4).join(', ')}`;
-    } else if (isScalarNumeric(val)) {
-      valueType = "scalar";
-      detail = `= ${val}`;
-    } else if (isBooleanValue(val)) {
+      if (val.length > 0 && typeof val[0] === "object" && val[0] !== null) {
+        detail = `Array[${val.length}] (fields: ${Object.keys(val[0]).slice(0, 3).join(', ')})`;
+      } else {
+        detail = `Array[${val.length}]`;
+      }
+    } else if (typeof val === "boolean") {
       valueType = "boolean";
+      detail = `= ${val}`;
+    } else if (typeof val === "number") {
+      valueType = "number";
       detail = `= ${val}`;
     } else if (typeof val === "string") {
       valueType = "string";
       detail = `"${val.slice(0, 20)}${val.length > 20 ? '...' : ''}"`;
+    } else if (typeof val === "object") {
+      valueType = "object";
+      const keys = Object.keys(val);
+      if (keys.length > 0) {
+        detail = `Object { ${keys.slice(0, 3).join(', ')}${keys.length > 3 ? ', ...' : ''} }`;
+      } else {
+        detail = "Object {}";
+      }
     }
 
     results.push({
@@ -315,7 +320,10 @@ export function getSuggestionsFromStateTree(obj, prefix = "state", depth = 0, ma
     });
 
     if (val && typeof val === "object" && !Array.isArray(val)) {
-      results.push(...getSuggestionsFromStateTree(val, fullPath, depth + 1, maxDepth));
+      const childSuggestions = getSuggestionsFromStateTree(val, fullPath, depth + 1, maxDepth);
+      for (let i = 0; i < childSuggestions.length; i++) {
+        results.push(childSuggestions[i]);
+      }
     }
   }
   return results;

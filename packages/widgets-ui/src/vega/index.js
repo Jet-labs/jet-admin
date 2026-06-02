@@ -126,15 +126,16 @@ export const VegaWidget = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [specKey, configKey, isLoadingWorkflows]);
 
+  const isConfigLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+  const showLoading = loading || isLoadingWorkflows || isConfigLoading;
+
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      {(loading || isLoadingWorkflows) && !error && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <div className="flex items-center gap-2 rounded-lg  bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground shadow-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" />
-            </svg>
-            Loading visualization…
+      {showLoading && !error && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
+          <div className="flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
+            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
+            Updating...
           </div>
         </div>
       )}

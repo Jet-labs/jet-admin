@@ -139,9 +139,20 @@ export function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widg
   const displayStart = parsedStart ? (widgetConfig.enableTime ? formatDisplayDateTime(parsedStart) : formatDisplayDate(parsedStart)) : "";
   const displayEnd = parsedEnd ? (widgetConfig.enableTime ? formatDisplayDateTime(parsedEnd) : formatDisplayDate(parsedEnd)) : "";
   const nextMonthDate = setMonth(new Date(currentDate), currentDate.getMonth() + 1);
+  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
 
   return (
-    <div className="flex flex-col gap-1.5 w-full">
+    <div className="relative flex flex-col gap-1.5 w-full h-full min-h-0">
+      {/* Loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px] rounded-md">
+          <div className="flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
+            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
+            Updating...
+          </div>
+        </div>
+      )}
+
       {widgetConfig.label && <Label>{widgetConfig.label}</Label>}
       
       <Popover open={!!widgetState?.isOpen} onOpenChange={(open) => {

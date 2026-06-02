@@ -11,6 +11,8 @@ import {
 import { VegaSpecEditor } from "./vegaSpecEditor";
 import { ShelfBuilder } from "./shelfBuilder";
 import { AlertTriangle, Settings, ChevronDown, ChevronRight } from 'lucide-react';
+import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
 const VEGA_STRINGS = {
   WIDGET_EDITOR_FORM_SETTINGS_BUTTON: "Settings",
@@ -23,7 +25,9 @@ export const VegaConfigEditor = ({
   workflows,
   selectedWorkflow,
   queryResults,
+  stateTree,
 }) => {
+  const suggestions = getSuggestionsFromStateTree(stateTree);
   const isVegaLite = widgetEditorForm.values.widgetType === 'vega-lite';
   const currentMode = widgetEditorForm.values.widgetConfig?.editorMode || (isVegaLite ? 'visual' : 'raw');
   
@@ -129,6 +133,17 @@ export const VegaConfigEditor = ({
           />
         </div>
       )}
+
+      {/* Is Loading Template */}
+      <div className="space-y-1.5 mt-2">
+        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
+        <TemplateAutocompleteInput
+          value={widgetEditorForm.values.widgetConfig?.isLoading || ""}
+          onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
+          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
+          suggestions={suggestions.filter(s => s.detail === 'boolean' || !s.detail)}
+        />
+      </div>
     </div>
   );
 };

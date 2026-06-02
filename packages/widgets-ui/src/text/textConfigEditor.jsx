@@ -26,6 +26,17 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
         />
       </div>
 
+      {/* Is Loading Template */}
+      <div className="space-y-1.5">
+        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
+        <TemplateAutocompleteInput
+          value={config.isLoading || ""}
+          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val)}
+          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
+          suggestions={suggestions.filter(s => s.valueType === 'boolean' || !s.valueType)}
+        />
+      </div>
+
       <div className="grid grid-cols-3 gap-3">
         {/* Format */}
         <div className="space-y-1.5">

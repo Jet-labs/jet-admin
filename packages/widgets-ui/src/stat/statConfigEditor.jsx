@@ -119,6 +119,17 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
           </Select>
         </div>
       </div>
+
+      {/* Is Loading Template */}
+      <div className="space-y-1.5">
+        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
+        <TemplateAutocompleteInput
+          value={config.isLoading || ""}
+          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val)}
+          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
+          suggestions={suggestions.filter(s => s.detail === 'boolean' || !s.detail)}
+        />
+      </div>
     </div>
   );
 };

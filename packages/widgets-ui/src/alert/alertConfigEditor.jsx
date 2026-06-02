@@ -17,6 +17,8 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
     }));
   }, [stateTree]);
 
+  console.log({ suggestions })
+
   return (
     <div className="space-y-4">
       {/* Variant Selection */}
@@ -58,6 +60,7 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
           onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.message", val)}
           placeholder="e.g. Action completed successfully."
           suggestions={suggestions}
+          // context={{ state: stateTree }}
         />
       </div>
 
@@ -73,6 +76,17 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
         <Label htmlFor="alert-dismissible" className="text-xs text-muted-foreground cursor-pointer">
           Allow user to dismiss/close the banner
         </Label>
+      </div>
+
+      {/* Is Loading Template */}
+      <div className="space-y-1.5 mt-2">
+        <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
+        <TemplateAutocompleteInput
+          value={config.isLoading || ""}
+          onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
+          placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
+          suggestions={suggestions.filter(s => s.detail === 'boolean' || !s.detail)}
+        />
       </div>
     </div>
   );

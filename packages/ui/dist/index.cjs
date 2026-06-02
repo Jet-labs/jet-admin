@@ -1946,16 +1946,21 @@ ErrorBoundary.propTypes = {
 
 // src/components/template-autocomplete-input.jsx
 var import_react7 = __toESM(require("react"));
-function deriveContextSuggestions(obj, prefix = "", depth = 0, maxDepth = 8) {
+function deriveContextSuggestions(obj, prefix = "", depth = 0, maxDepth = 5) {
   if (depth > maxDepth || obj === null || obj === void 0) return [];
   const suggestions = [];
+  const addSuggestions = (newItems) => {
+    for (let i = 0; i < newItems.length; i++) {
+      suggestions.push(newItems[i]);
+    }
+  };
   if (Array.isArray(obj)) {
     if (prefix) {
       suggestions.push({ value: prefix, label: prefix, detail: `Array[${obj.length}]`, type: "array" });
       suggestions.push({ value: `${prefix}.length`, label: `${prefix}.length`, detail: "Number", type: "property" });
     }
     if (obj.length > 0 && typeof obj[0] === "object" && obj[0] !== null) {
-      suggestions.push(...deriveContextSuggestions(obj[0], prefix ? `${prefix}[0]` : "[0]", depth + 1, maxDepth));
+      addSuggestions(deriveContextSuggestions(obj[0], prefix ? `${prefix}[0]` : "[0]", depth + 1, maxDepth));
     }
     return suggestions;
   }
@@ -1967,9 +1972,9 @@ function deriveContextSuggestions(obj, prefix = "", depth = 0, maxDepth = 8) {
       if (val === null || val === void 0) {
         suggestions.push({ value: childPath, label: childPath, detail: "null", type: "null" });
       } else if (Array.isArray(val)) {
-        suggestions.push(...deriveContextSuggestions(val, childPath, depth + 1, maxDepth));
+        addSuggestions(deriveContextSuggestions(val, childPath, depth + 1, maxDepth));
       } else if (typeof val === "object") {
-        suggestions.push(...deriveContextSuggestions(val, childPath, depth + 1, maxDepth));
+        addSuggestions(deriveContextSuggestions(val, childPath, depth + 1, maxDepth));
       } else {
         suggestions.push({ value: childPath, label: childPath, detail: inferType(val), type: "primitive" });
       }

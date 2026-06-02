@@ -158,11 +158,22 @@ export const TextWidget = ({
     xl: "text-xl",
   }[fontSize] || "text-sm";
 
+  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+
   return (
     <div
-      className={`jet-md-root w-full h-full overflow-auto p-3 ${fontSizeClass}`}
+      className={`jet-md-root w-full h-full overflow-auto p-3 ${fontSizeClass} relative`}
       style={{ textAlign }}
     >
+      {/* Loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
+          <div className="flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
+            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
+            Updating...
+          </div>
+        </div>
+      )}
       <style>{`
         .jet-md-root { color: var(--foreground, hsl(0 0% 98%)); line-height: 1.65; }
         .jet-md-h1 { font-size: 1.5em; font-weight: 700; margin: 0.6em 0 0.3em; color: var(--foreground); }
