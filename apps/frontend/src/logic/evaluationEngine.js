@@ -49,7 +49,14 @@ const ALLOWED_ROOTS = ["state"];
  * @param {object} stateTree
  * @returns {{ state: object }}
  */
-const wrapStateContext = (stateTree) => ({ state: stateTree ?? {} });
+const wrapStateContext = (stateTree) => {
+  if (!stateTree) return { state: {} };
+  const { event, ...restState } = stateTree;
+  return {
+    state: restState,
+    ...(event !== undefined ? { event } : {})
+  };
+};
 
 /**
  * Safely resolve a dot-notated path against an object, enforcing the

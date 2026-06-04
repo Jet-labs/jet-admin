@@ -52,6 +52,7 @@ export const WidgetIdeModal = ({
   tenantID,
   widgetID = null,
   onAddWidget,
+  appPageEditorForm,
 }) => {
   const queryClient = useQueryClient();
 
@@ -191,6 +192,7 @@ export const WidgetIdeModal = ({
                   widgetEditorForm={widgetForm}
                   dataSourceResults={previewStateTree}
                   onDataSourceResults={() => {}}
+                  appPageEditorForm={appPageEditorForm}
                 />
               </div>
             </ResizablePanel>
@@ -228,4 +230,5 @@ WidgetIdeModal.propTypes = {
   tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   widgetID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onAddWidget: PropTypes.func,
+  appPageEditorForm: PropTypes.object,
 };

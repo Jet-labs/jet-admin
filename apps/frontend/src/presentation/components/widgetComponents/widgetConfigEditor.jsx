@@ -32,11 +32,13 @@ export const WidgetConfigEditor = ({
   widgetEditorForm,
   dataSourceResults,
   onDataSourceResults,
+  appPageEditorForm,
 }) => {
   WidgetConfigEditor.propTypes = {
     widgetEditorForm: PropTypes.object.isRequired,
     dataSourceResults: PropTypes.object,
     onDataSourceResults: PropTypes.func,
+    appPageEditorForm: PropTypes.object,
   };
 
   const { tenantID } = useParams();
@@ -200,6 +202,7 @@ export const WidgetConfigEditor = ({
           <WidgetEventsEditor 
             widgetEditorForm={widgetEditorForm} 
             stateTree={previewStateTree}
+            appPageEditorForm={appPageEditorForm}
           />
         </TabsContent>
       </Tabs>

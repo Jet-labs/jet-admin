@@ -1,8 +1,14 @@
 import React, { useCallback, useState, useMemo } from "react";
-import { Plus, Trash2, Key, Database, PanelTop, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Key, Database, PanelTop, MessageSquare, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import PropTypes from "prop-types";
-import { getWidgetEventTypes } from "@jet-admin/widget-types";
+import { getWidgetEventTypes, getWidgetMethods, getEventArgs } from "@jet-admin/widget-types";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import { useParams } from "react-router-dom";
+import { useQueryClient, useQueries } from "@tanstack/react-query";
+import { useDataQueries } from "../../../logic/hooks/useDataQueries";
+import { useWorkflows } from "../../../logic/hooks/useWorkflows";
+import { CONSTANTS } from "../../../constants";
+import { getWidgetByIDAPI } from "../../../data/apis/widget";
 
 import {
   Button,
@@ -34,15 +40,15 @@ const ACTION_TYPES = [
     border: "border-blue-200 dark:border-blue-500/20",
     description: "Run a page-level data source",
   },
-  {
-    value: "CALL_WIDGET_METHOD",
-    label: "Call Widget Method",
-    icon: PanelTop,
-    color: "text-purple-500",
-    bg: "bg-purple-50/50 dark:bg-purple-500/10",
-    border: "border-purple-200 dark:border-purple-500/20",
-    description: "Invoke a method on another widget",
-  },
+  // {
+  //   value: "CALL_WIDGET_METHOD",
+  //   label: "Call Widget Method",
+  //   icon: PanelTop,
+  //   color: "text-purple-500",
+  //   bg: "bg-purple-50/50 dark:bg-purple-500/10",
+  //   border: "border-purple-200 dark:border-purple-500/20",
+  //   description: "Invoke a method on another widget",
+  // },
   {
     value: "SHOW_TOAST",
     label: "Show Toast",
@@ -62,11 +68,55 @@ const getShallowKeys = (obj) => {
   }, {});
 };
 
-export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
+export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorForm }) => {
   WidgetEventsEditor.propTypes = {
     widgetEditorForm: PropTypes.object.isRequired,
     stateTree: PropTypes.object,
+    appPageEditorForm: PropTypes.object,
   };
+
+  const { tenantID } = useParams();
+  const queryClient = useQueryClient();
+  const { dataQueries = [] } = useDataQueries(tenantID);
+  const { workflows = [] } = useWorkflows(tenantID);
+
+  // Page-level data sources from appPageConfig
+  const pageDataSources = useMemo(
+    () => appPageEditorForm?.values?.appPageConfig?.dataSources || [],
+    [appPageEditorForm?.values?.appPageConfig?.dataSources]
+  );
+
+  // Look up arg definitions for a page-level data source by alias
+  const getArgDefsForAlias = useCallback((alias) => {
+    const ds = pageDataSources.find((s) => s.alias === alias);
+    if (!ds) return [];
+    if (ds.type === "query" && ds.queryID) {
+      const q = dataQueries.find((q) => String(q.dataQueryID) === String(ds.queryID));
+      return q?.dataQueryOptions?.args || [];
+    }
+    if (ds.type === "workflow" && ds.workflowID) {
+      const wf = workflows.find((w) => String(w.workflowID) === String(ds.workflowID));
+      return wf?.workflowOptions?.args || [];
+    }
+    return [];
+  }, [pageDataSources, dataQueries, workflows]);
+
+  const placedIDs = useMemo(() => {
+    const placedKeys = appPageEditorForm?.values?.appPageConfig?.widgets || [];
+    return Array.from(new Set(placedKeys.map((k) => String(k).split("_")[1])));
+  }, [appPageEditorForm?.values?.appPageConfig?.widgets]);
+
+  const widgetQueries = useQueries({
+    queries: placedIDs.map((id) => ({
+      queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), id],
+      queryFn: () => getWidgetByIDAPI({ tenantID, widgetID: id }),
+      staleTime: Infinity,
+    })),
+  });
+
+  const pageWidgets = useMemo(() => {
+    return widgetQueries.map((q) => q.data).filter(Boolean);
+  }, [widgetQueries]);
 
   const events = widgetEditorForm.values.widgetConfig?.events || {};
   const [expandedActionPath, setExpandedActionPath] = useState(null);
@@ -123,7 +173,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
       if (actionTypeValue === "SET_VARIABLE") {
         defaultConfig = { key: "", value: "" };
       } else if (actionTypeValue === "EXECUTE_QUERY") {
-        defaultConfig = { alias: "" };
+        defaultConfig = { alias: "", inputArgs: {} };
       } else if (actionTypeValue === "CALL_WIDGET_METHOD") {
         defaultConfig = { targetWidgetID: "", methodName: "", args: [] };
       } else if (actionTypeValue === "SHOW_TOAST") {
@@ -160,7 +210,9 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
       return `Execute: ${config.alias || "..."}`;
     }
     if (actionType === "CALL_WIDGET_METHOD") {
-      return `Call: ${config.targetWidgetID || "..."}.${config.methodName || "..."}()`;
+      const w = pageWidgets.find((pw) => String(pw.widgetID) === String(config.targetWidgetID));
+      const label = w?.widgetTitle || config.targetWidgetID || "...";
+      return `Call: ${label}.${config.methodName || "..."}()`;
     }
     if (actionType === "SHOW_TOAST") {
       return `Toast: "${config.message || "..."}"`;
@@ -186,6 +238,28 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
         const eventInfo = supportedEventTypes.find((et) => et.value === eventType);
         const eventLabel = eventInfo?.label || eventType;
 
+        const eventArgsSchema = getEventArgs(widgetType, eventType) || [];
+        const hasEventArgs = eventArgsSchema.length > 0;
+        
+        let localStateTree = liveStateTree;
+        if (hasEventArgs && liveStateTree) {
+          const mockEventObj = eventArgsSchema.reduce((acc, arg) => {
+            const path = arg.key.replace(/^event\./, "");
+            const parts = path.split(".");
+            let current = acc;
+            for (let i = 0; i < parts.length - 1; i++) {
+              current[parts[i]] = current[parts[i]] || {};
+              current = current[parts[i]];
+            }
+            current[parts[parts.length - 1]] = null;
+            return acc;
+          }, {});
+
+          localStateTree = {
+            ...liveStateTree,
+            event: mockEventObj
+          };
+        }
 
         return (
           <div
@@ -212,6 +286,24 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
                 Add Step
               </Button>
             </div>
+
+            {hasEventArgs && (
+              <div className="rounded-md border border-purple-200 dark:border-purple-500/20 bg-purple-50/50 dark:bg-purple-500/5 p-2">
+                <p className="text-[10px] font-semibold text-purple-600 dark:text-purple-400 mb-1.5 flex items-center gap-1">
+                  <Info className="h-3 w-3" /> Available Event Context
+                </p>
+                <div className="space-y-1">
+                  {eventArgsSchema.map((arg, idx) => (
+                    <div key={idx} className="flex justify-between items-center gap-2">
+                      <code className="text-[9px] bg-background px-1 py-0.5 rounded border border-border whitespace-nowrap text-muted-foreground font-mono">
+                        {`{{ ${arg.key} }}`}
+                      </code>
+                      <span className="text-[9px] text-muted-foreground truncate">{arg.description}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {Array.isArray(actions) && actions.length > 0 && (
               <div className="space-y-2.5">
@@ -324,55 +416,161 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
                                     handleActionConfigChange(eventType, actionIndex, "value", val)
                                   }
                                   placeholder="e.g. {{ state.event.args[0].id }}"
-                                  liveStateTree={liveStateTree}
+                                  liveStateTree={localStateTree}
                                 />
                               </div>
                             </div>
                           )}
 
                           {action.actionType === "EXECUTE_QUERY" && (
-                            <div className="space-y-1">
-                              <Label className="text-[10px] text-muted-foreground font-semibold">Data Source Alias</Label>
-                              <TemplateAutocompleteInput
-                                value={action.config?.alias || ""}
-                                onChange={(val) =>
-                                  handleActionConfigChange(eventType, actionIndex, "alias", val)
-                                }
-                                placeholder="e.g. {{ state.queries.get_users_list }}"
-                                liveStateTree={dataSourcesStateTree}
-                              />
-                              <p className="text-[9px] text-muted-foreground">
-                                Must match the reference alias of a page-level data source.
-                              </p>
+                            <div className="space-y-3">
+                              <div className="space-y-1">
+                                <Label className="text-[10px] text-muted-foreground font-semibold">Data Source</Label>
+                                {pageDataSources.length > 0 ? (
+                                  <Select
+                                    value={action.config?.alias || ""}
+                                    onValueChange={(val) => {
+                                      handleActionConfigChange(eventType, actionIndex, "alias", val);
+                                      handleActionConfigChange(eventType, actionIndex, "inputArgs", {});
+                                    }}
+                                  >
+                                    <SelectTrigger className="text-xs bg-background">
+                                      <SelectValue placeholder="Select a page data source…" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {pageDataSources.filter((ds) => ds.alias).map((ds) => (
+                                        <SelectItem key={ds.alias} value={ds.alias}>
+                                          <span className="flex items-center gap-2">
+                                            <Database className="h-3 w-3 text-blue-500" />
+                                            <span className="font-mono">{ds.alias}</span>
+                                            <span className="text-muted-foreground text-[9px] ml-1">({ds.type})</span>
+                                          </span>
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <div className="rounded-md border border-dashed border-border p-2.5 text-center">
+                                    <p className="text-[10px] text-muted-foreground">No page-level data sources defined. Add them in the Data tab of the page editor.</p>
+                                  </div>
+                                )}
+                              </div>
+                              {/* Dynamic Input Args */}
+                              {action.config?.alias && (() => {
+                                const argDefs = getArgDefsForAlias(action.config.alias);
+                                if (argDefs.length === 0) return null;
+                                return (
+                                  <div className="rounded-md border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 p-3 space-y-2">
+                                    <div className="flex items-center gap-1.5">
+                                      <Info className="h-3 w-3 text-blue-500" />
+                                      <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Input Arguments</p>
+                                    </div>
+                                    <p className="text-[9px] text-muted-foreground">Override argument values when this data source is executed by this event action.</p>
+                                    {argDefs.map((arg) => {
+                                      const argKey = arg.key || arg.name;
+                                      return (
+                                        <div key={argKey} className="space-y-0.5">
+                                          <Label className="text-[10px] font-medium text-muted-foreground">
+                                            {argKey}
+                                            {arg.type && <span className="ml-1 text-muted-foreground/50">({arg.type})</span>}
+                                          </Label>
+                                          <TemplateAutocompleteInput
+                                            value={action.config?.inputArgs?.[argKey] ?? ""}
+                                            onChange={(val) => {
+                                              const updated = { ...(action.config?.inputArgs || {}), [argKey]: val };
+                                              handleActionConfigChange(eventType, actionIndex, "inputArgs", updated);
+                                            }}
+                                            placeholder={arg.defaultValue || `e.g. {{ state.variables.${argKey} }}`}
+                                            liveStateTree={localStateTree}
+                                          />
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              })()}
                             </div>
                           )}
 
-                          {action.actionType === "CALL_WIDGET_METHOD" && (
-                            <div className="space-y-2">
+                          {action.actionType === "CALL_WIDGET_METHOD" && (() => {
+                            const selectedWidgetID = action.config?.targetWidgetID || "";
+                            const selectedWidget = pageWidgets.find((w) => String(w.widgetID) === selectedWidgetID);
+                            const availableMethods = selectedWidget ? getWidgetMethods(selectedWidget.widgetType) : [];
+                            const selectedMethod = availableMethods.find((m) => m.name === action.config?.methodName);
+                            return (
+                            <div className="space-y-3">
                               <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Target Widget ID</Label>
-                                <TemplateAutocompleteInput
-                                  value={action.config?.targetWidgetID || ""}
-                                  onChange={(val) =>
-                                    handleActionConfigChange(eventType, actionIndex, "targetWidgetID", val)
-                                  }
-                                  placeholder="e.g. {{ state.widgets.table_1 }}"
-                                  liveStateTree={widgetsStateTree}
-                                />
+                                <Label className="text-[10px] text-muted-foreground font-semibold">Target Widget</Label>
+                                {pageWidgets.length > 0 ? (
+                                  <Select
+                                    value={selectedWidgetID}
+                                    onValueChange={(val) => {
+                                      handleActionConfigChange(eventType, actionIndex, "targetWidgetID", val);
+                                      handleActionConfigChange(eventType, actionIndex, "methodName", "");
+                                    }}
+                                  >
+                                    <SelectTrigger className="text-xs bg-background">
+                                      <SelectValue placeholder="Select a widget on this page…" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {pageWidgets.map((w) => (
+                                        <SelectItem key={w.widgetID} value={String(w.widgetID)}>
+                                          <span className="flex items-center gap-2">
+                                            <PanelTop className="h-3 w-3 text-purple-500" />
+                                            <span>{w.widgetTitle}</span>
+                                            <span className="text-muted-foreground text-[9px] font-mono ml-1">({w.widgetType})</span>
+                                          </span>
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <div className="rounded-md border border-dashed border-border p-2.5 text-center">
+                                    <p className="text-[10px] text-muted-foreground">No widgets on this page yet. Place widgets on the canvas first.</p>
+                                  </div>
+                                )}
                               </div>
-                              <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Method Name</Label>
-                                <TemplateAutocompleteInput
-                                  value={action.config?.methodName || ""}
-                                  onChange={(val) =>
-                                    handleActionConfigChange(eventType, actionIndex, "methodName", val)
-                                  }
-                                  placeholder="e.g. refresh"
-                                  liveStateTree={liveStateTree}
-                                />
-                              </div>
+                              {selectedWidgetID && (
+                                <div className="space-y-1">
+                                  <Label className="text-[10px] text-muted-foreground font-semibold">Method</Label>
+                                  {availableMethods.length > 0 ? (
+                                    <>
+                                      <Select
+                                        value={action.config?.methodName || ""}
+                                        onValueChange={(val) =>
+                                          handleActionConfigChange(eventType, actionIndex, "methodName", val)
+                                        }
+                                      >
+                                        <SelectTrigger className="text-xs bg-background">
+                                          <SelectValue placeholder="Select a method…" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {availableMethods.map((m) => (
+                                            <SelectItem key={m.name} value={m.name}>
+                                              <span className="flex items-center gap-2">
+                                                <span className="font-mono">{m.name}()</span>
+                                              </span>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                      {selectedMethod && (
+                                        <p className="text-[9px] text-purple-600 dark:text-purple-400 flex items-center gap-1 mt-1">
+                                          <Info className="h-3 w-3" />
+                                          {selectedMethod.description}
+                                        </p>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <div className="rounded-md border border-dashed border-border p-2.5 text-center">
+                                      <p className="text-[10px] text-muted-foreground">This widget type does not expose any callable methods.</p>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                          )}
+                            );
+                          })()}
 
                           {action.actionType === "SHOW_TOAST" && (
                             <div className="space-y-2">
@@ -384,7 +582,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
                                     handleActionConfigChange(eventType, actionIndex, "message", val)
                                   }
                                   placeholder="e.g. Record saved successfully"
-                                  liveStateTree={liveStateTree}
+                                  liveStateTree={localStateTree}
                                 />
                               </div>
                               <div className="space-y-1">
