@@ -1,17 +1,7 @@
-import React, { useCallback, useState, useMemo, useContext } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import { Plus, Trash2, Key, Database, PanelTop, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import PropTypes from "prop-types";
-import { useParams } from "react-router-dom";
-import { useWidgets } from "../../../logic/hooks/useWidgets";
-import { AppPageMetaContext } from "../../../logic/appPageRuntime/AppPageRuntimeProvider";
-import { getWidgetEventTypes, getEventArgs } from "@jet-admin/widget-types";
-import {
-  getExpressionSuggestions,
-  getAliasSuggestions,
-  getVariableKeySuggestions,
-  getWidgetIDSuggestions,
-  getMethodSuggestionsForTarget,
-} from "@jet-admin/widgets-ui";
+import { getWidgetEventTypes } from "@jet-admin/widget-types";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
 
 import {
@@ -64,6 +54,14 @@ const ACTION_TYPES = [
   },
 ];
 
+const getShallowKeys = (obj) => {
+  if (!obj) return {};
+  return Object.keys(obj).reduce((acc, key) => {
+    acc[key] = null; // null value prevents CodeMirror schema walker from traversing deeper
+    return acc;
+  }, {});
+};
+
 export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
   WidgetEventsEditor.propTypes = {
     widgetEditorForm: PropTypes.object.isRequired,
@@ -73,54 +71,13 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
   const events = widgetEditorForm.values.widgetConfig?.events || {};
   const [expandedActionPath, setExpandedActionPath] = useState(null);
 
-  const { tenantID } = useParams();
-  const { widgets } = useWidgets(tenantID);
-  const meta = useContext(AppPageMetaContext);
-
   const widgetType = widgetEditorForm.values.widgetType;
 
-  // ── Shared suggestions (not event-specific) ───────────────────────────────
-
-  const widgetIDSuggestions = useMemo(() =>
-    getWidgetIDSuggestions(widgets, meta?.pageConfig),
-  [widgets, meta?.pageConfig]);
-
-  const baseExpressionSuggestions = useMemo(() =>
-    getExpressionSuggestions({
-      dataSources: meta?.pageConfig?.dataSources || [],
-      variableDefinitions: meta?.variableDefinitions || [],
-      widgetType,
-      eventType: null,
-    }),
-  [meta?.pageConfig?.dataSources, meta?.variableDefinitions, widgetType]);
-
-  const aliasSuggestions = useMemo(() =>
-    getAliasSuggestions(meta?.pageConfig?.dataSources || []),
-  [meta?.pageConfig?.dataSources]);
-
-  const variableKeySuggestions = useMemo(() =>
-    getVariableKeySuggestions(meta?.variableDefinitions || []),
-  [meta?.variableDefinitions]);
-
-  // ── Helpers ──────────────────────────────────────────────────────────────
-
-  /**
-   * Merge base expression suggestions with event-specific args
-   * for the active event type.
-   */
-  const getMergedSuggestions = (eventType) => {
-    const eventArgs = getEventArgs(widgetType, eventType);
-    if (!eventArgs || eventArgs.length === 0) return baseExpressionSuggestions;
-
-    const eventSuggestions = eventArgs.map((arg) => ({
-      label: `{{ state.${arg.key} }}`,
-      value: `{{ state.${arg.key} }}`,
-      detail: arg.description,
-    }));
-
-    // Prepend event args at the top (they're the most context-relevant)
-    return [...eventSuggestions, ...baseExpressionSuggestions];
-  };
+  // Wrap stateTree so {{ state.X }} resolves correctly in the JS sandbox
+  const liveStateTree = useMemo(() => stateTree ? { state: stateTree } : null, [stateTree]);
+  const variablesStateTree = useMemo(() => stateTree ? { state: { variables: getShallowKeys(stateTree.variables) } } : null, [stateTree]);
+  const dataSourcesStateTree = useMemo(() => stateTree ? { state: { queries: getShallowKeys(stateTree.queries), workflows: getShallowKeys(stateTree.workflows) } } : null, [stateTree]);
+  const widgetsStateTree = useMemo(() => stateTree ? { state: { widgets: getShallowKeys(stateTree.widgets) } } : null, [stateTree]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
@@ -228,7 +185,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
       {Object.entries(events).map(([eventType, actions]) => {
         const eventInfo = supportedEventTypes.find((et) => et.value === eventType);
         const eventLabel = eventInfo?.label || eventType;
-        const mergedSuggestions = getMergedSuggestions(eventType);
+
 
         return (
           <div
@@ -355,8 +312,8 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
                                   onChange={(val) =>
                                     handleActionConfigChange(eventType, actionIndex, "key", val)
                                   }
-                                  placeholder="e.g. state.variables.selectedUserId"
-                                  suggestions={variableKeySuggestions}
+                                  placeholder="e.g. {{ state.variables.selectedUserId }}"
+                                  liveStateTree={variablesStateTree}
                                 />
                               </div>
                               <div className="space-y-1">
@@ -367,7 +324,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
                                     handleActionConfigChange(eventType, actionIndex, "value", val)
                                   }
                                   placeholder="e.g. {{ state.event.args[0].id }}"
-                                  suggestions={mergedSuggestions}
+                                  liveStateTree={liveStateTree}
                                 />
                               </div>
                             </div>
@@ -381,8 +338,8 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
                                 onChange={(val) =>
                                   handleActionConfigChange(eventType, actionIndex, "alias", val)
                                 }
-                                placeholder="e.g. get_users_list"
-                                suggestions={aliasSuggestions}
+                                placeholder="e.g. {{ state.queries.get_users_list }}"
+                                liveStateTree={dataSourcesStateTree}
                               />
                               <p className="text-[9px] text-muted-foreground">
                                 Must match the reference alias of a page-level data source.
@@ -399,8 +356,8 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
                                   onChange={(val) =>
                                     handleActionConfigChange(eventType, actionIndex, "targetWidgetID", val)
                                   }
-                                  placeholder="e.g. table_1"
-                                  suggestions={widgetIDSuggestions}
+                                  placeholder="e.g. {{ state.widgets.table_1 }}"
+                                  liveStateTree={widgetsStateTree}
                                 />
                               </div>
                               <div className="space-y-1">
@@ -411,10 +368,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
                                     handleActionConfigChange(eventType, actionIndex, "methodName", val)
                                   }
                                   placeholder="e.g. refresh"
-                                  suggestions={getMethodSuggestionsForTarget(
-                                    action.config?.targetWidgetID,
-                                    widgets
-                                  )}
+                                  liveStateTree={liveStateTree}
                                 />
                               </div>
                             </div>
@@ -430,7 +384,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree }) => {
                                     handleActionConfigChange(eventType, actionIndex, "message", val)
                                   }
                                   placeholder="e.g. Record saved successfully"
-                                  suggestions={mergedSuggestions}
+                                  liveStateTree={liveStateTree}
                                 />
                               </div>
                               <div className="space-y-1">

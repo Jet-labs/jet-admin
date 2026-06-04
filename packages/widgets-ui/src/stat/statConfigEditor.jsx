@@ -2,20 +2,10 @@ import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
 export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-
-  const suggestions = useMemo(() => {
-    if (!stateTree) return [];
-    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-    return rawSuggestions.map((s) => ({
-      label: `{{${s.value}}}`,
-      value: `{{${s.value}}}`,
-      detail: s.detail,
-    }));
-  }, [stateTree]);
+  const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
     <div className="space-y-4">
@@ -38,7 +28,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.valueTemplate || ""}
           onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.valueTemplate", val)}
           placeholder="e.g. {{state.queries.stats.data[0].count}}"
-          suggestions={suggestions}
+          liveStateTree={liveStateTree}
         />
         <p className="text-[10px] text-muted-foreground">
           The primary metric value. Use template expressions to bind to data sources.
@@ -76,7 +66,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.trendTemplate || ""}
           onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.trendTemplate", val)}
           placeholder="e.g. {{state.queries.stats.data[0].change_pct}}"
-          suggestions={suggestions}
+          liveStateTree={liveStateTree}
         />
         <p className="text-[10px] text-muted-foreground">
           Optional percentage change. Positive = up trend, negative = down trend.
@@ -127,7 +117,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.isLoading || ""}
           onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val)}
           placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          suggestions={suggestions.filter(s => s.detail === 'boolean' || !s.detail)}
+          liveStateTree={liveStateTree}
         />
       </div>
     </div>

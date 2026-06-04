@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import { parseVegaLiteSpec } from "./chartSpecParser";
 import {
@@ -12,7 +12,6 @@ import { VegaSpecEditor } from "./vegaSpecEditor";
 import { ShelfBuilder } from "./shelfBuilder";
 import { AlertTriangle, Settings, ChevronDown, ChevronRight } from 'lucide-react';
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
 const VEGA_STRINGS = {
   WIDGET_EDITOR_FORM_SETTINGS_BUTTON: "Settings",
@@ -27,9 +26,10 @@ export const VegaConfigEditor = ({
   queryResults,
   stateTree,
 }) => {
-  const suggestions = getSuggestionsFromStateTree(stateTree);
   const isVegaLite = widgetEditorForm.values.widgetType === 'vega-lite';
   const currentMode = widgetEditorForm.values.widgetConfig?.editorMode || (isVegaLite ? 'visual' : 'raw');
+  // Wrap so {{ state.X }} paths resolve correctly inside the JS sandbox
+  const liveStateTree = useMemo(() => stateTree ? { state: stateTree } : null, [stateTree]);
   
   const [showParseWarning, setShowParseWarning] = useState(false);
   const [parseWarningsList, setParseWarningsList] = useState([]);
@@ -90,9 +90,10 @@ export const VegaConfigEditor = ({
           {currentMode === 'visual' && !showParseWarning && (
             <ShelfBuilder
               widgetEditorForm={widgetEditorForm}
-              workflowContext={workflowContext}
               workflows={workflows}
               queryResults={queryResults}
+              stateTree={stateTree}
+              liveStateTree={liveStateTree}
             />
           )}
         </div>
@@ -141,7 +142,7 @@ export const VegaConfigEditor = ({
           value={widgetEditorForm.values.widgetConfig?.isLoading || ""}
           onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
           placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          suggestions={suggestions.filter(s => s.detail === 'boolean' || !s.detail)}
+          liveStateTree={liveStateTree}
         />
       </div>
     </div>

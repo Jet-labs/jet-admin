@@ -104,7 +104,7 @@ var BaseWidgetBuilder = class {
 };
 
 // src/vega/builder.js
-var VegaWidgetBuilder = class extends BaseWidgetBuilder {
+var VegaWidgetBuilder = class _VegaWidgetBuilder extends BaseWidgetBuilder {
   /**
    * Build a complete, renderable Vega/Vega-Lite spec from widgetConfig.
    * 
@@ -151,6 +151,41 @@ var VegaWidgetBuilder = class extends BaseWidgetBuilder {
     return { vegaData };
   }
   /**
+   * Safe clone utility that strips out circular references and DOM nodes.
+   */
+  static safeClone(obj, cache = /* @__PURE__ */ new WeakSet()) {
+    if (obj === null || typeof obj !== "object") {
+      return obj;
+    }
+    const isHTMLElement = typeof HTMLElement !== "undefined" && obj instanceof HTMLElement;
+    if (isHTMLElement || obj.nodeType || obj._reactRootContainer || obj._reactInternals) {
+      return void 0;
+    }
+    if (cache.has(obj)) {
+      return void 0;
+    }
+    cache.add(obj);
+    if (Array.isArray(obj)) {
+      const arr = [];
+      for (let i = 0; i < obj.length; i++) {
+        const val = _VegaWidgetBuilder.safeClone(obj[i], cache);
+        if (val !== void 0) arr.push(val);
+      }
+      return arr;
+    }
+    const clone = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (key.startsWith("__reactFiber") || key.startsWith("__reactProps")) continue;
+        const val = _VegaWidgetBuilder.safeClone(obj[key], cache);
+        if (val !== void 0) {
+          clone[key] = val;
+        }
+      }
+    }
+    return clone;
+  }
+  /**
    * Resolve the data prop for VegaWidget from widgetConfig + dataSourceResults.
    * Expects that all template expressions have already been resolved by the
    * frontend evaluationEngine before reaching this method.
@@ -161,11 +196,10 @@ var VegaWidgetBuilder = class extends BaseWidgetBuilder {
    */
   resolveData(widgetConfig, dataSourceResults) {
     if (!widgetConfig?.vegaSpec) return null;
-    const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
-    if (spec.data?.values && !Array.isArray(spec.data.values)) {
-      if (typeof spec.data.values === "string") {
-        spec.data = { values: [] };
-      }
+    const spec = _VegaWidgetBuilder.safeClone(widgetConfig.vegaSpec);
+    if (!spec) return null;
+    if (spec.data?.values && typeof spec.data.values === "string") {
+      spec.data.values = [];
     }
     return spec;
   }

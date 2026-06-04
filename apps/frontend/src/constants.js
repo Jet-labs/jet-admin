@@ -3,11 +3,11 @@ export const CONSTANTS = {
 
   SERVER_HOST:
     import.meta.env.VITE_SERVER_HOST ||
-    "https://jet-admin-1.onrender.com",
+    (import.meta.env.DEV ? "http://localhost:8090" : "https://jet-admin-1.onrender.com"),
 
   SOCKET_HOST:
     import.meta.env.VITE_SOCKET_HOST ||
-    "https://jet-admin-1.onrender.com",
+    (import.meta.env.DEV ? "http://localhost:8090" : "https://jet-admin-1.onrender.com"),
 
   SUPABASE: {
     TENANT_ASSET_DIRECTORY: "tenant-assets",

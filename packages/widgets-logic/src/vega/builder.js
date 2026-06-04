@@ -64,6 +64,47 @@ export class VegaWidgetBuilder extends BaseWidgetBuilder {
   }
 
   /**
+   * Safe clone utility that strips out circular references and DOM nodes.
+   */
+  static safeClone(obj, cache = new WeakSet()) {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+
+    // Drop DOM nodes and React fibers
+    const isHTMLElement = typeof HTMLElement !== 'undefined' && obj instanceof HTMLElement;
+    if (isHTMLElement || obj.nodeType || obj._reactRootContainer || obj._reactInternals) {
+      return undefined;
+    }
+
+    if (cache.has(obj)) {
+      return undefined; // Drop circular references
+    }
+    cache.add(obj);
+
+    if (Array.isArray(obj)) {
+      const arr = [];
+      for (let i = 0; i < obj.length; i++) {
+        const val = VegaWidgetBuilder.safeClone(obj[i], cache);
+        if (val !== undefined) arr.push(val);
+      }
+      return arr;
+    }
+
+    const clone = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (key.startsWith('__reactFiber') || key.startsWith('__reactProps')) continue;
+        const val = VegaWidgetBuilder.safeClone(obj[key], cache);
+        if (val !== undefined) {
+          clone[key] = val;
+        }
+      }
+    }
+    return clone;
+  }
+
+  /**
    * Resolve the data prop for VegaWidget from widgetConfig + dataSourceResults.
    * Expects that all template expressions have already been resolved by the
    * frontend evaluationEngine before reaching this method.
@@ -75,16 +116,15 @@ export class VegaWidgetBuilder extends BaseWidgetBuilder {
   resolveData(widgetConfig, dataSourceResults) {
     if (!widgetConfig?.vegaSpec) return null;
 
-    // Clone spec to avoid mutating form/config state
-    const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
+    // Clone spec safely to avoid mutating form/config state and prevent circular JSON crashes
+    const spec = VegaWidgetBuilder.safeClone(widgetConfig.vegaSpec);
+    if (!spec) return null;
 
     // If data.values is already a resolved array, use it directly
     // (evaluationEngine has already replaced "{{alias}}" with actual data)
-    if (spec.data?.values && !Array.isArray(spec.data.values)) {
+    if (spec.data?.values && typeof spec.data.values === 'string') {
       // If it's still a string after resolution, it wasn't a valid template — clear it
-      if (typeof spec.data.values === 'string') {
-        spec.data = { values: [] };
-      }
+      spec.data.values = [];
     }
 
     return spec;

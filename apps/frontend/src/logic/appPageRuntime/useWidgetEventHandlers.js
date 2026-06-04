@@ -37,19 +37,36 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
 
   switch (actionType) {
     case "SET_VARIABLE": {
-      if (!config?.key) {
+      // Use rawConfig instead of config.key because resolveConfig evaluates {{ ... }} expressions
+      // If the user entered {{ state.variables.myVar }}, config.key would evaluate to its current value.
+      const rawKey = rawConfig?.key || "";
+      if (!rawKey) {
         console.warn("[AppPageEvents] SET_VARIABLE missing key");
         return null;
       }
+
+      // If the key is wrapped in {{ }}, extract the inside string
+      let variableKey = rawKey;
+      const match = rawKey.match(/^{{\s*(.*?)\s*}}$/);
+      if (match) {
+        variableKey = match[1];
+      }
+
       // Strip state.variables. prefix — configs are saved with the full path
       // (e.g. "state.variables.selectedUserId") but the reducer expects the bare key.
-      const variableKey = config.key.replace(/^state\.variables\./, "");
+      variableKey = variableKey.replace(/^state\.variables\./, "");
+      
       dispatch(appPageActions.setVariable(variableKey, config.value));
       return { key: variableKey, value: config.value };
     }
 
     case "EXECUTE_QUERY": {
-      const alias = config?.alias;
+      let rawAlias = rawConfig?.alias || "";
+      let alias = rawAlias;
+      const match = rawAlias.match(/^{{\s*(.*?)\s*}}$/);
+      if (match) alias = match[1];
+      alias = alias.replace(/^(state\.queries\.|state\.workflows\.)/, "");
+
       if (!alias) {
         console.warn("[AppPageEvents] EXECUTE_QUERY missing alias");
         return null;
@@ -102,7 +119,13 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
     }
 
     case "CALL_WIDGET_METHOD": {
-      const { targetWidgetID, methodName, args = [] } = config || {};
+      let rawTargetWidgetID = rawConfig?.targetWidgetID || "";
+      let targetWidgetID = rawTargetWidgetID;
+      const targetMatch = rawTargetWidgetID.match(/^{{\s*(.*?)\s*}}$/);
+      if (targetMatch) targetWidgetID = targetMatch[1];
+      targetWidgetID = targetWidgetID.replace(/^state\.widgets\./, "");
+
+      const { methodName, args = [] } = config || {};
       console.log(`[AppPageEvents] CALL_WIDGET_METHOD resolved config:`, { targetWidgetID, methodName, args });
       if (!targetWidgetID || !methodName) {
         console.warn("[AppPageEvents] CALL_WIDGET_METHOD missing target or method");

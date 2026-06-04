@@ -15,7 +15,6 @@ import {
 import { Trash2, Plus, ArrowUp, ArrowDown, Sparkles, Zap } from 'lucide-react';
 
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
 import { getValueByPath } from "@jet-admin/template-engine";
 
 /**
@@ -55,81 +54,8 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const multiSelect = config.multiSelect || { enabled: false, showSelectAll: true, actions: [] };
   const bulkEdit = config.bulkEdit || { enabled: false, saveLabel: "Save All Changes" };
 
-  // Build namespace-based suggestions from the state tree
-  const aliasSuggestions = useMemo(() => {
-    const suggestions = [];
-    if (!stateTree) return suggestions;
-    if (stateTree.queries) {
-      Object.keys(stateTree.queries).forEach(alias => suggestions.push(`state.queries.${alias}`));
-    }
-    if (stateTree.workflows) {
-      Object.keys(stateTree.workflows).forEach(alias => suggestions.push(`state.workflows.${alias}`));
-    }
-    return suggestions;
-  }, [stateTree]);
-
-  // ── Unified Intellisense from State Tree ──
-  const stateTreeSuggestions = useMemo(() => {
-    return getSuggestionsFromStateTree(stateTree);
-  }, [stateTree]);
-
-  const arraySuggestions = useMemo(() => {
-    const fromTree = stateTreeSuggestions
-      .filter(s => s.valueType === 'array')
-      .map(s => ({
-        label: `{{${s.value}}}`,
-        value: `{{${s.value}}}`,
-        detail: s.detail || "Runtime data array"
-      }));
-    
-    // Add alias fallbacks if tree is empty
-    if (fromTree.length === 0 && aliasSuggestions.length > 0) {
-      return aliasSuggestions.map(alias => ({
-        label: `{{${alias}.data}}`,
-        value: `{{${alias}.data}}`,
-        detail: "suggested"
-      }));
-    }
-    return fromTree;
-  }, [stateTreeSuggestions, aliasSuggestions]);
-
-  const scalarSuggestions = useMemo(() => {
-    const fromTree = stateTreeSuggestions
-      .filter(s => s.valueType === 'scalar' && !isNaN(Number(s.rawValue)))
-      .map(s => ({
-        label: `{{${s.value}}}`,
-        value: `{{${s.value}}}`,
-        detail: `= ${s.rawValue}`
-      }));
-      
-    if (fromTree.length === 0 && aliasSuggestions.length > 0) {
-      return aliasSuggestions.map(alias => ({
-        label: `{{${alias}.total}}`,
-        value: `{{${alias}.total}}`,
-        detail: "suggested"
-      }));
-    }
-    return fromTree;
-  }, [stateTreeSuggestions, aliasSuggestions]);
-
-  const loadingSuggestions = useMemo(() => {
-    const fromTree = stateTreeSuggestions
-      .filter(s => s.valueType === 'boolean')
-      .map(s => ({
-        label: `{{${s.value}}}`,
-        value: `{{${s.value}}}`,
-        detail: `= ${s.rawValue}`
-      }));
-      
-    if (fromTree.length === 0 && aliasSuggestions.length > 0) {
-      return aliasSuggestions.map(alias => ({
-        label: `{{${alias}.isLoading}}`,
-        value: `{{${alias}.isLoading}}`,
-        detail: "suggested"
-      }));
-    }
-    return fromTree;
-  }, [stateTreeSuggestions, aliasSuggestions]);
+  // Wrap so {{ state.X }} paths resolve in JS member completions
+  const liveStateTree = useMemo(() => stateTree ? { state: stateTree } : null, [stateTree]);
 
   // Discover column keys from queryResults using dataArrayTemplate
   // We need to strip {{ }} to resolve the path in the builder
@@ -261,7 +187,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
             value={config.dataArrayTemplate || config.dataMapping?.dataArrayPath || ""}
             onChange={(val) => handleConfigChange("dataArrayTemplate", val)}
             placeholder="e.g. {{ state.queries.my_query.data }}"
-            suggestions={arraySuggestions}
+            liveStateTree={liveStateTree}
           />
           <p className="text-[0.65rem] text-muted-foreground">
             Mustache template evaluating to an array of objects.
@@ -276,7 +202,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
             value={pagination.totalTemplate || config.dataMapping?.totalCountPath || ""}
             onChange={(val) => handlePaginationChange("totalTemplate", val)}
             placeholder="e.g. {{ state.queries.my_query.total }}"
-            suggestions={scalarSuggestions}
+            liveStateTree={liveStateTree}
           />
           <p className="text-[0.6rem] text-muted-foreground">
             Used for server-side pagination. Leave empty to use array length.
@@ -291,7 +217,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
             value={config.isLoading || ""}
             onChange={(val) => handleConfigChange("isLoading", val)}
             placeholder="e.g. {{ state.queries.my_query.isLoading }}"
-            suggestions={loadingSuggestions}
+            liveStateTree={liveStateTree}
           />
           <p className="text-[0.6rem] text-muted-foreground">
             Mustache template evaluating to a boolean loading state.

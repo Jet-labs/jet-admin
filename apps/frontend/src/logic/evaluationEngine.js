@@ -5,46 +5,51 @@
  * against a runtime state tree. This is the core of the reactive data
  * binding system, following the Retool/Appsmith pattern.
  *
- * All expressions MUST use the "state." prefix:
- *   {{ state.queries.get_users.data }}      ✅
- *   {{ state.variables.selectedUserID }}     ✅
- *   {{ queries.get_users.data }}             ❌ rejected
+ * Expressions support full JavaScript inside {{ }}:
+ *   {{ state.queries.get_users.data }}                          ✅ path
+ *   {{ state.variables.selectedUserID }}                        ✅ path
+ *   {{ state.queries.users.data.length > 0 ? "yes" : "no" }}   ✅ JS expression
+ *   {{ JSON.stringify(state.queries.users.data) }}              ✅ JS helper
+ *   {{ Math.round(state.widgets.mySlider.value * 100) / 100 }} ✅ JS arithmetic
+ *   {{ queries.get_users.data }}                                ❌ missing state. prefix
  *
- * The "state." prefix is stripped by the template engine's allowedRoots
- * mechanism before resolving against the state tree, mirroring how the
- * backend strips "ctx." for its own context.
+ * The `state` namespace is exposed as a top-level identifier inside every
+ * expression so the `{{ state.X }}` convention works naturally in both
+ * plain-path and JS-expression contexts.
  *
- * State tree shape (what expressions resolve against after "state." is stripped):
+ * State tree shape:
  * {
- *   queries: {
- *     get_users: { data: [...], isLoading: false, error: null },
- *   },
- *   workflows: {
- *     my_workflow: { data: {...}, isLoading: false, error: null },
- *   },
- *   widgets: {
- *     my_table: { selectedRow: {...}, selectedIndex: 0 },
- *   },
- *   variables: {
- *     selectedUserID: "...",
- *   },
- *   globals: {
- *     currentUser: { ... },
- *     tenantID: "...",
- *   }
+ *   queries:   { alias: { data, isLoading, error } },
+ *   workflows: { alias: { data, isLoading, error } },
+ *   widgets:   { widgetID: { selectedRow, ... } },
+ *   variables: { key: value },
+ *   globals:   { currentUser, tenantID, ... },
  * }
  */
 
 import {
-  resolveTemplate,
+  resolveJsTemplate,
   getValueByPath,
   extractTemplateBlocks,
   extractWholeTemplateExpression,
   tokenizeObjectPath,
 } from "@jet-admin/template-engine";
 
-/** The namespace root for all appPage expressions */
+/**
+ * The namespace root for all appPage expressions.
+ * Used by the legacy path resolver (resolvePath / evaluateExpression) and
+ * by extractDependencies for reactive dep tracking.
+ */
 const ALLOWED_ROOTS = ["state"];
+
+/**
+ * Wrap a stateTree so that {{ state.X }} expressions resolve correctly
+ * inside the JS sandbox (which uses bare identifier lookup via `with`).
+ *
+ * @param {object} stateTree
+ * @returns {{ state: object }}
+ */
+const wrapStateContext = (stateTree) => ({ state: stateTree ?? {} });
 
 /**
  * Safely resolve a dot-notated path against an object, enforcing the
@@ -73,6 +78,7 @@ export const containsExpression = (str) => {
 /**
  * Evaluate a single expression string against the state tree.
  * The expression MUST start with "state." — bare paths are rejected.
+ * Uses the legacy path resolver (no JS evaluation).
  *
  * @param {string} expression - e.g. "state.queries.get_users.data"
  * @param {object} stateTree - The global runtime state
@@ -85,30 +91,32 @@ export const evaluateExpression = (expression, stateTree) => {
 
 /**
  * Resolve a string value that may contain mustache expressions.
+ * Supports full JavaScript expressions inside {{ }} in addition to plain paths.
+ *
  * If the entire string is a single expression, returns the raw value (preserving type).
  * If the string contains mixed text + expressions, returns a string with substitutions.
- *
- * Delegates to the shared template engine's resolveTemplate with
- * allowedRoots: ["state"] and preserveSingleExpressionType: true.
  *
  * @param {string} value - The string to evaluate
  * @param {object} stateTree - The global runtime state
  * @returns {*} The resolved value
+ *
+ * @example
+ *   resolveValue("{{ state.queries.users.data }}", stateTree)           // → array
+ *   resolveValue("{{ state.queries.users.data.length }}", stateTree)    // → number
+ *   resolveValue("Hello {{ state.variables.name }}!", stateTree)        // → "Hello Alice!"
+ *   resolveValue("{{ state.queries.users.data.length > 0 ? state.queries.users.data[0].name : 'none' }}", stateTree)
  */
 export const resolveValue = (value, stateTree) => {
   if (typeof value !== "string") return value;
-  return resolveTemplate(value, stateTree, {
-    allowedRoots: ALLOWED_ROOTS,
+  return resolveJsTemplate(value, wrapStateContext(stateTree), {
     preserveSingleExpressionType: true,
   });
 };
 
 /**
  * Deep-resolve all expressions in an object or array recursively.
- * Walks through all string values and resolves any mustache expressions.
- *
- * Delegates to the shared template engine's resolveTemplate which handles
- * recursive object/array traversal natively.
+ * Walks through all string values and resolves any mustache expressions,
+ * including full JavaScript expressions.
  *
  * @param {*} config - The configuration object/array/value to resolve
  * @param {object} stateTree - The global runtime state
@@ -116,8 +124,7 @@ export const resolveValue = (value, stateTree) => {
  */
 export const resolveConfig = (config, stateTree) => {
   if (config === null || config === undefined) return config;
-  return resolveTemplate(config, stateTree, {
-    allowedRoots: ALLOWED_ROOTS,
+  return resolveJsTemplate(config, wrapStateContext(stateTree), {
     preserveSingleExpressionType: true,
   });
 };
@@ -141,17 +148,12 @@ export const extractDependencies = (config) => {
     if (typeof value === "string") {
       const blocks = extractTemplateBlocks(value);
       for (const block of blocks) {
-        // Tokenize with no allowedRoots so we get all segments including "state"
-        const tokens = tokenizeObjectPath(block.expression);
-        if (!tokens || tokens.length < 3) continue;
-
-        // Only process expressions that start with "state"
-        if (tokens[0] !== "state") continue;
-
-        // Extract the top-level dependency: namespace.key
-        // e.g. tokens = ["state", "queries", "get_users", "data"]
-        //   → dependency = "queries.get_users"
-        deps.add(`${tokens[1]}.${tokens[2]}`);
+        // Find all occurrences of "state.namespace.key" anywhere in the JS expression
+        // e.g. from "String(state.queries.query_5.isLoading)" we extract "queries.query_5"
+        const matches = block.expression.matchAll(/state\.([A-Za-z0-9_$]+)\.([A-Za-z0-9_$]+)/g);
+        for (const match of matches) {
+          deps.add(`${match[1]}.${match[2]}`);
+        }
       }
     } else if (Array.isArray(value)) {
       value.forEach(walk);

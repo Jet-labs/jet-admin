@@ -1,166 +1,143 @@
-import { getWidgetMethods, getEventArgs } from "@jet-admin/widget-types";
-
 /**
- * Describes the structure of the runtime state tree that {{ }} expressions
- * resolve against. Used to auto-generate intellisense suggestions.
+ * suggestionEngine.js  (widgets-ui)
  *
- * Shape mirrors buildAppPageStateTree() in appPageExpressionEngine.js.
- * __WILDCARD__ keys indicate branches that vary by alias/key at runtime.
+ * Thin schema-aware adapter over the core suggestion engine in
+ * @jet-admin/template-engine.
  *
- * The runtime tree is wrapped under a "state" namespace:
- *   {{ state.queries.users.data }}
- *   {{ state.variables.selectedUserID }}
+ * Responsibility: translate page-level schema metadata (dataSources,
+ * variableDefinitions, widgetType, eventType) into suggestion items that
+ * can be passed to TemplateAutocompleteInput.
+ *
+ * All runtime JS / object / member completion logic now lives in
+ * @jet-admin/template-engine's `getJsSuggestions` / `getObjectSuggestions`.
+ * This file only knows about the app-domain concepts (queries, variables,
+ * events, widget methods) that the template engine doesn't.
  */
-const STATE_TREE_SHAPE = {
-  queries: {
-    __WILDCARD__: {
-      data: { type: "any", detail: "Query result data" },
-      isLoading: { type: "boolean", detail: "Loading state" },
-      error: { type: "string|null", detail: "Error message if failed" },
-      lastUpdated: { type: "string", detail: "ISO timestamp of last result" },
-    },
-  },
-  workflows: {
-    __WILDCARD__: {
-      data: { type: "any", detail: "Workflow result data" },
-      isLoading: { type: "boolean", detail: "Loading state" },
-      error: { type: "string|null", detail: "Error message if failed" },
-      instanceID: { type: "string", detail: "Workflow instance ID" },
-      lastUpdated: { type: "string", detail: "ISO timestamp of last result" },
-    },
-  },
-};
 
-const COMMON_PAGINATION_VARIABLES = ["skip", "limit", "page", "pageSize"];
+import { getWidgetMethods, getEventArgs } from "@jet-admin/widget-types";
+import { getJsSuggestions, getObjectSuggestions } from "@jet-admin/template-engine";
+
+// Re-export the core APIs so existing import sites don't break
+export { getJsSuggestions, getObjectSuggestions };
+// Also re-export the catalogs in case any consumer needs them
+export { JS_BUILTINS, JS_ARRAY_METHODS, JS_STRING_METHODS, inferValueType, resolvePathInTree, getMemberSuggestions } from "@jet-admin/template-engine";
+
+// ─── Schema constants ────────────────────────────────────────────────────────
 
 const COMMON_GLOBALS = [
   { key: "state.globals.tenantID", detail: "Current tenant ID" },
-  { key: "state.globals.pageID", detail: "Current page ID" },
+  { key: "state.globals.pageID",   detail: "Current page ID"   },
 ];
 
-// ─── Internal helpers ───────────────────────────────────────────────────────
+// ─── Public APIs ─────────────────────────────────────────────────────────────
 
 /**
- * Walk a shape branch and collect all leaf keys (non-wildcard, non-object).
- */
-function collectLeaves(shape, prefix) {
-  const leaves = [];
-  if (shape === "__WILDCARD__") return leaves;
-  if (typeof shape !== "object" || shape === null) {
-    leaves.push({ path: prefix, ...(typeof shape === "object" ? shape : {}) });
-    return leaves;
-  }
-  for (const [key, value] of Object.entries(shape)) {
-    if (key === "__WILDCARD__") continue;
-    const childPrefix = prefix ? `${prefix}.${key}` : key;
-    if (typeof value === "object" && value !== null && !value.type) {
-      leaves.push(...collectLeaves(value, childPrefix));
-    } else if (typeof value === "object" && value !== null && value.type) {
-      leaves.push({
-        path: childPrefix,
-        type: value.type,
-        detail: value.detail || "",
-      });
-    }
-  }
-  return leaves;
-}
-
-/**
- * Expand a wildcard branch with concrete alias/key values.
- */
-function expandWildcard(shape, wildcardValues, root) {
-  const results = [];
-  const wildcardShape = shape.__WILDCARD__;
-  if (!wildcardShape) return results;
-
-  for (const { alias, label } of wildcardValues) {
-    const childLeaves = collectLeaves(wildcardShape, "");
-    for (const leaf of childLeaves) {
-      const fullPath = `state.${root}.${alias}.${leaf.path}`;
-      results.push({
-        label: `{{${fullPath}}}`,
-        value: `{{${fullPath}}}`,
-        detail: leaf.detail || `${label} ${leaf.path}`,
-      });
-    }
-  }
-
-  return results;
-}
-
-// ─── Public API ─────────────────────────────────────────────────────────────
-
-/**
- * Generate template expression suggestions for use in `{{ }}` blocks.
- * Produces paths like `{{ state.queries.users.data }}`.
+ * Build the full suggestion list for a template expression input.
+ *
+ * Combines:
+ *  - Schema-based state paths (queries, workflows, variables, event args)
+ *  - Live state-tree paths and JS built-ins (delegated to template-engine)
  *
  * @param {object} options
- * @param {Array} options.dataSources - page-level data source configs [{ alias, type }]
- * @param {Array} options.variableDefinitions - page variable definitions [{ key }]
- * @param {string} [options.widgetType] - current widget type for event.* suggestions
- * @param {string} [options.eventType] - current event type for event.* suggestions
- * @returns {Array<{ label: string, value: string, detail: string }>}
+ * @param {Array}  [options.dataSources]        - Page data sources [{ alias, type }]
+ * @param {Array}  [options.variableDefinitions] - Page variable definitions [{ key }]
+ * @param {string} [options.widgetType]          - For event.* arg suggestions
+ * @param {string} [options.eventType]           - For event.* arg suggestions
+ * @param {object} [options.stateTree]           - Live state tree wrapped as { state: … }
+ * @param {string} [options.filter]              - Text currently typed inside {{ }}
+ * @returns {Array<Suggestion>}
  */
-export function getExpressionSuggestions({ dataSources = [], variableDefinitions = [], widgetType, eventType } = {}) {
-  const suggestions = [];
+export function getExpressionSuggestions({
+  dataSources = [],
+  variableDefinitions = [],
+  widgetType,
+  eventType,
+  stateTree = null,
+  filter = "",
+} = {}) {
+  // ── Schema-based state suggestions ───────────────────────────────────────
+  const schemaSuggestions = [];
 
-  // ── queries ──
-  const queryAliases = dataSources
-    .filter((ds) => ds.type !== "workflow" && ds.alias)
-    .map((ds) => ({ alias: ds.alias, label: ds.alias }));
-  suggestions.push(
-    ...expandWildcard(STATE_TREE_SHAPE.queries, queryAliases, "queries")
-  );
-
-  // ── workflows ──
-  const workflowAliases = dataSources
-    .filter((ds) => ds.type === "workflow" && ds.alias)
-    .map((ds) => ({ alias: ds.alias, label: ds.alias }));
-  suggestions.push(
-    ...expandWildcard(STATE_TREE_SHAPE.workflows, workflowAliases, "workflows")
-  );
-
-  // ── variables ──
-  for (const def of variableDefinitions) {
-    if (def.key) {
-      suggestions.push({
-        label: `{{state.variables.${def.key}}}`,
-        value: `{{state.variables.${def.key}}}`,
-        detail: "page variable",
-      });
-    }
+  // queries
+  for (const ds of dataSources) {
+    if (ds.type === "workflow" || !ds.alias) continue;
+    const base = `state.queries.${ds.alias}`;
+    schemaSuggestions.push(
+      { value: `{{${base}.data}}`,        label: `{{${base}.data}}`,        detail: "Query result data",    type: "array",   category: "state" },
+      { value: `{{${base}.isLoading}}`,   label: `{{${base}.isLoading}}`,   detail: "Loading state",        type: "boolean", category: "state" },
+      { value: `{{${base}.error}}`,       label: `{{${base}.error}}`,       detail: "Error message",        type: "string",  category: "state" },
+      { value: `{{${base}.lastUpdated}}`, label: `{{${base}.lastUpdated}}`, detail: "ISO timestamp",        type: "string",  category: "state" },
+    );
   }
 
-  // ── event.* ──
+  // workflows
+  for (const ds of dataSources) {
+    if (ds.type !== "workflow" || !ds.alias) continue;
+    const base = `state.workflows.${ds.alias}`;
+    schemaSuggestions.push(
+      { value: `{{${base}.data}}`,        label: `{{${base}.data}}`,        detail: "Workflow result",      type: "any",     category: "state" },
+      { value: `{{${base}.isLoading}}`,   label: `{{${base}.isLoading}}`,   detail: "Loading state",        type: "boolean", category: "state" },
+      { value: `{{${base}.error}}`,       label: `{{${base}.error}}`,       detail: "Error message",        type: "string",  category: "state" },
+    );
+  }
+
+  // variables
+  for (const def of variableDefinitions) {
+    if (!def.key) continue;
+    schemaSuggestions.push({
+      value: `{{state.variables.${def.key}}}`,
+      label: `{{state.variables.${def.key}}}`,
+      detail: "page variable",
+      type: "variable",
+      category: "state",
+    });
+  }
+
+  // event args
   const eventArgs = getEventArgs(widgetType, eventType);
   for (const arg of eventArgs) {
     const fullPath = `state.${arg.key}`;
-    suggestions.push({
-      label: `{{${fullPath}}}`,
+    schemaSuggestions.push({
       value: `{{${fullPath}}}`,
+      label: `{{${fullPath}}}`,
       detail: arg.description,
+      type: "event",
+      category: "state",
     });
   }
 
-  // ── globals ──
+  // globals
   for (const g of COMMON_GLOBALS) {
-    suggestions.push({
-      label: `{{${g.key}}}`,
+    schemaSuggestions.push({
       value: `{{${g.key}}}`,
+      label: `{{${g.key}}}`,
       detail: g.detail,
+      type: "global",
+      category: "state",
     });
   }
 
-  return suggestions;
+  // ── Delegate to template-engine for live tree + JS built-ins ─────────────
+  return getJsSuggestions({
+    filter,
+    stateTree,
+    baseSuggestions: schemaSuggestions,
+    includeBuiltins: true,
+  });
+}
+
+// ─── Specialised suggestion helpers (unchanged API surface) ──────────────────
+
+/**
+ * @deprecated Use getObjectSuggestions from @jet-admin/template-engine directly.
+ * Kept for backwards compat. Will be removed in a future cleanup.
+ */
+export function getSuggestionsFromStateTree(stateTree, prefix = "state", depth = 0, maxDepth = 4) {
+  return getObjectSuggestions(stateTree, prefix, depth, maxDepth);
 }
 
 /**
- * Generate alias suggestions for the EXECUTE_QUERY alias field (plain names,
- * no template brackets). These match data source aliases from the page config.
- *
- * @param {Array} dataSources - page-level data source configs [{ alias, type }]
- * @returns {Array<{ label: string, value: string, detail: string }>}
+ * Alias suggestions for the EXECUTE_QUERY alias field.
  */
 export function getAliasSuggestions(dataSources = []) {
   return dataSources
@@ -173,20 +150,14 @@ export function getAliasSuggestions(dataSources = []) {
 }
 
 /**
- * Generate variable key suggestions for the SET_VARIABLE key field.
- * Uses the `state.variables.` prefix so saved configs are
- * consistent with the namespace convention.
- *
- * @param {Array} variableDefinitions - page variable definitions [{ key }]
- * @returns {Array<{ label: string, value: string, detail: string }>}
+ * Variable key suggestions for the SET_VARIABLE key field.
  */
 export function getVariableKeySuggestions(variableDefinitions = []) {
   const suggestions = [];
-  const existing = new Set();
-
+  const seen = new Set();
   for (const def of variableDefinitions) {
-    if (def.key && !existing.has(def.key)) {
-      existing.add(def.key);
+    if (def.key && !seen.has(def.key)) {
+      seen.add(def.key);
       suggestions.push({
         label: `state.variables.${def.key}`,
         value: `state.variables.${def.key}`,
@@ -194,27 +165,11 @@ export function getVariableKeySuggestions(variableDefinitions = []) {
       });
     }
   }
-
-  for (const common of COMMON_PAGINATION_VARIABLES) {
-    if (!existing.has(common)) {
-      suggestions.push({
-        label: `state.variables.${common}`,
-        value: `state.variables.${common}`,
-        detail: "pagination",
-      });
-    }
-  }
-
   return suggestions;
 }
 
 /**
- * Generate widget ID suggestions for CALL_WIDGET_METHOD targetWidgetID field.
- * Filters to widgets placed on the current page.
- *
- * @param {Array} widgets - all available widgets [{ widgetID, widgetTitle, widgetType }]
- * @param {object} pageConfig - page config with widgets array
- * @returns {Array<{ label: string, value: string, detail: string }>}
+ * Widget ID suggestions for CALL_WIDGET_METHOD targetWidgetID field.
  */
 export function getWidgetIDSuggestions(widgets = [], pageConfig) {
   if (!widgets || !Array.isArray(widgets)) return [];
@@ -239,12 +194,7 @@ export function getWidgetIDSuggestions(widgets = [], pageConfig) {
 }
 
 /**
- * Generate method suggestions for the CALL_WIDGET_METHOD methodName field,
- * based on the target widget's type.
- *
- * @param {string} targetWidgetID - ID of the target widget
- * @param {Array} widgets - all available widgets [{ widgetID, widgetType }]
- * @returns {Array<{ label: string, value: string, detail: string }>}
+ * Method suggestions for CALL_WIDGET_METHOD methodName field.
  */
 export function getMethodSuggestionsForTarget(targetWidgetID, widgets = []) {
   const widget = widgets?.find((w) => w.widgetID === targetWidgetID);
@@ -255,76 +205,4 @@ export function getMethodSuggestionsForTarget(targetWidgetID, widgets = []) {
     value: m.name,
     detail: m.description,
   }));
-}
-
-// ─── Live State Tree Introspection ──────────────────────────────────────────
-
-/**
- * Recursively walk the live state tree to discover variables and their types.
- * @param {object} obj - The state tree to walk
- * @param {string} prefix - The current path prefix (e.g., 'state')
- * @param {number} depth - Current recursion depth
- * @param {number} maxDepth - Maximum recursion depth
- * @returns {Array<{ value: string, path: string, valueType: string, rawValue: any, detail: string }>}
- */
-export function getSuggestionsFromStateTree(obj, prefix = "state", depth = 0, maxDepth = 4) {
-  const results = [];
-  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-
-  for (const key of Object.keys(obj)) {
-    if (key.startsWith("__")) continue;
-    const val = obj[key];
-    const fullPath = prefix ? `${prefix}.${key}` : key;
-
-    let valueType = typeof val;
-    let detail = "";
-
-    if (val === null) {
-      valueType = "null";
-      detail = "null";
-    } else if (val === undefined) {
-      valueType = "undefined";
-      detail = "undefined";
-    } else if (Array.isArray(val)) {
-      valueType = "array";
-      if (val.length > 0 && typeof val[0] === "object" && val[0] !== null) {
-        detail = `Array[${val.length}] (fields: ${Object.keys(val[0]).slice(0, 3).join(', ')})`;
-      } else {
-        detail = `Array[${val.length}]`;
-      }
-    } else if (typeof val === "boolean") {
-      valueType = "boolean";
-      detail = `= ${val}`;
-    } else if (typeof val === "number") {
-      valueType = "number";
-      detail = `= ${val}`;
-    } else if (typeof val === "string") {
-      valueType = "string";
-      detail = `"${val.slice(0, 20)}${val.length > 20 ? '...' : ''}"`;
-    } else if (typeof val === "object") {
-      valueType = "object";
-      const keys = Object.keys(val);
-      if (keys.length > 0) {
-        detail = `Object { ${keys.slice(0, 3).join(', ')}${keys.length > 3 ? ', ...' : ''} }`;
-      } else {
-        detail = "Object {}";
-      }
-    }
-
-    results.push({
-      value: fullPath,
-      path: fullPath,
-      valueType,
-      rawValue: val,
-      detail,
-    });
-
-    if (val && typeof val === "object" && !Array.isArray(val)) {
-      const childSuggestions = getSuggestionsFromStateTree(val, fullPath, depth + 1, maxDepth);
-      for (let i = 0; i < childSuggestions.length; i++) {
-        results.push(childSuggestions[i]);
-      }
-    }
-  }
-  return results;
 }

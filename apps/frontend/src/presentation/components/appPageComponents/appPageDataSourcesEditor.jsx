@@ -15,7 +15,6 @@ import {
   SelectValue,
   Checkbox,
 } from "@jet-admin/ui";
-import { getExpressionSuggestions } from "@jet-admin/widgets-ui";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { Plus, Trash2, Edit2, Play, Square, Database, GitBranch, Layers, Loader2, ArrowLeft } from "lucide-react";
 import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
@@ -465,10 +464,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                         handleSourceChange(editingIndex, "inputArgs", updatedArgs);
                       }}
                       placeholder={`e.g. {{ state.variables.${argDef.key} }}`}
-                      suggestions={getExpressionSuggestions({
-                        dataSources,
-                        variableDefinitions: variables,
-                      })}
+                      liveStateTree={stateTree ? { state: stateTree } : null}
                     />
                   </div>
                 ))}

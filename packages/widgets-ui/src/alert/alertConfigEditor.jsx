@@ -2,22 +2,10 @@ import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Checkbox } from "@jet-admin/ui";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
 export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-
-  const suggestions = useMemo(() => {
-    if (!stateTree) return [];
-    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-    return rawSuggestions.map((s) => ({
-      label: `{{${s.value}}}`,
-      value: `{{${s.value}}}`,
-      detail: s.detail,
-    }));
-  }, [stateTree]);
-
-  console.log({ suggestions })
+  const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
     <div className="space-y-4">
@@ -47,7 +35,7 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.title || ""}
           onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.title", val)}
           placeholder="e.g. Warning!"
-          suggestions={suggestions}
+          liveStateTree={liveStateTree}
         />
       </div>
 
@@ -59,8 +47,7 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.message || ""}
           onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.message", val)}
           placeholder="e.g. Action completed successfully."
-          suggestions={suggestions}
-          // context={{ state: stateTree }}
+          liveStateTree={liveStateTree}
         />
       </div>
 
@@ -85,7 +72,7 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.isLoading || ""}
           onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
           placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          suggestions={suggestions.filter(s => s.detail === 'boolean' || !s.detail)}
+          liveStateTree={liveStateTree}
         />
       </div>
     </div>

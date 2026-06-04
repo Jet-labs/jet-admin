@@ -5,7 +5,7 @@ import { inferFieldsFromData } from './chartSpecGenerator';
 
 import { Button, Input } from "@jet-admin/ui";
 import { Database, GitMerge, ArrowRightFromLine, Zap, Search, Plus } from 'lucide-react';
-import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
+import { getExpressionSuggestions } from '../intellisense/suggestionEngine';
 import { getValueByPath } from '@jet-admin/template-engine';
 
 /**
@@ -15,7 +15,6 @@ import { getValueByPath } from '@jet-admin/template-engine';
  * compact=false → Full panel with data source picker header.
  */
 export const DataFieldPanel = ({
-  workflowContext,
   queryResults,
   dataSource,
   onDataSourceChange,
@@ -23,6 +22,8 @@ export const DataFieldPanel = ({
   workflow,
   className = '',
   compact = false,
+  stateTree,
+  liveStateTree,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [manualField, setManualField] = useState('');
@@ -45,11 +46,16 @@ export const DataFieldPanel = ({
   const allSuggestions = useMemo(() => {
     const seen = new Set();
     const combined = [];
-    const stateTreeSuggestions = getSuggestionsFromStateTree(workflowContext);
-    const arraySuggestions = stateTreeSuggestions.filter(s => s.valueType === 'array');
+    const stateTreeSuggestions = getExpressionSuggestions({
+      stateTree: liveStateTree
+    });
+    const arraySuggestions = stateTreeSuggestions.filter(s => s.type === 'array');
     
     for (const arr of arraySuggestions) {
-      const bracePath = `{{${arr.value}}}`;
+      let bracePath = arr.value;
+      if (!bracePath.startsWith('{{')) {
+        bracePath = `{{${bracePath}}}`;
+      }
       if (!seen.has(bracePath)) {
         seen.add(bracePath);
         combined.push({
@@ -61,7 +67,7 @@ export const DataFieldPanel = ({
       }
     }
     return combined;
-  }, [workflowContext]);
+  }, [liveStateTree]);
 
   // Resolve fields from selected data source
   const fields = useMemo(() => {
@@ -76,18 +82,18 @@ export const DataFieldPanel = ({
       return null;
     };
 
-    if (workflowContext) {
-      const resolved = getValueByPath(workflowContext, rawPath, { allowedRoots: ['state'] });
+    if (stateTree) {
+      const resolved = getValueByPath(stateTree, rawPath, { allowedRoots: ['state'] });
       const result = toFields(resolved);
       if (result) return result;
     }
-    if (queryResults && queryResults !== workflowContext) {
+    if (queryResults) {
       const resolved = getValueByPath(queryResults, rawPath, { allowedRoots: ['state'] });
       const result = toFields(resolved);
       if (result) return result;
     }
     return [];
-  }, [workflowContext, queryResults, dataSource]);
+  }, [stateTree, queryResults, dataSource]);
 
   const filteredFields = useMemo(() => {
     if (!searchTerm) return fields;
@@ -276,7 +282,6 @@ export const DataFieldPanel = ({
 };
 
 DataFieldPanel.propTypes = {
-  workflowContext: PropTypes.object,
   queryResults: PropTypes.object,
   dataSource: PropTypes.string,
   onDataSourceChange: PropTypes.func,
@@ -284,4 +289,6 @@ DataFieldPanel.propTypes = {
   workflow: PropTypes.object,
   className: PropTypes.string,
   compact: PropTypes.bool,
+  stateTree: PropTypes.object,
+  liveStateTree: PropTypes.object,
 };

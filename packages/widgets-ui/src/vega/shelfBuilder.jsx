@@ -9,9 +9,9 @@ import {
   inferMarkType,
   COLOR_SCHEMES,
 } from "./chartSpecGenerator";
-import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
+import { getExpressionSuggestions } from '../intellisense/suggestionEngine';
 
-import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, TemplateAutocompleteInput } from "@jet-admin/ui";
 import { ChevronDown, ChevronRight, Database, TrendingUp, Layers, Palette } from 'lucide-react';
 
 const PRIMARY_SHELVES = ['x', 'y', 'color', 'size'];
@@ -25,9 +25,10 @@ const SECONDARY_SHELVES = ['row', 'column', 'shape', 'opacity', 'detail', 'text'
  */
 export const ShelfBuilder = ({
   widgetEditorForm,
-  workflowContext,
   workflows,
   queryResults,
+  stateTree,
+  liveStateTree,
 }) => {
 
   // Initialize shelf spec from form or defaults
@@ -153,28 +154,8 @@ export const ShelfBuilder = ({
     return () => clearTimeout(timer);
   }, [shelfSpec]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Centralized suggestions from state tree ──
-  const stateTreeSuggestions = useMemo(
-    () => getSuggestionsFromStateTree(workflowContext),
-    [workflowContext]
-  );
-
-  // Discover array paths for data source picker
-  const discoveredArrayPaths = useMemo(() => {
-    return stateTreeSuggestions
-      .filter(s => s.valueType === 'array')
-      .map(s => {
-        const bracePath = `{{${s.value}}}`;
-        return {
-          path: bracePath,  // {{state.queries.alias.data}}
-          label: bracePath,  // {{state.queries.alias.data}}
-          description: s.detail,
-        };
-      });
-  }, [stateTreeSuggestions]);
-
   // Quick fallback if no data source available
-  const hasDataSources = discoveredArrayPaths.length > 0;
+  const hasDataSources = true; // Always true now since it's an input
   const isWorkflowSelected = !!selectedWorkflow;
   const hasAnyData = isWorkflowSelected || hasDataSources;
 
@@ -222,30 +203,20 @@ export const ShelfBuilder = ({
                 <Label className="font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground mb-1 block">
                   Data Source
                 </Label>
-                <Select value={shelfSpec.dataSource || ''} onValueChange={(val) => handleDataSourceChange(val)}>
-                  <SelectTrigger className="h-7 text-[11px] font-mono">
-                    <SelectValue placeholder="Select data input..." />
-                  </SelectTrigger>
-                  <SelectContent className="z-[200]">
-                    {selectedWorkflow && (
-                      <SelectItem value={`{{state.workflows.${selectedWorkflow.alias}.data}}`}>
-                        Workflow: {selectedWorkflow.alias}
-                      </SelectItem>
-                    )}
-                    {discoveredArrayPaths.map((arr) => (
-                      <SelectItem key={arr.path} value={arr.path}>
-                        {arr.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <TemplateAutocompleteInput
+                  value={shelfSpec.dataSource || ''}
+                  onChange={(val) => handleDataSourceChange(val)}
+                  placeholder="e.g. {{ state.queries.my_query.data }}"
+                  liveStateTree={liveStateTree}
+                />
               </div>
 
               {/* ── Section: Discovered Fields ── */}
               <div className="border-b border-border/50 max-h-[220px] overflow-y-auto">
                 <DataFieldPanel
-                  workflowContext={workflowContext}
                   queryResults={queryResults}
+                  stateTree={stateTree}
+                  liveStateTree={liveStateTree}
                   dataSource={shelfSpec.dataSource}
                   onDataSourceChange={handleDataSourceChange}
                   onFieldClick={handleFieldQuickAdd}
@@ -395,7 +366,8 @@ export const ShelfBuilder = ({
 
 ShelfBuilder.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
-  workflowContext: PropTypes.object,
   workflows: PropTypes.array,
   queryResults: PropTypes.object,
+  stateTree: PropTypes.object,
+  liveStateTree: PropTypes.object,
 };

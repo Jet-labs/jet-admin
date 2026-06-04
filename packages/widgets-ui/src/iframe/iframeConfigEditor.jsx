@@ -2,20 +2,10 @@ import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Input, Label, Checkbox } from "@jet-admin/ui";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import { getSuggestionsFromStateTree } from "../intellisense/suggestionEngine";
 
 export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-
-  const suggestions = useMemo(() => {
-    if (!stateTree) return [];
-    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-    return rawSuggestions.map((s) => ({
-      label: `{{${s.value}}}`,
-      value: `{{${s.value}}}`,
-      detail: s.detail,
-    }));
-  }, [stateTree]);
+  const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
     <div className="space-y-4">
@@ -26,7 +16,7 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.url || ""}
           onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.url", val)}
           placeholder="e.g. https://example.com"
-          suggestions={suggestions}
+          liveStateTree={liveStateTree}
         />
         <p className="text-[10px] text-muted-foreground">
           Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).
@@ -104,7 +94,7 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.isLoading || ""}
           onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
           placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          suggestions={suggestions.filter(s => s.detail === 'boolean' || !s.detail)}
+          liveStateTree={liveStateTree}
         />
       </div>
     </div>

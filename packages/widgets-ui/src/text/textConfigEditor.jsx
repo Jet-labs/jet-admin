@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useMemo } from "react";
 import PropTypes from "prop-types";
 import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
-import { getSuggestionsFromStateTree } from "@jet-admin/widgets-ui";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
 
 export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-  const suggestions = getSuggestionsFromStateTree(stateTree);
+  // Wrap so {{ state.X }} paths resolve correctly inside the JS sandbox
+  const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
     <div className="space-y-4">
@@ -14,7 +14,7 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-foreground">Content</Label>
         <p className="text-[10px] text-muted-foreground leading-snug">
-          Supports Markdown formatting and <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]">{"{{expression}}"}</code> templates.
+          Supports Markdown formatting and <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]">{"{{expression}}"}</code> templates. Full JS expressions supported.
         </p>
         <TemplateAutocompleteInput
           isTextArea={true}
@@ -22,7 +22,7 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.content || ""}
           onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.content", val)}
           placeholder={"# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{ state.queries.myQuery.data[0].name }}"}
-          suggestions={suggestions}
+          liveStateTree={liveStateTree}
         />
       </div>
 
@@ -33,7 +33,7 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
           value={config.isLoading || ""}
           onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val)}
           placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          suggestions={suggestions.filter(s => s.valueType === 'boolean' || !s.valueType)}
+          liveStateTree={liveStateTree}
         />
       </div>
 

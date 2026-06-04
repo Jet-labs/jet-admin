@@ -1945,94 +1945,209 @@ ErrorBoundary.propTypes = {
 };
 
 // src/components/template-autocomplete-input.jsx
-var import_react7 = __toESM(require("react"));
-function deriveContextSuggestions(obj, prefix = "", depth = 0, maxDepth = 5) {
-  if (depth > maxDepth || obj === null || obj === void 0) return [];
-  const suggestions = [];
-  const addSuggestions = (newItems) => {
-    for (let i = 0; i < newItems.length; i++) {
-      suggestions.push(newItems[i]);
+var import_react8 = __toESM(require("react"));
+var import_view2 = require("@codemirror/view");
+var import_state2 = require("@codemirror/state");
+var import_commands = require("@codemirror/commands");
+var import_autocomplete = require("@codemirror/autocomplete");
+
+// src/components/template-autocomplete/useMustacheCompletions.js
+var import_react7 = require("react");
+function walkSchema(obj, prefix = "", depth = 0, maxDepth = 6, results = []) {
+  if (depth > maxDepth) return results;
+  const type = Array.isArray(obj) ? "array" : typeof obj;
+  if (prefix) {
+    const entry = { label: prefix, type };
+    if (type !== "object" && type !== "array") {
+      entry.detail = `${type}: ${JSON.stringify(obj)}`;
+      entry.boost = 1;
+    } else {
+      entry.detail = type;
     }
-  };
-  if (Array.isArray(obj)) {
-    if (prefix) {
-      suggestions.push({ value: prefix, label: prefix, detail: `Array[${obj.length}]`, type: "array" });
-      suggestions.push({ value: `${prefix}.length`, label: `${prefix}.length`, detail: "Number", type: "property" });
-    }
-    if (obj.length > 0 && typeof obj[0] === "object" && obj[0] !== null) {
-      addSuggestions(deriveContextSuggestions(obj[0], prefix ? `${prefix}[0]` : "[0]", depth + 1, maxDepth));
-    }
-    return suggestions;
+    results.push(entry);
   }
-  if (typeof obj === "object") {
-    if (prefix) suggestions.push({ value: prefix, label: prefix, detail: "Object", type: "object" });
-    for (const [key, val] of Object.entries(obj)) {
-      if (typeof val === "function") continue;
-      const childPath = prefix ? `${prefix}.${key}` : key;
-      if (val === null || val === void 0) {
-        suggestions.push({ value: childPath, label: childPath, detail: "null", type: "null" });
-      } else if (Array.isArray(val)) {
-        addSuggestions(deriveContextSuggestions(val, childPath, depth + 1, maxDepth));
-      } else if (typeof val === "object") {
-        addSuggestions(deriveContextSuggestions(val, childPath, depth + 1, maxDepth));
-      } else {
-        suggestions.push({ value: childPath, label: childPath, detail: inferType(val), type: "primitive" });
+  if (type === "object" && obj !== null) {
+    for (const key of Object.keys(obj)) {
+      const childPrefix = prefix ? `${prefix}.${key}` : key;
+      walkSchema(obj[key], childPrefix, depth + 1, maxDepth, results);
+    }
+  } else if (type === "array") {
+    for (let i = 0; i < Math.min(obj.length, 3); i++) {
+      walkSchema(obj[i], `${prefix}[${i}]`, depth + 1, maxDepth, results);
+    }
+  }
+  return results;
+}
+function getCursorZone(state, pos) {
+  const doc = state.doc.toString();
+  let searchFrom = 0;
+  while (searchFrom < doc.length) {
+    const open = doc.indexOf("{{", searchFrom);
+    if (open === -1) break;
+    const close = doc.indexOf("}}", open + 2);
+    if (close === -1) break;
+    if (pos > open + 1 && pos <= close) {
+      return {
+        inZone: true,
+        zoneStart: open + 2,
+        zoneEnd: close,
+        typed: doc.slice(open + 2, pos).trim()
+      };
+    }
+    searchFrom = close + 2;
+  }
+  return { inZone: false };
+}
+function useMustacheCompletions(jsonContext) {
+  const schemaPaths = (0, import_react7.useMemo)(() => {
+    if (!jsonContext || typeof jsonContext !== "object") return [];
+    return walkSchema(jsonContext);
+  }, [jsonContext]);
+  const mustacheCompletionSource = (0, import_react7.useMemo)(() => {
+    return (ctx) => {
+      const zone = getCursorZone(ctx.state, ctx.pos);
+      if (!zone.inZone) return null;
+      const word = ctx.matchBefore(/[\w.[\]"']*/);
+      if (!word) return null;
+      if (word.from === word.to && !ctx.explicit) return null;
+      const query = word.text.toLowerCase();
+      const schemaOptions = schemaPaths.filter((p) => p.label.toLowerCase().startsWith(query)).slice(0, 50).map((p) => ({
+        label: p.label,
+        detail: p.detail,
+        type: p.type === "object" ? "namespace" : p.type === "array" ? "namespace" : p.type === "function" ? "function" : "variable",
+        boost: p.boost ?? 0,
+        info: p.detail ? `Value: ${p.detail}` : void 0
+      }));
+      const jsKeywords = [
+        "if",
+        "else",
+        "return",
+        "const",
+        "let",
+        "var",
+        "function",
+        "true",
+        "false",
+        "null",
+        "undefined",
+        "typeof",
+        "instanceof",
+        "new",
+        "this",
+        "class",
+        "import",
+        "export",
+        "default",
+        "async",
+        "await",
+        "try",
+        "catch",
+        "finally",
+        "throw",
+        "for",
+        "while",
+        "do",
+        "break",
+        "continue",
+        "switch",
+        "case",
+        "Math.round",
+        "Math.floor",
+        "Math.ceil",
+        "Math.abs",
+        "Math.max",
+        "Math.min",
+        "JSON.stringify",
+        "JSON.parse",
+        "Array.isArray",
+        "Object.keys",
+        "Object.values",
+        "Object.entries",
+        "parseInt",
+        "parseFloat",
+        "isNaN",
+        "String",
+        "Number",
+        "Boolean",
+        "Date.now",
+        "new Date",
+        ".toString()",
+        ".toFixed(",
+        ".toUpperCase()",
+        ".toLowerCase()",
+        ".trim()",
+        ".split(",
+        ".join(",
+        ".map(",
+        ".filter(",
+        ".find(",
+        ".reduce(",
+        ".forEach(",
+        ".some(",
+        ".every(",
+        ".includes(",
+        ".length",
+        ".slice(",
+        ".replace(",
+        ".indexOf("
+      ];
+      const jsOptions = jsKeywords.filter((k) => k.toLowerCase().startsWith(query)).slice(0, 30).map((k) => ({
+        label: k,
+        type: k.startsWith(".") ? "method" : /^[A-Z]/.test(k) ? "class" : "keyword",
+        boost: -1
+        // rank below schema paths
+      }));
+      const allOptions = [...schemaOptions, ...jsOptions];
+      if (allOptions.length === 0 && !ctx.explicit) return null;
+      return {
+        from: word.from,
+        options: allOptions,
+        validFor: /^[\w.[\]"']*$/
+      };
+    };
+  }, [schemaPaths]);
+  return mustacheCompletionSource;
+}
+
+// src/components/template-autocomplete/mustacheHighlighter.js
+var import_view = require("@codemirror/view");
+var import_state = require("@codemirror/state");
+var delimMark = import_view.Decoration.mark({ class: "cm-mustache-delim" });
+var zoneMark = import_view.Decoration.mark({ class: "cm-mustache-zone" });
+function buildDecorations(view) {
+  const builder = new import_state.RangeSetBuilder();
+  const doc = view.state.doc;
+  const text = doc.toString();
+  let searchFrom = 0;
+  while (searchFrom < text.length) {
+    const open = text.indexOf("{{", searchFrom);
+    if (open === -1) break;
+    const close = text.indexOf("}}", open + 2);
+    if (close === -1) break;
+    builder.add(open, open + 2, delimMark);
+    builder.add(close, close + 2, delimMark);
+    if (close > open + 2) {
+      builder.add(open + 2, close, zoneMark);
+    }
+    searchFrom = close + 2;
+  }
+  return builder.finish();
+}
+var mustacheHighlighter = import_view.ViewPlugin.fromClass(
+  class {
+    constructor(view) {
+      this.decorations = buildDecorations(view);
+    }
+    update(update) {
+      if (update.docChanged || update.viewportChanged) {
+        this.decorations = buildDecorations(update.view);
       }
     }
-    return suggestions;
-  }
-  if (prefix) suggestions.push({ value: prefix, label: prefix, detail: inferType(obj), type: "primitive" });
-  return suggestions;
-}
-function inferType(val) {
-  if (val === null || val === void 0) return "null";
-  if (typeof val === "boolean") return "Boolean";
-  if (typeof val === "number") return Number.isInteger(val) ? "Integer" : "Float";
-  if (typeof val === "string") return "String";
-  return typeof val;
-}
-function typeIcon(type) {
-  return { object: "{ }", array: "[ ]", primitive: "ab", null: "\u2205", property: "#", ctx: "\u2B1F", form: "\u25A3", widget: "\u25C8" }[type] || "\u25C6";
-}
-function highlightMatch(text, query) {
-  if (!query) return /* @__PURE__ */ import_react7.default.createElement("span", null, text);
-  const idx = text.toLowerCase().indexOf(query.toLowerCase());
-  if (idx === -1) return /* @__PURE__ */ import_react7.default.createElement("span", null, text);
-  return /* @__PURE__ */ import_react7.default.createElement("span", null, text.slice(0, idx), /* @__PURE__ */ import_react7.default.createElement("mark", { className: "bg-primary/20 text-primary rounded-[2px] font-semibold px-[1px]" }, text.slice(idx, idx + query.length)), text.slice(idx + query.length));
-}
-function getFilterAtCaret(el) {
-  const pos = el.selectionStart ?? 0;
-  const before = (el.value ?? "").substring(0, pos);
-  const match = before.match(/\{\{([^}]*)$/);
-  return match ? match[1] : null;
-}
-function SuggestionDropdown({ items, totalItems, filterText, activeIdx, onSelect, onActiveChange, style }) {
-  const listRef = (0, import_react7.useRef)(null);
-  (0, import_react7.useEffect)(() => {
-    if (!listRef.current || activeIdx < 0) return;
-    listRef.current.querySelectorAll(".tpl-item")[activeIdx]?.scrollIntoView({ block: "nearest" });
-  }, [activeIdx]);
-  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute left-0 right-0 z-[9999] bg-background border border-border rounded-md shadow-lg flex flex-col overflow-hidden", style }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex items-center justify-between px-2.5 py-1.5 border-b border-border bg-muted/50 shrink-0" }, /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground font-mono" }, "Bindings"), filterText ? /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] text-muted-foreground font-mono truncate ml-2" }, "filtering ", /* @__PURE__ */ import_react7.default.createElement("code", { className: "font-mono text-[10px] bg-primary/10 px-1 py-[1.5px] rounded-[3px] border border-primary/20 text-primary" }, filterText), "\xA0\xB7\xA0", totalItems, " result", totalItems !== 1 ? "s" : "") : /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] text-muted-foreground font-mono" }, totalItems, " available")), /* @__PURE__ */ import_react7.default.createElement("div", { className: "max-h-[200px] overflow-y-auto overflow-x-hidden", ref: listRef }, items.length === 0 ? /* @__PURE__ */ import_react7.default.createElement("div", { className: "p-3 text-[11px] text-center text-muted-foreground font-mono" }, 'No bindings match "', filterText, '"') : items.map((s, i) => {
-    const cleanVal = (s.value || "").replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
-    const cleanLabel = (s.label || cleanVal).replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
-    return /* @__PURE__ */ import_react7.default.createElement(
-      "div",
-      {
-        key: i,
-        className: `tpl-item flex items-center gap-2 px-2.5 py-1.5 cursor-pointer border-b border-border last:border-0 transition-colors ${i === activeIdx ? "bg-primary/10" : "hover:bg-muted/50"}`,
-        onMouseDown: (e) => {
-          e.preventDefault();
-          onSelect(i);
-        },
-        onMouseEnter: () => onActiveChange(i)
-      },
-      /* @__PURE__ */ import_react7.default.createElement("div", { className: `w-5 h-5 rounded-[3px] flex items-center justify-center shrink-0 text-[9px] font-bold tracking-tighter font-mono ${s.type === "object" ? "bg-muted text-foreground border border-border/50" : s.type === "array" ? "bg-muted/50 text-foreground border border-border/50" : s.type === "null" ? "bg-transparent text-muted-foreground border border-dashed border-border/50" : "bg-primary/10 text-primary border border-primary/20"}` }, typeIcon(s.type)),
-      /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-xs font-mono text-foreground whitespace-nowrap overflow-hidden text-ellipsis" }, highlightMatch(cleanLabel, filterText))),
-      s.detail && /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] text-muted-foreground font-mono whitespace-nowrap shrink-0" }, s.detail),
-      s.type && /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[9px] font-semibold uppercase tracking-[0.04em] px-1.5 py-px rounded-[3px] border border-border text-muted-foreground bg-muted shrink-0" }, s.type)
-    );
-  })), /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex items-center justify-between px-2.5 py-1 border-t border-border bg-muted/50 shrink-0" }, /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] text-muted-foreground font-mono flex items-center gap-0.5" }, /* @__PURE__ */ import_react7.default.createElement("kbd", { className: "inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground" }, "\u2191"), /* @__PURE__ */ import_react7.default.createElement("kbd", { className: "inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground" }, "\u2193"), " navigate"), /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] text-muted-foreground font-mono flex items-center gap-0.5" }, /* @__PURE__ */ import_react7.default.createElement("kbd", { className: "inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground" }, "\u21B5"), " select \xB7 ", /* @__PURE__ */ import_react7.default.createElement("kbd", { className: "inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground" }, "Esc"), " close")));
-}
+  },
+  { decorations: (v) => v.decorations }
+);
+
+// src/components/template-autocomplete-input.jsx
 function extractTokens(value) {
   const matches = [...(value || "").matchAll(/\{\{([^}]+)\}\}/g)];
   const seen = /* @__PURE__ */ new Set();
@@ -2049,158 +2164,230 @@ var TemplateAutocompleteInput = ({
   value,
   onChange,
   placeholder,
-  suggestions = [],
   context,
+  jsonContext,
+  liveStateTree,
   isTextArea = false,
   isParagraph = false,
   rows = 4,
+  readOnly = false,
   className = ""
 }) => {
   const multiline = isTextArea || isParagraph;
-  const [showSuggestions, setShowSuggestions] = (0, import_react7.useState)(false);
-  const [filterText, setFilterText] = (0, import_react7.useState)("");
-  const [activeIdx, setActiveIdx] = (0, import_react7.useState)(-1);
-  const [dropdownTop, setDropdownTop] = (0, import_react7.useState)(null);
-  const fieldRef = (0, import_react7.useRef)(null);
-  const effectiveSuggestions = (0, import_react7.useMemo)(() => {
-    if (suggestions?.length > 0) return suggestions;
-    if (context && typeof context === "object") return deriveContextSuggestions(context);
-    return [];
-  }, [suggestions, context]);
-  const filteredSuggestions = (0, import_react7.useMemo)(() => {
-    if (!filterText) return effectiveSuggestions;
-    const lower = filterText.toLowerCase();
-    return effectiveSuggestions.filter((s) => {
-      const v = (s.value || "").replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
-      const l = (s.label || v).replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
-      return v.toLowerCase().includes(lower) || l.toLowerCase().includes(lower);
+  const containerRef = (0, import_react8.useRef)(null);
+  const viewRef = (0, import_react8.useRef)(null);
+  const internalChange = (0, import_react8.useRef)(false);
+  const readOnlyCompartment = (0, import_react8.useRef)(new import_state2.Compartment()).current;
+  const effectiveContext = (0, import_react8.useMemo)(() => {
+    if (jsonContext && typeof jsonContext === "object") return jsonContext;
+    if (context && typeof context === "object") return context;
+    if (liveStateTree && typeof liveStateTree === "object") return liveStateTree;
+    return {};
+  }, [jsonContext, context, liveStateTree]);
+  const mustacheSource = useMustacheCompletions(effectiveContext);
+  const boundTokens = (0, import_react8.useMemo)(() => extractTokens(value), [value]);
+  const lineHeightPx = 20;
+  const paddingPx = multiline ? 12 : 0;
+  const minContentH = multiline ? `${Math.max(rows * lineHeightPx + paddingPx * 2, 80)}px` : "32px";
+  const maxContentH = multiline ? "400px" : "32px";
+  const baseExtensions = (0, import_react8.useMemo)(() => {
+    const exts = [
+      (0, import_commands.history)(),
+      mustacheHighlighter,
+      (0, import_autocomplete.autocompletion)({
+        override: [mustacheSource],
+        defaultKeymap: true,
+        closeOnBlur: true,
+        activateOnTyping: true,
+        maxRenderedOptions: 50
+      }),
+      (0, import_autocomplete.closeBrackets)(),
+      import_view2.keymap.of([
+        ...import_commands.defaultKeymap,
+        ...import_commands.historyKeymap,
+        ...import_autocomplete.completionKeymap,
+        ...import_autocomplete.closeBracketsKeymap
+      ]),
+      // Update listener → propagate changes upward
+      import_view2.EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          internalChange.current = true;
+          onChange?.(update.state.doc.toString());
+        }
+      }),
+      // Theme — compact, blends with the @jet-admin/ui design system
+      import_view2.EditorView.theme({
+        "&": {
+          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          fontSize: "12px",
+          lineHeight: "1.6",
+          outline: "none",
+          background: "transparent",
+          color: "hsl(var(--foreground))"
+        },
+        ".cm-content": {
+          padding: multiline ? "8px 8px" : "0 8px",
+          minHeight: minContentH,
+          maxHeight: maxContentH,
+          caretColor: "hsl(var(--foreground))",
+          // Single-line: vertically center text
+          ...multiline ? {} : {
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "nowrap"
+          }
+        },
+        ".cm-line": {
+          padding: "0",
+          ...multiline ? {} : {
+            // Force single-line: don't allow wrapping
+          }
+        },
+        ".cm-scroller": {
+          overflow: multiline ? "auto" : "hidden",
+          maxHeight: maxContentH,
+          scrollbarWidth: "thin"
+        },
+        ".cm-focused": { outline: "none" },
+        ".cm-cursor": {
+          borderLeftColor: "hsl(var(--foreground))"
+        },
+        ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": {
+          background: "hsl(var(--primary) / 0.15)"
+        },
+        // {{ }} delimiter styling
+        ".cm-mustache-delim": {
+          color: "hsl(var(--primary))",
+          fontWeight: "600",
+          opacity: "0.9"
+        },
+        // Zone interior background tint
+        ".cm-mustache-zone": {
+          background: "hsl(var(--primary) / 0.06)",
+          borderRadius: "2px"
+        },
+        // Autocomplete dropdown — match design system
+        ".cm-tooltip.cm-tooltip-autocomplete": {
+          border: "1px solid hsl(var(--border))",
+          borderRadius: "6px",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+          background: "hsl(var(--background))",
+          fontSize: "11px",
+          overflow: "hidden",
+          maxHeight: "220px",
+          zIndex: "9999"
+        },
+        ".cm-tooltip-autocomplete > ul": {
+          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          maxHeight: "220px",
+          scrollbarWidth: "thin"
+        },
+        ".cm-tooltip-autocomplete > ul > li": {
+          padding: "4px 10px",
+          lineHeight: "1.5",
+          color: "hsl(var(--foreground))"
+        },
+        ".cm-tooltip-autocomplete > ul > li[aria-selected]": {
+          background: "hsl(var(--primary) / 0.12)",
+          color: "hsl(var(--foreground))"
+        },
+        ".cm-completionLabel": {
+          color: "hsl(var(--foreground))",
+          fontSize: "11px"
+        },
+        ".cm-completionDetail": {
+          color: "hsl(var(--muted-foreground))",
+          fontSize: "10px",
+          marginLeft: "8px"
+        },
+        ".cm-completionIcon": {
+          marginRight: "4px",
+          opacity: "0.7"
+        },
+        // Placeholder
+        ".cm-placeholder": {
+          color: "hsl(var(--muted-foreground))",
+          fontStyle: "normal",
+          fontSize: "12px"
+        }
+      })
+    ];
+    if (multiline) {
+      exts.push(import_view2.EditorView.lineWrapping);
+    }
+    if (!multiline) {
+      exts.push(
+        import_view2.keymap.of([{
+          key: "Enter",
+          run: () => true
+          // consume Enter — don't insert newline
+        }])
+      );
+      exts.push(
+        import_state2.EditorState.transactionFilter.of((tr) => {
+          if (!tr.docChanged) return tr;
+          let hasNewline = false;
+          tr.changes.iterChanges((_fromA, _toA, _fromB, _toB, inserted) => {
+            if (inserted.toString().includes("\n")) hasNewline = true;
+          });
+          return hasNewline ? [] : tr;
+        })
+      );
+    }
+    return exts;
+  }, [mustacheSource, multiline, minContentH, maxContentH]);
+  (0, import_react8.useEffect)(() => {
+    if (!containerRef.current) return;
+    containerRef.current.innerHTML = "";
+    const state = import_state2.EditorState.create({
+      doc: value || "",
+      extensions: [
+        ...baseExtensions,
+        (0, import_view2.placeholder)(placeholder || ""),
+        readOnlyCompartment.of(import_state2.EditorState.readOnly.of(readOnly))
+      ]
     });
-  }, [effectiveSuggestions, filterText]);
-  const displayedSuggestions = (0, import_react7.useMemo)(() => filteredSuggestions.slice(0, 100), [filteredSuggestions]);
-  const boundTokens = (0, import_react7.useMemo)(() => extractTokens(value), [value]);
-  const computeDropdownTop = (0, import_react7.useCallback)(() => {
-    const el = fieldRef.current;
-    if (!el || !multiline) return null;
-    const pos = el.selectionStart ?? 0;
-    const textBefore = (el.value ?? "").substring(0, pos);
-    const linesBefore = textBefore.split("\n").length;
-    const lineH = parseFloat(getComputedStyle(el).lineHeight) || 20;
-    const paddingTop = parseFloat(getComputedStyle(el).paddingTop) || 8;
-    return paddingTop + linesBefore * lineH;
-  }, [multiline]);
-  const openWith = (0, import_react7.useCallback)((filter) => {
-    setFilterText(filter);
-    setActiveIdx(-1);
-    setShowSuggestions(true);
-    if (multiline) setDropdownTop(computeDropdownTop());
-  }, [multiline, computeDropdownTop]);
-  const close = (0, import_react7.useCallback)(() => {
-    setShowSuggestions(false);
-    setActiveIdx(-1);
-  }, []);
-  const handleSelect = (0, import_react7.useCallback)((idx) => {
-    const s = displayedSuggestions[idx];
-    if (!s) return;
-    const el = fieldRef.current;
-    const pos = el?.selectionStart ?? (value || "").length;
-    const before = (value || "").substring(0, pos);
-    const after = (value || "").substring(pos);
-    const match = before.match(/\{\{([^}]*)$/);
-    const cleanVal = (s.value || "").replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
-    let newValue;
-    if (match) {
-      const strippedAfter = after.replace(/^\s*\}\}/, "");
-      newValue = before.substring(0, match.index) + "{{" + cleanVal + "}}" + strippedAfter;
-    } else {
-      newValue = "{{" + cleanVal + "}}";
+    const view = new import_view2.EditorView({ state, parent: containerRef.current });
+    viewRef.current = view;
+    return () => {
+      view.destroy();
+      viewRef.current = null;
+    };
+  }, [baseExtensions]);
+  (0, import_react8.useEffect)(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    if (internalChange.current) {
+      internalChange.current = false;
+      return;
     }
-    onChange(newValue);
-    close();
-    setTimeout(() => {
-      if (el) {
-        el.focus();
-        const newPos = match ? match.index + 2 + cleanVal.length + 2 : newValue.length;
-        el.setSelectionRange(newPos, newPos);
+    const current = view.state.doc.toString();
+    const incoming = value || "";
+    if (current !== incoming) {
+      view.dispatch({
+        changes: { from: 0, to: current.length, insert: incoming }
+      });
+    }
+  }, [value]);
+  (0, import_react8.useEffect)(() => {
+    viewRef.current?.dispatch({
+      effects: readOnlyCompartment.reconfigure(import_state2.EditorState.readOnly.of(readOnly))
+    });
+  }, [readOnly]);
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: `relative w-full ${className}` }, /* @__PURE__ */ import_react8.default.createElement(
+    "div",
+    {
+      className: `bg-input-custom border border-input-custom rounded-sm transition-shadow duration-150 [&:has(.cm-focused)]:border-border/80 [&:has(.cm-focused)]:ring-2 [&:has(.cm-focused)]:ring-primary/30`
+    },
+    /* @__PURE__ */ import_react8.default.createElement(
+      "div",
+      {
+        ref: containerRef,
+        className: "tpl-cm-container",
+        style: { cursor: "text" }
       }
-    }, 0);
-  }, [displayedSuggestions, value, onChange, close]);
-  const handleChange = (e) => {
-    onChange(e.target.value);
-    const filter = getFilterAtCaret(e.target);
-    if (filter !== null) openWith(filter);
-    else close();
-  };
-  const handleKeyDown = (e) => {
-    if (!showSuggestions) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setActiveIdx((i) => Math.min(i + 1, displayedSuggestions.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActiveIdx((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter" && activeIdx >= 0) {
-      e.preventDefault();
-      handleSelect(activeIdx);
-    } else if (e.key === "Escape") {
-      close();
-    }
-  };
-  const handleClick = () => {
-    const el = fieldRef.current;
-    if (!el) return;
-    const filter = getFilterAtCaret(el);
-    if (filter !== null) openWith(filter);
-  };
-  const handleBlur = () => {
-    setTimeout(close, 150);
-  };
-  const dropdownStyle = multiline && dropdownTop != null ? { top: dropdownTop } : { top: "calc(100% + 4px)" };
-  return /* @__PURE__ */ import_react7.default.createElement("div", { className: `relative w-full ${className}` }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "bg-input-custom border border-input-custom rounded-sm overflow-hidden transition-shadow duration-150 focus-within:border-border/80 focus-within:ring-2 focus-within:ring-primary/30" }, multiline ? /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement(
-    "textarea",
-    {
-      ref: fieldRef,
-      className: "block w-full p-2 text-xs leading-[1.6] font-mono text-foreground bg-transparent border-none outline-none resize-y min-h-[80px] placeholder:text-muted-foreground",
-      value: value || "",
-      rows,
-      placeholder,
-      onChange: handleChange,
-      onKeyDown: handleKeyDown,
-      onClick: handleClick,
-      onBlur: handleBlur,
-      autoComplete: "off",
-      spellCheck: false
-    }
-  ), boundTokens.length > 0 && /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50" }, /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0" }, "bound"), boundTokens.map((tok, i) => {
-    const match = effectiveSuggestions.find(
-      (s) => s.value.replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "") === tok
-    );
-    return /* @__PURE__ */ import_react7.default.createElement("span", { key: i, className: "inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-[10px] font-mono text-primary cursor-default max-w-full", title: match?.detail || "" }, /* @__PURE__ */ import_react7.default.createElement("span", { className: "truncate min-w-0" }, tok), match?.detail && /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[9px] text-primary/70 shrink-0" }, match.detail));
-  }))) : /* @__PURE__ */ import_react7.default.createElement(
-    "input",
-    {
-      ref: fieldRef,
-      type: "text",
-      className: "block w-full h-8 px-2 text-xs font-mono text-foreground bg-transparent border-none outline-none placeholder:text-muted-foreground",
-      value: value || "",
-      placeholder,
-      onChange: handleChange,
-      onKeyDown: handleKeyDown,
-      onClick: handleClick,
-      onBlur: handleBlur,
-      autoComplete: "off",
-      spellCheck: false
-    }
-  )), showSuggestions && /* @__PURE__ */ import_react7.default.createElement(
-    SuggestionDropdown,
-    {
-      items: displayedSuggestions,
-      totalItems: filteredSuggestions.length,
-      filterText,
-      activeIdx,
-      onSelect: handleSelect,
-      onActiveChange: setActiveIdx,
-      style: dropdownStyle
-    }
+    ),
+    multiline && boundTokens.length > 0 && /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50 rounded-b-[2px]" }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0" }, "bound"), boundTokens.map((tok, i) => /* @__PURE__ */ import_react8.default.createElement("span", { key: i, className: "inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-[10px] font-mono text-primary cursor-default max-w-full", title: tok }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "truncate min-w-0" }, tok))))
   ));
 };
 //# sourceMappingURL=index.cjs.map

@@ -1,6 +1,41 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+/**
+ * TemplateAutocompleteInput
+ *
+ * A CodeMirror 6 powered input that behaves like a plain text field, but provides
+ * full JS + JSON-schema intellisense when the cursor is inside a {{ }} zone.
+ *
+ * Ported from the standalone mustache-editor, adapted for the @jet-admin/ui
+ * design system (Tailwind tokens, compact sizing, single-line + multiline modes).
+ *
+ * Props:
+ *   value          {string}   Controlled value
+ *   onChange       {fn}       Called with new string on every change
+ *   placeholder    {string}   Placeholder text
+ *   context        {object}   JSON object; auto-derives all deep dot-paths (VS Code-style)
+ *   jsonContext    {object}   Alias for context — use whichever you prefer
+ *   liveStateTree  {object}   The live runtime state tree (wrapped as { state: … })
+ *   isTextArea     {boolean}  Multiline mode
+ *   isParagraph    {boolean}  Alias for isTextArea
+ *   rows           {number}   Approximate visible rows for textarea mode (default: 4)
+ *   readOnly       {boolean}  Read-only mode
+ *   className      {string}   Extra class on the wrapper
+ */
 
-// ─── Context crawler ──────────────────────────────────────────────────────────
+import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import { EditorView, keymap, placeholder as cmPlaceholder } from '@codemirror/view';
+import { EditorState, Compartment } from '@codemirror/state';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import {
+  autocompletion,
+  completionKeymap,
+  closeBrackets,
+  closeBracketsKeymap
+} from '@codemirror/autocomplete';
+
+import { useMustacheCompletions, getCursorZone } from './template-autocomplete/useMustacheCompletions';
+import { mustacheHighlighter } from './template-autocomplete/mustacheHighlighter';
+
+// ─── Context crawler (kept for legacy/external consumers) ─────────────────────
 export function deriveContextSuggestions(obj, prefix = "", depth = 0, maxDepth = 5) {
   if (depth > maxDepth || obj === null || obj === undefined) return [];
   const suggestions = [];
@@ -52,96 +87,6 @@ function inferType(val) {
   return typeof val;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function typeIcon(type) {
-  return { object: "{ }", array: "[ ]", primitive: "ab", null: "∅", property: "#", ctx: "⬟", form: "▣", widget: "◈" }[type] || "◆";
-}
-
-function highlightMatch(text, query) {
-  if (!query) return <span>{text}</span>;
-  const idx = text.toLowerCase().indexOf(query.toLowerCase());
-  if (idx === -1) return <span>{text}</span>;
-  return (
-    <span>
-      {text.slice(0, idx)}
-      <mark className="bg-primary/20 text-primary rounded-[2px] font-semibold px-[1px]">{text.slice(idx, idx + query.length)}</mark>
-      {text.slice(idx + query.length)}
-    </span>
-  );
-}
-
-function getFilterAtCaret(el) {
-  const pos = el.selectionStart ?? 0;
-  const before = (el.value ?? "").substring(0, pos);
-  const match = before.match(/\{\{([^}]*)$/);
-  return match ? match[1] : null;
-}
-
-// ─── Shared dropdown ──────────────────────────────────────────────────────────
-function SuggestionDropdown({ items, totalItems, filterText, activeIdx, onSelect, onActiveChange, style }) {
-  const listRef = useRef(null);
-
-  useEffect(() => {
-    if (!listRef.current || activeIdx < 0) return;
-    listRef.current.querySelectorAll(".tpl-item")[activeIdx]?.scrollIntoView({ block: "nearest" });
-  }, [activeIdx]);
-
-  return (
-    <div className="absolute left-0 right-0 z-[9999] bg-background border border-border rounded-md shadow-lg flex flex-col overflow-hidden" style={style}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-border bg-muted/50 shrink-0">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground font-mono">Bindings</span>
-        {filterText
-          ? <span className="text-[10px] text-muted-foreground font-mono truncate ml-2">
-            filtering <code className="font-mono text-[10px] bg-primary/10 px-1 py-[1.5px] rounded-[3px] border border-primary/20 text-primary">{filterText}</code>
-            &nbsp;·&nbsp;{totalItems} result{totalItems !== 1 ? "s" : ""}
-          </span>
-          : <span className="text-[10px] text-muted-foreground font-mono">{totalItems} available</span>
-        }
-      </div>
-
-      {/* List */}
-      <div className="max-h-[200px] overflow-y-auto overflow-x-hidden" ref={listRef}>
-        {items.length === 0
-          ? <div className="p-3 text-[11px] text-center text-muted-foreground font-mono">No bindings match "{filterText}"</div>
-          : items.map((s, i) => {
-            const cleanVal = (s.value || "").replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
-            const cleanLabel = (s.label || cleanVal).replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
-            return (
-              <div
-                key={i}
-                className={`tpl-item flex items-center gap-2 px-2.5 py-1.5 cursor-pointer border-b border-border last:border-0 transition-colors ${i === activeIdx ? "bg-primary/10" : "hover:bg-muted/50"}`}
-                onMouseDown={(e) => { e.preventDefault(); onSelect(i); }}
-                onMouseEnter={() => onActiveChange(i)}
-              >
-                <div className={`w-5 h-5 rounded-[3px] flex items-center justify-center shrink-0 text-[9px] font-bold tracking-tighter font-mono ${
-                  s.type === 'object' ? 'bg-muted text-foreground border border-border/50' :
-                  s.type === 'array' ? 'bg-muted/50 text-foreground border border-border/50' :
-                  s.type === 'null' ? 'bg-transparent text-muted-foreground border border-dashed border-border/50' :
-                  'bg-primary/10 text-primary border border-primary/20'
-                }`}>{typeIcon(s.type)}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-mono text-foreground whitespace-nowrap overflow-hidden text-ellipsis">{highlightMatch(cleanLabel, filterText)}</div>
-                </div>
-                {s.detail && <span className="text-[10px] text-muted-foreground font-mono whitespace-nowrap shrink-0">{s.detail}</span>}
-                {s.type && <span className="text-[9px] font-semibold uppercase tracking-[0.04em] px-1.5 py-px rounded-[3px] border border-border text-muted-foreground bg-muted shrink-0">{s.type}</span>}
-              </div>
-            );
-          })
-        }
-      </div>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between px-2.5 py-1 border-t border-border bg-muted/50 shrink-0">
-        <span className="text-[10px] text-muted-foreground font-mono flex items-center gap-0.5"><kbd className="inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground">↑</kbd><kbd className="inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground">↓</kbd> navigate</span>
-        <span className="text-[10px] text-muted-foreground font-mono flex items-center gap-0.5"><kbd className="inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground">↵</kbd> select · <kbd className="inline-flex items-center px-1 h-4 text-[9px] font-mono bg-background border border-border rounded-[3px] text-muted-foreground">Esc</kbd> close</span>
-      </div>
-    </div>
-  );
-}
-
-// CSS removed, utilizing Tailwind classes directly
-
 // ─── Extract all {{tokens}} currently in value (for chip bar) ─────────────────
 function extractTokens(value) {
   const matches = [...(value || "").matchAll(/\{\{([^}]+)\}\}/g)];
@@ -154,228 +99,281 @@ function extractTokens(value) {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-/**
- * TemplateAutocompleteInput
- *
- * Props:
- *   value        {string}
- *   onChange     {fn}
- *   placeholder  {string}
- *   suggestions  {Array}   – explicit list; each: { value, label?, detail?, type? }
- *   context      {object}  – JSON object; auto-derives all deep dot-paths when
- *                            suggestions is empty/absent (VS Code-style)
- *   isTextArea   {boolean} – multiline mode
- *   isParagraph  {boolean} – alias for isTextArea
- *   rows         {number}  – initial visible rows for textarea
- *   className    {string}
- */
 export const TemplateAutocompleteInput = ({
   value,
   onChange,
   placeholder,
-  suggestions = [],
   context,
+  jsonContext,
+  liveStateTree,
   isTextArea = false,
   isParagraph = false,
   rows = 4,
+  readOnly = false,
   className = "",
 }) => {
   const multiline = isTextArea || isParagraph;
+  const containerRef = useRef(null);
+  const viewRef = useRef(null);
+  const internalChange = useRef(false);
+  // Each instance gets its own Compartment to avoid shared state conflicts
+  const readOnlyCompartment = useRef(new Compartment()).current;
 
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [filterText, setFilterText] = useState("");
-  const [activeIdx, setActiveIdx] = useState(-1);
-  // For multiline: position the dropdown just below the caret line
-  const [dropdownTop, setDropdownTop] = useState(null);
+  // Merge context sources: jsonContext > context > liveStateTree > derive from suggestions
+  const effectiveContext = useMemo(() => {
+    if (jsonContext && typeof jsonContext === 'object') return jsonContext;
+    if (context && typeof context === 'object') return context;
+    if (liveStateTree && typeof liveStateTree === 'object') return liveStateTree;
+    return {};
+  }, [jsonContext, context, liveStateTree]);
 
-  const fieldRef = useRef(null); // the input or textarea element
+  // Build the CodeMirror completion source
+  const mustacheSource = useMustacheCompletions(effectiveContext);
 
-  // ── Effective suggestions ─────────────────────────────────────────────────
-  const effectiveSuggestions = useMemo(() => {
-    if (suggestions?.length > 0) return suggestions;
-    if (context && typeof context === "object") return deriveContextSuggestions(context);
-    return [];
-  }, [suggestions, context]);
-
-  const filteredSuggestions = useMemo(() => {
-    if (!filterText) return effectiveSuggestions;
-    const lower = filterText.toLowerCase();
-    return effectiveSuggestions.filter((s) => {
-      const v = (s.value || "").replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
-      const l = (s.label || v).replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
-      return v.toLowerCase().includes(lower) || l.toLowerCase().includes(lower);
-    });
-  }, [effectiveSuggestions, filterText]);
-
-  const displayedSuggestions = useMemo(() => filteredSuggestions.slice(0, 100), [filteredSuggestions]);
-
-  // ── Chip tokens (multiline — show currently bound tokens below textarea) ──
+  // Token chip bar for multiline — shows all {{bindings}} currently in value
   const boundTokens = useMemo(() => extractTokens(value), [value]);
 
-  // ── Caret pixel position for multiline dropdown ───────────────────────────
-  // We approximate vertical position using line height × current line number.
-  const computeDropdownTop = useCallback(() => {
-    const el = fieldRef.current;
-    if (!el || !multiline) return null;
-    const pos = el.selectionStart ?? 0;
-    const textBefore = (el.value ?? "").substring(0, pos);
-    const linesBefore = textBefore.split("\n").length;
-    const lineH = parseFloat(getComputedStyle(el).lineHeight) || 20;
-    const paddingTop = parseFloat(getComputedStyle(el).paddingTop) || 8;
-    // top of dropdown = bottom of current line
-    return paddingTop + linesBefore * lineH;
-  }, [multiline]);
+  // Compute heights based on mode
+  const lineHeightPx = 20; // approximate line height in px
+  const paddingPx = multiline ? 12 : 0;
+  const minContentH = multiline ? `${Math.max(rows * lineHeightPx + paddingPx * 2, 80)}px` : '32px';
+  const maxContentH = multiline ? '400px' : '32px';
 
-  // ── Open / close helpers ──────────────────────────────────────────────────
-  const openWith = useCallback((filter) => {
-    setFilterText(filter);
-    setActiveIdx(-1);
-    setShowSuggestions(true);
-    if (multiline) setDropdownTop(computeDropdownTop());
-  }, [multiline, computeDropdownTop]);
+  // Build base extensions
+  const baseExtensions = useMemo(() => {
+    const exts = [
+      history(),
+      mustacheHighlighter,
 
-  const close = useCallback(() => {
-    setShowSuggestions(false);
-    setActiveIdx(-1);
-  }, []);
+      autocompletion({
+        override: [mustacheSource],
+        defaultKeymap: true,
+        closeOnBlur: true,
+        activateOnTyping: true,
+        maxRenderedOptions: 50,
+      }),
 
-  // ── Selection logic ───────────────────────────────────────────────────────
-  const handleSelect = useCallback((idx) => {
-    const s = displayedSuggestions[idx];
-    if (!s) return;
-    const el = fieldRef.current;
-    const pos = el?.selectionStart ?? (value || "").length;
-    const before = (value || "").substring(0, pos);
-    const after = (value || "").substring(pos);
-    const match = before.match(/\{\{([^}]*)$/);
-    const cleanVal = (s.value || "").replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "");
+      closeBrackets(),
 
-    let newValue;
-    if (match) {
-      const strippedAfter = after.replace(/^\s*\}\}/, "");
-      newValue = before.substring(0, match.index) + "{{" + cleanVal + "}}" + strippedAfter;
-    } else {
-      newValue = "{{" + cleanVal + "}}";
+      keymap.of([
+        ...defaultKeymap,
+        ...historyKeymap,
+        ...completionKeymap,
+        ...closeBracketsKeymap,
+      ]),
+
+      // Update listener → propagate changes upward
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          internalChange.current = true;
+          onChange?.(update.state.doc.toString());
+        }
+      }),
+
+      // Theme — compact, blends with the @jet-admin/ui design system
+      EditorView.theme({
+        '&': {
+          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          fontSize: '12px',
+          lineHeight: '1.6',
+          outline: 'none',
+          background: 'transparent',
+          color: 'hsl(var(--foreground))',
+        },
+        '.cm-content': {
+          padding: multiline ? '8px 8px' : '0 8px',
+          minHeight: minContentH,
+          maxHeight: maxContentH,
+          caretColor: 'hsl(var(--foreground))',
+          // Single-line: vertically center text
+          ...(multiline ? {} : {
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'nowrap',
+          }),
+        },
+        '.cm-line': {
+          padding: '0',
+          ...(multiline ? {} : {
+            // Force single-line: don't allow wrapping
+          }),
+        },
+        '.cm-scroller': {
+          overflow: multiline ? 'auto' : 'hidden',
+          maxHeight: maxContentH,
+          scrollbarWidth: 'thin',
+        },
+        '.cm-focused': { outline: 'none' },
+        '.cm-cursor': {
+          borderLeftColor: 'hsl(var(--foreground))',
+        },
+        '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
+          background: 'hsl(var(--primary) / 0.15)',
+        },
+        // {{ }} delimiter styling
+        '.cm-mustache-delim': {
+          color: 'hsl(var(--primary))',
+          fontWeight: '600',
+          opacity: '0.9',
+        },
+        // Zone interior background tint
+        '.cm-mustache-zone': {
+          background: 'hsl(var(--primary) / 0.06)',
+          borderRadius: '2px',
+        },
+        // Autocomplete dropdown — match design system
+        '.cm-tooltip.cm-tooltip-autocomplete': {
+          border: '1px solid hsl(var(--border))',
+          borderRadius: '6px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          background: 'hsl(var(--background))',
+          fontSize: '11px',
+          overflow: 'hidden',
+          maxHeight: '220px',
+          zIndex: '9999',
+        },
+        '.cm-tooltip-autocomplete > ul': {
+          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          maxHeight: '220px',
+          scrollbarWidth: 'thin',
+        },
+        '.cm-tooltip-autocomplete > ul > li': {
+          padding: '4px 10px',
+          lineHeight: '1.5',
+          color: 'hsl(var(--foreground))',
+        },
+        '.cm-tooltip-autocomplete > ul > li[aria-selected]': {
+          background: 'hsl(var(--primary) / 0.12)',
+          color: 'hsl(var(--foreground))',
+        },
+        '.cm-completionLabel': {
+          color: 'hsl(var(--foreground))',
+          fontSize: '11px',
+        },
+        '.cm-completionDetail': {
+          color: 'hsl(var(--muted-foreground))',
+          fontSize: '10px',
+          marginLeft: '8px',
+        },
+        '.cm-completionIcon': {
+          marginRight: '4px',
+          opacity: '0.7',
+        },
+        // Placeholder
+        '.cm-placeholder': {
+          color: 'hsl(var(--muted-foreground))',
+          fontStyle: 'normal',
+          fontSize: '12px',
+        },
+      }),
+    ];
+
+    // Line wrapping for multiline mode
+    if (multiline) {
+      exts.push(EditorView.lineWrapping);
     }
 
-    onChange(newValue);
-    close();
-
-    setTimeout(() => {
-      if (el) {
-        el.focus();
-        const newPos = match ? match.index + 2 + cleanVal.length + 2 : newValue.length;
-        el.setSelectionRange(newPos, newPos);
-      }
-    }, 0);
-  }, [displayedSuggestions, value, onChange, close]);
-
-  // ── Event handlers (shared between input and textarea) ───────────────────
-  const handleChange = (e) => {
-    onChange(e.target.value);
-    const filter = getFilterAtCaret(e.target);
-    if (filter !== null) openWith(filter);
-    else close();
-  };
-
-  const handleKeyDown = (e) => {
-    if (!showSuggestions) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setActiveIdx((i) => Math.min(i + 1, displayedSuggestions.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActiveIdx((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter" && activeIdx >= 0) {
-      e.preventDefault();
-      handleSelect(activeIdx);
-    } else if (e.key === "Escape") {
-      close();
+    // Single-line: block Enter key from inserting newlines
+    if (!multiline) {
+      exts.push(
+        keymap.of([{
+          key: 'Enter',
+          run: () => true, // consume Enter — don't insert newline
+        }])
+      );
+      // Prevent newlines via transaction filter
+      exts.push(
+        EditorState.transactionFilter.of(tr => {
+          if (!tr.docChanged) return tr;
+          let hasNewline = false;
+          tr.changes.iterChanges((_fromA, _toA, _fromB, _toB, inserted) => {
+            if (inserted.toString().includes('\n')) hasNewline = true;
+          });
+          return hasNewline ? [] : tr;
+        })
+      );
     }
-  };
 
-  const handleClick = () => {
-    const el = fieldRef.current;
-    if (!el) return;
-    const filter = getFilterAtCaret(el);
-    if (filter !== null) openWith(filter);
-  };
+    return exts;
+  }, [mustacheSource, multiline, minContentH, maxContentH]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleBlur = () => {
-    setTimeout(close, 150);
-  };
+  // ── Mount the editor once ────────────────────────────────────────────────
+  useEffect(() => {
+    if (!containerRef.current) return;
 
-  // Dropdown style: for single-line anchors to bottom of field wrapper;
-  // for multiline anchors to caret position inside the textarea.
-  const dropdownStyle = multiline && dropdownTop != null
-    ? { top: dropdownTop }
-    : { top: "calc(100% + 4px)" };
+    // Clear any previous content
+    containerRef.current.innerHTML = '';
+
+    const state = EditorState.create({
+      doc: value || '',
+      extensions: [
+        ...baseExtensions,
+        cmPlaceholder(placeholder || ''),
+        readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
+      ],
+    });
+
+    const view = new EditorView({ state, parent: containerRef.current });
+    viewRef.current = view;
+
+    return () => {
+      view.destroy();
+      viewRef.current = null;
+    };
+  }, [baseExtensions]); // re-mount when extensions change
+
+  // ── Sync external value changes INTO the editor ──────────────────────────
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+
+    // Skip if this change originated inside the editor (we already have it)
+    if (internalChange.current) {
+      internalChange.current = false;
+      return;
+    }
+
+    const current = view.state.doc.toString();
+    const incoming = value || '';
+    if (current !== incoming) {
+      view.dispatch({
+        changes: { from: 0, to: current.length, insert: incoming },
+      });
+    }
+  }, [value]);
+
+  // ── Hot-swap readOnly ────────────────────────────────────────────────────
+  useEffect(() => {
+    viewRef.current?.dispatch({
+      effects: readOnlyCompartment.reconfigure(EditorState.readOnly.of(readOnly)),
+    });
+  }, [readOnly]);
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className={`relative w-full ${className}`}>
-      <div className="bg-input-custom border border-input-custom rounded-sm overflow-hidden transition-shadow duration-150 focus-within:border-border/80 focus-within:ring-2 focus-within:ring-primary/30">
-        {multiline ? (
-          <>
-            <textarea
-              ref={fieldRef}
-              className="block w-full p-2 text-xs leading-[1.6] font-mono text-foreground bg-transparent border-none outline-none resize-y min-h-[80px] placeholder:text-muted-foreground"
-              value={value || ""}
-              rows={rows}
-              placeholder={placeholder}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              onClick={handleClick}
-              onBlur={handleBlur}
-              autoComplete="off"
-              spellCheck={false}
-            />
-            {/* Token chip bar — shows all {{bindings}} currently in the value */}
-            {boundTokens.length > 0 && (
-              <div className="flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50">
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0">bound</span>
-                {boundTokens.map((tok, i) => {
-                  const match = effectiveSuggestions.find(
-                    (s) => s.value.replace(/^\{\{\s*/, "").replace(/\s*\}\}$/, "") === tok
-                  );
-                  return (
-                    <span key={i} className="inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-[10px] font-mono text-primary cursor-default max-w-full" title={match?.detail || ""}>
-                      <span className="truncate min-w-0">{tok}</span>
-                      {match?.detail && <span className="text-[9px] text-primary/70 shrink-0">{match.detail}</span>}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        ) : (
-          <input
-            ref={fieldRef}
-            type="text"
-            className="block w-full h-8 px-2 text-xs font-mono text-foreground bg-transparent border-none outline-none placeholder:text-muted-foreground"
-            value={value || ""}
-            placeholder={placeholder}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            onClick={handleClick}
-            onBlur={handleBlur}
-            autoComplete="off"
-            spellCheck={false}
-          />
+      <div
+        className={`bg-input-custom border border-input-custom rounded-sm transition-shadow duration-150 [&:has(.cm-focused)]:border-border/80 [&:has(.cm-focused)]:ring-2 [&:has(.cm-focused)]:ring-primary/30`}
+      >
+        {/* CodeMirror editor mount point */}
+        <div
+          ref={containerRef}
+          className="tpl-cm-container"
+          style={{ cursor: 'text' }}
+        />
+
+        {/* Token chip bar — shows all {{bindings}} currently in the value (multiline only) */}
+        {multiline && boundTokens.length > 0 && (
+          <div className="flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50 rounded-b-[2px]">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0">bound</span>
+            {boundTokens.map((tok, i) => (
+              <span key={i} className="inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-[10px] font-mono text-primary cursor-default max-w-full" title={tok}>
+                <span className="truncate min-w-0">{tok}</span>
+              </span>
+            ))}
+          </div>
         )}
       </div>
-
-      {showSuggestions && (
-        <SuggestionDropdown
-          items={displayedSuggestions}
-          totalItems={filteredSuggestions.length}
-          filterText={filterText}
-          activeIdx={activeIdx}
-          onSelect={handleSelect}
-          onActiveChange={setActiveIdx}
-          style={dropdownStyle}
-        />
-      )}
     </div>
   );
 };

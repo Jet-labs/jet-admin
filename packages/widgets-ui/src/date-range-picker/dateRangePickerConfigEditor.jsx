@@ -2,20 +2,10 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Input, Label, Checkbox } from '@jet-admin/ui';
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import { getSuggestionsFromStateTree } from '../intellisense/suggestionEngine';
 
 export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-
-  const suggestions = useMemo(() => {
-    if (!stateTree) return [];
-    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-    return rawSuggestions.map((s) => ({
-      label: `{{${s.value}}}`,
-      value: `{{${s.value}}}`,
-      detail: s.detail,
-    }));
-  }, [stateTree]);
+  const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
     <div className="space-y-4">
@@ -72,7 +62,7 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => 
             value={config.defaultStart || ''}
             onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.defaultStart', val)}
             placeholder="e.g. {{state.variables.startDate}}"
-            suggestions={suggestions}
+            liveStateTree={liveStateTree}
           />
         </div>
 
@@ -82,7 +72,7 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => 
             value={config.defaultEnd || ''}
             onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.defaultEnd', val)}
             placeholder="e.g. {{state.variables.endDate}}"
-            suggestions={suggestions}
+            liveStateTree={liveStateTree}
           />
         </div>
       </div>
@@ -94,7 +84,7 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => 
           value={config.isLoading || ""}
           onChange={(val) => widgetEditorForm.setFieldValue('widgetConfig.isLoading', val)}
           placeholder="e.g. {{ state.queries.myQuery.isLoading }}"
-          suggestions={suggestions.filter(s => s.detail === 'boolean' || !s.detail)}
+          liveStateTree={liveStateTree}
         />
       </div>
     </div>

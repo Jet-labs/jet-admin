@@ -142,226 +142,8 @@ var init_vega = __esm({
   }
 });
 
-// src/intellisense/suggestionEngine.js
-import { getWidgetMethods, getEventArgs } from "@jet-admin/widget-types";
-function collectLeaves(shape, prefix) {
-  const leaves = [];
-  if (shape === "__WILDCARD__") return leaves;
-  if (typeof shape !== "object" || shape === null) {
-    leaves.push({ path: prefix, ...typeof shape === "object" ? shape : {} });
-    return leaves;
-  }
-  for (const [key, value] of Object.entries(shape)) {
-    if (key === "__WILDCARD__") continue;
-    const childPrefix = prefix ? `${prefix}.${key}` : key;
-    if (typeof value === "object" && value !== null && !value.type) {
-      leaves.push(...collectLeaves(value, childPrefix));
-    } else if (typeof value === "object" && value !== null && value.type) {
-      leaves.push({
-        path: childPrefix,
-        type: value.type,
-        detail: value.detail || ""
-      });
-    }
-  }
-  return leaves;
-}
-function expandWildcard(shape, wildcardValues, root) {
-  const results = [];
-  const wildcardShape = shape.__WILDCARD__;
-  if (!wildcardShape) return results;
-  for (const { alias, label } of wildcardValues) {
-    const childLeaves = collectLeaves(wildcardShape, "");
-    for (const leaf of childLeaves) {
-      const fullPath = `state.${root}.${alias}.${leaf.path}`;
-      results.push({
-        label: `{{${fullPath}}}`,
-        value: `{{${fullPath}}}`,
-        detail: leaf.detail || `${label} ${leaf.path}`
-      });
-    }
-  }
-  return results;
-}
-function getExpressionSuggestions({ dataSources = [], variableDefinitions = [], widgetType, eventType } = {}) {
-  const suggestions = [];
-  const queryAliases = dataSources.filter((ds) => ds.type !== "workflow" && ds.alias).map((ds) => ({ alias: ds.alias, label: ds.alias }));
-  suggestions.push(
-    ...expandWildcard(STATE_TREE_SHAPE.queries, queryAliases, "queries")
-  );
-  const workflowAliases = dataSources.filter((ds) => ds.type === "workflow" && ds.alias).map((ds) => ({ alias: ds.alias, label: ds.alias }));
-  suggestions.push(
-    ...expandWildcard(STATE_TREE_SHAPE.workflows, workflowAliases, "workflows")
-  );
-  for (const def of variableDefinitions) {
-    if (def.key) {
-      suggestions.push({
-        label: `{{state.variables.${def.key}}}`,
-        value: `{{state.variables.${def.key}}}`,
-        detail: "page variable"
-      });
-    }
-  }
-  const eventArgs = getEventArgs(widgetType, eventType);
-  for (const arg of eventArgs) {
-    const fullPath = `state.${arg.key}`;
-    suggestions.push({
-      label: `{{${fullPath}}}`,
-      value: `{{${fullPath}}}`,
-      detail: arg.description
-    });
-  }
-  for (const g of COMMON_GLOBALS) {
-    suggestions.push({
-      label: `{{${g.key}}}`,
-      value: `{{${g.key}}}`,
-      detail: g.detail
-    });
-  }
-  return suggestions;
-}
-function getAliasSuggestions(dataSources = []) {
-  return dataSources.filter((ds) => ds.alias).map((ds) => ({
-    label: ds.alias,
-    value: ds.alias,
-    detail: ds.type || "data source"
-  }));
-}
-function getVariableKeySuggestions(variableDefinitions = []) {
-  const suggestions = [];
-  const existing = /* @__PURE__ */ new Set();
-  for (const def of variableDefinitions) {
-    if (def.key && !existing.has(def.key)) {
-      existing.add(def.key);
-      suggestions.push({
-        label: `state.variables.${def.key}`,
-        value: `state.variables.${def.key}`,
-        detail: "page variable"
-      });
-    }
-  }
-  for (const common of COMMON_PAGINATION_VARIABLES) {
-    if (!existing.has(common)) {
-      suggestions.push({
-        label: `state.variables.${common}`,
-        value: `state.variables.${common}`,
-        detail: "pagination"
-      });
-    }
-  }
-  return suggestions;
-}
-function getWidgetIDSuggestions(widgets = [], pageConfig) {
-  if (!widgets || !Array.isArray(widgets)) return [];
-  const placedWidgetIDs = (pageConfig?.widgets || []).map((k) => {
-    const parts = String(k).split("_");
-    return parts.length > 1 ? parts[1] : parts[0];
-  }).filter(Boolean);
-  const filtered = placedWidgetIDs.length > 0 ? widgets.filter((w) => placedWidgetIDs.includes(w.widgetID)) : widgets;
-  return filtered.map((w) => ({
-    label: w.widgetTitle || w.widgetID,
-    value: w.widgetID,
-    detail: w.widgetType
-  }));
-}
-function getMethodSuggestionsForTarget(targetWidgetID, widgets = []) {
-  const widget = widgets?.find((w) => w.widgetID === targetWidgetID);
-  if (!widget) return [];
-  const methods = getWidgetMethods(widget.widgetType);
-  return methods.map((m) => ({
-    label: m.name,
-    value: m.name,
-    detail: m.description
-  }));
-}
-function getSuggestionsFromStateTree(obj, prefix = "state", depth = 0, maxDepth = 4) {
-  const results = [];
-  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-  for (const key of Object.keys(obj)) {
-    if (key.startsWith("__")) continue;
-    const val = obj[key];
-    const fullPath = prefix ? `${prefix}.${key}` : key;
-    let valueType = typeof val;
-    let detail = "";
-    if (val === null) {
-      valueType = "null";
-      detail = "null";
-    } else if (val === void 0) {
-      valueType = "undefined";
-      detail = "undefined";
-    } else if (Array.isArray(val)) {
-      valueType = "array";
-      if (val.length > 0 && typeof val[0] === "object" && val[0] !== null) {
-        detail = `Array[${val.length}] (fields: ${Object.keys(val[0]).slice(0, 3).join(", ")})`;
-      } else {
-        detail = `Array[${val.length}]`;
-      }
-    } else if (typeof val === "boolean") {
-      valueType = "boolean";
-      detail = `= ${val}`;
-    } else if (typeof val === "number") {
-      valueType = "number";
-      detail = `= ${val}`;
-    } else if (typeof val === "string") {
-      valueType = "string";
-      detail = `"${val.slice(0, 20)}${val.length > 20 ? "..." : ""}"`;
-    } else if (typeof val === "object") {
-      valueType = "object";
-      const keys = Object.keys(val);
-      if (keys.length > 0) {
-        detail = `Object { ${keys.slice(0, 3).join(", ")}${keys.length > 3 ? ", ..." : ""} }`;
-      } else {
-        detail = "Object {}";
-      }
-    }
-    results.push({
-      value: fullPath,
-      path: fullPath,
-      valueType,
-      rawValue: val,
-      detail
-    });
-    if (val && typeof val === "object" && !Array.isArray(val)) {
-      const childSuggestions = getSuggestionsFromStateTree(val, fullPath, depth + 1, maxDepth);
-      for (let i = 0; i < childSuggestions.length; i++) {
-        results.push(childSuggestions[i]);
-      }
-    }
-  }
-  return results;
-}
-var STATE_TREE_SHAPE, COMMON_PAGINATION_VARIABLES, COMMON_GLOBALS;
-var init_suggestionEngine = __esm({
-  "src/intellisense/suggestionEngine.js"() {
-    STATE_TREE_SHAPE = {
-      queries: {
-        __WILDCARD__: {
-          data: { type: "any", detail: "Query result data" },
-          isLoading: { type: "boolean", detail: "Loading state" },
-          error: { type: "string|null", detail: "Error message if failed" },
-          lastUpdated: { type: "string", detail: "ISO timestamp of last result" }
-        }
-      },
-      workflows: {
-        __WILDCARD__: {
-          data: { type: "any", detail: "Workflow result data" },
-          isLoading: { type: "boolean", detail: "Loading state" },
-          error: { type: "string|null", detail: "Error message if failed" },
-          instanceID: { type: "string", detail: "Workflow instance ID" },
-          lastUpdated: { type: "string", detail: "ISO timestamp of last result" }
-        }
-      }
-    };
-    COMMON_PAGINATION_VARIABLES = ["skip", "limit", "page", "pageSize"];
-    COMMON_GLOBALS = [
-      { key: "state.globals.tenantID", detail: "Current tenant ID" },
-      { key: "state.globals.pageID", detail: "Current page ID" }
-    ];
-  }
-});
-
 // src/table/tableWidget.jsx
-import React9, { useMemo as useMemo5, useState as useState7, useEffect as useEffect5, useCallback as useCallback6, useRef as useRef5 } from "react";
+import React9, { useMemo as useMemo6, useState as useState7, useEffect as useEffect5, useCallback as useCallback6, useRef as useRef5 } from "react";
 import PropTypes8 from "prop-types";
 import {
   useReactTable,
@@ -469,13 +251,13 @@ var init_tableWidget = __esm({
       setWidgetState,
       onRowSelect
     }) => {
-      const tableData = useMemo5(() => {
+      const tableData = useMemo6(() => {
         if (processedData && typeof processedData === "object" && !Array.isArray(processedData)) return processedData;
         if (Array.isArray(processedData)) return { data: processedData, columns: [], pagination: { enabled: false } };
         return { data: [], columns: [], pagination: { enabled: false } };
       }, [processedData]);
       const rows = tableData.data || [];
-      const isLoading = useMemo5(() => {
+      const isLoading = useMemo6(() => {
         if (tableData.isLoading !== void 0) {
           return tableData.isLoading === true || tableData.isLoading === "true";
         }
@@ -484,7 +266,7 @@ var init_tableWidget = __esm({
         }
         return !!isLoadingWorkflows;
       }, [tableData.isLoading, widgetConfig?.isLoading, isLoadingWorkflows]);
-      const configColumns = useMemo5(() => {
+      const configColumns = useMemo6(() => {
         const cols = tableData.columns?.length ? tableData.columns : widgetConfig?.columns?.length ? widgetConfig.columns : [];
         if (cols.length > 0) return cols;
         if (rows.length > 0 && typeof rows[0] === "object" && rows[0] !== null) {
@@ -529,7 +311,7 @@ var init_tableWidget = __esm({
           pendingEdits
         }));
       }, [globalFilter, rowSelection, rows, pendingEdits, setWidgetState]);
-      const columnDefs = useMemo5(() => {
+      const columnDefs = useMemo6(() => {
         const defs = [];
         if (multiSelectConfig.enabled) {
           defs.push({
@@ -838,7 +620,7 @@ var init_tableWidget = __esm({
 });
 
 // src/table/tableConfigEditor.jsx
-import React10, { useMemo as useMemo6, useCallback as useCallback7 } from "react";
+import React10, { useMemo as useMemo7, useCallback as useCallback7 } from "react";
 import PropTypes9 from "prop-types";
 import {
   Input as Input5,
@@ -853,12 +635,11 @@ import {
   Checkbox as Checkbox2
 } from "@jet-admin/ui";
 import { Trash2, Plus as Plus2, ArrowUp, ArrowDown, Sparkles as Sparkles2, Zap as Zap2 } from "lucide-react";
-import { TemplateAutocompleteInput as TemplateAutocompleteInput2 } from "@jet-admin/ui";
+import { TemplateAutocompleteInput as TemplateAutocompleteInput3 } from "@jet-admin/ui";
 import { getValueByPath as getValueByPath3 } from "@jet-admin/template-engine";
 var resolvePath, TableConfigEditor;
 var init_tableConfigEditor = __esm({
   "src/table/tableConfigEditor.jsx"() {
-    init_suggestionEngine();
     resolvePath = (obj, path) => {
       if (!obj || !path) return void 0;
       return getValueByPath3(obj, path, { allowedRoots: ["state"] });
@@ -878,68 +659,10 @@ var init_tableConfigEditor = __esm({
       const editing = config.editing || { enabled: false };
       const multiSelect = config.multiSelect || { enabled: false, showSelectAll: true, actions: [] };
       const bulkEdit = config.bulkEdit || { enabled: false, saveLabel: "Save All Changes" };
-      const aliasSuggestions = useMemo6(() => {
-        const suggestions = [];
-        if (!stateTree) return suggestions;
-        if (stateTree.queries) {
-          Object.keys(stateTree.queries).forEach((alias) => suggestions.push(`state.queries.${alias}`));
-        }
-        if (stateTree.workflows) {
-          Object.keys(stateTree.workflows).forEach((alias) => suggestions.push(`state.workflows.${alias}`));
-        }
-        return suggestions;
-      }, [stateTree]);
-      const stateTreeSuggestions = useMemo6(() => {
-        return getSuggestionsFromStateTree(stateTree);
-      }, [stateTree]);
-      const arraySuggestions = useMemo6(() => {
-        const fromTree = stateTreeSuggestions.filter((s) => s.valueType === "array").map((s) => ({
-          label: `{{${s.value}}}`,
-          value: `{{${s.value}}}`,
-          detail: s.detail || "Runtime data array"
-        }));
-        if (fromTree.length === 0 && aliasSuggestions.length > 0) {
-          return aliasSuggestions.map((alias) => ({
-            label: `{{${alias}.data}}`,
-            value: `{{${alias}.data}}`,
-            detail: "suggested"
-          }));
-        }
-        return fromTree;
-      }, [stateTreeSuggestions, aliasSuggestions]);
-      const scalarSuggestions = useMemo6(() => {
-        const fromTree = stateTreeSuggestions.filter((s) => s.valueType === "scalar" && !isNaN(Number(s.rawValue))).map((s) => ({
-          label: `{{${s.value}}}`,
-          value: `{{${s.value}}}`,
-          detail: `= ${s.rawValue}`
-        }));
-        if (fromTree.length === 0 && aliasSuggestions.length > 0) {
-          return aliasSuggestions.map((alias) => ({
-            label: `{{${alias}.total}}`,
-            value: `{{${alias}.total}}`,
-            detail: "suggested"
-          }));
-        }
-        return fromTree;
-      }, [stateTreeSuggestions, aliasSuggestions]);
-      const loadingSuggestions = useMemo6(() => {
-        const fromTree = stateTreeSuggestions.filter((s) => s.valueType === "boolean").map((s) => ({
-          label: `{{${s.value}}}`,
-          value: `{{${s.value}}}`,
-          detail: `= ${s.rawValue}`
-        }));
-        if (fromTree.length === 0 && aliasSuggestions.length > 0) {
-          return aliasSuggestions.map((alias) => ({
-            label: `{{${alias}.isLoading}}`,
-            value: `{{${alias}.isLoading}}`,
-            detail: "suggested"
-          }));
-        }
-        return fromTree;
-      }, [stateTreeSuggestions, aliasSuggestions]);
+      const liveStateTree = useMemo7(() => stateTree ? { state: stateTree } : null, [stateTree]);
       const dataArrayPathStr = config.dataArrayTemplate || config.dataMapping?.dataArrayPath || "";
       const dataArrayPath = dataArrayPathStr.replace(/^\{{\s*/, "").replace(/\s*}}$/, "");
-      const discoveredColumns = useMemo6(() => {
+      const discoveredColumns = useMemo7(() => {
         if (!stateTree || !dataArrayPath) return [];
         const resolved = resolvePath(stateTree, dataArrayPath);
         if (Array.isArray(resolved) && resolved.length > 0 && typeof resolved[0] === "object") {
@@ -951,7 +674,7 @@ var init_tableConfigEditor = __esm({
         }
         return [];
       }, [stateTree, dataArrayPath]);
-      const availableKeys = useMemo6(() => {
+      const availableKeys = useMemo7(() => {
         return discoveredColumns.map((c) => c.key);
       }, [discoveredColumns]);
       const handleAddColumn = useCallback7(() => {
@@ -1028,28 +751,28 @@ var init_tableConfigEditor = __esm({
         });
       };
       return /* @__PURE__ */ React10.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Data Array Template"), /* @__PURE__ */ React10.createElement(
-        TemplateAutocompleteInput2,
+        TemplateAutocompleteInput3,
         {
           value: config.dataArrayTemplate || config.dataMapping?.dataArrayPath || "",
           onChange: (val) => handleConfigChange("dataArrayTemplate", val),
           placeholder: "e.g. {{ state.queries.my_query.data }}",
-          suggestions: arraySuggestions
+          liveStateTree
         }
       ), /* @__PURE__ */ React10.createElement("p", { className: "text-[0.65rem] text-muted-foreground" }, "Mustache template evaluating to an array of objects.")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Total Count Template ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React10.createElement(
-        TemplateAutocompleteInput2,
+        TemplateAutocompleteInput3,
         {
           value: pagination.totalTemplate || config.dataMapping?.totalCountPath || "",
           onChange: (val) => handlePaginationChange("totalTemplate", val),
           placeholder: "e.g. {{ state.queries.my_query.total }}",
-          suggestions: scalarSuggestions
+          liveStateTree
         }
       ), /* @__PURE__ */ React10.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use array length.")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React10.createElement(
-        TemplateAutocompleteInput2,
+        TemplateAutocompleteInput3,
         {
           value: config.isLoading || "",
           onChange: (val) => handleConfigChange("isLoading", val),
           placeholder: "e.g. {{ state.queries.my_query.isLoading }}",
-          suggestions: loadingSuggestions
+          liveStateTree
         }
       ), /* @__PURE__ */ React10.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Mustache template evaluating to a boolean loading state."))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Table Columns"), /* @__PURE__ */ React10.createElement("div", { className: "flex gap-1" }, discoveredColumns.length > 0 && /* @__PURE__ */ React10.createElement(
         Button5,
@@ -1275,25 +998,16 @@ var init_buttonConfigEditor = __esm({
 });
 
 // src/date-picker/datePickerConfigEditor.jsx
-import React16, { useMemo as useMemo11 } from "react";
+import React16, { useMemo as useMemo13 } from "react";
 import PropTypes15 from "prop-types";
 import { Input as Input10, Label as Label9, Checkbox as Checkbox5 } from "@jet-admin/ui";
-import { TemplateAutocompleteInput as TemplateAutocompleteInput8 } from "@jet-admin/ui";
+import { TemplateAutocompleteInput as TemplateAutocompleteInput9 } from "@jet-admin/ui";
 var DatePickerConfigEditor;
 var init_datePickerConfigEditor = __esm({
   "src/date-picker/datePickerConfigEditor.jsx"() {
-    init_suggestionEngine();
     DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
-      const suggestions = useMemo11(() => {
-        if (!stateTree) return [];
-        const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-        return rawSuggestions.map((s) => ({
-          label: `{{${s.value}}}`,
-          value: `{{${s.value}}}`,
-          detail: s.detail
-        }));
-      }, [stateTree]);
+      const liveStateTree = useMemo13(() => ({ state: stateTree }), [stateTree]);
       return /* @__PURE__ */ React16.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React16.createElement(
         Input10,
         {
@@ -1320,20 +1034,20 @@ var init_datePickerConfigEditor = __esm({
           onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
         }
       ), /* @__PURE__ */ React16.createElement(Label9, { htmlFor: "date-picker-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Default Value"), /* @__PURE__ */ React16.createElement(
-        TemplateAutocompleteInput8,
+        TemplateAutocompleteInput9,
         {
           value: config.defaultValue || "",
           onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.defaultValue", val),
           placeholder: "e.g. {{state.variables.myDate}} or ISO string",
-          suggestions
+          liveStateTree
         }
       )), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React16.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React16.createElement(
-        TemplateAutocompleteInput8,
+        TemplateAutocompleteInput9,
         {
           value: config.isLoading || "",
           onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val),
           placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
-          suggestions: suggestions.filter((s) => s.detail === "boolean" || !s.detail)
+          liveStateTree
         }
       )));
     };
@@ -1345,25 +1059,16 @@ var init_datePickerConfigEditor = __esm({
 });
 
 // src/date-range-picker/dateRangePickerConfigEditor.jsx
-import React17, { useMemo as useMemo12 } from "react";
+import React17, { useMemo as useMemo14 } from "react";
 import PropTypes16 from "prop-types";
 import { Input as Input11, Label as Label10, Checkbox as Checkbox6 } from "@jet-admin/ui";
-import { TemplateAutocompleteInput as TemplateAutocompleteInput9 } from "@jet-admin/ui";
+import { TemplateAutocompleteInput as TemplateAutocompleteInput10 } from "@jet-admin/ui";
 var DateRangePickerConfigEditor;
 var init_dateRangePickerConfigEditor = __esm({
   "src/date-range-picker/dateRangePickerConfigEditor.jsx"() {
-    init_suggestionEngine();
     DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
-      const suggestions = useMemo12(() => {
-        if (!stateTree) return [];
-        const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-        return rawSuggestions.map((s) => ({
-          label: `{{${s.value}}}`,
-          value: `{{${s.value}}}`,
-          detail: s.detail
-        }));
-      }, [stateTree]);
+      const liveStateTree = useMemo14(() => ({ state: stateTree }), [stateTree]);
       return /* @__PURE__ */ React17.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React17.createElement(
         Input11,
         {
@@ -1399,28 +1104,28 @@ var init_dateRangePickerConfigEditor = __esm({
           onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
         }
       ), /* @__PURE__ */ React17.createElement(Label10, { htmlFor: "date-range-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React17.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Default Start"), /* @__PURE__ */ React17.createElement(
-        TemplateAutocompleteInput9,
+        TemplateAutocompleteInput10,
         {
           value: config.defaultStart || "",
           onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.defaultStart", val),
           placeholder: "e.g. {{state.variables.startDate}}",
-          suggestions
+          liveStateTree
         }
       )), /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Default End"), /* @__PURE__ */ React17.createElement(
-        TemplateAutocompleteInput9,
+        TemplateAutocompleteInput10,
         {
           value: config.defaultEnd || "",
           onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.defaultEnd", val),
           placeholder: "e.g. {{state.variables.endDate}}",
-          suggestions
+          liveStateTree
         }
       ))), /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React17.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React17.createElement(
-        TemplateAutocompleteInput9,
+        TemplateAutocompleteInput10,
         {
           value: config.isLoading || "",
           onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val),
           placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
-          suggestions: suggestions.filter((s) => s.detail === "boolean" || !s.detail)
+          liveStateTree
         }
       )));
     };
@@ -1460,7 +1165,7 @@ var init_table = __esm({
 });
 
 // src/text/textWidget.jsx
-import React18, { useMemo as useMemo13 } from "react";
+import React18, { useMemo as useMemo15 } from "react";
 import PropTypes17 from "prop-types";
 var parseMarkdown, inlineFormat, TextWidget;
 var init_textWidget = __esm({
@@ -1553,7 +1258,7 @@ var init_textWidget = __esm({
       const format3 = widgetConfig?.format || "markdown";
       const textAlign = widgetConfig?.textAlign || "left";
       const fontSize = widgetConfig?.fontSize || "sm";
-      const renderedHTML = useMemo13(() => {
+      const renderedHTML = useMemo15(() => {
         if (format3 === "plain") {
           return content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />");
         }
@@ -2028,14 +1733,14 @@ var init_timeInput = __esm({
 });
 
 // src/date-picker/datePickerWidget.jsx
-import React24, { useState as useState9, useEffect as useEffect6, useMemo as useMemo14 } from "react";
+import React24, { useState as useState9, useEffect as useEffect6, useMemo as useMemo16 } from "react";
 import PropTypes21 from "prop-types";
 import { Popover, PopoverContent, PopoverTrigger, Label as Label11, Input as Input13 } from "@jet-admin/ui";
 import { Calendar as CalendarIcon, X as X4 } from "lucide-react";
 import { setMonth, setHours, setMinutes, setSeconds } from "date-fns";
 function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}, setWidgetState }) {
   const [currentDate, setCurrentDate] = useState9(/* @__PURE__ */ new Date());
-  const parsedValue = useMemo14(() => parseISOSafe(widgetState?.value), [widgetState?.value]);
+  const parsedValue = useMemo16(() => parseISOSafe(widgetState?.value), [widgetState?.value]);
   useEffect6(() => {
     if (!widgetState?.value && widgetConfig.defaultValue) {
       const parsed = parseISOSafe(widgetConfig.defaultValue);
@@ -2170,7 +1875,7 @@ var init_date_picker = __esm({
 });
 
 // src/date-range-picker/dateRangePickerWidget.jsx
-import React25, { useState as useState10, useEffect as useEffect7, useMemo as useMemo15 } from "react";
+import React25, { useState as useState10, useEffect as useEffect7, useMemo as useMemo17 } from "react";
 import PropTypes22 from "prop-types";
 import { Popover as Popover2, PopoverContent as PopoverContent2, PopoverTrigger as PopoverTrigger2, Label as Label12, Input as Input14, Button as Button7 } from "@jet-admin/ui";
 import { CalendarRange, ArrowRight, X as X5 } from "lucide-react";
@@ -2178,8 +1883,8 @@ import { setMonth as setMonth2, setHours as setHours2, setMinutes as setMinutes2
 function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}, setWidgetState }) {
   const [currentDate, setCurrentDate] = useState10(/* @__PURE__ */ new Date());
   const [hoverDate, setHoverDate] = useState10(null);
-  const parsedStart = useMemo15(() => parseISOSafe(widgetState?.start), [widgetState?.start]);
-  const parsedEnd = useMemo15(() => parseISOSafe(widgetState?.end), [widgetState?.end]);
+  const parsedStart = useMemo17(() => parseISOSafe(widgetState?.start), [widgetState?.start]);
+  const parsedEnd = useMemo17(() => parseISOSafe(widgetState?.end), [widgetState?.end]);
   useEffect7(() => {
     if (!widgetState?.start && !widgetState?.end && (widgetConfig.defaultStart || widgetConfig.defaultEnd)) {
       const start = parseISOSafe(widgetConfig.defaultStart);
@@ -2397,7 +2102,7 @@ var init_date_range_picker = __esm({
 init_vega();
 
 // src/vega/vegaConfigEditor.jsx
-import React8, { useState as useState6 } from "react";
+import React8, { useState as useState6, useMemo as useMemo5 } from "react";
 import PropTypes7 from "prop-types";
 
 // src/vega/chartSpecParser.js
@@ -3496,19 +3201,143 @@ FieldPill.propTypes = {
 };
 
 // src/vega/dataFieldPanel.jsx
-init_suggestionEngine();
 import { Button, Input } from "@jet-admin/ui";
 import { Database, GitMerge, ArrowRightFromLine, Zap, Search, Plus } from "lucide-react";
+
+// src/intellisense/suggestionEngine.js
+import { getWidgetMethods, getEventArgs } from "@jet-admin/widget-types";
+import { getJsSuggestions, getObjectSuggestions } from "@jet-admin/template-engine";
+import { JS_BUILTINS, JS_ARRAY_METHODS, JS_STRING_METHODS, inferValueType, resolvePathInTree, getMemberSuggestions } from "@jet-admin/template-engine";
+var COMMON_GLOBALS = [
+  { key: "state.globals.tenantID", detail: "Current tenant ID" },
+  { key: "state.globals.pageID", detail: "Current page ID" }
+];
+function getExpressionSuggestions({
+  dataSources = [],
+  variableDefinitions = [],
+  widgetType,
+  eventType,
+  stateTree = null,
+  filter = ""
+} = {}) {
+  const schemaSuggestions = [];
+  for (const ds of dataSources) {
+    if (ds.type === "workflow" || !ds.alias) continue;
+    const base = `state.queries.${ds.alias}`;
+    schemaSuggestions.push(
+      { value: `{{${base}.data}}`, label: `{{${base}.data}}`, detail: "Query result data", type: "array", category: "state" },
+      { value: `{{${base}.isLoading}}`, label: `{{${base}.isLoading}}`, detail: "Loading state", type: "boolean", category: "state" },
+      { value: `{{${base}.error}}`, label: `{{${base}.error}}`, detail: "Error message", type: "string", category: "state" },
+      { value: `{{${base}.lastUpdated}}`, label: `{{${base}.lastUpdated}}`, detail: "ISO timestamp", type: "string", category: "state" }
+    );
+  }
+  for (const ds of dataSources) {
+    if (ds.type !== "workflow" || !ds.alias) continue;
+    const base = `state.workflows.${ds.alias}`;
+    schemaSuggestions.push(
+      { value: `{{${base}.data}}`, label: `{{${base}.data}}`, detail: "Workflow result", type: "any", category: "state" },
+      { value: `{{${base}.isLoading}}`, label: `{{${base}.isLoading}}`, detail: "Loading state", type: "boolean", category: "state" },
+      { value: `{{${base}.error}}`, label: `{{${base}.error}}`, detail: "Error message", type: "string", category: "state" }
+    );
+  }
+  for (const def of variableDefinitions) {
+    if (!def.key) continue;
+    schemaSuggestions.push({
+      value: `{{state.variables.${def.key}}}`,
+      label: `{{state.variables.${def.key}}}`,
+      detail: "page variable",
+      type: "variable",
+      category: "state"
+    });
+  }
+  const eventArgs = getEventArgs(widgetType, eventType);
+  for (const arg of eventArgs) {
+    const fullPath = `state.${arg.key}`;
+    schemaSuggestions.push({
+      value: `{{${fullPath}}}`,
+      label: `{{${fullPath}}}`,
+      detail: arg.description,
+      type: "event",
+      category: "state"
+    });
+  }
+  for (const g of COMMON_GLOBALS) {
+    schemaSuggestions.push({
+      value: `{{${g.key}}}`,
+      label: `{{${g.key}}}`,
+      detail: g.detail,
+      type: "global",
+      category: "state"
+    });
+  }
+  return getJsSuggestions({
+    filter,
+    stateTree,
+    baseSuggestions: schemaSuggestions,
+    includeBuiltins: true
+  });
+}
+function getSuggestionsFromStateTree(stateTree, prefix = "state", depth = 0, maxDepth = 4) {
+  return getObjectSuggestions(stateTree, prefix, depth, maxDepth);
+}
+function getAliasSuggestions(dataSources = []) {
+  return dataSources.filter((ds) => ds.alias).map((ds) => ({
+    label: ds.alias,
+    value: ds.alias,
+    detail: ds.type || "data source"
+  }));
+}
+function getVariableKeySuggestions(variableDefinitions = []) {
+  const suggestions = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const def of variableDefinitions) {
+    if (def.key && !seen.has(def.key)) {
+      seen.add(def.key);
+      suggestions.push({
+        label: `state.variables.${def.key}`,
+        value: `state.variables.${def.key}`,
+        detail: "page variable"
+      });
+    }
+  }
+  return suggestions;
+}
+function getWidgetIDSuggestions(widgets = [], pageConfig) {
+  if (!widgets || !Array.isArray(widgets)) return [];
+  const placedWidgetIDs = (pageConfig?.widgets || []).map((k) => {
+    const parts = String(k).split("_");
+    return parts.length > 1 ? parts[1] : parts[0];
+  }).filter(Boolean);
+  const filtered = placedWidgetIDs.length > 0 ? widgets.filter((w) => placedWidgetIDs.includes(w.widgetID)) : widgets;
+  return filtered.map((w) => ({
+    label: w.widgetTitle || w.widgetID,
+    value: w.widgetID,
+    detail: w.widgetType
+  }));
+}
+function getMethodSuggestionsForTarget(targetWidgetID, widgets = []) {
+  const widget = widgets?.find((w) => w.widgetID === targetWidgetID);
+  if (!widget) return [];
+  const methods = getWidgetMethods(widget.widgetType);
+  return methods.map((m) => ({
+    label: m.name,
+    value: m.name,
+    detail: m.description
+  }));
+}
+
+// src/vega/dataFieldPanel.jsx
 import { getValueByPath as getValueByPath2 } from "@jet-admin/template-engine";
 var DataFieldPanel = ({
-  workflowContext,
   queryResults,
   dataSource,
   onDataSourceChange,
   onFieldClick,
   workflow,
   className = "",
-  compact = false
+  compact = false,
+  stateTree,
+  liveStateTree
 }) => {
   const [searchTerm, setSearchTerm] = useState3("");
   const [manualField, setManualField] = useState3("");
@@ -3527,10 +3356,15 @@ var DataFieldPanel = ({
   const allSuggestions = useMemo3(() => {
     const seen = /* @__PURE__ */ new Set();
     const combined = [];
-    const stateTreeSuggestions = getSuggestionsFromStateTree(workflowContext);
-    const arraySuggestions = stateTreeSuggestions.filter((s) => s.valueType === "array");
+    const stateTreeSuggestions = getExpressionSuggestions({
+      stateTree: liveStateTree
+    });
+    const arraySuggestions = stateTreeSuggestions.filter((s) => s.type === "array");
     for (const arr of arraySuggestions) {
-      const bracePath = `{{${arr.value}}}`;
+      let bracePath = arr.value;
+      if (!bracePath.startsWith("{{")) {
+        bracePath = `{{${bracePath}}}`;
+      }
       if (!seen.has(bracePath)) {
         seen.add(bracePath);
         combined.push({
@@ -3542,7 +3376,7 @@ var DataFieldPanel = ({
       }
     }
     return combined;
-  }, [workflowContext]);
+  }, [liveStateTree]);
   const fields = useMemo3(() => {
     if (!dataSource) return [];
     const match = dataSource.match(/\{\{([^}]+)\}\}/);
@@ -3553,18 +3387,18 @@ var DataFieldPanel = ({
       if (data && typeof data === "object" && !Array.isArray(data)) return inferFieldsFromData([data]);
       return null;
     };
-    if (workflowContext) {
-      const resolved = getValueByPath2(workflowContext, rawPath, { allowedRoots: ["state"] });
+    if (stateTree) {
+      const resolved = getValueByPath2(stateTree, rawPath, { allowedRoots: ["state"] });
       const result = toFields(resolved);
       if (result) return result;
     }
-    if (queryResults && queryResults !== workflowContext) {
+    if (queryResults) {
       const resolved = getValueByPath2(queryResults, rawPath, { allowedRoots: ["state"] });
       const result = toFields(resolved);
       if (result) return result;
     }
     return [];
-  }, [workflowContext, queryResults, dataSource]);
+  }, [stateTree, queryResults, dataSource]);
   const filteredFields = useMemo3(() => {
     if (!searchTerm) return fields;
     const lower = searchTerm.toLowerCase();
@@ -3664,14 +3498,15 @@ var DataFieldPanel = ({
   )));
 };
 DataFieldPanel.propTypes = {
-  workflowContext: PropTypes3.object,
   queryResults: PropTypes3.object,
   dataSource: PropTypes3.string,
   onDataSourceChange: PropTypes3.func,
   onFieldClick: PropTypes3.func,
   workflow: PropTypes3.object,
   className: PropTypes3.string,
-  compact: PropTypes3.bool
+  compact: PropTypes3.bool,
+  stateTree: PropTypes3.object,
+  liveStateTree: PropTypes3.object
 };
 
 // src/vega/encodingShelf.jsx
@@ -3835,16 +3670,16 @@ MarkSelector.propTypes = {
 };
 
 // src/vega/shelfBuilder.jsx
-init_suggestionEngine();
-import { Button as Button2, Input as Input2, Label, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2 } from "@jet-admin/ui";
+import { Button as Button2, Input as Input2, Label, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2, TemplateAutocompleteInput } from "@jet-admin/ui";
 import { ChevronDown, ChevronRight, Database as Database2, TrendingUp as TrendingUp2, Layers, Palette as Palette2 } from "lucide-react";
 var PRIMARY_SHELVES = ["x", "y", "color", "size"];
 var SECONDARY_SHELVES = ["row", "column", "shape", "opacity", "detail", "text"];
 var ShelfBuilder = ({
   widgetEditorForm,
-  workflowContext,
   workflows,
-  queryResults
+  queryResults,
+  stateTree,
+  liveStateTree
 }) => {
   const [shelfSpec, setShelfSpec] = useState5(() => {
     let savedSpec = widgetEditorForm.values.widgetConfig?.shelfSpec;
@@ -3943,23 +3778,7 @@ var ShelfBuilder = ({
     }, 200);
     return () => clearTimeout(timer);
   }, [shelfSpec]);
-  const stateTreeSuggestions = useMemo4(
-    () => getSuggestionsFromStateTree(workflowContext),
-    [workflowContext]
-  );
-  const discoveredArrayPaths = useMemo4(() => {
-    return stateTreeSuggestions.filter((s) => s.valueType === "array").map((s) => {
-      const bracePath = `{{${s.value}}}`;
-      return {
-        path: bracePath,
-        // {{state.queries.alias.data}}
-        label: bracePath,
-        // {{state.queries.alias.data}}
-        description: s.detail
-      };
-    });
-  }, [stateTreeSuggestions]);
-  const hasDataSources = discoveredArrayPaths.length > 0;
+  const hasDataSources = true;
   const isWorkflowSelected = !!selectedWorkflow;
   const hasAnyData = isWorkflowSelected || hasDataSources;
   const activeCount = [...PRIMARY_SHELVES, ...SECONDARY_SHELVES].filter((ch) => shelfSpec.encoding[ch]?.field).length;
@@ -3977,11 +3796,20 @@ var ShelfBuilder = ({
   ), isExpanded && /* @__PURE__ */ React7.createElement("div", { className: "mt-1.5 rounded-md border border-border bg-card overflow-hidden" }, !hasAnyData ? (
     /* ── Empty State ── */
     /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col items-center justify-center p-6 text-center" }, /* @__PURE__ */ React7.createElement(Database2, { className: "w-7 h-7 mb-2 text-muted-foreground/30" }), /* @__PURE__ */ React7.createElement("p", { className: "text-xs font-medium text-foreground mb-0.5" }, "No Data Source"), /* @__PURE__ */ React7.createElement("p", { className: "text-[10px] text-muted-foreground leading-relaxed" }, "Add a Data Source in the Data tab and run a Test, or select a Workflow."))
-  ) : /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement("div", { className: "px-2.5 py-2 border-b border-border/50 bg-muted/20" }, /* @__PURE__ */ React7.createElement(Label, { className: "font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground mb-1 block" }, "Data Source"), /* @__PURE__ */ React7.createElement(Select2, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ React7.createElement(SelectTrigger2, { className: "h-7 text-[11px] font-mono" }, /* @__PURE__ */ React7.createElement(SelectValue2, { placeholder: "Select data input..." })), /* @__PURE__ */ React7.createElement(SelectContent2, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ React7.createElement(SelectItem2, { value: `{{state.workflows.${selectedWorkflow.alias}.data}}` }, "Workflow: ", selectedWorkflow.alias), discoveredArrayPaths.map((arr) => /* @__PURE__ */ React7.createElement(SelectItem2, { key: arr.path, value: arr.path }, arr.label))))), /* @__PURE__ */ React7.createElement("div", { className: "border-b border-border/50 max-h-[220px] overflow-y-auto" }, /* @__PURE__ */ React7.createElement(
+  ) : /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement("div", { className: "px-2.5 py-2 border-b border-border/50 bg-muted/20" }, /* @__PURE__ */ React7.createElement(Label, { className: "font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground mb-1 block" }, "Data Source"), /* @__PURE__ */ React7.createElement(
+    TemplateAutocompleteInput,
+    {
+      value: shelfSpec.dataSource || "",
+      onChange: (val) => handleDataSourceChange(val),
+      placeholder: "e.g. {{ state.queries.my_query.data }}",
+      liveStateTree
+    }
+  )), /* @__PURE__ */ React7.createElement("div", { className: "border-b border-border/50 max-h-[220px] overflow-y-auto" }, /* @__PURE__ */ React7.createElement(
     DataFieldPanel,
     {
-      workflowContext,
       queryResults,
+      stateTree,
+      liveStateTree,
       dataSource: shelfSpec.dataSource,
       onDataSourceChange: handleDataSourceChange,
       onFieldClick: handleFieldQuickAdd,
@@ -4047,15 +3875,15 @@ var ShelfBuilder = ({
 };
 ShelfBuilder.propTypes = {
   widgetEditorForm: PropTypes6.object.isRequired,
-  workflowContext: PropTypes6.object,
   workflows: PropTypes6.array,
-  queryResults: PropTypes6.object
+  queryResults: PropTypes6.object,
+  stateTree: PropTypes6.object,
+  liveStateTree: PropTypes6.object
 };
 
 // src/vega/vegaConfigEditor.jsx
-init_suggestionEngine();
 import { AlertTriangle, Settings, ChevronDown as ChevronDown2, ChevronRight as ChevronRight2 } from "lucide-react";
-import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import { TemplateAutocompleteInput as TemplateAutocompleteInput2 } from "@jet-admin/ui";
 var VegaConfigEditor = ({
   widgetEditorForm,
   workflowContext,
@@ -4064,9 +3892,9 @@ var VegaConfigEditor = ({
   queryResults,
   stateTree
 }) => {
-  const suggestions = getSuggestionsFromStateTree(stateTree);
   const isVegaLite = widgetEditorForm.values.widgetType === "vega-lite";
   const currentMode = widgetEditorForm.values.widgetConfig?.editorMode || (isVegaLite ? "visual" : "raw");
+  const liveStateTree = useMemo5(() => stateTree ? { state: stateTree } : null, [stateTree]);
   const [showParseWarning, setShowParseWarning] = useState6(false);
   const [parseWarningsList, setParseWarningsList] = useState6([]);
   const [showSettings, setShowSettings] = useState6(false);
@@ -4103,9 +3931,10 @@ var VegaConfigEditor = ({
     ShelfBuilder,
     {
       widgetEditorForm,
-      workflowContext,
       workflows,
-      queryResults
+      queryResults,
+      stateTree,
+      liveStateTree
     }
   )), showParseWarning && /* @__PURE__ */ React8.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React8.createElement(AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React8.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React8.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React8.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React8.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React8.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React8.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React8.createElement(Button3, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React8.createElement(Button3, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React8.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ React8.createElement(
     VegaSpecEditor,
@@ -4116,12 +3945,12 @@ var VegaConfigEditor = ({
       workflow: resolvedSelectedWorkflow
     }
   )), /* @__PURE__ */ React8.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React8.createElement(Label2, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React8.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React8.createElement(
-    TemplateAutocompleteInput,
+    TemplateAutocompleteInput2,
     {
       value: widgetEditorForm.values.widgetConfig?.isLoading || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val),
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
-      suggestions: suggestions.filter((s) => s.detail === "boolean" || !s.detail)
+      liveStateTree
     }
   )));
 };
@@ -4248,31 +4077,30 @@ init_buttonConfigEditor();
 init_tableConfigEditor();
 
 // src/text/textConfigEditor.jsx
-import React11 from "react";
+import React11, { useMemo as useMemo8 } from "react";
 import PropTypes10 from "prop-types";
 import { Label as Label4, Select as Select4, SelectContent as SelectContent4, SelectItem as SelectItem4, SelectTrigger as SelectTrigger4, SelectValue as SelectValue4 } from "@jet-admin/ui";
-import { getSuggestionsFromStateTree as getSuggestionsFromStateTree2 } from "@jet-admin/widgets-ui";
-import { TemplateAutocompleteInput as TemplateAutocompleteInput3 } from "@jet-admin/ui";
+import { TemplateAutocompleteInput as TemplateAutocompleteInput4 } from "@jet-admin/ui";
 var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-  const suggestions = getSuggestionsFromStateTree2(stateTree);
-  return /* @__PURE__ */ React11.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Content"), /* @__PURE__ */ React11.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports Markdown formatting and ", /* @__PURE__ */ React11.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates."), /* @__PURE__ */ React11.createElement(
-    TemplateAutocompleteInput3,
+  const liveStateTree = useMemo8(() => ({ state: stateTree }), [stateTree]);
+  return /* @__PURE__ */ React11.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Content"), /* @__PURE__ */ React11.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports Markdown formatting and ", /* @__PURE__ */ React11.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates. Full JS expressions supported."), /* @__PURE__ */ React11.createElement(
+    TemplateAutocompleteInput4,
     {
       isTextArea: true,
       className: "",
       value: config.content || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.content", val),
       placeholder: "# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{ state.queries.myQuery.data[0].name }}",
-      suggestions
+      liveStateTree
     }
   )), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React11.createElement(
-    TemplateAutocompleteInput3,
+    TemplateAutocompleteInput4,
     {
       value: config.isLoading || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val),
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
-      suggestions: suggestions.filter((s) => s.valueType === "boolean" || !s.valueType)
+      liveStateTree
     }
   )), /* @__PURE__ */ React11.createElement("div", { className: "grid grid-cols-3 gap-3" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Format"), /* @__PURE__ */ React11.createElement(
     Select4,
@@ -4306,22 +4134,13 @@ TextConfigEditor.propTypes = {
 };
 
 // src/stat/statConfigEditor.jsx
-init_suggestionEngine();
-import React12, { useMemo as useMemo7 } from "react";
+import React12, { useMemo as useMemo9 } from "react";
 import PropTypes11 from "prop-types";
 import { Input as Input6, Label as Label5, Select as Select5, SelectContent as SelectContent5, SelectItem as SelectItem5, SelectTrigger as SelectTrigger5, SelectValue as SelectValue5 } from "@jet-admin/ui";
-import { TemplateAutocompleteInput as TemplateAutocompleteInput4 } from "@jet-admin/ui";
+import { TemplateAutocompleteInput as TemplateAutocompleteInput5 } from "@jet-admin/ui";
 var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-  const suggestions = useMemo7(() => {
-    if (!stateTree) return [];
-    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-    return rawSuggestions.map((s) => ({
-      label: `{{${s.value}}}`,
-      value: `{{${s.value}}}`,
-      detail: s.detail
-    }));
-  }, [stateTree]);
+  const liveStateTree = useMemo9(() => ({ state: stateTree }), [stateTree]);
   return /* @__PURE__ */ React12.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React12.createElement(
     Input6,
     {
@@ -4332,12 +4151,12 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. Total Revenue"
     }
   )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Value"), /* @__PURE__ */ React12.createElement(
-    TemplateAutocompleteInput4,
+    TemplateAutocompleteInput5,
     {
       value: config.valueTemplate || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.valueTemplate", val),
       placeholder: "e.g. {{state.queries.stats.data[0].count}}",
-      suggestions
+      liveStateTree
     }
   ), /* @__PURE__ */ React12.createElement("p", { className: "text-[10px] text-muted-foreground" }, "The primary metric value. Use template expressions to bind to data sources.")), /* @__PURE__ */ React12.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Prefix"), /* @__PURE__ */ React12.createElement(
     Input6,
@@ -4358,12 +4177,12 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. users"
     }
   ))), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Trend Value"), /* @__PURE__ */ React12.createElement(
-    TemplateAutocompleteInput4,
+    TemplateAutocompleteInput5,
     {
       value: config.trendTemplate || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.trendTemplate", val),
       placeholder: "e.g. {{state.queries.stats.data[0].change_pct}}",
-      suggestions
+      liveStateTree
     }
   ), /* @__PURE__ */ React12.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Optional percentage change. Positive = up trend, negative = down trend.")), /* @__PURE__ */ React12.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Trend Semantics"), /* @__PURE__ */ React12.createElement(
     Select5,
@@ -4382,12 +4201,12 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
     /* @__PURE__ */ React12.createElement(SelectTrigger5, { className: "text-xs" }, /* @__PURE__ */ React12.createElement(SelectValue5, null)),
     /* @__PURE__ */ React12.createElement(SelectContent5, null, /* @__PURE__ */ React12.createElement(SelectItem5, { value: "left" }, "Left"), /* @__PURE__ */ React12.createElement(SelectItem5, { value: "center" }, "Center"), /* @__PURE__ */ React12.createElement(SelectItem5, { value: "right" }, "Right"))
   ))), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React12.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React12.createElement(
-    TemplateAutocompleteInput4,
+    TemplateAutocompleteInput5,
     {
       value: config.isLoading || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val),
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
-      suggestions: suggestions.filter((s) => s.detail === "boolean" || !s.detail)
+      liveStateTree
     }
   )));
 };
@@ -4397,23 +4216,13 @@ StatConfigEditor.propTypes = {
 };
 
 // src/alert/alertConfigEditor.jsx
-init_suggestionEngine();
-import React13, { useMemo as useMemo8 } from "react";
+import React13, { useMemo as useMemo10 } from "react";
 import PropTypes12 from "prop-types";
 import { Input as Input7, Label as Label6, Select as Select6, SelectContent as SelectContent6, SelectItem as SelectItem6, SelectTrigger as SelectTrigger6, SelectValue as SelectValue6, Checkbox as Checkbox3 } from "@jet-admin/ui";
-import { TemplateAutocompleteInput as TemplateAutocompleteInput5 } from "@jet-admin/ui";
+import { TemplateAutocompleteInput as TemplateAutocompleteInput6 } from "@jet-admin/ui";
 var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-  const suggestions = useMemo8(() => {
-    if (!stateTree) return [];
-    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-    return rawSuggestions.map((s) => ({
-      label: `{{${s.value}}}`,
-      value: `{{${s.value}}}`,
-      detail: s.detail
-    }));
-  }, [stateTree]);
-  console.log({ suggestions });
+  const liveStateTree = useMemo10(() => ({ state: stateTree }), [stateTree]);
   return /* @__PURE__ */ React13.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Type / Variant"), /* @__PURE__ */ React13.createElement(
     Select6,
     {
@@ -4423,21 +4232,21 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
     /* @__PURE__ */ React13.createElement(SelectTrigger6, { className: "text-xs" }, /* @__PURE__ */ React13.createElement(SelectValue6, null)),
     /* @__PURE__ */ React13.createElement(SelectContent6, null, /* @__PURE__ */ React13.createElement(SelectItem6, { value: "info" }, "Info (Blue)"), /* @__PURE__ */ React13.createElement(SelectItem6, { value: "success" }, "Success (Green)"), /* @__PURE__ */ React13.createElement(SelectItem6, { value: "warning" }, "Warning (Amber)"), /* @__PURE__ */ React13.createElement(SelectItem6, { value: "error" }, "Error (Red)"))
   )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Title (Optional)"), /* @__PURE__ */ React13.createElement(
-    TemplateAutocompleteInput5,
+    TemplateAutocompleteInput6,
     {
       value: config.title || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.title", val),
       placeholder: "e.g. Warning!",
-      suggestions
+      liveStateTree
     }
   )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Message"), /* @__PURE__ */ React13.createElement(
-    TemplateAutocompleteInput5,
+    TemplateAutocompleteInput6,
     {
       isTextArea: true,
       value: config.message || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.message", val),
       placeholder: "e.g. Action completed successfully.",
-      suggestions
+      liveStateTree
     }
   )), /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React13.createElement(
     Checkbox3,
@@ -4447,12 +4256,12 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.dismissible", !!checked)
     }
   ), /* @__PURE__ */ React13.createElement(Label6, { htmlFor: "alert-dismissible", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow user to dismiss/close the banner")), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React13.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React13.createElement(
-    TemplateAutocompleteInput5,
+    TemplateAutocompleteInput6,
     {
       value: config.isLoading || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val),
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
-      suggestions: suggestions.filter((s) => s.detail === "boolean" || !s.detail)
+      liveStateTree
     }
   )));
 };
@@ -4462,29 +4271,20 @@ AlertConfigEditor.propTypes = {
 };
 
 // src/image/imageConfigEditor.jsx
-init_suggestionEngine();
-import React14, { useMemo as useMemo9 } from "react";
+import React14, { useMemo as useMemo11 } from "react";
 import PropTypes13 from "prop-types";
 import { Input as Input8, Label as Label7, Select as Select7, SelectContent as SelectContent7, SelectItem as SelectItem7, SelectTrigger as SelectTrigger7, SelectValue as SelectValue7 } from "@jet-admin/ui";
-import { TemplateAutocompleteInput as TemplateAutocompleteInput6 } from "@jet-admin/ui";
+import { TemplateAutocompleteInput as TemplateAutocompleteInput7 } from "@jet-admin/ui";
 var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-  const suggestions = useMemo9(() => {
-    if (!stateTree) return [];
-    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-    return rawSuggestions.map((s) => ({
-      label: `{{${s.value}}}`,
-      value: `{{${s.value}}}`,
-      detail: s.detail
-    }));
-  }, [stateTree]);
+  const liveStateTree = useMemo11(() => ({ state: stateTree }), [stateTree]);
   return /* @__PURE__ */ React14.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ React14.createElement(
-    TemplateAutocompleteInput6,
+    TemplateAutocompleteInput7,
     {
       value: config.src || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.src", val),
       placeholder: "e.g. {{state.queries.user.data.avatar_url}}",
-      suggestions
+      liveStateTree
     }
   ), /* @__PURE__ */ React14.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content.")), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ React14.createElement(
     Input8,
@@ -4512,12 +4312,12 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
     /* @__PURE__ */ React14.createElement(SelectTrigger7, { className: "text-xs" }, /* @__PURE__ */ React14.createElement(SelectValue7, null)),
     /* @__PURE__ */ React14.createElement(SelectContent7, null, /* @__PURE__ */ React14.createElement(SelectItem7, { value: "none" }, "Square (None)"), /* @__PURE__ */ React14.createElement(SelectItem7, { value: "sm" }, "Small"), /* @__PURE__ */ React14.createElement(SelectItem7, { value: "md" }, "Medium"), /* @__PURE__ */ React14.createElement(SelectItem7, { value: "lg" }, "Large"), /* @__PURE__ */ React14.createElement(SelectItem7, { value: "full" }, "Circle (Full)"))
   ))), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React14.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React14.createElement(
-    TemplateAutocompleteInput6,
+    TemplateAutocompleteInput7,
     {
       value: config.isLoading || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val),
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
-      suggestions: suggestions.filter((s) => s.detail === "boolean" || !s.detail)
+      liveStateTree
     }
   )));
 };
@@ -4527,29 +4327,20 @@ ImageConfigEditor.propTypes = {
 };
 
 // src/iframe/iframeConfigEditor.jsx
-init_suggestionEngine();
-import React15, { useMemo as useMemo10 } from "react";
+import React15, { useMemo as useMemo12 } from "react";
 import PropTypes14 from "prop-types";
 import { Input as Input9, Label as Label8, Checkbox as Checkbox4 } from "@jet-admin/ui";
-import { TemplateAutocompleteInput as TemplateAutocompleteInput7 } from "@jet-admin/ui";
+import { TemplateAutocompleteInput as TemplateAutocompleteInput8 } from "@jet-admin/ui";
 var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
-  const suggestions = useMemo10(() => {
-    if (!stateTree) return [];
-    const rawSuggestions = getSuggestionsFromStateTree(stateTree);
-    return rawSuggestions.map((s) => ({
-      label: `{{${s.value}}}`,
-      value: `{{${s.value}}}`,
-      detail: s.detail
-    }));
-  }, [stateTree]);
+  const liveStateTree = useMemo12(() => ({ state: stateTree }), [stateTree]);
   return /* @__PURE__ */ React15.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Embed URL / Target Source"), /* @__PURE__ */ React15.createElement(
-    TemplateAutocompleteInput7,
+    TemplateAutocompleteInput8,
     {
       value: config.url || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.url", val),
       placeholder: "e.g. https://example.com",
-      suggestions
+      liveStateTree
     }
   ), /* @__PURE__ */ React15.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).")), /* @__PURE__ */ React15.createElement("div", { className: "space-y-2 border-t pt-3" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Sandbox Security Options"), /* @__PURE__ */ React15.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug mb-2" }, "Toggle capabilities granted to the embedded page. Restricted by default."), /* @__PURE__ */ React15.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React15.createElement(
     Checkbox4,
@@ -4580,12 +4371,12 @@ var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowSameOrigin", !!checked)
     }
   ), /* @__PURE__ */ React15.createElement(Label8, { htmlFor: "iframe-origin", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow sharing local storage/cookies (allow-same-origin)"))), /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React15.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React15.createElement(
-    TemplateAutocompleteInput7,
+    TemplateAutocompleteInput8,
     {
       value: config.isLoading || "",
       onChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.isLoading", val),
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
-      suggestions: suggestions.filter((s) => s.detail === "boolean" || !s.detail)
+      liveStateTree
     }
   )));
 };
@@ -4920,7 +4711,6 @@ init_imageWidget();
 init_iframeWidget();
 init_date_picker();
 init_date_range_picker();
-init_suggestionEngine();
 var export_FormConfigEditor = void 0;
 var export_FormWidget = void 0;
 var export_StatWidget = void 0;
