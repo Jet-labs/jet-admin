@@ -43,13 +43,3 @@ export * from "./date-picker";
 export * from "./date-range-picker";
 
 // Shared components removed, TemplateAutocompleteInput moved to @jet-admin/ui
-
-// Dynamic intellisense
-export {
-  getExpressionSuggestions,
-  getAliasSuggestions,
-  getVariableKeySuggestions,
-  getWidgetIDSuggestions,
-  getMethodSuggestionsForTarget,
-  getSuggestionsFromStateTree,
-} from "./intellisense/suggestionEngine";

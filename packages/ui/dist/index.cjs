@@ -2125,10 +2125,10 @@ function buildDecorations(view) {
     const close = text.indexOf("}}", open + 2);
     if (close === -1) break;
     builder.add(open, open + 2, delimMark);
-    builder.add(close, close + 2, delimMark);
     if (close > open + 2) {
       builder.add(open + 2, close, zoneMark);
     }
+    builder.add(close, close + 2, delimMark);
     searchFrom = close + 2;
   }
   return builder.finish();
@@ -2178,6 +2178,7 @@ var TemplateAutocompleteInput = ({
   const viewRef = (0, import_react8.useRef)(null);
   const internalChange = (0, import_react8.useRef)(false);
   const readOnlyCompartment = (0, import_react8.useRef)(new import_state2.Compartment()).current;
+  const autocompleteCompartment = (0, import_react8.useRef)(new import_state2.Compartment()).current;
   const effectiveContext = (0, import_react8.useMemo)(() => {
     if (jsonContext && typeof jsonContext === "object") return jsonContext;
     if (context && typeof context === "object") return context;
@@ -2185,6 +2186,11 @@ var TemplateAutocompleteInput = ({
     return {};
   }, [jsonContext, context, liveStateTree]);
   const mustacheSource = useMustacheCompletions(effectiveContext);
+  const mustacheSourceRef = (0, import_react8.useRef)(mustacheSource);
+  mustacheSourceRef.current = mustacheSource;
+  const stableCompletionSource = (0, import_react8.useCallback)((ctx) => {
+    return mustacheSourceRef.current(ctx);
+  }, []);
   const boundTokens = (0, import_react8.useMemo)(() => extractTokens(value), [value]);
   const lineHeightPx = 20;
   const paddingPx = multiline ? 12 : 0;
@@ -2194,13 +2200,15 @@ var TemplateAutocompleteInput = ({
     const exts = [
       (0, import_commands.history)(),
       mustacheHighlighter,
-      (0, import_autocomplete.autocompletion)({
-        override: [mustacheSource],
-        defaultKeymap: true,
-        closeOnBlur: true,
-        activateOnTyping: true,
-        maxRenderedOptions: 50
-      }),
+      autocompleteCompartment.of(
+        (0, import_autocomplete.autocompletion)({
+          override: [stableCompletionSource],
+          defaultKeymap: true,
+          closeOnBlur: true,
+          activateOnTyping: true,
+          maxRenderedOptions: 50
+        })
+      ),
       (0, import_autocomplete.closeBrackets)(),
       import_view2.keymap.of([
         ...import_commands.defaultKeymap,
@@ -2335,7 +2343,7 @@ var TemplateAutocompleteInput = ({
       );
     }
     return exts;
-  }, [mustacheSource, multiline, minContentH, maxContentH]);
+  }, [multiline, minContentH, maxContentH]);
   (0, import_react8.useEffect)(() => {
     if (!containerRef.current) return;
     containerRef.current.innerHTML = "";

@@ -2003,10 +2003,10 @@ function buildDecorations(view) {
     const close = text.indexOf("}}", open + 2);
     if (close === -1) break;
     builder.add(open, open + 2, delimMark);
-    builder.add(close, close + 2, delimMark);
     if (close > open + 2) {
       builder.add(open + 2, close, zoneMark);
     }
+    builder.add(close, close + 2, delimMark);
     searchFrom = close + 2;
   }
   return builder.finish();
@@ -2056,6 +2056,7 @@ var TemplateAutocompleteInput = ({
   const viewRef = useRef2(null);
   const internalChange = useRef2(false);
   const readOnlyCompartment = useRef2(new Compartment()).current;
+  const autocompleteCompartment = useRef2(new Compartment()).current;
   const effectiveContext = useMemo2(() => {
     if (jsonContext && typeof jsonContext === "object") return jsonContext;
     if (context && typeof context === "object") return context;
@@ -2063,6 +2064,11 @@ var TemplateAutocompleteInput = ({
     return {};
   }, [jsonContext, context, liveStateTree]);
   const mustacheSource = useMustacheCompletions(effectiveContext);
+  const mustacheSourceRef = useRef2(mustacheSource);
+  mustacheSourceRef.current = mustacheSource;
+  const stableCompletionSource = useCallback((ctx) => {
+    return mustacheSourceRef.current(ctx);
+  }, []);
   const boundTokens = useMemo2(() => extractTokens(value), [value]);
   const lineHeightPx = 20;
   const paddingPx = multiline ? 12 : 0;
@@ -2072,13 +2078,15 @@ var TemplateAutocompleteInput = ({
     const exts = [
       history(),
       mustacheHighlighter,
-      autocompletion({
-        override: [mustacheSource],
-        defaultKeymap: true,
-        closeOnBlur: true,
-        activateOnTyping: true,
-        maxRenderedOptions: 50
-      }),
+      autocompleteCompartment.of(
+        autocompletion({
+          override: [stableCompletionSource],
+          defaultKeymap: true,
+          closeOnBlur: true,
+          activateOnTyping: true,
+          maxRenderedOptions: 50
+        })
+      ),
       closeBrackets(),
       keymap.of([
         ...defaultKeymap,
@@ -2213,7 +2221,7 @@ var TemplateAutocompleteInput = ({
       );
     }
     return exts;
-  }, [mustacheSource, multiline, minContentH, maxContentH]);
+  }, [multiline, minContentH, maxContentH]);
   useEffect2(() => {
     if (!containerRef.current) return;
     containerRef.current.innerHTML = "";

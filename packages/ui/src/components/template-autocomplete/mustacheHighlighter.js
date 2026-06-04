@@ -30,14 +30,13 @@ function buildDecorations(view) {
     const close = text.indexOf('}}', open + 2)
     if (close === -1) break
 
-    // Delimiters themselves
-    builder.add(open,     open + 2,  delimMark) // {{
-    builder.add(close,    close + 2, delimMark) // }}
-
-    // Zone interior background
+    // Ranges MUST be added in ascending `from` position order.
+    // Open delimiter → zone interior → close delimiter.
+    builder.add(open, open + 2, delimMark)        // {{
     if (close > open + 2) {
-      builder.add(open + 2, close, zoneMark)
+      builder.add(open + 2, close, zoneMark)      // interior
     }
+    builder.add(close, close + 2, delimMark)       // }}
 
     searchFrom = close + 2
   }

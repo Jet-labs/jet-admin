@@ -116,8 +116,9 @@ export const TemplateAutocompleteInput = ({
   const containerRef = useRef(null);
   const viewRef = useRef(null);
   const internalChange = useRef(false);
-  // Each instance gets its own Compartment to avoid shared state conflicts
+  // Each instance gets its own Compartments to avoid shared state conflicts
   const readOnlyCompartment = useRef(new Compartment()).current;
+  const autocompleteCompartment = useRef(new Compartment()).current;
 
   // Merge context sources: jsonContext > context > liveStateTree > derive from suggestions
   const effectiveContext = useMemo(() => {
@@ -127,8 +128,18 @@ export const TemplateAutocompleteInput = ({
     return {};
   }, [jsonContext, context, liveStateTree]);
 
-  // Build the CodeMirror completion source
+  // Build the CodeMirror completion source.
+  // We store it in a ref so the actual CM completion function has a stable
+  // identity — it delegates to whatever mustacheSourceRef.current holds.
   const mustacheSource = useMustacheCompletions(effectiveContext);
+  const mustacheSourceRef = useRef(mustacheSource);
+  mustacheSourceRef.current = mustacheSource;
+
+  // Stable wrapper that delegates to the latest completion source ref.
+  // This never changes identity, so it won't cause extension rebuilds.
+  const stableCompletionSource = useCallback((ctx) => {
+    return mustacheSourceRef.current(ctx);
+  }, []);
 
   // Token chip bar for multiline — shows all {{bindings}} currently in value
   const boundTokens = useMemo(() => extractTokens(value), [value]);
@@ -139,19 +150,23 @@ export const TemplateAutocompleteInput = ({
   const minContentH = multiline ? `${Math.max(rows * lineHeightPx + paddingPx * 2, 80)}px` : '32px';
   const maxContentH = multiline ? '400px' : '32px';
 
-  // Build base extensions
+  // Build base extensions — the autocompletion config lives in a
+  // Compartment so it can be hot-swapped when the completion source changes
+  // without remounting the entire editor (which would steal focus).
   const baseExtensions = useMemo(() => {
     const exts = [
       history(),
       mustacheHighlighter,
 
-      autocompletion({
-        override: [mustacheSource],
-        defaultKeymap: true,
-        closeOnBlur: true,
-        activateOnTyping: true,
-        maxRenderedOptions: 50,
-      }),
+      autocompleteCompartment.of(
+        autocompletion({
+          override: [stableCompletionSource],
+          defaultKeymap: true,
+          closeOnBlur: true,
+          activateOnTyping: true,
+          maxRenderedOptions: 50,
+        })
+      ),
 
       closeBrackets(),
 
@@ -295,7 +310,7 @@ export const TemplateAutocompleteInput = ({
     }
 
     return exts;
-  }, [mustacheSource, multiline, minContentH, maxContentH]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [multiline, minContentH, maxContentH]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Mount the editor once ────────────────────────────────────────────────
   useEffect(() => {

@@ -9,8 +9,6 @@ import {
   inferMarkType,
   COLOR_SCHEMES,
 } from "./chartSpecGenerator";
-import { getExpressionSuggestions } from '../intellisense/suggestionEngine';
-
 import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, TemplateAutocompleteInput } from "@jet-admin/ui";
 import { ChevronDown, ChevronRight, Database, TrendingUp, Layers, Palette } from 'lucide-react';
 
