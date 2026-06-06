@@ -5,9 +5,9 @@ const {
   normalizeDefinitions,
   extractWorkflowDefinitions,
   extractQueryDefinitions,
-} = require('../../../utils/inputArgs.util');
+} = require('../../../utils/input.util');
 
-describe('inputArgs.util', () => {
+describe('input.util', () => {
   // ─── coerceValue ──────────────────────────────────────────────────────────
 
   describe('coerceValue', () => {
@@ -189,10 +189,9 @@ describe('inputArgs.util', () => {
   // ─── extractWorkflowDefinitions ─────────────────────────────────────────
 
   describe('extractWorkflowDefinitions', () => {
-    it('extracts definitions from workflowOptions.args', () => {
+    it('extracts definitions from workflowOptions.inputDefinitions', () => {
       const workflow = {
-        workflowOptions: {
-          args: [
+        workflowOptions: { inputDefinitions: [
             { key: 'userId', type: 'number', required: true },
             { key: 'mode', type: 'string' },
           ],
@@ -215,7 +214,7 @@ describe('inputArgs.util', () => {
       expect(extractWorkflowDefinitions(null)).toEqual([]);
     });
 
-    it('returns empty array when workflowOptions.args is missing', () => {
+    it('returns empty array when workflowOptions.inputDefinitions is missing', () => {
       expect(extractWorkflowDefinitions({ workflowOptions: {} })).toEqual([]);
     });
   });
@@ -223,10 +222,9 @@ describe('inputArgs.util', () => {
   // ─── extractQueryDefinitions ────────────────────────────────────────────
 
   describe('extractQueryDefinitions', () => {
-    it('extracts definitions from dataQueryOptions.args with supportsTemplate=true', () => {
+    it('extracts definitions from dataQueryOptions.inputDefinitions with supportsTemplate=true', () => {
       const query = {
-        dataQueryOptions: {
-          args: [
+        dataQueryOptions: { inputDefinitions: [
             { key: 'customerId', type: 'number', required: true },
             { key: 'status', type: 'string' },
           ],

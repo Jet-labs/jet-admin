@@ -173,7 +173,7 @@ All data sources are page-level. Each has:
   alias: "users",               // unique key for referencing in expressions
   type: "query" | "workflow",   // execution backend
   queryID: "q_123",             // or workflowID for workflow type
-  inputArgs: {                  // supports {{ }} expressions
+  inputValues: {                  // supports {{ }} expressions
     search: "{{ widgets.searchInput.value }}",
     limit: 50
   },
@@ -228,7 +228,7 @@ State mutation (SET_VARIABLE, SET_WIDGET_STATE, query result arrives)
 ```
 State mutation changes path "variables.selectedUserID"
   -> Check all data sources with refreshOn including that path
-  -> Re-resolve their inputArgs against new state tree
+  -> Re-resolve their inputValues against new state tree
   -> Re-execute the data source
   -> Store new result in queries[alias]
   -> Widgets depending on queries[alias] re-render
@@ -355,7 +355,7 @@ No separate tables needed. Data sources and variables are stored inside the `app
       "alias": "users",
       "type": "query",
       "queryID": "q_123",
-      "inputArgs": {},
+      "inputValues": {},
       "triggerMode": "auto",
       "refreshOn": [],
       "refetchInterval": null

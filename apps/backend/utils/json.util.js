@@ -1,5 +1,5 @@
-// Re-export from inputArgs.util.js for backwards compatibility
-const { keyValueTypeArrayToObject } = require('./inputArgs.util');
+// Re-export from input.util.js for backwards compatibility
+const { keyValueTypeArrayToObject } = require('./input.util');
 
 module.exports = {
   keyValueTypeArrayToObject,

@@ -1,6 +1,6 @@
 const {
   resolveInputs,
-} = require('../../../utils/inputArgs.util');
+} = require('../../../utils/input.util');
 
 // Mock the template engine
 jest.mock("@jet-admin/expression-engine", () => ({
@@ -31,7 +31,7 @@ describe('resolveInputs', () => {
 
   it('passes through all values when no definitions are provided', async () => {
     const result = await resolveInputs({
-      runtimeValues: { foo: 'bar', count: 42 },
+      inputValues: { foo: 'bar', count: 42 },
     });
 
     expect(result.valid).toBe(true);
@@ -41,8 +41,8 @@ describe('resolveInputs', () => {
 
   it('passes through all values when definitions array is empty', async () => {
     const result = await resolveInputs({
-      definitions: [],
-      runtimeValues: { untypedField: 'hello' },
+      inputDefinitions: [],
+      inputValues: { untypedField: 'hello' },
     });
 
     expect(result.valid).toBe(true);
@@ -53,8 +53,8 @@ describe('resolveInputs', () => {
 
   it('coerces string to number when definition says number', async () => {
     const result = await resolveInputs({
-      definitions: [{ key: 'age', type: 'number' }],
-      runtimeValues: { age: '30' },
+      inputDefinitions: [{ key: 'age', type: 'number' }],
+      inputValues: { age: '30' },
     });
 
     expect(result.valid).toBe(true);
@@ -63,8 +63,8 @@ describe('resolveInputs', () => {
 
   it('coerces string to boolean', async () => {
     const result = await resolveInputs({
-      definitions: [{ key: 'active', type: 'boolean' }],
-      runtimeValues: { active: 'true' },
+      inputDefinitions: [{ key: 'active', type: 'boolean' }],
+      inputValues: { active: 'true' },
     });
 
     expect(result.valid).toBe(true);
@@ -73,8 +73,8 @@ describe('resolveInputs', () => {
 
   it('returns error for invalid coercion', async () => {
     const result = await resolveInputs({
-      definitions: [{ key: 'count', type: 'number' }],
-      runtimeValues: { count: 'not-a-number' },
+      inputDefinitions: [{ key: 'count', type: 'number' }],
+      inputValues: { count: 'not-a-number' },
     });
 
     expect(result.valid).toBe(false);
@@ -85,11 +85,11 @@ describe('resolveInputs', () => {
 
   it('validates required fields', async () => {
     const result = await resolveInputs({
-      definitions: [
+      inputDefinitions: [
         { key: 'name', type: 'string', required: true },
         { key: 'age', type: 'number', required: true },
       ],
-      runtimeValues: { name: 'Alice' },
+      inputValues: { name: 'Alice' },
     });
 
     expect(result.valid).toBe(false);
@@ -99,11 +99,11 @@ describe('resolveInputs', () => {
 
   it('passes when all required fields are present', async () => {
     const result = await resolveInputs({
-      definitions: [
+      inputDefinitions: [
         { key: 'name', type: 'string', required: true },
         { key: 'age', type: 'number', required: true },
       ],
-      runtimeValues: { name: 'Alice', age: '25' },
+      inputValues: { name: 'Alice', age: '25' },
     });
 
     expect(result.valid).toBe(true);
@@ -112,8 +112,8 @@ describe('resolveInputs', () => {
 
   it('treats empty string as missing for required fields', async () => {
     const result = await resolveInputs({
-      definitions: [{ key: 'name', type: 'string', required: true }],
-      runtimeValues: { name: '' },
+      inputDefinitions: [{ key: 'name', type: 'string', required: true }],
+      inputValues: { name: '' },
     });
 
     expect(result.valid).toBe(false);
@@ -124,11 +124,11 @@ describe('resolveInputs', () => {
 
   it('applies defaults when runtime value is missing', async () => {
     const result = await resolveInputs({
-      definitions: [
+      inputDefinitions: [
         { key: 'limit', type: 'number', default: 10 },
         { key: 'offset', type: 'number', default: 0 },
       ],
-      runtimeValues: { limit: '25' },
+      inputValues: { limit: '25' },
     });
 
     expect(result.valid).toBe(true);
@@ -138,8 +138,8 @@ describe('resolveInputs', () => {
 
   it('does not apply default when runtime value is provided', async () => {
     const result = await resolveInputs({
-      definitions: [{ key: 'limit', type: 'number', default: 10 }],
-      runtimeValues: { limit: '5' },
+      inputDefinitions: [{ key: 'limit', type: 'number', default: 10 }],
+      inputValues: { limit: '5' },
     });
 
     expect(result.resolved.limit).toBe(5);
@@ -149,10 +149,10 @@ describe('resolveInputs', () => {
 
   it('resolves templates when supportsTemplate is true and contextData is provided', async () => {
     const result = await resolveInputs({
-      definitions: [
+      inputDefinitions: [
         { key: 'userId', type: 'number', supportsTemplate: true },
       ],
-      runtimeValues: { userId: '{{ctx.input.userId}}' },
+      inputValues: { userId: '{{ctx.input.userId}}' },
       contextData: { ctx: { input: { userId: 42 } } },
     });
 
@@ -162,10 +162,10 @@ describe('resolveInputs', () => {
 
   it('does NOT resolve templates when supportsTemplate is false', async () => {
     const result = await resolveInputs({
-      definitions: [
+      inputDefinitions: [
         { key: 'name', type: 'string', supportsTemplate: false },
       ],
-      runtimeValues: { name: '{{ctx.input.name}}' },
+      inputValues: { name: '{{ctx.input.name}}' },
       contextData: { ctx: { input: { name: 'Alice' } } },
     });
 
@@ -175,10 +175,10 @@ describe('resolveInputs', () => {
 
   it('does NOT resolve templates when contextData is missing', async () => {
     const result = await resolveInputs({
-      definitions: [
+      inputDefinitions: [
         { key: 'userId', type: 'string', supportsTemplate: true },
       ],
-      runtimeValues: { userId: '{{ctx.input.userId}}' },
+      inputValues: { userId: '{{ctx.input.userId}}' },
     });
 
     // No context → value stays as-is
@@ -189,10 +189,10 @@ describe('resolveInputs', () => {
 
   it('sets missing optional fields to null', async () => {
     const result = await resolveInputs({
-      definitions: [
+      inputDefinitions: [
         { key: 'optional', type: 'string', required: false },
       ],
-      runtimeValues: {},
+      inputValues: {},
     });
 
     expect(result.valid).toBe(true);
@@ -203,13 +203,13 @@ describe('resolveInputs', () => {
 
   it('handles a real-world workflow input schema', async () => {
     const result = await resolveInputs({
-      definitions: [
+      inputDefinitions: [
         { key: 'customerId', type: 'number', required: true },
         { key: 'action', type: 'string', required: true },
         { key: 'dryRun', type: 'boolean', default: false },
         { key: 'metadata', type: 'object' },
       ],
-      runtimeValues: {
+      inputValues: {
         customerId: '123',
         action: 'activate',
         metadata: '{"source":"api"}',
@@ -228,7 +228,7 @@ describe('resolveInputs', () => {
   // ─── Definition fetching fallback ─────────────────────────────────────
 
   it('calls getInputDefinitions when type and id are provided but definitions are not', async () => {
-    const inputArgsUtil = require('../../../utils/inputArgs.util');
+    const inputArgsUtil = require('../../../utils/input.util');
     jest.spyOn(inputArgsUtil, 'getInputDefinitions').mockResolvedValueOnce([
       { key: 'x', type: 'number', required: true },
     ]);
@@ -236,10 +236,10 @@ describe('resolveInputs', () => {
     const result = await inputArgsUtil.resolveInputs({
       type: 'workflow',
       id: 'wf-123',
-      runtimeValues: { x: '10' },
+      inputValues: { x: '10' },
     });
 
-    expect(getInputDefinitions).toHaveBeenCalledWith('workflow', 'wf-123');
+    expect(inputArgsUtil.getInputDefinitions).toHaveBeenCalledWith('workflow', 'wf-123');
     expect(result.valid).toBe(true);
     expect(result.resolved.x).toBe(10);
   });

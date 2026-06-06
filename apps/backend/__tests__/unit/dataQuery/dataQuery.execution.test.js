@@ -1,6 +1,6 @@
 const {
   createQueryEngine,
-  buildDataQueryExecutionArgs,
+  buildDataQueryExecutionInputs,
   executeDataQuery,
   defaultDatasourceFetcher,
 } = require('../../../modules/dataQuery/dataQuery.service');
@@ -15,8 +15,8 @@ describe('dataQuery execution', () => {
     expect(engine.datasourceFetcher).toBe(datasourceFetcher);
   });
 
-  it('builds runtime args from arg definitions and values', () => {
-    const result = buildDataQueryExecutionArgs(
+  it('builds runtime inputs from input definitions and values', () => {
+    const result = buildDataQueryExecutionInputs(
       [
         { key: 'customerID', type: 'number' },
         { key: 'status', type: 'string' },
@@ -24,7 +24,7 @@ describe('dataQuery execution', () => {
       { customerID: 42, status: 'ACTIVE' }
     );
 
-    expect(result.mappedArgsToValues).toEqual([
+    expect(result.mappedInputsToValues).toEqual([
       { key: 'customerID', type: 'number', value: 42 },
       { key: 'status', type: 'string', value: 'ACTIVE' },
     ]);
@@ -34,7 +34,7 @@ describe('dataQuery execution', () => {
     });
   });
 
-  it('executes a query using precomputed execution args', async () => {
+  it('executes a query using precomputed execution inputs', async () => {
     const engine = {
       executeQuery: jest.fn().mockResolvedValue({ rows: [] }),
     };
@@ -42,7 +42,7 @@ describe('dataQuery execution', () => {
     const result = await executeDataQuery({
       engine,
       dataQueryID: 'query-1',
-      executionArgs: { customerID: 42 },
+      executionInputs: { customerID: 42 },
     });
 
     expect(engine.executeQuery).toHaveBeenCalledWith('query-1', { customerID: 42 });

@@ -72,7 +72,7 @@
           "dataQueryId": { "type": "string" }
         }
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "items": {
           "type": "object",
@@ -202,7 +202,7 @@
           }
         ]
       },
-      { "type": "Control", "scope": "#/properties/args", "label": "Dynamic Arguments" }
+      { "type": "Control", "scope": "#/properties/inputDefinitions", "label": "Dynamic Arguments" }
     ]
   },
   "data": {
@@ -219,6 +219,6 @@
     "channel": "",
     "consumeMode": "preview",
     "storeDestination": { "type": "dataQuery", "dataQueryId": "" },
-    "args": []
+    "inputDefinitions": []
   }
 }

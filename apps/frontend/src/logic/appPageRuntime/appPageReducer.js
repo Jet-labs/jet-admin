@@ -30,8 +30,8 @@ export const createAppPageInitialState = () => ({
   /** Variable definitions from appPageConfig (for type info & defaults) */
   variableDefinitions: [],
 
-  /** Listener event data keyed by listenerID */
-  listenerData: {},
+  /** Listener results keyed by alias */
+  listenerResults: {},
 
   /** Global context (currentUser, tenantID, etc.) */
   globals: {},
@@ -170,13 +170,37 @@ export const appPageReducer = (state, action) => {
       };
     }
 
-    case APP_PAGE_ACTIONS.SET_LISTENER_DATA: {
-      const { listenerID, data } = action.payload;
+    case APP_PAGE_ACTIONS.SET_LISTENER_RESULT: {
+      const { alias, data, error, mode = "replace", limit = 1000 } = action.payload;
+      let newData = data;
+      
+      if (mode === "append" || mode === "prepend") {
+        const currentData = state.listenerResults[alias]?.data || [];
+        const currentArray = Array.isArray(currentData) ? currentData : [];
+        if (mode === "append") {
+          newData = [...currentArray, data];
+        } else {
+          newData = [data, ...currentArray];
+        }
+        
+        if (newData.length > limit) {
+          if (mode === "append") {
+            newData = newData.slice(newData.length - limit);
+          } else {
+            newData = newData.slice(0, limit);
+          }
+        }
+      }
+
       return {
         ...state,
-        listenerData: {
-          ...state.listenerData,
-          [listenerID]: { data, lastUpdated: Date.now() },
+        listenerResults: {
+          ...state.listenerResults,
+          [alias]: { 
+            data: newData, 
+            error,
+            lastUpdated: Date.now() 
+          },
         },
       };
     }

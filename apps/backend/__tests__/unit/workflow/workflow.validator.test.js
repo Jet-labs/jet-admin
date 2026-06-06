@@ -35,7 +35,7 @@ describe('workflow.validator', () => {
         id: 'n1',
         type: 'dataQuery',
         data: {
-          args: {
+          inputValues: {
             customerID: 'ctx.input.customerID',
           },
         },
@@ -46,7 +46,7 @@ describe('workflow.validator', () => {
     expect(result.success).toBe(false);
     expect(result.error.issues).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        path: ['nodes', 0, 'data', 'args', 'customerID'],
+        path: ['nodes', 0, 'data', 'inputValues', 'customerID'],
         message: MUSTACHE_ONLY_TEMPLATE_MESSAGE,
       }),
     ]));

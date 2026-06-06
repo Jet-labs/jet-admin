@@ -38,7 +38,7 @@ export const AppPageConsole = () => {
           <div className="flex-1 overflow-hidden">
             {!contextTree ? (
                <div className="text-zinc-600 italic p-4 text-[11px]">Console not connected to runtime.</div>
-            ) : Object.keys(contextTree.queries || {}).length === 0 && Object.keys(contextTree.workflows || {}).length === 0 ? (
+            ) : Object.keys(contextTree.queries || {}).length === 0 && Object.keys(contextTree.workflows || {}).length === 0 && Object.keys(contextTree.listeners || {}).length === 0 ? (
                <div className="text-zinc-600 italic p-4 text-[11px]">No data sources configured yet.</div>
             ) : (
               <CodeEditor

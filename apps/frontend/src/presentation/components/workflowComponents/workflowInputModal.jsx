@@ -1,43 +1,43 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Play, X } from 'lucide-react';
 import PropTypes from "prop-types";
-import { Button, InputArgsForm } from "@jet-admin/ui";
+import { Button, InputValuesForm } from "@jet-admin/ui";
 /**
  * Modal to prompt for workflow input parameters before test run.
- * Renders form fields based on the args schema defined in workflowOptions.
- * Uses the shared InputArgsForm component from @jet-admin/ui.
+ * Renders form fields based on the inputDefinitions schema defined in workflowOptions.
+ * Uses the shared InputValuesForm component from @jet-admin/ui.
  */
-export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
-  // Initialize values based on args schema, using defaultValue when available
+export const WorkflowInputModal = ({ inputDefinitions, onSubmit, onClose }) => {
+  // Initialize values based on inputDefinitions schema, using defaultValue when available
   const initialValues = useMemo(() => {
     const values = {};
-    args.forEach((arg) => {
-      if (arg.key) {
+    inputDefinitions.forEach((inputDef) => {
+      if (inputDef.key) {
         // Use defaultValue if defined, otherwise fall back to type-appropriate empty value
-        if (arg.defaultValue !== undefined && arg.defaultValue !== null) {
-          values[arg.key] = arg.defaultValue;
+        if (inputDef.defaultValue !== undefined && inputDef.defaultValue !== null) {
+          values[inputDef.key] = inputDef.defaultValue;
         } else {
-          switch (arg.type) {
+          switch (inputDef.type) {
             case "number":
-              values[arg.key] = "";
+              values[inputDef.key] = "";
               break;
             case "boolean":
-              values[arg.key] = false;
+              values[inputDef.key] = false;
               break;
             case "object":
-              values[arg.key] = "";
+              values[inputDef.key] = "";
               break;
             case "array":
-              values[arg.key] = [];
+              values[inputDef.key] = [];
               break;
             default:
-              values[arg.key] = "";
+              values[inputDef.key] = "";
           }
         }
       }
     });
     return values;
-  }, [args]);
+  }, [inputDefinitions]);
 
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
@@ -51,17 +51,17 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
 
   const validate = useCallback(() => {
     const newErrors = {};
-    args.forEach((arg) => {
-      if (arg.required && arg.key) {
-        const value = values[arg.key];
+    inputDefinitions.forEach((inputDef) => {
+      if (inputDef.required && inputDef.key) {
+        const value = values[inputDef.key];
         if (value === "" || value === undefined || value === null) {
-          newErrors[arg.key] = "Required";
+          newErrors[inputDef.key] = "Required";
         }
       }
     });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [args, values]);
+  }, [inputDefinitions, values]);
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
@@ -69,33 +69,33 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
 
     // Parse values based on type
     const parsedValues = {};
-    args.forEach((arg) => {
-      if (arg.key) {
-        const value = values[arg.key];
-        switch (arg.type) {
+    inputDefinitions.forEach((inputDef) => {
+      if (inputDef.key) {
+        const value = values[inputDef.key];
+        switch (inputDef.type) {
           case "number":
-            parsedValues[arg.key] = value === "" ? null : Number(value);
+            parsedValues[inputDef.key] = value === "" ? null : Number(value);
             break;
           case "boolean":
-            parsedValues[arg.key] = Boolean(value);
+            parsedValues[inputDef.key] = Boolean(value);
             break;
           case "object":
             try {
-              parsedValues[arg.key] = value ? JSON.parse(value) : null;
+              parsedValues[inputDef.key] = value ? JSON.parse(value) : null;
             } catch {
-              parsedValues[arg.key] = null;
+              parsedValues[inputDef.key] = null;
             }
             break;
           case "array":
-            parsedValues[arg.key] = Array.isArray(value) ? value : [];
+            parsedValues[inputDef.key] = Array.isArray(value) ? value : [];
             break;
           default:
-            parsedValues[arg.key] = value;
+            parsedValues[inputDef.key] = value;
         }
       }
     });
     onSubmit(parsedValues);
-  }, [args, values, validate, onSubmit]);
+  }, [inputDefinitions, values, validate, onSubmit]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -120,8 +120,8 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
         {/* Body */}
         <form>
           <div className="p-4 max-h-[60vh] overflow-y-auto">
-            <InputArgsForm
-              args={args}
+            <InputValuesForm
+              inputDefinitions={inputDefinitions}
               values={values}
               onChange={handleChange}
               errors={errors}
@@ -155,7 +155,7 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
 };
 
 WorkflowInputModal.propTypes = {
-  args: PropTypes.arrayOf(
+  inputDefinitions: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string,
       type: PropTypes.string,

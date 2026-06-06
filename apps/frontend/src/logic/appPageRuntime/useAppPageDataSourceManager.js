@@ -18,13 +18,14 @@ import { getChangedPaths } from "./appPageExpressionEngine";
 import { runDataQueryByIDAPI } from "../../data/apis/dataQuery";
 import { executeWorkflowWithStreaming } from "./executeWorkflowWithStreaming";
 import { resolveConfig } from "../evaluationEngine";
+import { useSocketStore } from "../stores/useSocketStore";
 
 export const useAppPageDataSourceManager = () => {
   const meta = useContext(AppPageMetaContext);
   const stateTree = useAppPageStateTree();
   const dispatch = useAppPageDispatch();
 
-  const { dataSources = [], tenantID } = meta;
+  const { dataSources = [], tenantID, pageID } = meta;
 
   // Track previous state tree for reactive change detection
   const prevStateTreeRef = useRef(stateTree);
@@ -53,37 +54,38 @@ export const useAppPageDataSourceManager = () => {
    * Execute a single data source and store the result.
    */
   const executeDataSource = useCallback(
-    async (dataSource, overrideArgs = {}) => {
-      const { alias, type, queryID, workflowID, inputArgs = {} } = dataSource;
+    async (dataSource, overrideInputs = {}) => {
+      const { alias, type, queryID, workflowID, listenerID, channelName, inputValues = {} } = dataSource;
 
       // Increment request counter for deduplication
       const requestID = (requestCounterRef.current[alias] || 0) + 1;
       requestCounterRef.current[alias] = requestID;
 
-      // Resolve any {{ }} expressions in inputArgs against current state
-      const resolvedInputArgs = resolveConfig(
-        { ...inputArgs, ...overrideArgs },
+      // Resolve any {{ }} expressions in inputValues against current state
+      const resolvedInputValues = resolveConfig(
+        { ...inputValues, ...overrideInputs },
         stateTree
       );
 
-      // If any inputArg template resolved to undefined/null, it means a
+      // If any inputValue template resolved to undefined/null, it means a
       // referenced variable/path doesn't exist yet (e.g. {{variables.skip}}
       // before the table widget sets initial pagination variables).
       // Skip execution — the reactive system will re-trigger once the
       // variables are set, avoiding SQL errors like "OFFSET  LIMIT".
-      const hasUnresolvedArgs = Object.keys(inputArgs).length > 0 &&
-        Object.entries(resolvedInputArgs).some(
+      const hasUnresolvedInputs = Object.keys(inputValues).length > 0 &&
+        Object.entries(resolvedInputValues).some(
           ([, val]) => val === undefined || val === null
         );
-      if (hasUnresolvedArgs) {
+      if (hasUnresolvedInputs) {
         console.log(
-          `[DataSourceManager] Skipping "${alias}" — has unresolved template args`,
-          resolvedInputArgs
+          `[DataSourceManager] Skipping "${alias}" — has unresolved template inputs`,
+          resolvedInputValues
         );
         return null;
       }
 
       const isWorkflow = type === "workflow";
+      const isListener = type === "listener";
 
       try {
         if (isWorkflow) {
@@ -95,7 +97,7 @@ export const useAppPageDataSourceManager = () => {
           const { disconnect } = executeWorkflowWithStreaming({
             tenantID,
             workflowID,
-            inputArgs: resolvedInputArgs,
+            inputValues: resolvedInputValues,
             alias,
             dispatch,
             isStale: () => requestCounterRef.current[alias] !== requestID,
@@ -105,13 +107,49 @@ export const useAppPageDataSourceManager = () => {
           activeDisconnectorsRef.current[alias] = disconnect;
 
           return null;
+        } else if (isListener) {
+          // Disconnect any existing listener stream for this alias
+          if (typeof activeDisconnectorsRef.current[alias] === "function") {
+            activeDisconnectorsRef.current[alias]();
+          }
+
+          const socket = useSocketStore.getState().socket;
+          if (!socket) {
+            console.warn(`[ListenerStream] Shared socket not connected for "${alias}"`);
+            dispatch(appPageActions.setListenerResult(alias, null));
+            return null;
+          }
+
+          if (pageID) {
+            socket.emit("join_room", `listener:app_page:${pageID}`);
+          }
+
+          const handleListenerEvent = (payload) => {
+            if (
+              payload.channelName === `listener:${listenerID}` ||
+              payload.channelName === channelName
+            ) {
+              dispatch(appPageActions.setListenerResult(alias, payload.data, null, payload.mode, payload.limit));
+            }
+          };
+
+          socket.on("listener_event", handleListenerEvent);
+
+          const disconnect = () => {
+            socket.off("listener_event", handleListenerEvent);
+          };
+
+          activeDisconnectorsRef.current[alias] = disconnect;
+          dispatch(appPageActions.setListenerResult(alias, null));
+
+          return null;
         } else {
           dispatch(appPageActions.setQueryLoading(alias));
 
           const result = await runDataQueryByIDAPI({
             tenantID,
             dataQueryID: queryID,
-            inputArgs: resolvedInputArgs,
+            inputValues: resolvedInputValues,
           });
 
           // Only store if this is still the latest request for this alias
@@ -158,7 +196,7 @@ export const useAppPageDataSourceManager = () => {
     const autoSources = dataSources.filter(
       (ds) =>
         (ds.triggerMode === "auto" || ds.triggerMode === "reactive") &&
-        (ds.queryID || ds.workflowID) &&
+        (ds.queryID || ds.workflowID || ds.listenerID) &&
         ds.alias &&
         !fetchedAliasesRef.current.has(ds.alias)
     );

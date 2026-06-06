@@ -4,22 +4,22 @@ import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 
-import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, InputArgsForm } from "@jet-admin/ui";
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, InputValuesForm } from "@jet-admin/ui";
 
 /**
- * Parse raw form values based on arg type definitions.
+ * Parse raw form values based on inputDefinitions.
  * JSON Forms stores:
  *  - arrays as comma-separated strings
  *  - objects as stringified JSON
  * This function converts them to proper JS types before sending to the backend.
  */
-function parseFormValues(args, rawValues) {
-  if (!args || !rawValues) return rawValues;
+function parseFormValues(inputDefinitions, rawValues) {
+  if (!inputDefinitions || !rawValues) return rawValues;
   const parsed = {};
 
-  for (const arg of args) {
-    const key = arg.key;
-    const type = arg.type || "string";
+  for (const inputDef of inputDefinitions) {
+    const key = inputDef.key;
+    const type = inputDef.type || "string";
     const rawValue = rawValues[key];
 
     switch (type) {
@@ -81,22 +81,22 @@ function parseFormValues(args, rawValues) {
   return parsed;
 }
 
-export const DataQueryArgsForm = ({
+export const DataQueryInputsForm = ({
   onDecline,
   onAccepted,
   open,
-  dataQueryArgs,
+  inputDefinitions,
 }) => {
-  DataQueryArgsForm.propTypes = {
+  DataQueryInputsForm.propTypes = {
     onDecline: PropTypes.func.isRequired,
     onAccepted: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
-    dataQueryArgs: PropTypes.array.isRequired,
+    inputDefinitions: PropTypes.array.isRequired,
   };
 
-  const dataQueryArgsForm = useFormik({
+  const dataQueryInputsForm = useFormik({
     initialValues: Object.fromEntries(
-      dataQueryArgs?.map(({ key, type }) => {
+      inputDefinitions?.map(({ key, type }) => {
         // Initialize with proper default based on type
         switch (type) {
           case "boolean": return [key, false];
@@ -109,50 +109,50 @@ export const DataQueryArgsForm = ({
     validateOnMount: false,
     validateOnChange: false,
     validationSchema:
-      formValidations.dataQueryArgsFormValidationSchema(dataQueryArgs),
+      formValidations.dataQueryInputsFormValidationSchema(inputDefinitions),
     onSubmit: () => {},
   });
 
   useEffect(() => {
-    if (dataQueryArgsForm && dataQueryArgs) {
-      dataQueryArgs.forEach((arg) => {
-        const type = arg.type || "string";
+    if (dataQueryInputsForm && inputDefinitions) {
+      inputDefinitions.forEach((inputDef) => {
+        const type = inputDef.type || "string";
         switch (type) {
           case "boolean":
-            dataQueryArgsForm.setFieldValue(arg.key, false);
+            dataQueryInputsForm.setFieldValue(inputDef.key, false);
             break;
           case "array":
-            dataQueryArgsForm.setFieldValue(arg.key, []);
+            dataQueryInputsForm.setFieldValue(inputDef.key, []);
             break;
           default:
-            dataQueryArgsForm.setFieldValue(arg.key, "");
+            dataQueryInputsForm.setFieldValue(inputDef.key, "");
         }
       });
     }
-  }, [dataQueryArgs]);
+  }, [inputDefinitions]);
 
   const handleAccepted = useCallback(() => {
-    const parsedValues = parseFormValues(dataQueryArgs, dataQueryArgsForm.values);
+    const parsedValues = parseFormValues(inputDefinitions, dataQueryInputsForm.values);
     onAccepted(parsedValues);
-  }, [dataQueryArgs, dataQueryArgsForm.values, onAccepted]);
+  }, [inputDefinitions, dataQueryInputsForm.values, onAccepted]);
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onDecline(); }}>
-      <DialogContent className="max-w-sm p-4 md:p-6">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold tracking-tight">
-            {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_TITLE}
+            {CONSTANTS.STRINGS.DATA_QUERY_INPUTS_FORM_TITLE}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_DESCRIPTION}
+            {CONSTANTS.STRINGS.DATA_QUERY_INPUTS_FORM_DESCRIPTION}
           </p>
-          <InputArgsForm
-            args={dataQueryArgs}
-            values={dataQueryArgsForm.values}
-            onChange={(key, value) => dataQueryArgsForm.setFieldValue(key, value)}
-            errors={dataQueryArgsForm.errors}
+          <InputValuesForm
+            inputDefinitions={inputDefinitions}
+            values={dataQueryInputsForm.values}
+            onChange={(key, value) => dataQueryInputsForm.setFieldValue(key, value)}
+            errors={dataQueryInputsForm.errors}
           />
         </div>
         <DialogFooter className="gap-2 sm:gap-3 mt-4">
@@ -161,17 +161,17 @@ export const DataQueryArgsForm = ({
             type="button"
             variant="outline"
           >
-            {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_CANCEL_BUTTON}
+            {CONSTANTS.STRINGS.DATA_QUERY_INPUTS_FORM_CANCEL_BUTTON}
           </Button>
 
           <Button
             type="button"
             onClick={handleAccepted}
-            disabled={dataQueryArgs.some(
-              (arg) => arg.required && !dataQueryArgsForm.values[arg.key]
+            disabled={inputDefinitions.some(
+              (inputDef) => inputDef.required && !dataQueryInputsForm.values[inputDef.key]
             )}
           >
-            {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_CONFIRM_BUTTON}
+            {CONSTANTS.STRINGS.DATA_QUERY_INPUTS_FORM_CONFIRM_BUTTON}
           </Button>
         </DialogFooter>
       </DialogContent>

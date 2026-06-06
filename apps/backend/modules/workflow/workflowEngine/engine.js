@@ -528,11 +528,11 @@ async function recoverStuckWorkflows() {
 
 // ─── Workflow launchers ───────────────────────────────────────────────────────
 
-async function startWorkflow({ workflowID, tenantID, inputArgs = {} }) {
+async function startWorkflow({ workflowID, tenantID, inputValues = {} }) {
   Logger.log('info', { message: 'orchestrator:startWorkflow', params: { workflowID, tenantID } });
 
   const { instance, initialContext } = await stateManager.createInstance({
-    workflowID, tenantID, inputArgs,
+    workflowID, tenantID, inputValues,
   });
 
   const startNode = await dagScheduler.getStartNode(workflowID);
@@ -555,7 +555,7 @@ async function startWorkflow({ workflowID, tenantID, inputArgs = {} }) {
   return { instanceID: instance.instanceID };
 }
 
-async function startTestWorkflow({ nodes, edges, tenantID, inputArgs = {} }) {
+async function startTestWorkflow({ nodes, edges, tenantID, inputValues = {} }) {
   Logger.log('info', {
     message: 'orchestrator:startTestWorkflow',
     params: { tenantID, nodeCount: nodes.length, edgeCount: edges.length },
@@ -567,7 +567,7 @@ async function startTestWorkflow({ nodes, edges, tenantID, inputArgs = {} }) {
   const testWorkflowID = uuidv4();
 
   const { instance, initialContext } = await stateManager.createInstance({
-    workflowID: testWorkflowID, tenantID, inputArgs, isTest: true,
+    workflowID: testWorkflowID, tenantID, inputValues, isTest: true,
   });
 
   const workflowDefinition = _buildWorkflowDefinition(nodes, edges);

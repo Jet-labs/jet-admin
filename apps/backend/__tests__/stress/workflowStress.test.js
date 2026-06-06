@@ -120,12 +120,12 @@ const {
 
 const TENANT = 'tenant-stress-test';
 
-async function launchWorkflow(topology, inputArgs = {}) {
+async function launchWorkflow(topology, inputValues = {}) {
   store.seedWorkflow(topology);
   const { instanceID } = await startWorkflow({
     workflowID: topology.workflowID,
     tenantID: TENANT,
-    inputArgs,
+    inputValues,
   });
   return instanceID;
 }
@@ -222,7 +222,7 @@ describe('dagScheduler — isNodeReadyToExecute', () => {
 describe('stateManager', () => {
   test('createInstance writes INPUT_SET log row', async () => {
     const { instance, initialContext } = await stateManager.createInstance({
-      workflowID: 'wf-1', tenantID: TENANT, inputArgs: { foo: 'bar' },
+      workflowID: 'wf-1', tenantID: TENANT, inputValues: { foo: 'bar' },
     });
 
     expect(instance.status).toBe('RUNNING');

@@ -61,7 +61,7 @@
           "replicationFactor": { "type": "integer", "default": 1 }
         }
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "items": {
           "type": "object",
@@ -155,7 +155,7 @@
           }
         ]
       },
-      { "type": "Control", "scope": "#/properties/args", "label": "Dynamic Arguments" }
+      { "type": "Control", "scope": "#/properties/inputDefinitions", "label": "Dynamic Arguments" }
     ]
   },
   "data": {
@@ -169,6 +169,6 @@
     "consumeMode": "preview",
     "storeDestination": { "type": "dataQuery", "dataQueryId": "" },
     "topicConfig": { "numPartitions": 1, "replicationFactor": 1 },
-    "args": []
+    "inputDefinitions": []
   }
 }

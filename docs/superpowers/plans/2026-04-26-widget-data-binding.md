@@ -297,7 +297,7 @@ This is the generic data sources editor that lives in the "Data" tab. It should:
   - **Source picker**: If type is `query`, show dropdown of `dataQueries` (value: `dataQueryID`, label: `dataQueryTitle`). If type is `workflow`, show dropdown of `workflows` (value: `workflowID`, label: `title`)
   - **Alias input**: Text input, auto-generated from source name on selection, user-editable
   - **Input Arguments section**: When a source is selected, detect available args:
-    - For queries: read `dataQueryOptions.args` from the selected query object
+    - For queries: read `dataQueryOptions.inputDefinitions` from the selected query object
     - For workflows: read `workflowInputSchema` or `workflowOptions` from the selected workflow
     - Render each arg as a labeled Input field, values stored at `dataSources[i].inputArgValues[argName]`
   - **Remove button**: Removes the entry from the array
@@ -343,7 +343,7 @@ Modify `widgetConfigEditor.jsx` to:
 
 3. Add a `handleTestRun` callback that:
    - Reads `widgetEditorForm.values.widgetConfig.dataSources`
-   - For each source with `type: 'query'`: calls `testDataQueryByIDAPI({ tenantID, dataQueryID: source.queryID, inputArgs: source.inputArgValues })`
+   - For each source with `type: 'query'`: calls `testDataQueryByIDAPI({ tenantID, dataQueryID: source.queryID, inputValues: source.inputArgValues })`
    - Collects results into `{ [alias]: result }` and calls `setQueryResults(results)`
    - Sets `isTestRunning` during execution
 

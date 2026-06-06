@@ -47,11 +47,11 @@ export const WorkflowTestingPanel = ({
 
   // Execute workflow mutation
   const { isPending: isExecuting, mutate: executeWorkflow } = useMutation({
-    mutationFn: ({ inputArgs }) => {
+    mutationFn: ({ inputValues }) => {
       return executeWorkflowAPI({
         tenantID,
         workflowID: selectedWorkflowForTesting.workflowID,
-        inputArgs,
+        inputValues,
       });
     },
     retry: false,
@@ -154,9 +154,9 @@ export const WorkflowTestingPanel = ({
     setLogs([]);
     setIsRunning(true);
     
-    // For now, start with empty params - you could add a dialog for args similar to DataQueryArgsForm
-    const inputArgs = {};
-    executeWorkflow({ inputArgs });
+    // For now, start with empty params - you could add a dialog for inputDefinitions similar to DataQueryInputsForm
+    const inputValues = {};
+    executeWorkflow({ inputValues });
   };
 
   return (
@@ -215,9 +215,9 @@ export const WorkflowTestingPanel = ({
                 <h3 className="text-sm font-medium text-foreground">
                   {selectedWorkflowForTesting.title}
                 </h3>
-                {selectedWorkflowForTesting.workflowOptions?.args?.length > 0 && (
+                {selectedWorkflowForTesting.workflowOptions?.inputDefinitions?.length > 0 && (
                   <p className="text-xs text-foreground mt-1">
-                    Has {selectedWorkflowForTesting.workflowOptions.args.length} input parameter(s)
+                    Has {selectedWorkflowForTesting.workflowOptions.inputDefinitions.length} input parameter(s)
                   </p>
                 )}
               </div>

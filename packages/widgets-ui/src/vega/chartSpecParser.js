@@ -1,7 +1,7 @@
 /**
  * Chart Spec Parser
  * 
- * Reverse-engineers a Vega-Lite spec back into a chartBuilderSpec config.
+ * Reverse-engineers a Vega-Lite spec back into a shelfSpec config.
  * Used when switching from Raw mode → Visual mode.
  * 
  * Best-effort: complex specs or custom Vega features may not parse fully.
@@ -29,7 +29,7 @@ const MARK_TO_CHART_TYPE = {
 // ============================================================
 
 /**
- * Parse a Vega-Lite spec into a chartBuilderSpec config.
+ * Parse a Vega-Lite spec into a shelfSpec config.
  * 
  * @param {object} spec - Vega-Lite JSON spec
  * @returns {{ success: boolean, config: object, warnings: string[] }}

@@ -111,14 +111,14 @@ export const DataSourcesEditor = ({
     [dataSources, updateDataSources]
   );
 
-  // Get arg definitions for a source
-  const getSourceArgDefs = useCallback(
+  // Get inputDef definitions for a source
+  const getSourceInputDefinitions = useCallback(
     (source) => {
       if (source.type === "query" && source.queryID) {
         const query = dataQueries.find(
           (q) => q.dataQueryID === source.queryID
         );
-        return query?.dataQueryOptions?.args || [];
+        return query?.dataQueryOptions?.inputDefinitions || [];
       }
       if (source.type === "workflow" && source.workflowID) {
         const wf = workflows.find((w) => w.workflowID === source.workflowID);
@@ -172,7 +172,7 @@ export const DataSourcesEditor = ({
       )}
 
       {dataSources.map((source, idx) => {
-        const argDefs = getSourceArgDefs(source);
+        const inputDefinitions = getSourceInputDefinitions(source);
         return (
           <div
             key={idx}
@@ -280,20 +280,20 @@ export const DataSourcesEditor = ({
             </div>
 
             {/* Input Arguments */}
-            {argDefs.length > 0 && (
+            {inputDefinitions.length > 0 && (
               <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2 mt-2">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Input Arguments
                 </p>
-                {argDefs.map((arg) => {
-                  const argKey = arg.key || arg.name;
+                {inputDefinitions.map((inputDef) => {
+                  const argKey = inputDef.key || inputDef.name;
                   return (
                     <div key={argKey} className="space-y-0.5">
                       <Label className="text-[10px] font-medium text-muted-foreground">
                         {argKey}
-                        {arg.type && (
+                        {inputDef.type && (
                           <span className="ml-1 text-muted-foreground/50">
-                            ({arg.type})
+                            ({inputDef.type})
                           </span>
                         )}
                       </Label>
@@ -304,7 +304,7 @@ export const DataSourcesEditor = ({
                         onChange={(e) =>
                           handleArgChange(idx, argKey, e.target.value)
                         }
-                        placeholder={arg.defaultValue || ""}
+                        placeholder={inputDef.defaultValue || ""}
                       />
                     </div>
                   );

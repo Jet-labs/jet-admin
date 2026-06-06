@@ -22,7 +22,7 @@
         "type": "string",
         "description": "Operation name (optional, for queries with multiple operations)"
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Dynamic arguments to inject into variables",
         "items": {
@@ -68,7 +68,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Dynamic Arguments",
         "options": {
           "detail": {
@@ -93,6 +93,6 @@
     "query": "query GetUsers($limit: Int) {\n  users(limit: $limit) {\n    id\n    name\n    email\n  }\n}",
     "variables": "{\n  \"limit\": 10\n}",
     "operationName": "",
-    "args": []
+    "inputDefinitions": []
   }
 }

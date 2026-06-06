@@ -109,7 +109,7 @@ export const WidgetConfigEditor = ({
         >
           Select widget type
         </Label>
-        <Select value={widgetType} onValueChange={(val) => widgetEditorForm.setFieldValue('widgetType', val)}>
+        <Select value={widgetType ? String(widgetType) : undefined} onValueChange={(val) => widgetEditorForm.setFieldValue('widgetType', val)}>
           <SelectTrigger className="text-xs">
             <SelectValue placeholder="Select an option" />
           </SelectTrigger>

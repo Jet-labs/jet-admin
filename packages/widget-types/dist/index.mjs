@@ -123,8 +123,8 @@ var WIDGET_EVENT_TYPES = {
       value: "onClick",
       label: "On Click",
       desc: "Fires when the widget is clicked",
-      args: [
-        { key: "event.args[0]", description: "Native click event" }
+      inputDefinitions: [
+        { key: "event.inputDefinitions[0]", description: "Native click event" }
       ]
     },
     { value: "onRefresh", label: "On Refresh", desc: "Fires when the widget refreshes data" },
@@ -136,7 +136,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onRowSelect",
       label: "On Row Select",
       desc: "Fires when a table row is selected",
-      args: [
+      inputDefinitions: [
         { key: "event.row", description: "Selected row object" },
         { key: "event.rowIndex", description: "Zero-based row index" }
       ]
@@ -145,7 +145,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onPageChange",
       label: "On Page Change",
       desc: "Fires when the table page changes",
-      args: [
+      inputDefinitions: [
         { key: "event.page", description: "Current page number" },
         { key: "event.pageSize", description: "Rows per page (limit)" },
         { key: "event.offset", description: "Row offset (skip)" }
@@ -155,7 +155,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onSearch",
       label: "On Search",
       desc: "Fires when search term changes (debounced)",
-      args: [
+      inputDefinitions: [
         { key: "event.searchTerm", description: "Debounced search term" }
       ]
     },
@@ -163,7 +163,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onExport",
       label: "On Export",
       desc: "Fires when export is triggered",
-      args: [
+      inputDefinitions: [
         { key: "event.format", description: "Export format (csv / json)" },
         { key: "event.rowCount", description: "Total rows exported" }
       ]
@@ -172,7 +172,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onRowSave",
       label: "On Row Save",
       desc: "Fires when an edited row is saved",
-      args: [
+      inputDefinitions: [
         { key: "event.rowIndex", description: "Edited row index" },
         { key: "event.originalRow", description: "Row before edit" },
         { key: "event.updatedRow", description: "Row after edit" },
@@ -183,7 +183,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onBulkDelete",
       label: "On Bulk Delete",
       desc: "Fires when bulk delete is triggered",
-      args: [
+      inputDefinitions: [
         { key: "event.selectedRows", description: "Array of selected row objects" },
         { key: "event.selectedRowIndices", description: "Array of selected row indices" }
       ]
@@ -192,7 +192,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onBulkExport",
       label: "On Bulk Export",
       desc: "Fires when bulk export is triggered",
-      args: [
+      inputDefinitions: [
         { key: "event.selectedRows", description: "Array of selected row objects" },
         { key: "event.format", description: "Export format (csv / json)" }
       ]
@@ -201,7 +201,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onBulkAction",
       label: "On Bulk Action",
       desc: "Fires for custom bulk actions",
-      args: [
+      inputDefinitions: [
         { key: "event.actionKey", description: "Custom action key" },
         { key: "event.selectedRows", description: "Array of selected row objects" }
       ]
@@ -210,7 +210,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onBulkEdit",
       label: "On Bulk Edit",
       desc: "Fires when bulk edits are saved",
-      args: [
+      inputDefinitions: [
         { key: "event.edits", description: "Array of { rowIndex, originalRow, changes } objects" }
       ]
     }
@@ -221,8 +221,8 @@ var WIDGET_EVENT_TYPES = {
       value: "onSubmit",
       label: "On Submit",
       desc: "Fires when the button is submitted",
-      args: [
-        { key: "event.args[0]", description: "Submit payload" }
+      inputDefinitions: [
+        { key: "event.inputDefinitions[0]", description: "Submit payload" }
       ]
     }
   ],
@@ -232,7 +232,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onSubmit",
       label: "On Submit",
       desc: "Fires when the form is submitted",
-      args: [
+      inputDefinitions: [
         { key: "event.formData", description: "Submitted form data object" }
       ]
     },
@@ -240,7 +240,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onFieldChange",
       label: "On Field Change",
       desc: "Fires when any form field changes",
-      args: [
+      inputDefinitions: [
         { key: "event.field", description: "Changed field name" },
         { key: "event.value", description: "New field value" },
         { key: "event.formData", description: "Current form data" }
@@ -253,8 +253,8 @@ var WIDGET_EVENT_TYPES = {
       value: "onDismiss",
       label: "On Dismiss",
       desc: "Fires when the alert is dismissed",
-      args: [
-        { key: "event.args[0]", description: "Dismiss payload" }
+      inputDefinitions: [
+        { key: "event.inputDefinitions[0]", description: "Dismiss payload" }
       ]
     }
   ],
@@ -263,7 +263,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onChange",
       label: "On Change",
       desc: "Fires when the selected date/time changes",
-      args: [
+      inputDefinitions: [
         { key: "event.value", description: "ISO datetime string" },
         { key: "event.date", description: "ISO date string (YYYY-MM-DD)" },
         { key: "event.time", description: "Time portion (HH:mm:ss) when enableTime is on" }
@@ -275,7 +275,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onClear",
       label: "On Clear",
       desc: "Fires when the selected value is cleared",
-      args: [
+      inputDefinitions: [
         { key: "event.value", description: "Cleared value (empty string)" }
       ]
     }
@@ -285,7 +285,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onChange",
       label: "On Change",
       desc: "Fires when the selected range changes",
-      args: [
+      inputDefinitions: [
         { key: "event.start", description: "ISO start datetime" },
         { key: "event.end", description: "ISO end datetime" },
         { key: "event.startDate", description: "ISO start date (YYYY-MM-DD)" },
@@ -298,7 +298,7 @@ var WIDGET_EVENT_TYPES = {
       value: "onClear",
       label: "On Clear",
       desc: "Fires when the range is cleared",
-      args: [
+      inputDefinitions: [
         { key: "event.start", description: "Cleared start (empty string)" }
       ]
     }
@@ -309,13 +309,13 @@ var getWidgetEventTypes = (widgetType) => {
   const specific = WIDGET_EVENT_TYPES[widgetType] || [];
   return [...common, ...specific];
 };
-var getEventArgs = (widgetType, eventType) => {
+var getEventInputDefinitions = (widgetType, eventType) => {
   const specific = WIDGET_EVENT_TYPES[widgetType] || [];
   const specificEvent = specific.find((e) => e.value === eventType);
-  if (specificEvent?.args) return specificEvent.args;
+  if (specificEvent?.inputDefinitions) return specificEvent.inputDefinitions;
   const common = WIDGET_EVENT_TYPES.COMMON || [];
   const commonEvent = common.find((e) => e.value === eventType);
-  if (commonEvent?.args) return commonEvent.args;
+  if (commonEvent?.inputDefinitions) return commonEvent.inputDefinitions;
   return [];
 };
 var WIDGET_METHODS = {
@@ -345,7 +345,7 @@ export {
   WIDGET_EVENT_TYPES,
   WIDGET_METHODS,
   WIDGET_TYPES,
-  getEventArgs,
+  getEventInputDefinitions,
   getWidgetEventTypes,
   getWidgetMethods
 };

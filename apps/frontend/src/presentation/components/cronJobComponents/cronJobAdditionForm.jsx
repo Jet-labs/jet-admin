@@ -42,7 +42,7 @@ export const CronJobAdditionForm = ({ tenantID }) => {
       cronJobDescription: "",
       cronJobSchedule: "* * * * *",
       workflowID: "",
-      workflowConfig: { inputArgs: {} },
+      workflowConfig: { inputValues: {} },
       isDisabled: false,
       timeoutSeconds: "",
       retryAttempts: "",

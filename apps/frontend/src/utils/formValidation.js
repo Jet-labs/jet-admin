@@ -95,7 +95,7 @@ formValidations.queryAdditionFormValidationSchema = Yup.object().shape({
   dataQueryTitle: Yup.string()
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
-  dataQueryArgs: Yup.array()
+  dataQueryInputs: Yup.array()
     .of(Yup.string().required("Argument name is required"))
     .optional(), // Optional array of arguments
 
@@ -106,7 +106,7 @@ formValidations.queryUpdationFormValidationSchema = Yup.object().shape({
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
 
-  dataQueryArgs: Yup.array()
+  dataQueryInputs: Yup.array()
     .of(Yup.string().required("Argument name is required"))
     .optional(), // Optional array of arguments
 
@@ -180,29 +180,13 @@ formValidations.webhookUpdationFormValidationSchema = Yup.object().shape({
   authConfig: Yup.string().optional(),
 });
 
-formValidations.dataQueryArgsFormValidationSchema = (dataQueryArgs) =>
+formValidations.dataQueryInputsFormValidationSchema = (inputDefinitions) =>
   Yup.object().shape(
-    dataQueryArgs.reduce((acc, arg) => {
-      acc[arg] = Yup.string().required(`${arg} is required`);
+    inputDefinitions.reduce((acc, inputDef) => {
+      acc[inputDef] = Yup.string().required(`${inputDef} is required`);
       return acc;
     }, {})
   );
-
-formValidations.datasetArgumentsFormValidationSchema = (dataQueryArgs) => {
-  const dataQueryArgValuesSchema = {};
-
-  // Dynamically create validation rules for each argument
-  dataQueryArgs?.forEach((arg) => {
-    const argName = arg.key; // Remove curly braces if present
-    dataQueryArgValuesSchema[argName] = Yup.string()
-      .required(`Value for ${argName} is required`)
-      .min(1, `Value for ${argName} cannot be empty`);
-  });
-
-  return Yup.object().shape({
-    dataQueryArgValues: Yup.object().shape(dataQueryArgValuesSchema),
-  });
-};
 
 formValidations.datasetFieldMappingFormValidationSchema = (datasetFields) => {
   const datasetFieldsSchema = {};

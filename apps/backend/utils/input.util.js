@@ -1,10 +1,10 @@
 /**
- * Input Args Utility
+ * Input Values Utility
  *
  * Centralized resolution, validation, coercion, and extraction 
- * for input arguments used across data-query, workflow, and cron-job modules.
+ * for input values used across data-query, workflow, and cron-job modules.
  *
- * Canonical arg schema shape:
+ * Canonical input schema shape:
  *   { key: string, type: 'string'|'number'|'boolean'|'object'|'array', required?: boolean, default?: any, supportsTemplate?: boolean }
  *
  * Canonical runtime values shape:
@@ -19,27 +19,27 @@ const SUPPORTED_TYPES = ['string', 'number', 'boolean', 'object', 'array'];
 // ─── Definition Providers ─────────────────────────────────────────────────────
 
 /**
- * Normalise a raw arg-schema array into a canonical InputDefinition[].
+ * Normalise a raw input-schema array into a canonical InputDefinition[].
  *
- * @param {Array<{ key: string, type?: string, required?: boolean, default?: * }>} rawArgs
+ * @param {Array<{ key: string, type?: string, required?: boolean, default?: * }>} inputDefinitions
  * @param {{ definitionSource?: string, supportsTemplate?: boolean }} [options]
  * @returns {Array<object>}
  */
-function normalizeDefinitions(rawArgs, options = {}) {
-  if (!Array.isArray(rawArgs)) return [];
+function normalizeDefinitions(inputDefinitions, options = {}) {
+  if (!Array.isArray(inputDefinitions)) return [];
 
   const {
     definitionSource = 'native',
     supportsTemplate = false,
   } = options;
 
-  return rawArgs
-    .filter((arg) => arg && arg.key)
-    .map((arg) => ({
-      key: arg.key,
-      type: arg.type || 'string',
-      required: arg.required === true,
-      default: arg.default !== undefined ? arg.default : (arg.defaultValue !== undefined ? arg.defaultValue : undefined),
+  return inputDefinitions
+    .filter((input) => input && input.key)
+    .map((input) => ({
+      key: input.key,
+      type: input.type || 'string',
+      required: input.required === true,
+      default: input.default !== undefined ? input.default : (input.defaultValue !== undefined ? input.defaultValue : undefined),
       supportsTemplate,
       definitionSource,
     }));
@@ -48,7 +48,7 @@ function normalizeDefinitions(rawArgs, options = {}) {
 function extractWorkflowDefinitions(workflow) {
   if (!workflow || !workflow.workflowOptions) return [];
   return normalizeDefinitions(
-    workflow.workflowOptions.args,
+    workflow.workflowOptions.inputDefinitions,
     { definitionSource: 'native', supportsTemplate: false }
   );
 }
@@ -56,7 +56,7 @@ function extractWorkflowDefinitions(workflow) {
 function extractQueryDefinitions(dataQuery) {
   if (!dataQuery || !dataQuery.dataQueryOptions) return [];
   return normalizeDefinitions(
-    dataQuery.dataQueryOptions.args,
+    dataQuery.dataQueryOptions.inputDefinitions,
     { definitionSource: 'native', supportsTemplate: true }
   );
 }
@@ -70,7 +70,7 @@ function extractQueryDefinitions(dataQuery) {
  */
 async function getInputDefinitions(type, id) {
   Logger.log('info', {
-    message: 'inputArgs:getInputDefinitions',
+    message: 'inputValues:getInputDefinitions',
     params: { type, id },
   });
 
@@ -94,7 +94,7 @@ async function getInputDefinitions(type, id) {
     }
     default:
       Logger.log('warning', {
-        message: 'inputArgs:unknownType',
+        message: 'inputValues:unknownType',
         params: { type, id },
       });
       return [];
@@ -180,14 +180,14 @@ function coerceValue(rawValue, type) {
 
 // ─── Pipeline Stages ──────────────────────────────────────────────────────────
 
-function resolveInputTemplates(definitions, values, contextData) {
+function resolveInputTemplates(inputDefinitions, values, contextData) {
   const resolved = { ...values };
   const errors = {};
   if (!contextData) return { values: resolved, errors };
 
   const { resolveTemplate } = require("@jet-admin/expression-engine");
 
-  for (const def of definitions) {
+  for (const def of inputDefinitions) {
     if (!def.supportsTemplate || resolved[def.key] === undefined || resolved[def.key] === null) continue;
     try {
       resolved[def.key] = resolveTemplate(resolved[def.key], contextData, { preserveSingleExpressionType: true });
@@ -198,9 +198,9 @@ function resolveInputTemplates(definitions, values, contextData) {
   return { values: resolved, errors };
 }
 
-function applyInputDefaults(definitions, values) {
+function applyInputDefaults(inputDefinitions, values) {
   const resolved = { ...values };
-  for (const def of definitions) {
+  for (const def of inputDefinitions) {
     if ((resolved[def.key] === undefined || resolved[def.key] === null) && def.default !== undefined) {
       resolved[def.key] = def.default;
     }
@@ -208,10 +208,10 @@ function applyInputDefaults(definitions, values) {
   return { values: resolved, errors: {} };
 }
 
-function coerceInputTypes(definitions, values) {
+function coerceInputTypes(inputDefinitions, values) {
   const resolved = { ...values };
   const errors = {};
-  for (const def of definitions) {
+  for (const def of inputDefinitions) {
     if (resolved[def.key] === undefined || resolved[def.key] === null) continue;
     const type = normalizeType(def.type);
     const { value: coerced, error } = coerceValue(resolved[def.key], type);
@@ -224,10 +224,10 @@ function coerceInputTypes(definitions, values) {
   return { values: resolved, errors };
 }
 
-function validateRequiredInputs(definitions, values) {
+function validateRequiredInputs(inputDefinitions, values) {
   const resolved = { ...values };
   const errors = {};
-  for (const def of definitions) {
+  for (const def of inputDefinitions) {
     if (def.required && (resolved[def.key] === undefined || resolved[def.key] === null || resolved[def.key] === '')) {
       errors[def.key] = `"${def.key}" is required`;
     }
@@ -258,19 +258,19 @@ function keyValueTypeArrayToObject(kvtArray) {
 async function resolveInputs({
   type,
   id,
-  definitions,
-  runtimeValues = {},
+  inputDefinitions,
+  inputValues = {},
   contextData,
 } = {}) {
   // Stage 0: Get definitions
-  let defs = definitions;
+  let defs = inputDefinitions;
   if (!defs && type && id) {
     defs = await getInputDefinitions(type, id);
   }
 
   // No definitions → pass through all values as-is
   if (!Array.isArray(defs) || defs.length === 0) {
-    return { resolved: { ...runtimeValues }, errors: {}, valid: true };
+    return { resolved: { ...inputValues }, errors: {}, valid: true };
   }
 
   // Sequentially process each stage, accumulating errors and halting processing 
@@ -281,7 +281,7 @@ async function resolveInputs({
   for (const def of defs) {
     if (!def.key) continue;
 
-    let value = runtimeValues[def.key];
+    let value = inputValues[def.key];
     let hasError = false;
 
     // Stage 1: Templates

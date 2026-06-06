@@ -13,7 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  InputArgsForm,
+  InputValuesForm,
   Switch,
   Section,
 } from "@jet-admin/ui";
@@ -143,15 +143,15 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
           {touched.workflowID && <FieldError message={errors.workflowID} />}
         </div>
 
-        {selectedWorkflow?.workflowOptions?.args?.length > 0 && (
+        {selectedWorkflow?.workflowOptions?.inputDefinitions?.length > 0 && (
           <div className="space-y-1.5 pt-1">
             <Label>Workflow Arguments</Label>
-            <InputArgsForm
-              args={selectedWorkflow.workflowOptions.args}
-              values={cronJobEditorForm.values.workflowConfig?.inputArgs ?? {}}
+            <InputValuesForm
+              inputDefinitions={selectedWorkflow.workflowOptions.inputDefinitions}
+              values={cronJobEditorForm.values.workflowConfig?.inputValues ?? {}}
               onChange={(key, value) =>
                 cronJobEditorForm.setFieldValue(
-                  `workflowConfig.inputArgs.${key}`,
+                  `workflowConfig.inputValues.${key}`,
                   value
                 )
               }

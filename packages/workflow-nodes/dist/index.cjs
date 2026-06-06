@@ -126,7 +126,7 @@ var WorkflowNodesProvider = ({
   workflowNodes = [],
   workflowEdges = [],
   // Edges for DAG traversal
-  workflowInputArgs = [],
+  workflowInputDefinitions = [],
   // Declared workflow input parameters [{key, type, ...}]
   nodeExecutionStatus = {},
   // Map of nodeId -> status
@@ -135,7 +135,7 @@ var WorkflowNodesProvider = ({
   tenantID = null,
   // Tenant ID for API calls
   onQueryTest = null
-  // Callback for testing queries: (dataQueryID, argValues) => Promise<result>
+  // Callback for testing queries: (dataQueryID, inputValues) => Promise<result>
 }) => {
   return /* @__PURE__ */ import_react.default.createElement(WorkflowNodesContext.Provider, { value: {
     dataQueries,
@@ -143,7 +143,7 @@ var WorkflowNodesProvider = ({
     onRefreshDataQueries,
     workflowNodes,
     workflowEdges,
-    workflowInputArgs,
+    workflowInputDefinitions,
     nodeExecutionStatus,
     workflowContext,
     tenantID,
@@ -165,6 +165,22 @@ var useNodeExecutionStatus = (nodeId) => {
 // src/nodes/conditionNode.jsx
 var import_ui = require("@jet-admin/ui");
 var import_lucide_react = require("lucide-react");
+var sampleForInputType = (type) => {
+  switch ((type || "").toLowerCase()) {
+    case "number":
+    case "integer":
+    case "float":
+      return 0;
+    case "boolean":
+      return false;
+    case "array":
+      return [];
+    case "object":
+      return {};
+    default:
+      return "";
+  }
+};
 var OPERATORS = [
   { value: "equals", label: "Equals", symbol: "=", needsRight: true },
   { value: "not_equals", label: "Not Equals", symbol: "\u2260", needsRight: true },
@@ -245,33 +261,43 @@ function conditionSummary(cond) {
   const str = op?.needsRight === false ? `${left} ${sym}` : `${left} ${sym} ${right}`;
   return str.length > 28 ? str.slice(0, 28) + "\u2026" : str;
 }
-function ConditionRow({ condition, onChange, onDelete, canDelete }) {
+function ConditionRow({ condition, onChange, onDelete, canDelete, stateTree }) {
   const op = OP_MAP[condition.operator] || OP_MAP["equals"];
   const update = (patch) => onChange({ ...condition, ...patch });
   return /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center gap-2" }, op.isExpression ? /* @__PURE__ */ import_react2.default.createElement(
-    import_ui.Input,
+    import_ui.CodeEditor,
     {
       value: condition.leftValue,
-      onChange: (e) => update({ leftValue: e.target.value }),
+      onChange: (val) => update({ leftValue: val }),
       placeholder: "ctx.score > 80 && ctx.status === 'active'",
-      className: "flex-1 h-7 text-xs font-mono px-2",
-      title: "Raw JavaScript \u2014 use ctx.variable (no curly braces)"
+      language: "javascript",
+      height: "32px",
+      showHeader: false,
+      showLineNumbers: false,
+      showExpandButton: false,
+      showFormatButton: false,
+      stateTree,
+      className: "flex-1 min-w-0"
     }
   ) : /* @__PURE__ */ import_react2.default.createElement(import_react2.default.Fragment, null, /* @__PURE__ */ import_react2.default.createElement(
-    import_ui.Input,
+    import_ui.TemplateAutocompleteInput,
     {
       value: condition.leftValue,
-      onChange: (e) => update({ leftValue: e.target.value }),
+      onChange: (val) => update({ leftValue: val }),
       placeholder: "{{ctx.field}}",
-      className: "flex-1 min-w-0 h-7 text-xs font-mono px-2"
+      liveStateTree: stateTree,
+      mode: "safe-path",
+      className: "flex-1 min-w-0"
     }
   ), /* @__PURE__ */ import_react2.default.createElement(import_ui.Select, { value: condition.operator, onValueChange: (val) => update({ operator: val, rightValue: "" }) }, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectTrigger, { className: "w-[136px] h-7 text-xs shrink-0" }, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectValue, null)), /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectContent, null, OPERATORS.map((o) => /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectItem, { key: o.value, value: o.value, className: "text-xs" }, /* @__PURE__ */ import_react2.default.createElement("span", { className: "font-mono text-muted-foreground mr-1.5 text-[10px]" }, o.symbol), o.label)))), op.needsRight !== false && /* @__PURE__ */ import_react2.default.createElement(
-    import_ui.Input,
+    import_ui.TemplateAutocompleteInput,
     {
       value: condition.rightValue,
-      onChange: (e) => update({ rightValue: e.target.value }),
+      onChange: (val) => update({ rightValue: val }),
       placeholder: "value or {{ctx.x}}",
-      className: "flex-1 min-w-0 h-7 text-xs px-2"
+      liveStateTree: stateTree,
+      mode: "safe-path",
+      className: "flex-1 min-w-0"
     }
   )), /* @__PURE__ */ import_react2.default.createElement(
     import_ui.Button,
@@ -304,7 +330,7 @@ function AndOrDivider({ logic, onToggle }) {
     logic
   ), /* @__PURE__ */ import_react2.default.createElement("div", { className: "h-px flex-1 bg-border" }));
 }
-function BranchEditor({ branch, onChange }) {
+function BranchEditor({ branch, onChange, stateTree }) {
   const updateField = (patch) => onChange({ ...branch, ...patch });
   const updateCondition = (idx, updated) => {
     const conditions = [...branch.conditions];
@@ -343,7 +369,8 @@ function BranchEditor({ branch, onChange }) {
       condition: cond,
       onChange: (updated) => updateCondition(idx, updated),
       onDelete: () => deleteCondition(idx),
-      canDelete: branch.conditions.length > 1
+      canDelete: branch.conditions.length > 1,
+      stateTree
     }
   ), idx < branch.conditions.length - 1 && /* @__PURE__ */ import_react2.default.createElement(AndOrDivider, { logic: branch.conditionLogic, onToggle: toggleLogic })))), /* @__PURE__ */ import_react2.default.createElement(
     import_ui.Button,
@@ -359,12 +386,29 @@ function BranchEditor({ branch, onChange }) {
   ));
 }
 var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { strings } = useWorkflowNodes();
+  const { strings, workflowNodes, workflowInputDefinitions, workflowContext } = useWorkflowNodes();
   const [title, setTitle] = (0, import_react2.useState)(data?.title || "Condition");
   const [description, setDescription] = (0, import_react2.useState)(data?.description || "");
   const [branches, setBranches] = (0, import_react2.useState)(() => migrateBranches(data?.branches));
   const [activeIdx, setActiveIdx] = (0, import_react2.useState)(0);
   const [errorHandling, setErrorHandling] = (0, import_react2.useState)(data?.errorHandling || "fail_workflow");
+  const ctxStateTree = (0, import_react2.useMemo)(() => {
+    const ctx = { input: {}, item: "" };
+    (workflowInputDefinitions || []).filter((inputDef) => typeof inputDef?.key === "string" && inputDef.key.trim()).forEach((inputDef) => {
+      ctx.input[inputDef.key.trim()] = sampleForInputType(inputDef.type);
+    });
+    if (workflowNodes) {
+      workflowNodes.filter((n) => n.id !== nodeId && n.data?.outputVariable).forEach((n) => {
+        if (!(n.data.outputVariable in ctx)) {
+          ctx[n.data.outputVariable] = {};
+        }
+      });
+    }
+    if (workflowContext && typeof workflowContext === "object") {
+      Object.assign(ctx, workflowContext);
+    }
+    return { ctx };
+  }, [workflowNodes, nodeId, workflowInputDefinitions, workflowContext]);
   (0, import_react2.useEffect)(() => {
     if (!data) return;
     setTitle(data.title || "Condition");
@@ -466,7 +510,8 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
     {
       key: activeBranch.id,
       branch: activeBranch,
-      onChange: (updated) => updateBranch(activeIdx, updated)
+      onChange: (updated) => updateBranch(activeIdx, updated),
+      stateTree: ctxStateTree
     }
   ) : /* @__PURE__ */ import_react2.default.createElement("div", { className: "p-4 text-xs text-muted-foreground text-center" }, "No branches yet \u2014 click ", /* @__PURE__ */ import_react2.default.createElement("strong", null, "Add branch"), " above.")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded-md text-xs text-muted-foreground" }, /* @__PURE__ */ import_react2.default.createElement("span", { className: "w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0" }, "\u2205"), /* @__PURE__ */ import_react2.default.createElement("span", null, /* @__PURE__ */ import_react2.default.createElement("span", { className: "font-semibold text-foreground" }, "else"), " ", "\u2014 taken when none of the branches above match")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "On Error"), /* @__PURE__ */ import_react2.default.createElement(import_ui.Select, { value: errorHandling, onValueChange: setErrorHandling }, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectTrigger, { className: "h-8 text-xs" }, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectValue, null)), /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectContent, null, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectItem, { value: "fail_workflow", className: "text-xs" }, "Fail Workflow"), /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectItem, { value: "continue", className: "text-xs" }, "Continue to Default Branch")))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "p-3 rounded-md border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1.5" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "font-semibold text-xs text-primary" }, "\u{1F4A1} Writing Conditions"), /* @__PURE__ */ import_react2.default.createElement("div", null, "Use ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "{{ctx.field}}"), " in left and right inputs \u2014 e.g.", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "{{ctx.input.severity}}"), "."), /* @__PURE__ */ import_react2.default.createElement("div", null, "The right side can also be a plain literal like", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "High"), " or", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "3"), "."), /* @__PURE__ */ import_react2.default.createElement("div", null, "For complex logic, use ", /* @__PURE__ */ import_react2.default.createElement("strong", null, "JS Expression"), " \u2014 raw JS where", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "ctx.field"), " is a direct variable (no braces)."), /* @__PURE__ */ import_react2.default.createElement("div", null, "Branches are evaluated ", /* @__PURE__ */ import_react2.default.createElement("strong", null, "top \u2192 bottom"), "; first match wins.")), /* @__PURE__ */ import_react2.default.createElement(import_ui.Button, { type: "button", onClick: handleSave, className: "w-full", size: "sm" }, strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || "Save Condition"));
 };
@@ -584,12 +629,12 @@ var ERROR_HANDLING_OPTIONS2 = {
   RETRY_THEN_FAIL: "retry_then_fail"
 };
 var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, workflowEdges, workflowInputArgs, onQueryTest } = useWorkflowNodes();
+  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, workflowEdges, workflowInputDefinitions, onQueryTest } = useWorkflowNodes();
   const [formData, setFormData] = (0, import_react3.useState)({
     title: data?.title || "",
     description: data?.description || "",
     dataQueryID: data?.dataQueryID || "",
-    args: data?.args || {},
+    inputValues: data?.inputValues || {},
     outputVariable: data?.outputVariable || "queryResult",
     timeoutSeconds: data?.timeoutSeconds ?? 300,
     retryLimit: data?.retryLimit ?? 0,
@@ -603,7 +648,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         title: data.title || "",
         description: data.description || "",
         dataQueryID: data.dataQueryID || "",
-        args: data.args || {},
+        inputValues: data.inputValues || {},
         outputVariable: data.outputVariable || "queryResult",
         timeoutSeconds: data.timeoutSeconds ?? 300,
         retryLimit: data.retryLimit ?? 0,
@@ -624,7 +669,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         title: { type: "string", title: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL || "Node Title" },
         description: { type: "string", title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || "Description" },
         dataQueryID: { type: "string", title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL || "Data Query", enum: queryEnums.length > 0 ? queryEnums : [""] },
-        args: { type: "object", title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || "Arguments" },
+        inputValues: { type: "object", title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || "Inputs" },
         outputVariable: { type: "string", title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || "Output Variable Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$" },
         timeoutSeconds: { type: "integer", title: strings.WORKFLOW_EDITOR_TIMEOUT_LABEL || "Timeout (seconds)", minimum: 1, maximum: 3600, default: 300 },
         retryLimit: { type: "integer", title: strings.WORKFLOW_EDITOR_RETRY_LIMIT_LABEL || "Retry Attempts", minimum: 0, maximum: 10, default: 0 },
@@ -637,10 +682,10 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
   }, [dataQueries, strings]);
   const upstreamStateTree = (0, import_react3.useMemo)(() => {
     const tree = { ctx: { input: {} } };
-    if (workflowInputArgs && workflowInputArgs.length > 0) {
-      workflowInputArgs.forEach((arg) => {
-        if (arg.key) {
-          tree.ctx.input[arg.key] = "";
+    if (workflowInputDefinitions && workflowInputDefinitions.length > 0) {
+      workflowInputDefinitions.forEach((inputDef) => {
+        if (inputDef.key) {
+          tree.ctx.input[inputDef.key] = "";
         }
       });
     }
@@ -667,7 +712,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       });
     }
     return tree;
-  }, [workflowNodes, workflowEdges, workflowInputArgs, nodeId]);
+  }, [workflowNodes, workflowEdges, workflowInputDefinitions, nodeId]);
   const uischema = (0, import_react3.useMemo)(() => {
     const generalElements = [
       { type: "Control", scope: "#/properties/title", options: { placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER || "Enter node title" } },
@@ -686,11 +731,11 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         }
       }
     ];
-    if (selectedQuery?.dataQueryOptions?.args?.length > 0) {
+    if (selectedQuery?.dataQueryOptions?.inputDefinitions?.length > 0) {
       generalElements.push({
         type: "Control",
-        scope: "#/properties/args",
-        options: { isDynamicKeyValueInput: true, keys: selectedQuery.dataQueryOptions.args, stateTree: upstreamStateTree }
+        scope: "#/properties/inputValues",
+        options: { isDynamicKeyValueInput: true, keys: selectedQuery.dataQueryOptions.inputDefinitions, stateTree: upstreamStateTree }
       });
     }
     return {
@@ -732,7 +777,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleOpenTest = (0, import_react3.useCallback)(() => {
     if (onQueryTest && formData.dataQueryID) onQueryTest(formData.dataQueryID);
   }, [onQueryTest, formData.dataQueryID]);
-  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "w-full space-y-3" }, /* @__PURE__ */ import_react3.default.createElement(import_react4.JsonForms, { schema, uischema, data: formData, renderers: import_json_forms_renderers.jetFormsRenderers, onChange: handleFormChange }), /* @__PURE__ */ import_react3.default.createElement("div", { className: "rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "font-semibold text-xs text-foreground" }, "\u{1F4D8} Query Arguments"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-medium text-foreground" }, "Argument Format:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "ml-3 mt-0.5 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-medium text-foreground" }, "Access Result:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "ml-3 mt-0.5" }, "Stored in ", /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 py-0.5 rounded-sm border border-border font-mono" }, "ctx.{outputVariable}"), " for use in next nodes."))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, onQueryTest && formData.dataQueryID && /* @__PURE__ */ import_react3.default.createElement(import_ui2.Button, { type: "button", variant: "outline", size: "sm", onClick: handleOpenTest, className: "flex items-center gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.Play, { className: "h-3 w-3" }), "Test Query"), /* @__PURE__ */ import_react3.default.createElement(import_ui2.Button, { type: "button", size: "sm", onClick: handleSave, className: "flex-1" }, strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || "Save")));
+  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "w-full space-y-3" }, /* @__PURE__ */ import_react3.default.createElement(import_react4.JsonForms, { schema, uischema, data: formData, renderers: import_json_forms_renderers.jetFormsRenderers, onChange: handleFormChange }), /* @__PURE__ */ import_react3.default.createElement("div", { className: "rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "font-semibold text-xs text-foreground" }, "\u{1F4D8} Query Inputs"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-medium text-foreground" }, "Input Format:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "ml-3 mt-0.5 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-medium text-foreground" }, "Access Result:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "ml-3 mt-0.5" }, "Stored in ", /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 py-0.5 rounded-sm border border-border font-mono" }, "ctx.{outputVariable}"), " for use in next nodes."))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, onQueryTest && formData.dataQueryID && /* @__PURE__ */ import_react3.default.createElement(import_ui2.Button, { type: "button", variant: "outline", size: "sm", onClick: handleOpenTest, className: "flex items-center gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.Play, { className: "h-3 w-3" }), "Test Query"), /* @__PURE__ */ import_react3.default.createElement(import_ui2.Button, { type: "button", size: "sm", onClick: handleSave, className: "flex-1" }, strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || "Save")));
 };
 var DataQueryNode = (0, import_react3.memo)(({ id, data, isConnectable }) => {
   const { dataQueries, nodeExecutionStatus } = useWorkflowNodes();
@@ -789,7 +834,7 @@ var ERROR_HANDLING_OPTIONS3 = {
   RETRY_THEN_CONTINUE: "retry_then_continue",
   RETRY_THEN_FAIL: "retry_then_fail"
 };
-var sampleForArgType = (type) => {
+var sampleForInputType2 = (type) => {
   switch ((type || "").toLowerCase()) {
     case "number":
     case "integer":
@@ -806,7 +851,7 @@ var sampleForArgType = (type) => {
   }
 };
 var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { strings, workflowNodes, workflowInputArgs, workflowContext } = useWorkflowNodes();
+  const { strings, workflowNodes, workflowInputDefinitions, workflowContext } = useWorkflowNodes();
   const [formData, setFormData] = (0, import_react5.useState)({
     title: data?.title || "",
     description: data?.description || "",
@@ -846,14 +891,14 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
     feed.push({ parentPath: "", label: "ctx", kind: "Variable", insertText: "ctx", detail: "Workflow context object" });
     feed.push({ parentPath: "ctx", label: "input", kind: "Property", insertText: "input", detail: "Workflow Input Parameters" });
     feed.push({ parentPath: "ctx", label: "item", kind: "Property", insertText: "item", detail: "Current loop item (if inside loop)" });
-    if (workflowInputArgs && workflowInputArgs.length > 0) {
-      workflowInputArgs.forEach((arg) => {
+    if (workflowInputDefinitions && workflowInputDefinitions.length > 0) {
+      workflowInputDefinitions.forEach((inputDef) => {
         feed.push({
           parentPath: "ctx.input",
-          label: arg.key,
+          label: inputDef.key,
           kind: "Field",
-          insertText: arg.key,
-          detail: arg.type ? `Input arg (${arg.type})` : "Workflow Input Parameter"
+          insertText: inputDef.key,
+          detail: inputDef.type ? `Input parameter (${inputDef.type})` : "Workflow Input Parameter"
         });
       });
     }
@@ -915,11 +960,11 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
       }
     });
     return uniqueFeed;
-  }, [workflowNodes, nodeId, workflowInputArgs, workflowContext]);
+  }, [workflowNodes, nodeId, workflowInputDefinitions, workflowContext]);
   const ctxStateTree = (0, import_react5.useMemo)(() => {
     const ctx = { input: {}, item: "" };
-    (workflowInputArgs || []).filter((arg) => typeof arg?.key === "string" && arg.key.trim()).forEach((arg) => {
-      ctx.input[arg.key.trim()] = sampleForArgType(arg.type);
+    (workflowInputDefinitions || []).filter((inputDef) => typeof inputDef?.key === "string" && inputDef.key.trim()).forEach((inputDef) => {
+      ctx.input[inputDef.key.trim()] = sampleForInputType2(inputDef.type);
     });
     if (workflowNodes) {
       workflowNodes.filter((n) => n.id !== nodeId && n.data?.outputVariable).forEach((n) => {
@@ -932,7 +977,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
       Object.assign(ctx, workflowContext);
     }
     return { ctx };
-  }, [workflowNodes, nodeId, workflowInputArgs, workflowContext]);
+  }, [workflowNodes, nodeId, workflowInputDefinitions, workflowContext]);
   const schema = (0, import_react5.useMemo)(() => {
     return {
       type: "object",
@@ -2532,7 +2577,7 @@ var WORKFLOW_NODES_MAP = {
       title: "Data Query",
       description: "",
       dataQueryID: "",
-      args: {},
+      inputValues: {},
       outputVariable: "queryResult",
       timeoutSeconds: 300,
       retryLimit: 0,
@@ -2585,7 +2630,7 @@ var WORKFLOW_NODES_MAP = {
           title: "Skip this node",
           default: false
         }
-        // Args added dynamically
+        // Inputs added dynamically
       },
       required: ["dataQueryID"]
     },
@@ -2815,7 +2860,7 @@ var WORKFLOW_NODES_MAP = {
     defaultValue: {
       title: "Start",
       description: ""
-      // Note: Input parameters are managed at workflow level (workflowOptions.args)
+      // Note: Input parameters are managed at workflow level (workflowOptions.inputDefinitions)
     },
     schema: {
       type: "object",

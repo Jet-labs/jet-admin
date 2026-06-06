@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import { testDataQueryByDataAPI, testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { DataQueryArgsForm } from "./dataQueryArgsForm";
+import { DataQueryInputsForm } from "./dataQueryInputsForm";
 import PropTypes from "prop-types";
 import { Button, Spinner } from "@jet-admin/ui";
 
@@ -43,18 +43,18 @@ export const DataQueryTestingForm = ({
   });
 
   const { isPending: isTestingDataQuery, mutate: testDataQuery } = useMutation({
-    mutationFn: ({ inputArgs }) => {
+    mutationFn: ({ inputValues }) => {
       if (dataQuery) {
         return testDataQueryByDataAPI({
           tenantID,
           dataQuery,
-          inputArgs,
+          inputValues,
         });
       } else {
         return testDataQueryByIDAPI({
           tenantID,
           dataQueryID,
-          inputArgs,
+          inputValues,
         });
       }
     },
@@ -71,12 +71,12 @@ export const DataQueryTestingForm = ({
   const _handleTestQuery = () => {
     if (
       dataQueryOptions &&
-      Array.isArray(dataQueryOptions.args) &&
-      dataQueryOptions.args.length > 0
+      Array.isArray(dataQueryOptions.inputDefinitions) &&
+      dataQueryOptions.inputDefinitions.length > 0
     ) {
       _handleOpenArgsForm();
     } else {
-      testDataQuery({ inputArgs: {} });
+      testDataQuery({ inputValues: {} });
     }
   };
 
@@ -91,18 +91,18 @@ export const DataQueryTestingForm = ({
   const _handleOnArgFormCompleted = (dataQueryArgValues) => {
     setIsArgsFormOpen(false);
     testDataQuery({
-      inputArgs: dataQueryArgValues,
+      inputValues: dataQueryArgValues,
     });
   };
 
   return (
     <>
-      {dataQueryOptions?.args?.length > 0 ? (
-        <DataQueryArgsForm
+      {dataQueryOptions?.inputDefinitions?.length > 0 ? (
+        <DataQueryInputsForm
           open={isArgsFormOpen}
           onAccepted={_handleOnArgFormCompleted}
           onDecline={_handleOnArgFormDeclined}
-          dataQueryArgs={dataQueryOptions?.args}
+          inputDefinitions={dataQueryOptions?.inputDefinitions}
         />
       ) : null}
       <Button

@@ -24,9 +24,9 @@ import {
 
 
 
-// Map a declared arg type to a representative sample value so the engine can
+// Map a declared input type to a representative sample value so the engine can
 // infer member completions (e.g. string methods, array helpers).
-const sampleForArgType = (type) => {
+const sampleForInputType = (type) => {
   switch ((type || "").toLowerCase()) {
     case "number":
     case "integer":
@@ -43,36 +43,36 @@ const sampleForArgType = (type) => {
   }
 };
 
-// Build the safe-path context tree exposed to query templates. `args` is
+// Build the safe-path context tree exposed to query templates. `inputs` is
 // valid roots on the backend (see queryEngine allowedRoots).
-const buildQueryArgsStateTree = (queryArgs = []) => {
-  const args = {};
+const buildQueryInputsStateTree = (queryInputs = []) => {
+  const inputs = {};
   const seen = new Set();
 
-  (queryArgs || [])
-    .filter((arg) => typeof arg?.key === "string" && arg.key.trim())
-    .forEach((arg) => {
-      const key = arg.key.trim();
+  (queryInputs || [])
+    .filter((inputDef) => typeof inputDef?.key === "string" && inputDef.key.trim())
+    .forEach((inputDef) => {
+      const key = inputDef.key.trim();
       if (seen.has(key)) return;
       seen.add(key);
-      args[key] = sampleForArgType(arg.type);
+      inputs[key] = sampleForInputType(inputDef.type);
     });
 
-  return { args };
+  return { inputs };
 };
 
 // Inject context for {{ }} intellisense into every Control's options:
-//   queryArgs     → declared args (Monaco code-editor fallback context)
-//   stateTree     → { args } live tree for suggestions
+//   queryInputs   → declared inputs (Monaco code-editor fallback context)
+//   stateTree     → { inputs } live tree for suggestions
 //   templateMode  → expression-engine mode (queries resolve via safe-path)
-const injectQueryArgsIntoUiSchema = (uiSchema, injection) => {
+const injectQueryInputsIntoUiSchema = (uiSchema, injection) => {
   if (!uiSchema || typeof uiSchema !== "object") {
     return uiSchema;
   }
 
   if (Array.isArray(uiSchema)) {
     return uiSchema.map((childUiSchema) =>
-      injectQueryArgsIntoUiSchema(childUiSchema, injection)
+      injectQueryInputsIntoUiSchema(childUiSchema, injection)
     );
   }
 
@@ -82,7 +82,7 @@ const injectQueryArgsIntoUiSchema = (uiSchema, injection) => {
       ? {
         options: {
           ...(uiSchema.options || {}),
-          queryArgs: injection.queryArgs,
+          queryInputs: injection.queryInputs,
           stateTree: injection.stateTree,
           templateMode: injection.templateMode,
         },
@@ -92,18 +92,18 @@ const injectQueryArgsIntoUiSchema = (uiSchema, injection) => {
 
   if (Array.isArray(uiSchema.elements)) {
     nextUiSchema.elements = uiSchema.elements.map((childUiSchema) =>
-      injectQueryArgsIntoUiSchema(childUiSchema, injection)
+      injectQueryInputsIntoUiSchema(childUiSchema, injection)
     );
   }
 
   if (uiSchema.detail) {
-    nextUiSchema.detail = injectQueryArgsIntoUiSchema(uiSchema.detail, injection);
+    nextUiSchema.detail = injectQueryInputsIntoUiSchema(uiSchema.detail, injection);
   }
 
   if (uiSchema.options?.detail) {
     nextUiSchema.options = {
       ...(nextUiSchema.options || {}),
-      detail: injectQueryArgsIntoUiSchema(uiSchema.options.detail, injection),
+      detail: injectQueryInputsIntoUiSchema(uiSchema.options.detail, injection),
     };
   }
 
@@ -129,19 +129,20 @@ export const DataQueryEditor = ({
   // Get the current datasource type config
   const currentDatasourceType = getDatasourceTypeByValue(dataQueryEditorForm.values.datasourceType);
   const queryConfigUiSchema = useMemo(() => {
-    const queryArgs = dataQueryEditorForm.values.dataQueryOptions?.args || [];
-    return injectQueryArgsIntoUiSchema(
+    const queryInputs = dataQueryEditorForm.values.dataQueryOptions?.inputDefinitions || [];
+    return injectQueryInputsIntoUiSchema(
       currentDatasourceType?.queryConfigForm?.uischema,
       {
-        queryArgs,
-        stateTree: buildQueryArgsStateTree(queryArgs),
+        queryInputs,
+        stateTree: buildQueryInputsStateTree(queryInputs),
         templateMode: MODES.SAFE_PATH,
       }
     );
   }, [
     currentDatasourceType?.queryConfigForm?.uischema,
-    dataQueryEditorForm.values.dataQueryOptions?.args,
+    dataQueryEditorForm.values.dataQueryOptions?.inputDefinitions,
   ]);
+  console.log({ datasourceID: dataQueryEditorForm?.values?.datasourceID })
 
   // This handler specifically updates the 'datasourceOptions' part of Formik's state
   const _handleDatasourceOptionsChange = useCallback(
@@ -154,6 +155,8 @@ export const DataQueryEditor = ({
 
   const _handleDatasourceTypeChange = useCallback(
     (val) => {
+      console.log("SELECT FIRED onValueChange WITH:", val);
+      if (!val) return; // Prevent phantom empty events from clearing the ID
       dataQueryEditorForm.setFieldValue("datasourceID", val);
       const selectedDatasource = datasources.find(
         (datasource) => String(datasource.value) === String(val)
@@ -204,7 +207,7 @@ export const DataQueryEditor = ({
               </div>
             ) : (
               <Select
-                value={String(dataQueryEditorForm.values.datasourceID || "")}
+                  value={dataQueryEditorForm.values.datasourceID ? String(dataQueryEditorForm.values.datasourceID) : undefined}
                 onValueChange={_handleDatasourceTypeChange}
               >
                 <SelectTrigger>

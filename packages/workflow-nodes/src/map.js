@@ -50,7 +50,7 @@ export const WORKFLOW_NODES_MAP = {
             title: "Data Query",
             description: "",
             dataQueryID: "",
-            args: {},
+            inputValues: {},
             outputVariable: "queryResult",
             timeoutSeconds: 300,
             retryLimit: 0,
@@ -102,7 +102,7 @@ export const WORKFLOW_NODES_MAP = {
                     title: "Skip this node",
                     default: false
                 },
-                // Args added dynamically
+                // Inputs added dynamically
             },
             required: ["dataQueryID"],
         },
@@ -332,7 +332,7 @@ export const WORKFLOW_NODES_MAP = {
         defaultValue: {
             title: "Start",
             description: "",
-            // Note: Input parameters are managed at workflow level (workflowOptions.args)
+            // Note: Input parameters are managed at workflow level (workflowOptions.inputDefinitions)
         },
         schema: {
             type: "object",

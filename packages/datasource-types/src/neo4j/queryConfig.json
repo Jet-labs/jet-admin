@@ -12,7 +12,7 @@
         "description": "Cypher query to execute",
         "format": "code-sql"
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Query parameters",
         "items": {
@@ -46,7 +46,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Parameters"
       }
     ]
@@ -54,6 +54,6 @@
   "data": {
     "queryType": "cypher",
     "query": "MATCH (n) RETURN n LIMIT 10",
-    "args": []
+    "inputDefinitions": []
   }
 }

@@ -768,7 +768,7 @@ WorkflowEditor (workflowEditorForm: Formik)
 │   └── Context Values:
 │       ├── dataQueries
 │       ├── workflowNodes / workflowEdges
-│       ├── workflowInputArgs
+│       ├── workflowInputDefinitions
 │       ├── nodeExecutionStatus
 │       └── onQueryTest callback
 │
@@ -787,7 +787,7 @@ WorkflowEditor (workflowEditorForm: Formik)
 │   │   ├── Title Input
 │   │   ├── Node Palette (Add Node buttons)
 │   │   ├── Settings (Edge Style, Snap to Grid)
-│   │   ├── WorkflowInputArgsPanel
+│   │   ├── WorkflowInputDefinitionsPanel
 │   │   ├── Actions (Test Run / Stop buttons)
 │   │   └── Utilities (Auto-layout, Schema, Console, Context)
 │   │
@@ -809,7 +809,7 @@ WorkflowEditor (workflowEditorForm: Formik)
 
 onTestRunClick()
     │
-    ├── If workflowArgs.length > 0:
+    ├── If workflowInputDefinitions.length > 0:
     │   └── setShowInputModal(true)  // User enters input values
     │       └── handleInputModalSubmit(inputParams)
     │           └── executeTestRun(inputParams)

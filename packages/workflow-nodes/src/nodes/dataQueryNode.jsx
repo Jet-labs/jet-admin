@@ -14,12 +14,12 @@ const ERROR_HANDLING_OPTIONS = {
 };
 
 export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, workflowEdges, workflowInputArgs, onQueryTest } = useWorkflowNodes();
+  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, workflowEdges, workflowInputDefinitions, onQueryTest } = useWorkflowNodes();
   const [formData, setFormData] = useState({
     title: data?.title || '',
     description: data?.description || '',
     dataQueryID: data?.dataQueryID || '',
-    args: data?.args || {},
+    inputValues: data?.inputValues || {},
     outputVariable: data?.outputVariable || 'queryResult',
     timeoutSeconds: data?.timeoutSeconds ?? 300,
     retryLimit: data?.retryLimit ?? 0,
@@ -34,7 +34,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         title: data.title || '',
         description: data.description || '',
         dataQueryID: data.dataQueryID || '',
-        args: data.args || {},
+        inputValues: data.inputValues || {},
         outputVariable: data.outputVariable || 'queryResult',
         timeoutSeconds: data.timeoutSeconds ?? 300,
         retryLimit: data.retryLimit ?? 0,
@@ -57,7 +57,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         title: { type: 'string', title: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL || 'Node Title' },
         description: { type: 'string', title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || 'Description' },
         dataQueryID: { type: 'string', title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL || 'Data Query', enum: queryEnums.length > 0 ? queryEnums : [''] },
-        args: { type: 'object', title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || 'Arguments' },
+        inputValues: { type: 'object', title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || 'Inputs' },
         outputVariable: { type: 'string', title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || 'Output Variable Name', pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$' },
         timeoutSeconds: { type: 'integer', title: strings.WORKFLOW_EDITOR_TIMEOUT_LABEL || 'Timeout (seconds)', minimum: 1, maximum: 3600, default: 300 },
         retryLimit: { type: 'integer', title: strings.WORKFLOW_EDITOR_RETRY_LIMIT_LABEL || 'Retry Attempts', minimum: 0, maximum: 10, default: 0 },
@@ -72,10 +72,10 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
   const upstreamStateTree = useMemo(() => {
     const tree = { ctx: { input: {} } };
     
-    if (workflowInputArgs && workflowInputArgs.length > 0) {
-      workflowInputArgs.forEach(arg => {
-        if (arg.key) {
-          tree.ctx.input[arg.key] = "";
+    if (workflowInputDefinitions && workflowInputDefinitions.length > 0) {
+      workflowInputDefinitions.forEach(inputDef => {
+        if (inputDef.key) {
+          tree.ctx.input[inputDef.key] = "";
         }
       });
     }
@@ -104,7 +104,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       });
     }
     return tree;
-  }, [workflowNodes, workflowEdges, workflowInputArgs, nodeId]);
+  }, [workflowNodes, workflowEdges, workflowInputDefinitions, nodeId]);
 
   const uischema = useMemo(() => {
     const generalElements = [
@@ -119,10 +119,10 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         },
       },
     ];
-    if (selectedQuery?.dataQueryOptions?.args?.length > 0) {
+    if (selectedQuery?.dataQueryOptions?.inputDefinitions?.length > 0) {
       generalElements.push({
-        type: 'Control', scope: '#/properties/args',
-        options: { isDynamicKeyValueInput: true, keys: selectedQuery.dataQueryOptions.args, stateTree: upstreamStateTree },
+        type: 'Control', scope: '#/properties/inputValues',
+        options: { isDynamicKeyValueInput: true, keys: selectedQuery.dataQueryOptions.inputDefinitions, stateTree: upstreamStateTree },
       });
     }
     return {
@@ -164,9 +164,9 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Help callout */}
       <div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
-        <div className="font-semibold text-xs text-foreground">📘 Query Arguments</div>
+        <div className="font-semibold text-xs text-foreground">📘 Query Inputs</div>
         <div>
-          <span className="font-medium text-foreground">Argument Format:</span>
+          <span className="font-medium text-foreground">Input Format:</span>
           <div className="ml-3 mt-0.5 font-mono text-[9px] space-y-0.5">
             <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.input.userId}}'}</code> → pass input value</div>
             <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.queryResult.id}}'}</code> → from previous query</div>

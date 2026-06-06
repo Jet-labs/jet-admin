@@ -32,7 +32,7 @@ const disconnectWorkflowStream = (alias) => {
 const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
   const { actionType, config: rawConfig } = action;
 
-  // Resolve {{ }} expressions in action config against current state + event args
+  // Resolve {{ }} expressions in action config against current state + event input
   const config = resolveConfig(rawConfig, stateTree);
 
   switch (actionType) {
@@ -78,9 +78,9 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
         return null;
       }
       try {
-        // Merge input args: dataSource defaults → action config → event-level overrides
-        const eventInputArgs = stateTree.event?.inputArgs || {};
-        const mergedInputArgs = { ...dataSource.inputArgs, ...config.inputArgs, ...eventInputArgs };
+        // Merge inputs: dataSource defaults → action config → event-level overrides
+        const eventInputValues = stateTree.event?.inputValues || {};
+        const mergedInputValues = { ...dataSource.inputValues, ...config.inputValues, ...eventInputValues };
 
         const isWorkflow = dataSource.type === "workflow";
         if (isWorkflow) {
@@ -89,7 +89,7 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
           const { disconnect } = executeWorkflowWithStreaming({
             tenantID: meta.tenantID,
             workflowID: dataSource.workflowID,
-            inputArgs: mergedInputArgs,
+            inputValues: mergedInputValues,
             alias,
             dispatch,
           });
@@ -101,7 +101,7 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
           const result = await runDataQueryByIDAPI({
             tenantID: meta.tenantID,
             dataQueryID: dataSource.queryID,
-            inputArgs: mergedInputArgs,
+            inputValues: mergedInputValues,
           });
           dispatch(appPageActions.setQueryResult(alias, result));
           return result;
@@ -125,8 +125,8 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
       if (targetMatch) targetWidgetID = targetMatch[1];
       targetWidgetID = targetWidgetID.replace(/^state\.widgets\./, "");
 
-      const { methodName, args = [] } = config || {};
-      console.log(`[AppPageEvents] CALL_WIDGET_METHOD resolved config:`, { targetWidgetID, methodName, args });
+      const { methodName, inputs = [] } = config || {};
+      console.log(`[AppPageEvents] CALL_WIDGET_METHOD resolved config:`, { targetWidgetID, methodName, inputs });
       if (!targetWidgetID || !methodName) {
         console.warn("[AppPageEvents] CALL_WIDGET_METHOD missing target or method");
         return null;
@@ -144,7 +144,7 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
       }
       try {
         console.log(`[AppPageEvents] CALL_WIDGET_METHOD: Executing ${targetWidgetID}.${methodName}()`);
-        return method(...args);
+        return method(...inputs);
       } catch (error) {
         console.error(`[AppPageEvents] CALL_WIDGET_METHOD: Failed to execute ${targetWidgetID}.${methodName}():`, error);
         throw error;
@@ -184,14 +184,14 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
   });
 
   const fireWidgetEvent = useCallback(
-    async (eventType, eventArgs = {}) => {
+    async (eventType, eventInputs = {}) => {
       const currentWidgetConfig = widgetConfigRef.current;
       const currentStateTree = stateTreeRef.current;
       const currentMeta = metaRef.current;
 
       const events = currentWidgetConfig?.events || {};
       const actions = events[eventType];
-      console.log(`[AppPageEvents] fireWidgetEvent triggered for widget "${widgetID}", eventType: "${eventType}"`, { actions, eventArgs });
+      console.log(`[AppPageEvents] fireWidgetEvent triggered for widget "${widgetID}", eventType: "${eventType}"`, { actions, eventInputs });
 
       if (!actions || !Array.isArray(actions) || actions.length === 0) {
         return [];
@@ -207,7 +207,7 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
           event: {
             type: eventType,
             widgetID,
-            ...eventArgs,
+            ...eventInputs,
           },
         };
 

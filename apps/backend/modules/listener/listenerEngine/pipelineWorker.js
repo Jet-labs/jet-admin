@@ -1,7 +1,7 @@
 /**
  * Pipeline Worker
  * Consumes events from the listener event queue, applies transforms,
- * and dispatches actions (trigger_workflow, trigger_query, save_to_buffer, push_to_widget).
+ * and dispatches actions (trigger_workflow, trigger_query, save_to_buffer, push_to_app_page).
  *
  * Same pattern as workflow taskListener.js — registered as a fastq worker.
  */
@@ -114,29 +114,29 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
   switch (actionType) {
     case 'trigger_workflow': {
       const { workflowService } = require('../../workflow/workflow.service');
-      const inputArgs = actionConfig.inputMapping
-        ? sharedResolveTemplate(actionConfig.inputMapping, { event }, TEMPLATE_OPTIONS, {
+      const inputValues = actionConfig.inputValues
+        ? sharedResolveTemplate(actionConfig.inputValues, { event }, TEMPLATE_OPTIONS, {
             module: 'listener', listenerID,
           })
         : { event };
       await workflowService.executeWorkflow({
         workflowID: actionConfig.workflowID,
         tenantID,
-        inputArgs,
+        inputValues,
       });
       break;
     }
 
     case 'trigger_query': {
       const { executeDataQuery } = require('../../dataQuery/dataQuery.service');
-      const inputArgs = actionConfig.argMapping
-        ? sharedResolveTemplate(actionConfig.argMapping, { event }, TEMPLATE_OPTIONS, {
+      const inputValues = actionConfig.inputValues
+        ? sharedResolveTemplate(actionConfig.inputValues, { event }, TEMPLATE_OPTIONS, {
             module: 'listener', listenerID,
           })
         : {};
       await executeDataQuery({
         dataQueryID: actionConfig.dataQueryID,
-        inputArgs,
+        inputValues,
       });
       break;
     }
@@ -156,26 +156,23 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
       break;
     }
 
-    case 'push_to_widget': {
+    case 'push_to_app_page': {
       const channelName = actionConfig.channelName || `listener:${listenerID}`;
-      const data = actionConfig.dataPath
-        ? _getByPath(event, actionConfig.dataPath)
-        : event;
+      const data = event;
 
-      if (actionConfig.widgetID) {
-        socketIO.to(`widget:${actionConfig.widgetID}`).emit('listener_event', {
+      const appPageID = actionConfig.appPageID;
+      if (appPageID) {
+        socketIO.to(`listener:app_page:${appPageID}`).emit('listener_event', {
           channelName,
           data,
           mode: actionConfig.mode || 'replace',
+          limit: actionConfig.maxArrayLength || 1000,
           timestamp: Date.now(),
         });
       } else {
-        // Broadcast to the tenant's room only — prevents cross-tenant data leaks
-        socketIO.to(`tenant:${tenantID}`).emit('listener_event', {
-          channelName,
-          data,
-          mode: actionConfig.mode || 'replace',
-          timestamp: Date.now(),
+        Logger.log('warning', {
+          message: 'pipelineWorker:push_to_app_page:missing_appPageID',
+          params: { listenerID },
         });
       }
       break;
@@ -227,11 +224,6 @@ async function _enforceRetention(listenerID, config) {
       });
     }
   }
-}
-
-function _getByPath(obj, path) {
-  if (!path || !obj) return obj;
-  return path.split('.').reduce((acc, key) => acc?.[key], obj);
 }
 
 module.exports = { startPipelineWorker };

@@ -1,8 +1,9 @@
 import React, { useCallback, useState, useMemo, useRef } from "react";
-import { ArrowRightToLine, Braces, Clock, Code, Columns, Eraser, FileJson, GitBranch, Play, Repeat, Square, Terminal, Zap } from 'lucide-react';
+import { ArrowRightToLine, Braces, Clock, Code, Columns, Eraser, FileJson, GitBranch, Map, Play, Repeat, Square, Terminal, Zap } from 'lucide-react';
 import ReactFlow, {
     ReactFlowProvider,
     Controls,
+    ControlButton,
     MiniMap,
     Background,
     Panel,
@@ -33,7 +34,7 @@ import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
 import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
 import { WorkflowConsole } from "./workflowConsole";
 import { WorkflowContextPanel } from "./workflowContextPanel";
-import { WorkflowInputArgsPanel } from "./workflowInputArgsPanel";
+import { WorkflowInputDefinitionsPanel } from "./workflowInputDefinitionsPanel";
 import { WorkflowInputModal } from "./workflowInputModal";
 import { DataQueryTestingPanel } from "../dataQueryComponents/dataQueryTestingPanel";
 import { useParams } from "react-router-dom";
@@ -125,6 +126,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const { datasources, refetchDatasources } = useDatasources(tenantID);
     const [selectedNodeId, setSelectedNodeId] = useState(null);
     const [showSchemaPanel, setShowSchemaPanel] = useState(false);
+    const [showMiniMap, setShowMiniMap] = useState(true);
 
     // New Hook for Workflow Execution
     const {
@@ -310,10 +312,10 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         setFieldValue("edges", updatedEdges);
     }, [values.edges, setFieldValue]);
 
-    // Get workflow input args from options
-    const workflowArgs = useMemo(() => {
-        return values.workflowOptions?.args?.filter(arg => arg.key) || [];
-    }, [values.workflowOptions?.args]);
+    // Get workflow input values from options
+    const workflowInputDefinitions = useMemo(() => {
+        return values.workflowOptions?.inputDefinitions?.filter(arg => arg.key) || [];
+    }, [values.workflowOptions?.inputDefinitions]);
 
     const hasRunState = useMemo(() => {
         return Boolean(testResult)
@@ -323,30 +325,30 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     }, [testResult, consoleLogs, nodeExecutionStatus, workflowContext]);
 
     // Execute test run wrapper
-    const executeTestRun = useCallback((inputArgs) => {
+    const executeTestRun = useCallback((inputValues) => {
         startTestRun({
             nodes: values.nodes,
             edges: values.edges,
-            inputArgs
+            inputValues
         });
     }, [startTestRun, values.nodes, values.edges]);
 
 
-    // Handle Test Run button click - show modal if args exist
+    // Handle Test Run button click - show modal if inputDefinitions exist
     const onTestRunClick = useCallback(() => {
-        if (workflowArgs.length > 0) {
+        if (workflowInputDefinitions.length > 0) {
             setShowInputModal(true);
         } else {
-            // No args, run directly with empty params
+            // No inputDefinitions, run directly with empty params
             executeTestRun({});
         }
-    }, [workflowArgs, executeTestRun]);
+    }, [workflowInputDefinitions, executeTestRun]);
 
 
     // Handle input modal submit
-    const handleInputModalSubmit = useCallback((inputArgs) => {
+    const handleInputModalSubmit = useCallback((inputValues) => {
         setShowInputModal(false);
-        executeTestRun(inputArgs);
+        executeTestRun(inputValues);
     }, [executeTestRun]);
 
     // Query testing callback for node configurators
@@ -369,7 +371,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             onRefreshDatasources={refetchDatasources}
             workflowNodes={values.nodes}
             workflowEdges={values.edges}
-            workflowInputArgs={workflowArgs}
+            workflowInputDefinitions={workflowInputDefinitions}
             nodeExecutionStatus={nodeExecutionStatus}
             workflowContext={workflowContext}
             tenantID={tenantID}
@@ -468,7 +470,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                     </div>
                                 </div>
 
-                                <WorkflowInputArgsPanel workflowForm={workflowEditorForm} />
+                                <WorkflowInputDefinitionsPanel workflowForm={workflowEditorForm} />
 
                                 <div className="flex flex-col gap-2">
                                     <p className="text-[10px] font-bold text-muted-foreground tracking-wider">Actions</p>
@@ -617,8 +619,12 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                             className="bg-transparent"
                                             proOptions={{ hideAttribution: true }}
                                         >
-                                            <Controls />
-                                            <MiniMap />
+                                            <Controls>
+                                                <ControlButton onClick={() => setShowMiniMap(!showMiniMap)} title="Toggle MiniMap">
+                                                    <Map />
+                                                </ControlButton>
+                                            </Controls>
+                                            {showMiniMap && <MiniMap />}
                                             <Background variant="dots" gap={20} size={1} color="hsl(var(--border))" />
                                             <FitViewButton />
                                         </ReactFlow>
@@ -699,7 +705,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                     {/* Workflow Input Modal */}
                     {showInputModal && (
                         <WorkflowInputModal
-                            args={workflowArgs}
+                            inputDefinitions={workflowInputDefinitions}
                             onSubmit={handleInputModalSubmit}
                             onClose={() => setShowInputModal(false)}
                         />

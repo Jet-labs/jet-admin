@@ -17,7 +17,7 @@
         "description": "Use legacy SQL syntax",
         "default": false
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Query parameters",
         "items": {
@@ -58,7 +58,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Query Parameters",
         "options": {
           "detail": {
@@ -82,6 +82,6 @@
     "queryType": "query",
     "query": "SELECT * FROM `project.dataset.table` LIMIT 100",
     "useLegacySql": false,
-    "args": []
+    "inputDefinitions": []
   }
 }

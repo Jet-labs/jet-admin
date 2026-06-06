@@ -283,10 +283,10 @@ export const CONSTANTS = {
     CLONE_QUERY_DIALOG_MESSAGE:
       "Are you sure you want to clone this item? This action cannot be undone.",
 
-    DATA_QUERY_ARGS_FORM_TITLE: "Query arguments",
-    DATA_QUERY_ARGS_FORM_DESCRIPTION: "Enter the query arguments",
-    DATA_QUERY_ARGS_FORM_CONFIRM_BUTTON: "Confirm",
-    DATA_QUERY_ARGS_FORM_CANCEL_BUTTON: "Cancel",
+    DATA_QUERY_INPUTS_FORM_TITLE: "Query arguments",
+    DATA_QUERY_INPUTS_FORM_DESCRIPTION: "Enter the query arguments",
+    DATA_QUERY_INPUTS_FORM_CONFIRM_BUTTON: "Confirm",
+    DATA_QUERY_INPUTS_FORM_CANCEL_BUTTON: "Cancel",
 
     DATABASE_TABLES_STATS_TITLE: "Database Stats",
     DATABASE_TABLES_STATS_TOTAL_TABLES_LABEL: "Total Tables",

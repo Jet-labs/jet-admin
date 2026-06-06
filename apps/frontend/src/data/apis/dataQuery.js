@@ -212,7 +212,7 @@ export const cloneDataQueryByIDAPI = async ({
 export const testDataQueryByIDAPI = async ({
   tenantID,
   dataQueryID,
-  inputArgs,
+  inputValues,
 }) => {
   try {
     const url =
@@ -222,7 +222,7 @@ export const testDataQueryByIDAPI = async ({
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { inputArgs },
+        { inputValues },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,
@@ -247,7 +247,7 @@ export const testDataQueryByIDAPI = async ({
 export const runDataQueryByIDAPI = async ({
   tenantID,
   dataQueryID,
-  inputArgs,
+  inputValues,
 }) => {
   try {
     const url =
@@ -257,7 +257,7 @@ export const runDataQueryByIDAPI = async ({
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { inputArgs },
+        { inputValues },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,
@@ -282,7 +282,7 @@ export const runDataQueryByIDAPI = async ({
 export const testDataQueryByDataAPI = async ({
   tenantID,
   dataQuery,
-  inputArgs,
+  inputValues,
 }) => {
   try {
     const url =
@@ -292,7 +292,7 @@ export const testDataQueryByDataAPI = async ({
     if (bearerToken) {
       const response = await axios.patch(
         url,
-        { dataQuery, inputArgs },
+        { dataQuery, inputValues },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,

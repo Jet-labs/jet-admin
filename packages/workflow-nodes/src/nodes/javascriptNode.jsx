@@ -16,9 +16,9 @@ const ERROR_HANDLING_OPTIONS = {
   RETRY_THEN_FAIL: 'retry_then_fail',
 };
 
-// Representative sample value for a declared arg type so the expression engine
+// Representative sample value for a declared input type so the expression engine
 // can infer member completions on synthesized (pre-run) context entries.
-const sampleForArgType = (type) => {
+const sampleForInputType = (type) => {
   switch ((type || '').toLowerCase()) {
     case 'number':
     case 'integer':
@@ -39,7 +39,7 @@ const sampleForArgType = (type) => {
 // JavascriptNodeConfigurator - JSON Forms based configuration
 // ============================================================================
 export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { strings, workflowNodes, workflowInputArgs, workflowContext } = useWorkflowNodes();
+  const { strings, workflowNodes, workflowInputDefinitions, workflowContext } = useWorkflowNodes();
   const [formData, setFormData] = useState({
     title: data?.title || '',
     description: data?.description || '',
@@ -84,19 +84,19 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
   const intellisenseFeed = useMemo(() => {
     const feed = [];
     
-    // Fallback/base intellisense using workflowNodes and workflowInputArgs (for when context is empty before run)
+    // Fallback/base intellisense using workflowNodes and workflowInputDefinitions (for when context is empty before run)
     feed.push({ parentPath: "", label: "ctx", kind: "Variable", insertText: "ctx", detail: "Workflow context object" });
     feed.push({ parentPath: "ctx", label: "input", kind: "Property", insertText: "input", detail: "Workflow Input Parameters" });
     feed.push({ parentPath: "ctx", label: "item", kind: "Property", insertText: "item", detail: "Current loop item (if inside loop)" });
 
-    if (workflowInputArgs && workflowInputArgs.length > 0) {
-      workflowInputArgs.forEach(arg => {
+    if (workflowInputDefinitions && workflowInputDefinitions.length > 0) {
+      workflowInputDefinitions.forEach(inputDef => {
         feed.push({
           parentPath: "ctx.input",
-          label: arg.key,
+          label: inputDef.key,
           kind: "Field",
-          insertText: arg.key,
-          detail: arg.type ? `Input arg (${arg.type})` : 'Workflow Input Parameter'
+          insertText: inputDef.key,
+          detail: inputDef.type ? `Input parameter (${inputDef.type})` : 'Workflow Input Parameter'
         });
       });
     }
@@ -169,19 +169,19 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
     });
 
     return uniqueFeed;
-  }, [workflowNodes, nodeId, workflowInputArgs, workflowContext]);
+  }, [workflowNodes, nodeId, workflowInputDefinitions, workflowContext]);
 
   // Build the `ctx` state tree exposed to the JS code editor. This synthesizes a
-  // pre-run shape (input args, preceding node outputs, loop item) and merges any
+  // pre-run shape (input parameters, preceding node outputs, loop item) and merges any
   // live runtime workflowContext on top so the engine can offer deep, accurate
   // member completions for raw-JS code (js-template mode).
   const ctxStateTree = useMemo(() => {
     const ctx = { input: {}, item: '' };
 
-    (workflowInputArgs || [])
-      .filter((arg) => typeof arg?.key === 'string' && arg.key.trim())
-      .forEach((arg) => {
-        ctx.input[arg.key.trim()] = sampleForArgType(arg.type);
+    (workflowInputDefinitions || [])
+      .filter((inputDef) => typeof inputDef?.key === 'string' && inputDef.key.trim())
+      .forEach((inputDef) => {
+        ctx.input[inputDef.key.trim()] = sampleForInputType(inputDef.type);
       });
 
     if (workflowNodes) {
@@ -199,7 +199,7 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
     }
 
     return { ctx };
-  }, [workflowNodes, nodeId, workflowInputArgs, workflowContext]);
+  }, [workflowNodes, nodeId, workflowInputDefinitions, workflowContext]);
 
   // Build schema
   const schema = useMemo(() => {

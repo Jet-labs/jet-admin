@@ -12,7 +12,7 @@
         "description": "CockroachDB SQL query (PostgreSQL-compatible)",
         "format": "code-pgsql"
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Query arguments",
         "items": {
@@ -46,7 +46,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Arguments"
       }
     ]
@@ -54,6 +54,6 @@
   "data": {
     "queryType": "query",
     "query": "SELECT * FROM crdb_internal.tables LIMIT 10;",
-    "args": []
+    "inputDefinitions": []
   }
 }

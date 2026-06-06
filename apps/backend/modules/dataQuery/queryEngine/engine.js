@@ -5,7 +5,7 @@ const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
 const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
 
 const QUERY_TEMPLATE_OPTIONS = {
-  allowedRoots: ["args"],
+  allowedRoots: ["inputs"],
   preserveSingleExpressionType: true,
 };
 
@@ -17,11 +17,11 @@ class QueryEngine {
     this.dataSourceCache = new Map();
   }
 
-  async executeQuery(dataQueryID, runtimeArgs) {
-    const cacheKey = `${dataQueryID}|${JSON.stringify(runtimeArgs)}`;
+  async executeQuery(dataQueryID, runtimeInputs) {
+    const cacheKey = `${dataQueryID}|${JSON.stringify(runtimeInputs)}`;
     Logger.log("info", {
       message: "QueryEngine:executeQuery:start",
-      params: { dataQueryID, runtimeArgs },
+      params: { dataQueryID, runtimeInputs },
     });
 
     if (this.cache.has(cacheKey)) {
@@ -48,7 +48,7 @@ class QueryEngine {
 
     const resolvedTemplate = await this.resolveTemplate(
       query.dataQueryOptions,
-      runtimeArgs,
+      runtimeInputs,
       dataQueryID
     );
     Logger.log("info", {
@@ -62,7 +62,7 @@ class QueryEngine {
     this.cache.set(cacheKey, result);
     Logger.log("info", {
       message: "QueryEngine:executeQuery:executed",
-      params: { dataQueryID, runtimeArgs },
+      params: { dataQueryID, runtimeInputs },
     });
     return result;
   }
@@ -109,7 +109,7 @@ class QueryEngine {
     return instance;
   }
 
-  async resolveTemplate(template, runtimeArgs, dataQueryID) {
+  async resolveTemplate(template, runtimeInputs, dataQueryID) {
     Logger.log("info", {
       message: "QueryEngine:resolveTemplate:start",
       params: { dataQueryID, template },
@@ -117,7 +117,7 @@ class QueryEngine {
 
     const resolvedTemplate = resolveTemplate(
       template,
-      runtimeArgs,
+      runtimeInputs, // flat object directly, as expression-engine strips the allowedRoot prefix
       QUERY_TEMPLATE_OPTIONS,
       { dataQueryID, module: "dataQuery" }
     );

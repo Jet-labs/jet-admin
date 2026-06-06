@@ -57,7 +57,7 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
     initialValues: {
       datasourceTitle: "",
       datasourceDescription: "",
-      datasourceType: "postgresql", // Default value
+      datasourceType: DATASOURCE_TYPES.POSTGRESQL.value, // Default value
       datasourceOptions: datasourceOptionsMetadata.initialData, // Initialize nested object
     },
     onSubmit: (data) => {

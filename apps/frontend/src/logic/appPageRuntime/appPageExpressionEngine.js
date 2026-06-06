@@ -39,12 +39,13 @@ export const buildAppPageStateTree = (reducerState, dataSources = []) => {
     widgetStates = {},
     widgetMethods = {},
     variables = {},
-    listenerData = {},
+    listenerResults = {},
     globals = {},
   } = reducerState;
 
   const queries = {};
   const workflows = {};
+  const listeners = {};
 
   for (const ds of dataSources) {
     const alias = ds.alias;
@@ -52,6 +53,12 @@ export const buildAppPageStateTree = (reducerState, dataSources = []) => {
 
     if (ds.type === "workflow") {
       workflows[alias] = workflowResults[alias] || {
+        data: null,
+        error: null,
+        isLoading: false,
+      };
+    } else if (ds.type === "listener") {
+      listeners[alias] = listenerResults[alias] || {
         data: null,
         error: null,
         isLoading: false,
@@ -68,10 +75,10 @@ export const buildAppPageStateTree = (reducerState, dataSources = []) => {
   return {
     queries,
     workflows,
+    listeners,
     widgets: widgetStates,
     widgetMethods,
     variables,
-    listeners: listenerData,
     globals,
   };
 };

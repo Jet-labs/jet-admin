@@ -141,12 +141,12 @@ workflowController.executeWorkflow = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, workflowID } = req.params;
-    const inputArgs = req.body.inputArgs || {};
+    const inputValues = req.body.inputValues || {};
     const authContext = getServiceAuthContext(req);
 
     Logger.log("info", { message: "WorkflowController:executeWorkflow:params", params: { workflowID, tenantID, authContext } });
 
-    const result = await workflowService.executeWorkflow({ workflowID, tenantID, inputArgs, authContext });
+    const result = await workflowService.executeWorkflow({ workflowID, tenantID, inputValues, authContext });
 
     Logger.log("success", { message: "WorkflowController:executeWorkflow:success", params: { instanceID: result.instanceID } });
     expressUtils.sendResponse(res, true, result);
@@ -189,7 +189,7 @@ workflowController.testWorkflow = async (req, res) => {
   try {
     const { tenantID } = req.params;
     const { nodes, edges } = req.body;
-    const inputArgs = req.body.inputArgs || {};
+    const inputValues = req.body.inputValues || {};
     const authContext = getServiceAuthContext(req);
 
     if (!Array.isArray(nodes) || !Array.isArray(edges)) {
@@ -198,7 +198,7 @@ workflowController.testWorkflow = async (req, res) => {
 
     Logger.log("info", { message: "WorkflowController:testWorkflow:params", params: { tenantID, nodeCount: nodes.length, authContext } });
 
-    const result = await workflowService.testWorkflow({ tenantID, nodes, edges, inputArgs, authContext });
+    const result = await workflowService.testWorkflow({ tenantID, nodes, edges, inputValues, authContext });
 
     Logger.log("success", { message: "WorkflowController:testWorkflow:success", params: { instanceID: result.instanceID } });
     expressUtils.sendResponse(res, true, result);

@@ -115,7 +115,7 @@ export const DefaultAppPageSelectionLayout = ({
                 <Spinner size={16} className="text-primary" />
               ) : (
                 <>
-                  <Select value={String(pinnedAppPageID)} onValueChange={(val) => _handleSetDefaultAppPage(val)}>
+                  <Select value={pinnedAppPageID ? String(pinnedAppPageID) : undefined} onValueChange={(val) => _handleSetDefaultAppPage(val)}>
                     <SelectTrigger className="text-xs">
                       <SelectValue placeholder="Select an app page" />
                     </SelectTrigger>
@@ -211,7 +211,7 @@ export const DefaultAppPageSelectionLayout = ({
                 {isUpdatingUserConfig ? (
                   <Spinner size={16} className="text-primary" />
                 ) : (
-                  <Select value={String(pinnedAppPageID || '')} onValueChange={(val) => _handleSetDefaultAppPage(val)}>
+                  <Select value={pinnedAppPageID ? String(pinnedAppPageID) : undefined} onValueChange={(val) => _handleSetDefaultAppPage(val)}>
                     <SelectTrigger className="text-xs">
                       <SelectValue placeholder="Select an app page" />
                     </SelectTrigger>

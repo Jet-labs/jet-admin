@@ -189,7 +189,7 @@ export const cloneWorkflowAPI = async ({ tenantID, workflowID }) => {
 /**
  * Execute a saved workflow by ID
  */
-export const executeWorkflowAPI = async ({ tenantID, workflowID, inputArgs = {} }) => {
+export const executeWorkflowAPI = async ({ tenantID, workflowID, inputValues = {} }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -198,7 +198,7 @@ export const executeWorkflowAPI = async ({ tenantID, workflowID, inputArgs = {} 
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { inputArgs },
+        { inputValues },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,
@@ -223,7 +223,7 @@ export const executeWorkflowAPI = async ({ tenantID, workflowID, inputArgs = {} 
 /**
  * Test run a workflow without saving (uses in-memory nodes/edges)
  */
-export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputArgs = {} }) => {
+export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputValues = {} }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -232,7 +232,7 @@ export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputArgs = {} }
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { nodes, edges, inputArgs },
+        { nodes, edges, inputValues },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,

@@ -27,7 +27,7 @@ export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './comp
 export { CollapseComponent } from './components/collapseComponent';
 export { CodeEditor } from './components/code-editor';
 export { ArrayInput } from './components/array-input';
-export { InputArgsForm } from './components/input-args-form';
+export { InputValuesForm } from './components/input-values-form';
 export { PageHeader } from './components/pageHeader';
 export { Section } from './components/section';
 export { ErrorBoundary } from './components/error-boundary';

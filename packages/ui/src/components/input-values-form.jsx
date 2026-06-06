@@ -8,7 +8,7 @@ import { ArrayInput } from "./array-input";
 import { TemplateAutocompleteInput } from "./template-autocomplete-input";
 
 /**
- * Unified component for rendering typed input args from a schema array.
+ * Unified component for rendering typed input definitions from a schema array.
  * Replaces the 4 duplicate per-type rendering implementations across
  * DataQueryArgsForm, WorkflowInputModal, CronJobEditor, and WidgetDatasetArguments.
  *
@@ -17,7 +17,7 @@ import { TemplateAutocompleteInput } from "./template-autocomplete-input";
  * `{{event.property}}` regardless of the arg's declared type).
  *
  * @param {{
- *   args: Array<{ key: string, type?: string, required?: boolean }>,
+ *   inputDefinitions: Array<{ key: string, type?: string, required?: boolean }>,
  *   values: Object,
  *   onChange: (key: string, value: any) => void,
  *   errors?: Object<string, string>,
@@ -27,8 +27,8 @@ import { TemplateAutocompleteInput } from "./template-autocomplete-input";
  *   templateMode?: string,
  * }} props
  */
-export function InputArgsForm({
-  args = [],
+export function InputValuesForm({
+  inputDefinitions = [],
   values = {},
   onChange,
   errors = {},
@@ -37,7 +37,7 @@ export function InputArgsForm({
   stateTree = null,
   templateMode,
 }) {
-  if (!Array.isArray(args) || args.length === 0) {
+  if (!Array.isArray(inputDefinitions) || inputDefinitions.length === 0) {
     return (
       <p className="text-xs text-[#1c1c1e] italic">
         No input parameters defined.
@@ -45,26 +45,26 @@ export function InputArgsForm({
     );
   }
 
-  const renderField = (arg) => {
-    const argName = arg.key;
-    const argType = arg.type || "string";
-    const value = values[argName];
+  const renderField = (inputDef) => {
+    const inputName = inputDef.key;
+    const inputType = inputDef.type || "string";
+    const value = values[inputName];
 
     // Template mode: author the value as a {{ }} expression against stateTree.
     if (stateTree) {
       return (
         <>
-          <Label htmlFor={`input-arg-${argName}`} className="text-xs">
-            {argName}{" "}
-            {arg.required && <span className="text-red-500">*</span>}{" "}
-            {argType !== "string" && (
-              <span className="text-muted-foreground">({argType})</span>
+          <Label htmlFor={`input-def-${inputName}`} className="text-xs">
+            {inputName}{" "}
+            {inputDef.required && <span className="text-red-500">*</span>}{" "}
+            {inputType !== "string" && (
+              <span className="text-muted-foreground">({inputType})</span>
             )}
           </Label>
           <TemplateAutocompleteInput
             value={typeof value === "string" ? value : value == null ? "" : String(value)}
-            onChange={(val) => onChange(argName, val)}
-            placeholder={`{{event.${argName}}}`}
+            onChange={(val) => onChange(inputName, val)}
+            placeholder={`{{event.${inputName}}}`}
             context={stateTree}
             mode={templateMode}
             readOnly={disabled}
@@ -73,23 +73,23 @@ export function InputArgsForm({
       );
     }
 
-    switch (argType) {
+    switch (inputType) {
       case "boolean":
         return (
           <div className="flex items-center gap-2">
             <Checkbox
-              id={`input-arg-${argName}`}
+              id={`input-def-${inputName}`}
               checked={!!value}
-              onCheckedChange={(checked) => onChange(argName, checked)}
+              onCheckedChange={(checked) => onChange(inputName, checked)}
               disabled={disabled}
             />
             <Label
-              htmlFor={`input-arg-${argName}`}
+              htmlFor={`input-def-${inputName}`}
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              {argName}
-              {arg.required && <span className="text-red-500 ml-1">*</span>}
-              <span className="text-muted-foreground ml-1">({argType})</span>
+              {inputName}
+              {inputDef.required && <span className="text-red-500 ml-1">*</span>}
+              <span className="text-muted-foreground ml-1">({inputType})</span>
             </Label>
           </div>
         );
@@ -97,15 +97,15 @@ export function InputArgsForm({
       case "array":
         return (
           <>
-            <Label htmlFor={`input-arg-${argName}`} className="text-xs">
-              {argName}{" "}
-              {arg.required && <span className="text-red-500">*</span>}{" "}
-              <span className="text-muted-foreground">({argType})</span>
+            <Label htmlFor={`input-def-${inputName}`} className="text-xs">
+              {inputName}{" "}
+              {inputDef.required && <span className="text-red-500">*</span>}{" "}
+              <span className="text-muted-foreground">({inputType})</span>
             </Label>
             <ArrayInput
               value={Array.isArray(value) ? value : []}
-              onChange={(val) => onChange(argName, val)}
-              placeholder={`Add ${argName} item...`}
+              onChange={(val) => onChange(inputName, val)}
+              placeholder={`Add ${inputName} item...`}
               disabled={disabled}
             />
           </>
@@ -114,10 +114,10 @@ export function InputArgsForm({
       case "object":
         return (
           <>
-            <Label htmlFor={`input-arg-${argName}`} className="text-xs">
-              {argName}{" "}
-              {arg.required && <span className="text-red-500">*</span>}{" "}
-              <span className="text-muted-foreground">({argType})</span>
+            <Label htmlFor={`input-def-${inputName}`} className="text-xs">
+              {inputName}{" "}
+              {inputDef.required && <span className="text-red-500">*</span>}{" "}
+              <span className="text-muted-foreground">({inputType})</span>
             </Label>
             <CodeEditor
               language="json"
@@ -128,7 +128,7 @@ export function InputArgsForm({
                   ? JSON.stringify(value, null, 2)
                   : value || ""
               }
-              onChange={(val) => onChange(argName, val)}
+              onChange={(val) => onChange(inputName, val)}
               disabled={disabled}
             />
           </>
@@ -137,20 +137,20 @@ export function InputArgsForm({
       case "number":
         return (
           <>
-            <Label htmlFor={`input-arg-${argName}`} className="text-xs">
-              {argName}{" "}
-              {arg.required && <span className="text-red-500">*</span>}{" "}
-              <span className="text-muted-foreground">({argType})</span>
+            <Label htmlFor={`input-def-${inputName}`} className="text-xs">
+              {inputName}{" "}
+              {inputDef.required && <span className="text-red-500">*</span>}{" "}
+              <span className="text-muted-foreground">({inputType})</span>
             </Label>
             <Input
               type="number"
-              id={`input-arg-${argName}`}
+              id={`input-def-${inputName}`}
               className="w-full text-xs"
-              placeholder={`Value for ${argName}`}
+              placeholder={`Value for ${inputName}`}
               value={value ?? ""}
               onChange={(e) =>
                 onChange(
-                  argName,
+                  inputName,
                   e.target.value === "" ? "" : Number(e.target.value)
                 )
               }
@@ -163,20 +163,20 @@ export function InputArgsForm({
       default:
         return (
           <>
-            <Label htmlFor={`input-arg-${argName}`} className="text-xs">
-              {argName}{" "}
-              {arg.required && <span className="text-red-500">*</span>}{" "}
-              {argType !== "string" && (
-                <span className="text-muted-foreground">({argType})</span>
+            <Label htmlFor={`input-def-${inputName}`} className="text-xs">
+              {inputName}{" "}
+              {inputDef.required && <span className="text-red-500">*</span>}{" "}
+              {inputType !== "string" && (
+                <span className="text-muted-foreground">({inputType})</span>
               )}
             </Label>
             <Input
               type="text"
-              id={`input-arg-${argName}`}
+              id={`input-def-${inputName}`}
               className="w-full text-xs"
-              placeholder={`Value for ${argName}`}
+              placeholder={`Value for ${inputName}`}
               value={value || ""}
-              onChange={(e) => onChange(argName, e.target.value)}
+              onChange={(e) => onChange(inputName, e.target.value)}
               disabled={disabled}
             />
           </>
@@ -186,11 +186,11 @@ export function InputArgsForm({
 
   return (
     <div className={className || "space-y-3"}>
-      {args.map((arg) => (
-        <div key={arg.key} className="space-y-1">
-          {renderField(arg)}
-          {errors[arg.key] && (
-            <span className="text-destructive text-xs">{errors[arg.key]}</span>
+      {inputDefinitions.map((inputDef) => (
+        <div key={inputDef.key} className="space-y-1">
+          {renderField(inputDef)}
+          {errors[inputDef.key] && (
+            <span className="text-destructive text-xs">{errors[inputDef.key]}</span>
           )}
         </div>
       ))}
@@ -198,8 +198,8 @@ export function InputArgsForm({
   );
 }
 
-InputArgsForm.propTypes = {
-  args: PropTypes.arrayOf(
+InputValuesForm.propTypes = {
+  inputDefinitions: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
       type: PropTypes.string,

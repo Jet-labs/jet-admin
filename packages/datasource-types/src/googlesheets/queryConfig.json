@@ -49,7 +49,7 @@
         "description": "Treat first row as headers when reading",
         "default": true
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Dynamic arguments",
         "items": {
@@ -215,7 +215,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Dynamic Arguments",
         "options": {
           "detail": {
@@ -245,6 +245,6 @@
     "insertDataOption": "INSERT_ROWS",
     "majorDimension": "ROWS",
     "includeHeaders": true,
-    "args": []
+    "inputDefinitions": []
   }
 }

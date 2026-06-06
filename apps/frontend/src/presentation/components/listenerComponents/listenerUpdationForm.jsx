@@ -76,7 +76,7 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
     initialValues: {
       listenerTitle: listener?.listenerTitle || "",
       listenerDescription: listener?.listenerDescription || "",
-      datasourceID: listener?.datasourceID || "",
+      datasourceID: listener?.datasourceID,
       listenerType: listener?.listenerType || "",
       listenerConfig: listener?.listenerConfig || {},
       status: listener?.status || "inactive",

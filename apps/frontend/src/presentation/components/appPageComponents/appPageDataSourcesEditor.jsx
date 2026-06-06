@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useWorkflows } from "../../../logic/hooks/useWorkflows";
 import { useDataQueries } from "../../../logic/hooks/useDataQueries";
+import { useListeners } from "../../../logic/hooks/useListeners";
 import { useAppPageDispatch, appPageActions, useAppPageStateTree } from "../../../logic/appPageRuntime";
 import {
   Button,
@@ -16,17 +17,19 @@ import {
   Checkbox,
 } from "@jet-admin/ui";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import { Plus, Trash2, Edit2, Play, Square, Database, GitBranch, Layers, Loader2, ArrowLeft } from "lucide-react";
+import { Plus, Trash2, Edit2, Play, Square, Database, GitBranch, Layers, Loader2, ArrowLeft, RefreshCw } from "lucide-react";
 import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { stopTestWorkflowAPI } from "../../../data/apis/workflow";
 import { executeWorkflowWithStreaming } from "../../../logic/appPageRuntime/executeWorkflowWithStreaming";
 import { resolveValue } from "../../../logic/evaluationEngine";
+import { useSocketStore } from "../../../logic/stores/useSocketStore";
 import { displaySuccess, displayError } from "../../../utils/notification";
 
 export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
   const { tenantID } = useParams();
   const { workflows = [] } = useWorkflows(tenantID);
   const { dataQueries = [] } = useDataQueries(tenantID);
+  const { listeners = [] } = useListeners(tenantID);
   const dispatch = useAppPageDispatch();
   const stateTree = useAppPageStateTree();
 
@@ -35,6 +38,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
   // Track active workflow disconnectors for cleanup
   const workflowDisconnectorsRef = React.useRef({});
+  const listenerDisconnectorsRef = React.useRef({});
 
   // Cleanup on unmount
   React.useEffect(() => {
@@ -45,12 +49,59 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         }
       }
       workflowDisconnectorsRef.current = {};
+
+      for (const alias of Object.keys(listenerDisconnectorsRef.current)) {
+        if (typeof listenerDisconnectorsRef.current[alias] === "function") {
+          listenerDisconnectorsRef.current[alias]();
+        }
+      }
+      listenerDisconnectorsRef.current = {};
     };
   }, []);
 
   const handleFetchData = async (source) => {
     if (!source.alias) return;
     
+    if (source.type === "listener") {
+      const socket = useSocketStore.getState().socket;
+      if (!socket) {
+        displayError(`Socket not connected. Cannot start listening to "${source.alias}".`);
+        return;
+      }
+
+      if (typeof listenerDisconnectorsRef.current[source.alias] === "function") {
+        listenerDisconnectorsRef.current[source.alias]();
+      }
+
+      dispatch(appPageActions.setListenerResult(source.alias, null));
+
+      // The runtime room is listener:app_page:appPageID but appPageID might not be in URL if we are in editor.
+      // Wait, in editor, are we in a specific app page URL? No, the URL is usually `.../app-pages/:appPageID/...`
+      // Wait, if appPageEditorForm has the ID, let's use it, otherwise fall back to pageID from props or URL.
+      // Actually we just don't have appPageID readily available here, let's just use the URL param if present.
+      // We don't necessarily need to join the room if the runtime already joined it.
+
+      const channelName = source.channelName || `listener:${source.listenerID}`;
+
+      const handleListenerEvent = (payload) => {
+        if (
+          payload.channelName === `listener:${source.listenerID}` ||
+          payload.channelName === channelName
+        ) {
+          dispatch(appPageActions.setListenerResult(source.alias, payload.data, null, payload.mode, payload.limit));
+        }
+      };
+
+      socket.on("listener_event", handleListenerEvent);
+
+      listenerDisconnectorsRef.current[source.alias] = () => {
+        socket.off("listener_event", handleListenerEvent);
+      };
+
+      displaySuccess(`Refreshed listener connection for "${source.alias}". Waiting for events...`);
+      return;
+    }
+
     if (source.type === "workflow") {
       dispatch(appPageActions.setWorkflowLoading(source.alias));
     } else {
@@ -58,19 +109,19 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     }
     
     try {
-      const resolvedInputArgs = {};
+      const resolvedInputValues = {};
       const variablesList = appPageEditorForm.values.appPageConfig?.variables || [];
       const mockStateTree = {
         variables: variablesList.reduce((acc, v) => ({ ...acc, [v.key]: v.defaultValue }), {}),
         globals: {},
       };
       
-      const inputArgs = source.inputArgs || {};
-      for (const [k, v] of Object.entries(inputArgs)) {
+      const inputValues = source.inputValues || {};
+      for (const [k, v] of Object.entries(inputValues)) {
         if (typeof v === "string" && v.startsWith("{{") && v.endsWith("}}")) {
-          resolvedInputArgs[k] = resolveValue(v, mockStateTree) || "";
+          resolvedInputValues[k] = resolveValue(v, mockStateTree) || "";
         } else {
-          resolvedInputArgs[k] = v;
+          resolvedInputValues[k] = v;
         }
       }
 
@@ -83,7 +134,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         const { disconnect } = executeWorkflowWithStreaming({
           tenantID,
           workflowID: source.workflowID,
-          inputArgs: resolvedInputArgs,
+          inputValues: resolvedInputValues,
           alias: source.alias,
           dispatch,
           onError: (err) => {
@@ -97,7 +148,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         const result = await testDataQueryByIDAPI({
           tenantID,
           dataQueryID: source.queryID,
-          inputArgs: resolvedInputArgs,
+          inputValues: resolvedInputValues,
         });
 
         appPageEditorForm.setFieldValue(`fetchedDataPreview.${source.alias}`, {
@@ -209,7 +260,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
       type: "query",
       queryID: "",
       workflowID: "",
-      inputArgs: {},
+      inputValues: {},
       triggerMode: "auto",
       refreshOn: [],
       refetchInterval: null,
@@ -239,7 +290,9 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
       if (field === "type") {
         next.queryID = "";
         next.workflowID = "";
-        next.inputArgs = {};
+        next.listenerID = "";
+        next.channelName = "";
+        next.inputValues = {};
         next.refreshOn = [];
       }
       return next;
@@ -247,15 +300,15 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     updateDataSources(updated);
   };
 
-  const getSourceArgDefs = (source) => {
+  const getSourceInputDefinitions = (source) => {
     if (source.type === "query" && source.queryID) {
       const query = dataQueries.find((q) => String(q.dataQueryID) === String(source.queryID));
-      return query?.dataQueryOptions?.args || [];
+      return query?.dataQueryOptions?.inputDefinitions || [];
     }
     if (source.type === "workflow" && source.workflowID) {
       const wf = workflows.find((w) => String(w.workflowID) === String(source.workflowID));
-      const args = wf?.workflowOptions?.args;
-      if (Array.isArray(args)) return args;
+      const inputDefinitions = wf?.workflowOptions?.inputDefinitions;
+      if (Array.isArray(inputDefinitions)) return inputDefinitions;
       return [];
     }
     return [];
@@ -325,6 +378,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                 <SelectContent>
                   <SelectItem value="query">Data Query</SelectItem>
                   <SelectItem value="workflow">Workflow</SelectItem>
+                  <SelectItem value="listener">Listener</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -332,7 +386,11 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             {/* Target Select */}
             <div className="space-y-1.5">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                {selectedSource.type === "query" ? "Select Query" : "Select Workflow"}
+                {selectedSource.type === "query"
+                  ? "Select Query"
+                  : selectedSource.type === "workflow"
+                    ? "Select Workflow"
+                    : "Select Listener"}
               </Label>
               {selectedSource.type === "query" ? (
                 <Select
@@ -350,7 +408,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                     ))}
                   </SelectContent>
                 </Select>
-              ) : (
+              ) : selectedSource.type === "workflow" ? (
                 <Select
                   value={selectedSource.workflowID ? String(selectedSource.workflowID) : ""}
                   onValueChange={(val) => handleSourceChange(editingIndex, "workflowID", val)}
@@ -366,8 +424,43 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                     ))}
                   </SelectContent>
                 </Select>
+                ) : (
+                  <Select
+                    value={selectedSource.listenerID ? String(selectedSource.listenerID) : ""}
+                    onValueChange={(val) => handleSourceChange(editingIndex, "listenerID", val)}
+                  >
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Choose a listener…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {listeners.map((l) => (
+                        <SelectItem key={l.listenerID} value={String(l.listenerID)}>
+                          {l.listenerTitle || `Listener ${l.listenerID}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
               )}
             </div>
+
+            {/* Custom Channel Name (for listener) */}
+            {selectedSource.type === "listener" && (
+              <div className="space-y-1.5">
+                <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  Custom Channel Name (Optional)
+                </Label>
+                <Input
+                  type="text"
+                  className="w-full text-xs font-mono"
+                  placeholder="e.g. custom_channel"
+                  value={selectedSource.channelName || ""}
+                  onChange={(e) => handleSourceChange(editingIndex, "channelName", e.target.value)}
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Defaults to <code className="bg-background px-1 rounded border border-border font-mono text-xs">{`listener:${selectedSource.listenerID}`}</code> if left blank.
+                </p>
+              </div>
+            )}
 
             {/* Trigger Mode */}
             <div className="space-y-1.5">
@@ -449,21 +542,21 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
 
             {/* Input Arguments Form */}
-            {getSourceArgDefs(selectedSource).length > 0 && (
+            {getSourceInputDefinitions(selectedSource).length > 0 && (
               <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Parameters / Arguments
                 </p>
-                {getSourceArgDefs(selectedSource).map((argDef) => (
-                  <div key={argDef.key} className="space-y-1">
-                    <Label className="text-[10px] text-muted-foreground font-mono">{argDef.key}</Label>
+                {getSourceInputDefinitions(selectedSource).map((inputDef) => (
+                  <div key={inputDef.key} className="space-y-1">
+                    <Label className="text-[10px] text-muted-foreground font-mono">{inputDef.key}</Label>
                     <TemplateAutocompleteInput
-                      value={selectedSource.inputArgs?.[argDef.key] || ""}
+                      value={selectedSource.inputValues?.[inputDef.key] || ""}
                       onChange={(val) => {
-                        const updatedArgs = { ...(selectedSource.inputArgs || {}), [argDef.key]: val };
-                        handleSourceChange(editingIndex, "inputArgs", updatedArgs);
+                        const updatedInputs = { ...(selectedSource.inputValues || {}), [inputDef.key]: val };
+                        handleSourceChange(editingIndex, "inputValues", updatedInputs);
                       }}
-                      placeholder={`e.g. {{ state.variables.${argDef.key} }}`}
+                      placeholder={`e.g. {{ state.variables.${inputDef.key} }}`}
                       liveStateTree={stateTree ? { state: stateTree } : null}
                     />
                   </div>
@@ -499,10 +592,11 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               <div className="space-y-2">
                 {dataSources.map((source, index) => {
                   const isQuery = source.type === "query";
-                  const Icon = isQuery ? Database : GitBranch;
-                  const stateTreeSource = isQuery
-                    ? stateTree?.queries?.[source.alias]
-                    : stateTree?.workflows?.[source.alias];
+                  const isWorkflow = source.type === "workflow";
+                  const Icon = isQuery ? Database : isWorkflow ? GitBranch : Layers;
+                  const stateTreeSource = isWorkflow
+                    ? stateTree?.workflows?.[source.alias]
+                    : stateTree?.queries?.[source.alias];
                   const isFetching = !!stateTreeSource?.isLoading;
                   const summary = getFetchedSummary(source, stateTreeSource);
 
@@ -521,7 +615,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                               {source.alias || `source_${index + 1}`}
                             </span>
                             <p className="text-[10px] text-muted-foreground truncate font-mono mt-0.5">
-                              {source.type} : {isQuery ? source.queryID : source.workflowID}
+                              {source.type} : {isQuery ? source.queryID : isWorkflow ? source.workflowID : source.listenerID}
                             </p>
                           </div>
                         </div>
@@ -568,13 +662,26 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                               type="button"
                               variant="ghost"
                               size="sm"
-                              disabled={isFetching || (!source.queryID && !source.workflowID)}
+                                disabled={
+                                  isFetching ||
+                                  (source.type === "query" && !source.queryID) ||
+                                  (source.type === "workflow" && !source.workflowID) ||
+                                  (source.type === "listener" && !source.listenerID)
+                                }
                               className="h-6 w-6 p-0 text-primary hover:bg-primary/10"
                               onClick={() => handleFetchData(source)}
-                              title={source.type === "workflow" ? "Run workflow" : "Fetch query"}
+                                title={
+                                  source.type === "workflow"
+                                    ? "Run workflow"
+                                    : source.type === "listener"
+                                      ? "Refresh Listener Socket"
+                                      : "Fetch query"
+                                }
                             >
                               {isFetching ? (
                                 <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : source.type === "listener" ? (
+                                  <RefreshCw className="h-3 w-3" />
                               ) : (
                                 <Play className="h-3 w-3 fill-current" />
                               )}

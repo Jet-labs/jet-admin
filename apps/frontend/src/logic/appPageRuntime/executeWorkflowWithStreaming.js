@@ -23,7 +23,7 @@ import { appPageActions } from "./appPageActions";
  * @param {object} params
  * @param {string} params.tenantID
  * @param {string} params.workflowID
- * @param {object} params.inputArgs        - Resolved input arguments
+ * @param {object} params.inputValues        - Resolved input values
  * @param {string} params.alias            - Data source alias for state storage
  * @param {Function} params.dispatch       - AppPage dispatch function
  * @param {Function} [params.isStale]      - Optional guard: returns true if this request
@@ -34,7 +34,7 @@ import { appPageActions } from "./appPageActions";
 export const executeWorkflowWithStreaming = ({
   tenantID,
   workflowID,
-  inputArgs,
+  inputValues,
   alias,
   dispatch,
   isStale = () => false,
@@ -64,7 +64,7 @@ export const executeWorkflowWithStreaming = ({
       const runRes = await executeWorkflowAPI({
         tenantID,
         workflowID,
-        inputArgs,
+        inputValues,
       });
 
       const instanceID = runRes.instanceID;

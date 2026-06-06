@@ -9,7 +9,7 @@
         "default": "GET"
       },
 
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Query arguments",
         "items": {
@@ -47,7 +47,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Arguments",
         "options": {
           "detail": {
@@ -79,7 +79,7 @@
   "data": {
     "action": "GET",
     "timeout": 10,
-    "args": [
+    "inputDefinitions": [
       { "key": "user_id", "value": "123" },
       { "key": "status", "value": "active" }
     ]

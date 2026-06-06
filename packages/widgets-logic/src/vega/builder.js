@@ -120,12 +120,80 @@ export class VegaWidgetBuilder extends BaseWidgetBuilder {
     const spec = VegaWidgetBuilder.safeClone(widgetConfig.vegaSpec);
     if (!spec) return null;
 
-    // If data.values is already a resolved array, use it directly
-    // (evaluationEngine has already replaced "{{alias}}" with actual data)
-    if (spec.data?.values && typeof spec.data.values === 'string') {
-      // If it's still a string after resolution, it wasn't a valid template — clear it
-      spec.data.values = [];
-    }
+    // Helper to recursively sanitize all data blocks in the spec.
+    // When queries are loading or return empty/null/undefined, we ensure
+    // that the spec has valid default values (e.g. values: []) rather than
+    // missing or template strings which would crash the Vega-Lite compiler/renderer.
+    const sanitizeSpec = (obj, originalObj) => {
+      if (!obj || typeof obj !== 'object') return;
+
+      const getFallbackValues = (dataBlock) => {
+        const format = dataBlock?.format;
+        if (format && typeof format === 'object' && format.type === 'topojson') {
+          const featureName = format.feature || 'features';
+          return {
+            type: 'Topology',
+            objects: {
+              [featureName]: {
+                type: 'GeometryCollection',
+                geometries: []
+              }
+            }
+          };
+        }
+        return [];
+      };
+
+      const processDataBlock = (dataBlock, originalDataBlock) => {
+        if (!dataBlock || typeof dataBlock !== 'object') return;
+
+        const hasValues = ('values' in dataBlock) || (originalDataBlock && ('values' in originalDataBlock));
+        if (hasValues) {
+          let val = dataBlock.values;
+          if (val === undefined && originalDataBlock) {
+            val = originalDataBlock.values;
+          }
+
+          const format = dataBlock.format || originalDataBlock?.format;
+          const isTopoJSON = format && typeof format === 'object' && format.type === 'topojson';
+
+          const isValidTopoJSON = isTopoJSON && val && typeof val === 'object' && val.objects && typeof val.objects === 'object';
+          const isValidRegularObject = !isTopoJSON && val && typeof val === 'object';
+
+          if (isValidTopoJSON || isValidRegularObject) {
+            dataBlock.values = val;
+          } else if (typeof val === 'string') {
+            if (val.includes('{{') || val.trim() === '') {
+              dataBlock.values = getFallbackValues(dataBlock);
+            } else {
+              dataBlock.values = val;
+            }
+          } else {
+            dataBlock.values = getFallbackValues(dataBlock);
+          }
+        }
+      };
+
+      if (obj.data && typeof obj.data === 'object') {
+        processDataBlock(obj.data, originalObj?.data);
+      }
+
+      for (const key of Object.keys(obj)) {
+        const val = obj[key];
+        const originalVal = originalObj ? originalObj[key] : undefined;
+
+        if (val && typeof val === 'object') {
+          if (key === 'data') {
+            processDataBlock(val, originalVal);
+            sanitizeSpec(val, originalVal);
+          } else {
+            sanitizeSpec(val, originalVal);
+          }
+        }
+      }
+    };
+
+    sanitizeSpec(spec, widgetConfig.vegaSpec);
 
     return spec;
   }

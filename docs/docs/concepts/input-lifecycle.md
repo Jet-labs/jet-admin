@@ -31,8 +31,8 @@ The Execution Contract defines the exact inputs required to execute a unit (Work
 
 | Executable | Contract Storage |
 | ---------- | ----------------- |
-| Workflow   | `workflowOptions.args` |
-| Data Query | `dataQueryOptions.args` |
+| Workflow   | `workflowOptions.inputDefinitions` |
+| Data Query | `dataQueryOptions.inputDefinitions` |
 
 Each required input is defined as an `InputDefinition`:
 ```ts
@@ -47,7 +47,7 @@ Each required input is defined as an `InputDefinition`:
 ```
 
 ### Definition Sources
-Definitions are extracted via the `DefinitionProvider` utility. There are two origins for definitions:
+Definitions are extracted via the `DefinitionProvider` utility. There are two origins for inputDefinitions:
 1.  **Native**: Defined directly on the executable (e.g., Workflow inputs, Data Query parameters).
 2.  **Derived**: Inherited from another executable.
     *   **Node**: Inherits from its linked Query.
@@ -58,7 +58,7 @@ Definitions are extracted via the `DefinitionProvider` utility. There are two or
 
 ## 2. Input Providers
 
-Input Providers supply the raw, unvalidated values (often called `inputArgs`) that attempt to satisfy the Execution Contract.
+Input Providers supply the raw, unvalidated values (often called `inputValues`) that attempt to satisfy the Execution Contract.
 
 | Provider / Trigger | Supplies Input Values To |
 | ----------- | --------------- |
@@ -97,7 +97,7 @@ The `QueryEngine` receives the `resolvedInputs` and performs a secondary `resolv
 
 ```mermaid
 graph TD
-    A[Caller provides runtimeValues] --> B{Definitions Provided?}
+    A[Caller provides inputValues] --> B{Definitions Provided?}
     B -->|Yes| D[Use Inline Definitions]
     B -->|No| C[DefinitionProvider.getInputDefinitions]
     C --> D
@@ -128,7 +128,7 @@ graph TD
 To maintain system integrity, the following rules are strictly enforced across the backend and frontend:
 1.  **Definitions Determine Behavior**: Modules do not guess input shapes; they blindly follow the Definitions.
 2.  **Centralized Resolution**: Runtimes (Workflows, Queries) must NOT resolve templates or validate inputs independently. They must use the `resolveInputs()` pipeline.
-3.  **Execution Receives Safe Inputs**: Execution functions (like `startWorkflow` or `executeDataQuery`) assume `inputArgs` are already fully validated by the pipeline.
+3.  **Execution Receives Safe Inputs**: Execution functions (like `startWorkflow` or `executeDataQuery`) assume `inputValues` are already fully validated by the pipeline.
 
 ---
 
@@ -141,16 +141,16 @@ When a user clicks "Run" in the Data Query editor before saving.
 
 **Chronological Invocation:**
 1. `dataQuery.controller.js: testDataQuery(req, res)`
-2. `dataQuery.service.js: runDataQueryByData(tempQuery, inputArgs)`
-3. `definitionProvider.util.js: extractQueryDefinitions(tempQuery)` (Extracts `dataQueryOptions.args` directly from the payload request)
-4. `inputArgs.util.js: resolveInputs(type: 'query', definitions, runtimeValues)` — **(Stage 1 Pipeline)**
+2. `dataQuery.service.js: runDataQueryByData(tempQuery, inputValues)`
+3. `definitionProvider.util.js: extractQueryDefinitions(tempQuery)` (Extracts `dataQueryOptions.inputDefinitions` directly from the payload request)
+4. `inputValues.util.js: resolveInputs(type: 'query', definitions, inputValues)` — **(Stage 1 Pipeline)**
    * Resolves templates against context (if provided)
    * Applies default values
    * Coerces to declared types (e.g. string `"123"` to integer `123`)
    * Validates required fields
-5. `queryExecution.adapter.js: executeDataQuery({ executionArgs: resolved })`
-6. `engine.js (QueryEngine): run(executionArgs)`
-7. `engine.js (QueryEngine): resolveTemplate(queryBody, executionArgs)` — **(Stage 2 Pipeline)**
+5. `queryExecution.adapter.js: executeDataQuery({ executionInputs: resolved })`
+6. `engine.js (QueryEngine): run(executionInputs)`
+7. `engine.js (QueryEngine): resolveTemplate(queryBody, executionInputs)` — **(Stage 2 Pipeline)**
    * Injects the *validated* arguments directly into the SQL string or JSON body.
 8. `[Specific DB Adapter]: execute()`
 
@@ -163,11 +163,11 @@ sequenceDiagram
     participant Pipe as InputResolver Pipeline
     participant Eng as Query Engine
 
-    UI->>API: POST /test (tempQuery, inputArgs)
+    UI->>API: POST /test (tempQuery, inputValues)
     API->>Svc: runDataQueryByData()
     Svc->>Def: extractQueryDefinitions(tempQuery)
     Def-->>Svc: definitions[]
-    Svc->>Pipe: resolveInputs(definitions, inputArgs)
+    Svc->>Pipe: resolveInputs(definitions, inputValues)
     Note over Pipe: STAGE 1:<br/>Apply Defaults<br/>Coerce Types<br/>Validate Required
     Pipe-->>Svc: { resolved, valid }
     Svc->>Eng: executeDataQuery(resolvedArgs)
@@ -185,13 +185,13 @@ When a query is executed via its API endpoint or triggered standalone.
 
 **Chronological Invocation:**
 1. `dataQuery.controller.js: runDataQuery(req, res)`
-2. `dataQuery.service.js: runDataQueryByID(dataQueryID, inputArgs)`
+2. `dataQuery.service.js: runDataQueryByID(dataQueryID, inputValues)`
 3. `prisma.tblDataQueries.findUnique(dataQueryID)` (Fetches the saved query config)
 4. `definitionProvider.util.js: extractQueryDefinitions(savedQuery)`
-5. `inputArgs.util.js: resolveInputs(type: 'query', definitions, runtimeValues)` — **(Stage 1 Pipeline)**
-6. `queryExecution.adapter.js: executeDataQuery({ executionArgs: resolved })`
-7. `engine.js (QueryEngine): run(executionArgs)`
-8. `engine.js (QueryEngine): resolveTemplate(queryBody, executionArgs)` — **(Stage 2 Pipeline)**
+5. `inputValues.util.js: resolveInputs(type: 'query', definitions, inputValues)` — **(Stage 1 Pipeline)**
+6. `queryExecution.adapter.js: executeDataQuery({ executionInputs: resolved })`
+7. `engine.js (QueryEngine): run(executionInputs)`
+8. `engine.js (QueryEngine): resolveTemplate(queryBody, executionInputs)` — **(Stage 2 Pipeline)**
 
 ```mermaid
 sequenceDiagram
@@ -201,10 +201,10 @@ sequenceDiagram
     participant Pipe as InputResolver Pipeline
     participant Eng as Query Engine
 
-    Client->>API: POST /:dataQueryID/run (inputArgs)
+    Client->>API: POST /:dataQueryID/run (inputValues)
     API->>DB: findUnique(dataQueryID)
     DB-->>API: Saved Query Config
-    API->>Pipe: resolveInputs(query.args, inputArgs)
+    API->>Pipe: resolveInputs(query.args, inputValues)
     Pipe-->>API: { resolved, valid }
     API->>Eng: executeDataQuery(resolved)
     Eng->>Eng: resolveTemplate(queryBody, resolved)
@@ -220,8 +220,8 @@ When a workflow triggers, evaluating a Data Query node followed by a Javascript 
 **Chronological Invocation:**
 *(Workflow Initialisation)*
 1. `workflow.controller.js: testWorkflow()` / `executeWorkflow()`
-2. `workflow.service.js: testWorkflow()` / `executeWorkflow(inputArgs)`
-3. `inputArgs.util.js: resolveInputs()` *(For `executeWorkflow` only: validates initial workflow-level arguments against `workflowOptions.args`)*
+2. `workflow.service.js: testWorkflow()` / `executeWorkflow(inputValues)`
+3. `inputValues.util.js: resolveInputs()` *(For `executeWorkflow` only: validates initial workflow-level arguments against `workflowOptions.inputDefinitions`)*
 4. `orchestrator.js: startWorkflow()` (Stores validated inputs in initial state)
 
 *(Node 1: Data Query Node)*
@@ -275,7 +275,7 @@ When `node-cron` fires on a schedule.
 1. `node-cron` trigger fires.
 2. `cronJob.service.js: runCronJob({ cronJob })`
 3. `definitionProvider.util.js: extractWorkflowDefinitions(cronJob.tblWorkflows)` (Gets required workflow inputs).
-4. `inputArgs.util.js: resolveInputs(runtimeValues: cronJob.workflowConfig.inputArgs)`
+4. `inputValues.util.js: resolveInputs(inputValues: cronJob.workflowConfig.inputValues)`
    * Applies defaults and guarantees the static cron payload is valid for the linked workflow.
    * If invalid, creates a `FAILED` history record immediately.
 5. `workflow.service.js: executeWorkflow(workflowID, resolvedArgs)`
@@ -291,7 +291,7 @@ sequenceDiagram
     participant WSvc as Workflow Service
 
     Cron->>CSvc: Timer Triggered
-    CSvc->>Pipe: resolveInputs(wfDefinitions, cron.inputArgs)
+    CSvc->>Pipe: resolveInputs(wfDefinitions, cron.inputValues)
     alt Validation Failed
         Pipe-->>CSvc: { valid: false, errors }
         CSvc->>DB: create(status: FAILED, errorMsg)

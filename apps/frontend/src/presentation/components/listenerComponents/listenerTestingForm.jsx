@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Play, Square, Unplug } from 'lucide-react';
+import { Play, Square, Unplug, RefreshCw } from 'lucide-react';
 import React, { useState, useEffect, useRef } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
@@ -165,6 +165,23 @@ export const ListenerTestingForm = ({
         </div>
 
         <div className="flex gap-2 items-center">
+          <Button
+            onClick={() => {
+              if (!socket || !listenerID) return;
+              const testRoom = `listener_test:${listenerID}`;
+              socket.emit('leave_room', testRoom);
+              setTimeout(() => {
+                socket.emit('join_room', testRoom);
+                displaySuccess("Refreshed listener testing socket");
+              }, 100);
+            }}
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-zinc-500 hover:text-zinc-300"
+            title="Refresh Socket Connection"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </Button>
           {liveEvents.length > 0 && (
             <Button
               onClick={() => setLiveEvents([])}

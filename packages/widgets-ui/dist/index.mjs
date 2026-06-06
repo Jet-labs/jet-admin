@@ -4070,7 +4070,7 @@ var VegaConfigEditor = ({
             setShowParseWarning(true);
             return;
           } else if (config) {
-            widgetEditorForm.setFieldValue("widgetConfig.chartBuilderSpec", config);
+            widgetEditorForm.setFieldValue("widgetConfig.shelfSpec", config);
           }
         }
       } catch (e) {

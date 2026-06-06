@@ -8,7 +8,7 @@ const Logger = require("../../../utils/logger");
 const { prisma } = require("../../../config/prisma.config");
 const { workflowService } = require("../../workflow/workflow.service");
 const constants = require("../../../constants");
-const { resolveInputs, extractWorkflowDefinitions } = require("../../../utils/inputArgs.util");
+const { resolveInputs, extractWorkflowDefinitions } = require("../../../utils/input.util");
 
 class CronJobEngine {
   constructor() {
@@ -19,16 +19,16 @@ class CronJobEngine {
     Logger.log("info", { message: "CronJobEngine:runCronJob", params: { cronJobID: cronJob.cronJobID } });
     const startTime = new Date();
     try {
-      const rawInputArgs = cronJob.workflowConfig?.inputArgs || {};
-      let definitions = [];
+      const rawInputValues = cronJob.workflowConfig?.inputValues || {};
+      let inputDefinitions = [];
       if (cronJob.tblWorkflows) {
-        definitions = extractWorkflowDefinitions(cronJob.tblWorkflows);
+        inputDefinitions = extractWorkflowDefinitions(cronJob.tblWorkflows);
       }
       const { resolved, errors, valid } = await resolveInputs({
         type: 'cron',
         id: !cronJob.tblWorkflows ? cronJob.cronJobID : undefined,
-        definitions: definitions.length > 0 ? definitions : undefined,
-        runtimeValues: rawInputArgs,
+        inputDefinitions: inputDefinitions.length > 0 ? inputDefinitions : undefined,
+        inputValues: rawInputValues,
       });
 
       if (!valid) {
@@ -38,7 +38,7 @@ class CronJobEngine {
       const workflowRunResult = await workflowService.executeWorkflow({
         workflowID: cronJob.workflowID,
         tenantID: cronJob.tenantID,
-        inputArgs: resolved,
+        inputValues: resolved,
       });
 
       await prisma.tblCronJobHistory.create({

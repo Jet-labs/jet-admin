@@ -135,15 +135,15 @@ export const WIDGET_DATASET_ADVANCED_OPTIONS = [];
 // Always-available keys: state.event.type, state.event.widgetID
 
 /**
- * @type {Record<string, Array<{ value: string, label: string, desc: string, args?: Array<{ key: string, description: string }> }>>}
+ * @type {Record<string, Array<{ value: string, label: string, desc: string, inputDefinitions?: Array<{ key: string, description: string }> }>>}
  */
 export const WIDGET_EVENT_TYPES = {
   /** Events available to every widget type */
   COMMON: [
     {
       value: "onClick", label: "On Click", desc: "Fires when the widget is clicked",
-      args: [
-        { key: "event.args[0]", description: "Native click event" },
+      inputDefinitions: [
+        { key: "event.inputDefinitions[0]", description: "Native click event" },
       ],
     },
     { value: "onRefresh", label: "On Refresh", desc: "Fires when the widget refreshes data" },
@@ -154,14 +154,14 @@ export const WIDGET_EVENT_TYPES = {
   table: [
     {
       value: "onRowSelect", label: "On Row Select", desc: "Fires when a table row is selected",
-      args: [
+      inputDefinitions: [
         { key: "event.row", description: "Selected row object" },
         { key: "event.rowIndex", description: "Zero-based row index" },
       ],
     },
     {
       value: "onPageChange", label: "On Page Change", desc: "Fires when the table page changes",
-      args: [
+      inputDefinitions: [
         { key: "event.page", description: "Current page number" },
         { key: "event.pageSize", description: "Rows per page (limit)" },
         { key: "event.offset", description: "Row offset (skip)" },
@@ -169,20 +169,20 @@ export const WIDGET_EVENT_TYPES = {
     },
     {
       value: "onSearch", label: "On Search", desc: "Fires when search term changes (debounced)",
-      args: [
+      inputDefinitions: [
         { key: "event.searchTerm", description: "Debounced search term" },
       ],
     },
     {
       value: "onExport", label: "On Export", desc: "Fires when export is triggered",
-      args: [
+      inputDefinitions: [
         { key: "event.format", description: "Export format (csv / json)" },
         { key: "event.rowCount", description: "Total rows exported" },
       ],
     },
     {
       value: "onRowSave", label: "On Row Save", desc: "Fires when an edited row is saved",
-      args: [
+      inputDefinitions: [
         { key: "event.rowIndex", description: "Edited row index" },
         { key: "event.originalRow", description: "Row before edit" },
         { key: "event.updatedRow", description: "Row after edit" },
@@ -191,28 +191,28 @@ export const WIDGET_EVENT_TYPES = {
     },
     {
       value: "onBulkDelete", label: "On Bulk Delete", desc: "Fires when bulk delete is triggered",
-      args: [
+      inputDefinitions: [
         { key: "event.selectedRows", description: "Array of selected row objects" },
         { key: "event.selectedRowIndices", description: "Array of selected row indices" },
       ],
     },
     {
       value: "onBulkExport", label: "On Bulk Export", desc: "Fires when bulk export is triggered",
-      args: [
+      inputDefinitions: [
         { key: "event.selectedRows", description: "Array of selected row objects" },
         { key: "event.format", description: "Export format (csv / json)" },
       ],
     },
     {
       value: "onBulkAction", label: "On Bulk Action", desc: "Fires for custom bulk actions",
-      args: [
+      inputDefinitions: [
         { key: "event.actionKey", description: "Custom action key" },
         { key: "event.selectedRows", description: "Array of selected row objects" },
       ],
     },
     {
       value: "onBulkEdit", label: "On Bulk Edit", desc: "Fires when bulk edits are saved",
-      args: [
+      inputDefinitions: [
         { key: "event.edits", description: "Array of { rowIndex, originalRow, changes } objects" },
       ],
     },
@@ -222,8 +222,8 @@ export const WIDGET_EVENT_TYPES = {
   button: [
     {
       value: "onSubmit", label: "On Submit", desc: "Fires when the button is submitted",
-      args: [
-        { key: "event.args[0]", description: "Submit payload" },
+      inputDefinitions: [
+        { key: "event.inputDefinitions[0]", description: "Submit payload" },
       ],
     },
   ],
@@ -232,13 +232,13 @@ export const WIDGET_EVENT_TYPES = {
   form: [
     {
       value: "onSubmit", label: "On Submit", desc: "Fires when the form is submitted",
-      args: [
+      inputDefinitions: [
         { key: "event.formData", description: "Submitted form data object" },
       ],
     },
     {
       value: "onFieldChange", label: "On Field Change", desc: "Fires when any form field changes",
-      args: [
+      inputDefinitions: [
         { key: "event.field", description: "Changed field name" },
         { key: "event.value", description: "New field value" },
         { key: "event.formData", description: "Current form data" },
@@ -250,8 +250,8 @@ export const WIDGET_EVENT_TYPES = {
   alert: [
     {
       value: "onDismiss", label: "On Dismiss", desc: "Fires when the alert is dismissed",
-      args: [
-        { key: "event.args[0]", description: "Dismiss payload" },
+      inputDefinitions: [
+        { key: "event.inputDefinitions[0]", description: "Dismiss payload" },
       ],
     },
   ],
@@ -259,7 +259,7 @@ export const WIDGET_EVENT_TYPES = {
   "date-picker": [
     {
       value: "onChange", label: "On Change", desc: "Fires when the selected date/time changes",
-      args: [
+      inputDefinitions: [
         { key: "event.value", description: "ISO datetime string" },
         { key: "event.date", description: "ISO date string (YYYY-MM-DD)" },
         { key: "event.time", description: "Time portion (HH:mm:ss) when enableTime is on" },
@@ -269,7 +269,7 @@ export const WIDGET_EVENT_TYPES = {
     { value: "onClose", label: "On Close", desc: "Fires when the picker popover closes" },
     {
       value: "onClear", label: "On Clear", desc: "Fires when the selected value is cleared",
-      args: [
+      inputDefinitions: [
         { key: "event.value", description: "Cleared value (empty string)" },
       ],
     },
@@ -278,7 +278,7 @@ export const WIDGET_EVENT_TYPES = {
   "date-range-picker": [
     {
       value: "onChange", label: "On Change", desc: "Fires when the selected range changes",
-      args: [
+      inputDefinitions: [
         { key: "event.start", description: "ISO start datetime" },
         { key: "event.end", description: "ISO end datetime" },
         { key: "event.startDate", description: "ISO start date (YYYY-MM-DD)" },
@@ -289,7 +289,7 @@ export const WIDGET_EVENT_TYPES = {
     { value: "onClose", label: "On Close", desc: "Fires when the picker popover closes" },
     {
       value: "onClear", label: "On Clear", desc: "Fires when the range is cleared",
-      args: [
+      inputDefinitions: [
         { key: "event.start", description: "Cleared start (empty string)" },
       ],
     },
@@ -301,7 +301,7 @@ export const WIDGET_EVENT_TYPES = {
  * Returns COMMON events + widget-specific events.
  *
  * @param {string} widgetType - e.g. "table", "vega-lite", "button"
- * @returns {Array<{ value: string, label: string, desc: string, args?: Array<{ key: string, description: string }> }>}
+ * @returns {Array<{ value: string, label: string, desc: string, inputDefinitions?: Array<{ key: string, description: string }> }>}
  */
 export const getWidgetEventTypes = (widgetType) => {
   const common = WIDGET_EVENT_TYPES.COMMON || [];
@@ -312,24 +312,24 @@ export const getWidgetEventTypes = (widgetType) => {
 /**
  * Get the event arguments for a specific event type on a specific widget type.
  * Checks the widget-specific entry first, then falls back to COMMON events.
- * Returns the args array if found, otherwise an empty array.
+ * Returns the inputDefinitions array if found, otherwise an empty array.
  *
  * @param {string} widgetType - e.g. "table", "date-picker"
  * @param {string} eventType - e.g. "onClick", "onChange"
  * @returns {Array<{ key: string, description: string }>}
  */
-export const getEventArgs = (widgetType, eventType) => {
+export const getEventInputDefinitions = (widgetType, eventType) => {
   // Check widget-specific events first
   const specific = WIDGET_EVENT_TYPES[widgetType] || [];
   const specificEvent = specific.find((e) => e.value === eventType);
-  if (specificEvent?.args) return specificEvent.args;
+  if (specificEvent?.inputDefinitions) return specificEvent.inputDefinitions;
 
   // Check COMMON events
   const common = WIDGET_EVENT_TYPES.COMMON || [];
   const commonEvent = common.find((e) => e.value === eventType);
-  if (commonEvent?.args) return commonEvent.args;
+  if (commonEvent?.inputDefinitions) return commonEvent.inputDefinitions;
 
-  // No args defined for this event
+  // No inputDefinitions defined for this event
   return [];
 };
 

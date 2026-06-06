@@ -37,8 +37,8 @@ export const APP_PAGE_ACTIONS = {
   /** Unregister a widget on unmount: { widgetID } */
   UNREGISTER_WIDGET: "APP_PAGE_UNREGISTER_WIDGET",
 
-  /** Store listener event data: { listenerID, data } */
-  SET_LISTENER_DATA: "APP_PAGE_SET_LISTENER_DATA",
+  /** Store listener event data: { alias, data, error, mode, limit } */
+  SET_LISTENER_RESULT: "APP_PAGE_SET_LISTENER_RESULT",
 };
 
 // ============================================================
@@ -91,8 +91,8 @@ export const appPageActions = {
     payload: { widgetID },
   }),
 
-  setListenerData: (listenerID, data) => ({
-    type: APP_PAGE_ACTIONS.SET_LISTENER_DATA,
-    payload: { listenerID, data },
+  setListenerResult: (alias, data, error = null, mode = "replace", limit = 1000) => ({
+    type: APP_PAGE_ACTIONS.SET_LISTENER_RESULT,
+    payload: { alias, data, error, mode, limit },
   }),
 };

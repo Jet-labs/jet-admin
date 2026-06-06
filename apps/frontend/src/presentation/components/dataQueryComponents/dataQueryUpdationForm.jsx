@@ -77,17 +77,14 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
       },
     });
 
-  // Derive initial values from fetched data query
-  const initialValues = useMemo(() => ({
-    dataQueryTitle: dataQuery?.dataQueryTitle || "Untitled",
-    datasourceID: String(dataQuery?.datasourceID || dataQuery?.datasourceType || ""),
-    datasourceType: dataQuery?.datasourceType || "",
-    dataQueryOptions: dataQuery?.dataQueryOptions || {},
-    runOnLoad: dataQuery?.runOnLoad || false,
-  }), [dataQuery]);
-
   const queryUpdationForm = useFormik({
-    initialValues,
+    initialValues: {
+      dataQueryTitle: dataQuery?.dataQueryTitle || "Untitled",
+      datasourceID: dataQuery?.datasourceID,
+      datasourceType: dataQuery?.datasourceType || "",
+      dataQueryOptions: dataQuery?.dataQueryOptions || {},
+      runOnLoad: dataQuery?.runOnLoad || false,
+    },
     enableReinitialize: true, // Re-initialize form when dataQuery changes
     validateOnMount: false,
     validateOnChange: false,
@@ -105,11 +102,13 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
     },
   });
 
+
   // Reset test result when switching to a different data query
   React.useEffect(() => {
     setDataQueryTestResult(undefined);
   }, [dataQueryID]);
 
+  console.log({ datasourceID: queryUpdationForm?.values?.datasourceID })
   return (
     <div className="flex h-full w-full flex-col items-center bg-background">
       <PageHeader

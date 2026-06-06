@@ -42,7 +42,7 @@ import {
 
 /**
  * Base renderers array - common renderers used across the application
- * Does not include specialized renderers like DynamicArgs or CodePgsql
+ * Does not include specialized renderers like DynamicInputs or CodePgsql
  */
 export const jetFormsBaseRenderers = [
   { tester: tabRendererTester, renderer: JetTabLayout },

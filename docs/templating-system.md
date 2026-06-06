@@ -80,7 +80,7 @@ logs merged in insertion order.
 **File:** `apps/backend/modules/dataQuery/dataQuery.service.js`
 
 ```js
-resolveInputs({ type: "query", definitions, runtimeValues: inputArgs })
+resolveInputs({ type: "query", definitions, inputValues: inputValues })
 // contextData NOT passed → templates NOT resolved here
 ```
 
@@ -189,7 +189,7 @@ Generates expression suggestions dynamically:
 
 **File:** `packages/json-forms-renderers/src/renderers/templateCompletion.js`
 
-Provides `args.` and `runtimeArgs.` suggestions in Monaco editor for
+Provides `args.` and `runtimeInputs.` suggestions in Monaco editor for
 workflow node config editors. Suggests configured input arg keys with types.
 
 ---
@@ -231,7 +231,7 @@ This namespace exists more for the runtime dispatch than for user templates.
 
 ### 5.4 No `state.event.*` for Non-WidgetContext Templates
 
-`getEventArgs(widgetType, eventType)` returns event payload suggestions.
+`getEventInputDefinitions(widgetType, eventType)` returns event payload suggestions.
 But these are only offered inside `WidgetEventsEditor`. If a user writes
 `{{ state.event.row }}` in a widget's `data` config, there's no autocomplete
 for it — even though at runtime, if an event fires and populates `state.event`,
@@ -248,7 +248,7 @@ All suggestion engine functions produce `{{ state.queries.x }}` which is correct
 But `WidgetEventsEditor.getMergedSuggestions()` calls the suggestion engine
 with `eventType: null` (to avoid polluting baseExpressionSuggestions with
 event args) and then separately prepends event args. The event args come from
-`getEventArgs()` which returns paths like `event.row` — these get wrapped as
+`getEventInputDefinitions()` which returns paths like `event.row` — these get wrapped as
 `{{ state.event.row }}`. Consistent.
 
 ### 5.6 Backend: `supportsTemplate` Defines But Not Always Consumed

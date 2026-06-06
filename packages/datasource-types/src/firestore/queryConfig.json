@@ -54,7 +54,7 @@
         "minimum": 1,
         "maximum": 1000
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Query arguments",
         "items": {
@@ -161,7 +161,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Arguments",
         "options": {
           "detail": {

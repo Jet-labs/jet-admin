@@ -163,7 +163,7 @@ socketIO.on("connection", async (socket) => {
 
   // === Room Management (for listener test streaming, etc.) ===
   socket.on('join_room', (room) => {
-    if (typeof room === 'string' && room.startsWith('listener_test:')) {
+    if (typeof room === 'string' && (room.startsWith('listener_test:') || room.startsWith('tenant:') || room.startsWith('listener:'))) {
       socket.join(room);
     }
   });

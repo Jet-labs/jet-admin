@@ -85,7 +85,7 @@ __export(index_exports, {
   DropdownMenuTrigger: () => DropdownMenuTrigger,
   ErrorBoundary: () => ErrorBoundary,
   Input: () => Input,
-  InputArgsForm: () => InputArgsForm,
+  InputValuesForm: () => InputValuesForm,
   Label: () => Label2,
   PageHeader: () => PageHeader,
   Popover: () => Popover,
@@ -499,7 +499,7 @@ var DialogContent = React8.forwardRef(
     {
       ref,
       className: cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
         className
       ),
       ...props
@@ -1115,6 +1115,7 @@ var import_state = require("@codemirror/state");
 var import_view = require("@codemirror/view");
 var import_commands = require("@codemirror/commands");
 var import_autocomplete = require("@codemirror/autocomplete");
+var import_language = require("@codemirror/language");
 var import_lang_javascript = require("@codemirror/lang-javascript");
 var import_lang_sql = require("@codemirror/lang-sql");
 var import_lang_json = require("@codemirror/lang-json");
@@ -1320,7 +1321,7 @@ var CodeEditor = React23.forwardRef(({
       };
     };
     return (0, import_autocomplete.autocompletion)({ override: [completionSource], activateOnTyping: true, maxRenderedOptions: 50 });
-  }, [language, stateTree, effectiveTemplateMode, tablesMap]);
+  }, [language, stateTree, effectiveTemplateMode]);
   React23.useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape" && isExpanded) {
@@ -1341,7 +1342,8 @@ var CodeEditor = React23.forwardRef(({
       import_view.keymap.of([
         ...import_commands.defaultKeymap,
         ...import_commands.historyKeymap,
-        ...import_autocomplete.closeBracketsKeymap
+        ...import_autocomplete.closeBracketsKeymap,
+        ...import_language.foldKeymap
       ]),
       languageCompartment.of(getLanguageExtension(language)),
       readOnlyCompartment.of(import_state.EditorState.readOnly.of(isReadOnly)),
@@ -1422,6 +1424,7 @@ var CodeEditor = React23.forwardRef(({
     if (showLineNumbers) {
       baseExtensions.push((0, import_view.lineNumbers)());
     }
+    baseExtensions.push((0, import_language.foldGutter)());
     const state = import_state.EditorState.create({
       doc: value !== void 0 ? value : defaultValue || "",
       extensions: baseExtensions
@@ -1615,7 +1618,7 @@ ArrayInput.propTypes = {
   minItems: import_prop_types2.default.number
 };
 
-// src/components/input-args-form.jsx
+// src/components/input-values-form.jsx
 var import_react5 = __toESM(require("react"));
 var import_prop_types3 = __toESM(require("prop-types"));
 
@@ -2012,9 +2015,9 @@ var TemplateAutocompleteInput = ({
   ));
 };
 
-// src/components/input-args-form.jsx
-function InputArgsForm({
-  args = [],
+// src/components/input-values-form.jsx
+function InputValuesForm({
+  inputDefinitions = [],
   values = {},
   onChange,
   errors = {},
@@ -2023,79 +2026,79 @@ function InputArgsForm({
   stateTree = null,
   templateMode
 }) {
-  if (!Array.isArray(args) || args.length === 0) {
+  if (!Array.isArray(inputDefinitions) || inputDefinitions.length === 0) {
     return /* @__PURE__ */ import_react5.default.createElement("p", { className: "text-xs text-[#1c1c1e] italic" }, "No input parameters defined.");
   }
-  const renderField = (arg) => {
-    const argName = arg.key;
-    const argType = arg.type || "string";
-    const value = values[argName];
+  const renderField = (inputDef) => {
+    const inputName = inputDef.key;
+    const inputType = inputDef.type || "string";
+    const value = values[inputName];
     if (stateTree) {
-      return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", argType !== "string" && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+      return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", inputType !== "string" && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
         TemplateAutocompleteInput,
         {
           value: typeof value === "string" ? value : value == null ? "" : String(value),
-          onChange: (val) => onChange(argName, val),
-          placeholder: `{{event.${argName}}}`,
+          onChange: (val) => onChange(inputName, val),
+          placeholder: `{{event.${inputName}}}`,
           context: stateTree,
           mode: templateMode,
           readOnly: disabled
         }
       ));
     }
-    switch (argType) {
+    switch (inputType) {
       case "boolean":
         return /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react5.default.createElement(
           Checkbox,
           {
-            id: `input-arg-${argName}`,
+            id: `input-def-${inputName}`,
             checked: !!value,
-            onCheckedChange: (checked) => onChange(argName, checked),
+            onCheckedChange: (checked) => onChange(inputName, checked),
             disabled
           }
         ), /* @__PURE__ */ import_react5.default.createElement(
           Label2,
           {
-            htmlFor: `input-arg-${argName}`,
+            htmlFor: `input-def-${inputName}`,
             className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           },
-          argName,
-          arg.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500 ml-1" }, "*"),
-          /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground ml-1" }, "(", argType, ")")
+          inputName,
+          inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500 ml-1" }, "*"),
+          /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground ml-1" }, "(", inputType, ")")
         ));
       case "array":
-        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
           ArrayInput,
           {
             value: Array.isArray(value) ? value : [],
-            onChange: (val) => onChange(argName, val),
-            placeholder: `Add ${argName} item...`,
+            onChange: (val) => onChange(inputName, val),
+            placeholder: `Add ${inputName} item...`,
             disabled
           }
         ));
       case "object":
-        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
           CodeEditor,
           {
             language: "json",
             height: 120,
             title: "JSON Input",
             value: typeof value === "object" && value !== null ? JSON.stringify(value, null, 2) : value || "",
-            onChange: (val) => onChange(argName, val),
+            onChange: (val) => onChange(inputName, val),
             disabled
           }
         ));
       case "number":
-        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
           Input,
           {
             type: "number",
-            id: `input-arg-${argName}`,
+            id: `input-def-${inputName}`,
             className: "w-full text-xs",
-            placeholder: `Value for ${argName}`,
+            placeholder: `Value for ${inputName}`,
             value: value ?? "",
             onChange: (e) => onChange(
-              argName,
+              inputName,
               e.target.value === "" ? "" : Number(e.target.value)
             ),
             disabled
@@ -2103,24 +2106,24 @@ function InputArgsForm({
         ));
       // string & default
       default:
-        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", argType !== "string" && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", inputType !== "string" && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
           Input,
           {
             type: "text",
-            id: `input-arg-${argName}`,
+            id: `input-def-${inputName}`,
             className: "w-full text-xs",
-            placeholder: `Value for ${argName}`,
+            placeholder: `Value for ${inputName}`,
             value: value || "",
-            onChange: (e) => onChange(argName, e.target.value),
+            onChange: (e) => onChange(inputName, e.target.value),
             disabled
           }
         ));
     }
   };
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: className || "space-y-3" }, args.map((arg) => /* @__PURE__ */ import_react5.default.createElement("div", { key: arg.key, className: "space-y-1" }, renderField(arg), errors[arg.key] && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-destructive text-xs" }, errors[arg.key]))));
+  return /* @__PURE__ */ import_react5.default.createElement("div", { className: className || "space-y-3" }, inputDefinitions.map((inputDef) => /* @__PURE__ */ import_react5.default.createElement("div", { key: inputDef.key, className: "space-y-1" }, renderField(inputDef), errors[inputDef.key] && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-destructive text-xs" }, errors[inputDef.key]))));
 }
-InputArgsForm.propTypes = {
-  args: import_prop_types3.default.arrayOf(
+InputValuesForm.propTypes = {
+  inputDefinitions: import_prop_types3.default.arrayOf(
     import_prop_types3.default.shape({
       key: import_prop_types3.default.string.isRequired,
       type: import_prop_types3.default.string,

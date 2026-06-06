@@ -96,7 +96,7 @@
           }
         }
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Dynamic arguments",
         "items": {
@@ -202,7 +202,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Dynamic Arguments"
       }
     ]
@@ -219,6 +219,6 @@
     "storeDestination": { "type": "dataQuery", "dataQueryId": "" },
     "queueOptions": { "durable": true, "autoDelete": false, "exclusive": false },
     "messageOptions": { "persistent": true, "contentType": "application/json" },
-    "args": []
+    "inputDefinitions": []
   }
 }

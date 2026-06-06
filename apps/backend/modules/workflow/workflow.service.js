@@ -11,7 +11,7 @@ const {
 } = require("../../utils/auth.context.utils");
 
 const { resolveTemplate } = require("@jet-admin/expression-engine");
-const { extractWorkflowDefinitions, resolveInputs } = require("../../utils/inputArgs.util");
+const { extractWorkflowDefinitions, resolveInputs } = require("../../utils/input.util");
 
 function mapWorkflowNodeForPersistence(node, workflowID) {
   return {
@@ -461,23 +461,21 @@ workflowService.cloneWorkflow = async ({ userID, tenantID, workflowID, authConte
  * @param {object} param0
  * @param {string} param0.workflowID
  * @param {string} param0.tenantID
- * @param {object} param0.inputArgs - Input parameters for workflow
+ * @param {object} param0.inputValues - Input parameters for workflow
  * @returns {Promise<{instanceID: string}>}
  */
-workflowService.executeWorkflow = async ({ workflowID, tenantID, inputArgs = {} }) => {
+workflowService.executeWorkflow = async ({ workflowID, tenantID, inputValues = {} }) => {
   Logger.log("info", {
     message: "workflowService:executeWorkflow:params",
-    params: { workflowID, tenantID, inputArgs },
+    params: { workflowID, tenantID, inputValues },
   });
 
   try {
     // Resolve & validate inputs through the unified pipeline
     const workflow = await prisma.tblWorkflows.findUnique({ where: { workflowID } });
-    const definitions = workflow ? extractWorkflowDefinitions(workflow) : [];
+    const inputDefinitions = workflow ? extractWorkflowDefinitions(workflow) : [];
     const { resolved, errors, valid } = await resolveInputs({
-      type: 'workflow',
-      definitions,
-      runtimeValues: inputArgs,
+      type: 'workflow', inputDefinitions, inputValues: inputValues,
     });
 
     if (!valid) {
@@ -489,7 +487,7 @@ workflowService.executeWorkflow = async ({ workflowID, tenantID, inputArgs = {} 
     }
 
     // Start workflow with resolved inputs
-    const result = await startWorkflow({ workflowID, tenantID, inputArgs: resolved });
+    const result = await startWorkflow({ workflowID, tenantID, inputValues: resolved });
 
     Logger.log("success", {
       message: "workflowService:executeWorkflow:started",
@@ -577,10 +575,10 @@ workflowService.getRunStatus = async (instanceID) => {
  * @param {string} param0.tenantID
  * @param {Array} param0.nodes - In-memory nodes from frontend
  * @param {Array} param0.edges - In-memory edges from frontend
- * @param {object} param0.inputArgs - Input parameters for workflow
+ * @param {object} param0.inputValues - Input parameters for workflow
  * @returns {Promise<{instanceID: string, isTest: boolean}>}
  */
-workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputArgs = {} }) => {
+workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputValues = {} }) => {
   const { startTestWorkflow } = require("./workflowEngine/engine");
 
   Logger.log("info", {
@@ -589,7 +587,7 @@ workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputArgs = {} }
   });
 
   try {
-    const result = await startTestWorkflow({ nodes, edges, tenantID, inputArgs });
+    const result = await startTestWorkflow({ nodes, edges, tenantID, inputValues });
 
     Logger.log("success", {
       message: "workflowService:testWorkflow:started",

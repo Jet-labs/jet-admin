@@ -3,6 +3,7 @@ import { EditorState, Compartment } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { closeBrackets, closeBracketsKeymap, autocompletion } from '@codemirror/autocomplete';
+import { foldGutter, foldKeymap } from '@codemirror/language';
 import { javascript } from '@codemirror/lang-javascript';
 import { sql } from '@codemirror/lang-sql';
 import { json } from '@codemirror/lang-json';
@@ -203,7 +204,7 @@ const CodeEditor = React.forwardRef(({
     };
 
     return autocompletion({ override: [completionSource], activateOnTyping: true, maxRenderedOptions: 50 });
-  }, [language, stateTree, effectiveTemplateMode, tablesMap]);
+  }, [language, stateTree, effectiveTemplateMode]);
 
   // Toggle fullscreen mode
   React.useEffect(() => {
@@ -230,6 +231,7 @@ const CodeEditor = React.forwardRef(({
         ...defaultKeymap,
         ...historyKeymap,
         ...closeBracketsKeymap,
+        ...foldKeymap,
       ]),
       languageCompartment.of(getLanguageExtension(language)),
       readOnlyCompartment.of(EditorState.readOnly.of(isReadOnly)),
@@ -311,6 +313,9 @@ const CodeEditor = React.forwardRef(({
     if (showLineNumbers) {
       baseExtensions.push(lineNumbers());
     }
+    
+    // Add foldGutter after lineNumbers so it appears to the right of line numbers
+    baseExtensions.push(foldGutter());
 
     const state = EditorState.create({
       doc: value !== undefined ? value : (defaultValue || ''),

@@ -12,7 +12,7 @@
         "description": "PostgreSQL code to execute",
         "format": "code-pgsql"
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Query arguments",
         "items": {
@@ -68,7 +68,7 @@
 
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Arguments",
         "options": {
           "detail": {
@@ -100,7 +100,7 @@
   "data": {
     "queryType": "query",
     "query": "SELECT id, name FROM users WHERE active = true;",
-    "args": [
+    "inputDefinitions": [
       {
         "key": "user_id",
         "type": "string"

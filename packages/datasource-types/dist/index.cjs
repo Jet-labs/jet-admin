@@ -275,7 +275,7 @@ var queryConfig_default = {
         description: "PostgreSQL code to execute",
         format: "code-pgsql"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query arguments",
         items: {
@@ -330,7 +330,7 @@ var queryConfig_default = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Arguments",
         options: {
           detail: {
@@ -362,7 +362,7 @@ var queryConfig_default = {
   data: {
     queryType: "query",
     query: "SELECT id, name FROM users WHERE active = true;",
-    args: [
+    inputDefinitions: [
       {
         key: "user_id",
         type: "string"
@@ -754,7 +754,7 @@ var queryConfig_default2 = {
         type: "string",
         description: "Request body (for POST/PUT/PATCH)"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query arguments",
         items: {
@@ -888,7 +888,7 @@ var queryConfig_default2 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Arguments",
         options: {
           detail: {
@@ -981,7 +981,7 @@ var queryConfig_default3 = {
         enum: ["GET", "POST", "PUT", "DELETE", "PATCH"],
         default: "GET"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query arguments",
         items: {
@@ -1018,7 +1018,7 @@ var queryConfig_default3 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Arguments",
         options: {
           detail: {
@@ -1050,7 +1050,7 @@ var queryConfig_default3 = {
   data: {
     action: "GET",
     timeout: 10,
-    args: [
+    inputDefinitions: [
       { key: "user_id", value: "123" },
       { key: "status", value: "active" }
     ]
@@ -1209,7 +1209,7 @@ var queryConfig_default4 = {
         minimum: 1,
         maximum: 1e3
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query arguments",
         items: {
@@ -1316,7 +1316,7 @@ var queryConfig_default4 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Arguments",
         options: {
           detail: {
@@ -1627,7 +1627,7 @@ var queryConfig_default5 = {
         description: "MySQL code to execute",
         format: "code-mysql"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query arguments",
         items: {
@@ -1682,7 +1682,7 @@ var queryConfig_default5 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Arguments",
         options: {
           detail: {
@@ -1714,7 +1714,7 @@ var queryConfig_default5 = {
   data: {
     queryType: "query",
     query: "SELECT id, name FROM users WHERE active = 1;",
-    args: [
+    inputDefinitions: [
       {
         key: "user_id",
         type: "string"
@@ -2007,7 +2007,7 @@ var queryConfig_default6 = {
           }
         }
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Dynamic arguments to inject into filter/document",
         items: {
@@ -2203,7 +2203,7 @@ var queryConfig_default6 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Dynamic Arguments",
         options: {
           detail: {
@@ -2236,7 +2236,7 @@ var queryConfig_default6 = {
     options: {
       upsert: false
     },
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -2500,7 +2500,7 @@ var queryConfig_default7 = {
         description: "Treat first row as headers when reading",
         default: true
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Dynamic arguments",
         items: {
@@ -2666,7 +2666,7 @@ var queryConfig_default7 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Dynamic Arguments",
         options: {
           detail: {
@@ -2696,7 +2696,7 @@ var queryConfig_default7 = {
     insertDataOption: "INSERT_ROWS",
     majorDimension: "ROWS",
     includeHeaders: true,
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -2966,7 +2966,7 @@ var queryConfig_default8 = {
         type: "string",
         description: "Operation name (optional, for queries with multiple operations)"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Dynamic arguments to inject into variables",
         items: {
@@ -3012,7 +3012,7 @@ var queryConfig_default8 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Dynamic Arguments",
         options: {
           detail: {
@@ -3037,7 +3037,7 @@ var queryConfig_default8 = {
     query: "query GetUsers($limit: Int) {\n  users(limit: $limit) {\n    id\n    name\n    email\n  }\n}",
     variables: '{\n  "limit": 10\n}',
     operationName: "",
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -3378,7 +3378,7 @@ var queryConfig_default9 = {
           }
         }
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Dynamic arguments",
         items: {
@@ -3484,7 +3484,7 @@ var queryConfig_default9 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Dynamic Arguments"
       }
     ]
@@ -3501,7 +3501,7 @@ var queryConfig_default9 = {
     storeDestination: { type: "dataQuery", dataQueryId: "" },
     queueOptions: { durable: true, autoDelete: false, exclusive: false },
     messageOptions: { persistent: true, contentType: "application/json" },
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -3747,7 +3747,7 @@ var queryConfig_default10 = {
           replicationFactor: { type: "integer", default: 1 }
         }
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         items: {
           type: "object",
@@ -3841,7 +3841,7 @@ var queryConfig_default10 = {
           }
         ]
       },
-      { type: "Control", scope: "#/properties/args", label: "Dynamic Arguments" }
+      { type: "Control", scope: "#/properties/inputDefinitions", label: "Dynamic Arguments" }
     ]
   },
   data: {
@@ -3855,7 +3855,7 @@ var queryConfig_default10 = {
     consumeMode: "preview",
     storeDestination: { type: "dataQuery", dataQueryId: "" },
     topicConfig: { numPartitions: 1, replicationFactor: 1 },
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -4142,7 +4142,7 @@ var queryConfig_default11 = {
           dataQueryId: { type: "string" }
         }
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         items: {
           type: "object",
@@ -4272,7 +4272,7 @@ var queryConfig_default11 = {
           }
         ]
       },
-      { type: "Control", scope: "#/properties/args", label: "Dynamic Arguments" }
+      { type: "Control", scope: "#/properties/inputDefinitions", label: "Dynamic Arguments" }
     ]
   },
   data: {
@@ -4289,7 +4289,7 @@ var queryConfig_default11 = {
     channel: "",
     consumeMode: "preview",
     storeDestination: { type: "dataQuery", dataQueryId: "" },
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -4594,7 +4594,7 @@ var queryConfig_default12 = {
         description: "T-SQL code to execute",
         format: "code-sql"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query arguments",
         items: {
@@ -4649,7 +4649,7 @@ var queryConfig_default12 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Arguments",
         options: {
           detail: {
@@ -4681,7 +4681,7 @@ var queryConfig_default12 = {
   data: {
     queryType: "query",
     query: "SELECT TOP 10 * FROM sys.tables;",
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -5021,7 +5021,7 @@ var queryConfig_default14 = {
         description: "Use legacy SQL syntax",
         default: false
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query parameters",
         items: {
@@ -5062,7 +5062,7 @@ var queryConfig_default14 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Query Parameters",
         options: {
           detail: {
@@ -5086,7 +5086,7 @@ var queryConfig_default14 = {
     queryType: "query",
     query: "SELECT * FROM `project.dataset.table` LIMIT 100",
     useLegacySql: false,
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -6216,7 +6216,7 @@ var queryConfig_default19 = {
         description: "Oracle SQL query to execute",
         format: "code-sql"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query arguments",
         items: {
@@ -6250,7 +6250,7 @@ var queryConfig_default19 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Arguments"
       }
     ]
@@ -6258,7 +6258,7 @@ var queryConfig_default19 = {
   data: {
     queryType: "query",
     query: "SELECT * FROM dual",
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -6316,7 +6316,7 @@ var queryConfig_default20 = {
         description: "SQLite SQL query to execute",
         format: "code-sql"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query arguments",
         items: {
@@ -6350,7 +6350,7 @@ var queryConfig_default20 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Arguments"
       }
     ]
@@ -6358,7 +6358,7 @@ var queryConfig_default20 = {
   data: {
     queryType: "query",
     query: "SELECT * FROM sqlite_master WHERE type='table';",
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -6426,7 +6426,7 @@ var queryConfig_default21 = {
         description: "CockroachDB SQL query (PostgreSQL-compatible)",
         format: "code-pgsql"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query arguments",
         items: {
@@ -6460,7 +6460,7 @@ var queryConfig_default21 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Arguments"
       }
     ]
@@ -6468,7 +6468,7 @@ var queryConfig_default21 = {
   data: {
     queryType: "query",
     query: "SELECT * FROM crdb_internal.tables LIMIT 10;",
-    args: []
+    inputDefinitions: []
   }
 };
 
@@ -6554,7 +6554,7 @@ var queryConfig_default22 = {
         description: "Cypher query to execute",
         format: "code-sql"
       },
-      args: {
+      inputDefinitions: {
         type: "array",
         description: "Query parameters",
         items: {
@@ -6588,7 +6588,7 @@ var queryConfig_default22 = {
       },
       {
         type: "Control",
-        scope: "#/properties/args",
+        scope: "#/properties/inputDefinitions",
         label: "Parameters"
       }
     ]
@@ -6596,7 +6596,7 @@ var queryConfig_default22 = {
   data: {
     queryType: "cypher",
     query: "MATCH (n) RETURN n LIMIT 10",
-    args: []
+    inputDefinitions: []
   }
 };
 

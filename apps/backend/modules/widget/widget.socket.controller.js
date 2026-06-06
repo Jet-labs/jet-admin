@@ -42,7 +42,7 @@ const widgetSocketController = {
    * @param {string} params.widgetID - Widget ID
    * @param {string} params.workflowID - Workflow ID
    * @param {string} params.mode - Connection mode
-   * @param {object} params.inputArgs - Input parameters for execute mode
+   * @param {object} params.inputValues - Input parameters for execute mode
    * @param {string} params.instanceID - Instance ID for subscribe/replay mode
    * @param {string} params.tenantID - Tenant ID
    * @param {string} params.firebaseID - User's Firebase ID
@@ -55,7 +55,7 @@ const widgetSocketController = {
     widgetID, 
     workflowID, 
     mode = 'execute', 
-    inputArgs = {}, 
+    inputValues = {}, 
     instanceID = null,
     tenantID,
     firebaseID,
@@ -80,11 +80,11 @@ const widgetSocketController = {
           const result = await orchestrator.startWorkflow({
             workflowID,
             tenantID,
-            inputArgs,
+            inputValues,
           });
 
           responseInstanceID = result.instanceID;
-          initialContext = { input: inputArgs };
+          initialContext = { input: inputValues };
           
           // IMPORTANT: Register widget IMMEDIATELY after getting instanceID
           // This must happen before any node jobs complete and emit context updates
@@ -296,10 +296,10 @@ const widgetSocketController = {
    * @param {object} params
    * @param {object} params.socket - Socket.IO socket
    * @param {string} params.widgetID - Widget ID
-   * @param {object} params.inputArgs - New input parameters (optional)
+   * @param {object} params.inputValues - New input parameters (optional)
    * @param {string} params.tenantID - Tenant ID
    */
-  async onWidgetRefresh({ socket, widgetID, inputArgs, tenantID }) {
+  async onWidgetRefresh({ socket, widgetID, inputValues, tenantID }) {
     Logger.log('info', {
       message: 'widgetSocketController:onWidgetRefresh',
       params: { widgetID },
@@ -320,7 +320,7 @@ const widgetSocketController = {
         widgetID,
         workflowID: connection.workflowID,
         mode: 'execute',
-        inputArgs: inputArgs || {},
+        inputValues: inputValues || {},
         tenantID: tenantID || connection.tenantID,
       });
 
@@ -417,7 +417,7 @@ const widgetSocketController = {
 
       // Build schema from workflow nodes
       const schema = {
-        inputs: workflow.workflowOptions?.args || [],
+        inputs: workflow.workflowOptions?.inputDefinitions || [],
         outputs: {},
       };
 

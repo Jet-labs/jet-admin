@@ -33,7 +33,7 @@ const addWorkflowTemplateIssues = (data, ctx) => {
 
     switch (nodeType) {
       case "dataQuery":
-        collectTemplateViolations(nodeData?.args, [...nodePath, "args"], issues);
+        collectTemplateViolations(nodeData?.inputValues, [...nodePath, "inputValues"], issues);
         break;
       case "loop":
         collectTemplateViolations(nodeData?.sourceVariable, [...nodePath, "sourceVariable"], issues);
@@ -129,14 +129,14 @@ const updateWorkflowSchema = z.object({
 });
 
 const executeWorkflowSchema = z.object({
-  inputArgs: z.object({}).passthrough().optional(),
+  inputValues: z.object({}).passthrough().optional(),
 }).passthrough();
 
 const testWorkflowSchema = z.object({
   nodes: z.array(z.any()),
   edges: z.array(z.any()),
   workflowOptions: z.object({}).passthrough().optional(),
-  inputArgs: z.object({}).passthrough().optional(),
+  inputValues: z.object({}).passthrough().optional(),
 }).passthrough().superRefine((data, ctx) => {
   addWorkflowTemplateIssues(data, ctx);
   addWorkflowNodeConfigIssues(data, ctx);

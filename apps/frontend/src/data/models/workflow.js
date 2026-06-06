@@ -80,10 +80,10 @@ export class Workflow {
   }
 
   /**
-   * Get workflow inputs from workflowOptions.args
+   * Get workflow inputs from workflowOptions.inputDefinitions
    */
   get inputs() {
-    return this.workflowOptions?.args || [];
+    return this.workflowOptions?.inputDefinitions || [];
   }
 
   /**

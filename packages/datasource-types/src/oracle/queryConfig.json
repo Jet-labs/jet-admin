@@ -12,7 +12,7 @@
         "description": "Oracle SQL query to execute",
         "format": "code-sql"
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Query arguments",
         "items": {
@@ -46,7 +46,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Arguments"
       }
     ]
@@ -54,6 +54,6 @@
   "data": {
     "queryType": "query",
     "query": "SELECT * FROM dual",
-    "args": []
+    "inputDefinitions": []
   }
 }

@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useMemo } from "react";
 import { Plus, Trash2, Key, Database, PanelTop, MessageSquare, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import PropTypes from "prop-types";
-import { getWidgetEventTypes, getWidgetMethods, getEventArgs } from "@jet-admin/widget-types";
+import { getWidgetEventTypes, getWidgetMethods, getEventInputDefinitions } from "@jet-admin/widget-types";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { useParams } from "react-router-dom";
 import { useQueryClient, useQueries } from "@tanstack/react-query";
@@ -86,17 +86,17 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
     [appPageEditorForm?.values?.appPageConfig?.dataSources]
   );
 
-  // Look up arg definitions for a page-level data source by alias
-  const getArgDefsForAlias = useCallback((alias) => {
+  // Look up input definitions for a page-level data source by alias
+  const getInputDefinitionsForAlias = useCallback((alias) => {
     const ds = pageDataSources.find((s) => s.alias === alias);
     if (!ds) return [];
     if (ds.type === "query" && ds.queryID) {
       const q = dataQueries.find((q) => String(q.dataQueryID) === String(ds.queryID));
-      return q?.dataQueryOptions?.args || [];
+      return q?.dataQueryOptions?.inputDefinitions || [];
     }
     if (ds.type === "workflow" && ds.workflowID) {
       const wf = workflows.find((w) => String(w.workflowID) === String(ds.workflowID));
-      return wf?.workflowOptions?.args || [];
+      return wf?.workflowOptions?.inputDefinitions || [];
     }
     return [];
   }, [pageDataSources, dataQueries, workflows]);
@@ -173,7 +173,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
       if (actionTypeValue === "SET_VARIABLE") {
         defaultConfig = { key: "", value: "" };
       } else if (actionTypeValue === "EXECUTE_QUERY") {
-        defaultConfig = { alias: "", inputArgs: {} };
+        defaultConfig = { alias: "", inputValues: {} };
       } else if (actionTypeValue === "CALL_WIDGET_METHOD") {
         defaultConfig = { targetWidgetID: "", methodName: "", args: [] };
       } else if (actionTypeValue === "SHOW_TOAST") {
@@ -238,13 +238,13 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
         const eventInfo = supportedEventTypes.find((et) => et.value === eventType);
         const eventLabel = eventInfo?.label || eventType;
 
-        const eventArgsSchema = getEventArgs(widgetType, eventType) || [];
-        const hasEventArgs = eventArgsSchema.length > 0;
+        const eventInputDefinitions = getEventInputDefinitions(widgetType, eventType) || [];
+        const hasEventInputs = eventInputDefinitions.length > 0;
         
         let localStateTree = liveStateTree;
-        if (hasEventArgs && liveStateTree) {
-          const mockEventObj = eventArgsSchema.reduce((acc, arg) => {
-            const path = arg.key.replace(/^event\./, "");
+        if (hasEventInputs && liveStateTree) {
+          const mockEventObj = eventInputDefinitions.reduce((acc, inputDef) => {
+            const path = inputDef.key.replace(/^event\./, "");
             const parts = path.split(".");
             let current = acc;
             for (let i = 0; i < parts.length - 1; i++) {
@@ -287,18 +287,18 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
               </Button>
             </div>
 
-            {hasEventArgs && (
+            {hasEventInputs && (
               <div className="rounded-md border border-purple-200 dark:border-purple-500/20 bg-purple-50/50 dark:bg-purple-500/5 p-2">
                 <p className="text-[10px] font-semibold text-purple-600 dark:text-purple-400 mb-1.5 flex items-center gap-1">
                   <Info className="h-3 w-3" /> Available Event Context
                 </p>
                 <div className="space-y-1">
-                  {eventArgsSchema.map((arg, idx) => (
+                  {eventInputDefinitions.map((inputDef, idx) => (
                     <div key={idx} className="flex justify-between items-center gap-2">
                       <code className="text-[9px] bg-background px-1 py-0.5 rounded border border-border whitespace-nowrap text-muted-foreground font-mono">
-                        {`{{ ${arg.key} }}`}
+                        {`{{ ${inputDef.key} }}`}
                       </code>
-                      <span className="text-[9px] text-muted-foreground truncate">{arg.description}</span>
+                      <span className="text-[9px] text-muted-foreground truncate">{inputDef.description}</span>
                     </div>
                   ))}
                 </div>
@@ -431,7 +431,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                     value={action.config?.alias || ""}
                                     onValueChange={(val) => {
                                       handleActionConfigChange(eventType, actionIndex, "alias", val);
-                                      handleActionConfigChange(eventType, actionIndex, "inputArgs", {});
+                                      handleActionConfigChange(eventType, actionIndex, "inputValues", {});
                                     }}
                                   >
                                     <SelectTrigger className="text-xs bg-background">
@@ -455,10 +455,10 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                   </div>
                                 )}
                               </div>
-                              {/* Dynamic Input Args */}
+                              {/* Dynamic Input Values */}
                               {action.config?.alias && (() => {
-                                const argDefs = getArgDefsForAlias(action.config.alias);
-                                if (argDefs.length === 0) return null;
+                                const inputDefinitions = getInputDefinitionsForAlias(action.config.alias);
+                                if (inputDefinitions.length === 0) return null;
                                 return (
                                   <div className="rounded-md border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 p-3 space-y-2">
                                     <div className="flex items-center gap-1.5">
@@ -466,21 +466,21 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                       <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Input Arguments</p>
                                     </div>
                                     <p className="text-[9px] text-muted-foreground">Override argument values when this data source is executed by this event action.</p>
-                                    {argDefs.map((arg) => {
-                                      const argKey = arg.key || arg.name;
+                                    {inputDefinitions.map((inputDef) => {
+                                      const inputKey = inputDef.key || inputDef.name;
                                       return (
-                                        <div key={argKey} className="space-y-0.5">
+                                        <div key={inputKey} className="space-y-0.5">
                                           <Label className="text-[10px] font-medium text-muted-foreground">
-                                            {argKey}
-                                            {arg.type && <span className="ml-1 text-muted-foreground/50">({arg.type})</span>}
+                                            {inputKey}
+                                            {inputDef.type && <span className="ml-1 text-muted-foreground/50">({inputDef.type})</span>}
                                           </Label>
                                           <TemplateAutocompleteInput
-                                            value={action.config?.inputArgs?.[argKey] ?? ""}
+                                            value={action.config?.inputValues?.[inputKey] ?? ""}
                                             onChange={(val) => {
-                                              const updated = { ...(action.config?.inputArgs || {}), [argKey]: val };
-                                              handleActionConfigChange(eventType, actionIndex, "inputArgs", updated);
+                                              const updated = { ...(action.config?.inputValues || {}), [inputKey]: val };
+                                              handleActionConfigChange(eventType, actionIndex, "inputValues", updated);
                                             }}
-                                            placeholder={arg.defaultValue || `e.g. {{ state.variables.${argKey} }}`}
+                                            placeholder={inputDef.defaultValue || `e.g. {{ state.variables.${inputKey} }}`}
                                             liveStateTree={localStateTree}
                                           />
                                         </div>

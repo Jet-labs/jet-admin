@@ -52,7 +52,7 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
     refetchOnWindowFocus: false,
   });
 
-  console.log("datasource", datasource);
+
 
   const { isPending: isUpdatingDatasource, mutate: updateDatasource } =
     useMutation({
@@ -78,17 +78,12 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
       },
     });
 
-  // Derive initial values from fetched datasource
-  const initialValues = useMemo(() => ({
-    datasourceTitle: datasource?.datasourceTitle || "",
-    datasourceType: datasource?.datasourceType || "postgresql",
-    datasourceOptions: datasource?.datasourceOptions || datasourceOptionsMetadata.data,
-  }), [datasource]);
-
-  console.log("initialValues", initialValues);
-
   const datasourceUpdationForm = useFormik({
-    initialValues,
+    initialValues: {
+      datasourceTitle: datasource?.datasourceTitle || "",
+      datasourceType: datasource?.datasourceType || DATASOURCE_TYPES.POSTGRESQL.value,
+      datasourceOptions: datasource?.datasourceOptions || datasourceOptionsMetadata.data,
+    },
     enableReinitialize: true, // Re-initialize form when datasource changes
     onSubmit: (data) => {
       updateDatasource(data);

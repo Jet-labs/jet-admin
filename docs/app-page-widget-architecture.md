@@ -107,7 +107,7 @@ The backend has **zero knowledge** of widgets, expressions, events, or data flow
       "triggerMode": "auto",         // "auto" | "reactive" | "manual"
       "refreshOn": ["variables.department"],  // reactive dependencies
       "refetchInterval": 30,         // polling seconds (0 = no polling)
-      "inputArgs": { "limit": 100 }  // passed to query/workflow
+      "inputValues": { "limit": 100 }  // passed to query/workflow
     }
   ],
 
@@ -266,7 +266,7 @@ stateTree = {
     type: "onClick",
     widgetID: "widget_abc",
     args: [{ id: 1, name: "Alice" }],
-    inputArgs: { optionalParam: "hello" }
+    inputValues: { optionalParam: "hello" }
   }
 }
 ```
@@ -295,11 +295,11 @@ STEP 3: AppPageDataSourceBootstrapper mounts
    └── useAppPageDataSourceManager(dataSources, stateTree, dispatch, meta)
        ├── Filters "auto" and "reactive" triggerMode sources
        ├── For each: executeDataSource(ds)
-       │   ├── resolveConfig(inputArgs, stateTree)  // resolves {{ }} in args
+       │   ├── resolveConfig(inputValues, stateTree)  // resolves {{ }} in args
        │   ├── Bails if any arg is undefined/null (reactive will retry)
        │   ├── For queries:
        │   │   ├── dispatch(setQueryLoading(alias))
-       │   │   ├── await runDataQueryByIDAPI({ tenantID, queryID, inputArgs })
+       │   │   ├── await runDataQueryByIDAPI({ tenantID, queryID, inputValues })
        │   │   └── dispatch(setQueryResult(alias, { data, error }))
        │   └── For workflows:
        │       └── executeWorkflowWithStreaming({ dispatch, ... })
@@ -372,7 +372,7 @@ useEffect(() => {
 }, [stateTree]);
 ```
 
-When a user clicks a button that sets `state.variables.department`, the reducer updates the variable → state tree changes → `getChangedPaths` detects `"variables.department"` changed → any data source with `refreshOn: ["variables.department"]` re-executes with the new variable value resolved in its `inputArgs`.
+When a user clicks a button that sets `state.variables.department`, the reducer updates the variable → state tree changes → `getChangedPaths` detects `"variables.department"` changed → any data source with `refreshOn: ["variables.department"]` re-executes with the new variable value resolved in its `inputValues`.
 
 ### Request Deduplication
 
@@ -399,7 +399,7 @@ Prevents queries like `SELECT * FROM users OFFSET null LIMIT null`.
 ### Workflow Streaming Pipeline
 
 ```
-executeWorkflowAPI(tenantID, workflowID, inputArgs)
+executeWorkflowAPI(tenantID, workflowID, inputValues)
   │
   ├→ Returns { instanceID, runData }
   ├→ dispatch(setWorkflowResult(alias, runData, null, true, instanceID))
@@ -441,7 +441,7 @@ Events are stored in the widget config as an **ordered array of actions** per ev
         "actionType": "EXECUTE_QUERY",
         "config": {
           "alias": "get_user_details",
-          "inputArgs": { "userId": "{{ state.variables.selectedId }}" }
+          "inputValues": { "userId": "{{ state.variables.selectedId }}" }
         }
       },
       {
@@ -508,7 +508,7 @@ Strips `state.variables.` prefix, dispatches to reducer. This is synchronous —
 ```js
 case "EXECUTE_QUERY": {
     // Merge input args: dataSource defaults → action config → event-level overrides
-    const mergedInputArgs = { ...ds.inputArgs, ...config.inputArgs, ...eventInputArgs };
+    const mergedInputArgs = { ...ds.inputValues, ...config.inputValues, ...eventInputArgs };
     const resolvedInputArgs = resolveConfig(mergedInputArgs, stateTree);
 
     if (isWorkflow) {
@@ -522,7 +522,7 @@ case "EXECUTE_QUERY": {
 }
 ```
 
-Input arg merging priority: `event.inputArgs` > `action.config.inputArgs` > `dataSource.inputArgs`.
+Input arg merging priority: `event.inputValues` > `action.config.inputValues` > `dataSource.inputValues`.
 
 #### CALL_WIDGET_METHOD
 
@@ -620,7 +620,7 @@ Raw widget config from API
 1. `AppPageWidgetSlot` — for widget config
 2. `MemoizedWidgetContent` — for widget data (builder transform)
 3. `executeAppPageAction` — for event action configs
-4. `executeDataSource` — for data source inputArgs
+4. `executeDataSource` — for data source inputValues
 
 ---
 

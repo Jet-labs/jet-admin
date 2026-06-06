@@ -212,7 +212,7 @@ export const AppPageWidgetSlot = ({
     if (!widget?.widgetConfig?.events) return {};
     const handlers = {};
     for (const eventType of Object.keys(widget.widgetConfig.events)) {
-      handlers[eventType] = (...args) => fireWidgetEvent(eventType, { args });
+      handlers[eventType] = (...inputs) => fireWidgetEvent(eventType, { inputs });
     }
     return handlers;
   }, [widget?.widgetConfig?.events, fireWidgetEvent]);

@@ -2,17 +2,50 @@ jest.mock('../../../modules/dataQuery/dataQuery.service', () => ({
   createQueryEngine: jest.fn(),
 }));
 
+jest.mock('../../../utils/input.util', () => ({
+  resolveInputs: jest.fn().mockImplementation(async ({ inputValues, contextData }) => {
+    const { resolveTemplate } = require("@jet-admin/expression-engine");
+    const WORKFLOW_TEMPLATE_OPTIONS = {
+      preserveSingleExpressionType: true,
+    };
+    const resolveNested = (val) => {
+      if (typeof val === 'string') {
+        try {
+          return resolveTemplate(val, contextData, WORKFLOW_TEMPLATE_OPTIONS);
+        } catch {
+          return val;
+        }
+      }
+      if (Array.isArray(val)) {
+        return val.map(resolveNested);
+      }
+      if (typeof val === 'object' && val !== null) {
+        const res = {};
+        for (const k of Object.keys(val)) {
+          res[k] = resolveNested(val[k]);
+        }
+        return res;
+      }
+      return val;
+    };
+    return {
+      resolved: resolveNested(inputValues),
+      errors: {},
+      valid: true,
+    };
+  }),
+}));
+
 const { createQueryEngine } = require('../../../modules/dataQuery/dataQuery.service');
 const { resolveTemplate } = require("@jet-admin/expression-engine");
 
 const WORKFLOW_TEMPLATE_OPTIONS = {
-  allowedRoots: ['ctx'],
   preserveSingleExpressionType: true,
 };
 const dataQueryHandler = require('../../../modules/workflow/workers/handlers/dataQueryHandler');
 
 describe('workflow dataQueryHandler', () => {
-  it('recursively resolves nested args before executing the query engine', async () => {
+  it('recursively resolves nested inputValues before executing the query engine', async () => {
     const executeQuery = jest.fn().mockResolvedValue([{ id: 1 }]);
     createQueryEngine.mockReturnValue({ executeQuery });
 
@@ -29,7 +62,7 @@ describe('workflow dataQueryHandler', () => {
       {
         dataQueryID: 'query-1',
         outputVariable: 'queryResult',
-        args: {
+        inputValues: {
           customerID: '{{ctx.input.customerID}}',
           filters: {
             status: '{{ctx.input.status}}',
@@ -65,7 +98,7 @@ describe('workflow dataQueryHandler', () => {
     await dataQueryHandler.execute(
       {
         dataQueryID: 'query-2',
-        args: {
+        inputValues: {
           customerID: 'ctx.input.customerID',
         },
       },

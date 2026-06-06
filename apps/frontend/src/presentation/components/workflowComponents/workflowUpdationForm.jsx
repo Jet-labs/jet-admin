@@ -69,7 +69,7 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
       nodes: workflow?.nodes || [],
       edges: workflow?.edges || [],
       workflowConfig: workflow?.workflowConfig || {},
-      workflowOptions: workflow?.workflowOptions || { args: [] },
+      workflowOptions: workflow?.workflowOptions || { inputDefinitions: [] },
     },
     validationSchema: formValidations.workflowUpdationFormValidationSchema,
     enableReinitialize: true,

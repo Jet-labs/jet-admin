@@ -1,5 +1,6 @@
 const {
   processWorkflowDataForWidget,
+  resolveWidgetData,
   WIDGET_PROCESSORS_MAP
 } = require('../dist/index.cjs');
 
@@ -56,5 +57,120 @@ describe('VegaWidgetBuilder (via processWorkflowDataForWidget)', () => {
     expect(processWorkflowDataForWidget({
       widgetType: 'vega-lite',
     })).toBeNull();
+  });
+});
+
+describe('VegaWidgetBuilder.resolveData sanitization', () => {
+  test('sanitizes unresolved template strings and undefined/null data values', () => {
+    const spec = {
+      data: {
+        format: { type: 'topojson', feature: 'states' },
+        values: '{{state.queries.query_4.data}}' // Unresolved template string
+      },
+      transform: [
+        {
+          from: {
+            data: {
+              values: undefined // Will be stripped by safeClone
+            }
+          }
+        },
+        {
+          from: {
+            data: {
+              values: null // Evaluated to null
+            }
+          }
+        }
+      ]
+    };
+
+    const result = resolveWidgetData({
+      widgetType: 'vega-lite',
+      widgetConfig: { vegaSpec: spec },
+      dataSourceResults: {}
+    });
+
+    // Check top level values
+    expect(result.data.values).toEqual({
+      type: 'Topology',
+      objects: {
+        states: {
+          type: 'GeometryCollection',
+          geometries: []
+        }
+      }
+    });
+    
+    // Check nested values inside transform
+    expect(result.transform[0].from.data.values).toEqual([]);
+    expect(result.transform[1].from.data.values).toEqual([]);
+  });
+
+  test('preserves valid arrays and url-based data sources', () => {
+    const spec = {
+      data: {
+        url: 'https://example.com/data.json',
+        format: { type: 'json' }
+      },
+      transform: [
+        {
+          from: {
+            data: {
+              values: [{ id: 1, val: 10 }]
+            }
+          }
+        }
+      ]
+    };
+
+    const result = resolveWidgetData({
+      widgetType: 'vega-lite',
+      widgetConfig: { vegaSpec: spec },
+      dataSourceResults: {}
+    });
+
+    // Top level url datasource should be untouched
+    expect(result.data.url).toBe('https://example.com/data.json');
+    expect(result.data.values).toBeUndefined();
+
+    // Nested array should be preserved
+    expect(result.transform[0].from.data.values).toEqual([{ id: 1, val: 10 }]);
+  });
+
+  test('preserves valid objects like TopoJSON topology objects', () => {
+    const spec = {
+      data: {
+        format: {
+          type: 'topojson',
+          feature: 'states'
+        },
+        values: {
+          type: 'Topology',
+          objects: {
+            states: {
+              type: 'GeometryCollection',
+              geometries: []
+            }
+          }
+        }
+      }
+    };
+
+    const result = resolveWidgetData({
+      widgetType: 'vega-lite',
+      widgetConfig: { vegaSpec: spec },
+      dataSourceResults: {}
+    });
+
+    expect(result.data.values).toEqual({
+      type: 'Topology',
+      objects: {
+        states: {
+          type: 'GeometryCollection',
+          geometries: []
+        }
+      }
+    });
   });
 });

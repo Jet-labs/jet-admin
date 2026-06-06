@@ -4,7 +4,7 @@ const { isUUID } = require("validator");
 const { v4: uuid } = require("uuid");
 const dataQueryService = {};
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
-const { resolveInputs, extractQueryDefinitions } = require("../../utils/inputArgs.util");
+const { resolveInputs, extractQueryDefinitions } = require("../../utils/input.util");
 
 dataQueryService.getDataQueriesWithDatasource = async ({
   userID,
@@ -235,14 +235,14 @@ dataQueryService.createBulkDataQuery = async ({
  * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.dataQueryID
- * @param {object} param0.inputArgs
+ * @param {object} param0.inputValues
  * @returns {Promise<object>}
  */
 dataQueryService.runDataQueryByID = async ({
   userID,
   tenantID,
   dataQueryID,
-  inputArgs,
+  inputValues,
 }) => {
   Logger.log("info", {
     message: "dataQueryService:runDataQueryByID:params",
@@ -250,7 +250,7 @@ dataQueryService.runDataQueryByID = async ({
       userID,
       tenantID,
       dataQueryID,
-      inputArgs,
+      inputValues,
     },
   });
 
@@ -279,11 +279,9 @@ dataQueryService.runDataQueryByID = async ({
     }
 
     // Resolve & validate inputs through the unified pipeline
-    const definitions = extractQueryDefinitions(dataQuery);
+    const inputDefinitions = extractQueryDefinitions(dataQuery);
     const { resolved, errors, valid } = await resolveInputs({
-      type: 'query',
-      definitions,
-      runtimeValues: inputArgs || {},
+      type: 'query', inputDefinitions, inputValues: inputValues || {},
     });
 
     if (!valid) {
@@ -302,8 +300,8 @@ dataQueryService.runDataQueryByID = async ({
         userID,
         tenantID,
         dataQueryID,
-        inputArgs,
-        args: dataQuery.dataQueryOptions?.args,
+        inputValues,
+        inputDefinitions: dataQuery.dataQueryOptions?.inputDefinitions,
         resolvedInputs: resolved,
       },
     });
@@ -311,7 +309,7 @@ dataQueryService.runDataQueryByID = async ({
     const results = await executeDataQuery({
       engine: queryRunner,
       dataQueryID,
-      executionArgs: resolved,
+      executionInputs: resolved,
     });
 
     Logger.log("success", {
@@ -344,14 +342,14 @@ dataQueryService.runDataQueryByID = async ({
  * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.dataQueryID
- * @param {object} param0.inputArgs
+ * @param {object} param0.inputValues
  * @returns {Promise<object>}
  */
 dataQueryService.runDataQueryByData = async ({
   userID,
   tenantID,
   dataQuery,
-  inputArgs,
+  inputValues,
 }) => {
   const tempQueryID = uuid();
   Logger.log("info", {
@@ -359,7 +357,7 @@ dataQueryService.runDataQueryByData = async ({
     params: {
       userID,
       tenantID,
-      inputArgs,
+      inputValues,
       dataQuery,
       tempQueryID,
     },
@@ -399,11 +397,9 @@ dataQueryService.runDataQueryByData = async ({
     });
 
     // Resolve & validate inputs through the unified pipeline
-    const definitions = extractQueryDefinitions(processedDataQuery);
+    const inputDefinitions = extractQueryDefinitions(processedDataQuery);
     const { resolved, errors, valid } = await resolveInputs({
-      type: 'query',
-      definitions,
-      runtimeValues: inputArgs || {},
+      type: 'query', inputDefinitions, inputValues: inputValues || {},
     });
 
     if (!valid) {
@@ -420,8 +416,8 @@ dataQueryService.runDataQueryByData = async ({
         userID,
         tenantID,
         tempQueryID,
-        inputArgs,
-        args: processedDataQuery.dataQueryOptions?.args,
+        inputValues,
+        inputDefinitions: processedDataQuery.dataQueryOptions?.inputDefinitions,
         resolvedInputs: resolved,
       },
     });
@@ -429,7 +425,7 @@ dataQueryService.runDataQueryByData = async ({
     const results = await executeDataQuery({
       engine: queryRunner,
       dataQueryID: tempQueryID,
-      executionArgs: resolved,
+      executionInputs: resolved,
     });
 
     Logger.log("success", {
@@ -747,45 +743,45 @@ function createQueryEngine({
   return new QueryEngine(queryFetcher, datasourceFetcher);
 }
 
-function buildDataQueryExecutionArgs(argDefinitions = [], inputArgs = {}) {
-  const normalizedArgDefinitions = Array.isArray(argDefinitions)
-    ? argDefinitions
+function buildDataQueryExecutionInputs(inputDefinitions = [], inputValues = {}) {
+  const normalizedInputDefinitions = Array.isArray(inputDefinitions)
+    ? inputDefinitions
     : [];
 
-  const mappedArgsToValues = normalizedArgDefinitions.map((arg) => ({
-    ...arg,
-    value: inputArgs?.[arg.key],
+  const mappedInputsToValues = normalizedInputDefinitions.map((inputDef) => ({
+    ...inputDef,
+    value: inputValues?.[inputDef.key],
   }));
 
   return {
-    mappedArgsToValues,
-    kvtObject: keyValueTypeArrayToObject(mappedArgsToValues),
+    mappedInputsToValues,
+    kvtObject: keyValueTypeArrayToObject(mappedInputsToValues),
   };
 }
 
 async function executeDataQuery({
   engine,
   dataQueryID,
-  argDefinitions = [],
-  inputArgs = {},
-  executionArgs,
+  inputDefinitions = [],
+  inputValues = {},
+  executionInputs,
 }) {
   const activeEngine = engine || createQueryEngine();
-  const runtimeArgs =
-    executionArgs ?? buildDataQueryExecutionArgs(argDefinitions, inputArgs).kvtObject;
+  const runtimeInputs =
+    executionInputs ?? buildDataQueryExecutionInputs(inputDefinitions, inputValues).kvtObject;
 
-  return activeEngine.executeQuery(dataQueryID, runtimeArgs);
+  return activeEngine.executeQuery(dataQueryID, runtimeInputs);
 }
 
 // Assign execution methods to service to simplify imports across codebase
 dataQueryService.createQueryEngine = createQueryEngine;
-dataQueryService.buildDataQueryExecutionArgs = buildDataQueryExecutionArgs;
+dataQueryService.buildDataQueryExecutionInputs = buildDataQueryExecutionInputs;
 dataQueryService.executeDataQuery = executeDataQuery;
 
 module.exports = { 
   dataQueryService, 
   createQueryEngine, 
-  buildDataQueryExecutionArgs, 
+  buildDataQueryExecutionInputs, 
   executeDataQuery,
   defaultQueryFetcher,
   defaultDatasourceFetcher

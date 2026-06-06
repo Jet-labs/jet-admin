@@ -23,8 +23,27 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
+  TemplateAutocompleteInput,
+  CodeEditor,
 } from '@jet-admin/ui';
 import { Plus, Trash2, Ban } from 'lucide-react';
+
+const sampleForInputType = (type) => {
+  switch ((type || '').toLowerCase()) {
+    case 'number':
+    case 'integer':
+    case 'float':
+      return 0;
+    case 'boolean':
+      return false;
+    case 'array':
+      return [];
+    case 'object':
+      return {};
+    default:
+      return '';
+  }
+};
 
 // ─── Operators ─────────────────────────────────────────────────────────────────
 
@@ -124,50 +143,60 @@ function conditionSummary(cond) {
 // Sub-components
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ConditionRow({ condition, onChange, onDelete, canDelete }) {
+function ConditionRow({ condition, onChange, onDelete, canDelete, stateTree }) {
   const op = OP_MAP[condition.operator] || OP_MAP['equals'];
   const update = (patch) => onChange({ ...condition, ...patch });
 
   return (
     <div className="flex items-center gap-2">
       {op.isExpression ? (
-        <Input
+        <CodeEditor
           value={condition.leftValue}
-          onChange={e => update({ leftValue: e.target.value })}
+          onChange={val => update({ leftValue: val })}
           placeholder="ctx.score > 80 && ctx.status === 'active'"
-          className="flex-1 h-7 text-xs font-mono px-2"
-          title="Raw JavaScript — use ctx.variable (no curly braces)"
+          language="javascript"
+          height="32px"
+          showHeader={false}
+          showLineNumbers={false}
+          showExpandButton={false}
+          showFormatButton={false}
+          stateTree={stateTree}
+          className="flex-1 min-w-0"
         />
       ) : (
-          <>
-          <Input
+        <>
+          <TemplateAutocompleteInput
             value={condition.leftValue}
-            onChange={e => update({ leftValue: e.target.value })}
+            onChange={val => update({ leftValue: val })}
             placeholder="{{ctx.field}}"
-            className="flex-1 min-w-0 h-7 text-xs font-mono px-2"
+            liveStateTree={stateTree}
+            mode="safe-path"
+            className="flex-1 min-w-0"
           />
-            <Select value={condition.operator} onValueChange={val => update({ operator: val, rightValue: '' })}>
-              <SelectTrigger className="w-[136px] h-7 text-xs shrink-0">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {OPERATORS.map(o => (
-                  <SelectItem key={o.value} value={o.value} className="text-xs">
+          <Select value={condition.operator} onValueChange={val => update({ operator: val, rightValue: '' })}>
+            <SelectTrigger className="w-[136px] h-7 text-xs shrink-0">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {OPERATORS.map(o => (
+                <SelectItem key={o.value} value={o.value} className="text-xs">
                   <span className="font-mono text-muted-foreground mr-1.5 text-[10px]">{o.symbol}</span>
                   {o.label}
                 </SelectItem>
               ))}
-              </SelectContent>
-            </Select>
-            {op.needsRight !== false && (
-              <Input
-                value={condition.rightValue}
-                onChange={e => update({ rightValue: e.target.value })}
-                placeholder="value or {{ctx.x}}"
-                className="flex-1 min-w-0 h-7 text-xs px-2"
-              />
-            )}
-          </>
+            </SelectContent>
+          </Select>
+          {op.needsRight !== false && (
+            <TemplateAutocompleteInput
+              value={condition.rightValue}
+              onChange={val => update({ rightValue: val })}
+              placeholder="value or {{ctx.x}}"
+              liveStateTree={stateTree}
+              mode="safe-path"
+              className="flex-1 min-w-0"
+            />
+          )}
+        </>
       )}
       <Button
         type="button"
@@ -209,7 +238,7 @@ function AndOrDivider({ logic, onToggle }) {
   );
 }
 
-function BranchEditor({ branch, onChange }) {
+function BranchEditor({ branch, onChange, stateTree }) {
   const updateField = (patch) => onChange({ ...branch, ...patch });
 
   const updateCondition = (idx, updated) => {
@@ -270,6 +299,7 @@ function BranchEditor({ branch, onChange }) {
               onChange={updated => updateCondition(idx, updated)}
               onDelete={() => deleteCondition(idx)}
               canDelete={branch.conditions.length > 1}
+              stateTree={stateTree}
             />
             {idx < branch.conditions.length - 1 && (
               <AndOrDivider logic={branch.conditionLogic} onToggle={toggleLogic} />
@@ -297,13 +327,40 @@ function BranchEditor({ branch, onChange }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { strings } = useWorkflowNodes();
+  const { strings, workflowNodes, workflowInputDefinitions, workflowContext } = useWorkflowNodes();
 
   const [title, setTitle] = useState(data?.title || 'Condition');
   const [description, setDescription] = useState(data?.description || '');
   const [branches, setBranches] = useState(() => migrateBranches(data?.branches));
   const [activeIdx, setActiveIdx] = useState(0);
   const [errorHandling, setErrorHandling] = useState(data?.errorHandling || 'fail_workflow');
+
+  // Build the `ctx` state tree exposed to the template autocomplete input.
+  const ctxStateTree = useMemo(() => {
+    const ctx = { input: {}, item: '' };
+
+    (workflowInputDefinitions || [])
+      .filter((inputDef) => typeof inputDef?.key === 'string' && inputDef.key.trim())
+      .forEach((inputDef) => {
+        ctx.input[inputDef.key.trim()] = sampleForInputType(inputDef.type);
+      });
+
+    if (workflowNodes) {
+      workflowNodes
+        .filter((n) => n.id !== nodeId && n.data?.outputVariable)
+        .forEach((n) => {
+          if (!(n.data.outputVariable in ctx)) {
+            ctx[n.data.outputVariable] = {};
+          }
+        });
+    }
+
+    if (workflowContext && typeof workflowContext === 'object') {
+      Object.assign(ctx, workflowContext);
+    }
+
+    return { ctx };
+  }, [workflowNodes, nodeId, workflowInputDefinitions, workflowContext]);
 
   useEffect(() => {
     if (!data) return;
@@ -437,6 +494,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
               key={activeBranch.id}
               branch={activeBranch}
               onChange={updated => updateBranch(activeIdx, updated)}
+              stateTree={ctxStateTree}
             />
           ) : (
             <div className="p-4 text-xs text-muted-foreground text-center">

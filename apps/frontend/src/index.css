@@ -251,3 +251,67 @@ button {
     background-color: color-mix(in oklab, hsl(var(--input-foreground-default)) 2.6%, transparent);
   }
 }
+
+/* React Flow Premium Dark Styles */
+.react-flow__minimap {
+  background-color: hsl(var(--card) / 0.7) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.react-flow__minimap-mask {
+  fill: hsl(var(--foreground) / 0.04) !important;
+  stroke: hsl(var(--foreground) / 0.15) !important;
+  stroke-width: 1px !important;
+}
+
+.react-flow__minimap-node {
+  fill: hsl(var(--muted-foreground) / 0.25) !important;
+  stroke: none !important;
+}
+
+.react-flow__controls {
+  background-color: hsl(var(--card) / 0.7) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  display: flex !important;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  padding: 2px !important;
+}
+
+.react-flow__controls-button {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: none !important;
+  color: var(--brand-text-secondary) !important;
+  fill: currentColor !important;
+  transition: all 0.15s ease-in-out !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+}
+
+.react-flow__controls-button:hover {
+  background-color: hsl(var(--foreground) / 0.08) !important;
+  color: var(--brand-text-primary) !important;
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.react-flow__controls-button path {
+  fill: currentColor !important;
+}

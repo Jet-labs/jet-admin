@@ -14,7 +14,7 @@ Jet Admin includes a visual workflow system for automating business logic, exter
 
 - a graph-based workflow editor,
 - reusable node types,
-- persisted workflow definitions,
+- persisted workflow inputDefinitions,
 - test execution for unsaved graphs,
 - runtime execution state tracking,
 - live progress updates over Socket.IO.

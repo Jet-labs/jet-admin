@@ -12,7 +12,7 @@
         "description": "MySQL code to execute",
         "format": "code-mysql"
       },
-      "args": {
+      "inputDefinitions": {
         "type": "array",
         "description": "Query arguments",
         "items": {
@@ -67,7 +67,7 @@
       },
       {
         "type": "Control",
-        "scope": "#/properties/args",
+        "scope": "#/properties/inputDefinitions",
         "label": "Arguments",
         "options": {
           "detail": {
@@ -99,7 +99,7 @@
   "data": {
     "queryType": "query",
     "query": "SELECT id, name FROM users WHERE active = 1;",
-    "args": [
+    "inputDefinitions": [
       {
         "key": "user_id",
         "type": "string"
