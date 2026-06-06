@@ -3,7 +3,7 @@
  */
 
 const { z, schemas } = require("../../utils/validation.utils");
-const { collectTemplateViolations } = require("../../utils/templateEngine/validator");
+const { collectTemplateViolations } = require("@jet-admin/expression-engine");
 
 const addCustomIssue = (ctx, path, message) => {
   ctx.addIssue({

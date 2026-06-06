@@ -2,12 +2,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Trash2 } from 'lucide-react';
-import { Button, Input, Label } from '@jet-admin/ui';
+import { Button, Label, TemplateAutocompleteInput } from '@jet-admin/ui';
 
 export const CustomStringArrayRenderer = (props) => {
   const { data, path, handleChange, label, uischema, enabled, visible } = props;
 
   const arrayData = Array.isArray(data) ? data : [];
+  // Template context propagated by the host form, so each item keeps {{ }} intellisense.
+  const stateTree = uischema?.options?.stateTree || null;
+  const templateMode = uischema?.options?.templateMode;
 
   const handleAddItem = () => {
     handleChange(path, [...arrayData, '']);
@@ -38,13 +41,13 @@ export const CustomStringArrayRenderer = (props) => {
         {arrayData.map((item, index) => (
           <div key={`${path}-${index}`} className="flex items-center space-x-2 mb-2">
             <div className="flex-grow">
-              <Input
-                size="sm"
-                type="text"
+              <TemplateAutocompleteInput
                 value={item || ''}
-                onChange={(e) => handleItemChange(index, e.target.value)}
-                disabled={!enabled}
+                onChange={(val) => handleItemChange(index, val)}
                 placeholder="Enter value..."
+                liveStateTree={stateTree}
+                mode={templateMode}
+                readOnly={!enabled}
               />
             </div>
             <Button

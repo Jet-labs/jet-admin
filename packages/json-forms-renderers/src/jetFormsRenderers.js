@@ -5,7 +5,7 @@ import {
   JetCheckboxControl,
   JetCodeEditorControl,
   JetSuggestionControl,
-  JetDynamicArgsControl,
+  JetCustomDynamicKeyValueInputRenderer,
   JetKeyValueArrayControl,
   JetKeyValueTypeArrayControl,
   JetKeyTypeArrayControl,
@@ -26,7 +26,7 @@ import {
   checkboxTester,
   codeEditorTester,
   suggestionInputTester,
-  dynamicArgsTester,
+  dynamicKeyValueInputTester,
   keyValueArrayTester,
   keyValueTypeArrayTester,
   keyTypeArrayTester,
@@ -69,6 +69,6 @@ export const jetFormsBaseRenderers = [
 export const jetFormsRenderers = [
   { tester: suggestionInputTester, renderer: JetSuggestionControl },
   { tester: codeEditorTester, renderer: JetCodeEditorControl },
-  { tester: dynamicArgsTester, renderer: JetDynamicArgsControl },
+  { tester: dynamicKeyValueInputTester, renderer: JetCustomDynamicKeyValueInputRenderer },
   ...jetFormsBaseRenderers,
 ];

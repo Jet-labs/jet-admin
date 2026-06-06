@@ -14,6 +14,9 @@
  *   context        {object}   JSON object; auto-derives all deep dot-paths (VS Code-style)
  *   jsonContext    {object}   Alias for context — use whichever you prefer
  *   liveStateTree  {object}   The live runtime state tree (wrapped as { state: … })
+ *   mode           {string}   Expression-engine mode driving intellisense:
+ *                             "js-template" (default) → object keys + JS built-ins,
+ *                             "safe-path" → object keys only.
  *   isTextArea     {boolean}  Multiline mode
  *   isParagraph    {boolean}  Alias for isTextArea
  *   rows           {number}   Approximate visible rows for textarea mode (default: 4)
@@ -106,10 +109,12 @@ export const TemplateAutocompleteInput = ({
   context,
   jsonContext,
   liveStateTree,
+  mode,
   isTextArea = false,
   isParagraph = false,
   rows = 4,
   readOnly = false,
+  size = "sm",
   className = "",
 }) => {
   const multiline = isTextArea || isParagraph;
@@ -131,7 +136,7 @@ export const TemplateAutocompleteInput = ({
   // Build the CodeMirror completion source.
   // We store it in a ref so the actual CM completion function has a stable
   // identity — it delegates to whatever mustacheSourceRef.current holds.
-  const mustacheSource = useMustacheCompletions(effectiveContext);
+  const mustacheSource = useMustacheCompletions(effectiveContext, mode);
   const mustacheSourceRef = useRef(mustacheSource);
   mustacheSourceRef.current = mustacheSource;
 
@@ -145,10 +150,24 @@ export const TemplateAutocompleteInput = ({
   const boundTokens = useMemo(() => extractTokens(value), [value]);
 
   // Compute heights based on mode
+  // We subtract 2px from the Tailwind height to account for the wrapper's 1px border.
+  let singleLineHeight = '26px'; // h-7 (28px) - 2px
+  let fontSize = '12px';
+  let px = '8px';
+  if (size === 'default') {
+    singleLineHeight = '30px'; // h-8 (32px) - 2px
+    fontSize = '14px';
+    px = '10px';
+  } else if (size === 'lg') {
+    singleLineHeight = '38px'; // h-10 (40px) - 2px
+    fontSize = '16px';
+    px = '12px';
+  }
+
   const lineHeightPx = 20; // approximate line height in px
   const paddingPx = multiline ? 12 : 0;
-  const minContentH = multiline ? `${Math.max(rows * lineHeightPx + paddingPx * 2, 80)}px` : '32px';
-  const maxContentH = multiline ? '400px' : '32px';
+  const minContentH = multiline ? `${Math.max(rows * lineHeightPx + paddingPx * 2, 80)}px` : singleLineHeight;
+  const maxContentH = multiline ? '400px' : singleLineHeight;
 
   // Build base extensions — the autocompletion config lives in a
   // Compartment so it can be hot-swapped when the completion source changes
@@ -189,14 +208,14 @@ export const TemplateAutocompleteInput = ({
       EditorView.theme({
         '&': {
           fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
-          fontSize: '12px',
+          fontSize: fontSize,
           lineHeight: '1.6',
           outline: 'none',
           background: 'transparent',
           color: 'hsl(var(--foreground))',
         },
         '.cm-content': {
-          padding: multiline ? '8px 8px' : '0 8px',
+          padding: multiline ? `8px ${px}` : `0 ${px}`,
           minHeight: minContentH,
           maxHeight: maxContentH,
           caretColor: 'hsl(var(--foreground))',
@@ -278,7 +297,7 @@ export const TemplateAutocompleteInput = ({
         '.cm-placeholder': {
           color: 'hsl(var(--muted-foreground))',
           fontStyle: 'normal',
-          fontSize: '12px',
+          fontSize: fontSize,
         },
       }),
     ];
@@ -310,7 +329,7 @@ export const TemplateAutocompleteInput = ({
     }
 
     return exts;
-  }, [multiline, minContentH, maxContentH]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [multiline, minContentH, maxContentH, fontSize, px]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Mount the editor once ────────────────────────────────────────────────
   useEffect(() => {

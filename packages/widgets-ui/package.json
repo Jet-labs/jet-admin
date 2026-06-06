@@ -49,7 +49,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@jet-admin/template-engine": "^1.0.0",
+    "@jet-admin/expression-engine": "^1.0.0",
     "@jet-admin/ui": "^1.0.0",
     "@jet-admin/widget-types": "^1.0.0",
     "@mui/material": "^7.0.2",

@@ -1,7 +1,7 @@
 // Custom Number Input Renderer
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input, Label } from '@jet-admin/ui';
+import { Label, TemplateAutocompleteInput } from '@jet-admin/ui';
 
 export const CustomNumberInput = (props) => {
   const {
@@ -13,30 +13,46 @@ export const CustomNumberInput = (props) => {
     errors,
     uischema,
     schema,
+    enabled,
   } = props;
 
-  const handleInputChange = (ev) => {
-    const valueString = ev.target.value;
+  const options = uischema?.options || {};
+  const isDisabled = enabled === false;
+  const stateTree = options.stateTree || null;
+  const templateMode = options.templateMode;
+
+  const handleInputChange = (valueString) => {
     if (valueString === "") {
       handleChange(path, undefined);
+    } else if (valueString.includes("{{")) {
+      handleChange(path, valueString);
     } else {
       const numValue =
         schema.type === "integer"
           ? parseInt(valueString, 10)
           : parseFloat(valueString);
 
-      if (!isNaN(numValue)) {
+      if (!isNaN(numValue) && String(numValue) === valueString.trim()) {
         handleChange(path, numValue);
+      } else {
+        handleChange(path, valueString);
       }
     }
   };
 
-  const step =
-    uischema.options?.step ||
-    schema.multipleOf ||
-    (schema.type === "integer" ? 1 : "any");
+  const stringValue = data === undefined || data === null ? "" : String(data);
+  const isTemplateString = stringValue.includes("{{");
 
-  const hasErrors = errors && errors.length > 0;
+  // JSON Forms passes `errors` as a single string
+  let displayErrors = errors || "";
+  
+  // Suppress "must be integer/number" AJV errors if a template is being used
+  if (isTemplateString && (displayErrors.includes("must be integer") || displayErrors.includes("must be number"))) {
+    displayErrors = "";
+  }
+
+  const hasErrors = displayErrors.length > 0;
+  const placeholder = hasErrors ? displayErrors : uischema?.options?.placeholder || "";
 
   return (
     <div className="">
@@ -48,32 +64,24 @@ export const CustomNumberInput = (props) => {
       >
         {label || description}
       </Label>
-      <Input
-        size="sm"
-        type="number"
-        id={path}
-        name={path}
-        className={hasErrors ? "border-red-500 focus:border-red-500" : ""}
-        placeholder={
-          hasErrors
-            ? errors
-            : uischema?.options?.placeholder || ""
-        }
+      <TemplateAutocompleteInput
+        value={stringValue}
         onChange={handleInputChange}
-        value={data === undefined || data === null ? "" : data}
-        min={schema.minimum}
-        max={schema.maximum}
-        step={step}
+        placeholder={placeholder}
+        liveStateTree={stateTree}
+        mode={templateMode}
+        readOnly={isDisabled}
+        className={hasErrors ? "ring-1 ring-red-500 rounded-sm" : ""}
       />
       {hasErrors && (
-        <p className="text-xs text-red-500 mt-1">{errors}</p>
+        <p className="text-xs text-red-500 mt-1">{displayErrors}</p>
       )}
     </div>
   );
 };
 
 CustomNumberInput.propTypes = {
-  data: PropTypes.number,
+  data: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   path: PropTypes.string.isRequired,
   handleChange: PropTypes.func.isRequired,
   label: PropTypes.string,
@@ -81,4 +89,5 @@ CustomNumberInput.propTypes = {
   errors: PropTypes.arrayOf(PropTypes.string),
   uischema: PropTypes.object.isRequired,
   schema: PropTypes.object.isRequired,
+  enabled: PropTypes.bool,
 };

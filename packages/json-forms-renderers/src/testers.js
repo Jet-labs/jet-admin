@@ -137,9 +137,9 @@ export const suggestionInputTester = rankWith(
 // ============================================================================
 // Dynamic Args Tester (for workflow nodes)
 // ============================================================================
-export const dynamicArgsTester = rankWith(
+export const dynamicKeyValueInputTester = rankWith(
   20,
-  and(isControl, (uischema) => uischema?.options?.isDynamicArgs === true)
+  and(isControl, (uischema) => uischema?.options?.isDynamicKeyValueInput === true)
 );
 
 // ============================================================================

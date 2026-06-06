@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Trash2 } from 'lucide-react';
-import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@jet-admin/ui';
+import { Button, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, TemplateAutocompleteInput } from '@jet-admin/ui';
 
 export const CustomFieldOperatorValueArrayRenderer = ({
   data,
@@ -17,6 +17,9 @@ export const CustomFieldOperatorValueArrayRenderer = ({
   const items = data || [];
   const itemSchema = schema.items;
   const isDisabled = enabled === false;
+  // Template context propagated by the host form, so field/value keep {{ }} intellisense.
+  const stateTree = uischema?.options?.stateTree || null;
+  const templateMode = uischema?.options?.templateMode;
 
   // Get operator options from schema
   const operatorOptions = itemSchema?.properties?.operator?.enum || [
@@ -53,14 +56,14 @@ export const CustomFieldOperatorValueArrayRenderer = ({
           <div key={`${path}-${index}`} className="flex items-center gap-2">
             {/* Field */}
             <div className="flex-1">
-              <Input
-                size="sm"
-                type="text"
+              <TemplateAutocompleteInput
                 placeholder="Field"
                 value={item.field || ""}
-                disabled={isDisabled}
-                onChange={(e) => handleItemChange(index, "field", e.target.value)}
-                className={errors && errors.length > 0 ? "border-red-500" : ""}
+                readOnly={isDisabled}
+                onChange={(val) => handleItemChange(index, "field", val)}
+                liveStateTree={stateTree}
+                mode={templateMode}
+                className={errors && errors.length > 0 ? "ring-1 ring-red-500 rounded-sm" : ""}
               />
             </div>
             {/* Operator */}
@@ -78,13 +81,13 @@ export const CustomFieldOperatorValueArrayRenderer = ({
             </div>
             {/* Value */}
             <div className="flex-1">
-              <Input
-                size="sm"
-                type="text"
+              <TemplateAutocompleteInput
                 placeholder="Value"
                 value={item.value || ""}
-                disabled={isDisabled}
-                onChange={(e) => handleItemChange(index, "value", e.target.value)}
+                readOnly={isDisabled}
+                onChange={(val) => handleItemChange(index, "value", val)}
+                liveStateTree={stateTree}
+                mode={templateMode}
               />
             </div>
             {/* Delete Button */}

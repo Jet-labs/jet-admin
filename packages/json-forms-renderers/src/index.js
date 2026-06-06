@@ -12,7 +12,7 @@ export {
   CustomCodeEditorControl as CustomCodePgsqlControl,
   CustomCodeEditorControl as CustomCodeJavascriptControl,
   CustomSuggestionInput,
-  DynamicArgsControl,
+  CustomDynamicKeyValueInputRenderer,
   CustomRadioInput,
   
   // Array Renderers
@@ -41,7 +41,7 @@ export {
   JetCodeEditorControl as JetCodePgsqlControl,
   JetCodeEditorControl as JetCodeJavascriptControl,
   JetSuggestionControl,
-  JetDynamicArgsControl,
+  JetCustomDynamicKeyValueInputRenderer,
   JetRadioControl,
   
   // Array Components
@@ -69,7 +69,7 @@ export {
   codeEditorTester as codePgsqlTester,
   codeEditorTester as codeJavascriptTester,
   suggestionInputTester,
-  dynamicArgsTester,
+  dynamicKeyValueInputTester,
   radioInputTester,
   keyValueArrayTester,
   keyValueTypeArrayTester,

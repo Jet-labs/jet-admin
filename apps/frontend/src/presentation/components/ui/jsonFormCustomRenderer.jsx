@@ -13,7 +13,7 @@ export {
   CustomCheckboxInput,
   CustomCodePgsqlControl,
   CustomSuggestionInput,
-  DynamicArgsControl,
+  CustomDynamicKeyValueInputRenderer,
 
   // Array Renderers
   CustomKeyValueArrayRenderer,
@@ -32,7 +32,7 @@ export {
   JetCheckboxControl,
   JetCodeEditorControl,
   JetSuggestionControl,
-  JetDynamicArgsControl,
+  JetCustomDynamicKeyValueInputRenderer,
   JetKeyValueArrayControl,
   JetKeyValueTypeArrayControl,
   JetKeyTypeArrayControl,
@@ -47,7 +47,7 @@ export {
   checkboxTester,
   codePgsqlTester,
   suggestionInputTester,
-  dynamicArgsTester,
+  dynamicKeyValueInputTester,
   keyValueArrayTester,
   keyValueTypeArrayTester,
   keyTypeArrayTester,

@@ -8,8 +8,7 @@ const Logger = require("../../../utils/logger");
 const { prisma } = require("../../../config/prisma.config");
 const { workflowService } = require("../../workflow/workflow.service");
 const constants = require("../../../constants");
-const { resolveInputs } = require("../../../utils/inputArgs.util");
-const { extractWorkflowDefinitions } = require("../../../utils/definitionProvider.util");
+const { resolveInputs, extractWorkflowDefinitions } = require("../../../utils/inputArgs.util");
 
 class CronJobEngine {
   constructor() {

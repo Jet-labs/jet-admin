@@ -69,6 +69,43 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     };
   }, [dataQueries, strings]);
 
+  const upstreamStateTree = useMemo(() => {
+    const tree = { ctx: { input: {} } };
+    
+    if (workflowInputArgs && workflowInputArgs.length > 0) {
+      workflowInputArgs.forEach(arg => {
+        if (arg.key) {
+          tree.ctx.input[arg.key] = "";
+        }
+      });
+    }
+
+    if (nodeId && workflowEdges && workflowEdges.length > 0) {
+      const upstreamIds = new Set();
+      const visited = new Set();
+      const queue = [nodeId];
+      while (queue.length > 0) {
+        const id = queue.shift();
+        if (visited.has(id)) continue;
+        visited.add(id);
+        const incomingEdges = workflowEdges.filter(e => e.target === id);
+        for (const edge of incomingEdges) {
+          if (!visited.has(edge.source)) {
+            upstreamIds.add(edge.source);
+            queue.push(edge.source);
+          }
+        }
+      }
+
+      workflowNodes?.forEach(node => {
+        if (node.id !== nodeId && upstreamIds.has(node.id) && node.data?.outputVariable) {
+          tree.ctx[node.data.outputVariable] = {};
+        }
+      });
+    }
+    return tree;
+  }, [workflowNodes, workflowEdges, workflowInputArgs, nodeId]);
+
   const uischema = useMemo(() => {
     const generalElements = [
       { type: 'Control', scope: '#/properties/title', options: { placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER || 'Enter node title' } },
@@ -85,7 +122,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     if (selectedQuery?.dataQueryOptions?.args?.length > 0) {
       generalElements.push({
         type: 'Control', scope: '#/properties/args',
-        options: { isDynamicArgs: true, args: selectedQuery.dataQueryOptions.args, workflowNodes, workflowEdges, workflowInputArgs, currentNodeId: nodeId },
+        options: { isDynamicKeyValueInput: true, keys: selectedQuery.dataQueryOptions.args, stateTree: upstreamStateTree },
       });
     }
     return {
@@ -113,7 +150,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         },
       ],
     };
-  }, [dataQueries, strings, selectedQuery, workflowNodes, workflowEdges, workflowInputArgs, nodeId, onRefreshDataQueries]);
+  }, [dataQueries, strings, selectedQuery, upstreamStateTree, onRefreshDataQueries]);
 
   const handleFormChange = useCallback(({ data: newData }) => { setFormData(newData); }, []);
   const handleSave = useCallback(() => { onChange(formData); }, [onChange, formData]);

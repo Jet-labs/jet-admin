@@ -5,11 +5,16 @@ import { Label } from "./label";
 import { Checkbox } from "./checkbox";
 import { CodeEditor } from "./code-editor";
 import { ArrayInput } from "./array-input";
+import { TemplateAutocompleteInput } from "./template-autocomplete-input";
 
 /**
  * Unified component for rendering typed input args from a schema array.
  * Replaces the 4 duplicate per-type rendering implementations across
  * DataQueryArgsForm, WorkflowInputModal, CronJobEditor, and WidgetDatasetArguments.
+ *
+ * When `stateTree` is provided, every field renders as a TemplateAutocompleteInput
+ * so values can be authored as {{ }} templates (e.g. listener action mappings use
+ * `{{event.property}}` regardless of the arg's declared type).
  *
  * @param {{
  *   args: Array<{ key: string, type?: string, required?: boolean }>,
@@ -18,6 +23,8 @@ import { ArrayInput } from "./array-input";
  *   errors?: Object<string, string>,
  *   disabled?: boolean,
  *   className?: string,
+ *   stateTree?: Object,
+ *   templateMode?: string,
  * }} props
  */
 export function InputArgsForm({
@@ -27,6 +34,8 @@ export function InputArgsForm({
   errors = {},
   disabled = false,
   className,
+  stateTree = null,
+  templateMode,
 }) {
   if (!Array.isArray(args) || args.length === 0) {
     return (
@@ -40,6 +49,29 @@ export function InputArgsForm({
     const argName = arg.key;
     const argType = arg.type || "string";
     const value = values[argName];
+
+    // Template mode: author the value as a {{ }} expression against stateTree.
+    if (stateTree) {
+      return (
+        <>
+          <Label htmlFor={`input-arg-${argName}`} className="text-xs">
+            {argName}{" "}
+            {arg.required && <span className="text-red-500">*</span>}{" "}
+            {argType !== "string" && (
+              <span className="text-muted-foreground">({argType})</span>
+            )}
+          </Label>
+          <TemplateAutocompleteInput
+            value={typeof value === "string" ? value : value == null ? "" : String(value)}
+            onChange={(val) => onChange(argName, val)}
+            placeholder={`{{event.${argName}}}`}
+            context={stateTree}
+            mode={templateMode}
+            readOnly={disabled}
+          />
+        </>
+      );
+    }
 
     switch (argType) {
       case "boolean":
@@ -179,4 +211,6 @@ InputArgsForm.propTypes = {
   errors: PropTypes.object,
   disabled: PropTypes.bool,
   className: PropTypes.string,
+  stateTree: PropTypes.object,
+  templateMode: PropTypes.string,
 };

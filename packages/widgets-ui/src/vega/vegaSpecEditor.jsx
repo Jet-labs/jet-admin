@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 
 
-import { getValueByPath } from "@jet-admin/template-engine";
+import { getValueByPath } from "@jet-admin/expression-engine";
 import { CodeEditor } from "@jet-admin/ui";
 import { BarChart, Code, LineChart, PieChart, ScatterChart } from 'lucide-react';
 
@@ -163,7 +163,7 @@ const getNestedKeys = (obj, prefix = "", maxDepth = 4, depth = 0) => {
   return keys;
 };
 
-// getValueByPath is imported from @jet-admin/template-engine
+// getValueByPath is imported from @jet-admin/expression-engine
 
 const getValuePreview = (obj, path) => {
   const v = getValueByPath(obj, path);

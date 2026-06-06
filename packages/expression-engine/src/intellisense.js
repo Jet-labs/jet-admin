@@ -1,41 +1,37 @@
 /**
- * suggestion-engine.js
+ * intellisense.js — Context-aware autocomplete for {{ }} template inputs.
  *
- * Centralised suggestion logic for {{ }} template expression inputs.
+ * Provides mode-aware completions:
  *
- * Responsibility: given a runtime state tree and/or the text currently typed
- * inside a {{ }} block, produce a ranked list of completion items that editors
- * can display in a dropdown.
+ *   safe-path:    ONLY object key suggestions (no JS built-ins)
+ *   js-template:  Object keys + JS built-ins + member methods
+ *   isolated-js:  Object keys + JS built-ins + member methods
  *
- * Three exported APIs cover every known use-case in the project:
+ * Three exported APIs cover every use-case:
  *
  *   getObjectSuggestions(stateTree)
- *     ── Path-only completions derived by walking the live state tree.
- *     ── Use when you only want to expose what is in the data (no JS).
- *
- *   getJsSuggestions(filter?, stateTree?)
- *     ── Full JS-aware completions: object paths + JS built-ins + member
- *        completions (e.g. .filter(), .length) resolved against the tree.
- *     ── Use for generic template inputs that accept any expression.
+ *     Path-only completions by walking the live state tree.
  *
  *   getMemberSuggestions(basePath, stateTree)
- *     ── Completions for a specific resolved path (arrays → methods,
- *        objects → property keys, strings → string methods).
- *     ── Use when you already know what the prefix path resolves to.
+ *     Member completions for a resolved path (arrays → methods, etc.).
+ *
+ *   getJsSuggestions({ filter, stateTree, ... })
+ *     Full JS-aware: object paths + built-ins + member completions.
+ *
+ *   getCompletions(cursorPosition, contextSchema, options)
+ *     Mode-aware entry point that delegates to the correct API above.
  *
  * Every function returns the same Suggestion shape:
  *   { value, label, detail, type, category }
  *
- *   value     – the string inserted into the field (may or may not include {{ }})
- *   label     – human-readable display text (defaults to value)
- *   detail    – secondary line (type hint, description)
- *   type      – "property" | "method" | "snippet" | "variable" | "event" | "global" | "any" | …
- *   category  – grouping key: "state" | "live-state" | "json" | "math" | "object" |
- *               "type" | "operator" | "array-member" | "string-member" | "object-member"
+ * Ported from packages/template-engine/src/suggestion-engine.js with
+ * mode-aware routing added.
  */
 
-// ─── JS Built-in catalog ──────────────────────────────────────────────────────
-// Mirrors the safe globals allowed by js-resolver.js's SAFE_GLOBALS.
+import { MODES } from "./evaluator.js";
+
+// ─── JS Built-in catalogs ────────────────────────────────────────────────────
+// Mirrors the safe globals allowed by js-template-resolver.js's SAFE_GLOBALS.
 
 export const JS_ARRAY_METHODS = [
   { label: ".length",      value: ".length",          detail: "Number of items",             type: "property", category: "array-member" },
@@ -102,6 +98,9 @@ export const JS_BUILTINS = [
 
 /**
  * Infer a human-readable type label for a runtime value.
+ *
+ * @param {*} val
+ * @returns {string}
  */
 export function inferValueType(val) {
   if (val === null || val === undefined) return "null";
@@ -123,8 +122,11 @@ export function inferValueType(val) {
 }
 
 /**
- * Resolve a dotted path like "state.queries.users.data" against an object.
- * Supports bracket notation like "state.queries.users.data[0]".
+ * Resolve a dotted path against an object for suggestion resolution.
+ *
+ * @param {object} obj
+ * @param {string} path
+ * @returns {*}
  */
 export function resolvePathInTree(obj, path) {
   if (!obj || !path) return undefined;
@@ -144,29 +146,21 @@ export function resolvePathInTree(obj, path) {
 
 /**
  * Walk a live state tree and return path-based suggestions for every
- * reachable leaf and intermediate node.
+ * reachable leaf and intermediate node. BFS, cycle-safe.
  *
- * This is the pure "data binding" mode — no JS built-ins are included.
- * Use this when you want to show what's in the data without encouraging
- * arbitrary expressions (e.g. a key selector dropdown).
- *
- * @param {object} stateTree  - The live state tree. If wrapped as
- *                              `{ state: … }` the paths will be prefixed
- *                              with "state." so `{{ state.queries.X }}` works.
- * @param {string} [prefix]   - Path prefix for recursive calls.
- * @param {number} [depth]    - Current recursion depth (internal).
- * @param {number} [maxDepth] - Maximum depth to traverse (default 6).
+ * @param {object} stateTree
+ * @param {string} [prefix]
+ * @param {number} [depth]
+ * @param {number} [maxDepth]
  * @returns {Array<Suggestion>}
  */
 export function getObjectSuggestions(stateTree, _prefix = "", _depth = 0, maxDepth = 6) {
-  // Fully iterative BFS — no recursion, immune to stack overflow and circular refs.
   const results = [];
   if (!stateTree || typeof stateTree !== "object") return results;
 
   const MAX_ITEMS = 150;
-  const seen = new WeakSet(); // cycle guard
+  const seen = new WeakSet();
 
-  // Queue entries: { obj, prefix, depth }
   const queue = [{ obj: stateTree, prefix: _prefix, depth: _depth }];
 
   while (queue.length > 0 && results.length < MAX_ITEMS) {
@@ -188,7 +182,6 @@ export function getObjectSuggestions(stateTree, _prefix = "", _depth = 0, maxDep
         results.push({ value: fullPath, label: fullPath, detail: "null", type: "null", category: "live-state" });
       } else if (Array.isArray(val)) {
         results.push({ value: fullPath, label: fullPath, detail, type: "array", category: "live-state" });
-        // Only inspect first row to expose its field shape — never iterate the whole array.
         if (val.length > 0 && val[0] !== null && typeof val[0] === "object") {
           queue.push({ obj: val[0], prefix: `${fullPath}[0]`, depth: depth + 1 });
         }
@@ -206,14 +199,12 @@ export function getObjectSuggestions(stateTree, _prefix = "", _depth = 0, maxDep
 // ─── API 2: Member suggestions for a specific resolved path ──────────────────
 
 /**
- * Given a base path (e.g. "state.queries.users.data") and a state tree,
- * resolve the path and return method/property completions appropriate for
- * the resolved type (array → array methods, string → string methods,
- * object → property keys).
+ * Given a base path and a state tree, resolve the path and return
+ * method/property completions appropriate for the resolved type.
  *
- * @param {string} basePath   - The expression typed so far (before the trailing ".")
- * @param {object} stateTree  - The live state tree to resolve against
- * @param {string} [memberPrefix] - Characters typed after the last "." for pre-filtering
+ * @param {string} basePath
+ * @param {object} stateTree
+ * @param {string} [memberPrefix]
  * @returns {Array<Suggestion>}
  */
 export function getMemberSuggestions(basePath, stateTree, memberPrefix = "") {
@@ -247,7 +238,6 @@ export function getMemberSuggestions(basePath, stateTree, memberPrefix = "") {
   if (memberPrefix) {
     const lower = memberPrefix.toLowerCase();
     members = members.filter((m) => {
-      // Match on the tail of the label after the last "."
       const tail = (m.label || "").split(".").pop() || "";
       return tail.toLowerCase().startsWith(lower);
     });
@@ -260,20 +250,15 @@ export function getMemberSuggestions(basePath, stateTree, memberPrefix = "") {
 
 /**
  * The primary autocomplete API. Returns a ranked merge of:
- *
- *   1. Member completions  – when `filter` ends with "." (highest priority)
- *   2. Object path suggestions – from the live state tree
- *   3. JS built-ins        – JSON, Math, Object, type coercions, snippets
- *
- * Pass `baseSuggestions` to prepend schema-derived items (e.g. from page
- * config metadata like dataSources and variableDefinitions) that are not in
- * the live tree yet.
+ *   1. Member completions  (when filter ends with ".")
+ *   2. Object path suggestions from the live tree
+ *   3. JS built-ins (JSON, Math, Object, type coercions, snippets)
  *
  * @param {object}  [options]
- * @param {string}  [options.filter]           - Text typed inside {{ }} right now
- * @param {object}  [options.stateTree]        - Live state tree (wrapped as { state: … })
- * @param {Array}   [options.baseSuggestions]  - Pre-built suggestions to merge in (schema-based)
- * @param {boolean} [options.includeBuiltins]  - Whether to include JS built-ins (default true)
+ * @param {string}  [options.filter]
+ * @param {object}  [options.stateTree]
+ * @param {Array}   [options.baseSuggestions]
+ * @param {boolean} [options.includeBuiltins]
  * @returns {Array<Suggestion>}
  */
 export function getJsSuggestions({
@@ -286,15 +271,13 @@ export function getJsSuggestions({
 
   // ── Tier 1: Member completions triggered by a trailing "." ────────────────
   if (trimmedFilter.includes(".") && stateTree) {
-    // Match: "state.queries.users.data." or "state.queries.users.data.fi"
     const dotMatch = trimmedFilter.match(/^([\w.[\]0-9"']+)\.(\w*)$/);
     if (dotMatch) {
-      const basePath = dotMatch[1];     // path before the last dot
-      const memberPrefix = dotMatch[2]; // chars typed after the last dot
+      const basePath = dotMatch[1];
+      const memberPrefix = dotMatch[2];
 
       const members = getMemberSuggestions(basePath, stateTree, memberPrefix);
       if (members.length > 0) {
-        // Return member completions first, followed by builtins as fallback
         const builtins = includeBuiltins
           ? JS_BUILTINS.filter((b) =>
               !trimmedFilter || b.value.toLowerCase().includes(trimmedFilter.toLowerCase())
@@ -319,12 +302,55 @@ export function getJsSuggestions({
         : JS_BUILTINS)
     : [];
 
-  // Merge: schema-based first (most context-relevant), then live tree, then builtins.
-  // Cap at 200 — the component already slices to 100 for display, but this avoids
-  // building a massive intermediate array when the state tree is very large.
+  // Merge: schema-based first, then live tree, then builtins. Cap at 200.
   const merged = [];
   for (const s of baseSuggestions) { if (merged.length >= 200) break; merged.push(s); }
   for (const s of objectSuggestions) { if (merged.length >= 200) break; merged.push(s); }
   for (const s of builtins) { if (merged.length >= 200) break; merged.push(s); }
   return merged;
+}
+
+// ─── API 4: Mode-aware entry point ───────────────────────────────────────────
+
+/**
+ * Get completions based on the current mode and cursor context.
+ *
+ * In `safe-path` mode, ONLY object key suggestions are returned.
+ * In `js-template` or `isolated-js` mode, object keys + JS built-ins +
+ * member completions are returned.
+ *
+ * @param {object}  [options]
+ * @param {string}  [options.filter]           Text typed inside {{ }}
+ * @param {object}  [options.stateTree]        Live state tree
+ * @param {string}  [options.mode]             Execution mode
+ * @param {Array}   [options.baseSuggestions]   Pre-built schema-derived items
+ * @returns {Array<Suggestion>}
+ */
+export function getCompletions({
+  filter = "",
+  stateTree = null,
+  mode = MODES.SAFE_PATH,
+  baseSuggestions = [],
+} = {}) {
+  if (mode === MODES.SAFE_PATH) {
+    // Safe-path: only object keys, no JS built-ins or methods
+    const objectSuggestions = stateTree ? getObjectSuggestions(stateTree) : [];
+    const trimmedFilter = filter.trim().toLowerCase();
+
+    const filtered = trimmedFilter
+      ? [...baseSuggestions, ...objectSuggestions].filter(
+          (s) => s.value.toLowerCase().includes(trimmedFilter)
+        )
+      : [...baseSuggestions, ...objectSuggestions];
+
+    return filtered.slice(0, 200);
+  }
+
+  // js-template / isolated-js: full JS-aware suggestions
+  return getJsSuggestions({
+    filter,
+    stateTree,
+    baseSuggestions,
+    includeBuiltins: true,
+  });
 }

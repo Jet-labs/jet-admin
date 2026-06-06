@@ -15,7 +15,7 @@ import {
 import { Trash2, Plus, ArrowUp, ArrowDown, Sparkles, Zap } from 'lucide-react';
 
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import { getValueByPath } from "@jet-admin/template-engine";
+import { getValueByPath } from "@jet-admin/expression-engine";
 
 /**
  * Resolve a dotted path against an object (e.g. "alias.data" -> obj.alias.data).

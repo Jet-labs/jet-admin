@@ -16,6 +16,25 @@ const ERROR_HANDLING_OPTIONS = {
   RETRY_THEN_FAIL: 'retry_then_fail',
 };
 
+// Representative sample value for a declared arg type so the expression engine
+// can infer member completions on synthesized (pre-run) context entries.
+const sampleForArgType = (type) => {
+  switch ((type || '').toLowerCase()) {
+    case 'number':
+    case 'integer':
+    case 'float':
+      return 0;
+    case 'boolean':
+      return false;
+    case 'array':
+      return [];
+    case 'object':
+      return {};
+    default:
+      return '';
+  }
+};
+
 // ============================================================================
 // JavascriptNodeConfigurator - JSON Forms based configuration
 // ============================================================================
@@ -152,6 +171,36 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
     return uniqueFeed;
   }, [workflowNodes, nodeId, workflowInputArgs, workflowContext]);
 
+  // Build the `ctx` state tree exposed to the JS code editor. This synthesizes a
+  // pre-run shape (input args, preceding node outputs, loop item) and merges any
+  // live runtime workflowContext on top so the engine can offer deep, accurate
+  // member completions for raw-JS code (js-template mode).
+  const ctxStateTree = useMemo(() => {
+    const ctx = { input: {}, item: '' };
+
+    (workflowInputArgs || [])
+      .filter((arg) => typeof arg?.key === 'string' && arg.key.trim())
+      .forEach((arg) => {
+        ctx.input[arg.key.trim()] = sampleForArgType(arg.type);
+      });
+
+    if (workflowNodes) {
+      workflowNodes
+        .filter((n) => n.id !== nodeId && n.data?.outputVariable)
+        .forEach((n) => {
+          if (!(n.data.outputVariable in ctx)) {
+            ctx[n.data.outputVariable] = {};
+          }
+        });
+    }
+
+    if (workflowContext && typeof workflowContext === 'object') {
+      Object.assign(ctx, workflowContext);
+    }
+
+    return { ctx };
+  }, [workflowNodes, nodeId, workflowInputArgs, workflowContext]);
+
   // Build schema
   const schema = useMemo(() => {
     return {
@@ -257,6 +306,7 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
                 placeholder: '// Your JavaScript code here\n// Access context: ctx.variableName\n// Return a value to store in outputVariable\nreturn true;',
                 hint: contextHint,
                 intellisenseFeed: intellisenseFeed,
+                stateTree: ctxStateTree,
                 showHeader: true,
               },
             },
@@ -311,7 +361,7 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         },
       ],
     };
-  }, [strings, availableVariables]);
+  }, [strings, availableVariables, intellisenseFeed, ctxStateTree]);
 
   // Handle form changes
   const handleFormChange = useCallback(({ data: newData }) => {

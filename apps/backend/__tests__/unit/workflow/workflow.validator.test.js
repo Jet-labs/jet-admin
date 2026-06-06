@@ -6,7 +6,7 @@ const {
 } = require('../../../modules/workflow/workflow.validator');
 const {
   MUSTACHE_ONLY_TEMPLATE_MESSAGE,
-} = require('../../../utils/templateEngine/validator');
+} = require("@jet-admin/expression-engine");
 
 describe('workflow.validator', () => {
   it('accepts canonical create payloads', () => {

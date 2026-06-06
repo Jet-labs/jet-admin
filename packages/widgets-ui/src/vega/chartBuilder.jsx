@@ -6,7 +6,7 @@ import { VariablePathPicker } from './variablePathPicker';
 import { CollapseComponent } from '../ui/collapseComponent';
 import { generateVegaLiteSpec, getDefaultChartConfig } from './chartSpecGenerator';
 import { Input, Label, Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@jet-admin/ui";
-import { getValueByPath } from '@jet-admin/template-engine';
+import { getValueByPath } from '@jet-admin/expression-engine';
 
 // ─── Section card wrapper (matches UI_GUIDELINES_V3 section card pattern) ────
 

@@ -10,9 +10,8 @@ const {
   getCreationContextFromAuthContext,
 } = require("../../utils/auth.context.utils");
 
-const { resolveTemplate } = require("../../utils/templateEngine/resolver");
-const { resolveInputs } = require("../../utils/inputArgs.util");
-const { extractWorkflowDefinitions } = require("../../utils/definitionProvider.util");
+const { resolveTemplate } = require("@jet-admin/expression-engine");
+const { extractWorkflowDefinitions, resolveInputs } = require("../../utils/inputArgs.util");
 
 function mapWorkflowNodeForPersistence(node, workflowID) {
   return {

@@ -4,8 +4,7 @@ const { isUUID } = require("validator");
 const { v4: uuid } = require("uuid");
 const dataQueryService = {};
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
-const { resolveInputs } = require("../../utils/inputArgs.util");
-const { extractQueryDefinitions } = require("../../utils/definitionProvider.util");
+const { resolveInputs, extractQueryDefinitions } = require("../../utils/inputArgs.util");
 
 dataQueryService.getDataQueriesWithDatasource = async ({
   userID,

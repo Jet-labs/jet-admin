@@ -5,7 +5,7 @@ import { inferFieldsFromData } from './chartSpecGenerator';
 
 import { Button, Input } from "@jet-admin/ui";
 import { Database, GitMerge, ArrowRightFromLine, Zap, Search, Plus } from 'lucide-react';
-import { getJsSuggestions, getValueByPath } from '@jet-admin/template-engine';
+import { getJsSuggestions, getValueByPath } from '@jet-admin/expression-engine';
 
 /**
  * DataFieldPanel — Inline field list for Vega visual builder.

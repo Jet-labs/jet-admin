@@ -3,7 +3,7 @@ const {
 } = require('../../../utils/inputArgs.util');
 
 // Mock the template engine
-jest.mock('../../../utils/templateEngine/resolver', () => ({
+jest.mock("@jet-admin/expression-engine", () => ({
   resolveTemplate: jest.fn((value, context, options) => {
     // Simple mock: replace {{ctx.input.X}} with context.ctx.input[X]
     if (typeof value === 'string' && value.startsWith('{{') && value.endsWith('}}')) {
@@ -20,10 +20,7 @@ jest.mock('../../../utils/templateEngine/resolver', () => ({
   }),
 }));
 
-// Mock definitionProvider (only used when definitions are not provided inline)
-jest.mock('../../../utils/definitionProvider.util', () => ({
-  getInputDefinitions: jest.fn(async () => []),
-}));
+
 
 describe('resolveInputs', () => {
   beforeEach(() => {
@@ -231,12 +228,12 @@ describe('resolveInputs', () => {
   // ─── Definition fetching fallback ─────────────────────────────────────
 
   it('calls getInputDefinitions when type and id are provided but definitions are not', async () => {
-    const { getInputDefinitions } = require('../../../utils/definitionProvider.util');
-    getInputDefinitions.mockResolvedValueOnce([
+    const inputArgsUtil = require('../../../utils/inputArgs.util');
+    jest.spyOn(inputArgsUtil, 'getInputDefinitions').mockResolvedValueOnce([
       { key: 'x', type: 'number', required: true },
     ]);
 
-    const result = await resolveInputs({
+    const result = await inputArgsUtil.resolveInputs({
       type: 'workflow',
       id: 'wf-123',
       runtimeValues: { x: '10' },

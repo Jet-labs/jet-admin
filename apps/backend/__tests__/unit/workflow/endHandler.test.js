@@ -1,4 +1,4 @@
-const { resolveTemplate } = require('../../../utils/templateEngine');
+const { resolveTemplate } = require("@jet-admin/expression-engine");
 
 const WORKFLOW_TEMPLATE_OPTIONS = {
   allowedRoots: ['ctx'],

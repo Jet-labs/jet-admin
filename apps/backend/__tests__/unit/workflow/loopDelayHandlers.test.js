@@ -1,4 +1,4 @@
-const { resolveTemplate } = require('../../../utils/templateEngine');
+const { resolveTemplate } = require("@jet-admin/expression-engine");
 const loopHandler = require('../../../modules/workflow/handlers/loopHandler');
 const delayHandler = require('../../../modules/workflow/handlers/delayHandler');
 

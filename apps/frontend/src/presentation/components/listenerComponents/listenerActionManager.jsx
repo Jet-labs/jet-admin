@@ -25,9 +25,14 @@ import {
   CardFooter,
   CardTitle,
 } from "@jet-admin/ui";
+import { MODES } from "@jet-admin/expression-engine";
 import { Zap, Search, Save, Smartphone, Plus, Trash2, Edit2, Play, CircleSlash, ArrowRight, Wand2 } from "lucide-react";
 import PropTypes from "prop-types";
 import { GitBranch, FileCode2, DatabaseZap, PanelTop } from "lucide-react";
+
+// Listener action mappings resolve {{event.*}} against the incoming event via
+// the backend's safe-path resolver, so suggestions use the `event` root only.
+const LISTENER_EVENT_STATE_TREE = { event: {} };
 const ACTION_TYPES = [
   { value: "transform", label: "Transform Event", icon: Wand2, color: "text-primary", bg: "bg-muted", border: "border-border" },
   { value: "trigger_workflow", label: "Trigger Workflow", icon: GitBranch, color: "text-primary", bg: "bg-muted", border: "border-border" },
@@ -461,6 +466,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                   <InputArgsForm
                     args={normalizedArgs}
                     values={typeof config.inputMapping === 'object' ? config.inputMapping : {}}
+                    stateTree={LISTENER_EVENT_STATE_TREE}
+                    templateMode={MODES.SAFE_PATH}
                     onChange={(key, val) => {
                       const currentMapping = typeof config.inputMapping === 'object' ? config.inputMapping : {};
                       const updated = { ...currentMapping };
@@ -563,6 +570,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                   <InputArgsForm
                     args={normalizedArgs}
                     values={typeof config.argMapping === 'object' ? config.argMapping : {}}
+                    stateTree={LISTENER_EVENT_STATE_TREE}
+                    templateMode={MODES.SAFE_PATH}
                     onChange={(key, val) => {
                       const currentMapping = typeof config.argMapping === 'object' ? config.argMapping : {};
                       const updated = { ...currentMapping };

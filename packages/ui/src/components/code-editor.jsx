@@ -1,8 +1,62 @@
 import * as React from "react";
-import Editor from "@monaco-editor/react";
-import GithubTheme from "./github-light.json";
+import { EditorState, Compartment } from '@codemirror/state';
+import { EditorView, keymap, lineNumbers } from '@codemirror/view';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { closeBrackets, closeBracketsKeymap, autocompletion } from '@codemirror/autocomplete';
+import { javascript } from '@codemirror/lang-javascript';
+import { sql } from '@codemirror/lang-sql';
+import { json } from '@codemirror/lang-json';
+import { html } from '@codemirror/lang-html';
+import { css } from '@codemirror/lang-css';
+import { oneDark } from '@codemirror/theme-one-dark';
+import { getCompletions, MODES } from '@jet-admin/expression-engine';
 import { cn } from "../lib/utils";
-import { Maximize2, Minimize2, Braces, AlertTriangle, CheckCircle2, Code } from "lucide-react";
+import { Maximize2, Minimize2, AlertTriangle, CheckCircle2, Code } from "lucide-react";
+
+// For hot-swapping properties without remounting the editor
+const languageCompartment = new Compartment();
+const readOnlyCompartment = new Compartment();
+const autocompleteCompartment = new Compartment();
+
+const getLanguageExtension = (lang) => {
+  switch (lang) {
+    case 'javascript': return javascript();
+    case 'sql': return sql();
+    case 'json': return json();
+    case 'html': return html();
+    case 'css': return css();
+    default: return javascript();
+  }
+};
+
+function engineTypeToCmType(type) {
+  switch (type) {
+    case 'object':
+    case 'array':
+      return 'namespace';
+    case 'method':
+      return 'method';
+    case 'function':
+      return 'function';
+    case 'property':
+      return 'property';
+    case 'snippet':
+      return 'text';
+    default:
+      return 'variable';
+  }
+}
+
+function toCmOption(s) {
+  return {
+    label: s.label,
+    apply: s.value ?? s.label,
+    detail: s.detail,
+    type: engineTypeToCmType(s.type),
+    boost: s.category === 'live-state' ? 2 : (typeof s.category === 'string' && s.category.endsWith('member')) ? 1 : 0,
+    info: s.detail ? `Value: ${s.detail}` : undefined,
+  };
+}
 
 const CodeEditor = React.forwardRef(({
   value,
@@ -22,50 +76,134 @@ const CodeEditor = React.forwardRef(({
   showLineNumbers = true,
   headerExtra,
   headerLeft,
-  status, // "valid" | "error" | null
+  status,
   statusMessage,
   footerHint,
   onMount,
   beforeMount,
+  extensions = [],
   editorOptions = {},
+  // Intellisense Props
+  stateTree = null,
+  templateMode,
   ...props
 }, ref) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
-  const internalEditorRef = React.useRef(null);
-  const monacoRef = React.useRef(null);
+  const containerRef = React.useRef(null);
+  const viewRef = React.useRef(null);
+  const internalChange = React.useRef(false);
 
   const isReadOnly = disabled || readOnly;
 
-  const handleEditorWillMount = (monaco) => {
-    // Register GitHub Light theme
-    monaco.editor.defineTheme("github-light", GithubTheme);
-    
-    if (beforeMount) {
-      beforeMount(monaco);
-    }
-  };
+  const effectiveTemplateMode = React.useMemo(() => {
+    if (templateMode) return templateMode;
+    return language === 'javascript' ? MODES.JS_TEMPLATE : MODES.SAFE_PATH;
+  }, [templateMode, language]);
 
-  const handleEditorDidMount = (editor, monaco) => {
-    internalEditorRef.current = editor;
-    monacoRef.current = monaco;
-    
-    // Pass refs to parent if a ref was provided
-    if (typeof ref === "function") {
-      ref({ editor, monaco });
-    } else if (ref) {
-      ref.current = { editor, monaco };
-    }
+  // Build the autocompletion extension
+  const autocompletionExtension = React.useMemo(() => {
+    const completionSource = (ctx) => {
+      const isSql = language === 'sql';
+      let inMustache = false;
 
-    if (onMount) {
-      onMount(editor, monaco);
-    }
-  };
+      if (isSql) {
+        // Check if inside {{ }}
+        const doc = ctx.state.doc.toString();
+        let searchFrom = 0;
+        while (searchFrom < doc.length) {
+          const open = doc.indexOf('{{', searchFrom);
+          if (open === -1) break;
+          const close = doc.indexOf('}}', open + 2);
+          if (close === -1) break;
+          if (ctx.pos > open + 1 && ctx.pos <= close) {
+            inMustache = true;
+            break;
+          }
+          searchFrom = close + 2;
+        }
 
-  const handleFormat = () => {
-    if (internalEditorRef.current) {
-      internalEditorRef.current.getAction("editor.action.formatDocument")?.run();
-    }
-  };
+        if (!inMustache) {
+          const sqlWord = ctx.matchBefore(/[\w.]*/);
+          if (!sqlWord) return null;
+          if (sqlWord.from === sqlWord.to && !ctx.explicit) return null;
+
+          const text = sqlWord.text;
+          const suggestions = [];
+
+          const sqlKeywords = [
+            "SELECT", "FROM", "WHERE", "JOIN", "LEFT JOIN", "RIGHT JOIN",
+            "INNER JOIN", "ON", "GROUP BY", "ORDER BY", "ASC", "DESC",
+            "AS", "DISTINCT", "LIMIT", "OFFSET", "INSERT INTO", "VALUES",
+            "UPDATE", "SET", "DELETE", "CREATE TABLE", "ALTER TABLE",
+            "DROP TABLE", "INDEX", "COUNT", "SUM", "AVG", "MAX", "MIN",
+            "AND", "OR", "NOT", "NULL", "IS"
+          ];
+          sqlKeywords.forEach(kw => suggestions.push({ label: kw, type: 'keyword' }));
+
+          const options = suggestions.filter(s => {
+            if (!text) return true;
+            const matchQuery = text.includes('.') ? text.split('.').pop().toLowerCase() : text.toLowerCase();
+            return s.label.toLowerCase().includes(matchQuery);
+          });
+
+          if (options.length === 0 && !ctx.explicit) return null;
+
+          return {
+            from: text.includes('.') ? sqlWord.from + text.lastIndexOf('.') + 1 : sqlWord.from,
+            options,
+            validFor: /^[\w]*$/
+          };
+        }
+      }
+
+      const word = ctx.matchBefore(/[\w.[\]"']*/);
+      if (!word) return null;
+      if (word.from === word.to && !ctx.explicit) return null;
+
+      const filter = word.text;
+      const query = filter.toLowerCase();
+
+      let engineSuggestions = [];
+
+      if (stateTree) {
+        engineSuggestions = getCompletions({ filter, stateTree, mode: effectiveTemplateMode });
+      } else if (language === 'javascript') {
+        // Fallback JS keywords if no stateTree
+        const jsKeywords = [
+          { label: 'return', detail: 'Return statement' },
+          { label: 'const', detail: 'Constant declaration' },
+          { label: 'let', detail: 'Variable declaration' },
+          { label: 'ctx', detail: 'Workflow context object' },
+          { label: 'console.log', detail: 'Log to console' },
+          { label: 'JSON.stringify', detail: 'Convert to JSON string' },
+          { label: 'JSON.parse', detail: 'Parse JSON string' },
+          { label: 'Array.isArray', detail: 'Check if array' },
+          { label: 'Object.keys', detail: 'Get object keys' },
+          { label: 'Object.values', detail: 'Get object values' },
+        ];
+        engineSuggestions = jsKeywords.map(k => ({ ...k, type: 'keyword' }));
+      }
+
+      const options = engineSuggestions
+        .filter(s => {
+          if (!query) return true;
+          const value = (s.value || s.label || '').toLowerCase();
+          const label = (s.label || '').toLowerCase();
+          return value.includes(query) || label.includes(query);
+        })
+        .map(toCmOption);
+
+      if (options.length === 0 && !ctx.explicit) return null;
+
+      return {
+        from: word.from,
+        options,
+        validFor: /^[\w.[\]"']*$/
+      };
+    };
+
+    return autocompletion({ override: [completionSource], activateOnTyping: true, maxRenderedOptions: 50 });
+  }, [language, stateTree, effectiveTemplateMode, tablesMap]);
 
   // Toggle fullscreen mode
   React.useEffect(() => {
@@ -79,6 +217,164 @@ const CodeEditor = React.forwardRef(({
     }
     return () => document.removeEventListener("keydown", handleEsc);
   }, [isExpanded]);
+
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+
+    containerRef.current.innerHTML = "";
+
+    const baseExtensions = [
+      history(),
+      closeBrackets(),
+      keymap.of([
+        ...defaultKeymap,
+        ...historyKeymap,
+        ...closeBracketsKeymap,
+      ]),
+      languageCompartment.of(getLanguageExtension(language)),
+      readOnlyCompartment.of(EditorState.readOnly.of(isReadOnly)),
+      autocompleteCompartment.of(autocompletionExtension),
+      oneDark,
+      ...extensions,
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          internalChange.current = true;
+          onChange?.(update.state.doc.toString());
+        }
+      }),
+      EditorView.theme({
+        '&': {
+          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          fontSize: '12px',
+          height: '100%',
+          backgroundColor: 'transparent',
+          color: 'hsl(var(--foreground))',
+        },
+        '.cm-scroller': { overflow: 'auto', maxHeight: '100%', scrollbarWidth: 'thin' },
+        '.cm-gutters': {
+          backgroundColor: 'transparent',
+          borderRight: '1px solid hsl(var(--border))',
+          color: 'hsl(var(--muted-foreground))',
+        },
+        '.cm-content': {
+          padding: '8px 0',
+          caretColor: 'hsl(var(--foreground))',
+        },
+        '&.cm-focused': { outline: 'none' },
+        '.cm-cursor': {
+          borderLeftColor: 'hsl(var(--foreground))',
+        },
+        '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
+          background: 'hsl(var(--primary) / 0.15) !important',
+        },
+        // Autocomplete dropdown — match design system
+        '.cm-tooltip.cm-tooltip-autocomplete': {
+          border: '1px solid hsl(var(--border))',
+          borderRadius: '6px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          background: 'hsl(var(--background))',
+          fontSize: '11px',
+          overflow: 'hidden',
+          maxHeight: '220px',
+          zIndex: '9999',
+        },
+        '.cm-tooltip-autocomplete > ul': {
+          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          maxHeight: '220px',
+          scrollbarWidth: 'thin',
+        },
+        '.cm-tooltip-autocomplete > ul > li': {
+          padding: '4px 10px',
+          lineHeight: '1.5',
+          color: 'hsl(var(--foreground))',
+        },
+        '.cm-tooltip-autocomplete > ul > li[aria-selected]': {
+          background: 'hsl(var(--primary) / 0.12)',
+          color: 'hsl(var(--foreground))',
+        },
+        '.cm-completionLabel': {
+          color: 'hsl(var(--foreground))',
+          fontSize: '11px',
+        },
+        '.cm-completionDetail': {
+          color: 'hsl(var(--muted-foreground))',
+          fontSize: '10px',
+          marginLeft: '8px',
+        },
+        '.cm-completionIcon': {
+          marginRight: '4px',
+          opacity: '0.7',
+        },
+      }),
+    ];
+
+    if (showLineNumbers) {
+      baseExtensions.push(lineNumbers());
+    }
+
+    const state = EditorState.create({
+      doc: value !== undefined ? value : (defaultValue || ''),
+      extensions: baseExtensions,
+    });
+
+    const view = new EditorView({
+      state,
+      parent: containerRef.current,
+    });
+
+    viewRef.current = view;
+
+    if (typeof ref === "function") {
+      ref({ editor: view, monaco: null });
+    } else if (ref) {
+      ref.current = { editor: view, monaco: null };
+    }
+
+    if (onMount) {
+      onMount(view, null);
+    }
+
+    return () => {
+      view.destroy();
+      viewRef.current = null;
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    if (internalChange.current) {
+      internalChange.current = false;
+      return;
+    }
+    const current = view.state.doc.toString();
+    const incoming = value || '';
+    if (current !== incoming) {
+      view.dispatch({
+        changes: { from: 0, to: current.length, insert: incoming },
+      });
+    }
+  }, [value]);
+
+  React.useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        effects: [
+          languageCompartment.reconfigure(getLanguageExtension(language)),
+          readOnlyCompartment.reconfigure(EditorState.readOnly.of(isReadOnly)),
+        ],
+      });
+    }
+  }, [language, isReadOnly]);
+
+  // Sync completion dependencies
+  React.useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        effects: autocompleteCompartment.reconfigure(autocompletionExtension),
+      });
+    }
+  }, [autocompletionExtension]);
 
   return (
     <div
@@ -116,25 +412,12 @@ const CodeEditor = React.forwardRef(({
               </span>
             )}
 
-            {/* Custom Left Injection */}
             {headerLeft}
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-1.5">
             {headerExtra}
-            
-            {showFormatButton && !isReadOnly && (
-              <button
-                type="button"
-                onClick={handleFormat}
-                className="inline-flex h-6 items-center gap-1.5 rounded border border-transparent px-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:border-border/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                title="Format Code (Shift+Alt+F)"
-              >
-                <Braces className="h-3 w-3" />
-                Format
-              </button>
-            )}
 
             {showExpandButton && (
               <button
@@ -151,49 +434,8 @@ const CodeEditor = React.forwardRef(({
       )}
 
       {/* Editor Main Area */}
-      <div className="relative flex-1">
-        <Editor
-          height={isExpanded ? "calc(100vh - 80px)" : height}
-          language={language}
-          value={value}
-          defaultValue={defaultValue}
-          onChange={onChange}
-          beforeMount={handleEditorWillMount}
-          onMount={handleEditorDidMount}
-          theme={"vs-dark"}
-          options={{
-            readOnly: isReadOnly,
-            minimap: { enabled: isExpanded },
-            fontSize: 12,
-            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-            lineNumbers: showLineNumbers ? "on" : "off",
-            scrollBeyondLastLine: false,
-            wordWrap: "on",
-            wrappingStrategy: "advanced",
-            automaticLayout: true,
-            formatOnPaste: true,
-            formatOnType: true,
-            tabSize: 2,
-            insertSpaces: true,
-            quickSuggestions: { other: true, comments: false, strings: true },
-            suggestOnTriggerCharacters: true,
-            acceptSuggestionOnEnter: "on",
-            snippetSuggestions: "inline",
-            padding: { top: 8, bottom: 8 },
-            folding: true,
-            foldingStrategy: "indentation",
-            showFoldingControls: "always",
-            bracketPairColorization: { enabled: true },
-            lineNumbersMinChars: 3,
-            glyphMargin: false,
-            overviewRulerLanes: 0,
-            scrollbar: {
-              verticalScrollbarSize: 8,
-              horizontalScrollbarSize: 8,
-            },
-            ...editorOptions,
-          }}
-        />
+      <div className="relative flex-1" style={{ height: isExpanded ? "calc(100vh - 80px)" : (typeof height === "number" ? `${height}px` : height) }}>
+        <div ref={containerRef} className="h-full w-full" />
 
         {/* Footer Hint Overlay */}
         {footerHint && (

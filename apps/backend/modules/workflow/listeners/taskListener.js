@@ -14,7 +14,7 @@
 
 const { registerTaskWorker, addResult, addNodeJob } = require("../../../config/queue.config");
 const { getHandler } = require('../handlers');
-const { resolveTemplate: sharedResolveTemplate } = require("../../../utils/templateEngine");
+const { resolveTemplate: sharedResolveTemplate } = require("@jet-admin/expression-engine");
 const { stateManager } = require('../workflowEngine/stateManager');
 const Logger = require("../../../utils/logger");
 const { serializeError } = require('../handlers/constants');

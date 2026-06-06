@@ -28,12 +28,12 @@
  */
 
 import {
-  resolveJsTemplate,
+  evaluate,
+  MODES,
   getValueByPath,
   extractTemplateBlocks,
-  extractWholeTemplateExpression,
-  tokenizeObjectPath,
-} from "@jet-admin/template-engine";
+  extractDependencies as engineExtractDependencies,
+} from "@jet-admin/expression-engine";
 
 /**
  * The namespace root for all appPage expressions.
@@ -115,7 +115,8 @@ export const evaluateExpression = (expression, stateTree) => {
  */
 export const resolveValue = (value, stateTree) => {
   if (typeof value !== "string") return value;
-  return resolveJsTemplate(value, wrapStateContext(stateTree), {
+  return evaluate(value, wrapStateContext(stateTree), {
+    mode: MODES.JS_TEMPLATE,
     preserveSingleExpressionType: true,
   });
 };
@@ -131,7 +132,8 @@ export const resolveValue = (value, stateTree) => {
  */
 export const resolveConfig = (config, stateTree) => {
   if (config === null || config === undefined) return config;
-  return resolveJsTemplate(config, wrapStateContext(stateTree), {
+  return evaluate(config, wrapStateContext(stateTree), {
+    mode: MODES.JS_TEMPLATE,
     preserveSingleExpressionType: true,
   });
 };
@@ -149,26 +151,5 @@ export const resolveConfig = (config, stateTree) => {
  * @returns {string[]} Array of unique state paths referenced
  */
 export const extractDependencies = (config) => {
-  const deps = new Set();
-
-  const walk = (value) => {
-    if (typeof value === "string") {
-      const blocks = extractTemplateBlocks(value);
-      for (const block of blocks) {
-        // Find all occurrences of "state.namespace.key" anywhere in the JS expression
-        // e.g. from "String(state.queries.query_5.isLoading)" we extract "queries.query_5"
-        const matches = block.expression.matchAll(/state\.([A-Za-z0-9_$]+)\.([A-Za-z0-9_$]+)/g);
-        for (const match of matches) {
-          deps.add(`${match[1]}.${match[2]}`);
-        }
-      }
-    } else if (Array.isArray(value)) {
-      value.forEach(walk);
-    } else if (value && typeof value === "object") {
-      Object.values(value).forEach(walk);
-    }
-  };
-
-  walk(config);
-  return [...deps];
+  return engineExtractDependencies(config, { roots: ALLOWED_ROOTS });
 };

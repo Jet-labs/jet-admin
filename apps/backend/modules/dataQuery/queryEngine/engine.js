@@ -1,11 +1,11 @@
 // src/engine.js
 const Logger = require("../../../utils/logger");
-const { resolveTemplate } = require("../../../utils/templateEngine");
+const { resolveTemplate } = require("@jet-admin/expression-engine");
 const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
 const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
 
 const QUERY_TEMPLATE_OPTIONS = {
-  allowedRoots: ["runtimeArgs", "args"],
+  allowedRoots: ["args"],
   preserveSingleExpressionType: true,
 };
 

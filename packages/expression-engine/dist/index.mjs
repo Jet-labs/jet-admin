@@ -1,91 +1,3 @@
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/index.js
-var index_exports = {};
-__export(index_exports, {
-  BLOCKED_PATH_SEGMENTS: () => BLOCKED_PATH_SEGMENTS,
-  JS_ARRAY_METHODS: () => JS_ARRAY_METHODS,
-  JS_BUILTINS: () => JS_BUILTINS,
-  JS_STRING_METHODS: () => JS_STRING_METHODS,
-  JsTemplateError: () => JsTemplateError,
-  MUSTACHE_ONLY_TEMPLATE_MESSAGE: () => MUSTACHE_ONLY_TEMPLATE_MESSAGE,
-  TEMPLATE_BLOCK_REGEX: () => TEMPLATE_BLOCK_REGEX,
-  WHOLE_TEMPLATE_REGEX: () => WHOLE_TEMPLATE_REGEX,
-  collectTemplateViolations: () => collectTemplateViolations,
-  evalJsExpression: () => evalJsExpression,
-  extractTemplateBlocks: () => extractTemplateBlocks,
-  extractWholeTemplateExpression: () => extractWholeTemplateExpression,
-  getJsSuggestions: () => getJsSuggestions,
-  getMemberSuggestions: () => getMemberSuggestions,
-  getObjectSuggestions: () => getObjectSuggestions,
-  getValueByPath: () => getValueByPath,
-  hasMissingTemplateBraces: () => hasMissingTemplateBraces,
-  inferValueType: () => inferValueType,
-  looksLikeJsExpression: () => looksLikeJsExpression,
-  normalizePath: () => normalizePath,
-  resolveJsTemplate: () => resolveJsTemplate,
-  resolvePathInTree: () => resolvePathInTree,
-  resolveTemplate: () => resolveTemplate,
-  tokenizeObjectPath: () => tokenizeObjectPath
-});
-module.exports = __toCommonJS(index_exports);
-
-// src/parsers.js
-var TEMPLATE_BLOCK_REGEX = /\{\{([\s\S]+?)\}\}/g;
-var WHOLE_TEMPLATE_REGEX = /^\{\{([\s\S]+?)\}\}$/;
-function isPlainObject(value) {
-  return Object.prototype.toString.call(value) === "[object Object]";
-}
-function extractTemplateBlocks(template) {
-  if (template === null || template === void 0 || template === "") return [];
-  if (Array.isArray(template)) {
-    return template.flatMap(extractTemplateBlocks);
-  }
-  if (isPlainObject(template)) {
-    return Object.values(template).flatMap(extractTemplateBlocks);
-  }
-  if (typeof template !== "string") {
-    return [];
-  }
-  const regex = new RegExp(TEMPLATE_BLOCK_REGEX);
-  let match;
-  const matches = [];
-  while ((match = regex.exec(template)) !== null) {
-    matches.push({
-      fullMatch: match[0],
-      expression: match[1].trim(),
-      index: match.index
-    });
-  }
-  return matches;
-}
-function extractWholeTemplateExpression(template) {
-  if (typeof template !== "string") return null;
-  const match = template.match(WHOLE_TEMPLATE_REGEX);
-  if (!match) return null;
-  return {
-    fullMatch: match[0],
-    expression: match[1].trim(),
-    index: 0
-  };
-}
-
 // src/tokenizer.js
 var BLOCKED_PATH_SEGMENTS = /* @__PURE__ */ new Set(["__proto__", "prototype", "constructor"]);
 function normalizePath(path, allowedRoots = []) {
@@ -173,7 +85,47 @@ function getValueByPath(target, path, options = {}) {
   return current;
 }
 
-// src/resolver.js
+// src/parsers.js
+var TEMPLATE_BLOCK_REGEX = /\{\{([\s\S]+?)\}\}/g;
+var WHOLE_TEMPLATE_REGEX = /^\{\{([\s\S]+?)\}\}$/;
+function isPlainObject(value) {
+  return Object.prototype.toString.call(value) === "[object Object]";
+}
+function extractTemplateBlocks(template) {
+  if (template === null || template === void 0 || template === "") return [];
+  if (Array.isArray(template)) {
+    return template.flatMap(extractTemplateBlocks);
+  }
+  if (isPlainObject(template)) {
+    return Object.values(template).flatMap(extractTemplateBlocks);
+  }
+  if (typeof template !== "string") {
+    return [];
+  }
+  const regex = new RegExp(TEMPLATE_BLOCK_REGEX);
+  let match;
+  const matches = [];
+  while ((match = regex.exec(template)) !== null) {
+    matches.push({
+      fullMatch: match[0],
+      expression: match[1].trim(),
+      index: match.index
+    });
+  }
+  return matches;
+}
+function extractWholeTemplateExpression(template) {
+  if (typeof template !== "string") return null;
+  const match = template.match(WHOLE_TEMPLATE_REGEX);
+  if (!match) return null;
+  return {
+    fullMatch: match[0],
+    expression: match[1].trim(),
+    index: 0
+  };
+}
+
+// src/path-resolver.js
 function isPlainObject2(value) {
   return Object.prototype.toString.call(value) === "[object Object]";
 }
@@ -188,7 +140,7 @@ function formatInlineTemplateValue(value, options = {}) {
   const formatter = options.inlineValueFormatter || defaultInlineValueFormatter;
   return formatter(value);
 }
-function resolveStringTemplateInternal(template, target, options = {}) {
+function resolveStringTemplate(template, target, options = {}) {
   if (typeof template !== "string") return template;
   const wholeExpression = extractWholeTemplateExpression(template);
   if (wholeExpression) {
@@ -204,31 +156,86 @@ function resolveStringTemplateInternal(template, target, options = {}) {
   }
   return result;
 }
-function resolveArrayTemplateInternal(template, target, options = {}, meta = {}) {
-  return template.map((value) => resolveTemplate(value, target, options, meta));
-}
-function resolveObjectTemplateInternal(template, target, options = {}, meta = {}) {
-  return Object.fromEntries(
-    Object.entries(template).map(([key, value]) => [
-      key,
-      resolveTemplate(value, target, options, meta)
-    ])
-  );
-}
-function resolveTemplate(template, target, options = {}, meta = {}) {
+function resolvePathTemplate(template, target, options = {}) {
   if (typeof template === "string") {
-    return resolveStringTemplateInternal(template, target, options);
+    return resolveStringTemplate(template, target, options);
   }
   if (Array.isArray(template)) {
-    return resolveArrayTemplateInternal(template, target, options, meta);
+    return template.map((value) => resolvePathTemplate(value, target, options));
   }
   if (isPlainObject2(template)) {
-    return resolveObjectTemplateInternal(template, target, options, meta);
+    return Object.fromEntries(
+      Object.entries(template).map(([key, value]) => [
+        key,
+        resolvePathTemplate(value, target, options)
+      ])
+    );
   }
   return template;
 }
 
-// src/js-resolver.js
+// src/errors.js
+var ExpressionEngineError = class extends Error {
+  /**
+   * @param {string} message
+   * @param {Error}  [cause]
+   */
+  constructor(message, cause) {
+    super(message);
+    this.name = "ExpressionEngineError";
+    if (cause) this.cause = cause;
+  }
+};
+var TemplateSyntaxError = class extends ExpressionEngineError {
+  /**
+   * @param {string} message
+   * @param {string} template  The raw template string that failed
+   * @param {Error}  [cause]
+   */
+  constructor(message, template, cause) {
+    super(message, cause);
+    this.name = "TemplateSyntaxError";
+    this.template = template;
+  }
+};
+var SecurityViolationError = class extends ExpressionEngineError {
+  /**
+   * @param {string} message
+   * @param {string} expression  The offending expression content
+   * @param {Error}  [cause]
+   */
+  constructor(message, expression, cause) {
+    super(message, cause);
+    this.name = "SecurityViolationError";
+    this.expression = expression;
+  }
+};
+var SandboxTimeoutError = class extends ExpressionEngineError {
+  /**
+   * @param {string} message
+   * @param {number} [timeoutMs]  The configured timeout that was exceeded
+   * @param {Error}  [cause]
+   */
+  constructor(message, timeoutMs, cause) {
+    super(message, cause);
+    this.name = "SandboxTimeoutError";
+    this.timeoutMs = timeoutMs;
+  }
+};
+var JsTemplateError = class extends ExpressionEngineError {
+  /**
+   * @param {string} message
+   * @param {string} expression  The {{ }} content that failed
+   * @param {Error}  [cause]
+   */
+  constructor(message, expression, cause) {
+    super(message, cause);
+    this.name = "JsTemplateError";
+    this.expression = expression;
+  }
+};
+
+// src/js-template-resolver.js
 var safeStringify = (obj, replacer, space) => {
   const cache = /* @__PURE__ */ new Set();
   return JSON.stringify(
@@ -353,19 +360,6 @@ function buildSandboxedEvaluator(expression) {
   _exprCache.set(expression, fn);
   return fn;
 }
-var JsTemplateError = class extends Error {
-  /**
-   * @param {string} message
-   * @param {string} expression  The {{ }} content that failed
-   * @param {Error}  [cause]     Underlying JS error
-   */
-  constructor(message, expression, cause) {
-    super(message);
-    this.name = "JsTemplateError";
-    this.expression = expression;
-    if (cause) this.cause = cause;
-  }
-};
 function evalJsExpression(expression, ctx, options = {}) {
   const { throwOnError = false, extraGlobals = {} } = options;
   const safeCtx = typeof ctx === "object" && ctx !== null ? ctx : {};
@@ -373,8 +367,7 @@ function evalJsExpression(expression, ctx, options = {}) {
     __safeGlobals: { ...SAFE_GLOBALS, ...extraGlobals },
     __ctx: safeCtx,
     // Also spread context at the top level so identifiers resolve
-    // even without `with` in environments that strip it (e.g. bundlers with
-    // strict mode transforms). Belt-and-suspenders.
+    // even without `with` in environments that strip it.
     ...safeCtx
   };
   const blockedArgs = new Array(BLOCKED_GLOBALS.length).fill(void 0);
@@ -439,10 +432,97 @@ function collectError(error, options) {
   }
 }
 
+// src/evaluator.js
+var MODES = (
+  /** @type {const} */
+  {
+    SAFE_PATH: "safe-path",
+    JS_TEMPLATE: "js-template",
+    ISOLATED_JS: "isolated-js"
+  }
+);
+function evaluate(template, context, options = {}) {
+  const {
+    mode = MODES.SAFE_PATH,
+    preserveSingleExpressionType = true,
+    ...restOptions
+  } = options;
+  const resolveOptions = {
+    ...restOptions,
+    preserveSingleExpressionType
+  };
+  switch (mode) {
+    case MODES.SAFE_PATH:
+      return resolvePathTemplate(template, context, resolveOptions);
+    case MODES.JS_TEMPLATE:
+      return resolveJsTemplate(template, context, resolveOptions);
+    case MODES.ISOLATED_JS:
+      throw new Error(
+        `Mode "${MODES.ISOLATED_JS}" is not handled by the expression engine. Use the backend's workflowVm or listenerTransformerVm for isolated JS execution.`
+      );
+    default:
+      throw new Error(
+        `Unknown expression engine mode: "${mode}". Valid modes are: ${Object.values(MODES).join(", ")}`
+      );
+  }
+}
+
 // src/validator.js
 var MUSTACHE_ONLY_TEMPLATE_MESSAGE = "Use mustache syntax like {{ctx.input.customerID}} instead of a raw value path";
 function isPlainObject3(value) {
   return Object.prototype.toString.call(value) === "[object Object]";
+}
+var JS_SYNTAX_PATTERN = /[+\-*/%<>=!&|^~`?:()]|Math\.|JSON\.|Object\.|Array\.|String\.|Number\.|Boolean\.|Date\./;
+function containsJsSyntax(expression) {
+  if (!expression) return false;
+  return JS_SYNTAX_PATTERN.test(expression);
+}
+function validateTemplate(template, mode = "safe-path", options = {}) {
+  const errors = [];
+  if (typeof template !== "string") {
+    return { valid: true, errors };
+  }
+  const openCount = (template.match(/\{\{/g) || []).length;
+  const closeCount = (template.match(/\}\}/g) || []).length;
+  if (openCount !== closeCount) {
+    errors.push(
+      new TemplateSyntaxError(
+        `Mismatched template braces: ${openCount} opening '{{' vs ${closeCount} closing '}}'`,
+        template
+      )
+    );
+    return { valid: false, errors };
+  }
+  const blocks = extractTemplateBlocks(template);
+  if (mode === "safe-path") {
+    for (const block of blocks) {
+      if (containsJsSyntax(block.expression)) {
+        errors.push(
+          new SecurityViolationError(
+            `JavaScript syntax is not allowed in safe-path mode: "${block.expression}"`,
+            block.expression
+          )
+        );
+      }
+    }
+  }
+  if (options.allowedRoots && options.allowedRoots.length > 0) {
+    for (const block of blocks) {
+      const rootMatch = block.expression.match(/^([A-Za-z_$][A-Za-z0-9_$]*)/);
+      if (rootMatch) {
+        const root = rootMatch[1];
+        if (!options.allowedRoots.includes(root)) {
+          errors.push(
+            new SecurityViolationError(
+              `Expression root "${root}" is not in allowedRoots [${options.allowedRoots.join(", ")}]`,
+              block.expression
+            )
+          );
+        }
+      }
+    }
+  }
+  return { valid: errors.length === 0, errors };
 }
 function hasMissingTemplateBraces(value, options = { allowedRoots: ["ctx"] }) {
   if (typeof value !== "string") return false;
@@ -473,7 +553,38 @@ function collectTemplateViolations(value, path, issues = [], options = { allowed
   return issues;
 }
 
-// src/suggestion-engine.js
+// src/dependency-extractor.js
+function buildDependencyRegex(root) {
+  const escaped = root.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`${escaped}\\.([A-Za-z0-9_$]+)\\.([A-Za-z0-9_$]+)`, "g");
+}
+function extractDependencies(config, options = {}) {
+  const { roots = ["state"] } = options;
+  const deps = /* @__PURE__ */ new Set();
+  const regexes = roots.map((root) => ({ root, regex: buildDependencyRegex(root) }));
+  const walk = (value) => {
+    if (typeof value === "string") {
+      const blocks = extractTemplateBlocks(value);
+      for (const block of blocks) {
+        for (const { regex } of regexes) {
+          regex.lastIndex = 0;
+          let match;
+          while ((match = regex.exec(block.expression)) !== null) {
+            deps.add(`${match[1]}.${match[2]}`);
+          }
+        }
+      }
+    } else if (Array.isArray(value)) {
+      value.forEach(walk);
+    } else if (value && typeof value === "object") {
+      Object.values(value).forEach(walk);
+    }
+  };
+  walk(config);
+  return [...deps];
+}
+
+// src/intellisense.js
 var JS_ARRAY_METHODS = [
   { label: ".length", value: ".length", detail: "Number of items", type: "property", category: "array-member" },
   { label: ".filter()", value: ".filter()", detail: "Filter items by condition", type: "method", category: "array-member" },
@@ -668,4 +779,61 @@ function getJsSuggestions({
   }
   return merged;
 }
-//# sourceMappingURL=index.cjs.map
+function getCompletions({
+  filter = "",
+  stateTree = null,
+  mode = MODES.SAFE_PATH,
+  baseSuggestions = []
+} = {}) {
+  if (mode === MODES.SAFE_PATH) {
+    const objectSuggestions = stateTree ? getObjectSuggestions(stateTree) : [];
+    const trimmedFilter = filter.trim().toLowerCase();
+    const filtered = trimmedFilter ? [...baseSuggestions, ...objectSuggestions].filter(
+      (s) => s.value.toLowerCase().includes(trimmedFilter)
+    ) : [...baseSuggestions, ...objectSuggestions];
+    return filtered.slice(0, 200);
+  }
+  return getJsSuggestions({
+    filter,
+    stateTree,
+    baseSuggestions,
+    includeBuiltins: true
+  });
+}
+export {
+  BLOCKED_PATH_SEGMENTS,
+  ExpressionEngineError,
+  JS_ARRAY_METHODS,
+  JS_BUILTINS,
+  JS_STRING_METHODS,
+  JsTemplateError,
+  MODES,
+  MUSTACHE_ONLY_TEMPLATE_MESSAGE,
+  SandboxTimeoutError,
+  SecurityViolationError,
+  TEMPLATE_BLOCK_REGEX,
+  TemplateSyntaxError,
+  WHOLE_TEMPLATE_REGEX,
+  collectTemplateViolations,
+  evalJsExpression,
+  evaluate,
+  extractDependencies,
+  extractTemplateBlocks,
+  extractWholeTemplateExpression,
+  getCompletions,
+  getJsSuggestions,
+  getMemberSuggestions,
+  getObjectSuggestions,
+  getValueByPath,
+  hasMissingTemplateBraces,
+  inferValueType,
+  looksLikeJsExpression,
+  normalizePath,
+  resolveJsTemplate,
+  resolvePathInTree,
+  resolvePathTemplate,
+  resolvePathTemplate as resolveTemplate,
+  tokenizeObjectPath,
+  validateTemplate
+};
+//# sourceMappingURL=index.mjs.map

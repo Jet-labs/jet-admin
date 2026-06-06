@@ -636,7 +636,7 @@ import {
 } from "@jet-admin/ui";
 import { Trash2, Plus as Plus2, ArrowUp, ArrowDown, Sparkles as Sparkles2, Zap as Zap2 } from "lucide-react";
 import { TemplateAutocompleteInput as TemplateAutocompleteInput3 } from "@jet-admin/ui";
-import { getValueByPath as getValueByPath3 } from "@jet-admin/template-engine";
+import { getValueByPath as getValueByPath3 } from "@jet-admin/expression-engine";
 var resolvePath, TableConfigEditor;
 var init_tableConfigEditor = __esm({
   "src/table/tableConfigEditor.jsx"() {
@@ -2565,7 +2565,7 @@ import {
 // src/vega/vegaSpecEditor.jsx
 import React2, { useState as useState2, useCallback, useRef as useRef2, useEffect as useEffect2, useMemo as useMemo2 } from "react";
 import PropTypes from "prop-types";
-import { getValueByPath } from "@jet-admin/template-engine";
+import { getValueByPath } from "@jet-admin/expression-engine";
 import { CodeEditor } from "@jet-admin/ui";
 import { BarChart, Code, LineChart, PieChart, ScatterChart } from "lucide-react";
 var VEGA_TEMPLATES = {
@@ -3485,7 +3485,7 @@ FieldPill.propTypes = {
 // src/vega/dataFieldPanel.jsx
 import { Button, Input } from "@jet-admin/ui";
 import { Database, GitMerge, ArrowRightFromLine, Zap, Search, Plus } from "lucide-react";
-import { getJsSuggestions, getValueByPath as getValueByPath2 } from "@jet-admin/template-engine";
+import { getJsSuggestions, getValueByPath as getValueByPath2 } from "@jet-admin/expression-engine";
 var DataFieldPanel = ({
   queryResults,
   dataSource,

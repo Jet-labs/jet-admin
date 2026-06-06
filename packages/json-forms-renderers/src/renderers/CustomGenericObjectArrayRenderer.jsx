@@ -19,6 +19,12 @@ export const CustomGenericObjectArrayRenderer = ({
   const items = data || [];
   const itemSchema = schema.items;
   const propertyKeys = itemSchema?.properties ? Object.keys(itemSchema.properties) : [];
+  // Propagate template context (stateTree / templateMode) down to nested controls
+  // so inner text inputs keep their {{ }} intellisense.
+  const templateOptions = {
+    stateTree: uischema.options?.stateTree,
+    templateMode: uischema.options?.templateMode,
+  };
 
   const handleAddItem = () => {
     const newItem = itemSchema.properties
@@ -60,6 +66,7 @@ export const CustomGenericObjectArrayRenderer = ({
                     type: "Control",
                     scope: `#/properties/${propKey}`,
                     label: propKey.charAt(0).toUpperCase() + propKey.slice(1),
+                    options: { ...templateOptions },
                   }}
                   schema={itemSchema}
                   path={`${path}.${index}`}

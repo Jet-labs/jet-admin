@@ -8,7 +8,7 @@ export {
   // Control Renderers
   JetTextControl as WorkflowTextControl,
   JetSelectControl as WorkflowSelectControl,
-  JetDynamicArgsControl as WorkflowDynamicArgsControl,
+  JetCustomDynamicKeyValueInputRenderer as WorkflowDynamicArgsControl,
   JetNumberControl as WorkflowNumberControl,
   JetCheckboxControl as WorkflowCheckboxControl,
   
@@ -20,7 +20,7 @@ export {
   // Testers
   textInputTester,
   selectInputTester,
-  dynamicArgsTester,
+  dynamicKeyValueInputTester,
   verticalLayoutTester,
   groupLayoutTester,
   tabRendererTester,

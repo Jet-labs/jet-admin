@@ -7,7 +7,7 @@
  */
 const { registerListenerEventWorker } = require('../../../config/queue.config');
 const { ListenerTransformerVm } = require('./listenerTransformerVm');
-const { resolveTemplate: sharedResolveTemplate } = require('../../../utils/templateEngine');
+const { resolveTemplate: sharedResolveTemplate } = require("@jet-admin/expression-engine");
 const { socketIO } = require('../../../config/socket.io');
 const { prisma } = require('../../../config/prisma.config');
 const Logger = require('../../../utils/logger');

@@ -1,13 +1,27 @@
 // Custom Text Input Renderer
+//
+// Every JSON Forms text input is {{ }}-template aware: it renders the shared
+// TemplateAutocompleteInput from @jet-admin/ui, which provides expression-engine
+// powered intellisense whenever the cursor is inside a {{ }} zone. Context and
+// mode are supplied by the host form via uischema.options:
+//   options.stateTree     → live context tree for suggestions (args / ctx / events)
+//   options.templateMode  → expression-engine mode ("js-template" | "safe-path")
+// Password fields fall back to a masked plain input.
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input, Textarea, Label } from '@jet-admin/ui';
+import { Input, Label, TemplateAutocompleteInput } from '@jet-admin/ui';
 
 export const CustomTextInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
-  const isMulti = uischema?.options?.multi;
+  const options = uischema?.options || {};
+  const isMulti = options.multi;
+  const isPassword = options.format === "password";
   const isDisabled = enabled === false;
   const hasErrors = errors && errors.length > 0;
+  const stateTree = options.stateTree || null;
+  const templateMode = options.templateMode;
+  const placeholder = hasErrors ? errors : options.placeholder || "";
+  const stringValue = typeof data === 'object' ? JSON.stringify(data) : data || "";
 
   return (
     <div className="">
@@ -19,36 +33,29 @@ export const CustomTextInput = (props) => {
       >
         {label || description}
       </Label>
-      {isMulti ? (
-        <Textarea
+      {isPassword ? (
+        <Input
+          size="sm"
+          type="password"
           id={path}
           name={path}
           disabled={isDisabled}
           className={hasErrors ? "border-red-500 focus:border-red-500" : ""}
-          placeholder={
-            hasErrors
-              ? errors
-              : uischema?.options?.placeholder || ""
-          }
+          placeholder={placeholder}
           onChange={(ev) => handleChange(path, ev.target.value)}
-          value={typeof data === 'object' ? JSON.stringify(data) : data || ""}
-          rows={uischema?.options?.rows || 3}
+          value={stringValue}
         />
       ) : (
-          <Input
-            size="sm"
-          type={uischema?.options?.format === "password" ? "password" : "text"}
-          id={path}
-          name={path}
-          disabled={isDisabled}
-          className={hasErrors ? "border-red-500 focus:border-red-500" : ""}
-          placeholder={
-            hasErrors
-              ? errors
-              : uischema?.options?.placeholder || ""
-          }
-          onChange={(ev) => handleChange(path, ev.target.value)}
-          value={typeof data === 'object' ? JSON.stringify(data) : data || ""}
+          <TemplateAutocompleteInput
+            value={stringValue}
+            onChange={(val) => handleChange(path, val)}
+            placeholder={placeholder}
+            liveStateTree={stateTree}
+            mode={templateMode}
+            isTextArea={!!isMulti}
+            rows={options.rows || 3}
+            readOnly={isDisabled}
+            className={hasErrors ? "ring-1 ring-red-500 rounded-sm" : ""}
         />
       )}
       {hasErrors && (

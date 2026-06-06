@@ -7,6 +7,7 @@ import React, { useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
+import { MODES } from "@jet-admin/expression-engine";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
 import { useDatasourceOptions } from "../../../logic/hooks/useDatasourceOptions";
@@ -23,14 +24,55 @@ import {
 
 
 
-const injectQueryArgsIntoUiSchema = (uiSchema, queryArgs) => {
+// Map a declared arg type to a representative sample value so the engine can
+// infer member completions (e.g. string methods, array helpers).
+const sampleForArgType = (type) => {
+  switch ((type || "").toLowerCase()) {
+    case "number":
+    case "integer":
+    case "float":
+      return 0;
+    case "boolean":
+      return false;
+    case "array":
+      return [];
+    case "object":
+      return {};
+    default:
+      return "";
+  }
+};
+
+// Build the safe-path context tree exposed to query templates. `args` is
+// valid roots on the backend (see queryEngine allowedRoots).
+const buildQueryArgsStateTree = (queryArgs = []) => {
+  const args = {};
+  const seen = new Set();
+
+  (queryArgs || [])
+    .filter((arg) => typeof arg?.key === "string" && arg.key.trim())
+    .forEach((arg) => {
+      const key = arg.key.trim();
+      if (seen.has(key)) return;
+      seen.add(key);
+      args[key] = sampleForArgType(arg.type);
+    });
+
+  return { args };
+};
+
+// Inject context for {{ }} intellisense into every Control's options:
+//   queryArgs     → declared args (Monaco code-editor fallback context)
+//   stateTree     → { args } live tree for suggestions
+//   templateMode  → expression-engine mode (queries resolve via safe-path)
+const injectQueryArgsIntoUiSchema = (uiSchema, injection) => {
   if (!uiSchema || typeof uiSchema !== "object") {
     return uiSchema;
   }
 
   if (Array.isArray(uiSchema)) {
     return uiSchema.map((childUiSchema) =>
-      injectQueryArgsIntoUiSchema(childUiSchema, queryArgs)
+      injectQueryArgsIntoUiSchema(childUiSchema, injection)
     );
   }
 
@@ -40,7 +82,9 @@ const injectQueryArgsIntoUiSchema = (uiSchema, queryArgs) => {
       ? {
         options: {
           ...(uiSchema.options || {}),
-          queryArgs,
+          queryArgs: injection.queryArgs,
+          stateTree: injection.stateTree,
+          templateMode: injection.templateMode,
         },
       }
       : {}),
@@ -48,18 +92,18 @@ const injectQueryArgsIntoUiSchema = (uiSchema, queryArgs) => {
 
   if (Array.isArray(uiSchema.elements)) {
     nextUiSchema.elements = uiSchema.elements.map((childUiSchema) =>
-      injectQueryArgsIntoUiSchema(childUiSchema, queryArgs)
+      injectQueryArgsIntoUiSchema(childUiSchema, injection)
     );
   }
 
   if (uiSchema.detail) {
-    nextUiSchema.detail = injectQueryArgsIntoUiSchema(uiSchema.detail, queryArgs);
+    nextUiSchema.detail = injectQueryArgsIntoUiSchema(uiSchema.detail, injection);
   }
 
   if (uiSchema.options?.detail) {
     nextUiSchema.options = {
       ...(nextUiSchema.options || {}),
-      detail: injectQueryArgsIntoUiSchema(uiSchema.options.detail, queryArgs),
+      detail: injectQueryArgsIntoUiSchema(uiSchema.options.detail, injection),
     };
   }
 
@@ -84,17 +128,20 @@ export const DataQueryEditor = ({
 
   // Get the current datasource type config
   const currentDatasourceType = getDatasourceTypeByValue(dataQueryEditorForm.values.datasourceType);
-  const queryConfigUiSchema = useMemo(
-    () =>
-      injectQueryArgsIntoUiSchema(
-        currentDatasourceType?.queryConfigForm?.uischema,
-        dataQueryEditorForm.values.dataQueryOptions?.args || []
-      ),
-    [
+  const queryConfigUiSchema = useMemo(() => {
+    const queryArgs = dataQueryEditorForm.values.dataQueryOptions?.args || [];
+    return injectQueryArgsIntoUiSchema(
       currentDatasourceType?.queryConfigForm?.uischema,
-      dataQueryEditorForm.values.dataQueryOptions?.args,
-    ]
-  );
+      {
+        queryArgs,
+        stateTree: buildQueryArgsStateTree(queryArgs),
+        templateMode: MODES.SAFE_PATH,
+      }
+    );
+  }, [
+    currentDatasourceType?.queryConfigForm?.uischema,
+    dataQueryEditorForm.values.dataQueryOptions?.args,
+  ]);
 
   // This handler specifically updates the 'datasourceOptions' part of Formik's state
   const _handleDatasourceOptionsChange = useCallback(

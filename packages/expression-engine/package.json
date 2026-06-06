@@ -1,6 +1,7 @@
 {
-  "name": "@jet-admin/template-engine",
+  "name": "@jet-admin/expression-engine",
   "version": "1.0.0",
+  "description": "Unified template expression engine for Jet Admin — safe-path traversal, JS template evaluation, validation, dependency extraction, and intellisense.",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "exports": {
@@ -14,9 +15,19 @@
   ],
   "scripts": {
     "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --format=esm --sourcemap --packages=external && esbuild src/index.js --bundle --outfile=dist/index.cjs --format=cjs --sourcemap --packages=external",
-    "dev": "npm run build -- --watch"
+    "dev": "npm run build -- --watch",
+    "test": "jest --config jest.config.js"
   },
   "devDependencies": {
-    "esbuild": "^0.25.3"
-  }
+    "esbuild": "^0.25.3",
+    "esbuild-jest": "^0.5.0",
+    "jest": "^29.7.0"
+  },
+  "keywords": [
+    "template",
+    "expression",
+    "mustache",
+    "sandbox",
+    "jet-admin"
+  ]
 }

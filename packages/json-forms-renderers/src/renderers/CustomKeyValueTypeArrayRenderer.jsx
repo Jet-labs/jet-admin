@@ -18,6 +18,12 @@ export const CustomKeyValueTypeArrayRenderer = ({
 }) => {
   const items = data || [];
   const itemSchema = schema.items;
+  // Propagate template context (stateTree / templateMode) down to nested controls
+  // so inner text inputs keep their {{ }} intellisense.
+  const templateOptions = {
+    stateTree: uischema.options?.stateTree,
+    templateMode: uischema.options?.templateMode,
+  };
 
   const handleAddItem = () => {
     const newItem = itemSchema.properties
@@ -55,7 +61,7 @@ export const CustomKeyValueTypeArrayRenderer = ({
                   type: "Control",
                   scope: "#/properties/key",
                   label: "Key",
-                  options: uischema.options?.keyOptions,
+                  options: { ...uischema.options?.keyOptions, ...templateOptions },
                 }}
                 schema={itemSchema}
                 path={`${path}.${index}`}
@@ -70,7 +76,7 @@ export const CustomKeyValueTypeArrayRenderer = ({
                   type: "Control",
                   scope: "#/properties/type",
                   label: "Value Type",
-                  options: uischema.options?.typeOptions,
+                  options: { ...uischema.options?.typeOptions, ...templateOptions },
                 }}
                 schema={itemSchema}
                 path={`${path}.${index}`}
@@ -85,7 +91,7 @@ export const CustomKeyValueTypeArrayRenderer = ({
                   type: "Control",
                   scope: "#/properties/value",
                   label: "Value",
-                  options: uischema.options?.valueOptions,
+                  options: { ...uischema.options?.valueOptions, ...templateOptions },
                 }}
                 schema={itemSchema}
                 path={`${path}.${index}`}

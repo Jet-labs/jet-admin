@@ -6,7 +6,7 @@ const { z, schemas } = require("../../utils/validation.utils");
 const {
   collectTemplateViolations,
   MUSTACHE_ONLY_TEMPLATE_MESSAGE,
-} = require("../../utils/templateEngine/validator");
+} = require("@jet-admin/expression-engine");
 
 // ============================================================
 // Request Body Schemas

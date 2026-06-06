@@ -502,7 +502,7 @@ import { jetFormsRenderers } from "@jet-admin/json-forms-renderers";
 import {
   JetTextControl,
   JetSelectControl,
-  JetDynamicArgsControl,
+  JetCustomDynamicKeyValueInputRenderer,
   JetNumberControl,
   JetCheckboxControl,
   JetVerticalLayout,
@@ -510,7 +510,7 @@ import {
   JetTabLayout,
   textInputTester,
   selectInputTester,
-  dynamicArgsTester,
+  dynamicKeyValueInputTester,
   verticalLayoutTester,
   groupLayoutTester,
   tabRendererTester,
@@ -581,6 +581,39 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       required: ["dataQueryID"]
     };
   }, [dataQueries, strings]);
+  const upstreamStateTree = useMemo2(() => {
+    const tree = { ctx: { input: {} } };
+    if (workflowInputArgs && workflowInputArgs.length > 0) {
+      workflowInputArgs.forEach((arg) => {
+        if (arg.key) {
+          tree.ctx.input[arg.key] = "";
+        }
+      });
+    }
+    if (nodeId && workflowEdges && workflowEdges.length > 0) {
+      const upstreamIds = /* @__PURE__ */ new Set();
+      const visited = /* @__PURE__ */ new Set();
+      const queue = [nodeId];
+      while (queue.length > 0) {
+        const id = queue.shift();
+        if (visited.has(id)) continue;
+        visited.add(id);
+        const incomingEdges = workflowEdges.filter((e) => e.target === id);
+        for (const edge of incomingEdges) {
+          if (!visited.has(edge.source)) {
+            upstreamIds.add(edge.source);
+            queue.push(edge.source);
+          }
+        }
+      }
+      workflowNodes?.forEach((node) => {
+        if (node.id !== nodeId && upstreamIds.has(node.id) && node.data?.outputVariable) {
+          tree.ctx[node.data.outputVariable] = {};
+        }
+      });
+    }
+    return tree;
+  }, [workflowNodes, workflowEdges, workflowInputArgs, nodeId]);
   const uischema = useMemo2(() => {
     const generalElements = [
       { type: "Control", scope: "#/properties/title", options: { placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER || "Enter node title" } },
@@ -603,7 +636,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       generalElements.push({
         type: "Control",
         scope: "#/properties/args",
-        options: { isDynamicArgs: true, args: selectedQuery.dataQueryOptions.args, workflowNodes, workflowEdges, workflowInputArgs, currentNodeId: nodeId }
+        options: { isDynamicKeyValueInput: true, keys: selectedQuery.dataQueryOptions.args, stateTree: upstreamStateTree }
       });
     }
     return {
@@ -635,7 +668,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         }
       ]
     };
-  }, [dataQueries, strings, selectedQuery, workflowNodes, workflowEdges, workflowInputArgs, nodeId, onRefreshDataQueries]);
+  }, [dataQueries, strings, selectedQuery, upstreamStateTree, onRefreshDataQueries]);
   const handleFormChange = useCallback2(({ data: newData }) => {
     setFormData(newData);
   }, []);
@@ -701,6 +734,22 @@ var ERROR_HANDLING_OPTIONS3 = {
   CONTINUE: "continue",
   RETRY_THEN_CONTINUE: "retry_then_continue",
   RETRY_THEN_FAIL: "retry_then_fail"
+};
+var sampleForArgType = (type) => {
+  switch ((type || "").toLowerCase()) {
+    case "number":
+    case "integer":
+    case "float":
+      return 0;
+    case "boolean":
+      return false;
+    case "array":
+      return [];
+    case "object":
+      return {};
+    default:
+      return "";
+  }
 };
 var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
   const { strings, workflowNodes, workflowInputArgs, workflowContext } = useWorkflowNodes();
@@ -813,6 +862,23 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
     });
     return uniqueFeed;
   }, [workflowNodes, nodeId, workflowInputArgs, workflowContext]);
+  const ctxStateTree = useMemo3(() => {
+    const ctx = { input: {}, item: "" };
+    (workflowInputArgs || []).filter((arg) => typeof arg?.key === "string" && arg.key.trim()).forEach((arg) => {
+      ctx.input[arg.key.trim()] = sampleForArgType(arg.type);
+    });
+    if (workflowNodes) {
+      workflowNodes.filter((n) => n.id !== nodeId && n.data?.outputVariable).forEach((n) => {
+        if (!(n.data.outputVariable in ctx)) {
+          ctx[n.data.outputVariable] = {};
+        }
+      });
+    }
+    if (workflowContext && typeof workflowContext === "object") {
+      Object.assign(ctx, workflowContext);
+    }
+    return { ctx };
+  }, [workflowNodes, nodeId, workflowInputArgs, workflowContext]);
   const schema = useMemo3(() => {
     return {
       type: "object",
@@ -909,6 +975,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
                 placeholder: "// Your JavaScript code here\n// Access context: ctx.variableName\n// Return a value to store in outputVariable\nreturn true;",
                 hint: contextHint,
                 intellisenseFeed,
+                stateTree: ctxStateTree,
                 showHeader: true
               }
             }
@@ -963,7 +1030,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         }
       ]
     };
-  }, [strings, availableVariables]);
+  }, [strings, availableVariables, intellisenseFeed, ctxStateTree]);
   const handleFormChange = useCallback3(({ data: newData }) => {
     setFormData(newData);
   }, []);
@@ -2919,7 +2986,7 @@ export {
   WORKFLOW_NODES_MAP,
   WORKFLOW_NODE_TYPES,
   JetCheckboxControl as WorkflowCheckboxControl,
-  JetDynamicArgsControl as WorkflowDynamicArgsControl,
+  JetCustomDynamicKeyValueInputRenderer as WorkflowDynamicArgsControl,
   JetGroupLayout as WorkflowGroupLayout,
   WorkflowNodesProvider,
   JetNumberControl as WorkflowNumberControl,
@@ -2928,7 +2995,7 @@ export {
   JetTextControl as WorkflowTextControl,
   JetVerticalLayout as WorkflowVerticalLayout,
   checkboxTester,
-  dynamicArgsTester,
+  dynamicKeyValueInputTester,
   getIconColor,
   getStatusBgColor,
   getStatusStyles,

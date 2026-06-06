@@ -1,7 +1,10 @@
 const {
-  validateAndCoerceInputArgs,
+
   keyValueTypeArrayToObject,
   coerceValue,
+  normalizeDefinitions,
+  extractWorkflowDefinitions,
+  extractQueryDefinitions,
 } = require('../../../utils/inputArgs.util');
 
 describe('inputArgs.util', () => {
@@ -68,71 +71,7 @@ describe('inputArgs.util', () => {
     });
   });
 
-  // ─── validateAndCoerceInputArgs ───────────────────────────────────────────
 
-  describe('validateAndCoerceInputArgs', () => {
-    it('validates and coerces values against schema', () => {
-      const schema = [
-        { key: 'name', type: 'string', required: true },
-        { key: 'age', type: 'number', required: true },
-        { key: 'active', type: 'boolean' },
-      ];
-      const result = validateAndCoerceInputArgs(schema, {
-        name: 'Alice',
-        age: '30',
-        active: 'true',
-      });
-
-      expect(result.valid).toBe(true);
-      expect(result.errors).toEqual({});
-      expect(result.coercedValues).toEqual({
-        name: 'Alice',
-        age: 30,
-        active: true,
-      });
-    });
-
-    it('returns errors for missing required fields', () => {
-      const schema = [
-        { key: 'name', type: 'string', required: true },
-        { key: 'age', type: 'number', required: true },
-      ];
-      const result = validateAndCoerceInputArgs(schema, { name: 'Alice' });
-
-      expect(result.valid).toBe(false);
-      expect(result.errors.age).toBeDefined();
-    });
-
-    it('skips missing optional fields', () => {
-      const schema = [
-        { key: 'name', type: 'string', required: true },
-        { key: 'nickname', type: 'string', required: false },
-      ];
-      const result = validateAndCoerceInputArgs(schema, { name: 'Alice' });
-
-      expect(result.valid).toBe(true);
-      expect(result.coercedValues.nickname).toBeNull();
-    });
-
-    it('passes through all values when no schema is provided', () => {
-      const result = validateAndCoerceInputArgs([], { foo: 'bar' });
-      expect(result.valid).toBe(true);
-      expect(result.coercedValues).toEqual({ foo: 'bar' });
-    });
-
-    it('handles null inputArgs gracefully', () => {
-      const schema = [{ key: 'x', type: 'string' }];
-      const result = validateAndCoerceInputArgs(schema, null);
-      expect(result.valid).toBe(true);
-    });
-
-    it('returns coercion errors when types are wrong', () => {
-      const schema = [{ key: 'count', type: 'number' }];
-      const result = validateAndCoerceInputArgs(schema, { count: 'abc' });
-      expect(result.valid).toBe(false);
-      expect(result.errors.count).toBeDefined();
-    });
-  });
 
   // ─── keyValueTypeArrayToObject ────────────────────────────────────────────
 
@@ -176,6 +115,138 @@ describe('inputArgs.util', () => {
         { key: 'valid', type: 'string', value: 'keep' },
       ]);
       expect(result).toEqual({ valid: 'keep' });
+    });
+  });
+
+  // ─── normalizeDefinitions ─────────────────────────────────────────────────
+
+  describe('normalizeDefinitions', () => {
+    it('converts raw args to canonical InputDefinition shape', () => {
+      const raw = [
+        { key: 'userId', type: 'number', required: true },
+        { key: 'name', type: 'string' },
+      ];
+      const result = normalizeDefinitions(raw);
+
+      expect(result).toEqual([
+        {
+          key: 'userId',
+          type: 'number',
+          required: true,
+          default: undefined,
+          supportsTemplate: false,
+          definitionSource: 'native',
+        },
+        {
+          key: 'name',
+          type: 'string',
+          required: false,
+          default: undefined,
+          supportsTemplate: false,
+          definitionSource: 'native',
+        },
+      ]);
+    });
+
+    it('applies custom options (supportsTemplate, definitionSource)', () => {
+      const raw = [{ key: 'q', type: 'string' }];
+      const result = normalizeDefinitions(raw, {
+        supportsTemplate: true,
+        definitionSource: 'derived',
+      });
+
+      expect(result[0].supportsTemplate).toBe(true);
+      expect(result[0].definitionSource).toBe('derived');
+    });
+
+    it('filters out items without key', () => {
+      const raw = [
+        { key: '', type: 'string' },
+        { key: 'valid', type: 'number' },
+        null,
+      ];
+      expect(normalizeDefinitions(raw)).toHaveLength(1);
+      expect(normalizeDefinitions(raw)[0].key).toBe('valid');
+    });
+
+    it('returns empty array for non-array input', () => {
+      expect(normalizeDefinitions(null)).toEqual([]);
+      expect(normalizeDefinitions(undefined)).toEqual([]);
+      expect(normalizeDefinitions('string')).toEqual([]);
+    });
+
+    it('defaults type to string when missing', () => {
+      const raw = [{ key: 'x' }];
+      expect(normalizeDefinitions(raw)[0].type).toBe('string');
+    });
+
+    it('preserves default values', () => {
+      const raw = [{ key: 'limit', type: 'number', default: 10 }];
+      expect(normalizeDefinitions(raw)[0].default).toBe(10);
+    });
+  });
+
+  // ─── extractWorkflowDefinitions ─────────────────────────────────────────
+
+  describe('extractWorkflowDefinitions', () => {
+    it('extracts definitions from workflowOptions.args', () => {
+      const workflow = {
+        workflowOptions: {
+          args: [
+            { key: 'userId', type: 'number', required: true },
+            { key: 'mode', type: 'string' },
+          ],
+        },
+      };
+      const defs = extractWorkflowDefinitions(workflow);
+
+      expect(defs).toHaveLength(2);
+      expect(defs[0]).toMatchObject({
+        key: 'userId',
+        type: 'number',
+        required: true,
+        supportsTemplate: false,
+        definitionSource: 'native',
+      });
+    });
+
+    it('returns empty array for workflow without workflowOptions', () => {
+      expect(extractWorkflowDefinitions({})).toEqual([]);
+      expect(extractWorkflowDefinitions(null)).toEqual([]);
+    });
+
+    it('returns empty array when workflowOptions.args is missing', () => {
+      expect(extractWorkflowDefinitions({ workflowOptions: {} })).toEqual([]);
+    });
+  });
+
+  // ─── extractQueryDefinitions ────────────────────────────────────────────
+
+  describe('extractQueryDefinitions', () => {
+    it('extracts definitions from dataQueryOptions.args with supportsTemplate=true', () => {
+      const query = {
+        dataQueryOptions: {
+          args: [
+            { key: 'customerId', type: 'number', required: true },
+            { key: 'status', type: 'string' },
+          ],
+        },
+      };
+      const defs = extractQueryDefinitions(query);
+
+      expect(defs).toHaveLength(2);
+      expect(defs[0]).toMatchObject({
+        key: 'customerId',
+        type: 'number',
+        required: true,
+        supportsTemplate: true,
+        definitionSource: 'native',
+      });
+    });
+
+    it('returns empty array for query without dataQueryOptions', () => {
+      expect(extractQueryDefinitions({})).toEqual([]);
+      expect(extractQueryDefinitions(null)).toEqual([]);
     });
   });
 });

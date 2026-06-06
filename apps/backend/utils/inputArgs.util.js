@@ -1,41 +1,118 @@
 /**
  * Input Args Utility
  *
- * Centralized validation, coercion, and conversion for input arguments
- * used across data-query, workflow, and cron-job modules.
+ * Centralized resolution, validation, coercion, and extraction 
+ * for input arguments used across data-query, workflow, and cron-job modules.
  *
  * Canonical arg schema shape:
- *   { key: string, type: 'string'|'number'|'boolean'|'object'|'array', required?: boolean }
+ *   { key: string, type: 'string'|'number'|'boolean'|'object'|'array', required?: boolean, default?: any, supportsTemplate?: boolean }
  *
  * Canonical runtime values shape:
  *   { [key]: any }   (flat object)
  */
 
+const { prisma } = require('../config/prisma.config');
+const Logger = require('./logger');
+
 const SUPPORTED_TYPES = ['string', 'number', 'boolean', 'object', 'array'];
 
+// ─── Definition Providers ─────────────────────────────────────────────────────
 
 /**
- * Normalize a type string, converting legacy descriptive types to canonical ones.
- * @param {string} type
- * @returns {string}
+ * Normalise a raw arg-schema array into a canonical InputDefinition[].
+ *
+ * @param {Array<{ key: string, type?: string, required?: boolean, default?: * }>} rawArgs
+ * @param {{ definitionSource?: string, supportsTemplate?: boolean }} [options]
+ * @returns {Array<object>}
  */
+function normalizeDefinitions(rawArgs, options = {}) {
+  if (!Array.isArray(rawArgs)) return [];
+
+  const {
+    definitionSource = 'native',
+    supportsTemplate = false,
+  } = options;
+
+  return rawArgs
+    .filter((arg) => arg && arg.key)
+    .map((arg) => ({
+      key: arg.key,
+      type: arg.type || 'string',
+      required: arg.required === true,
+      default: arg.default !== undefined ? arg.default : (arg.defaultValue !== undefined ? arg.defaultValue : undefined),
+      supportsTemplate,
+      definitionSource,
+    }));
+}
+
+function extractWorkflowDefinitions(workflow) {
+  if (!workflow || !workflow.workflowOptions) return [];
+  return normalizeDefinitions(
+    workflow.workflowOptions.args,
+    { definitionSource: 'native', supportsTemplate: false }
+  );
+}
+
+function extractQueryDefinitions(dataQuery) {
+  if (!dataQuery || !dataQuery.dataQueryOptions) return [];
+  return normalizeDefinitions(
+    dataQuery.dataQueryOptions.args,
+    { definitionSource: 'native', supportsTemplate: true }
+  );
+}
+
+/**
+ * Fetch input definitions by executable type and ID.
+ *
+ * @param {'workflow'|'query'|'node'|'widget'|'cron'} type
+ * @param {string|number} id  Entity primary key
+ * @returns {Promise<Array<object>>}  Normalised InputDefinition[]
+ */
+async function getInputDefinitions(type, id) {
+  Logger.log('info', {
+    message: 'inputArgs:getInputDefinitions',
+    params: { type, id },
+  });
+
+  switch (type) {
+    case 'workflow': {
+      const workflow = await prisma.tblWorkflows.findUnique({ where: { workflowID: id } });
+      return extractWorkflowDefinitions(workflow);
+    }
+    case 'query': {
+      const query = await prisma.tblDataQueries.findFirst({ where: { dataQueryID: id } });
+      return extractQueryDefinitions(query);
+    }
+    case 'cron': {
+      const cronJob = await prisma.tblCronJobs.findFirst({
+        where: { cronJobID: id },
+        include: { tblWorkflows: true },
+      });
+      if (!cronJob?.tblWorkflows) return [];
+      const defs = extractWorkflowDefinitions(cronJob.tblWorkflows);
+      return defs.map((d) => ({ ...d, definitionSource: 'derived' }));
+    }
+    default:
+      Logger.log('warning', {
+        message: 'inputArgs:unknownType',
+        params: { type, id },
+      });
+      return [];
+  }
+}
+
+// ─── Coercion helpers ─────────────────────────────────────────────────────────
+
 function normalizeType(type) {
   if (!type) return 'string';
   return type;
 }
 
-// ─── Coercion helpers ─────────────────────────────────────────────────────────
-
 /**
  * Coerce a single value to the declared type.
  * Returns { value, error } — error is a string if coercion fails.
- *
- * @param {*}      rawValue
- * @param {string} type
- * @returns {{ value: *, error: string|null }}
  */
 function coerceValue(rawValue, type) {
-  // null / undefined pass through (handled by required check separately)
   if (rawValue === null || rawValue === undefined) {
     return { value: rawValue, error: null };
   }
@@ -101,67 +178,67 @@ function coerceValue(rawValue, type) {
   }
 }
 
+// ─── Pipeline Stages ──────────────────────────────────────────────────────────
+
+function resolveInputTemplates(definitions, values, contextData) {
+  const resolved = { ...values };
+  const errors = {};
+  if (!contextData) return { values: resolved, errors };
+
+  const { resolveTemplate } = require("@jet-admin/expression-engine");
+
+  for (const def of definitions) {
+    if (!def.supportsTemplate || resolved[def.key] === undefined || resolved[def.key] === null) continue;
+    try {
+      resolved[def.key] = resolveTemplate(resolved[def.key], contextData, { preserveSingleExpressionType: true });
+    } catch (err) {
+      errors[def.key] = `Template resolution failed: ${err.message}`;
+    }
+  }
+  return { values: resolved, errors };
+}
+
+function applyInputDefaults(definitions, values) {
+  const resolved = { ...values };
+  for (const def of definitions) {
+    if ((resolved[def.key] === undefined || resolved[def.key] === null) && def.default !== undefined) {
+      resolved[def.key] = def.default;
+    }
+  }
+  return { values: resolved, errors: {} };
+}
+
+function coerceInputTypes(definitions, values) {
+  const resolved = { ...values };
+  const errors = {};
+  for (const def of definitions) {
+    if (resolved[def.key] === undefined || resolved[def.key] === null) continue;
+    const type = normalizeType(def.type);
+    const { value: coerced, error } = coerceValue(resolved[def.key], type);
+    if (error) {
+      errors[def.key] = `"${def.key}": ${error}`;
+    } else {
+      resolved[def.key] = coerced;
+    }
+  }
+  return { values: resolved, errors };
+}
+
+function validateRequiredInputs(definitions, values) {
+  const resolved = { ...values };
+  const errors = {};
+  for (const def of definitions) {
+    if (def.required && (resolved[def.key] === undefined || resolved[def.key] === null || resolved[def.key] === '')) {
+      errors[def.key] = `"${def.key}" is required`;
+    }
+  }
+  return { values: resolved, errors };
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
- * Validate and coerce runtime input args against a schema.
- *
- * @param {Array<{ key: string, type: string, required?: boolean }>} argSchema
- * @param {Object}  inputArgs   Flat { key: value } object
- * @returns {{ valid: boolean, errors: Object<string, string>, coercedValues: Object }}
- */
-function validateAndCoerceInputArgs(argSchema, inputArgs) {
-  const safeInputArgs = inputArgs || {};
-  const errors = {};
-  const coercedValues = {};
-
-  if (!Array.isArray(argSchema) || argSchema.length === 0) {
-    // No schema — pass through all values as-is
-    return { valid: true, errors: {}, coercedValues: { ...safeInputArgs } };
-  }
-
-  for (const arg of argSchema) {
-    const { key, type: rawType = 'string', required = false } = arg;
-    const type = normalizeType(rawType);
-    if (!key) continue;
-
-    const rawValue = safeInputArgs[key];
-
-    // Required check
-    if (required && (rawValue === undefined || rawValue === null || rawValue === '')) {
-      errors[key] = `"${key}" is required`;
-      continue;
-    }
-
-    // Skip coercion for missing optional values
-    if (rawValue === undefined || rawValue === null) {
-      coercedValues[key] = rawValue ?? null;
-      continue;
-    }
-
-    // Coerce
-    const { value, error } = coerceValue(rawValue, type);
-    if (error) {
-      errors[key] = `"${key}": ${error}`;
-    } else {
-      coercedValues[key] = value;
-    }
-  }
-
-  return {
-    valid: Object.keys(errors).length === 0,
-    errors,
-    coercedValues,
-  };
-}
-
-/**
  * Convert a KVT (key-value-type) array to a flat typed object.
- * This is the improved version of the original json.util.js function
- * with added `array` type support.
- *
- * @param {Array<{ key: string, type: string, value: * }>} kvtArray
- * @returns {Object}
  */
 function keyValueTypeArrayToObject(kvtArray) {
   if (!Array.isArray(kvtArray)) return {};
@@ -175,33 +252,8 @@ function keyValueTypeArrayToObject(kvtArray) {
   return obj;
 }
 
-// ─── Unified Input Resolution Pipeline ────────────────────────────────────────
-
 /**
- * Resolve inputs through the unified pipeline.
- *
- * Pipeline order:
- *   1. Fetch/derive definitions (unless provided directly)
- *   2. For each definition → resolve templates (if allowed)
- *   3. Apply defaults (if runtime value is missing)
- *   4. Coerce to declared type
- *   5. Validate required fields
- *   6. Return { resolved, errors, valid }
- *
- * @param {object} params
- * @param {'workflow'|'query'|'node'|'widget'|'cron'} [params.type]
- *   Entity type — used to fetch definitions when `definitions` is not provided.
- * @param {string|number} [params.id]
- *   Entity ID — used alongside `type` to fetch definitions.
- * @param {Array<object>} [params.definitions]
- *   Pre-loaded definitions (skips Prisma lookup). Each item should have:
- *     { key, type, required, default, supportsTemplate }
- * @param {object} [params.runtimeValues={}]
- *   Flat { key: value } object with runtime-supplied values.
- * @param {object} [params.contextData]
- *   Context object used for template resolution (e.g. { ctx: ... }).
- *   Only used when at least one definition has supportsTemplate: true.
- * @returns {Promise<{ resolved: object, errors: object, valid: boolean }>}
+ * Resolve inputs through the unified multi-stage pipeline.
  */
 async function resolveInputs({
   type,
@@ -210,63 +262,69 @@ async function resolveInputs({
   runtimeValues = {},
   contextData,
 } = {}) {
-  // ── Step 1: Get definitions ───────────────────────────────────────────────
+  // Stage 0: Get definitions
   let defs = definitions;
   if (!defs && type && id) {
-    const { getInputDefinitions } = require('./definitionProvider.util');
     defs = await getInputDefinitions(type, id);
   }
 
-  // No definitions → pass through all values as-is (backward compatible)
+  // No definitions → pass through all values as-is
   if (!Array.isArray(defs) || defs.length === 0) {
     return { resolved: { ...runtimeValues }, errors: {}, valid: true };
   }
 
+  // Sequentially process each stage, accumulating errors and halting processing 
+  // for a specific key if it fails an earlier stage.
   const resolved = {};
   const errors = {};
 
   for (const def of defs) {
-    const { key, type: rawType = 'string', required = false, supportsTemplate = false } = def;
-    if (!key) continue;
+    if (!def.key) continue;
 
-    let value = runtimeValues[key];
+    let value = runtimeValues[def.key];
+    let hasError = false;
 
-    // ── Step 2: Resolve templates (if allowed and value is a template) ─────
-    if (supportsTemplate && value !== undefined && value !== null && contextData) {
+    // Stage 1: Templates
+    if (def.supportsTemplate && value !== undefined && value !== null && contextData) {
       try {
-        const { resolveTemplate } = require('./templateEngine/resolver');
-        value = resolveTemplate(value, contextData, {
-          preserveSingleExpressionType: true,
-        });
+        const { resolveTemplate } = require("@jet-admin/expression-engine");
+        value = resolveTemplate(value, contextData, { preserveSingleExpressionType: true });
       } catch (err) {
-        errors[key] = `Template resolution failed: ${err.message}`;
-        continue;
+        errors[def.key] = `Template resolution failed: ${err.message}`;
+        hasError = true;
       }
     }
 
-    // ── Step 3: Apply defaults ──────────────────────────────────────────────
+    if (hasError) continue;
+
+    // Stage 2: Defaults
     if ((value === undefined || value === null) && def.default !== undefined) {
       value = def.default;
     }
 
-    // ── Step 4: Coerce to declared type ─────────────────────────────────────
-    const type = normalizeType(rawType);
+    // Stage 3: Coerce
+    const type = normalizeType(def.type);
     if (value !== undefined && value !== null) {
       const { value: coerced, error } = coerceValue(value, type);
       if (error) {
-        errors[key] = `"${key}": ${error}`;
-        continue;
+        errors[def.key] = `"${def.key}": ${error}`;
+        hasError = true;
+      } else {
+        value = coerced;
       }
-      value = coerced;
     }
 
-    // ── Step 5: Validate required ───────────────────────────────────────────
-    if (required && (value === undefined || value === null || value === '')) {
-      errors[key] = `"${key}" is required`;
-      continue;
+    if (hasError) continue;
+
+    // Stage 4: Validate required
+    if (def.required && (value === undefined || value === null || value === '')) {
+      errors[def.key] = `"${def.key}" is required`;
+      hasError = true;
     }
 
-    resolved[key] = value !== undefined ? value : null;
+    if (hasError) continue;
+
+    resolved[def.key] = value !== undefined ? value : null;
   }
 
   return {
@@ -277,10 +335,24 @@ async function resolveInputs({
 }
 
 module.exports = {
-  validateAndCoerceInputArgs,
+  // Main pipeline
+  resolveInputs,
+  
+  // Pipeline stages
+  resolveInputTemplates,
+  applyInputDefaults,
+  coerceInputTypes,
+  validateRequiredInputs,
+  
+  // Definition providers
+  normalizeDefinitions,
+  extractWorkflowDefinitions,
+  extractQueryDefinitions,
+  getInputDefinitions,
+
+  // Utilities
   keyValueTypeArrayToObject,
   coerceValue,
   normalizeType,
-  resolveInputs,
   SUPPORTED_TYPES,
 };

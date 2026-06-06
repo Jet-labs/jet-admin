@@ -624,7 +624,7 @@ var init_tableWidget = __esm({
 });
 
 // src/table/tableConfigEditor.jsx
-var import_react10, import_prop_types9, import_ui8, import_lucide_react9, import_ui9, import_template_engine3, resolvePath, TableConfigEditor;
+var import_react10, import_prop_types9, import_ui8, import_lucide_react9, import_ui9, import_expression_engine3, resolvePath, TableConfigEditor;
 var init_tableConfigEditor = __esm({
   "src/table/tableConfigEditor.jsx"() {
     import_react10 = __toESM(require("react"));
@@ -632,10 +632,10 @@ var init_tableConfigEditor = __esm({
     import_ui8 = require("@jet-admin/ui");
     import_lucide_react9 = require("lucide-react");
     import_ui9 = require("@jet-admin/ui");
-    import_template_engine3 = require("@jet-admin/template-engine");
+    import_expression_engine3 = require("@jet-admin/expression-engine");
     resolvePath = (obj, path) => {
       if (!obj || !path) return void 0;
-      return (0, import_template_engine3.getValueByPath)(obj, path, { allowedRoots: ["state"] });
+      return (0, import_expression_engine3.getValueByPath)(obj, path, { allowedRoots: ["state"] });
     };
     TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
@@ -2574,7 +2574,7 @@ var import_ui5 = require("@jet-admin/ui");
 // src/vega/vegaSpecEditor.jsx
 var import_react2 = __toESM(require("react"));
 var import_prop_types = __toESM(require("prop-types"));
-var import_template_engine = require("@jet-admin/template-engine");
+var import_expression_engine = require("@jet-admin/expression-engine");
 var import_ui = require("@jet-admin/ui");
 var import_lucide_react = require("lucide-react");
 var VEGA_TEMPLATES = {
@@ -2728,7 +2728,7 @@ var getNestedKeys = (obj, prefix = "", maxDepth = 4, depth = 0) => {
   return keys;
 };
 var getValuePreview = (obj, path) => {
-  const v = (0, import_template_engine.getValueByPath)(obj, path);
+  const v = (0, import_expression_engine.getValueByPath)(obj, path);
   if (v === void 0) return "undefined";
   if (v === null) return "null";
   if (Array.isArray(v)) return `Array(${v.length})`;
@@ -3494,7 +3494,7 @@ FieldPill.propTypes = {
 // src/vega/dataFieldPanel.jsx
 var import_ui2 = require("@jet-admin/ui");
 var import_lucide_react3 = require("lucide-react");
-var import_template_engine2 = require("@jet-admin/template-engine");
+var import_expression_engine2 = require("@jet-admin/expression-engine");
 var DataFieldPanel = ({
   queryResults,
   dataSource,
@@ -3523,7 +3523,7 @@ var DataFieldPanel = ({
   const allSuggestions = (0, import_react4.useMemo)(() => {
     const seen = /* @__PURE__ */ new Set();
     const combined = [];
-    const stateTreeSuggestions = (0, import_template_engine2.getJsSuggestions)({
+    const stateTreeSuggestions = (0, import_expression_engine2.getJsSuggestions)({
       stateTree: liveStateTree
     });
     const arraySuggestions = stateTreeSuggestions.filter((s) => s.type === "array");
@@ -3555,12 +3555,12 @@ var DataFieldPanel = ({
       return null;
     };
     if (stateTree) {
-      const resolved = (0, import_template_engine2.getValueByPath)(stateTree, rawPath, { allowedRoots: ["state"] });
+      const resolved = (0, import_expression_engine2.getValueByPath)(stateTree, rawPath, { allowedRoots: ["state"] });
       const result = toFields(resolved);
       if (result) return result;
     }
     if (queryResults) {
-      const resolved = (0, import_template_engine2.getValueByPath)(queryResults, rawPath, { allowedRoots: ["state"] });
+      const resolved = (0, import_expression_engine2.getValueByPath)(queryResults, rawPath, { allowedRoots: ["state"] });
       const result = toFields(resolved);
       if (result) return result;
     }

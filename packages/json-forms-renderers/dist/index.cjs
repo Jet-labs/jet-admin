@@ -33,6 +33,7 @@ __export(index_exports, {
   CustomCodeEditorControl: () => CustomCodeEditorControl,
   CustomCodeJavascriptControl: () => CustomCodeEditorControl,
   CustomCodePgsqlControl: () => CustomCodeEditorControl,
+  CustomDynamicKeyValueInputRenderer: () => CustomDynamicKeyValueInputRenderer,
   CustomFieldOperatorValueArrayRenderer: () => CustomFieldOperatorValueArrayRenderer,
   CustomGenericObjectArrayRenderer: () => CustomGenericObjectArrayRenderer,
   CustomGroupLayout: () => CustomGroupLayout,
@@ -48,12 +49,11 @@ __export(index_exports, {
   CustomTabRenderer: () => CustomTabRenderer,
   CustomTextInput: () => CustomTextInput,
   CustomVerticalLayout: () => CustomVerticalLayout,
-  DynamicArgsControl: () => DynamicArgsControl,
   JetCheckboxControl: () => JetCheckboxControl,
   JetCodeEditorControl: () => JetCodeEditorControl,
   JetCodeJavascriptControl: () => JetCodeEditorControl,
   JetCodePgsqlControl: () => JetCodeEditorControl,
-  JetDynamicArgsControl: () => JetDynamicArgsControl,
+  JetCustomDynamicKeyValueInputRenderer: () => JetCustomDynamicKeyValueInputRenderer,
   JetFieldOperatorValueArrayControl: () => JetFieldOperatorValueArrayControl,
   JetGenericObjectArrayControl: () => JetGenericObjectArrayControl,
   JetGroupLayout: () => JetGroupLayout,
@@ -73,7 +73,7 @@ __export(index_exports, {
   codeEditorTester: () => codeEditorTester,
   codeJavascriptTester: () => codeEditorTester,
   codePgsqlTester: () => codeEditorTester,
-  dynamicArgsTester: () => dynamicArgsTester,
+  dynamicKeyValueInputTester: () => dynamicKeyValueInputTester,
   fieldOperatorValueArrayTester: () => fieldOperatorValueArrayTester,
   genericObjectArrayTester: () => genericObjectArrayTester,
   groupLayoutTester: () => groupLayoutTester,
@@ -109,21 +109,35 @@ var CustomNumberInput = (props) => {
     description,
     errors,
     uischema,
-    schema
+    schema,
+    enabled
   } = props;
-  const handleInputChange = (ev) => {
-    const valueString = ev.target.value;
+  const options = uischema?.options || {};
+  const isDisabled = enabled === false;
+  const stateTree = options.stateTree || null;
+  const templateMode = options.templateMode;
+  const handleInputChange = (valueString) => {
     if (valueString === "") {
       handleChange(path, void 0);
+    } else if (valueString.includes("{{")) {
+      handleChange(path, valueString);
     } else {
       const numValue = schema.type === "integer" ? parseInt(valueString, 10) : parseFloat(valueString);
-      if (!isNaN(numValue)) {
+      if (!isNaN(numValue) && String(numValue) === valueString.trim()) {
         handleChange(path, numValue);
+      } else {
+        handleChange(path, valueString);
       }
     }
   };
-  const step = uischema.options?.step || schema.multipleOf || (schema.type === "integer" ? 1 : "any");
-  const hasErrors = errors && errors.length > 0;
+  const stringValue = data === void 0 || data === null ? "" : String(data);
+  const isTemplateString = stringValue.includes("{{");
+  let displayErrors = errors || "";
+  if (isTemplateString && (displayErrors.includes("must be integer") || displayErrors.includes("must be number"))) {
+    displayErrors = "";
+  }
+  const hasErrors = displayErrors.length > 0;
+  const placeholder = hasErrors ? displayErrors : uischema?.options?.placeholder || "";
   return /* @__PURE__ */ import_react.default.createElement("div", { className: "" }, /* @__PURE__ */ import_react.default.createElement(
     import_ui.Label,
     {
@@ -132,31 +146,28 @@ var CustomNumberInput = (props) => {
     },
     label || description
   ), /* @__PURE__ */ import_react.default.createElement(
-    import_ui.Input,
+    import_ui.TemplateAutocompleteInput,
     {
-      size: "sm",
-      type: "number",
-      id: path,
-      name: path,
-      className: hasErrors ? "border-red-500 focus:border-red-500" : "",
-      placeholder: hasErrors ? errors : uischema?.options?.placeholder || "",
+      value: stringValue,
       onChange: handleInputChange,
-      value: data === void 0 || data === null ? "" : data,
-      min: schema.minimum,
-      max: schema.maximum,
-      step
+      placeholder,
+      liveStateTree: stateTree,
+      mode: templateMode,
+      readOnly: isDisabled,
+      className: hasErrors ? "ring-1 ring-red-500 rounded-sm" : ""
     }
-  ), hasErrors && /* @__PURE__ */ import_react.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
+  ), hasErrors && /* @__PURE__ */ import_react.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, displayErrors));
 };
 CustomNumberInput.propTypes = {
-  data: import_prop_types.default.number,
+  data: import_prop_types.default.oneOfType([import_prop_types.default.number, import_prop_types.default.string]),
   path: import_prop_types.default.string.isRequired,
   handleChange: import_prop_types.default.func.isRequired,
   label: import_prop_types.default.string,
   description: import_prop_types.default.string,
   errors: import_prop_types.default.arrayOf(import_prop_types.default.string),
   uischema: import_prop_types.default.object.isRequired,
-  schema: import_prop_types.default.object.isRequired
+  schema: import_prop_types.default.object.isRequired,
+  enabled: import_prop_types.default.bool
 };
 
 // src/renderers/CustomTextInput.jsx
@@ -165,9 +176,15 @@ var import_prop_types2 = __toESM(require("prop-types"));
 var import_ui2 = require("@jet-admin/ui");
 var CustomTextInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
-  const isMulti = uischema?.options?.multi;
+  const options = uischema?.options || {};
+  const isMulti = options.multi;
+  const isPassword = options.format === "password";
   const isDisabled = enabled === false;
   const hasErrors = errors && errors.length > 0;
+  const stateTree = options.stateTree || null;
+  const templateMode = options.templateMode;
+  const placeholder = hasErrors ? errors : options.placeholder || "";
+  const stringValue = typeof data === "object" ? JSON.stringify(data) : data || "";
   return /* @__PURE__ */ import_react2.default.createElement("div", { className: "" }, /* @__PURE__ */ import_react2.default.createElement(
     import_ui2.Label,
     {
@@ -175,30 +192,31 @@ var CustomTextInput = (props) => {
       className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
     },
     label || description
-  ), isMulti ? /* @__PURE__ */ import_react2.default.createElement(
-    import_ui2.Textarea,
-    {
-      id: path,
-      name: path,
-      disabled: isDisabled,
-      className: hasErrors ? "border-red-500 focus:border-red-500" : "",
-      placeholder: hasErrors ? errors : uischema?.options?.placeholder || "",
-      onChange: (ev) => handleChange(path, ev.target.value),
-      value: typeof data === "object" ? JSON.stringify(data) : data || "",
-      rows: uischema?.options?.rows || 3
-    }
-  ) : /* @__PURE__ */ import_react2.default.createElement(
+  ), isPassword ? /* @__PURE__ */ import_react2.default.createElement(
     import_ui2.Input,
     {
       size: "sm",
-      type: uischema?.options?.format === "password" ? "password" : "text",
+      type: "password",
       id: path,
       name: path,
       disabled: isDisabled,
       className: hasErrors ? "border-red-500 focus:border-red-500" : "",
-      placeholder: hasErrors ? errors : uischema?.options?.placeholder || "",
+      placeholder,
       onChange: (ev) => handleChange(path, ev.target.value),
-      value: typeof data === "object" ? JSON.stringify(data) : data || ""
+      value: stringValue
+    }
+  ) : /* @__PURE__ */ import_react2.default.createElement(
+    import_ui2.TemplateAutocompleteInput,
+    {
+      value: stringValue,
+      onChange: (val) => handleChange(path, val),
+      placeholder,
+      liveStateTree: stateTree,
+      mode: templateMode,
+      isTextArea: !!isMulti,
+      rows: options.rows || 3,
+      readOnly: isDisabled,
+      className: hasErrors ? "ring-1 ring-red-500 rounded-sm" : ""
     }
   ), hasErrors && /* @__PURE__ */ import_react2.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
 };
@@ -345,121 +363,6 @@ CustomCheckboxInput.propTypes = {
 var import_react5 = __toESM(require("react"));
 var import_prop_types5 = __toESM(require("prop-types"));
 var import_ui5 = require("@jet-admin/ui");
-
-// src/renderers/templateCompletion.js
-var ROOT_COMPLETIONS = [
-  {
-    label: "args",
-    detail: "Configured query arguments"
-  },
-  {
-    label: "runtimeArgs",
-    detail: "Runtime query arguments"
-  }
-];
-var IDENTIFIER_REGEX = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
-var getUniqueQueryArgs = (queryArgs = []) => {
-  const seen = /* @__PURE__ */ new Set();
-  return queryArgs.filter((queryArg) => typeof queryArg?.key === "string" && queryArg.key.trim()).map((queryArg) => ({
-    key: queryArg.key.trim(),
-    type: queryArg.type
-  })).filter((queryArg) => {
-    if (seen.has(queryArg.key)) {
-      return false;
-    }
-    seen.add(queryArg.key);
-    return true;
-  });
-};
-var buildAccessExpression = (rootLabel, key) => {
-  if (IDENTIFIER_REGEX.test(key)) {
-    return `${rootLabel}.${key}`;
-  }
-  return `${rootLabel}["${key.replaceAll('"', '\\"')}"]`;
-};
-var getTemplateCompletionContext = (model, position) => {
-  const textBeforeCursor = model.getValueInRange({
-    startLineNumber: position.lineNumber,
-    startColumn: 1,
-    endLineNumber: position.lineNumber,
-    endColumn: position.column
-  });
-  const lastOpenIndex = textBeforeCursor.lastIndexOf("{{");
-  const lastCloseIndex = textBeforeCursor.lastIndexOf("}}");
-  if (lastOpenIndex === -1 || lastCloseIndex > lastOpenIndex) {
-    return null;
-  }
-  return {
-    expression: textBeforeCursor.slice(lastOpenIndex + 2),
-    range: {
-      startLineNumber: position.lineNumber,
-      endLineNumber: position.lineNumber,
-      startColumn: lastOpenIndex + 3,
-      endColumn: position.column
-    }
-  };
-};
-var buildTemplateSuggestions = ({ monaco, context, queryArgs = [] }) => {
-  if (!context) {
-    return [];
-  }
-  const normalizedExpression = context.expression.replace(/^\s*/, "");
-  const normalizedQueryArgs = getUniqueQueryArgs(queryArgs);
-  const templateSuggestions = [];
-  const pushRootSuggestions = (partial = "") => {
-    ROOT_COMPLETIONS.filter(
-      (rootCompletion) => rootCompletion.label.toLowerCase().startsWith(partial.toLowerCase())
-    ).forEach((rootCompletion) => {
-      templateSuggestions.push({
-        label: rootCompletion.label,
-        kind: monaco.languages.CompletionItemKind.Variable,
-        insertText: `${rootCompletion.label}.`,
-        detail: rootCompletion.detail,
-        command: {
-          id: "editor.action.triggerSuggest",
-          title: "Trigger suggest"
-        },
-        range: context.range,
-        sortText: `0-${rootCompletion.label}`
-      });
-    });
-  };
-  const pushQueryArgSuggestions = (rootLabel, partial = "") => {
-    normalizedQueryArgs.filter((queryArg) => queryArg.key.toLowerCase().startsWith(partial.toLowerCase())).forEach((queryArg) => {
-      templateSuggestions.push({
-        label: queryArg.key,
-        kind: monaco.languages.CompletionItemKind.Field,
-        insertText: buildAccessExpression(rootLabel, queryArg.key),
-        detail: queryArg.type ? `Query arg (${queryArg.type})` : "Configured query arg",
-        documentation: `Insert ${buildAccessExpression(rootLabel, queryArg.key)}`,
-        range: context.range,
-        sortText: `0-${rootLabel}-${queryArg.key}`
-      });
-    });
-  };
-  if (!normalizedExpression) {
-    pushRootSuggestions();
-    return templateSuggestions;
-  }
-  const dotAccessMatch = normalizedExpression.match(/^(args|runtimeArgs)(?:\.([A-Za-z0-9_$-]*))?$/);
-  if (dotAccessMatch) {
-    if (dotAccessMatch[2] === void 0) {
-      pushRootSuggestions(dotAccessMatch[1]);
-      return templateSuggestions;
-    }
-    pushQueryArgSuggestions(dotAccessMatch[1], dotAccessMatch[2]);
-    return templateSuggestions;
-  }
-  const bracketAccessMatch = normalizedExpression.match(/^(args|runtimeArgs)\[(?:["']?([^"'\]]*))?$/);
-  if (bracketAccessMatch) {
-    pushQueryArgSuggestions(bracketAccessMatch[1], bracketAccessMatch[2] || "");
-    return templateSuggestions;
-  }
-  pushRootSuggestions(normalizedExpression);
-  return templateSuggestions;
-};
-
-// src/renderers/CustomCodeEditorControl.jsx
 var CustomCodeEditorControl = ({
   data,
   path,
@@ -472,13 +375,12 @@ var CustomCodeEditorControl = ({
   schema
 }) => {
   const {
-    databaseMetadata,
-    queryArgs = [],
     height = "140px",
     placeholder,
     hint,
-    intellisenseFeed = [],
-    showHeader = false
+    showHeader = false,
+    stateTree = null,
+    templateMode
   } = uischema.options || {};
   const format = schema?.format || "";
   const language = (0, import_react5.useMemo)(() => {
@@ -490,222 +392,8 @@ var CustomCodeEditorControl = ({
     if (format.startsWith("code-")) return format.replace("code-", "");
     return "javascript";
   }, [format]);
-  const tablesMap = (0, import_react5.useMemo)(() => {
-    if (language !== "sql" || !databaseMetadata?.schemas) return {};
-    const map = {};
-    databaseMetadata.schemas.forEach((schemaItem) => {
-      schemaItem.tables?.forEach((t) => {
-        map[t.databaseTableName] = t.databaseTableColumns?.map((c) => c.databaseTableColumnName) || [];
-      });
-    });
-    return map;
-  }, [databaseMetadata, language]);
-  const schemaRef = (0, import_react5.useRef)(tablesMap);
-  const queryArgsRef = (0, import_react5.useRef)(queryArgs);
-  const intellisenseFeedRef = (0, import_react5.useRef)(intellisenseFeed);
-  (0, import_react5.useEffect)(() => {
-    schemaRef.current = tablesMap;
-  }, [tablesMap]);
-  (0, import_react5.useEffect)(() => {
-    queryArgsRef.current = queryArgs;
-  }, [queryArgs]);
-  (0, import_react5.useEffect)(() => {
-    intellisenseFeedRef.current = intellisenseFeed;
-  }, [intellisenseFeed]);
-  const handleBeforeMount = (monaco) => {
-    if (language === "sql") {
-      monaco.languages.registerCompletionItemProvider("sql", {
-        triggerCharacters: [".", " ", "{", "[", '"', "'"],
-        provideCompletionItems: (model, pos) => {
-          const text = model.getValueInRange({
-            startLineNumber: 1,
-            startColumn: 1,
-            endLineNumber: pos.lineNumber,
-            endColumn: pos.column
-          });
-          const wordInfo = model.getWordUntilPosition(pos);
-          const range = {
-            startLineNumber: pos.lineNumber,
-            endLineNumber: pos.lineNumber,
-            startColumn: wordInfo.startColumn,
-            endColumn: wordInfo.endColumn
-          };
-          const templateContext = getTemplateCompletionContext(model, pos);
-          if (templateContext) {
-            return {
-              suggestions: buildTemplateSuggestions({
-                monaco,
-                context: templateContext,
-                queryArgs: queryArgsRef.current
-              })
-            };
-          }
-          const suggestions = [];
-          const tableMatch = text.match(/(\\b\\w+)\\.$/);
-          ;
-          if (tableMatch) {
-            const cols = schemaRef.current[tableMatch[1]] || [];
-            cols.forEach(
-              (col) => suggestions.push({
-                label: col,
-                kind: monaco.languages.CompletionItemKind.Field,
-                insertText: col,
-                detail: `Column of ${tableMatch[1]}`,
-                range
-              })
-            );
-          } else {
-            Object.keys(schemaRef.current).forEach(
-              (tbl) => suggestions.push({
-                label: tbl,
-                kind: monaco.languages.CompletionItemKind.Class,
-                insertText: tbl,
-                detail: "Table",
-                range
-              })
-            );
-            const sqlKeywords = [
-              "SELECT",
-              "FROM",
-              "WHERE",
-              "JOIN",
-              "LEFT JOIN",
-              "RIGHT JOIN",
-              "INNER JOIN",
-              "ON",
-              "GROUP BY",
-              "ORDER BY",
-              "ASC",
-              "DESC",
-              "AS",
-              "DISTINCT",
-              "LIMIT",
-              "OFFSET",
-              "INSERT INTO",
-              "VALUES",
-              "UPDATE",
-              "SET",
-              "DELETE",
-              "CREATE TABLE",
-              "ALTER TABLE",
-              "DROP TABLE",
-              "INDEX",
-              "COUNT",
-              "SUM",
-              "AVG",
-              "MAX",
-              "MIN",
-              "AND",
-              "OR",
-              "NOT",
-              "NULL",
-              "IS"
-            ];
-            sqlKeywords.forEach(
-              (kw) => suggestions.push({
-                label: kw,
-                kind: monaco.languages.CompletionItemKind.Keyword,
-                insertText: kw,
-                range
-              })
-            );
-          }
-          return { suggestions };
-        }
-      });
-    }
-    if (language === "javascript") {
-      monaco.languages.registerCompletionItemProvider("javascript", {
-        triggerCharacters: [".", "{", "[", '"', "'", " "],
-        provideCompletionItems: (model, position) => {
-          const templateContext = getTemplateCompletionContext(model, position);
-          if (templateContext) {
-            return {
-              suggestions: buildTemplateSuggestions({
-                monaco,
-                context: templateContext,
-                queryArgs: queryArgsRef.current
-              })
-            };
-          }
-          const wordInfo = model.getWordUntilPosition(position);
-          const range = {
-            startLineNumber: position.lineNumber,
-            endLineNumber: position.lineNumber,
-            startColumn: wordInfo.startColumn,
-            endColumn: wordInfo.endColumn
-          };
-          const suggestions = [];
-          const textBeforeWord = model.getValueInRange({
-            startLineNumber: position.lineNumber,
-            startColumn: 1,
-            endLineNumber: position.lineNumber,
-            endColumn: wordInfo.startColumn
-          });
-          const pathMatch = textBeforeWord.match(/([a-zA-Z0-9_$]+(?:\.[a-zA-Z0-9_$]+)*)\.$/);
-          const feed = intellisenseFeedRef.current || [];
-          if (pathMatch) {
-            const parentPath = pathMatch[1];
-            const matchingItems = feed.filter((item) => item.parentPath === parentPath);
-            if (matchingItems.length > 0) {
-              matchingItems.forEach((item) => {
-                let priority = "03";
-                if (item.kind === "Property") priority = "01";
-                if (item.kind === "Field") priority = "02";
-                suggestions.push({
-                  label: item.label,
-                  kind: monaco.languages.CompletionItemKind[item.kind] || monaco.languages.CompletionItemKind.Property,
-                  insertText: item.insertText || item.label,
-                  detail: item.detail,
-                  sortText: `${priority}_${item.label}`,
-                  range
-                });
-              });
-            }
-          } else {
-            const rootItems = feed.filter((item) => !item.parentPath);
-            rootItems.forEach((item) => {
-              let priority = "03";
-              if (item.kind === "Property") priority = "01";
-              if (item.kind === "Field") priority = "02";
-              suggestions.push({
-                label: item.label,
-                kind: monaco.languages.CompletionItemKind[item.kind] || monaco.languages.CompletionItemKind.Variable,
-                insertText: item.insertText || item.label,
-                detail: item.detail,
-                sortText: `${priority}_${item.label}`,
-                range
-              });
-            });
-          }
-          const jsKeywords = [
-            { label: "return", detail: "Return statement" },
-            { label: "const", detail: "Constant declaration" },
-            { label: "let", detail: "Variable declaration" },
-            { label: "ctx", detail: "Workflow context object" },
-            { label: "console.log", detail: "Log to console" },
-            { label: "JSON.stringify", detail: "Convert to JSON string" },
-            { label: "JSON.parse", detail: "Parse JSON string" },
-            { label: "Array.isArray", detail: "Check if array" },
-            { label: "Object.keys", detail: "Get object keys" },
-            { label: "Object.values", detail: "Get object values" }
-          ];
-          jsKeywords.forEach((kw) => {
-            suggestions.push({
-              label: kw.label,
-              kind: monaco.languages.CompletionItemKind.Keyword,
-              insertText: kw.label,
-              detail: kw.detail,
-              sortText: `09_${kw.label}`,
-              range
-            });
-          });
-          return { suggestions };
-        }
-      });
-    }
-  };
-  const hasErrors = errors && errors.length > 0;
+  let displayErrors = typeof errors === "string" ? errors : errors ? errors.join(", ") : "";
+  const hasErrors = displayErrors.length > 0;
   return /* @__PURE__ */ import_react5.default.createElement("div", { className: "" }, /* @__PURE__ */ import_react5.default.createElement(
     import_ui5.Label,
     {
@@ -720,23 +408,25 @@ var CustomCodeEditorControl = ({
       onChange: (val) => handleChange(path, val || ""),
       language,
       height,
-      disabled: !enabled,
+      disabled: enabled === false,
       showHeader,
-      beforeMount: handleBeforeMount,
-      status: hasErrors ? "error" : null
+      stateTree,
+      templateMode,
+      status: hasErrors ? "error" : null,
+      statusMessage: hasErrors ? displayErrors : null
     }
-  ), hasErrors && /* @__PURE__ */ import_react5.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
+  ));
 };
 CustomCodeEditorControl.propTypes = {
-  data: import_prop_types5.default.string,
+  data: import_prop_types5.default.oneOfType([import_prop_types5.default.string, import_prop_types5.default.object]),
   path: import_prop_types5.default.string.isRequired,
   handleChange: import_prop_types5.default.func.isRequired,
-  enabled: import_prop_types5.default.bool.isRequired,
+  enabled: import_prop_types5.default.bool,
   uischema: import_prop_types5.default.object,
   schema: import_prop_types5.default.object,
   label: import_prop_types5.default.string,
   description: import_prop_types5.default.string,
-  errors: import_prop_types5.default.arrayOf(import_prop_types5.default.string)
+  errors: import_prop_types5.default.oneOfType([import_prop_types5.default.string, import_prop_types5.default.array])
 };
 
 // src/renderers/CustomSuggestionInput.jsx
@@ -805,169 +495,36 @@ CustomSuggestionInput.propTypes = {
   enabled: import_prop_types6.default.bool
 };
 
-// src/renderers/DynamicArgsControl.jsx
+// src/renderers/CustomDynamicKeyValueInputRenderer.jsx
 var import_react7 = __toESM(require("react"));
 var import_prop_types7 = __toESM(require("prop-types"));
-var import_lucide_react2 = require("lucide-react");
 var import_ui7 = require("@jet-admin/ui");
-var DynamicArgsControl = (props) => {
+var CustomDynamicKeyValueInputRenderer = (props) => {
   const { data, path, handleChange, uischema, errors } = props;
-  const args = uischema?.options?.args || [];
-  const workflowNodes = uischema?.options?.workflowNodes || [];
-  const workflowEdges = uischema?.options?.workflowEdges || [];
-  const workflowInputArgs = uischema?.options?.workflowInputArgs || [];
-  const currentNodeId = uischema?.options?.currentNodeId || null;
-  const argsData = data || {};
+  const keys = uischema?.options?.keys || uischema?.options?.args || [];
+  const stateTree = uischema?.options?.stateTree || {};
+  const formData = data || {};
   const handleArgChange = (argKey, value) => {
-    handleChange(path, { ...argsData, [argKey]: value });
+    handleChange(path, { ...formData, [argKey]: value });
   };
-  const getUpstreamNodeIds = (0, import_react7.useMemo)(() => {
-    if (!currentNodeId || !workflowEdges || workflowEdges.length === 0) {
-      return /* @__PURE__ */ new Set();
-    }
-    const upstreamIds = /* @__PURE__ */ new Set();
-    const visited = /* @__PURE__ */ new Set();
-    const queue = [currentNodeId];
-    while (queue.length > 0) {
-      const nodeId = queue.shift();
-      if (visited.has(nodeId)) continue;
-      visited.add(nodeId);
-      const incomingEdges = workflowEdges.filter((e) => e.target === nodeId);
-      for (const edge of incomingEdges) {
-        if (!visited.has(edge.source)) {
-          upstreamIds.add(edge.source);
-          queue.push(edge.source);
-        }
-      }
-    }
-    return upstreamIds;
-  }, [currentNodeId, workflowEdges]);
-  const getAvailableVariables = () => {
-    const variables = [];
-    if (workflowInputArgs && workflowInputArgs.length > 0) {
-      workflowInputArgs.forEach((arg) => {
-        if (arg.key) {
-          variables.push({
-            nodeId: "input",
-            nodeTitle: "Workflow Input",
-            variableName: arg.key,
-            contextPath: `ctx.input.${arg.key}`,
-            category: "input",
-            type: arg.type || "string"
-          });
-        }
-      });
-    }
-    if (workflowNodes && workflowNodes.length > 0) {
-      const nodeVariables = workflowNodes.filter((node) => node.id !== currentNodeId).filter((node) => getUpstreamNodeIds.has(node.id)).filter((node) => node.data?.outputVariable).map((node) => ({
-        nodeId: node.id,
-        nodeTitle: node.data?.title || node.data?.label || node.type,
-        variableName: node.data.outputVariable,
-        contextPath: `ctx.${node.data.outputVariable}`,
-        category: "node"
-      }));
-      variables.push(...nodeVariables);
-    }
-    return variables;
-  };
-  const availableVariables = getAvailableVariables();
-  if (args.length === 0) {
+  if (keys.length === 0) {
     return null;
   }
-  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "border border-border rounded-sm p-2 bg-background" }, /* @__PURE__ */ import_react7.default.createElement(import_ui7.Label, { className: "block mb-2 text-xs font-medium text-muted-foreground" }, "Arguments"), /* @__PURE__ */ import_react7.default.createElement("div", { className: "space-y-2" }, args.map((arg, index) => {
+  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "border border-border rounded-sm p-3 bg-background" }, /* @__PURE__ */ import_react7.default.createElement(import_ui7.Label, { className: "block mb-2 text-sm font-medium text-foreground" }, uischema.label || "Dynamic Inputs"), /* @__PURE__ */ import_react7.default.createElement("div", { className: "space-y-3" }, keys.map((arg, index) => {
     const argName = arg.key;
-    return /* @__PURE__ */ import_react7.default.createElement(
-      ArgInputWithVariablePicker,
+    return /* @__PURE__ */ import_react7.default.createElement("div", { key: `arg-${index}`, className: "flex flex-col gap-1.5" }, /* @__PURE__ */ import_react7.default.createElement(import_ui7.Label, { className: "text-xs font-medium text-muted-foreground flex items-center justify-between" }, /* @__PURE__ */ import_react7.default.createElement("span", null, argName), arg.type && /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px] bg-muted/50 px-1 rounded-sm text-muted-foreground/80 font-mono" }, arg.type)), /* @__PURE__ */ import_react7.default.createElement(
+      import_ui7.TemplateAutocompleteInput,
       {
-        key: `arg-${index}`,
-        argName,
-        value: argsData[argName] || "",
+        value: formData[argName] || "",
         onChange: (value) => handleArgChange(argName, value),
-        availableVariables
+        liveStateTree: stateTree,
+        placeholder: `Value for ${argName}...`,
+        size: "sm"
       }
-    );
-  })), errors && errors.length > 0 && /* @__PURE__ */ import_react7.default.createElement("p", { className: "text-red-500 text-xs mt-1" }, errors));
+    ));
+  })), errors && errors.length > 0 && /* @__PURE__ */ import_react7.default.createElement("p", { className: "text-red-500 text-xs mt-2" }, errors));
 };
-var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables }) => {
-  const [showDropdown, setShowDropdown] = (0, import_react7.useState)(false);
-  const inputRef = (0, import_react7.useRef)(null);
-  const dropdownRef = (0, import_react7.useRef)(null);
-  (0, import_react7.useEffect)(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-  const insertVariable = (contextPath) => {
-    const input = inputRef.current;
-    if (input) {
-      const start = input.selectionStart;
-      const end = input.selectionEnd;
-      const mustacheVar = `{{${contextPath}}}`;
-      const newValue = value.substring(0, start) + mustacheVar + value.substring(end);
-      onChange(newValue);
-      setTimeout(() => {
-        input.focus();
-        const newCursorPos = start + mustacheVar.length;
-        input.setSelectionRange(newCursorPos, newCursorPos);
-      }, 0);
-    } else {
-      onChange(`{{${contextPath}}}`);
-    }
-    setShowDropdown(false);
-  };
-  const inputVariables = availableVariables.filter((v) => v.category === "input");
-  const nodeVariables = availableVariables.filter((v) => v.category === "node");
-  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex flex-row justify-between items-center gap-2" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react7.default.createElement(import_ui7.Label, { className: "block mb-1 text-[10px] font-medium text-muted-foreground" }, argName), /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react7.default.createElement(
-    import_ui7.Input,
-    {
-      size: "sm",
-      ref: inputRef,
-      type: "text",
-      id: `arg-${argName}`,
-      placeholder: `Value for ${argName}`,
-      value,
-      onChange: (e) => onChange(e.target.value)
-    }
-  ), /* @__PURE__ */ import_react7.default.createElement("div", { className: "relative", ref: dropdownRef }, /* @__PURE__ */ import_react7.default.createElement(
-    import_ui7.Button,
-    {
-      type: "button",
-      variant: "outline",
-      size: "icon",
-      square: true,
-      onClick: () => setShowDropdown(!showDropdown),
-      title: "Insert variable from previous node"
-    },
-    /* @__PURE__ */ import_react7.default.createElement(import_lucide_react2.Variable, { className: "w-4 h-4" })
-  ), showDropdown && /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-background border border-border rounded-sm shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-3 text-xs text-muted-foreground text-center" }, "No variables available yet.", /* @__PURE__ */ import_react7.default.createElement("br", null), /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider border-b border-border bg-primary/5" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ import_react7.default.createElement(
-    import_ui7.Button,
-    {
-      key: `input-${idx}`,
-      type: "button",
-      variant: "ghost",
-      onClick: () => insertVariable(variable.contextPath),
-      className: "w-full text-left px-2 py-1.5 hover:bg-primary/5 rounded-none border-b border-border/50"
-    },
-    /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-xs font-medium text-foreground font-mono" }, variable.contextPath),
-    /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-[10px] text-muted-foreground truncate" }, "type: ", variable.type || "any")
-  ))), nodeVariables.length > 0 && /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider border-b border-border bg-primary/5" }, "\u{1F4E4} Upstream Node Outputs"), nodeVariables.map((variable, idx) => /* @__PURE__ */ import_react7.default.createElement(
-    import_ui7.Button,
-    {
-      key: `node-${idx}`,
-      type: "button",
-      variant: "ghost",
-      onClick: () => insertVariable(variable.contextPath),
-      className: "w-full text-left px-2 py-1.5 hover:bg-primary/5 rounded-none border-b border-border/50 last:border-b-0"
-    },
-    /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-xs font-medium text-foreground font-mono" }, variable.contextPath),
-    /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-[10px] text-muted-foreground truncate" }, "from: ", variable.nodeTitle)
-  )))))))));
-};
-DynamicArgsControl.propTypes = {
+CustomDynamicKeyValueInputRenderer.propTypes = {
   data: import_prop_types7.default.object,
   path: import_prop_types7.default.string.isRequired,
   handleChange: import_prop_types7.default.func.isRequired,
@@ -979,7 +536,7 @@ DynamicArgsControl.propTypes = {
 var import_react8 = __toESM(require("react"));
 var import_prop_types8 = __toESM(require("prop-types"));
 var import_react9 = require("@jsonforms/react");
-var import_lucide_react3 = require("lucide-react");
+var import_lucide_react2 = require("lucide-react");
 var import_ui8 = require("@jet-admin/ui");
 var CustomKeyValueArrayRenderer = ({
   data,
@@ -994,6 +551,10 @@ var CustomKeyValueArrayRenderer = ({
 }) => {
   const items = data || [];
   const itemSchema = schema.items;
+  const templateOptions = {
+    stateTree: uischema.options?.stateTree,
+    templateMode: uischema.options?.templateMode
+  };
   const handleAddItem = () => {
     const newItem = itemSchema.properties ? Object.fromEntries(
       Object.entries(itemSchema.properties).map(([key, propSchema]) => [
@@ -1014,7 +575,7 @@ var CustomKeyValueArrayRenderer = ({
         type: "Control",
         scope: "#/properties/key",
         label: "Key",
-        options: uischema.options?.keyOptions
+        options: { ...uischema.options?.keyOptions, ...templateOptions }
       },
       schema: itemSchema,
       path: `${path}.${index}`,
@@ -1028,7 +589,7 @@ var CustomKeyValueArrayRenderer = ({
         type: "Control",
         scope: "#/properties/value",
         label: "Value",
-        options: uischema.options?.valueOptions
+        options: { ...uischema.options?.valueOptions, ...templateOptions }
       },
       schema: itemSchema,
       path: `${path}.${index}`,
@@ -1044,7 +605,7 @@ var CustomKeyValueArrayRenderer = ({
       square: true,
       onClick: () => handleRemoveItem(index)
     },
-    /* @__PURE__ */ import_react8.default.createElement(import_lucide_react3.Trash2, { className: "w-4 h-4" })
+    /* @__PURE__ */ import_react8.default.createElement(import_lucide_react2.Trash2, { className: "w-4 h-4" })
   )))), /* @__PURE__ */ import_react8.default.createElement(
     import_ui8.Button,
     {
@@ -1074,7 +635,7 @@ CustomKeyValueArrayRenderer.propTypes = {
 var import_react10 = __toESM(require("react"));
 var import_prop_types9 = __toESM(require("prop-types"));
 var import_react11 = require("@jsonforms/react");
-var import_lucide_react4 = require("lucide-react");
+var import_lucide_react3 = require("lucide-react");
 var import_ui9 = require("@jet-admin/ui");
 var CustomKeyValueTypeArrayRenderer = ({
   data,
@@ -1089,6 +650,10 @@ var CustomKeyValueTypeArrayRenderer = ({
 }) => {
   const items = data || [];
   const itemSchema = schema.items;
+  const templateOptions = {
+    stateTree: uischema.options?.stateTree,
+    templateMode: uischema.options?.templateMode
+  };
   const handleAddItem = () => {
     const newItem = itemSchema.properties ? Object.fromEntries(
       Object.entries(itemSchema.properties).map(([key, propSchema]) => [
@@ -1109,7 +674,7 @@ var CustomKeyValueTypeArrayRenderer = ({
         type: "Control",
         scope: "#/properties/key",
         label: "Key",
-        options: uischema.options?.keyOptions
+        options: { ...uischema.options?.keyOptions, ...templateOptions }
       },
       schema: itemSchema,
       path: `${path}.${index}`,
@@ -1123,7 +688,7 @@ var CustomKeyValueTypeArrayRenderer = ({
         type: "Control",
         scope: "#/properties/type",
         label: "Value Type",
-        options: uischema.options?.typeOptions
+        options: { ...uischema.options?.typeOptions, ...templateOptions }
       },
       schema: itemSchema,
       path: `${path}.${index}`,
@@ -1137,7 +702,7 @@ var CustomKeyValueTypeArrayRenderer = ({
         type: "Control",
         scope: "#/properties/value",
         label: "Value",
-        options: uischema.options?.valueOptions
+        options: { ...uischema.options?.valueOptions, ...templateOptions }
       },
       schema: itemSchema,
       path: `${path}.${index}`,
@@ -1153,7 +718,7 @@ var CustomKeyValueTypeArrayRenderer = ({
       square: true,
       onClick: () => handleRemoveItem(index)
     },
-    /* @__PURE__ */ import_react10.default.createElement(import_lucide_react4.Trash2, { className: "w-4 h-4" })
+    /* @__PURE__ */ import_react10.default.createElement(import_lucide_react3.Trash2, { className: "w-4 h-4" })
   )))), /* @__PURE__ */ import_react10.default.createElement(
     import_ui9.Button,
     {
@@ -1183,7 +748,7 @@ CustomKeyValueTypeArrayRenderer.propTypes = {
 var import_react12 = __toESM(require("react"));
 var import_prop_types10 = __toESM(require("prop-types"));
 var import_react13 = require("@jsonforms/react");
-var import_lucide_react5 = require("lucide-react");
+var import_lucide_react4 = require("lucide-react");
 var import_ui10 = require("@jet-admin/ui");
 var CustomKeyTypeArrayRenderer = ({
   data,
@@ -1198,6 +763,10 @@ var CustomKeyTypeArrayRenderer = ({
 }) => {
   const items = data || [];
   const itemSchema = schema.items;
+  const templateOptions = {
+    stateTree: uischema.options?.stateTree,
+    templateMode: uischema.options?.templateMode
+  };
   const handleAddItem = () => {
     const newItem = itemSchema.properties ? Object.fromEntries(
       Object.entries(itemSchema.properties).map(([key, propSchema]) => [
@@ -1218,7 +787,7 @@ var CustomKeyTypeArrayRenderer = ({
         type: "Control",
         scope: "#/properties/key",
         label: "Key",
-        options: uischema.options?.keyOptions
+        options: { ...uischema.options?.keyOptions, ...templateOptions }
       },
       schema: itemSchema,
       path: `${path}.${index}`,
@@ -1232,9 +801,7 @@ var CustomKeyTypeArrayRenderer = ({
         type: "Control",
         scope: "#/properties/type",
         label: "Value Type",
-        options: {
-          ...uischema.options?.typeOptions
-        }
+        options: { ...uischema.options?.typeOptions, ...templateOptions }
       },
       schema: itemSchema,
       path: `${path}.${index}`,
@@ -1250,7 +817,7 @@ var CustomKeyTypeArrayRenderer = ({
       square: true,
       onClick: () => handleRemoveItem(index)
     },
-    /* @__PURE__ */ import_react12.default.createElement(import_lucide_react5.Trash2, { className: "w-4 h-4" })
+    /* @__PURE__ */ import_react12.default.createElement(import_lucide_react4.Trash2, { className: "w-4 h-4" })
   )))), /* @__PURE__ */ import_react12.default.createElement(
     import_ui10.Button,
     {
@@ -1279,11 +846,13 @@ CustomKeyTypeArrayRenderer.propTypes = {
 // src/renderers/CustomStringArrayRenderer.jsx
 var import_react14 = __toESM(require("react"));
 var import_prop_types11 = __toESM(require("prop-types"));
-var import_lucide_react6 = require("lucide-react");
+var import_lucide_react5 = require("lucide-react");
 var import_ui11 = require("@jet-admin/ui");
 var CustomStringArrayRenderer = (props) => {
   const { data, path, handleChange, label, uischema, enabled, visible } = props;
   const arrayData = Array.isArray(data) ? data : [];
+  const stateTree = uischema?.options?.stateTree || null;
+  const templateMode = uischema?.options?.templateMode;
   const handleAddItem = () => {
     handleChange(path, [...arrayData, ""]);
   };
@@ -1300,14 +869,14 @@ var CustomStringArrayRenderer = (props) => {
     return null;
   }
   return /* @__PURE__ */ import_react14.default.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ import_react14.default.createElement(import_ui11.Label, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema?.label || "Items"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ import_react14.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react14.default.createElement(
-    import_ui11.Input,
+    import_ui11.TemplateAutocompleteInput,
     {
-      size: "sm",
-      type: "text",
       value: item || "",
-      onChange: (e) => handleItemChange(index, e.target.value),
-      disabled: !enabled,
-      placeholder: "Enter value..."
+      onChange: (val) => handleItemChange(index, val),
+      placeholder: "Enter value...",
+      liveStateTree: stateTree,
+      mode: templateMode,
+      readOnly: !enabled
     }
   )), /* @__PURE__ */ import_react14.default.createElement(
     import_ui11.Button,
@@ -1319,7 +888,7 @@ var CustomStringArrayRenderer = (props) => {
       onClick: () => handleRemoveItem(index),
       disabled: !enabled
     },
-    /* @__PURE__ */ import_react14.default.createElement(import_lucide_react6.Trash2, { className: "w-4 h-4" })
+    /* @__PURE__ */ import_react14.default.createElement(import_lucide_react5.Trash2, { className: "w-4 h-4" })
   )))), arrayData.length === 0 && /* @__PURE__ */ import_react14.default.createElement("div", { className: "text-xs text-muted-foreground italic py-2" }, "No items added yet."), /* @__PURE__ */ import_react14.default.createElement(
     import_ui11.Button,
     {
@@ -1346,7 +915,7 @@ CustomStringArrayRenderer.propTypes = {
 // src/renderers/CustomFieldOperatorValueArrayRenderer.jsx
 var import_react15 = __toESM(require("react"));
 var import_prop_types12 = __toESM(require("prop-types"));
-var import_lucide_react7 = require("lucide-react");
+var import_lucide_react6 = require("lucide-react");
 var import_ui12 = require("@jet-admin/ui");
 var CustomFieldOperatorValueArrayRenderer = ({
   data,
@@ -1361,6 +930,8 @@ var CustomFieldOperatorValueArrayRenderer = ({
   const items = data || [];
   const itemSchema = schema.items;
   const isDisabled = enabled === false;
+  const stateTree = uischema?.options?.stateTree || null;
+  const templateMode = uischema?.options?.templateMode;
   const operatorOptions = itemSchema?.properties?.operator?.enum || [
     "==",
     "!=",
@@ -1387,25 +958,25 @@ var CustomFieldOperatorValueArrayRenderer = ({
     handleChange(path, newItems);
   };
   return /* @__PURE__ */ import_react15.default.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ import_react15.default.createElement(import_ui12.Label, { className: "block mb-2 text-sm font-medium text-foreground" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ import_react15.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ import_react15.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react15.default.createElement(
-    import_ui12.Input,
+    import_ui12.TemplateAutocompleteInput,
     {
-      size: "sm",
-      type: "text",
       placeholder: "Field",
       value: item.field || "",
-      disabled: isDisabled,
-      onChange: (e) => handleItemChange(index, "field", e.target.value),
-      className: errors && errors.length > 0 ? "border-red-500" : ""
+      readOnly: isDisabled,
+      onChange: (val) => handleItemChange(index, "field", val),
+      liveStateTree: stateTree,
+      mode: templateMode,
+      className: errors && errors.length > 0 ? "ring-1 ring-red-500 rounded-sm" : ""
     }
   )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "w-36" }, /* @__PURE__ */ import_react15.default.createElement(import_ui12.Select, { value: item.operator || "==", onValueChange: (val) => handleItemChange(index, "operator", val), disabled: isDisabled }, /* @__PURE__ */ import_react15.default.createElement(import_ui12.SelectTrigger, { size: "sm" }, /* @__PURE__ */ import_react15.default.createElement(import_ui12.SelectValue, null)), /* @__PURE__ */ import_react15.default.createElement(import_ui12.SelectContent, null, operatorOptions.map((op) => /* @__PURE__ */ import_react15.default.createElement(import_ui12.SelectItem, { key: op, value: op }, op))))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react15.default.createElement(
-    import_ui12.Input,
+    import_ui12.TemplateAutocompleteInput,
     {
-      size: "sm",
-      type: "text",
       placeholder: "Value",
       value: item.value || "",
-      disabled: isDisabled,
-      onChange: (e) => handleItemChange(index, "value", e.target.value)
+      readOnly: isDisabled,
+      onChange: (val) => handleItemChange(index, "value", val),
+      liveStateTree: stateTree,
+      mode: templateMode
     }
   )), /* @__PURE__ */ import_react15.default.createElement(
     import_ui12.Button,
@@ -1417,7 +988,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
       onClick: () => handleRemoveItem(index),
       disabled: isDisabled
     },
-    /* @__PURE__ */ import_react15.default.createElement(import_lucide_react7.Trash2, { className: "w-4 h-4" })
+    /* @__PURE__ */ import_react15.default.createElement(import_lucide_react6.Trash2, { className: "w-4 h-4" })
   )))), /* @__PURE__ */ import_react15.default.createElement(
     import_ui12.Button,
     {
@@ -1446,7 +1017,7 @@ CustomFieldOperatorValueArrayRenderer.propTypes = {
 var import_react16 = __toESM(require("react"));
 var import_prop_types13 = __toESM(require("prop-types"));
 var import_react17 = require("@jsonforms/react");
-var import_lucide_react8 = require("lucide-react");
+var import_lucide_react7 = require("lucide-react");
 var import_ui13 = require("@jet-admin/ui");
 var CustomGenericObjectArrayRenderer = ({
   data,
@@ -1462,6 +1033,10 @@ var CustomGenericObjectArrayRenderer = ({
   const items = data || [];
   const itemSchema = schema.items;
   const propertyKeys = itemSchema?.properties ? Object.keys(itemSchema.properties) : [];
+  const templateOptions = {
+    stateTree: uischema.options?.stateTree,
+    templateMode: uischema.options?.templateMode
+  };
   const handleAddItem = () => {
     const newItem = itemSchema.properties ? Object.fromEntries(
       Object.entries(itemSchema.properties).map(([key, propSchema]) => [
@@ -1484,7 +1059,8 @@ var CustomGenericObjectArrayRenderer = ({
       uischema: {
         type: "Control",
         scope: `#/properties/${propKey}`,
-        label: propKey.charAt(0).toUpperCase() + propKey.slice(1)
+        label: propKey.charAt(0).toUpperCase() + propKey.slice(1),
+        options: { ...templateOptions }
       },
       schema: itemSchema,
       path: `${path}.${index}`,
@@ -1500,7 +1076,7 @@ var CustomGenericObjectArrayRenderer = ({
       square: true,
       onClick: () => handleRemoveItem(index)
     },
-    /* @__PURE__ */ import_react16.default.createElement(import_lucide_react8.Trash2, { className: "w-4 h-4" })
+    /* @__PURE__ */ import_react16.default.createElement(import_lucide_react7.Trash2, { className: "w-4 h-4" })
   )))), items.length === 0 && /* @__PURE__ */ import_react16.default.createElement("div", { className: "text-xs text-muted-foreground italic py-2" }, "No items added yet."), /* @__PURE__ */ import_react16.default.createElement(
     import_ui13.Button,
     {
@@ -1750,7 +1326,7 @@ var JetSelectControl = (0, import_react27.withJsonFormsControlProps)(CustomSelec
 var JetCheckboxControl = (0, import_react27.withJsonFormsControlProps)(CustomCheckboxInput);
 var JetCodeEditorControl = (0, import_react27.withJsonFormsControlProps)(CustomCodeEditorControl);
 var JetSuggestionControl = (0, import_react27.withJsonFormsControlProps)(CustomSuggestionInput);
-var JetDynamicArgsControl = (0, import_react27.withJsonFormsControlProps)(DynamicArgsControl);
+var JetCustomDynamicKeyValueInputRenderer = (0, import_react27.withJsonFormsControlProps)(CustomDynamicKeyValueInputRenderer);
 var JetKeyValueArrayControl = (0, import_react27.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
 var JetKeyValueTypeArrayControl = (0, import_react27.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
 var JetKeyTypeArrayControl = (0, import_react27.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
@@ -1853,9 +1429,9 @@ var suggestionInputTester = (0, import_core.rankWith)(
   50,
   (0, import_core.and)(import_core.isControl, (uischema) => uischema.options && uischema.options.suggestionType === "nodeOutput")
 );
-var dynamicArgsTester = (0, import_core.rankWith)(
+var dynamicKeyValueInputTester = (0, import_core.rankWith)(
   20,
-  (0, import_core.and)(import_core.isControl, (uischema) => uischema?.options?.isDynamicArgs === true)
+  (0, import_core.and)(import_core.isControl, (uischema) => uischema?.options?.isDynamicKeyValueInput === true)
 );
 var stringArrayTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
@@ -2021,7 +1597,7 @@ var jetFormsBaseRenderers = [
 var jetFormsRenderers = [
   { tester: suggestionInputTester, renderer: JetSuggestionControl },
   { tester: codeEditorTester, renderer: JetCodeEditorControl },
-  { tester: dynamicArgsTester, renderer: JetDynamicArgsControl },
+  { tester: dynamicKeyValueInputTester, renderer: JetCustomDynamicKeyValueInputRenderer },
   ...jetFormsBaseRenderers
 ];
 //# sourceMappingURL=index.cjs.map

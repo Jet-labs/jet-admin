@@ -104,9 +104,9 @@ handlers['__delay'] = {
 
 // ─── Imports (after mocks are in place) ──────────────────────────────────────
 
-const { stateManager } = require('../../modules/workflow/orchestrator/stateManager');
-const { dagScheduler } = require('../../modules/workflow/orchestrator/dagScheduler');
-const { startWorkflow, __test__ } = require('../../modules/workflow/orchestrator/orchestrator');
+const { stateManager } = require('../../modules/workflow/workflowEngine/stateManager');
+const { dagScheduler } = require('../../modules/workflow/workflowEngine/dagScheduler');
+const { startWorkflow, __test__ } = require('../../modules/workflow/workflowEngine/engine');
 
 const {
   LINEAR, FAN_OUT, DIAMOND_AND, DIAMOND_OR,
@@ -120,12 +120,12 @@ const {
 
 const TENANT = 'tenant-stress-test';
 
-async function launchWorkflow(topology, inputParams = {}) {
+async function launchWorkflow(topology, inputArgs = {}) {
   store.seedWorkflow(topology);
   const { instanceID } = await startWorkflow({
     workflowID: topology.workflowID,
     tenantID: TENANT,
-    inputParams,
+    inputArgs,
   });
   return instanceID;
 }
@@ -222,7 +222,7 @@ describe('dagScheduler — isNodeReadyToExecute', () => {
 describe('stateManager', () => {
   test('createInstance writes INPUT_SET log row', async () => {
     const { instance, initialContext } = await stateManager.createInstance({
-      workflowID: 'wf-1', tenantID: TENANT, inputParams: { foo: 'bar' },
+      workflowID: 'wf-1', tenantID: TENANT, inputArgs: { foo: 'bar' },
     });
 
     expect(instance.status).toBe('RUNNING');

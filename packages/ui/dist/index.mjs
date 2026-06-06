@@ -984,360 +984,64 @@ var CollapseComponent = ({
 
 // src/components/code-editor.jsx
 import * as React23 from "react";
-import Editor from "@monaco-editor/react";
-
-// src/components/github-light.json
-var github_light_default = {
-  base: "vs",
-  inherit: true,
-  rules: [
-    {
-      background: "ffffff",
-      token: ""
-    },
-    {
-      foreground: "6a737d",
-      token: "comment"
-    },
-    {
-      foreground: "6a737d",
-      token: "punctuation.definition.comment"
-    },
-    {
-      foreground: "6a737d",
-      token: "string.comment"
-    },
-    {
-      foreground: "005cc5",
-      token: "constant"
-    },
-    {
-      foreground: "005cc5",
-      token: "entity.name.constant"
-    },
-    {
-      foreground: "005cc5",
-      token: "variable.other.constant"
-    },
-    {
-      foreground: "005cc5",
-      token: "variable.language"
-    },
-    {
-      foreground: "6f42c1",
-      token: "entity"
-    },
-    {
-      foreground: "6f42c1",
-      token: "entity.name"
-    },
-    {
-      foreground: "24292e",
-      token: "variable.parameter.function"
-    },
-    {
-      foreground: "22863a",
-      token: "entity.name.tag"
-    },
-    {
-      foreground: "d73a49",
-      token: "keyword"
-    },
-    {
-      foreground: "d73a49",
-      token: "storage"
-    },
-    {
-      foreground: "d73a49",
-      token: "storage.type"
-    },
-    {
-      foreground: "24292e",
-      token: "storage.modifier.package"
-    },
-    {
-      foreground: "24292e",
-      token: "storage.modifier.import"
-    },
-    {
-      foreground: "24292e",
-      token: "storage.type.java"
-    },
-    {
-      foreground: "032f62",
-      token: "string"
-    },
-    {
-      foreground: "032f62",
-      token: "punctuation.definition.string"
-    },
-    {
-      foreground: "032f62",
-      token: "string punctuation.section.embedded source"
-    },
-    {
-      foreground: "005cc5",
-      token: "support"
-    },
-    {
-      foreground: "005cc5",
-      token: "meta.property-name"
-    },
-    {
-      foreground: "e36209",
-      token: "variable"
-    },
-    {
-      foreground: "24292e",
-      token: "variable.other"
-    },
-    {
-      foreground: "b31d28",
-      fontStyle: "bold italic underline",
-      token: "invalid.broken"
-    },
-    {
-      foreground: "b31d28",
-      fontStyle: "bold italic underline",
-      token: "invalid.deprecated"
-    },
-    {
-      foreground: "fafbfc",
-      background: "b31d28",
-      fontStyle: "italic underline",
-      token: "invalid.illegal"
-    },
-    {
-      foreground: "fafbfc",
-      background: "d73a49",
-      fontStyle: "italic underline",
-      token: "carriage-return"
-    },
-    {
-      foreground: "b31d28",
-      fontStyle: "bold italic underline",
-      token: "invalid.unimplemented"
-    },
-    {
-      foreground: "b31d28",
-      token: "message.error"
-    },
-    {
-      foreground: "24292e",
-      token: "string source"
-    },
-    {
-      foreground: "005cc5",
-      token: "string variable"
-    },
-    {
-      foreground: "032f62",
-      token: "source.regexp"
-    },
-    {
-      foreground: "032f62",
-      token: "string.regexp"
-    },
-    {
-      foreground: "032f62",
-      token: "string.regexp.character-class"
-    },
-    {
-      foreground: "032f62",
-      token: "string.regexp constant.character.escape"
-    },
-    {
-      foreground: "032f62",
-      token: "string.regexp source.ruby.embedded"
-    },
-    {
-      foreground: "032f62",
-      token: "string.regexp string.regexp.arbitrary-repitition"
-    },
-    {
-      foreground: "22863a",
-      fontStyle: "bold",
-      token: "string.regexp constant.character.escape"
-    },
-    {
-      foreground: "005cc5",
-      token: "support.constant"
-    },
-    {
-      foreground: "005cc5",
-      token: "support.variable"
-    },
-    {
-      foreground: "005cc5",
-      token: "meta.module-reference"
-    },
-    {
-      foreground: "735c0f",
-      token: "markup.list"
-    },
-    {
-      foreground: "005cc5",
-      fontStyle: "bold",
-      token: "markup.heading"
-    },
-    {
-      foreground: "005cc5",
-      fontStyle: "bold",
-      token: "markup.heading entity.name"
-    },
-    {
-      foreground: "22863a",
-      token: "markup.quote"
-    },
-    {
-      foreground: "24292e",
-      fontStyle: "italic",
-      token: "markup.italic"
-    },
-    {
-      foreground: "24292e",
-      fontStyle: "bold",
-      token: "markup.bold"
-    },
-    {
-      foreground: "005cc5",
-      token: "markup.raw"
-    },
-    {
-      foreground: "b31d28",
-      background: "ffeef0",
-      token: "markup.deleted"
-    },
-    {
-      foreground: "b31d28",
-      background: "ffeef0",
-      token: "meta.diff.header.from-file"
-    },
-    {
-      foreground: "b31d28",
-      background: "ffeef0",
-      token: "punctuation.definition.deleted"
-    },
-    {
-      foreground: "22863a",
-      background: "f0fff4",
-      token: "markup.inserted"
-    },
-    {
-      foreground: "22863a",
-      background: "f0fff4",
-      token: "meta.diff.header.to-file"
-    },
-    {
-      foreground: "22863a",
-      background: "f0fff4",
-      token: "punctuation.definition.inserted"
-    },
-    {
-      foreground: "e36209",
-      background: "ffebda",
-      token: "markup.changed"
-    },
-    {
-      foreground: "e36209",
-      background: "ffebda",
-      token: "punctuation.definition.changed"
-    },
-    {
-      foreground: "f6f8fa",
-      background: "005cc5",
-      token: "markup.ignored"
-    },
-    {
-      foreground: "f6f8fa",
-      background: "005cc5",
-      token: "markup.untracked"
-    },
-    {
-      foreground: "6f42c1",
-      fontStyle: "bold",
-      token: "meta.diff.range"
-    },
-    {
-      foreground: "005cc5",
-      token: "meta.diff.header"
-    },
-    {
-      foreground: "005cc5",
-      fontStyle: "bold",
-      token: "meta.separator"
-    },
-    {
-      foreground: "005cc5",
-      token: "meta.output"
-    },
-    {
-      foreground: "586069",
-      token: "brackethighlighter.tag"
-    },
-    {
-      foreground: "586069",
-      token: "brackethighlighter.curly"
-    },
-    {
-      foreground: "586069",
-      token: "brackethighlighter.round"
-    },
-    {
-      foreground: "586069",
-      token: "brackethighlighter.square"
-    },
-    {
-      foreground: "586069",
-      token: "brackethighlighter.angle"
-    },
-    {
-      foreground: "586069",
-      token: "brackethighlighter.quote"
-    },
-    {
-      foreground: "b31d28",
-      token: "brackethighlighter.unmatched"
-    },
-    {
-      foreground: "b31d28",
-      token: "sublimelinter.mark.error"
-    },
-    {
-      foreground: "e36209",
-      token: "sublimelinter.mark.warning"
-    },
-    {
-      foreground: "959da5",
-      token: "sublimelinter.gutter-mark"
-    },
-    {
-      foreground: "032f62",
-      fontStyle: "underline",
-      token: "constant.other.reference.link"
-    },
-    {
-      foreground: "032f62",
-      fontStyle: "underline",
-      token: "string.other.link"
-    }
-  ],
-  colors: {
-    "editor.foreground": "#24292e",
-    "editor.background": "#ffffff",
-    "editor.selectionBackground": "#c8c8fa",
-    "editor.inactiveSelectionBackground": "#fafbfc",
-    "editor.lineHighlightBackground": "#fafbfc",
-    "editorCursor.foreground": "#24292e",
-    "editorWhitespace.foreground": "#959da5",
-    "editorIndentGuide.background": "#959da5",
-    "editorIndentGuide.activeBackground": "#24292e",
-    "editor.selectionHighlightBorder": "#fafbfc"
+import { EditorState, Compartment } from "@codemirror/state";
+import { EditorView, keymap, lineNumbers } from "@codemirror/view";
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { closeBrackets, closeBracketsKeymap, autocompletion } from "@codemirror/autocomplete";
+import { javascript } from "@codemirror/lang-javascript";
+import { sql } from "@codemirror/lang-sql";
+import { json } from "@codemirror/lang-json";
+import { html } from "@codemirror/lang-html";
+import { css } from "@codemirror/lang-css";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { getCompletions, MODES } from "@jet-admin/expression-engine";
+import { Maximize2, Minimize2, AlertTriangle, CheckCircle2, Code } from "lucide-react";
+var languageCompartment = new Compartment();
+var readOnlyCompartment = new Compartment();
+var autocompleteCompartment = new Compartment();
+var getLanguageExtension = (lang) => {
+  switch (lang) {
+    case "javascript":
+      return javascript();
+    case "sql":
+      return sql();
+    case "json":
+      return json();
+    case "html":
+      return html();
+    case "css":
+      return css();
+    default:
+      return javascript();
   }
 };
-
-// src/components/code-editor.jsx
-import { Maximize2, Minimize2, Braces, AlertTriangle, CheckCircle2, Code } from "lucide-react";
+function engineTypeToCmType(type) {
+  switch (type) {
+    case "object":
+    case "array":
+      return "namespace";
+    case "method":
+      return "method";
+    case "function":
+      return "function";
+    case "property":
+      return "property";
+    case "snippet":
+      return "text";
+    default:
+      return "variable";
+  }
+}
+function toCmOption(s) {
+  return {
+    label: s.label,
+    apply: s.value ?? s.label,
+    detail: s.detail,
+    type: engineTypeToCmType(s.type),
+    boost: s.category === "live-state" ? 2 : typeof s.category === "string" && s.category.endsWith("member") ? 1 : 0,
+    info: s.detail ? `Value: ${s.detail}` : void 0
+  };
+}
 var CodeEditor = React23.forwardRef(({
   value,
   defaultValue,
@@ -1357,41 +1061,139 @@ var CodeEditor = React23.forwardRef(({
   headerExtra,
   headerLeft,
   status,
-  // "valid" | "error" | null
   statusMessage,
   footerHint,
   onMount,
   beforeMount,
+  extensions = [],
   editorOptions = {},
+  // Intellisense Props
+  stateTree = null,
+  templateMode,
   ...props
 }, ref) => {
   const [isExpanded, setIsExpanded] = React23.useState(false);
-  const internalEditorRef = React23.useRef(null);
-  const monacoRef = React23.useRef(null);
+  const containerRef = React23.useRef(null);
+  const viewRef = React23.useRef(null);
+  const internalChange = React23.useRef(false);
   const isReadOnly = disabled || readOnly;
-  const handleEditorWillMount = (monaco) => {
-    monaco.editor.defineTheme("github-light", github_light_default);
-    if (beforeMount) {
-      beforeMount(monaco);
-    }
-  };
-  const handleEditorDidMount = (editor, monaco) => {
-    internalEditorRef.current = editor;
-    monacoRef.current = monaco;
-    if (typeof ref === "function") {
-      ref({ editor, monaco });
-    } else if (ref) {
-      ref.current = { editor, monaco };
-    }
-    if (onMount) {
-      onMount(editor, monaco);
-    }
-  };
-  const handleFormat = () => {
-    if (internalEditorRef.current) {
-      internalEditorRef.current.getAction("editor.action.formatDocument")?.run();
-    }
-  };
+  const effectiveTemplateMode = React23.useMemo(() => {
+    if (templateMode) return templateMode;
+    return language === "javascript" ? MODES.JS_TEMPLATE : MODES.SAFE_PATH;
+  }, [templateMode, language]);
+  const autocompletionExtension = React23.useMemo(() => {
+    const completionSource = (ctx) => {
+      const isSql = language === "sql";
+      let inMustache = false;
+      if (isSql) {
+        const doc = ctx.state.doc.toString();
+        let searchFrom = 0;
+        while (searchFrom < doc.length) {
+          const open = doc.indexOf("{{", searchFrom);
+          if (open === -1) break;
+          const close = doc.indexOf("}}", open + 2);
+          if (close === -1) break;
+          if (ctx.pos > open + 1 && ctx.pos <= close) {
+            inMustache = true;
+            break;
+          }
+          searchFrom = close + 2;
+        }
+        if (!inMustache) {
+          const sqlWord = ctx.matchBefore(/[\w.]*/);
+          if (!sqlWord) return null;
+          if (sqlWord.from === sqlWord.to && !ctx.explicit) return null;
+          const text = sqlWord.text;
+          const suggestions = [];
+          const sqlKeywords = [
+            "SELECT",
+            "FROM",
+            "WHERE",
+            "JOIN",
+            "LEFT JOIN",
+            "RIGHT JOIN",
+            "INNER JOIN",
+            "ON",
+            "GROUP BY",
+            "ORDER BY",
+            "ASC",
+            "DESC",
+            "AS",
+            "DISTINCT",
+            "LIMIT",
+            "OFFSET",
+            "INSERT INTO",
+            "VALUES",
+            "UPDATE",
+            "SET",
+            "DELETE",
+            "CREATE TABLE",
+            "ALTER TABLE",
+            "DROP TABLE",
+            "INDEX",
+            "COUNT",
+            "SUM",
+            "AVG",
+            "MAX",
+            "MIN",
+            "AND",
+            "OR",
+            "NOT",
+            "NULL",
+            "IS"
+          ];
+          sqlKeywords.forEach((kw) => suggestions.push({ label: kw, type: "keyword" }));
+          const options2 = suggestions.filter((s) => {
+            if (!text) return true;
+            const matchQuery = text.includes(".") ? text.split(".").pop().toLowerCase() : text.toLowerCase();
+            return s.label.toLowerCase().includes(matchQuery);
+          });
+          if (options2.length === 0 && !ctx.explicit) return null;
+          return {
+            from: text.includes(".") ? sqlWord.from + text.lastIndexOf(".") + 1 : sqlWord.from,
+            options: options2,
+            validFor: /^[\w]*$/
+          };
+        }
+      }
+      const word = ctx.matchBefore(/[\w.[\]"']*/);
+      if (!word) return null;
+      if (word.from === word.to && !ctx.explicit) return null;
+      const filter = word.text;
+      const query = filter.toLowerCase();
+      let engineSuggestions = [];
+      if (stateTree) {
+        engineSuggestions = getCompletions({ filter, stateTree, mode: effectiveTemplateMode });
+      } else if (language === "javascript") {
+        const jsKeywords = [
+          { label: "return", detail: "Return statement" },
+          { label: "const", detail: "Constant declaration" },
+          { label: "let", detail: "Variable declaration" },
+          { label: "ctx", detail: "Workflow context object" },
+          { label: "console.log", detail: "Log to console" },
+          { label: "JSON.stringify", detail: "Convert to JSON string" },
+          { label: "JSON.parse", detail: "Parse JSON string" },
+          { label: "Array.isArray", detail: "Check if array" },
+          { label: "Object.keys", detail: "Get object keys" },
+          { label: "Object.values", detail: "Get object values" }
+        ];
+        engineSuggestions = jsKeywords.map((k) => ({ ...k, type: "keyword" }));
+      }
+      const options = engineSuggestions.filter((s) => {
+        if (!query) return true;
+        const value2 = (s.value || s.label || "").toLowerCase();
+        const label = (s.label || "").toLowerCase();
+        return value2.includes(query) || label.includes(query);
+      }).map(toCmOption);
+      if (options.length === 0 && !ctx.explicit) return null;
+      return {
+        from: word.from,
+        options,
+        validFor: /^[\w.[\]"']*$/
+      };
+    };
+    return autocompletion({ override: [completionSource], activateOnTyping: true, maxRenderedOptions: 50 });
+  }, [language, stateTree, effectiveTemplateMode, tablesMap]);
   React23.useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape" && isExpanded) {
@@ -1403,6 +1205,150 @@ var CodeEditor = React23.forwardRef(({
     }
     return () => document.removeEventListener("keydown", handleEsc);
   }, [isExpanded]);
+  React23.useEffect(() => {
+    if (!containerRef.current) return;
+    containerRef.current.innerHTML = "";
+    const baseExtensions = [
+      history(),
+      closeBrackets(),
+      keymap.of([
+        ...defaultKeymap,
+        ...historyKeymap,
+        ...closeBracketsKeymap
+      ]),
+      languageCompartment.of(getLanguageExtension(language)),
+      readOnlyCompartment.of(EditorState.readOnly.of(isReadOnly)),
+      autocompleteCompartment.of(autocompletionExtension),
+      oneDark,
+      ...extensions,
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          internalChange.current = true;
+          onChange?.(update.state.doc.toString());
+        }
+      }),
+      EditorView.theme({
+        "&": {
+          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          fontSize: "12px",
+          height: "100%",
+          backgroundColor: "transparent",
+          color: "hsl(var(--foreground))"
+        },
+        ".cm-scroller": { overflow: "auto", maxHeight: "100%", scrollbarWidth: "thin" },
+        ".cm-gutters": {
+          backgroundColor: "transparent",
+          borderRight: "1px solid hsl(var(--border))",
+          color: "hsl(var(--muted-foreground))"
+        },
+        ".cm-content": {
+          padding: "8px 0",
+          caretColor: "hsl(var(--foreground))"
+        },
+        "&.cm-focused": { outline: "none" },
+        ".cm-cursor": {
+          borderLeftColor: "hsl(var(--foreground))"
+        },
+        ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": {
+          background: "hsl(var(--primary) / 0.15) !important"
+        },
+        // Autocomplete dropdown — match design system
+        ".cm-tooltip.cm-tooltip-autocomplete": {
+          border: "1px solid hsl(var(--border))",
+          borderRadius: "6px",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+          background: "hsl(var(--background))",
+          fontSize: "11px",
+          overflow: "hidden",
+          maxHeight: "220px",
+          zIndex: "9999"
+        },
+        ".cm-tooltip-autocomplete > ul": {
+          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          maxHeight: "220px",
+          scrollbarWidth: "thin"
+        },
+        ".cm-tooltip-autocomplete > ul > li": {
+          padding: "4px 10px",
+          lineHeight: "1.5",
+          color: "hsl(var(--foreground))"
+        },
+        ".cm-tooltip-autocomplete > ul > li[aria-selected]": {
+          background: "hsl(var(--primary) / 0.12)",
+          color: "hsl(var(--foreground))"
+        },
+        ".cm-completionLabel": {
+          color: "hsl(var(--foreground))",
+          fontSize: "11px"
+        },
+        ".cm-completionDetail": {
+          color: "hsl(var(--muted-foreground))",
+          fontSize: "10px",
+          marginLeft: "8px"
+        },
+        ".cm-completionIcon": {
+          marginRight: "4px",
+          opacity: "0.7"
+        }
+      })
+    ];
+    if (showLineNumbers) {
+      baseExtensions.push(lineNumbers());
+    }
+    const state = EditorState.create({
+      doc: value !== void 0 ? value : defaultValue || "",
+      extensions: baseExtensions
+    });
+    const view = new EditorView({
+      state,
+      parent: containerRef.current
+    });
+    viewRef.current = view;
+    if (typeof ref === "function") {
+      ref({ editor: view, monaco: null });
+    } else if (ref) {
+      ref.current = { editor: view, monaco: null };
+    }
+    if (onMount) {
+      onMount(view, null);
+    }
+    return () => {
+      view.destroy();
+      viewRef.current = null;
+    };
+  }, []);
+  React23.useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    if (internalChange.current) {
+      internalChange.current = false;
+      return;
+    }
+    const current = view.state.doc.toString();
+    const incoming = value || "";
+    if (current !== incoming) {
+      view.dispatch({
+        changes: { from: 0, to: current.length, insert: incoming }
+      });
+    }
+  }, [value]);
+  React23.useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        effects: [
+          languageCompartment.reconfigure(getLanguageExtension(language)),
+          readOnlyCompartment.reconfigure(EditorState.readOnly.of(isReadOnly))
+        ]
+      });
+    }
+  }, [language, isReadOnly]);
+  React23.useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        effects: autocompleteCompartment.reconfigure(autocompletionExtension)
+      });
+    }
+  }, [autocompletionExtension]);
   return /* @__PURE__ */ React23.createElement(
     "div",
     {
@@ -1417,17 +1363,7 @@ var CodeEditor = React23.forwardRef(({
     showHeader && /* @__PURE__ */ React23.createElement("div", { className: "flex min-h-[36px] flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-1.5" }, /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-3" }, (title || titleIcon) && /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5 font-medium text-foreground" }, titleIcon ? titleIcon : /* @__PURE__ */ React23.createElement(Code, { className: "h-3.5 w-3.5 text-primary" }), title && /* @__PURE__ */ React23.createElement("span", { className: "text-xs" }, title)), status && /* @__PURE__ */ React23.createElement("span", { className: cn(
       "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide",
       status === "valid" ? "bg-green-950/40 text-green-400 border border-green-800" : status === "error" ? "bg-red-950/40 text-red-400 border border-red-800" : ""
-    ) }, status === "valid" ? /* @__PURE__ */ React23.createElement(CheckCircle2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(AlertTriangle, { className: "h-3 w-3" }), status === "valid" ? "Valid" : "Invalid"), headerLeft), /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5" }, headerExtra, showFormatButton && !isReadOnly && /* @__PURE__ */ React23.createElement(
-      "button",
-      {
-        type: "button",
-        onClick: handleFormat,
-        className: "inline-flex h-6 items-center gap-1.5 rounded border border-transparent px-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:border-border/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        title: "Format Code (Shift+Alt+F)"
-      },
-      /* @__PURE__ */ React23.createElement(Braces, { className: "h-3 w-3" }),
-      "Format"
-    ), showExpandButton && /* @__PURE__ */ React23.createElement(
+    ) }, status === "valid" ? /* @__PURE__ */ React23.createElement(CheckCircle2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(AlertTriangle, { className: "h-3 w-3" }), status === "valid" ? "Valid" : "Invalid"), headerLeft), /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5" }, headerExtra, showExpandButton && /* @__PURE__ */ React23.createElement(
       "button",
       {
         type: "button",
@@ -1437,51 +1373,7 @@ var CodeEditor = React23.forwardRef(({
       },
       isExpanded ? /* @__PURE__ */ React23.createElement(Minimize2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(Maximize2, { className: "h-3 w-3" })
     ))),
-    /* @__PURE__ */ React23.createElement("div", { className: "relative flex-1" }, /* @__PURE__ */ React23.createElement(
-      Editor,
-      {
-        height: isExpanded ? "calc(100vh - 80px)" : height,
-        language,
-        value,
-        defaultValue,
-        onChange,
-        beforeMount: handleEditorWillMount,
-        onMount: handleEditorDidMount,
-        theme: "vs-dark",
-        options: {
-          readOnly: isReadOnly,
-          minimap: { enabled: isExpanded },
-          fontSize: 12,
-          fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-          lineNumbers: showLineNumbers ? "on" : "off",
-          scrollBeyondLastLine: false,
-          wordWrap: "on",
-          wrappingStrategy: "advanced",
-          automaticLayout: true,
-          formatOnPaste: true,
-          formatOnType: true,
-          tabSize: 2,
-          insertSpaces: true,
-          quickSuggestions: { other: true, comments: false, strings: true },
-          suggestOnTriggerCharacters: true,
-          acceptSuggestionOnEnter: "on",
-          snippetSuggestions: "inline",
-          padding: { top: 8, bottom: 8 },
-          folding: true,
-          foldingStrategy: "indentation",
-          showFoldingControls: "always",
-          bracketPairColorization: { enabled: true },
-          lineNumbersMinChars: 3,
-          glyphMargin: false,
-          overviewRulerLanes: 0,
-          scrollbar: {
-            verticalScrollbarSize: 8,
-            horizontalScrollbarSize: 8
-          },
-          ...editorOptions
-        }
-      }
-    ), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm" }, footerHint)),
+    /* @__PURE__ */ React23.createElement("div", { className: "relative flex-1", style: { height: isExpanded ? "calc(100vh - 80px)" : typeof height === "number" ? `${height}px` : height } }, /* @__PURE__ */ React23.createElement("div", { ref: containerRef, className: "h-full w-full" }), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm" }, footerHint)),
     status === "error" && statusMessage && /* @__PURE__ */ React23.createElement("div", { className: "flex items-start gap-2 border-t border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive" }, /* @__PURE__ */ React23.createElement(AlertTriangle, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" }), /* @__PURE__ */ React23.createElement("span", { className: "font-medium whitespace-pre-wrap leading-relaxed" }, statusMessage))
   );
 });
@@ -1597,264 +1489,51 @@ ArrayInput.propTypes = {
 };
 
 // src/components/input-args-form.jsx
-import React25 from "react";
-import PropTypes3 from "prop-types";
-function InputArgsForm({
-  args = [],
-  values = {},
-  onChange,
-  errors = {},
-  disabled = false,
-  className
-}) {
-  if (!Array.isArray(args) || args.length === 0) {
-    return /* @__PURE__ */ React25.createElement("p", { className: "text-xs text-[#1c1c1e] italic" }, "No input parameters defined.");
-  }
-  const renderField = (arg) => {
-    const argName = arg.key;
-    const argType = arg.type || "string";
-    const value = values[argName];
-    switch (argType) {
-      case "boolean":
-        return /* @__PURE__ */ React25.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React25.createElement(
-          Checkbox,
-          {
-            id: `input-arg-${argName}`,
-            checked: !!value,
-            onCheckedChange: (checked) => onChange(argName, checked),
-            disabled
-          }
-        ), /* @__PURE__ */ React25.createElement(
-          Label2,
-          {
-            htmlFor: `input-arg-${argName}`,
-            className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          },
-          argName,
-          arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500 ml-1" }, "*"),
-          /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground ml-1" }, "(", argType, ")")
-        ));
-      case "array":
-        return /* @__PURE__ */ React25.createElement(React25.Fragment, null, /* @__PURE__ */ React25.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React25.createElement(
-          ArrayInput,
-          {
-            value: Array.isArray(value) ? value : [],
-            onChange: (val) => onChange(argName, val),
-            placeholder: `Add ${argName} item...`,
-            disabled
-          }
-        ));
-      case "object":
-        return /* @__PURE__ */ React25.createElement(React25.Fragment, null, /* @__PURE__ */ React25.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React25.createElement(
-          CodeEditor,
-          {
-            language: "json",
-            height: 120,
-            title: "JSON Input",
-            value: typeof value === "object" && value !== null ? JSON.stringify(value, null, 2) : value || "",
-            onChange: (val) => onChange(argName, val),
-            disabled
-          }
-        ));
-      case "number":
-        return /* @__PURE__ */ React25.createElement(React25.Fragment, null, /* @__PURE__ */ React25.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React25.createElement(
-          Input,
-          {
-            type: "number",
-            id: `input-arg-${argName}`,
-            className: "w-full text-xs",
-            placeholder: `Value for ${argName}`,
-            value: value ?? "",
-            onChange: (e) => onChange(
-              argName,
-              e.target.value === "" ? "" : Number(e.target.value)
-            ),
-            disabled
-          }
-        ));
-      // string & default
-      default:
-        return /* @__PURE__ */ React25.createElement(React25.Fragment, null, /* @__PURE__ */ React25.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500" }, "*"), " ", argType !== "string" && /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React25.createElement(
-          Input,
-          {
-            type: "text",
-            id: `input-arg-${argName}`,
-            className: "w-full text-xs",
-            placeholder: `Value for ${argName}`,
-            value: value || "",
-            onChange: (e) => onChange(argName, e.target.value),
-            disabled
-          }
-        ));
-    }
-  };
-  return /* @__PURE__ */ React25.createElement("div", { className: className || "space-y-3" }, args.map((arg) => /* @__PURE__ */ React25.createElement("div", { key: arg.key, className: "space-y-1" }, renderField(arg), errors[arg.key] && /* @__PURE__ */ React25.createElement("span", { className: "text-destructive text-xs" }, errors[arg.key]))));
-}
-InputArgsForm.propTypes = {
-  args: PropTypes3.arrayOf(
-    PropTypes3.shape({
-      key: PropTypes3.string.isRequired,
-      type: PropTypes3.string,
-      required: PropTypes3.bool
-    })
-  ).isRequired,
-  values: PropTypes3.object,
-  onChange: PropTypes3.func.isRequired,
-  errors: PropTypes3.object,
-  disabled: PropTypes3.bool,
-  className: PropTypes3.string
-};
-
-// src/components/pageHeader.jsx
 import React26 from "react";
-import PropTypes4 from "prop-types";
-import { ChevronLeft } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-var PageHeader = ({
-  title,
-  id,
-  onSave,
-  onDelete,
-  onClone,
-  onHistory,
-  isSaving = false,
-  isDeleting = false,
-  isCloning = false,
-  hasHistory = false,
-  saveText = "Update",
-  parentTitle,
-  children
-}) => {
-  return /* @__PURE__ */ React26.createElement("div", { className: "flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-3 px-4" }, /* @__PURE__ */ React26.createElement("div", { className: "flex items-center gap-4" }, parentTitle && /* @__PURE__ */ React26.createElement(React26.Fragment, null, /* @__PURE__ */ React26.createElement(
-    "h1",
-    {
-      className: "text-base font-semibold tracking-tight text-foreground leading-none"
-    },
-    parentTitle
-  ), /* @__PURE__ */ React26.createElement(
-    "span",
-    {
-      className: "text-base font-semibold tracking-tight text-foreground leading-none"
-    },
-    "/"
-  )), /* @__PURE__ */ React26.createElement("div", null, /* @__PURE__ */ React26.createElement("h1", { className: "text-base font-semibold tracking-tight text-foreground leading-none" }, title), id && /* @__PURE__ */ React26.createElement("p", { className: "mt-1.5 font-mono text-xs text-muted-foreground" }, "ID: ", id))), /* @__PURE__ */ React26.createElement("div", { className: "flex items-center gap-2" }, children, hasHistory && onHistory && /* @__PURE__ */ React26.createElement(Button, { variant: "outline", size: "sm", onClick: onHistory }, "View History"), onClone && /* @__PURE__ */ React26.createElement(Button, { variant: "outline", size: "sm", onClick: onClone, disabled: isCloning }, isCloning && /* @__PURE__ */ React26.createElement(Spinner, { size: 14, className: "mr-2" }), "Clone"), onDelete && /* @__PURE__ */ React26.createElement(
-    Button,
-    {
-      variant: "outline",
-      size: "sm",
-      onClick: onDelete,
-      disabled: isDeleting,
-      className: "text-destructive hover:bg-destructive/10 border-destructive/20"
-    },
-    isDeleting && /* @__PURE__ */ React26.createElement(Spinner, { size: 14, className: "mr-2" }),
-    "Delete"
-  ), onSave && /* @__PURE__ */ React26.createElement(Button, { size: "sm", onClick: onSave, disabled: isSaving }, isSaving && /* @__PURE__ */ React26.createElement(Spinner, { size: 14, className: "mr-2" }), saveText)));
-};
-PageHeader.propTypes = {
-  title: PropTypes4.string.isRequired,
-  id: PropTypes4.string,
-  onSave: PropTypes4.func,
-  onDelete: PropTypes4.func,
-  onClone: PropTypes4.func,
-  onHistory: PropTypes4.func,
-  isSaving: PropTypes4.bool,
-  isDeleting: PropTypes4.bool,
-  isCloning: PropTypes4.bool,
-  hasHistory: PropTypes4.bool,
-  saveText: PropTypes4.string,
-  children: PropTypes4.node
-};
-
-// src/components/section.jsx
-import * as React27 from "react";
-var Section = React27.forwardRef(
-  ({ className, title, description, children, ...props }, ref) => {
-    return /* @__PURE__ */ React27.createElement(
-      "div",
-      {
-        ref,
-        className: cn(
-          "rounded-md border border-border bg-card p-4 space-y-3",
-          className
-        ),
-        ...props
-      },
-      (title || description) && /* @__PURE__ */ React27.createElement("div", null, title && /* @__PURE__ */ React27.createElement("p", { className: "text-xs font-bold text-muted-foreground mb-0.5" }, title), description && /* @__PURE__ */ React27.createElement("p", { className: "text-[11px] text-muted-foreground" }, description)),
-      children
-    );
-  }
-);
-Section.displayName = "Section";
-
-// src/components/error-boundary.jsx
-import React28 from "react";
-import { AlertTriangle as AlertTriangle2 } from "lucide-react";
-import PropTypes5 from "prop-types";
-var ErrorBoundary = class extends React28.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-  componentDidCatch(error, errorInfo) {
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
-  }
-  render() {
-    if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback(this.state.error);
-      }
-      return /* @__PURE__ */ React28.createElement("div", { className: "flex h-full w-full items-center justify-center p-4" }, /* @__PURE__ */ React28.createElement("div", { className: "bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2 text-center" }, /* @__PURE__ */ React28.createElement("div", { className: "flex justify-center" }, /* @__PURE__ */ React28.createElement(AlertTriangle2, { className: "h-4 w-4 text-foreground/80" })), /* @__PURE__ */ React28.createElement("div", { className: "font-medium text-xs text-foreground" }, this.props.title || "Component Error"), /* @__PURE__ */ React28.createElement("div", { className: "max-w-xs break-words" }, this.state.error?.message || "Something went wrong while rendering this component.")));
-    }
-    return this.props.children;
-  }
-};
-ErrorBoundary.propTypes = {
-  children: PropTypes5.node.isRequired,
-  fallback: PropTypes5.func,
-  title: PropTypes5.string
-};
+import PropTypes3 from "prop-types";
 
 // src/components/template-autocomplete-input.jsx
-import React29, { useEffect as useEffect2, useRef as useRef2, useMemo as useMemo2, useCallback } from "react";
-import { EditorView, keymap, placeholder as cmPlaceholder } from "@codemirror/view";
-import { EditorState, Compartment } from "@codemirror/state";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import React25, { useEffect as useEffect2, useRef as useRef2, useMemo as useMemo3, useCallback } from "react";
+import { EditorView as EditorView2, keymap as keymap2, placeholder as cmPlaceholder } from "@codemirror/view";
+import { EditorState as EditorState2, Compartment as Compartment2 } from "@codemirror/state";
+import { defaultKeymap as defaultKeymap2, history as history2, historyKeymap as historyKeymap2 } from "@codemirror/commands";
 import {
-  autocompletion,
+  autocompletion as autocompletion2,
   completionKeymap,
-  closeBrackets,
-  closeBracketsKeymap
+  closeBrackets as closeBrackets2,
+  closeBracketsKeymap as closeBracketsKeymap2
 } from "@codemirror/autocomplete";
 
 // src/components/template-autocomplete/useMustacheCompletions.js
-import { useMemo } from "react";
-function walkSchema(obj, prefix = "", depth = 0, maxDepth = 6, results = []) {
-  if (depth > maxDepth) return results;
-  const type = Array.isArray(obj) ? "array" : typeof obj;
-  if (prefix) {
-    const entry = { label: prefix, type };
-    if (type !== "object" && type !== "array") {
-      entry.detail = `${type}: ${JSON.stringify(obj)}`;
-      entry.boost = 1;
-    } else {
-      entry.detail = type;
-    }
-    results.push(entry);
+import { useMemo as useMemo2 } from "react";
+import { getCompletions as getCompletions2, MODES as MODES2 } from "@jet-admin/expression-engine";
+function engineTypeToCmType2(type) {
+  switch (type) {
+    case "object":
+    case "array":
+      return "namespace";
+    case "method":
+      return "method";
+    case "function":
+      return "function";
+    case "property":
+      return "property";
+    case "snippet":
+      return "text";
+    default:
+      return "variable";
   }
-  if (type === "object" && obj !== null) {
-    for (const key of Object.keys(obj)) {
-      const childPrefix = prefix ? `${prefix}.${key}` : key;
-      walkSchema(obj[key], childPrefix, depth + 1, maxDepth, results);
-    }
-  } else if (type === "array") {
-    for (let i = 0; i < Math.min(obj.length, 3); i++) {
-      walkSchema(obj[i], `${prefix}[${i}]`, depth + 1, maxDepth, results);
-    }
-  }
-  return results;
+}
+function toCmOption2(s) {
+  return {
+    label: s.label,
+    apply: s.value ?? s.label,
+    detail: s.detail,
+    type: engineTypeToCmType2(s.type),
+    // Live-state paths rank highest, then member methods, then built-ins.
+    boost: s.category === "live-state" ? 2 : typeof s.category === "string" && s.category.endsWith("member") ? 1 : 0,
+    info: s.detail ? `Value: ${s.detail}` : void 0
+  };
 }
 function getCursorZone(state, pos) {
   const doc = state.doc.toString();
@@ -1876,115 +1555,35 @@ function getCursorZone(state, pos) {
   }
   return { inZone: false };
 }
-function useMustacheCompletions(jsonContext) {
-  const schemaPaths = useMemo(() => {
-    if (!jsonContext || typeof jsonContext !== "object") return [];
-    return walkSchema(jsonContext);
-  }, [jsonContext]);
-  const mustacheCompletionSource = useMemo(() => {
+function useMustacheCompletions(jsonContext, mode = MODES2.JS_TEMPLATE) {
+  return useMemo2(() => {
+    const stateTree = jsonContext && typeof jsonContext === "object" ? jsonContext : null;
     return (ctx) => {
       const zone = getCursorZone(ctx.state, ctx.pos);
       if (!zone.inZone) return null;
       const word = ctx.matchBefore(/[\w.[\]"']*/);
       if (!word) return null;
       if (word.from === word.to && !ctx.explicit) return null;
-      const query = word.text.toLowerCase();
-      const schemaOptions = schemaPaths.filter((p) => p.label.toLowerCase().startsWith(query)).slice(0, 50).map((p) => ({
-        label: p.label,
-        detail: p.detail,
-        type: p.type === "object" ? "namespace" : p.type === "array" ? "namespace" : p.type === "function" ? "function" : "variable",
-        boost: p.boost ?? 0,
-        info: p.detail ? `Value: ${p.detail}` : void 0
-      }));
-      const jsKeywords = [
-        "if",
-        "else",
-        "return",
-        "const",
-        "let",
-        "var",
-        "function",
-        "true",
-        "false",
-        "null",
-        "undefined",
-        "typeof",
-        "instanceof",
-        "new",
-        "this",
-        "class",
-        "import",
-        "export",
-        "default",
-        "async",
-        "await",
-        "try",
-        "catch",
-        "finally",
-        "throw",
-        "for",
-        "while",
-        "do",
-        "break",
-        "continue",
-        "switch",
-        "case",
-        "Math.round",
-        "Math.floor",
-        "Math.ceil",
-        "Math.abs",
-        "Math.max",
-        "Math.min",
-        "JSON.stringify",
-        "JSON.parse",
-        "Array.isArray",
-        "Object.keys",
-        "Object.values",
-        "Object.entries",
-        "parseInt",
-        "parseFloat",
-        "isNaN",
-        "String",
-        "Number",
-        "Boolean",
-        "Date.now",
-        "new Date",
-        ".toString()",
-        ".toFixed(",
-        ".toUpperCase()",
-        ".toLowerCase()",
-        ".trim()",
-        ".split(",
-        ".join(",
-        ".map(",
-        ".filter(",
-        ".find(",
-        ".reduce(",
-        ".forEach(",
-        ".some(",
-        ".every(",
-        ".includes(",
-        ".length",
-        ".slice(",
-        ".replace(",
-        ".indexOf("
-      ];
-      const jsOptions = jsKeywords.filter((k) => k.toLowerCase().startsWith(query)).slice(0, 30).map((k) => ({
-        label: k,
-        type: k.startsWith(".") ? "method" : /^[A-Z]/.test(k) ? "class" : "keyword",
-        boost: -1
-        // rank below schema paths
-      }));
-      const allOptions = [...schemaOptions, ...jsOptions];
-      if (allOptions.length === 0 && !ctx.explicit) return null;
+      const filter = word.text;
+      const query = filter.toLowerCase();
+      const suggestions = getCompletions2({ filter, stateTree, mode });
+      const options = suggestions.filter((s) => {
+        if (!query) return true;
+        const value = (s.value || s.label || "").toLowerCase();
+        const label = (s.label || "").toLowerCase();
+        return value.includes(query) || label.includes(query);
+      }).slice(0, 80).map(toCmOption2);
+      if (options.length === 0 && !ctx.explicit) return null;
       return {
         from: word.from,
-        options: allOptions,
+        options,
         validFor: /^[\w.[\]"']*$/
       };
     };
-  }, [schemaPaths]);
-  return mustacheCompletionSource;
+  }, [stateTreeKey(jsonContext), mode]);
+}
+function stateTreeKey(jsonContext) {
+  return jsonContext && typeof jsonContext === "object" ? jsonContext : null;
 }
 
 // src/components/template-autocomplete/mustacheHighlighter.js
@@ -2045,41 +1644,55 @@ var TemplateAutocompleteInput = ({
   context,
   jsonContext,
   liveStateTree,
+  mode,
   isTextArea = false,
   isParagraph = false,
   rows = 4,
   readOnly = false,
+  size = "sm",
   className = ""
 }) => {
   const multiline = isTextArea || isParagraph;
   const containerRef = useRef2(null);
   const viewRef = useRef2(null);
   const internalChange = useRef2(false);
-  const readOnlyCompartment = useRef2(new Compartment()).current;
-  const autocompleteCompartment = useRef2(new Compartment()).current;
-  const effectiveContext = useMemo2(() => {
+  const readOnlyCompartment2 = useRef2(new Compartment2()).current;
+  const autocompleteCompartment2 = useRef2(new Compartment2()).current;
+  const effectiveContext = useMemo3(() => {
     if (jsonContext && typeof jsonContext === "object") return jsonContext;
     if (context && typeof context === "object") return context;
     if (liveStateTree && typeof liveStateTree === "object") return liveStateTree;
     return {};
   }, [jsonContext, context, liveStateTree]);
-  const mustacheSource = useMustacheCompletions(effectiveContext);
+  const mustacheSource = useMustacheCompletions(effectiveContext, mode);
   const mustacheSourceRef = useRef2(mustacheSource);
   mustacheSourceRef.current = mustacheSource;
   const stableCompletionSource = useCallback((ctx) => {
     return mustacheSourceRef.current(ctx);
   }, []);
-  const boundTokens = useMemo2(() => extractTokens(value), [value]);
+  const boundTokens = useMemo3(() => extractTokens(value), [value]);
+  let singleLineHeight = "26px";
+  let fontSize = "12px";
+  let px = "8px";
+  if (size === "default") {
+    singleLineHeight = "30px";
+    fontSize = "14px";
+    px = "10px";
+  } else if (size === "lg") {
+    singleLineHeight = "38px";
+    fontSize = "16px";
+    px = "12px";
+  }
   const lineHeightPx = 20;
   const paddingPx = multiline ? 12 : 0;
-  const minContentH = multiline ? `${Math.max(rows * lineHeightPx + paddingPx * 2, 80)}px` : "32px";
-  const maxContentH = multiline ? "400px" : "32px";
-  const baseExtensions = useMemo2(() => {
+  const minContentH = multiline ? `${Math.max(rows * lineHeightPx + paddingPx * 2, 80)}px` : singleLineHeight;
+  const maxContentH = multiline ? "400px" : singleLineHeight;
+  const baseExtensions = useMemo3(() => {
     const exts = [
-      history(),
+      history2(),
       mustacheHighlighter,
-      autocompleteCompartment.of(
-        autocompletion({
+      autocompleteCompartment2.of(
+        autocompletion2({
           override: [stableCompletionSource],
           defaultKeymap: true,
           closeOnBlur: true,
@@ -2087,32 +1700,32 @@ var TemplateAutocompleteInput = ({
           maxRenderedOptions: 50
         })
       ),
-      closeBrackets(),
-      keymap.of([
-        ...defaultKeymap,
-        ...historyKeymap,
+      closeBrackets2(),
+      keymap2.of([
+        ...defaultKeymap2,
+        ...historyKeymap2,
         ...completionKeymap,
-        ...closeBracketsKeymap
+        ...closeBracketsKeymap2
       ]),
       // Update listener → propagate changes upward
-      EditorView.updateListener.of((update) => {
+      EditorView2.updateListener.of((update) => {
         if (update.docChanged) {
           internalChange.current = true;
           onChange?.(update.state.doc.toString());
         }
       }),
       // Theme — compact, blends with the @jet-admin/ui design system
-      EditorView.theme({
+      EditorView2.theme({
         "&": {
           fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
-          fontSize: "12px",
+          fontSize,
           lineHeight: "1.6",
           outline: "none",
           background: "transparent",
           color: "hsl(var(--foreground))"
         },
         ".cm-content": {
-          padding: multiline ? "8px 8px" : "0 8px",
+          padding: multiline ? `8px ${px}` : `0 ${px}`,
           minHeight: minContentH,
           maxHeight: maxContentH,
           caretColor: "hsl(var(--foreground))",
@@ -2194,23 +1807,23 @@ var TemplateAutocompleteInput = ({
         ".cm-placeholder": {
           color: "hsl(var(--muted-foreground))",
           fontStyle: "normal",
-          fontSize: "12px"
+          fontSize
         }
       })
     ];
     if (multiline) {
-      exts.push(EditorView.lineWrapping);
+      exts.push(EditorView2.lineWrapping);
     }
     if (!multiline) {
       exts.push(
-        keymap.of([{
+        keymap2.of([{
           key: "Enter",
           run: () => true
           // consume Enter — don't insert newline
         }])
       );
       exts.push(
-        EditorState.transactionFilter.of((tr) => {
+        EditorState2.transactionFilter.of((tr) => {
           if (!tr.docChanged) return tr;
           let hasNewline = false;
           tr.changes.iterChanges((_fromA, _toA, _fromB, _toB, inserted) => {
@@ -2221,19 +1834,19 @@ var TemplateAutocompleteInput = ({
       );
     }
     return exts;
-  }, [multiline, minContentH, maxContentH]);
+  }, [multiline, minContentH, maxContentH, fontSize, px]);
   useEffect2(() => {
     if (!containerRef.current) return;
     containerRef.current.innerHTML = "";
-    const state = EditorState.create({
+    const state = EditorState2.create({
       doc: value || "",
       extensions: [
         ...baseExtensions,
         cmPlaceholder(placeholder || ""),
-        readOnlyCompartment.of(EditorState.readOnly.of(readOnly))
+        readOnlyCompartment2.of(EditorState2.readOnly.of(readOnly))
       ]
     });
-    const view = new EditorView({ state, parent: containerRef.current });
+    const view = new EditorView2({ state, parent: containerRef.current });
     viewRef.current = view;
     return () => {
       view.destroy();
@@ -2257,15 +1870,15 @@ var TemplateAutocompleteInput = ({
   }, [value]);
   useEffect2(() => {
     viewRef.current?.dispatch({
-      effects: readOnlyCompartment.reconfigure(EditorState.readOnly.of(readOnly))
+      effects: readOnlyCompartment2.reconfigure(EditorState2.readOnly.of(readOnly))
     });
   }, [readOnly]);
-  return /* @__PURE__ */ React29.createElement("div", { className: `relative w-full ${className}` }, /* @__PURE__ */ React29.createElement(
+  return /* @__PURE__ */ React25.createElement("div", { className: `relative w-full ${className}` }, /* @__PURE__ */ React25.createElement(
     "div",
     {
       className: `bg-input-custom border border-input-custom rounded-sm transition-shadow duration-150 [&:has(.cm-focused)]:border-border/80 [&:has(.cm-focused)]:ring-2 [&:has(.cm-focused)]:ring-primary/30`
     },
-    /* @__PURE__ */ React29.createElement(
+    /* @__PURE__ */ React25.createElement(
       "div",
       {
         ref: containerRef,
@@ -2273,8 +1886,244 @@ var TemplateAutocompleteInput = ({
         style: { cursor: "text" }
       }
     ),
-    multiline && boundTokens.length > 0 && /* @__PURE__ */ React29.createElement("div", { className: "flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50 rounded-b-[2px]" }, /* @__PURE__ */ React29.createElement("span", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0" }, "bound"), boundTokens.map((tok, i) => /* @__PURE__ */ React29.createElement("span", { key: i, className: "inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-[10px] font-mono text-primary cursor-default max-w-full", title: tok }, /* @__PURE__ */ React29.createElement("span", { className: "truncate min-w-0" }, tok))))
+    multiline && boundTokens.length > 0 && /* @__PURE__ */ React25.createElement("div", { className: "flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50 rounded-b-[2px]" }, /* @__PURE__ */ React25.createElement("span", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0" }, "bound"), boundTokens.map((tok, i) => /* @__PURE__ */ React25.createElement("span", { key: i, className: "inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-[10px] font-mono text-primary cursor-default max-w-full", title: tok }, /* @__PURE__ */ React25.createElement("span", { className: "truncate min-w-0" }, tok))))
   ));
+};
+
+// src/components/input-args-form.jsx
+function InputArgsForm({
+  args = [],
+  values = {},
+  onChange,
+  errors = {},
+  disabled = false,
+  className,
+  stateTree = null,
+  templateMode
+}) {
+  if (!Array.isArray(args) || args.length === 0) {
+    return /* @__PURE__ */ React26.createElement("p", { className: "text-xs text-[#1c1c1e] italic" }, "No input parameters defined.");
+  }
+  const renderField = (arg) => {
+    const argName = arg.key;
+    const argType = arg.type || "string";
+    const value = values[argName];
+    if (stateTree) {
+      return /* @__PURE__ */ React26.createElement(React26.Fragment, null, /* @__PURE__ */ React26.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React26.createElement("span", { className: "text-red-500" }, "*"), " ", argType !== "string" && /* @__PURE__ */ React26.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React26.createElement(
+        TemplateAutocompleteInput,
+        {
+          value: typeof value === "string" ? value : value == null ? "" : String(value),
+          onChange: (val) => onChange(argName, val),
+          placeholder: `{{event.${argName}}}`,
+          context: stateTree,
+          mode: templateMode,
+          readOnly: disabled
+        }
+      ));
+    }
+    switch (argType) {
+      case "boolean":
+        return /* @__PURE__ */ React26.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React26.createElement(
+          Checkbox,
+          {
+            id: `input-arg-${argName}`,
+            checked: !!value,
+            onCheckedChange: (checked) => onChange(argName, checked),
+            disabled
+          }
+        ), /* @__PURE__ */ React26.createElement(
+          Label2,
+          {
+            htmlFor: `input-arg-${argName}`,
+            className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          },
+          argName,
+          arg.required && /* @__PURE__ */ React26.createElement("span", { className: "text-red-500 ml-1" }, "*"),
+          /* @__PURE__ */ React26.createElement("span", { className: "text-muted-foreground ml-1" }, "(", argType, ")")
+        ));
+      case "array":
+        return /* @__PURE__ */ React26.createElement(React26.Fragment, null, /* @__PURE__ */ React26.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React26.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ React26.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React26.createElement(
+          ArrayInput,
+          {
+            value: Array.isArray(value) ? value : [],
+            onChange: (val) => onChange(argName, val),
+            placeholder: `Add ${argName} item...`,
+            disabled
+          }
+        ));
+      case "object":
+        return /* @__PURE__ */ React26.createElement(React26.Fragment, null, /* @__PURE__ */ React26.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React26.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ React26.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React26.createElement(
+          CodeEditor,
+          {
+            language: "json",
+            height: 120,
+            title: "JSON Input",
+            value: typeof value === "object" && value !== null ? JSON.stringify(value, null, 2) : value || "",
+            onChange: (val) => onChange(argName, val),
+            disabled
+          }
+        ));
+      case "number":
+        return /* @__PURE__ */ React26.createElement(React26.Fragment, null, /* @__PURE__ */ React26.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React26.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ React26.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React26.createElement(
+          Input,
+          {
+            type: "number",
+            id: `input-arg-${argName}`,
+            className: "w-full text-xs",
+            placeholder: `Value for ${argName}`,
+            value: value ?? "",
+            onChange: (e) => onChange(
+              argName,
+              e.target.value === "" ? "" : Number(e.target.value)
+            ),
+            disabled
+          }
+        ));
+      // string & default
+      default:
+        return /* @__PURE__ */ React26.createElement(React26.Fragment, null, /* @__PURE__ */ React26.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React26.createElement("span", { className: "text-red-500" }, "*"), " ", argType !== "string" && /* @__PURE__ */ React26.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React26.createElement(
+          Input,
+          {
+            type: "text",
+            id: `input-arg-${argName}`,
+            className: "w-full text-xs",
+            placeholder: `Value for ${argName}`,
+            value: value || "",
+            onChange: (e) => onChange(argName, e.target.value),
+            disabled
+          }
+        ));
+    }
+  };
+  return /* @__PURE__ */ React26.createElement("div", { className: className || "space-y-3" }, args.map((arg) => /* @__PURE__ */ React26.createElement("div", { key: arg.key, className: "space-y-1" }, renderField(arg), errors[arg.key] && /* @__PURE__ */ React26.createElement("span", { className: "text-destructive text-xs" }, errors[arg.key]))));
+}
+InputArgsForm.propTypes = {
+  args: PropTypes3.arrayOf(
+    PropTypes3.shape({
+      key: PropTypes3.string.isRequired,
+      type: PropTypes3.string,
+      required: PropTypes3.bool
+    })
+  ).isRequired,
+  values: PropTypes3.object,
+  onChange: PropTypes3.func.isRequired,
+  errors: PropTypes3.object,
+  disabled: PropTypes3.bool,
+  className: PropTypes3.string,
+  stateTree: PropTypes3.object,
+  templateMode: PropTypes3.string
+};
+
+// src/components/pageHeader.jsx
+import React27 from "react";
+import PropTypes4 from "prop-types";
+import { ChevronLeft } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+var PageHeader = ({
+  title,
+  id,
+  onSave,
+  onDelete,
+  onClone,
+  onHistory,
+  isSaving = false,
+  isDeleting = false,
+  isCloning = false,
+  hasHistory = false,
+  saveText = "Update",
+  parentTitle,
+  children
+}) => {
+  return /* @__PURE__ */ React27.createElement("div", { className: "flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-3 px-4" }, /* @__PURE__ */ React27.createElement("div", { className: "flex items-center gap-4" }, parentTitle && /* @__PURE__ */ React27.createElement(React27.Fragment, null, /* @__PURE__ */ React27.createElement(
+    "h1",
+    {
+      className: "text-base font-semibold tracking-tight text-foreground leading-none"
+    },
+    parentTitle
+  ), /* @__PURE__ */ React27.createElement(
+    "span",
+    {
+      className: "text-base font-semibold tracking-tight text-foreground leading-none"
+    },
+    "/"
+  )), /* @__PURE__ */ React27.createElement("div", null, /* @__PURE__ */ React27.createElement("h1", { className: "text-base font-semibold tracking-tight text-foreground leading-none" }, title), id && /* @__PURE__ */ React27.createElement("p", { className: "mt-1.5 font-mono text-xs text-muted-foreground" }, "ID: ", id))), /* @__PURE__ */ React27.createElement("div", { className: "flex items-center gap-2" }, children, hasHistory && onHistory && /* @__PURE__ */ React27.createElement(Button, { variant: "outline", size: "sm", onClick: onHistory }, "View History"), onClone && /* @__PURE__ */ React27.createElement(Button, { variant: "outline", size: "sm", onClick: onClone, disabled: isCloning }, isCloning && /* @__PURE__ */ React27.createElement(Spinner, { size: 14, className: "mr-2" }), "Clone"), onDelete && /* @__PURE__ */ React27.createElement(
+    Button,
+    {
+      variant: "outline",
+      size: "sm",
+      onClick: onDelete,
+      disabled: isDeleting,
+      className: "text-destructive hover:bg-destructive/10 border-destructive/20"
+    },
+    isDeleting && /* @__PURE__ */ React27.createElement(Spinner, { size: 14, className: "mr-2" }),
+    "Delete"
+  ), onSave && /* @__PURE__ */ React27.createElement(Button, { size: "sm", onClick: onSave, disabled: isSaving }, isSaving && /* @__PURE__ */ React27.createElement(Spinner, { size: 14, className: "mr-2" }), saveText)));
+};
+PageHeader.propTypes = {
+  title: PropTypes4.string.isRequired,
+  id: PropTypes4.string,
+  onSave: PropTypes4.func,
+  onDelete: PropTypes4.func,
+  onClone: PropTypes4.func,
+  onHistory: PropTypes4.func,
+  isSaving: PropTypes4.bool,
+  isDeleting: PropTypes4.bool,
+  isCloning: PropTypes4.bool,
+  hasHistory: PropTypes4.bool,
+  saveText: PropTypes4.string,
+  children: PropTypes4.node
+};
+
+// src/components/section.jsx
+import * as React28 from "react";
+var Section = React28.forwardRef(
+  ({ className, title, description, children, ...props }, ref) => {
+    return /* @__PURE__ */ React28.createElement(
+      "div",
+      {
+        ref,
+        className: cn(
+          "rounded-md border border-border bg-card p-4 space-y-3",
+          className
+        ),
+        ...props
+      },
+      (title || description) && /* @__PURE__ */ React28.createElement("div", null, title && /* @__PURE__ */ React28.createElement("p", { className: "text-xs font-bold text-muted-foreground mb-0.5" }, title), description && /* @__PURE__ */ React28.createElement("p", { className: "text-[11px] text-muted-foreground" }, description)),
+      children
+    );
+  }
+);
+Section.displayName = "Section";
+
+// src/components/error-boundary.jsx
+import React29 from "react";
+import { AlertTriangle as AlertTriangle2 } from "lucide-react";
+import PropTypes5 from "prop-types";
+var ErrorBoundary = class extends React29.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback(this.state.error);
+      }
+      return /* @__PURE__ */ React29.createElement("div", { className: "flex h-full w-full items-center justify-center p-4" }, /* @__PURE__ */ React29.createElement("div", { className: "bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2 text-center" }, /* @__PURE__ */ React29.createElement("div", { className: "flex justify-center" }, /* @__PURE__ */ React29.createElement(AlertTriangle2, { className: "h-4 w-4 text-foreground/80" })), /* @__PURE__ */ React29.createElement("div", { className: "font-medium text-xs text-foreground" }, this.props.title || "Component Error"), /* @__PURE__ */ React29.createElement("div", { className: "max-w-xs break-words" }, this.state.error?.message || "Something went wrong while rendering this component.")));
+    }
+    return this.props.children;
+  }
+};
+ErrorBoundary.propTypes = {
+  children: PropTypes5.node.isRequired,
+  fallback: PropTypes5.func,
+  title: PropTypes5.string
 };
 export {
   Accordion,

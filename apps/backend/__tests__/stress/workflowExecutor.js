@@ -22,10 +22,10 @@
  *   job, and instance-2 stalled with an empty queue.
  */
 
-const { handleTaskResult } = require('../../modules/workflow/orchestrator/orchestrator');
-const { getHandler } = require('../../modules/workflow/workers/handlers');
-const { resolveTemplate } = require('../../utils/templateEngine');
-const { stateManager } = require('../../modules/workflow/orchestrator/stateManager');
+const { handleTaskResult } = require('../../modules/workflow/workflowEngine/engine');
+const { getHandler } = require('../../modules/workflow/handlers');
+const { resolveTemplate } = require("@jet-admin/expression-engine");
+const { stateManager } = require('../../modules/workflow/workflowEngine/stateManager');
 
 const TEMPLATE_OPTIONS = { allowedRoots: ['ctx'], preserveSingleExpressionType: true };
 

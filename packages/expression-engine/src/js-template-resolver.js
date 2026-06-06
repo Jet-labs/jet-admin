@@ -1,42 +1,46 @@
 /**
- * js-resolver.js
+ * js-template-resolver.js — `js-template` mode implementation.
  *
- * A JS-expression-aware template resolver that extends the existing path-only
- * resolver. Expressions inside {{ }} are evaluated inside a locked-down sandbox
- * instead of being treated as plain object paths.
+ * Frontend Mustache-JS hybrid: expressions inside {{ }} are evaluated as
+ * JavaScript in a strictly scoped `new Function()` sandbox.
  *
- * Supported:  {{JSON.stringify(state.queries.data)}}
- *             {{items.length > 0 ? items[0].name : "none"}}
- *             {{Math.round(ctx.input.score * 100) / 100}}
- *             {{state.queries.data}}           ← still works (pure path)
+ * Used for:
+ *   • App Pages / Widget UI configs
+ *   • Any template input where power-user expressions are expected
  *
- * NOT supported (throws / returns undefined):
- *             {{fetch("/api")}}
- *             {{window.location}}
- *             {{eval("...")}}
+ * Supported:
+ *   {{JSON.stringify(state.queries.data)}}
+ *   {{items.length > 0 ? items[0].name : "none"}}
+ *   {{Math.round(ctx.input.score * 100) / 100}}
+ *   {{state.queries.data}}  ← still works (plain path resolved via JS)
  *
- * Security model
- * ──────────────
- * Evaluation happens inside `new Function(...)`. By default `new Function` has
- * access to the global scope, so we shadow every known dangerous global with
- * undefined and only expose an explicit allowlist.
+ * Blocked:
+ *   {{fetch("/api")}}       — fetch is shadowed
+ *   {{window.location}}     — window is shadowed
+ *   {{eval("…")}}           — eval is shadowed
  *
- * This is NOT a hard security boundary (a determined attacker with code
- * execution can escape any JS sandbox). The goal is defence-in-depth against
- * accidental or low-sophistication misuse — the same threat model that Lodash
- * template, Handlebars helpers, and similar tools target.
+ * Security model:
+ *   Evaluation happens inside `new Function(...)`. Dangerous globals are
+ *   shadowed by passing them as undefined parameters. Only an explicit
+ *   allowlist (Math, JSON, Array, etc.) is exposed.
  *
- * For a truly sandboxed eval you would run expressions in a Worker or a
- * separate vm.runInNewContext (Node.js). That is left as an upgrade path.
+ *   This is defence-in-depth against accidental misuse — NOT a hard
+ *   security boundary. For true isolation, use `isolated-js` mode
+ *   (backed by `isolated-vm` on the backend).
+ *
+ * Ported from packages/template-engine/src/js-resolver.js — canonical implementation.
  */
 
 import { extractTemplateBlocks, extractWholeTemplateExpression } from "./parsers.js";
+import { JsTemplateError } from "./errors.js";
 
 // ─── Sandbox allowlist ────────────────────────────────────────────────────────
 
-// Cycle-safe JSON stringifier for the sandbox.
-// Prevents "Converting circular structure to JSON" errors when users stringify
-// live state objects (e.g., {{JSON.stringify(state.queries)}}).
+/**
+ * Cycle-safe JSON stringifier for the sandbox.
+ * Prevents "Converting circular structure to JSON" errors when users stringify
+ * live state objects (e.g., {{JSON.stringify(state.queries)}}).
+ */
 const safeStringify = (obj, replacer, space) => {
   const cache = new Set();
   return JSON.stringify(
@@ -148,19 +152,10 @@ const BLOCKED_GLOBALS = [
  * Plain paths:    ctx.input.name      state[0].value
  * JS expressions: JSON.stringify(x)  x > 0 ? "yes" : "no"  items.length
  *
- * The heuristic checks for any of:
- *   • parentheses  (function call)
- *   • operators    (ternary, comparison, arithmetic, logical, nullish, template)
- *   • bracket with non-numeric content inside (computed access via variable)
- *   • array/object literal syntax
- *
- * Plain numeric bracket access like state[0] is already handled by
- * getValueByPath, so we only treat bracket content as JS if it is non-numeric.
- *
  * @param {string} expression  The trimmed content of {{ }}
  * @returns {boolean}
  */
-function looksLikeJsExpression(expression) {
+export function looksLikeJsExpression(expression) {
   if (!expression) return false;
 
   // Parentheses → function call or grouping
@@ -173,31 +168,29 @@ function looksLikeJsExpression(expression) {
   if (/[+\-*/%<>=!&|^~`]/.test(expression)) return true;
 
   // Non-numeric bracket content  e.g. state[key]  or  items[idx]
-  // Numeric bracket like state[0] is fine either way; path handles it
   if (/\[[^\]]*[^0-9\][\s][^\]]*\]/.test(expression)) return true;
 
   return false;
 }
 
-// ─── Sandbox builder ──────────────────────────────────────────────────────────
+// ─── LRU cache for compiled evaluators ────────────────────────────────────────
+
+/** @type {Map<string, Function>} */
+const _exprCache = new Map();
+const _MAX_CACHE = 512;
 
 /**
  * Compile and return a cached evaluator function for an expression.
- * We cache by expression string to avoid re-parsing identical templates on
- * every render cycle.
  *
  * The generated function signature is:
  *   function(__scope, <blocked globals...>) { return <expression>; }
  *
- * We destructure __scope in the function body so that all context keys are
- * available as plain identifiers, matching what users expect.
+ * We use `with (__scope.__ctx)` so that all context keys are available as
+ * plain identifiers, matching what users expect.
  *
  * @param {string} expression
  * @returns {Function}
  */
-const _exprCache = new Map();
-const _MAX_CACHE = 512; // prevent unbounded growth in long-running servers
-
 function buildSandboxedEvaluator(expression) {
   if (_exprCache.has(expression)) return _exprCache.get(expression);
 
@@ -221,7 +214,6 @@ function buildSandboxedEvaluator(expression) {
     // eslint-disable-next-line no-new-func
     fn = new Function(code)();
   } catch (syntaxError) {
-    // Surface parse errors immediately so they're caught at call site
     throw new JsTemplateError(
       `Syntax error in template expression: ${expression}`,
       expression,
@@ -229,8 +221,8 @@ function buildSandboxedEvaluator(expression) {
     );
   }
 
+  // LRU eviction: drop oldest entry when cache is full
   if (_exprCache.size >= _MAX_CACHE) {
-    // Evict oldest entry (Map preserves insertion order)
     const oldest = _exprCache.keys().next().value;
     _exprCache.delete(oldest);
   }
@@ -238,58 +230,28 @@ function buildSandboxedEvaluator(expression) {
   return fn;
 }
 
-// ─── Error type ──────────────────────────────────────────────────────────────
-
-export class JsTemplateError extends Error {
-  /**
-   * @param {string} message
-   * @param {string} expression  The {{ }} content that failed
-   * @param {Error}  [cause]     Underlying JS error
-   */
-  constructor(message, expression, cause) {
-    super(message);
-    this.name = "JsTemplateError";
-    this.expression = expression;
-    if (cause) this.cause = cause;
-  }
-}
-
 // ─── Core evaluator ──────────────────────────────────────────────────────────
 
 /**
- * Evaluate a single expression string against a context object.
+ * Evaluate a single JS expression string against a context object.
  *
  * @param {string} expression  Trimmed content of {{ }}
  * @param {object} ctx         The template context (state, variables, etc.)
  * @param {object} [options]
  * @param {boolean} [options.throwOnError=false]
- *   If true, rethrow evaluation errors.
- *   If false (default), return undefined on error (matches getValueByPath behaviour).
- * @param {object} [options.extraGlobals]
- *   Additional safe values to inject into the expression scope.
- *   Merged on top of SAFE_GLOBALS. Useful for per-datasource helpers.
- *
+ * @param {object}  [options.extraGlobals]  Additional safe values to inject
  * @returns {{ value: *, error: JsTemplateError|null }}
  */
 export function evalJsExpression(expression, ctx, options = {}) {
   const { throwOnError = false, extraGlobals = {} } = options;
 
-  // Build scope proxy: context keys available as bare identifiers
-  // We use a Proxy so that bracket-access on undefined sub-paths
-  // returns undefined instead of throwing, matching getValueByPath semantics.
   const safeCtx = typeof ctx === "object" && ctx !== null ? ctx : {};
-
-  // We DO NOT use strict mode in the generated function because the `with`
-  // statement is strictly forbidden in strict mode, and strict mode cascades
-  // to all inner scopes. Furthermore, we use `eval` as a blocked parameter
-  // name, which is also a SyntaxError in strict mode.
 
   const scope = {
     __safeGlobals: { ...SAFE_GLOBALS, ...extraGlobals },
     __ctx: safeCtx,
     // Also spread context at the top level so identifiers resolve
-    // even without `with` in environments that strip it (e.g. bundlers with
-    // strict mode transforms). Belt-and-suspenders.
+    // even without `with` in environments that strip it.
     ...safeCtx,
   };
 
@@ -314,11 +276,10 @@ export function evalJsExpression(expression, ctx, options = {}) {
   }
 }
 
-// ─── String resolver ──────────────────────────────────────────────────────────
+// ─── Value formatter ──────────────────────────────────────────────────────────
 
 /**
  * Format a resolved value for inline string interpolation.
- * Mirrors the behaviour of the existing path resolver's formatter.
  *
  * @param {*} value
  * @param {object} options
@@ -338,37 +299,20 @@ function formatValue(value, options = {}) {
  * Resolve a template string (or nested object/array) containing {{ }}
  * expressions that may include arbitrary JS.
  *
- * Drop-in companion to `resolveTemplate`. You can use both in the same
- * codebase: use `resolveTemplate` for high-frequency, security-sensitive paths
- * (e.g. datasource query params) and `resolveJsTemplate` for display-layer
- * templates where power-user expressions are expected.
- *
- * Behaviour
- * ─────────
- * • {{state.queries.data}}             → path traversal (fast path)
- * • {{JSON.stringify(state.queries.data)}} → JS evaluation
- * • {{items.length}}                   → JS evaluation (. followed by identifier
- *                                         that looks like a property but `.length`
- *                                         is safe and returns a number)
- * • Non-string values (numbers, booleans, null) pass through unchanged.
- * • Arrays and plain objects are recursed into (same as resolveTemplate).
+ * Behaviour:
+ *   {{state.queries.data}}                    → path traversal via JS eval
+ *   {{JSON.stringify(state.queries.data)}}    → JS evaluation
+ *   Non-string values pass through unchanged
+ *   Arrays and plain objects are recursed into
  *
  * @param {*}      template  String / array / plain-object / primitive
  * @param {object} ctx       Context data (state, vars, input, etc.)
  * @param {object} [options]
- * @param {boolean} [options.preserveSingleExpressionType=false]
- *   When the entire template is a single {{ }} block, return the raw value
- *   instead of stringifying it. Mirrors resolveTemplate's behaviour.
- * @param {boolean} [options.throwOnError=false]
- *   Propagate evaluation errors instead of substituting empty string.
+ * @param {boolean}  [options.preserveSingleExpressionType=false]
+ * @param {boolean}  [options.throwOnError=false]
  * @param {Function} [options.inlineValueFormatter]
- *   Custom formatter for interpolated values.
- * @param {object}  [options.extraGlobals]
- *   Additional identifiers available inside expressions.
- * @param {Array<JsTemplateError>} [options.errors]
- *   If provided, errors are collected here instead of being silently dropped
- *   (even when throwOnError is false).
- *
+ * @param {object}   [options.extraGlobals]
+ * @param {Array<JsTemplateError>} [options.errors]  Collect errors here
  * @returns {*}  Resolved value matching the shape of `template`
  */
 export function resolveJsTemplate(template, ctx, options = {}) {
@@ -397,8 +341,6 @@ export function resolveJsTemplate(template, ctx, options = {}) {
  */
 function resolveJsString(template, ctx, options) {
   // ── Whole-expression fast path ────────────────────────────────────────────
-  // If the entire string is a single {{ … }}, we can preserve the type
-  // (e.g. return an array, not "[object Array]").
   const wholeMatch = extractWholeTemplateExpression(template);
   if (wholeMatch) {
     const { value, error } = evalJsExpression(wholeMatch.expression, ctx, options);
@@ -411,11 +353,8 @@ function resolveJsString(template, ctx, options) {
   const blocks = extractTemplateBlocks(template);
   if (blocks.length === 0) return template;
 
-  // Replace each {{ }} in order. We walk from the end to preserve offsets,
-  // which also fixes the duplicate-expression bug present in the original
-  // resolver (replace() only hits the first occurrence).
-  let result = template;
   // Process right-to-left using offsets so replacement doesn't shift later indices
+  let result = template;
   const sortedBlocks = [...blocks].sort((a, b) => b.index - a.index);
 
   for (const block of sortedBlocks) {
@@ -434,7 +373,3 @@ function collectError(error, options) {
     options.errors.push(error);
   }
 }
-
-// ─── Convenience re-export ────────────────────────────────────────────────────
-
-export { looksLikeJsExpression };

@@ -1,47 +1,51 @@
 /**
  * useMustacheCompletions.js
  *
- * Core logic: walks a JSON object at mount time (memoised) to build
- * flat dot-notation paths, then provides a CodeMirror 6 completion source
- * that only activates when the cursor is inside a {{ }} zone.
+ * Provides a CodeMirror 6 completion source that only activates when the cursor
+ * is inside a {{ }} zone. All suggestions are produced by the unified
+ * `@jet-admin/expression-engine` via its mode-aware `getCompletions` API, so the
+ * intellisense shown here always matches what the engine can actually resolve.
  */
 
 import { useMemo } from 'react'
+import { getCompletions, MODES } from '@jet-admin/expression-engine'
 
-// ─── 1. JSON schema walker ────────────────────────────────────────────────────
-// Recursively walks any JSON-serialisable object and returns flat dot-notation
-// paths with type info and example values.
-// Depth-limited to avoid blowing the stack on pathological inputs.
+// ─── 1. Map an expression-engine suggestion → CodeMirror completion option ────
+// The engine returns { value, label, detail, type, category }. CodeMirror wants
+// { label, apply, detail, type, boost, info }.
 
-function walkSchema(obj, prefix = '', depth = 0, maxDepth = 6, results = []) {
-  if (depth > maxDepth) return results
-
-  const type = Array.isArray(obj) ? 'array' : typeof obj
-
-  if (prefix) {
-    const entry = { label: prefix, type }
-    if (type !== 'object' && type !== 'array') {
-      entry.detail = `${type}: ${JSON.stringify(obj)}`
-      entry.boost = 1 // surface leaf nodes higher in the list
-    } else {
-      entry.detail = type
-    }
-    results.push(entry)
+function engineTypeToCmType(type) {
+  switch (type) {
+    case 'object':
+    case 'array':
+      return 'namespace'
+    case 'method':
+      return 'method'
+    case 'function':
+      return 'function'
+    case 'property':
+      return 'property'
+    case 'snippet':
+      return 'text'
+    default:
+      return 'variable'
   }
+}
 
-  if (type === 'object' && obj !== null) {
-    for (const key of Object.keys(obj)) {
-      const childPrefix = prefix ? `${prefix}.${key}` : key
-      walkSchema(obj[key], childPrefix, depth + 1, maxDepth, results)
-    }
-  } else if (type === 'array') {
-    // Walk first 3 array items to infer schema; index them as [0], [1], [2]
-    for (let i = 0; i < Math.min(obj.length, 3); i++) {
-      walkSchema(obj[i], `${prefix}[${i}]`, depth + 1, maxDepth, results)
-    }
+function toCmOption(s) {
+  return {
+    label: s.label,
+    apply: s.value ?? s.label,
+    detail: s.detail,
+    type: engineTypeToCmType(s.type),
+    // Live-state paths rank highest, then member methods, then built-ins.
+    boost: s.category === 'live-state'
+      ? 2
+      : (typeof s.category === 'string' && s.category.endsWith('member'))
+        ? 1
+        : 0,
+    info: s.detail ? `Value: ${s.detail}` : undefined,
   }
-
-  return results
 }
 
 // ─── 2. Zone detector ─────────────────────────────────────────────────────────
@@ -73,15 +77,20 @@ export function getCursorZone(state, pos) {
 
 // ─── 3. Build CM6 completion source ──────────────────────────────────────────
 
-export function useMustacheCompletions(jsonContext) {
-  // Memoised: re-walk only when the jsonContext reference changes
-  const schemaPaths = useMemo(() => {
-    if (!jsonContext || typeof jsonContext !== 'object') return []
-    return walkSchema(jsonContext)
-  }, [jsonContext])
+/**
+ * Returns a CodeMirror 6 completion source backed by the unified expression
+ * engine. Suggestions are produced by `getCompletions`, so they respect the
+ * active `mode` (safe-path → object keys only; js-template/isolated-js → object
+ * keys + JS built-ins + member methods).
+ *
+ * @param {object} jsonContext  The live context/state tree to suggest against.
+ * @param {string} [mode]       Expression-engine mode (defaults to js-template).
+ */
+export function useMustacheCompletions(jsonContext, mode = MODES.JS_TEMPLATE) {
+  return useMemo(() => {
+    const stateTree =
+      jsonContext && typeof jsonContext === 'object' ? jsonContext : null
 
-  // Schema + JS keyword completion source
-  const mustacheCompletionSource = useMemo(() => {
     return (ctx) => {
       const zone = getCursorZone(ctx.state, ctx.pos)
       if (!zone.inZone) return null
@@ -91,62 +100,36 @@ export function useMustacheCompletions(jsonContext) {
       if (!word) return null
       if (word.from === word.to && !ctx.explicit) return null
 
-      const query = word.text.toLowerCase()
+      const filter = word.text
+      const query = filter.toLowerCase()
 
-      // --- Schema path completions ---
-      const schemaOptions = schemaPaths
-        .filter(p => p.label.toLowerCase().startsWith(query))
-        .slice(0, 50) // cap at 50 to avoid huge dropdowns
-        .map(p => ({
-          label: p.label,
-          detail: p.detail,
-          type: p.type === 'object' ? 'namespace'
-              : p.type === 'array'  ? 'namespace'
-              : p.type === 'function' ? 'function'
-              : 'variable',
-          boost: p.boost ?? 0,
-          info: p.detail ? `Value: ${p.detail}` : undefined
-        }))
+      // Delegate to the unified engine — single source of truth for what is
+      // resolvable in the active mode.
+      const suggestions = getCompletions({ filter, stateTree, mode })
 
-      // --- JS keyword / snippet completions ---
-      const jsKeywords = [
-        'if', 'else', 'return', 'const', 'let', 'var', 'function',
-        'true', 'false', 'null', 'undefined', 'typeof', 'instanceof',
-        'new', 'this', 'class', 'import', 'export', 'default',
-        'async', 'await', 'try', 'catch', 'finally', 'throw',
-        'for', 'while', 'do', 'break', 'continue', 'switch', 'case',
-        'Math.round', 'Math.floor', 'Math.ceil', 'Math.abs', 'Math.max', 'Math.min',
-        'JSON.stringify', 'JSON.parse',
-        'Array.isArray', 'Object.keys', 'Object.values', 'Object.entries',
-        'parseInt', 'parseFloat', 'isNaN', 'String', 'Number', 'Boolean',
-        'Date.now', 'new Date',
-        '.toString()', '.toFixed(', '.toUpperCase()', '.toLowerCase()',
-        '.trim()', '.split(', '.join(', '.map(', '.filter(', '.find(',
-        '.reduce(', '.forEach(', '.some(', '.every(', '.includes(',
-        '.length', '.slice(', '.replace(', '.indexOf('
-      ]
+      const options = suggestions
+        .filter((s) => {
+          if (!query) return true
+          const value = (s.value || s.label || '').toLowerCase()
+          const label = (s.label || '').toLowerCase()
+          return value.includes(query) || label.includes(query)
+        })
+        .slice(0, 80) // cap to avoid huge dropdowns
+        .map(toCmOption)
 
-      const jsOptions = jsKeywords
-        .filter(k => k.toLowerCase().startsWith(query))
-        .slice(0, 30)
-        .map(k => ({
-          label: k,
-          type: k.startsWith('.') ? 'method'
-              : /^[A-Z]/.test(k) ? 'class'
-              : 'keyword',
-          boost: -1 // rank below schema paths
-        }))
-
-      const allOptions = [...schemaOptions, ...jsOptions]
-      if (allOptions.length === 0 && !ctx.explicit) return null
+      if (options.length === 0 && !ctx.explicit) return null
 
       return {
         from: word.from,
-        options: allOptions,
-        validFor: /^[\w.[\]"']*$/
+        options,
+        validFor: /^[\w.[\]"']*$/,
       }
     }
-  }, [schemaPaths])
+  }, [stateTreeKey(jsonContext), mode]) // eslint-disable-line react-hooks/exhaustive-deps
+}
 
-  return mustacheCompletionSource
+// Stable-ish dependency key so the memo only rebuilds when the context identity
+// changes (the consumer already memoises the object it passes in).
+function stateTreeKey(jsonContext) {
+  return jsonContext && typeof jsonContext === 'object' ? jsonContext : null
 }
