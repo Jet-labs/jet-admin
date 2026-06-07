@@ -1,0 +1,89 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "sheetName": {
+        "type": "string",
+        "description": "Name of the worksheet tab to read (Excel only, defaults to first sheet)"
+      },
+      "headerRow": {
+        "type": "integer",
+        "description": "1-based row index for headers (defaults to 1)",
+        "default": 1
+      },
+      "range": {
+        "type": "string",
+        "description": "Range in A1 notation (e.g. A1:D50, optional)"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Limit the number of records returned (optional)"
+      },
+      "inputDefinitions": {
+        "type": "array",
+        "description": "Dynamic query arguments",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    }
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/sheetName",
+            "label": "Sheet Name (Excel only)"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/headerRow",
+            "label": "Header Row Index"
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/range",
+            "label": "Cell Range (optional, e.g. A1:Z100)"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/limit",
+            "label": "Row Limit"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/inputDefinitions",
+        "label": "Dynamic Arguments"
+      }
+    ]
+  },
+  "data": {
+    "sheetName": "",
+    "headerRow": 1,
+    "range": "",
+    "limit": 100,
+    "inputDefinitions": []
+  }
+}

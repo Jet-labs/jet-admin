@@ -37,6 +37,13 @@ const environmentVariables = {
         "http://127.0.0.1:3001",
         "http://localhost:3001",
       ],
+  SUPABASE_URL: process.env.SUPABASE_URL,
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+  SUPABASE_S3_ENDPOINT: process.env.SUPABASE_S3_ENDPOINT,
+  SUPABASE_S3_REGION: process.env.SUPABASE_S3_REGION,
+  SUPABASE_S3_ACCESS_KEY_ID: process.env.SUPABASE_S3_ACCESS_KEY_ID,
+  SUPABASE_S3_SECRET_ACCESS_KEY: process.env.SUPABASE_S3_SECRET_ACCESS_KEY,
+  SUPABASE_S3_BUCKET: process.env.SUPABASE_S3_BUCKET,
 };
 console.log("environment variables set-----------------------------");
 console.log(environmentVariables);

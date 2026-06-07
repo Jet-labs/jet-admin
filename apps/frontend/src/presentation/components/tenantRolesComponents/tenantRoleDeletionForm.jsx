@@ -31,10 +31,11 @@ export const TenantRoleDeletionForm = ({ tenantID, tenantRoleID }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.TENANT_ROLE_DELETION_SUCCESS);
-        queryClient.invalidateQueries([
-          CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID),
-          tenantRoleID,
-        ]);
+        queryClient.invalidateQueries({
+          queryKey:
+            [CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID),
+              tenantRoleID],
+        });
         navigate(-1);
       },
       onError: (error) => {

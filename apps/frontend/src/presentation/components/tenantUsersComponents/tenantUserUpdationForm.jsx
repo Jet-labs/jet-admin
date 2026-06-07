@@ -60,9 +60,10 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
         CONSTANTS.STRINGS
           .UPDATE_TENANT_USER_BY_ID_USER_ROLES_UPDATED_SUCCESSFULLY
       );
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.TENANT_USERS(tenantID),
-      ]);
+      });
     },
     onError: (error) => {
       displayError(error);
@@ -85,9 +86,10 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
         CONSTANTS.STRINGS
           .UPDATE_TENANT_USER_BY_ID_REMOVE_USER_FROM_TENANT_SUCCESS
       );
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.TENANT_USERS(tenantID),
-      ]);
+      });
       navigate(-1);
     },
     onError: (error) => {
@@ -125,6 +127,25 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
 
   return (
     <div className="flex w-full h-full flex-col overflow-hidden bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_FORM_TITLE}
+        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_USER_MANAGEMENT_TITLE}
+      >
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={_handleRemoveUserFromTenant}
+          disabled={isRemovingTenantUserFromTenant}
+        >
+          {isRemovingTenantUserFromTenant ? (
+            <Spinner size={14} className="mr-2" />
+          ) : (
+            <Trash2 className="mr-2 h-4 w-4" />
+          )}
+          Remove from Tenant
+        </Button>
+      </PageHeader>
+
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenantUser}
         error={tenantUserError}
@@ -143,27 +164,6 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
                 _handleSubmitTenantRoleSelectDialog
               }
             />
-
-            <PageHeader
-              title={CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_FORM_TITLE}
-              parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_USER_MANAGEMENT_TITLE}
-
-            >
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={_handleRemoveUserFromTenant}
-                disabled={isRemovingTenantUserFromTenant}
-              >
-                {isRemovingTenantUserFromTenant ? (
-                  <Spinner size={14} className="mr-2" />
-                ) : (
-                  <Trash2 className="mr-2 h-4 w-4" />
-                )}
-                Remove from Tenant
-              </Button>
-
-            </PageHeader>
 
             <div className="flex-1 overflow-y-auto p-4 md:p-6">
               <section className="mx-auto max-w-2xl w-full space-y-4">

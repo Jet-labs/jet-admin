@@ -19,6 +19,12 @@ function FieldError({ message }) {
   return <p className="text-xs text-red-500">{message}</p>;
 }
 
+const initialValues = {
+  roleTitle: "",
+  roleDescription: "",
+  permissionIDs: [],
+};
+
 export const TenantRoleUpdationForm = () => {
   const { tenantID, tenantRoleID } = useParams();
   const navigate = useNavigate();
@@ -49,9 +55,10 @@ export const TenantRoleUpdationForm = () => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_SUCCESS_TOAST);
-        queryClient.invalidateQueries([
+        queryClient.invalidateQueries({
+          queryKey:
           CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID),
-        ]);
+        });
       },
       onError: (error) => {
         displayError(error);
@@ -59,29 +66,22 @@ export const TenantRoleUpdationForm = () => {
     });
 
   const updateTenantRoleByIDForm = useFormik({
-    initialValues: {
-      roleTitle: "",
-      roleDescription: "",
-      permissionIDs: [],
-    },
+    initialValues: tenantRole ? {
+      roleTitle: tenantRole.roleTitle || "",
+      roleDescription: tenantRole.roleDescription || "",
+      permissionIDs:
+        tenantRole.tblRolePermissionMappings?.map(
+          (mapping) => mapping.permissionID
+        ) || [],
+    } : initialValues,
+    enableReinitialize: true,
     validationSchema: formValidations.updateTenantRoleFormValidationSchema,
     onSubmit: ({ roleTitle, roleDescription, permissionIDs }) => {
       updateTenantRoleByID({ roleTitle, roleDescription, permissionIDs });
     },
   });
 
-  useEffect(() => {
-    if (tenantRole && updateTenantRoleByIDForm) {
-      updateTenantRoleByIDForm.setValues({
-        roleTitle: tenantRole.roleTitle,
-        roleDescription: tenantRole.roleDescription,
-        permissionIDs:
-          tenantRole.tblRolePermissionMappings?.map(
-            (mapping) => mapping.permissionID
-          ) || [],
-      });
-    }
-  }, [tenantRole]);
+
 
   const _handleOnRolePermissionsSelectionChange = useCallback(
     (event) => {
@@ -99,31 +99,29 @@ export const TenantRoleUpdationForm = () => {
 
   return (
     <div className="flex w-full h-full flex-col overflow-hidden bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_TITLE}
+        parentTitle={CONSTANTS.STRINGS.TENANT_ROLE_MANAGEMENT_TITLE}
+        id={tenantRoleID}
+        onSave={updateTenantRoleByIDForm.handleSubmit}
+        isSaving={isUpdatingTenantRoleByID}
+        saveText="Update"
+      >
+        <TenantRoleDeletionForm
+          tenantID={tenantID}
+          tenantRoleID={tenantRoleID}
+        />
+        <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
+          Back
+        </Button>
+      </PageHeader>
+
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenantRoleByID}
         error={loadTenantRoleByIDError}
       >
         {tenantRole && (
-          <>
-            <PageHeader
-              title={CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_TITLE}
-              parentTitle={CONSTANTS.STRINGS.TENANT_ROLE_MANAGEMENT_TITLE}
-
-              id={tenantRoleID}
-              onSave={updateTenantRoleByIDForm.handleSubmit}
-              isSaving={isUpdatingTenantRoleByID}
-              saveText="Update"
-            >
-              <TenantRoleDeletionForm
-                tenantID={tenantID}
-                tenantRoleID={tenantRoleID}
-              />
-              <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-                Back
-              </Button>
-            </PageHeader>
-
-            <div className="flex-1 overflow-y-auto p-4 md:p-6">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6">
               <section className="mx-auto max-w-2xl w-full">
                 <form
                   id="update-role-form"
@@ -196,7 +194,6 @@ export const TenantRoleUpdationForm = () => {
                 </form>
               </section>
             </div>
-          </>
         )}
       </ReactQueryLoadingErrorWrapper>
     </div>

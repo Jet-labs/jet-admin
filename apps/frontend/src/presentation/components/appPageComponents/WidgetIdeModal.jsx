@@ -17,6 +17,7 @@ import {
 } from "../ui/resizable";
 import { WidgetConfigEditor } from "../widgetComponents/widgetConfigEditor";
 import { WidgetPreview } from "../widgetComponents/widgetPreview";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import {
   getWidgetByIDAPI,
   createWidgetAPI,
@@ -57,14 +58,22 @@ export const WidgetIdeModal = ({
   const queryClient = useQueryClient();
 
   // Fetch widget definition if in edit mode
-  const { data: widget, isLoading: isLoadingWidget } = useQuery({
+  const { data: widget, isLoading: isLoadingWidget, error: loadWidgetError } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), widgetID],
     queryFn: () => getWidgetByIDAPI({ tenantID, widgetID }),
     enabled: !!widgetID && isOpen,
   });
 
   const widgetForm = useFormik({
-    initialValues: initialValues,
+    initialValues: widget && widgetID ? {
+      widgetTitle: widget.widgetTitle || "",
+      widgetType: widget.widgetType || defaultWidgetType,
+      widgetConfig: widget.widgetConfig || {
+        properties: { showHeader: true },
+        events: {},
+      },
+    } : initialValues,
+    enableReinitialize: true,
     validationSchema: formValidations.addWidgetFormValidationSchema,
     validateOnMount: false,
     validateOnChange: false,
@@ -77,18 +86,18 @@ export const WidgetIdeModal = ({
             widgetData: values,
           });
           displaySuccess("Widget updated successfully.");
-          queryClient.invalidateQueries([
-            CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
-          ]);
+          queryClient.invalidateQueries({
+            queryKey: CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
+          });
         } else {
           const newWidget = await createWidgetAPI({
             tenantID,
             widgetData: values,
           });
           displaySuccess("Widget created and added to page canvas.");
-          queryClient.invalidateQueries([
-            CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
-          ]);
+          queryClient.invalidateQueries({
+            queryKey: CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
+          });
           if (onAddWidget && newWidget?.widgetID) {
             onAddWidget(newWidget.widgetID);
           }
@@ -99,24 +108,6 @@ export const WidgetIdeModal = ({
       }
     },
   });
-
-  // Load widget data into Formik when fetched
-  useEffect(() => {
-    if (isOpen) {
-      if (widget && widgetID) {
-        widgetForm.setValues({
-          widgetTitle: widget.widgetTitle || "",
-          widgetType: widget.widgetType || defaultWidgetType,
-          widgetConfig: widget.widgetConfig || {
-            properties: { showHeader: true },
-            events: {},
-          },
-        });
-      } else if (!widgetID) {
-        widgetForm.setValues(initialValues);
-      }
-    }
-  }, [widget, widgetID, isOpen]);
 
   // Construct page state tree preview for resolving expressions in the preview panel
   const previewStateTree = useAppPageStateTree();
@@ -172,52 +163,51 @@ export const WidgetIdeModal = ({
         </DialogHeader>
 
         <div className="flex-1 min-h-0 relative">
-          {widgetID && isLoadingWidget ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-50">
-              <Spinner size={24} />
-            </div>
-          ) : null}
-
-          <ResizablePanelGroup
-            direction="horizontal"
-            autoSaveId={
-              CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_ADDITION_FORM_RESULT_SEPARATION
-            }
-            className="w-full h-full"
+          <ReactQueryLoadingErrorWrapper
+            isLoading={widgetID ? isLoadingWidget : false}
+            error={loadWidgetError}
           >
-            {/* Left Panel: Configuration Editors */}
-            <ResizablePanel defaultSize={50} minSize={30}>
-              <div className="h-full overflow-y-auto p-5 pb-16 bg-background">
-                <WidgetConfigEditor
-                  widgetEditorForm={widgetForm}
-                  dataSourceResults={previewStateTree}
-                  onDataSourceResults={() => {}}
-                  appPageEditorForm={appPageEditorForm}
-                />
-              </div>
-            </ResizablePanel>
-
-            <ResizableHandle withHandle={true} />
-
-            {/* Right Panel: Live Preview */}
-            <ResizablePanel defaultSize={50} minSize={30}>
-              <div className="h-full bg-muted/20 border-l border-border/40 relative flex flex-col min-h-0">
-                <div className="flex-1 min-h-0 relative">
-                  <WidgetPreview
-                    tenantID={tenantID}
-                    widgetID={widgetID || "temp_preview"}
-                    widgetTitle={widgetForm.values.widgetTitle}
-                    widgetType={widgetForm.values.widgetType}
-                    widgetConfig={resolvedWidgetConfig}
-                    dataSourceResults={previewStateTree?.queries}
-                    isFetchingData={false}
-                    isRefreshingData={false}
-                    refreshData={() => {}}
+            <ResizablePanelGroup
+              direction="horizontal"
+              autoSaveId={
+                CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_ADDITION_FORM_RESULT_SEPARATION
+              }
+              className="w-full h-full"
+            >
+              {/* Left Panel: Configuration Editors */}
+              <ResizablePanel defaultSize={50} minSize={30}>
+                <div className="h-full overflow-y-auto p-5 pb-16 bg-background">
+                  <WidgetConfigEditor
+                    widgetEditorForm={widgetForm}
+                    dataSourceResults={previewStateTree}
+                    onDataSourceResults={() => {}}
+                    appPageEditorForm={appPageEditorForm}
                   />
                 </div>
-              </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+              </ResizablePanel>
+
+              <ResizableHandle withHandle={true} />
+
+              {/* Right Panel: Live Preview */}
+              <ResizablePanel defaultSize={50} minSize={30}>
+                <div className="h-full bg-muted/20 border-l border-border/40 relative flex flex-col min-h-0">
+                  <div className="flex-1 min-h-0 relative">
+                    <WidgetPreview
+                      tenantID={tenantID}
+                      widgetID={widgetID || "temp_preview"}
+                      widgetTitle={widgetForm.values.widgetTitle}
+                      widgetType={widgetForm.values.widgetType}
+                      widgetConfig={resolvedWidgetConfig}
+                      dataSourceResults={previewStateTree?.queries}
+                      isFetchingData={false}
+                      isRefreshingData={false}
+                      refreshData={() => {}}
+                    />
+                  </div>
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </ReactQueryLoadingErrorWrapper>
         </div>
       </DialogContent>
     </Dialog>

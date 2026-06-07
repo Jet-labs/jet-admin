@@ -92,4 +92,5 @@ export const DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.SSE.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.SYSLOG.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.NATS.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.EXCELCSV.value]: createGenericDatasourceUI(),
 };

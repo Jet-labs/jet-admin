@@ -18,6 +18,18 @@ import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { CronJobCloneForm } from "./cronJobCloneForm";
 import { CronJobDeletionForm } from "./cronJobDeletionForm";
 
+const initialValues = {
+  cronJobTitle: "",
+  cronJobDescription: "",
+  cronJobSchedule: "* * * * *",
+  workflowID: "",
+  workflowConfig: { inputValues: {} },
+  isDisabled: false,
+  timeoutSeconds: "",
+  retryAttempts: "",
+  retryDelaySeconds: "",
+};
+
 export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
   CronJobUpdationForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -53,9 +65,10 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.CRON_JOB_UPDATED_SUCCESS);
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID),
-      ]);
+      });
     },
     onError: (error) => {
       displayError(error);
@@ -65,41 +78,25 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
 
 
   const cronJobUpdationForm = useFormik({
-    initialValues: {
-      cronJobTitle: "",
-      cronJobDescription: "",
-      cronJobSchedule: "* * * * *",
-      workflowID: "",
-      workflowConfig: { inputValues: {} },
-      isDisabled: false,
-      timeoutSeconds: "",
-      retryAttempts: "",
-      retryDelaySeconds: "",
-    },
+    initialValues: cronJob ? {
+      cronJobTitle: cronJob.cronJobTitle ?? "",
+      cronJobDescription: cronJob.cronJobDescription ?? "",
+      cronJobSchedule: cronJob.cronJobSchedule ?? "* * * * *",
+      workflowID: cronJob.workflowID ?? "",
+      workflowConfig: cronJob.workflowConfig ?? { inputValues: {} },
+      isDisabled: cronJob.isDisabled ?? false,
+      timeoutSeconds: cronJob.timeoutSeconds ?? "",
+      retryAttempts: cronJob.retryAttempts ?? "",
+      retryDelaySeconds: cronJob.retryDelaySeconds ?? "",
+    } : initialValues,
+    enableReinitialize: true,
     validationSchema: formValidations.cronJobUpdationFormValidationSchema,
     onSubmit: (data) => {
       updateCronJob(data);
     },
   });
 
-  // Populate form once the remote data arrives.
-  // Using `setValues` directly — it is stable and safe to omit from deps.
-  useEffect(() => {
-    if (cronJob?.cronJobID) {
-      cronJobUpdationForm.setValues({
-        cronJobTitle: cronJob.cronJobTitle ?? "",
-        cronJobDescription: cronJob.cronJobDescription ?? "",
-        cronJobSchedule: cronJob.cronJobSchedule ?? "* * * * *",
-        workflowID: cronJob.workflowID ?? "",
-        workflowConfig: cronJob.workflowConfig ?? { inputValues: {} },
-        isDisabled: cronJob.isDisabled ?? false,
-        timeoutSeconds: cronJob.timeoutSeconds ?? "",
-        retryAttempts: cronJob.retryAttempts ?? "",
-        retryDelaySeconds: cronJob.retryDelaySeconds ?? "",
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cronJob]);
+
 
   return (
     <section className="w-full bg-background">

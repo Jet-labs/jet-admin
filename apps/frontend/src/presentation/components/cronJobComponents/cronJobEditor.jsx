@@ -3,6 +3,7 @@ import { useCallback, useMemo } from "react";
 import { CONSTANTS } from "../../../constants";
 import { CronJobScheduler } from "./cronJobScheduler";
 import { useWorkflows } from "../../../logic/hooks/useWorkflows";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
@@ -33,7 +34,7 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
   };
 
   const { tenantID } = useParams();
-  const { workflows } = useWorkflows(tenantID);
+  const { workflows, isLoadingWorkflows, loadWorkflowsError } = useWorkflows(tenantID);
 
   const _handleOnScheduleChange = useCallback(
     (value) => {
@@ -56,6 +57,7 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
   const errors = cronJobEditorForm.errors ?? {};
 
   return (
+    <ReactQueryLoadingErrorWrapper isLoading={isLoadingWorkflows} error={loadWorkflowsError}>
     <div className="w-full space-y-3">
 
       {/* ── Identity ──────────────────────────────────────────────────────── */}
@@ -237,5 +239,6 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
       </div>
 
     </div>
+    </ReactQueryLoadingErrorWrapper>
   );
 };

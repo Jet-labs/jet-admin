@@ -79,14 +79,12 @@ export const ListenerTestingForm = ({
       setTestResult({ success: true, message: "Listener activated", data });
       displaySuccess("Listener activated successfully");
       setLiveEvents([]); // Clear past events
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID),
-      ]);
-      queryClient.invalidateQueries([
-        "LISTENER_DETAIL",
-        tenantID,
-        listenerID,
-      ]);
+      queryClient.invalidateQueries({
+        queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID)],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), listenerID],
+      });
       onStatusChange?.("active");
     },
     onError: (error) => {
@@ -109,14 +107,12 @@ export const ListenerTestingForm = ({
           data,
         });
         displaySuccess("Listener deactivated");
-        queryClient.invalidateQueries([
-          CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID),
-        ]);
-        queryClient.invalidateQueries([
-          "LISTENER_DETAIL",
-          tenantID,
-          listenerID,
-        ]);
+        queryClient.invalidateQueries({
+          queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID)],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), listenerID],
+        });
         onStatusChange?.("inactive");
       },
       onError: (error) => {

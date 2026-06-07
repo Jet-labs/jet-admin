@@ -11,6 +11,7 @@ import { MODES } from "@jet-admin/expression-engine";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
 import { useDatasourceOptions } from "../../../logic/hooks/useDatasourceOptions";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import {
   Input,
   Label,
@@ -124,7 +125,7 @@ export const DataQueryEditor = ({
   const uniqueKey = dataQueryID
     ? `dataQueryEditor_${tenantID}_${dataQueryID}`
     : `dataQueryEditor_${tenantID}`;
-  const { datasources, isLoadingDatasources } = useDatasourceOptions(tenantID);
+  const { datasources, isLoadingDatasources, loadDatasourcesError } = useDatasourceOptions(tenantID);
 
   // Get the current datasource type config
   const currentDatasourceType = getDatasourceTypeByValue(dataQueryEditorForm.values.datasourceType);
@@ -172,6 +173,7 @@ export const DataQueryEditor = ({
   );
 
   return (
+    <ReactQueryLoadingErrorWrapper isLoading={isLoadingDatasources} error={loadDatasourcesError}>
     <div className="w-full">
       <Section title="Query Configuration">
         <div className="space-y-4">
@@ -247,5 +249,6 @@ export const DataQueryEditor = ({
         </div>
       </Section>
     </div>
+    </ReactQueryLoadingErrorWrapper>
   );
 };

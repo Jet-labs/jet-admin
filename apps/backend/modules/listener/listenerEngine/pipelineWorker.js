@@ -4,6 +4,10 @@
  * and dispatches actions (trigger_workflow, trigger_query, save_to_buffer, push_to_app_page).
  *
  * Same pattern as workflow taskListener.js — registered as a fastq worker.
+ *
+ * Error policy (intentional):
+ *   transform  → abort pipeline on error — downstream actions depend on clean data
+ *   dispatch   → continue on error — side-effect failures are independent of each other
  */
 const { registerListenerEventWorker } = require('../../../config/queue.config');
 const { ListenerTransformerVm } = require('./listenerTransformerVm');
@@ -15,6 +19,18 @@ const Logger = require('../../../utils/logger');
 const TEMPLATE_OPTIONS = {
   preserveSingleExpressionType: true,
 };
+
+// ─── Lazy service getters (avoids circular-dependency risk + hot-path require) ─
+
+let _workflowService;
+function getWorkflowService() {
+  return (_workflowService ??= require('../../workflow/workflow.service').workflowService);
+}
+
+let _executeDataQuery;
+function getExecuteDataQuery() {
+  return (_executeDataQuery ??= require('../../dataQuery/dataQuery.service').executeDataQuery);
+}
 
 // ─── Startup ──────────────────────────────────────────────────────────────────
 
@@ -33,6 +49,9 @@ async function startPipelineWorker() {
 async function _processEvent(job) {
   const { listenerID, tenantID, rawEvent, actions } = job;
 
+  // Track pipeline outcome to conditionally update metadata
+  let eventProcessed = false;
+
   try {
     let currentEvent = rawEvent;
 
@@ -42,6 +61,7 @@ async function _processEvent(job) {
 
       try {
         if (action.actionType === 'transform') {
+          // transform: abort pipeline on error — downstream actions depend on clean data
           const script = action.actionConfig?.script;
           if (script && script.trim()) {
             const { output, error: transformError } =
@@ -59,7 +79,7 @@ async function _processEvent(job) {
             currentEvent = output;
 
             // null/undefined = filtered out by transform script
-            if (!currentEvent) {
+            if (currentEvent == null) {
               Logger.log('info', {
                 message: 'pipelineWorker:eventFilteredOut',
                 params: { listenerID, actionID: action.actionID },
@@ -68,7 +88,9 @@ async function _processEvent(job) {
             }
           }
         } else {
+          // dispatch: continue on error — side-effect failures are independent
           await _dispatchAction(tenantID, listenerID, action, currentEvent);
+          eventProcessed = true;
         }
       } catch (actionErr) {
         Logger.log('error', {
@@ -84,19 +106,22 @@ async function _processEvent(job) {
       }
     }
 
-    // 3. Update metadata (async, non-blocking)
-    prisma.tblListeners.update({
-      where: { listenerID },
-      data: {
-        lastEventAt: new Date(),
-        eventCount: { increment: 1 },
-      },
-    }).catch(err => {
-      Logger.log('error', {
-        message: 'pipelineWorker:metadataUpdateError',
-        params: { listenerID, error: err.message },
+    // Only update metadata when at least one dispatch action ran successfully,
+    // avoiding inflated counts from filtered/aborted/all-disabled pipelines
+    if (eventProcessed) {
+      prisma.tblListeners.update({
+        where: { listenerID },
+        data: {
+          lastEventAt: new Date(),
+          eventCount: { increment: 1 },
+        },
+      }).catch(err => {
+        Logger.log('error', {
+          message: 'pipelineWorker:metadataUpdateError',
+          params: { listenerID, error: err.message },
+        });
       });
-    });
+    }
 
   } catch (err) {
     Logger.log('error', {
@@ -113,13 +138,12 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
 
   switch (actionType) {
     case 'trigger_workflow': {
-      const { workflowService } = require('../../workflow/workflow.service');
       const inputValues = actionConfig.inputValues
         ? sharedResolveTemplate(actionConfig.inputValues, { event }, TEMPLATE_OPTIONS, {
-            module: 'listener', listenerID,
-          })
+          module: 'listener', listenerID,
+        })
         : { event };
-      await workflowService.executeWorkflow({
+      await getWorkflowService().executeWorkflow({
         workflowID: actionConfig.workflowID,
         tenantID,
         inputValues,
@@ -128,13 +152,12 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
     }
 
     case 'trigger_query': {
-      const { executeDataQuery } = require('../../dataQuery/dataQuery.service');
       const inputValues = actionConfig.inputValues
         ? sharedResolveTemplate(actionConfig.inputValues, { event }, TEMPLATE_OPTIONS, {
-            module: 'listener', listenerID,
-          })
+          module: 'listener', listenerID,
+        })
         : {};
-      await executeDataQuery({
+      await getExecuteDataQuery()({
         dataQueryID: actionConfig.dataQueryID,
         inputValues,
       });
@@ -142,29 +165,34 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
     }
 
     case 'save_to_buffer': {
+      // Guard against transform scripts returning a primitive (string, number etc.),
+      // which would throw a TypeError on __metadata access
+      const eventMeta = (typeof event === 'object' && event !== null)
+        ? (event.__metadata ?? null)
+        : null;
+
       await prisma.tblListenerEvents.create({
         data: {
           listenerID,
           tenantID,
           bufferName: actionConfig.bufferName || 'default',
           eventData: event,
-          eventMeta: event.__metadata || null,
+          eventMeta,
         },
       });
       // Async retention enforcement (non-blocking)
-      _enforceRetention(listenerID, actionConfig).catch(() => {});
+      _enforceRetention(listenerID, actionConfig).catch(() => { });
       break;
     }
 
     case 'push_to_app_page': {
       const channelName = actionConfig.channelName || `listener:${listenerID}`;
-      const data = event;
-
       const appPageID = actionConfig.appPageID;
+
       if (appPageID) {
         socketIO.to(`listener:app_page:${appPageID}`).emit('listener_event', {
           channelName,
-          data,
+          data: event,
           mode: actionConfig.mode || 'replace',
           limit: actionConfig.maxArrayLength || 1000,
           timestamp: Date.now(),
@@ -190,12 +218,14 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
 
 async function _enforceRetention(listenerID, config) {
   const { retentionPolicy, maxEvents, maxAgeHours } = config;
+  const bufferName = config.bufferName || 'default';
 
   if (retentionPolicy === 'count' || retentionPolicy === 'both') {
-    if (maxEvents && maxEvents > 0) {
+    // Validate maxEvents is a positive integer to prevent Prisma skip: -1 / NaN / float
+    if (Number.isInteger(maxEvents) && maxEvents > 0) {
       // Delete events beyond maxEvents (keep most recent)
       const cutoff = await prisma.tblListenerEvents.findFirst({
-        where: { listenerID, bufferName: config.bufferName || 'default' },
+        where: { listenerID, bufferName },
         orderBy: { seqNo: 'desc' },
         skip: maxEvents,
         select: { seqNo: true },
@@ -204,7 +234,7 @@ async function _enforceRetention(listenerID, config) {
         await prisma.tblListenerEvents.deleteMany({
           where: {
             listenerID,
-            bufferName: config.bufferName || 'default',
+            bufferName,
             seqNo: { lte: cutoff.seqNo },
           },
         });
@@ -213,12 +243,12 @@ async function _enforceRetention(listenerID, config) {
   }
 
   if (retentionPolicy === 'time' || retentionPolicy === 'both') {
-    if (maxAgeHours && maxAgeHours > 0) {
+    if (Number.isFinite(maxAgeHours) && maxAgeHours > 0) {
       const cutoffTime = new Date(Date.now() - maxAgeHours * 60 * 60 * 1000);
       await prisma.tblListenerEvents.deleteMany({
         where: {
           listenerID,
-          bufferName: config.bufferName || 'default',
+          bufferName,
           receivedAt: { lt: cutoffTime },
         },
       });

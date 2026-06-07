@@ -20,6 +20,12 @@ import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 import { PageHeader } from "@jet-admin/ui";
+
+const initialValues = {
+  apiKeyTitle: "",
+  roleIDs: [],
+};
+
 export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
   APIKeyUpdationForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -57,9 +63,10 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
       displaySuccess(
         CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_API_KEY_UPDATION_SUCCESS
       );
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID),
-      ]);
+      });
     },
     onError: (error) => {
       displayError(error);
@@ -67,10 +74,11 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
   });
 
   const apiKeyUpdationForm = useFormik({
-    initialValues: {
-      apiKeyTitle: "",
-      roleIDs: [],
-    },
+    initialValues: apiKey ? {
+      apiKeyTitle: apiKey.apiKeyTitle || CONSTANTS.STRINGS.UNTITLED,
+      roleIDs: apiKey.roles?.map((r) => r.roleID) || [],
+    } : initialValues,
+    enableReinitialize: true,
     validateOnMount: false,
     validateOnChange: false,
     validationSchema: formValidations.apiKeyUpdationFormValidationSchema,
@@ -87,20 +95,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
     },
   });
 
-  // Use useEffect to update Formik values when apiKey is fetched
-  useEffect(() => {
-    if (apiKey) {
-      // Update Formik form values with the fetched apiKey data
-      apiKeyUpdationForm.setFieldValue(
-        "apiKeyTitle",
-        apiKey.apiKeyTitle || CONSTANTS.STRINGS.UNTITLED
-      );
-      apiKeyUpdationForm.setFieldValue(
-        "roleIDs",
-        apiKey.roles?.map((r) => r.roleID) || []
-      );
-    }
-  }, [apiKey]);
+
 
   return (
     <section className="w-full bg-background">

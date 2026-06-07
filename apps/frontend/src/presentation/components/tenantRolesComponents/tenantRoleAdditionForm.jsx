@@ -31,9 +31,10 @@ export const TenantRoleAdditionForm = () => {
     retry: false,
     onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.TENANT_ROLE_ADDITION_SUCCESS_TOAST);
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID),
-      ]);
+      });
       navigate(-1);
     },
     onError: (error) => {

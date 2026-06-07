@@ -56,9 +56,10 @@ export const WidgetAdditionForm = ({ tenantID }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.ADD_WIDGET_FORM_WIDGET_ADDITION_SUCCESS);
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
-      ]);
+      });
     },
     onError: (error) => {
       displayError(error);

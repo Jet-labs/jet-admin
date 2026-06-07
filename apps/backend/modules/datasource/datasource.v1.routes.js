@@ -8,6 +8,14 @@ const {
     datasourceIdParamSchema,
 } = require("./datasource.validator");
 
+const multer = require("multer");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+});
+
 // Datasource routes
 router.get(
   "/",
@@ -19,6 +27,13 @@ router.post(
   "/test",
   authMiddleware.checkUserPermissions(["tenant:datasource:test"]),
   datasourceController.testDatasourceConnection
+);
+
+router.post(
+  "/upload",
+  authMiddleware.checkUserPermissions(["tenant:datasource:create"]),
+  upload.single("file"),
+  datasourceController.uploadFile
 );
 
 router.get(

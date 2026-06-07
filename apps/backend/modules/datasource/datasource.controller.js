@@ -3,6 +3,9 @@ const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { datasourceService } = require("./datasource.service");
 const { getServiceAuthContext } = require("../../utils/auth.context.utils");
+const { createClient } = require("@supabase/supabase-js");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const environmentVariables = require("../../environment");
 
 const datasourceController = {};
 
@@ -374,6 +377,130 @@ datasourceController.cloneDatasourceByID = async (req, res) => {
     });
 
     return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ * Uploads a datasource file (Excel/CSV) to Supabase storage.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+datasourceController.uploadFile = async (req, res) => {
+  try {
+    const { tenantID } = req.params;
+    const file = req.file;
+
+    if (!file) {
+      throw new Error("No file uploaded.");
+    }
+
+    // Validate file extensions
+    const fileExt = file.originalname.split(".").pop().toLowerCase();
+    if (!["csv", "xlsx", "xls"].includes(fileExt)) {
+      throw new Error("Invalid file type. Only CSV, XLSX, and XLS files are allowed.");
+    }
+
+    Logger.log("info", {
+      message: "datasourceController:uploadFile:params",
+      params: {
+        tenantID,
+        fileName: file.originalname,
+        fileSize: file.size,
+        fileType: file.mimetype,
+      },
+    });
+
+    // Create unique filename and upload path
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    const filePath = `excel-csv-datasources/${tenantID}/${uniqueName}`;
+
+    const s3AccessKeyId = environmentVariables.SUPABASE_S3_ACCESS_KEY_ID;
+    const s3SecretAccessKey = environmentVariables.SUPABASE_S3_SECRET_ACCESS_KEY;
+    const useS3 = s3AccessKeyId && s3AccessKeyId !== "will add manually";
+
+    let publicUrl;
+    const bucketName = useS3
+      ? (environmentVariables.SUPABASE_S3_BUCKET || "jet-admin-datasource-file-uploads")
+      : "tenant-assets";
+
+    if (useS3) {
+      Logger.log("info", {
+        message: "datasourceController:uploadFile:s3",
+        params: { bucketName, filePath },
+      });
+
+      const s3Client = new S3Client({
+        endpoint: environmentVariables.SUPABASE_S3_ENDPOINT || "https://apopjzvhqwlrcykesema.storage.supabase.co/storage/v1/s3",
+        region: environmentVariables.SUPABASE_S3_REGION || "ap-south-1",
+        credentials: {
+          accessKeyId: s3AccessKeyId,
+          secretAccessKey: s3SecretAccessKey,
+        },
+        forcePathStyle: true,
+      });
+
+      const command = new PutObjectCommand({
+        Bucket: bucketName,
+        Key: filePath,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      });
+
+      await s3Client.send(command);
+
+      // Construct public URL
+      const supabaseUrl = environmentVariables.SUPABASE_URL || "https://apopjzvhqwlrcykesema.supabase.co";
+      publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucketName}/${filePath}`;
+    } else {
+      // Initialize Supabase Client
+      const supabase = createClient(
+        environmentVariables.SUPABASE_URL,
+        environmentVariables.SUPABASE_ANON_KEY
+      );
+
+      // Upload to Supabase bucket
+      const { data, error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, file.buffer, {
+          contentType: file.mimetype,
+          upsert: true,
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Generate public URL
+      const { data: { publicUrl: generatedUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(filePath);
+
+      publicUrl = generatedUrl;
+    }
+
+    Logger.log("success", {
+      message: "datasourceController:uploadFile:success",
+      params: {
+        url: publicUrl,
+        filePath,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      url: publicUrl,
+      filePath,
+      fileName: file.originalname,
+      fileSize: file.size,
+      fileType: file.mimetype,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:uploadFile:error",
+      params: {
+        error: error.message || error,
+      },
+    });
+    return expressUtils.sendResponse(res, false, {}, error.message || error);
   }
 };
 

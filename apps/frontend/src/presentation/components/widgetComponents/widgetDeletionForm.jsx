@@ -27,9 +27,10 @@ export const WidgetDeletionForm = ({ tenantID, widgetID }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.DELETE_WIDGET_DELETION_SUCCESS);
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
-      ]);
+      });
       navigate(-1);
     },
     onError: (error) => {

@@ -52,6 +52,10 @@ export const WIDGET_TYPES = {
     name: "Date Range Picker",
     value: "date-range-picker",
   },
+  HTML: {
+    name: "HTML Widget",
+    value: "html",
+  },
 };
 
 // Advanced options for Vega widgets (using JSON Schema + UI Schema for jsonforms)
@@ -294,6 +298,16 @@ export const WIDGET_EVENT_TYPES = {
       ],
     },
   ],
+  html: [
+    {
+      value: "onMessage",
+      label: "On Message",
+      desc: "Fires when custom HTML code dispatches a message",
+      inputDefinitions: [
+        { key: "event.data", description: "The payload object received" },
+      ],
+    },
+  ],
 };
 
 /**
@@ -356,6 +370,9 @@ export const WIDGET_METHODS = {
   ],
   button: [
     { name: "click", description: "Trigger button action" },
+  ],
+  html: [
+    { name: "refresh", description: "Reload iframe content" },
   ],
 };
 

@@ -42,4 +42,8 @@ export { IframeConfigEditor } from "./iframe/iframeConfigEditor";
 export * from "./date-picker";
 export * from "./date-range-picker";
 
+// HTML Widget
+export { HtmlWidget } from "./html/htmlWidget";
+export { HtmlConfigEditor } from "./html/htmlConfigEditor";
+
 // Shared components removed, TemplateAutocompleteInput moved to @jet-admin/ui

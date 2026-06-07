@@ -321,7 +321,8 @@ var DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.WEBSOCKET.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.SSE.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.SYSLOG.value]: createGenericDatasourceUI(),
-  [DATASOURCE_TYPES.NATS.value]: createGenericDatasourceUI()
+  [DATASOURCE_TYPES.NATS.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.EXCELCSV.value]: createGenericDatasourceUI()
 };
 export {
   DATASOURCE_UI_COMPONENTS

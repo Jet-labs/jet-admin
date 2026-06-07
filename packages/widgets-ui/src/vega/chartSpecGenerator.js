@@ -191,7 +191,18 @@ const buildDataSection = (dataSource, inlineValues) => {
     return { values: inlineValues };
   }
   if (dataSource) {
-    return { values: dataSource }; // mustache template resolved at runtime
+    if (Array.isArray(dataSource)) {
+      return { values: dataSource };
+    }
+    // Prevent Vega compiler from crashing on massive complex objects
+    if (typeof dataSource === 'object' && dataSource !== null) {
+      if (Array.isArray(dataSource.data)) {
+        return { values: dataSource.data };
+      }
+      return { values: [dataSource] };
+    }
+    // Strings/numbers fallback
+    return { values: [dataSource] };
   }
   return { values: [] };
 };
@@ -346,9 +357,9 @@ export const getDefaultShelfSpec = () => ({
  * @param {number} maxDepth - Maximum nesting depth to prevent runaway recursion
  * @returns {Array<{name: string, type: string, icon: string}>}
  */
-const flattenFieldsRecursive = (value, prefix = '', visited = new WeakSet(), maxDepth = 5) => {
-  const results = [];
+const flattenFieldsRecursive = (value, prefix = '', visited = new WeakSet(), maxDepth = 5, results = []) => {
   if (maxDepth <= 0) return results;
+  if (results.length > 500) return results; // Prevent runaway recursion and UI freeze
 
   if (value === null || value === undefined) return results;
 
@@ -369,8 +380,7 @@ const flattenFieldsRecursive = (value, prefix = '', visited = new WeakSet(), max
     }
     // Recurse into first element with index 0
     if (value.length > 0 && typeof value[0] === 'object' && value[0] !== null) {
-      const nested = flattenFieldsRecursive(value[0], prefix ? `${prefix}.0` : '0', visited, maxDepth - 1);
-      results.push(...nested);
+      flattenFieldsRecursive(value[0], prefix ? `${prefix}.0` : '0', visited, maxDepth - 1, results);
     }
     return results;
   }
@@ -386,6 +396,7 @@ const flattenFieldsRecursive = (value, prefix = '', visited = new WeakSet(), max
     }
     // Recurse into each key
     for (const key of Object.keys(value)) {
+      if (results.length > 500) return results; // Stop if we hit the limit
       const childPath = prefix ? `${prefix}.${key}` : key;
       const childVal = value[key];
 
@@ -393,8 +404,7 @@ const flattenFieldsRecursive = (value, prefix = '', visited = new WeakSet(), max
         results.push({ name: childPath, type: 'nominal', icon: getFieldTypeIcon('nominal') });
       } else if (Array.isArray(childVal) || (typeof childVal === 'object')) {
         // Recurse deeper
-        const nested = flattenFieldsRecursive(childVal, childPath, visited, maxDepth - 1);
-        results.push(...nested);
+        flattenFieldsRecursive(childVal, childPath, visited, maxDepth - 1, results);
       } else {
         // Leaf primitive
         const type = inferFieldType(childVal, key, []);

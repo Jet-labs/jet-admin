@@ -351,3 +351,22 @@ export const tabRendererTester = (uischema) => {
   }
   return -1;
 };
+
+// ============================================================================
+// File Upload Tester
+// ============================================================================
+export const fileUploadTester = rankWith(
+  150,
+  and(
+    isControl,
+    (uischema, rootSchema) => {
+      try {
+        const currentSchema = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+        return currentSchema?.format === "file" || uischema.options?.fileUpload === true;
+      } catch (e) {
+        return false;
+      }
+    }
+  )
+);
+

@@ -40,6 +40,7 @@ import { DataQueryTestingPanel } from "../dataQueryComponents/dataQueryTestingPa
 import { useParams } from "react-router-dom";
 import { useWorkflowRun } from "./useWorkflowRun";
 import { useEffect } from "react";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 import { Button, Checkbox, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 // Dagre graph for auto-layout
@@ -122,8 +123,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     // Destructure for cleaner access
     const { values, setFieldValue, errors, handleChange, handleBlur } = workflowEditorForm;
     const { tenantID } = useParams();
-    const { dataQueries, refetchDataQueries } = useDataQueries(tenantID);
-    const { datasources, refetchDatasources } = useDatasources(tenantID);
+    const { dataQueries, refetchDataQueries, isLoadingDataQueries, loadDataQueriesError } = useDataQueries(tenantID);
+    const { datasources, refetchDatasources, isLoadingDatasources, loadDatasourcesError } = useDatasources(tenantID);
     const [selectedNodeId, setSelectedNodeId] = useState(null);
     const [showSchemaPanel, setShowSchemaPanel] = useState(false);
     const [showMiniMap, setShowMiniMap] = useState(true);
@@ -377,6 +378,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             tenantID={tenantID}
             onQueryTest={handleQueryTest}
         >
+        <ReactQueryLoadingErrorWrapper isLoading={isLoadingDataQueries || isLoadingDatasources} error={loadDataQueriesError || loadDatasourcesError}>
             <WorkflowEdgeContext.Provider value={{ deleteEdge, updateEdge }}>
                 <ReactFlowProvider>
                     <ResizablePanelGroup
@@ -721,6 +723,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
                 </ReactFlowProvider>
             </WorkflowEdgeContext.Provider>
+        </ReactQueryLoadingErrorWrapper>
         </WorkflowNodesProvider>
     );
 };

@@ -21,6 +21,12 @@ import { TenantEditor } from "./tenantEditor";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { TenantDeletionForm } from "./tenantDeletionForm";
 
+const initialValues = {
+  tenantID: "",
+  tenantTitle: "",
+  tenantLogoURL: "",
+};
+
 export const TenantUpdationForm = ({ tenantID }) => {
   TenantUpdationForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
@@ -56,7 +62,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
     onSuccess: (tenant) => {
       saveTenantLocally(tenant);
       displaySuccess(CONSTANTS.STRINGS.UPDATE_TENANT_SUCCESS_TOAST);
-      queryClient.invalidateQueries([CONSTANTS.REACT_QUERY_KEYS.TENANTS]);
+      queryClient.invalidateQueries({ queryKey: CONSTANTS.REACT_QUERY_KEYS.TENANTS });
     },
     onError: (error) => {
       displayError(error);
@@ -64,11 +70,12 @@ export const TenantUpdationForm = ({ tenantID }) => {
   });
 
   const updateTenantForm = useFormik({
-    initialValues: {
-      tenantID: tenant ? tenant.tenantID : "",
-      tenantTitle: tenant ? tenant.tenantTitle : "",
-      tenantLogoURL: tenant ? tenant.tenantLogoURL : "",
-    },
+    initialValues: tenant && tenant.tenantID ? {
+      tenantID: tenant.tenantID,
+      tenantTitle: tenant.tenantTitle,
+      tenantLogoURL: tenant.tenantLogoURL,
+    } : initialValues,
+    enableReinitialize: true,
     validationSchema: formValidations.updateTenantFormValidationSchema,
     onSubmit: ({
       tenantID,
@@ -83,13 +90,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
     },
   });
 
-  useEffect(() => {
-    if (tenant) {
-      updateTenantForm.setFieldValue("tenantID", tenant.tenantID);
-      updateTenantForm.setFieldValue("tenantTitle", tenant.tenantTitle);
-      updateTenantForm.setFieldValue("tenantLogoURL", tenant.tenantLogoURL);
-    }
-  }, [tenant]);
+
 
   const _handleOpenAddTenantUserDialog = () => {
     setIsAddTenantUserDialogOpen(true);
@@ -100,37 +101,36 @@ export const TenantUpdationForm = ({ tenantID }) => {
 
   return (
     <div className="flex w-full h-full flex-col overflow-hidden bg-background">
+      <PageHeader
+        title={CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
+        parentTitle={'Tenants'}
+        id={tenantID}
+        onSave={updateTenantForm.handleSubmit}
+        isSaving={isUpdatingTenant}
+        saveText="Save"
+      >
+        <Button variant="outline" size="sm" asChild>
+          <Link to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}>
+            <Lock className="mr-1 h-3 w-3" />
+            {CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE}
+          </Link>
+        </Button>
+        <TenantDeletionForm tenantID={tenantID} />
+      </PageHeader>
+
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenant}
         isFetching={isFetchingTenant}
         error={tenantError}
       >
         {tenant && (
-          <>
-            <PageHeader
-              title={CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
-              parentTitle={'Tenants'}
-              id={tenant.tenantID}
-              onSave={updateTenantForm.handleSubmit}
-              isSaving={isUpdatingTenant}
-              saveText="Save"
-            >
-              <Button variant="outline" size="sm" asChild>
-                <Link to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}>
-                  <Lock className="mr-1 h-3 w-3" />
-                  {CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE}
-                </Link>
-              </Button>
-              <TenantDeletionForm tenantID={tenantID} />
-            </PageHeader>
-
-            <div className="flex-1 overflow-y-auto p-4 md:p-6">
-              <section className="mx-auto max-w-2xl w-full">
-                <TenantUserAdditionForm
-                  tenantID={tenant.tenantID}
-                  onClose={_handleCloseAddTenantUserDialog}
-                  open={isAddTenantUserDialogOpen}
-                />
+          <div className="flex-1 overflow-y-auto p-4 md:p-6">
+            <section className="mx-auto max-w-2xl w-full">
+              <TenantUserAdditionForm
+                tenantID={tenantID}
+                onClose={_handleCloseAddTenantUserDialog}
+                open={isAddTenantUserDialogOpen}
+              />
 
                 <form
                   id="update-tenant-form"
@@ -200,7 +200,6 @@ export const TenantUpdationForm = ({ tenantID }) => {
                 </form>
               </section>
             </div>
-          </>
         )}
       </ReactQueryLoadingErrorWrapper>
     </div>

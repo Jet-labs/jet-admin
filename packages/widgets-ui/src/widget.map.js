@@ -12,7 +12,8 @@ import { ImageConfigEditor } from "./image/imageConfigEditor";
 import { IframeConfigEditor } from "./iframe/iframeConfigEditor";
 import { DatePickerConfigEditor } from "./date-picker/datePickerConfigEditor";
 import { DateRangePickerConfigEditor } from "./date-range-picker/dateRangePickerConfigEditor";
-import { BarChart, Component, Table, Type, TrendingUp, AlertTriangle, FileText, Image, Globe, Calendar, CalendarRange } from 'lucide-react';
+import { HtmlConfigEditor } from "./html/htmlConfigEditor";
+import { BarChart, Component, Table, Type, TrendingUp, AlertTriangle, FileText, Image, Globe, Calendar, CalendarRange, Code } from 'lucide-react';
 
 
 // Register widgets
@@ -62,6 +63,10 @@ const LazyDatePickerWidget = React.lazy(() =>
 
 const LazyDateRangePickerWidget = React.lazy(() =>
   import("./date-range-picker/index.js").then(module => ({ default: module.DateRangePickerWidget }))
+);
+
+const LazyHtmlWidget = React.lazy(() =>
+  import("./html/index.js").then(module => ({ default: module.HtmlWidget }))
 );
 
 
@@ -389,6 +394,31 @@ export const WIDGETS_MAP = {
       ],
       isLoading: "",
       showHeader: false,
+    },
+  },
+  'html': {
+    label: "HTML Widget",
+    value: WIDGET_TYPES.HTML.value,
+    datasetFields: [],
+    defaultAutoRun: false,
+    description: "Custom HTML, CSS, and interactive scripting",
+    component: ({ data, ...props }) => {
+      return (
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading widget...</div>}>
+          <LazyHtmlWidget data={data} {...props} />
+        </React.Suspense>
+      );
+    },
+    configEditor: HtmlConfigEditor,
+    icon: ({ className }) => <Code className={`!text-lg ${className}`} />,
+    sampleConfig: {
+      html: "<div>\n  <h3>Hello Custom HTML!</h3>\n  <p>Customize this content inside properties.</p>\n</div>",
+      css: "h3 {\n  color: #3b82f6;\n}\np {\n  color: #6b7280;\n}",
+      allowScripts: false,
+      allowForms: false,
+      allowPopups: false,
+      isLoading: "",
+      showHeader: true,
     },
   },
 };

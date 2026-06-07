@@ -48,6 +48,7 @@ const MemoizedWidgetContent = React.memo(({
   runtimeEventHandlers,
   widgetState,
   setWidgetState,
+  widgetID,
 }) => {
   const widgetData = useMemo(() => {
     return resolveWidgetData({
@@ -64,6 +65,7 @@ const MemoizedWidgetContent = React.memo(({
 
   return (
     <RenderedWidgetComponent
+      widgetID={widgetID}
       widgetTitle={widgetTitle}
       widgetType={widgetType}
       widgetConfig={resolvedConfig}
@@ -340,6 +342,7 @@ export const AppPageWidgetSlot = ({
                       runtimeEventHandlers={runtimeEventHandlers}
                       widgetState={widgetState}
                       setWidgetState={setWidgetState}
+                      widgetID={widgetID}
                     />
                   </ErrorBoundary>
                 </div>

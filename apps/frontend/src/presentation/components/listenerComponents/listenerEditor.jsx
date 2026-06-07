@@ -6,6 +6,7 @@ import { JsonForms } from "@jsonforms/react";
 import React, { useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_TYPES, getDatasourceTypeByValue } from "@jet-admin/datasource-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
 import { DatasourceIcon } from "../datasourceComponents/datasourceIcon";
@@ -36,7 +37,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
     tenantID: PropTypes.string.isRequired,
   };
 
-  const { datasources, isLoadingDatasources } = useDatasources(tenantID);
+  const { datasources, isLoadingDatasources, loadDatasourcesError } = useDatasources(tenantID);
 
   // Track JsonForms init to prevent spurious onChange during mount
   const isJsonFormsInitialized = useRef(false);
@@ -93,6 +94,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
   );
 
   return (
+    <ReactQueryLoadingErrorWrapper isLoading={isLoadingDatasources} error={loadDatasourcesError}>
     <div className="space-y-4">
       {/* Identity section */}
       <Section title="Identity">
@@ -260,5 +262,6 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
         </Select>
       </Section>
     </div>
+    </ReactQueryLoadingErrorWrapper>
   );
 };

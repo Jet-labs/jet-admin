@@ -1227,6 +1227,161 @@ CustomHorizontalLayout.propTypes = {
   cells: PropTypes18.arrayOf(PropTypes18.object)
 };
 
+// src/renderers/CustomFileUploadInput.jsx
+import React20, { useState as useState4, useContext } from "react";
+import PropTypes19 from "prop-types";
+import { CloudUpload, FileSpreadsheet, Trash2 as Trash27, AlertCircle } from "lucide-react";
+import { Button as Button10, Label as Label15 } from "@jet-admin/ui";
+
+// src/context.js
+import React19 from "react";
+var FileUploadContext = React19.createContext({
+  uploadFile: async (file) => {
+    throw new Error("No upload handler provided");
+  }
+});
+
+// src/renderers/CustomFileUploadInput.jsx
+var CustomFileUploadInput = (props) => {
+  const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
+  const { uploadFile } = useContext(FileUploadContext);
+  const [isUploading, setIsUploading] = useState4(false);
+  const [dragActive, setDragActive] = useState4(false);
+  const [errorMsg, setErrorMsg] = useState4("");
+  const isDisabled = enabled === false;
+  const hasErrors = errors && errors.length > 0 || !!errorMsg;
+  const fileOptions = data || {};
+  const { fileUrl, fileName, fileSize, fileType } = fileOptions;
+  const handleUpload = async (file) => {
+    if (!file) return;
+    setErrorMsg("");
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMsg("File size exceeds 10MB limit.");
+      return;
+    }
+    const fileExt = file.name.split(".").pop().toLowerCase();
+    if (!["csv", "xlsx", "xls"].includes(fileExt)) {
+      setErrorMsg("Invalid file type. Please upload a CSV, XLSX, or XLS file.");
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const response = await uploadFile(file);
+      handleChange(path, {
+        fileUrl: response.url,
+        filePath: response.filePath,
+        fileName: response.fileName,
+        fileSize: response.fileSize,
+        fileType: response.fileType
+      });
+    } catch (err) {
+      setErrorMsg(err.message || err || "Failed to upload file.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleUpload(e.dataTransfer.files[0]);
+    }
+  };
+  const handleChangeInput = (e) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      handleUpload(e.target.files[0]);
+    }
+  };
+  const handleRemove = () => {
+    handleChange(path, {
+      fileUrl: "",
+      filePath: "",
+      fileName: "",
+      fileSize: 0,
+      fileType: ""
+    });
+  };
+  const formatBytes = (bytes) => {
+    if (!bytes) return "0 Bytes";
+    const k = 1024;
+    const dm = 2;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+  };
+  return /* @__PURE__ */ React20.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React20.createElement(
+    Label15,
+    {
+      htmlFor: path,
+      className: `block text-xs font-medium ${hasErrors ? "text-destructive" : "text-muted-foreground"}`
+    },
+    label || description || "Upload File",
+    " ",
+    /* @__PURE__ */ React20.createElement("span", { className: "text-destructive" }, "*")
+  ), fileUrl ? /* @__PURE__ */ React20.createElement("div", { className: "flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-md" }, /* @__PURE__ */ React20.createElement("div", { className: "flex items-center gap-3 overflow-hidden" }, /* @__PURE__ */ React20.createElement("div", { className: "p-2 bg-primary/10 rounded-md text-primary" }, /* @__PURE__ */ React20.createElement(FileSpreadsheet, { className: "h-5 w-5" })), /* @__PURE__ */ React20.createElement("div", { className: "overflow-hidden" }, /* @__PURE__ */ React20.createElement("p", { className: "text-sm font-medium text-foreground truncate max-w-sm" }, fileName || "Uploaded File"), /* @__PURE__ */ React20.createElement("p", { className: "text-xs text-muted-foreground" }, formatBytes(fileSize), " \u2022 ", fileType || "Spreadsheet"))), /* @__PURE__ */ React20.createElement(
+    Button10,
+    {
+      type: "button",
+      variant: "destructive",
+      size: "sm",
+      onClick: handleRemove,
+      disabled: isDisabled,
+      className: "flex items-center gap-1.5 shrink-0"
+    },
+    /* @__PURE__ */ React20.createElement(Trash27, { className: "h-3 w-3" }),
+    "Remove"
+  )) : /* @__PURE__ */ React20.createElement(
+    "div",
+    {
+      onDragEnter: handleDrag,
+      onDragOver: handleDrag,
+      onDragLeave: handleDrag,
+      onDrop: handleDrop,
+      className: `relative flex flex-col items-center justify-center p-6 border border-dashed rounded-md transition-colors ${dragActive ? "border-primary bg-primary/5" : "border-border bg-background hover:border-muted-foreground/50 hover:bg-muted/50"}`
+    },
+    /* @__PURE__ */ React20.createElement(
+      "input",
+      {
+        type: "file",
+        id: `file-upload-${path}`,
+        className: "hidden",
+        accept: ".csv, .xlsx, .xls",
+        onChange: handleChangeInput,
+        disabled: isUploading || isDisabled
+      }
+    ),
+    /* @__PURE__ */ React20.createElement(
+      "label",
+      {
+        htmlFor: `file-upload-${path}`,
+        className: "flex flex-col items-center justify-center cursor-pointer space-y-3 w-full h-full"
+      },
+      isUploading ? /* @__PURE__ */ React20.createElement("div", { className: "flex flex-col items-center space-y-2" }, /* @__PURE__ */ React20.createElement("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-primary" }), /* @__PURE__ */ React20.createElement("p", { className: "text-sm font-medium text-muted-foreground" }, "Uploading file\u2026")) : /* @__PURE__ */ React20.createElement(React20.Fragment, null, /* @__PURE__ */ React20.createElement("div", { className: "p-3 bg-primary/10 text-primary rounded-lg" }, /* @__PURE__ */ React20.createElement(CloudUpload, { className: "h-6 w-6" })), /* @__PURE__ */ React20.createElement("div", { className: "text-center" }, /* @__PURE__ */ React20.createElement("p", { className: "text-sm font-medium text-foreground" }, "Click to upload or drag & drop"), /* @__PURE__ */ React20.createElement("p", { className: "text-xs text-muted-foreground mt-1" }, "Excel (.xlsx, .xls) or CSV up to 10MB")))
+    )
+  ), (errors?.length > 0 || errorMsg) && /* @__PURE__ */ React20.createElement("p", { className: "text-xs text-destructive mt-1 flex items-center gap-1" }, /* @__PURE__ */ React20.createElement(AlertCircle, { className: "h-3 w-3" }), errorMsg || errors));
+};
+CustomFileUploadInput.propTypes = {
+  data: PropTypes19.object,
+  path: PropTypes19.string.isRequired,
+  handleChange: PropTypes19.func.isRequired,
+  label: PropTypes19.string,
+  description: PropTypes19.string,
+  errors: PropTypes19.arrayOf(PropTypes19.string),
+  uischema: PropTypes19.object.isRequired,
+  enabled: PropTypes19.bool
+};
+
 // src/renderers/index.js
 var JetNumberControl = withJsonFormsControlProps(CustomNumberInput);
 var JetTextControl = withJsonFormsControlProps(CustomTextInput);
@@ -1246,6 +1401,7 @@ var JetRadioControl = withJsonFormsControlProps(CustomRadioInput);
 var JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);
 var JetTabLayout = withJsonFormsLayoutProps(CustomTabRenderer);
 var JetHorizontalLayout = withJsonFormsLayoutProps(CustomHorizontalLayout);
+var JetFileUploadControl = withJsonFormsControlProps(CustomFileUploadInput);
 
 // src/testers.js
 import {
@@ -1490,6 +1646,20 @@ var tabRendererTester = (uischema) => {
   }
   return -1;
 };
+var fileUploadTester = rankWith(
+  150,
+  and(
+    isControl,
+    (uischema, rootSchema) => {
+      try {
+        const currentSchema = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+        return currentSchema?.format === "file" || uischema.options?.fileUpload === true;
+      } catch (e) {
+        return false;
+      }
+    }
+  )
+);
 
 // src/jetFormsRenderers.js
 var jetFormsBaseRenderers = [
@@ -1507,7 +1677,8 @@ var jetFormsBaseRenderers = [
   { tester: genericObjectArrayTester, renderer: JetGenericObjectArrayControl },
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout },
-  { tester: horizontalLayoutTester, renderer: JetHorizontalLayout }
+  { tester: horizontalLayoutTester, renderer: JetHorizontalLayout },
+  { tester: fileUploadTester, renderer: JetFileUploadControl }
 ];
 var jetFormsRenderers = [
   { tester: suggestionInputTester, renderer: JetSuggestionControl },
@@ -1522,6 +1693,7 @@ export {
   CustomCodeEditorControl as CustomCodePgsqlControl,
   CustomDynamicKeyValueInputRenderer,
   CustomFieldOperatorValueArrayRenderer,
+  CustomFileUploadInput,
   CustomGenericObjectArrayRenderer,
   CustomGroupLayout,
   CustomHorizontalLayout,
@@ -1536,12 +1708,14 @@ export {
   CustomTabRenderer,
   CustomTextInput,
   CustomVerticalLayout,
+  FileUploadContext,
   JetCheckboxControl,
   JetCodeEditorControl,
   JetCodeEditorControl as JetCodeJavascriptControl,
   JetCodeEditorControl as JetCodePgsqlControl,
   JetCustomDynamicKeyValueInputRenderer,
   JetFieldOperatorValueArrayControl,
+  JetFileUploadControl,
   JetGenericObjectArrayControl,
   JetGroupLayout,
   JetHorizontalLayout,
@@ -1562,6 +1736,7 @@ export {
   codeEditorTester as codePgsqlTester,
   dynamicKeyValueInputTester,
   fieldOperatorValueArrayTester,
+  fileUploadTester,
   genericObjectArrayTester,
   groupLayoutTester,
   jetFormsBaseRenderers,

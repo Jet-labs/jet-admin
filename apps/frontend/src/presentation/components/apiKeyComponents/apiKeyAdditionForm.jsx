@@ -28,9 +28,10 @@ export const APIKeyAdditionForm = ({ tenantID }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.ADD_API_KEY_FORM_API_KEY_CREATED);
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID),
-      ]);
+      queryClient.invalidateQueries({
+        queryKey
+          : CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID),
+      });
     },
     onError: (error) => {
       displayError(error);

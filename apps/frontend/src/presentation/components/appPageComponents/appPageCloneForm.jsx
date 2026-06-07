@@ -31,9 +31,10 @@ export const AppPageCloneForm = ({ tenantID, appPageID }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.CLONE_APP_PAGE_CLONING_SUCCESS);
-        queryClient.invalidateQueries([
+        queryClient.invalidateQueries({
+          queryKey:
           CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID),
-        ]);
+        });
         navigate(-1);
       },
       onError: (error) => {

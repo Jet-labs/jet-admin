@@ -77,6 +77,10 @@ var WIDGET_TYPES = {
   DATE_RANGE_PICKER: {
     name: "Date Range Picker",
     value: "date-range-picker"
+  },
+  HTML: {
+    name: "HTML Widget",
+    value: "html"
   }
 };
 var WIDGET_ADVANCED_OPTIONS = {
@@ -332,6 +336,16 @@ var WIDGET_EVENT_TYPES = {
         { key: "event.start", description: "Cleared start (empty string)" }
       ]
     }
+  ],
+  html: [
+    {
+      value: "onMessage",
+      label: "On Message",
+      desc: "Fires when custom HTML code dispatches a message",
+      inputDefinitions: [
+        { key: "event.data", description: "The payload object received" }
+      ]
+    }
   ]
 };
 var getWidgetEventTypes = (widgetType) => {
@@ -364,6 +378,9 @@ var WIDGET_METHODS = {
   ],
   button: [
     { name: "click", description: "Trigger button action" }
+  ],
+  html: [
+    { name: "refresh", description: "Reload iframe content" }
   ]
 };
 var getWidgetMethods = (widgetType) => {

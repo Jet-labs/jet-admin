@@ -5,37 +5,32 @@ import {
 import { JsonForms } from "@jsonforms/react";
 import React, { useCallback, useRef } from "react";
 import PropTypes from "prop-types";
+import { useParams } from "react-router-dom";
+import { uploadDatasourceFileAPI } from "../../../data/apis/datasource";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES, getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
+import { FileUploadContext } from "@jet-admin/json-forms-renderers";
 import { DatasourceIcon } from "./datasourceIcon";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Section } from "@jet-admin/ui";
-
 
 export const DatasourceEditor = ({ datasourceEditorForm }) => {
   DatasourceEditor.propTypes = {
     datasourceEditorForm: PropTypes.object.isRequired,
   };
 
+  const { tenantID } = useParams();
+
   // Track whether JsonForms has completed its initial render cycle.
-  // JsonForms fires onChange during mount while it resolves conditional
-  // visibility rules (e.g. connectionOption toggling group visibility).
-  // We skip those spurious updates so the server-fetched datasourceOptions
-  // are never overwritten before the user touches anything.
   const isJsonFormsInitialized = useRef(false);
 
   const handleDatasourceOptionsChange = useCallback(({ data }) => {
     if (!isJsonFormsInitialized.current) {
-      // First onChange is always the internal init pass — mark as done
-      // and bail out without touching Formik state.
       isJsonFormsInitialized.current = true;
       return;
     }
 
-    // Deep-equality guard: only update Formik if the data actually changed.
-    // This is a cheap safety net for any further re-renders that fire onChange
-    // with identical data (e.g. parent re-renders propagating down).
     if (
       JSON.stringify(data) !==
       JSON.stringify(datasourceEditorForm.values.datasourceOptions)
@@ -44,12 +39,24 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
     }
   }, [datasourceEditorForm]);
 
+  const handleUploadFile = useCallback(async (file) => {
+    return await uploadDatasourceFileAPI({ tenantID, file });
+  }, [tenantID]);
+
   // Reset the init flag whenever the datasource type changes so JsonForms
   // re-initialises cleanly for the new schema without polluting Formik state.
   const previousDatasourceType = useRef(datasourceEditorForm.values.datasourceType);
   if (previousDatasourceType.current !== datasourceEditorForm.values.datasourceType) {
     previousDatasourceType.current = datasourceEditorForm.values.datasourceType;
     isJsonFormsInitialized.current = false;
+
+    // Explicit type change - set default options for the new type
+    const config = getDatasourceTypeByValue(datasourceEditorForm.values.datasourceType);
+    if (config?.formConfig?.data) {
+      datasourceEditorForm.setFieldValue("datasourceOptions", config.formConfig.data);
+    } else {
+      datasourceEditorForm.setFieldValue("datasourceOptions", {});
+    }
   }
 
   const currentDatasourceType = getDatasourceTypeByValue(datasourceEditorForm.values.datasourceType);
@@ -110,7 +117,6 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
             )}
           </div>
 
-          {/* Show selected datasource with icon */}
           {currentDatasourceType && (
             <div className="flex items-center gap-2 p-2 bg-muted/20 rounded-sm border border-border">
               <DatasourceIcon
@@ -124,17 +130,18 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
             </div>
           )}
 
-          {/* JSON Forms for datasourceOptions */}
           {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType] && currentDatasourceType?.formConfig && (
             <div className="border-t border-border pt-4 mt-2">
-              <JsonForms
-                schema={currentDatasourceType.formConfig.schema}
-                uischema={currentDatasourceType.formConfig.uischema}
-                data={datasourceEditorForm.values.datasourceOptions}
-                renderers={[...materialRenderers, ...customJSONFormRenderers]}
-                cells={materialCells}
-                onChange={handleDatasourceOptionsChange}
-              />
+              <FileUploadContext.Provider value={{ uploadFile: handleUploadFile }}>
+                <JsonForms
+                  schema={currentDatasourceType.formConfig.schema}
+                  uischema={currentDatasourceType.formConfig.uischema}
+                  data={datasourceEditorForm.values.datasourceOptions}
+                  renderers={[...materialRenderers, ...customJSONFormRenderers]}
+                  cells={materialCells}
+                  onChange={handleDatasourceOptionsChange}
+                />
+              </FileUploadContext.Provider>
             </div>
           )}
         </div>

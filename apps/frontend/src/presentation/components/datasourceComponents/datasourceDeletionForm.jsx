@@ -29,9 +29,10 @@ export const DatasourceDeletionForm = ({ tenantID, datasourceID }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.DELETE_DATASOURCE_DELETION_SUCCESS);
-        queryClient.invalidateQueries([
-          CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
-        ]);
+        queryClient.invalidateQueries({
+          queryKey:
+          [CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID)],
+        });
         navigate(-1);
       },
       onError: (error) => {

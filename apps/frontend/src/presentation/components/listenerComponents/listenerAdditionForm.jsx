@@ -29,9 +29,10 @@ export const ListenerAdditionForm = ({ tenantID }) => {
     retry: false,
     onSuccess: (newListener) => {
       displaySuccess(CONSTANTS.STRINGS.LISTENER_ADDED_SUCCESS);
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID),
-      ]);
+      });
       if (newListener?.listenerID) {
         navigate(
           CONSTANTS.ROUTES.UPDATE_LISTENER_BY_ID.path(

@@ -15,10 +15,20 @@ import { PageHeader } from "@jet-admin/ui";
 import { WorkflowCloneForm } from "./workflowCloneForm";
 import { WorkflowDeletionForm } from "./workflowDeletionForm";
 
+const initialValues = {
+  title: "",
+  nodes: [],
+  edges: [],
+  workflowConfig: {},
+  workflowOptions: { inputDefinitions: [] },
+};
+
 export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
   WorkflowUpdationForm.propTypes = {
-    tenantID: PropTypes.string.isRequired,
-    workflowID: PropTypes.string.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    workflowID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -49,9 +59,10 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.UPDATE_WORKFLOW_FORM_WORKFLOW_UPDATION_SUCCESS);
-        queryClient.invalidateQueries([
+        queryClient.invalidateQueries({
+          queryKey:
           CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID),
-        ]);
+        });
       },
       onError: (error) => {
         displayError(error);
@@ -63,14 +74,14 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
 
 
   const workflowUpdationForm = useFormik({
-    initialValues: {
+    initialValues: workflow ? {
       tenantID,
-      title: workflow?.title || "",
-      nodes: workflow?.nodes || [],
-      edges: workflow?.edges || [],
-      workflowConfig: workflow?.workflowConfig || {},
-      workflowOptions: workflow?.workflowOptions || { inputDefinitions: [] },
-    },
+      title: workflow.title || "",
+      nodes: workflow.nodes || [],
+      edges: workflow.edges || [],
+      workflowConfig: workflow.workflowConfig || {},
+      workflowOptions: workflow.workflowOptions || { inputDefinitions: [] },
+    } : { ...initialValues, tenantID },
     validationSchema: formValidations.workflowUpdationFormValidationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {

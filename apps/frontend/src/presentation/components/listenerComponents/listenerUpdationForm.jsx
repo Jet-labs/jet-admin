@@ -7,6 +7,7 @@ import {
 } from "../../../data/apis/listener";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { CONSTANTS } from "../../../constants";
 import PropTypes from "prop-types";
 import { ListenerEditor } from "./listenerEditor";
@@ -24,6 +25,15 @@ import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { useNavigate } from "react-router-dom";
 import { ListenerActionManager } from "./listenerActionManager";
 
+const initialValues = {
+  listenerTitle: "",
+  listenerDescription: "",
+  datasourceID: undefined,
+  listenerType: "",
+  listenerConfig: {},
+  status: "inactive",
+};
+
 export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
   ListenerUpdationForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -36,8 +46,8 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
   const { showConfirmation } = useGlobalUI();
 
 
-  const { data: listener, isLoading: isLoadingListener } = useQuery({
-    queryKey: ["LISTENER_DETAIL", tenantID, listenerID],
+  const { data: listener, isLoading: isLoadingListener, error: listenerError } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), listenerID],
     queryFn: () => getListenerByIDAPI({ tenantID, listenerID }),
     refetchOnWindowFocus: false,
     enabled: Boolean(tenantID && listenerID),
@@ -56,14 +66,12 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.LISTENER_UPDATED_SUCCESS);
-        queryClient.invalidateQueries([
-          CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID),
-        ]);
-        queryClient.invalidateQueries([
-          "LISTENER_DETAIL",
-          tenantID,
-          listenerID,
-        ]);
+        queryClient.invalidateQueries({
+          queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID)],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), listenerID],
+        });
       },
       onError: (error) => {
         displayError(error);
@@ -73,27 +81,19 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
 
 
   const listenerUpdationForm = useFormik({
-    initialValues: {
-      listenerTitle: listener?.listenerTitle || "",
-      listenerDescription: listener?.listenerDescription || "",
-      datasourceID: listener?.datasourceID,
-      listenerType: listener?.listenerType || "",
-      listenerConfig: listener?.listenerConfig || {},
-      status: listener?.status || "inactive",
-    },
+    initialValues: listener ? {
+      listenerTitle: listener.listenerTitle || "",
+      listenerDescription: listener.listenerDescription || "",
+      datasourceID: listener.datasourceID,
+      listenerType: listener.listenerType || "",
+      listenerConfig: listener.listenerConfig || {},
+      status: listener.status || "inactive",
+    } : initialValues,
     enableReinitialize: true,
     onSubmit: (data) => {
       updateListener(data);
     },
   });
-
-  if (isLoadingListener) {
-    return (
-      <div className="flex h-full w-full items-center justify-center bg-background">
-        <Spinner size={24} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-full w-full flex-col items-center bg-background">
@@ -109,55 +109,60 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
         <ListenerCloneForm tenantID={tenantID} listenerID={listenerID} />
       </PageHeader>
 
-      <ResizablePanelGroup
-        direction="vertical"
-        autoSaveId="listener-updation-panel-layout"
-        className="!w-full !h-full"
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingListener}
+        error={listenerError}
       >
-        <ResizablePanel defaultSize={60} className="!overflow-y-auto h-full p-8"
+        <ResizablePanelGroup
+          direction="vertical"
+          autoSaveId="listener-updation-panel-layout"
+          className="!w-full !h-full"
         >
-          <div className="mx-auto w-full max-w-2xl">
-            <Tabs defaultValue="config" className="w-full">
-              <TabsList className="">
-                <TabsTrigger value="config">General Configuration</TabsTrigger>
-                <TabsTrigger value="actions">Pipeline Steps ({listener?.actions?.length || 0})</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="config">
-                <form
-                  id="listener-update-form"
-                  className="space-y-4 w-full"
-                  onSubmit={listenerUpdationForm.handleSubmit}
-                  noValidate
-                >
-                  <ListenerEditor listenerEditorForm={listenerUpdationForm} tenantID={tenantID} />
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="actions">
-                <ListenerActionManager 
-                  tenantID={tenantID} 
-                  listenerID={listenerID} 
-                  actions={listener?.actions || []} 
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle={true} />
-        <ResizablePanel defaultSize={40}>
-          <div className="h-full w-full">
-            <ListenerTestingForm
-              tenantID={tenantID}
-              listenerID={listenerID}
-              currentStatus={listenerUpdationForm.values.status}
-              onStatusChange={(newStatus) =>
-                listenerUpdationForm.setFieldValue("status", newStatus)
-              }
-            />
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+          <ResizablePanel defaultSize={60} className="!overflow-y-auto h-full p-8"
+          >
+            <div className="mx-auto w-full max-w-2xl">
+              <Tabs defaultValue="config" className="w-full">
+                <TabsList className="">
+                  <TabsTrigger value="config">General Configuration</TabsTrigger>
+                  <TabsTrigger value="actions">Pipeline Steps ({listener?.actions?.length || 0})</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="config">
+                  <form
+                    id="listener-update-form"
+                    className="space-y-4 w-full"
+                    onSubmit={listenerUpdationForm.handleSubmit}
+                    noValidate
+                  >
+                    <ListenerEditor listenerEditorForm={listenerUpdationForm} tenantID={tenantID} />
+                  </form>
+                </TabsContent>
+
+                <TabsContent value="actions">
+                  <ListenerActionManager
+                    tenantID={tenantID}
+                    listenerID={listenerID}
+                    actions={listener?.actions || []}
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle={true} />
+          <ResizablePanel defaultSize={40}>
+            <div className="h-full w-full">
+              <ListenerTestingForm
+                tenantID={tenantID}
+                listenerID={listenerID}
+                currentStatus={listenerUpdationForm.values.status}
+                onStatusChange={(newStatus) =>
+                  listenerUpdationForm.setFieldValue("status", newStatus)
+                }
+              />
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </ReactQueryLoadingErrorWrapper>
     </div>
   );
 };

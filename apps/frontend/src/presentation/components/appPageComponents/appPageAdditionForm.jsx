@@ -14,13 +14,21 @@ import { AppPageConsole } from "./appPageConsole";
 import { appendWidgetToAppPageConfig } from "./appPageLayoutUtils";
 import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { Undo } from "lucide-react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { AppPageRuntimeProvider } from "../../../logic/appPageRuntime/AppPageRuntimeProvider";
 import { AppPageDataSourceBootstrapper } from "./appPageDataSourceBootstrapper";
 
-import { PageHeader } from "@jet-admin/ui";
+import { PageHeader, Button } from "@jet-admin/ui";
+
+const initialAppPageConfig = {
+  widgets: [],
+  layouts: {},
+  dataSources: [],
+  variables: [],
+};
 
 export const AppPageAdditionForm = ({ tenantID }) => {
   AppPageAdditionForm.propTypes = {
@@ -40,25 +48,25 @@ export const AppPageAdditionForm = ({ tenantID }) => {
       displaySuccess(
         CONSTANTS.STRINGS.ADD_APP_PAGE_FORM_APP_PAGE_ADDITION_SUCCESS
       );
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID),
-      ]);
+      });
     },
     onError: (error) => {
       displayError(error);
     },
   });
 
+  const [history, setHistory] = useState([initialAppPageConfig]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const isUndoAction = useRef(false);
+
   const appPageAdditionForm = useFormik({
     initialValues: {
       appPageTitle: "",
       appPageDescription: "",
-      appPageConfig: {
-        widgets: [],
-        layouts: {},
-        dataSources: [],
-        variables: [],
-      },
+      appPageConfig: initialAppPageConfig,
       fetchedDataPreview: {},
     },
     validateOnMount: false,
@@ -69,20 +77,43 @@ export const AppPageAdditionForm = ({ tenantID }) => {
     },
   });
 
+  useEffect(() => {
+    if (isUndoAction.current) {
+      isUndoAction.current = false;
+      return;
+    }
+
+    if (history.length > 0 && appPageAdditionForm.values.appPageConfig) {
+      const currentConfig = appPageAdditionForm.values.appPageConfig;
+      const lastConfig = history[historyIndex];
+
+      if (JSON.stringify(currentConfig) !== JSON.stringify(lastConfig)) {
+        const newHistory = history.slice(0, historyIndex + 1);
+        newHistory.push(currentConfig);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+      }
+    }
+  }, [appPageAdditionForm.values.appPageConfig]);
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const prevConfig = history[historyIndex - 1];
+      isUndoAction.current = true;
+      appPageAdditionForm.setFieldValue("appPageConfig", prevConfig);
+      setHistoryIndex(historyIndex - 1);
+    }
+  };
+
   const handleAddWidgetToCanvas = (widgetID) => {
     const nextAppPageConfig = appendWidgetToAppPageConfig(
       appPageAdditionForm.values.appPageConfig,
       widgetID
     );
-
-    appPageAdditionForm.setFieldValue(
-      "appPageConfig.widgets",
-      nextAppPageConfig.widgets
-    );
-    appPageAdditionForm.setFieldValue(
-      "appPageConfig.layouts",
-      nextAppPageConfig.layouts
-    );
+    appPageAdditionForm.setFieldValue("appPageConfig", {
+      ...appPageAdditionForm.values.appPageConfig,
+      ...nextAppPageConfig,
+    });
   };
 
   return (
@@ -94,7 +125,24 @@ export const AppPageAdditionForm = ({ tenantID }) => {
           onSave={appPageAdditionForm.handleSubmit}
           isSaving={isAddingAppPage}
           saveText="Save"
-        />
+        >
+          {historyIndex > 0 && (
+            <div className="flex items-center gap-2 mr-2">
+              <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                {historyIndex} unsaved change{historyIndex > 1 ? "s" : ""}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleUndo}
+                title="Undo Last Change"
+              >
+                <Undo className="h-4 w-4 mr-1.5" />
+                Undo
+              </Button>
+            </div>
+          )}
+        </PageHeader>
         {appPageAdditionForm.values.appPageConfig ? (
           <AppPageRuntimeProvider
             pageID="new"

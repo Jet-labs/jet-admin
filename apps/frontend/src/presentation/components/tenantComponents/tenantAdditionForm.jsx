@@ -21,7 +21,7 @@ export const TenantAdditionForm = () => {
       onSuccess: (tenant) => {
         saveTenantLocallyAndReload(tenant);
         displaySuccess(CONSTANTS.STRINGS.ADD_TENANT_SUCCESS_TOAST);
-        queryClient.invalidateQueries([CONSTANTS.REACT_QUERY_KEYS.TENANTS]);
+        queryClient.invalidateQueries({ queryKey: CONSTANTS.REACT_QUERY_KEYS.TENANTS });
       },
       onError: (error) => {
         displayError(error);

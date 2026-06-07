@@ -3565,6 +3565,116 @@ var SyslogDataSource = class extends DataSource {
   }
 };
 
+// src/data-sources/excelcsv/datasource.js
+var import_exceljs = __toESM(require("exceljs"));
+var import_axios3 = __toESM(require("axios"));
+var parseCache = /* @__PURE__ */ new Map();
+var CACHE_TTL_MS = 5 * 60 * 1e3;
+var ExcelCSVDataSource = class extends DataSource {
+  async execute(dataQueryOptions2, context) {
+    Logger.log("info", {
+      message: "excelcsv:ExcelCSVDataSource:execute:params",
+      params: { dataQueryOptions: dataQueryOptions2 }
+    });
+    const {
+      sheetName,
+      headerRow = 1,
+      range,
+      limit
+    } = dataQueryOptions2 || {};
+    const fileInfo = this.config.datasourceOptions?.fileInfo || {};
+    const fileUrl = this.config.datasourceOptions?.fileUrl || fileInfo.fileUrl;
+    const fileType = this.config.datasourceOptions?.fileType || fileInfo.fileType;
+    if (!fileUrl) {
+      throw new Error("No Excel or CSV file URL configured for this data source.");
+    }
+    const targetHeaderRow = parseInt(headerRow, 10) || 1;
+    const cacheKey = `${fileUrl}|${sheetName || ""}|${targetHeaderRow}|${range || ""}|${limit || ""}`;
+    const cachedEntry = parseCache.get(cacheKey);
+    if (cachedEntry && Date.now() - cachedEntry.timestamp < CACHE_TTL_MS) {
+      Logger.log("info", {
+        message: "excelcsv:ExcelCSVDataSource:execute:cacheHit",
+        params: { fileUrl }
+      });
+      return cachedEntry.data;
+    }
+    try {
+      const response = await import_axios3.default.get(fileUrl, { responseType: "arraybuffer" });
+      const buffer = Buffer.from(response.data);
+      const workbook = new import_exceljs.default.Workbook();
+      const isCsv = fileUrl.toLowerCase().split("?")[0].endsWith(".csv") || fileType && fileType.includes("csv");
+      if (isCsv) {
+        const { Readable } = await import("stream");
+        const stream = Readable.from(buffer);
+        await workbook.csv.read(stream);
+      } else {
+        await workbook.xlsx.load(buffer);
+      }
+      const worksheet = sheetName ? workbook.getWorksheet(sheetName) : workbook.worksheets[0];
+      if (!worksheet) {
+        throw new Error(`Worksheet "${sheetName || 0}" not found in the spreadsheet.`);
+      }
+      const headerRowObj = worksheet.getRow(targetHeaderRow);
+      const headers = [];
+      headerRowObj.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        const val = cell.value;
+        if (val !== null && val !== void 0) {
+          headers[colNumber] = String(val).trim();
+        } else {
+          headers[colNumber] = `Column_${colNumber}`;
+        }
+      });
+      const data = [];
+      worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+        if (rowNumber <= targetHeaderRow) return;
+        if (range) {
+          const match = range.match(/\d+/g);
+          if (match && match.length >= 2) {
+            const endRow = parseInt(match[1], 10);
+            if (rowNumber > endRow) return;
+          }
+        }
+        const rowData = {};
+        let hasValues = false;
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          const header = headers[colNumber] || `Column_${colNumber}`;
+          let cellValue = cell.value;
+          if (cellValue && typeof cellValue === "object") {
+            if (cellValue.result !== void 0) {
+              cellValue = cellValue.result;
+            } else if (cellValue.text !== void 0) {
+              cellValue = cellValue.text;
+            } else if (Array.isArray(cellValue.richText)) {
+              cellValue = cellValue.richText.map((t) => t.text).join("");
+            }
+          }
+          if (cellValue !== null && cellValue !== void 0) {
+            rowData[header] = cellValue;
+            hasValues = true;
+          } else {
+            rowData[header] = null;
+          }
+        });
+        if (hasValues) {
+          data.push(rowData);
+        }
+      });
+      const finalResult = limit ? data.slice(0, parseInt(limit, 10)) : data;
+      parseCache.set(cacheKey, {
+        timestamp: Date.now(),
+        data: finalResult
+      });
+      return finalResult;
+    } catch (err) {
+      Logger.log("error", {
+        message: "excelcsv:ExcelCSVDataSource:execute:error",
+        params: { error: err.message || err }
+      });
+      throw new Error(`Failed to execute Excel/CSV query: ${err.message || err}`);
+    }
+  }
+};
+
 // src/data-sources/index.js
 var dataSources = {
   postgresql: PostgreSQLDataSource,
@@ -3598,7 +3708,8 @@ var dataSources = {
   jira: JiraDataSource,
   googleanalytics: GoogleAnalyticsDataSource,
   // Listeners
-  syslog: SyslogDataSource
+  syslog: SyslogDataSource,
+  excelcsv: ExcelCSVDataSource
 };
 var data_sources_default = {
   getDataSource(type) {
@@ -4082,7 +4193,7 @@ var googlesheetsTestConnection = async ({ datasourceOptions }) => {
 };
 
 // src/data-sources/graphql/connection.js
-var import_axios3 = __toESM(require("axios"));
+var import_axios4 = __toESM(require("axios"));
 var graphqlTestConnection = async ({ datasourceOptions }) => {
   try {
     Logger.log("info", {
@@ -4128,7 +4239,7 @@ var graphqlTestConnection = async ({ datasourceOptions }) => {
         }
       }
     `;
-    const response = await (0, import_axios3.default)({
+    const response = await (0, import_axios4.default)({
       method: "POST",
       url: endpoint,
       headers,
@@ -4742,6 +4853,65 @@ var googleanalyticsTestConnection = async ({ datasourceOptions }) => {
 // src/data-sources/syslog/connection.js
 var syslogTestConnection = async ({ datasourceOptions }) => {
   return { success: true };
+};
+
+// src/data-sources/excelcsv/connection.js
+var import_axios5 = __toESM(require("axios"));
+var excelcsvTestConnection = async ({ datasourceOptions }) => {
+  const fileInfo = datasourceOptions?.fileInfo || {};
+  const fileUrl = datasourceOptions?.fileUrl || fileInfo.fileUrl;
+  const fileName = datasourceOptions?.fileName || fileInfo.fileName;
+  try {
+    Logger.log("info", {
+      message: "excelcsv:excelcsvTestConnection:params",
+      params: datasourceOptions
+    });
+    if (!fileUrl) {
+      return {
+        ok: false,
+        error: "File URL is required. Please upload a file first."
+      };
+    }
+    const response = await import_axios5.default.head(fileUrl, { timeout: 5e3 });
+    if (response.status >= 200 && response.status < 300) {
+      return {
+        ok: true,
+        statusText: `Successfully reached file: ${fileName || "uploaded file"}`
+      };
+    } else {
+      return {
+        ok: false,
+        error: `Failed to reach file. HTTP Status: ${response.status}`
+      };
+    }
+  } catch (err) {
+    Logger.log("error", {
+      message: "excelcsv:excelcsvTestConnection:catch",
+      params: err.message || err
+    });
+    try {
+      const response = await import_axios5.default.get(fileUrl, {
+        headers: { Range: "bytes=0-0" },
+        // lightweight byte-range query
+        timeout: 5e3
+      });
+      if (response.status >= 200 && response.status < 300) {
+        return {
+          ok: true,
+          statusText: `Successfully reached file: ${fileName || "uploaded file"}`
+        };
+      }
+    } catch (innerErr) {
+      return {
+        ok: false,
+        error: `Could not reach file URL: ${err.message || err}`
+      };
+    }
+    return {
+      ok: false,
+      error: `Could not reach file URL: ${err.message || err}`
+    };
+  }
 };
 
 // src/data-sources/manifests.js
@@ -5699,6 +5869,12 @@ var DATASOURCE_LOGIC_COMPONENTS = {
       return await syslogTestConnection({ datasourceOptions });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("syslog")
+  },
+  [import_datasource_types.DATASOURCE_TYPES.EXCELCSV.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await excelcsvTestConnection({ datasourceOptions });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("excelcsv")
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

@@ -354,6 +354,7 @@ var DATASOURCE_UI_COMPONENTS = {
   [import_datasource_types.DATASOURCE_TYPES.WEBSOCKET.value]: createGenericDatasourceUI(),
   [import_datasource_types.DATASOURCE_TYPES.SSE.value]: createGenericDatasourceUI(),
   [import_datasource_types.DATASOURCE_TYPES.SYSLOG.value]: createGenericDatasourceUI(),
-  [import_datasource_types.DATASOURCE_TYPES.NATS.value]: createGenericDatasourceUI()
+  [import_datasource_types.DATASOURCE_TYPES.NATS.value]: createGenericDatasourceUI(),
+  [import_datasource_types.DATASOURCE_TYPES.EXCELCSV.value]: createGenericDatasourceUI()
 };
 //# sourceMappingURL=index.cjs.map

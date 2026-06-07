@@ -39,6 +39,8 @@ import { googleanalyticsTestConnection } from "./data-sources/googleanalytics/co
 // Listeners
 import { syslogTestConnection } from "./data-sources/syslog/connection";
 
+import { excelcsvTestConnection } from "./data-sources/excelcsv/connection";
+
 // AI Agent — Datasource manifest registry
 import { getManifestForType } from "./data-sources/manifests";
 
@@ -244,5 +246,11 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
       return await syslogTestConnection({ datasourceOptions });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("syslog"),
+  },
+  [DATASOURCE_TYPES.EXCELCSV.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await excelcsvTestConnection({ datasourceOptions });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("excelcsv"),
   },
 };

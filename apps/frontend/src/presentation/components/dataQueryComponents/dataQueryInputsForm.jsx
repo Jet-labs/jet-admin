@@ -106,30 +106,13 @@ export const DataQueryInputsForm = ({
         }
       })
     ),
+    enableReinitialize: true,
     validateOnMount: false,
     validateOnChange: false,
     validationSchema:
       formValidations.dataQueryInputsFormValidationSchema(inputDefinitions),
     onSubmit: () => {},
   });
-
-  useEffect(() => {
-    if (dataQueryInputsForm && inputDefinitions) {
-      inputDefinitions.forEach((inputDef) => {
-        const type = inputDef.type || "string";
-        switch (type) {
-          case "boolean":
-            dataQueryInputsForm.setFieldValue(inputDef.key, false);
-            break;
-          case "array":
-            dataQueryInputsForm.setFieldValue(inputDef.key, []);
-            break;
-          default:
-            dataQueryInputsForm.setFieldValue(inputDef.key, "");
-        }
-      });
-    }
-  }, [inputDefinitions]);
 
   const handleAccepted = useCallback(() => {
     const parsedValues = parseFormValues(inputDefinitions, dataQueryInputsForm.values);

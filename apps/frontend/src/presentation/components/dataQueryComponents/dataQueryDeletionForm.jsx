@@ -29,9 +29,10 @@ export const DataQueryDeletionForm = ({ tenantID, dataQueryID }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.DELETE_QUERY_DELETION_SUCCESS);
-        queryClient.invalidateQueries([
+        queryClient.invalidateQueries({
+          queryKey:
           CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
-        ]);
+        });
         navigate(-1);
       },
       onError: (error) => {

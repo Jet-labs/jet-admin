@@ -28,6 +28,7 @@ import {
   SiSupabase,
   SiTwilio
 } from "react-icons/si";
+import { FaFileExcel } from "react-icons/fa";
 import { TbApi, TbDatabase, TbWorldWww } from "react-icons/tb";
 
 /**
@@ -42,6 +43,7 @@ const ICON_MAP = {
   SiGraphql,
   SiRabbitmq,
   SiApachekafka,
+  FaFileExcel,
   SiRedis,
   SiMicrosoftsqlserver: DiMsqlServer,
   SiSupabase,

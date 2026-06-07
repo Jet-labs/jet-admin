@@ -21,8 +21,9 @@ export const DataQueryTestingForm = ({
   size = "sm"
 }) => {
   DataQueryTestingForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    dataQueryID: PropTypes.number,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    dataQueryID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     setDataQueryTestResult: PropTypes.func.isRequired,
     datasourceID: PropTypes.string,
     datasourceType: PropTypes.string,

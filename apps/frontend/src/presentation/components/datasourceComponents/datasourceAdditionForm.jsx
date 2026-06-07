@@ -44,9 +44,10 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
       displaySuccess(
         CONSTANTS.STRINGS.ADD_DATASOURCE_FORM_DATASOURCE_ADDITION_SUCCESS
       );
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID),
-      ]);
+      queryClient.invalidateQueries({
+        queryKey:
+        [CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID)],
+      });
     },
     onError: (error) => {
       displayError(error);
@@ -58,7 +59,7 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
       datasourceTitle: "",
       datasourceDescription: "",
       datasourceType: DATASOURCE_TYPES.POSTGRESQL.value, // Default value
-      datasourceOptions: datasourceOptionsMetadata.initialData, // Initialize nested object
+      datasourceOptions: datasourceOptionsMetadata.data, // Initialize nested object
     },
     onSubmit: (data) => {
       addDatasource(data);

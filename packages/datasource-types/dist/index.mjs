@@ -7357,8 +7357,145 @@ var queryConfig_default28 = {
   }
 };
 
-// src/webhook/formConfig.json
+// src/excelcsv/formConfig.json
 var formConfig_default29 = {
+  schema: {
+    type: "object",
+    properties: {
+      fileInfo: {
+        type: "object",
+        format: "file",
+        description: "Upload excel/csv data source",
+        properties: {
+          fileUrl: {
+            type: "string"
+          },
+          filePath: {
+            type: "string"
+          },
+          fileName: {
+            type: "string"
+          },
+          fileSize: {
+            type: "number"
+          },
+          fileType: {
+            type: "string"
+          }
+        },
+        required: ["fileUrl"]
+      }
+    },
+    required: ["fileInfo"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/fileInfo",
+        label: "Datasource File"
+      }
+    ]
+  },
+  data: {
+    fileInfo: null
+  }
+};
+
+// src/excelcsv/queryConfig.json
+var queryConfig_default29 = {
+  schema: {
+    type: "object",
+    properties: {
+      sheetName: {
+        type: "string",
+        description: "Name of the worksheet tab to read (Excel only, defaults to first sheet)"
+      },
+      headerRow: {
+        type: "integer",
+        description: "1-based row index for headers (defaults to 1)",
+        default: 1
+      },
+      range: {
+        type: "string",
+        description: "Range in A1 notation (e.g. A1:D50, optional)"
+      },
+      limit: {
+        type: "integer",
+        description: "Limit the number of records returned (optional)"
+      },
+      inputDefinitions: {
+        type: "array",
+        description: "Dynamic query arguments",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            type: {
+              type: "string",
+              enum: ["string", "number", "boolean"],
+              default: "string"
+            }
+          },
+          required: ["key", "type"]
+        }
+      }
+    }
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "HorizontalLayout",
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/sheetName",
+            label: "Sheet Name (Excel only)"
+          },
+          {
+            type: "Control",
+            scope: "#/properties/headerRow",
+            label: "Header Row Index"
+          }
+        ]
+      },
+      {
+        type: "HorizontalLayout",
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/range",
+            label: "Cell Range (optional, e.g. A1:Z100)"
+          },
+          {
+            type: "Control",
+            scope: "#/properties/limit",
+            label: "Row Limit"
+          }
+        ]
+      },
+      {
+        type: "Control",
+        scope: "#/properties/inputDefinitions",
+        label: "Dynamic Arguments"
+      }
+    ]
+  },
+  data: {
+    sheetName: "",
+    headerRow: 1,
+    range: "",
+    limit: 100,
+    inputDefinitions: []
+  }
+};
+
+// src/webhook/formConfig.json
+var formConfig_default30 = {
   schema: {
     type: "object",
     properties: {
@@ -7431,7 +7568,7 @@ var formConfig_default29 = {
 };
 
 // src/webhook/queryConfig.json
-var queryConfig_default29 = {
+var queryConfig_default30 = {
   schema: {
     type: "object",
     properties: {
@@ -7496,7 +7633,7 @@ var listenerConfig_default8 = {
 };
 
 // src/mqtt/formConfig.json
-var formConfig_default30 = {
+var formConfig_default31 = {
   schema: {
     type: "object",
     properties: {
@@ -7532,7 +7669,7 @@ var formConfig_default30 = {
 };
 
 // src/mqtt/queryConfig.json
-var queryConfig_default30 = {
+var queryConfig_default31 = {
   schema: {
     type: "object",
     properties: {
@@ -7579,7 +7716,7 @@ var listenerConfig_default9 = {
 };
 
 // src/websocket/formConfig.json
-var formConfig_default31 = {
+var formConfig_default32 = {
   schema: {
     type: "object",
     properties: {
@@ -7607,7 +7744,7 @@ var formConfig_default31 = {
 };
 
 // src/websocket/queryConfig.json
-var queryConfig_default31 = {
+var queryConfig_default32 = {
   schema: {
     type: "object",
     properties: {
@@ -7645,7 +7782,7 @@ var listenerConfig_default10 = {
 };
 
 // src/sse/formConfig.json
-var formConfig_default32 = {
+var formConfig_default33 = {
   schema: {
     type: "object",
     properties: {
@@ -7667,7 +7804,7 @@ var formConfig_default32 = {
 };
 
 // src/sse/queryConfig.json
-var queryConfig_default32 = {
+var queryConfig_default33 = {
   schema: { type: "object", properties: {} },
   uischema: { type: "VerticalLayout", elements: [] },
   data: {}
@@ -7693,7 +7830,7 @@ var listenerConfig_default11 = {
 };
 
 // src/syslog/formConfig.json
-var formConfig_default33 = {
+var formConfig_default34 = {
   schema: {
     type: "object",
     properties: {
@@ -7719,7 +7856,7 @@ var formConfig_default33 = {
 };
 
 // src/syslog/queryConfig.json
-var queryConfig_default33 = {
+var queryConfig_default34 = {
   schema: {
     type: "object",
     properties: {
@@ -7774,7 +7911,7 @@ var listenerConfig_default12 = {
 };
 
 // src/nats/formConfig.json
-var formConfig_default34 = {
+var formConfig_default35 = {
   schema: {
     type: "object",
     properties: {
@@ -7806,7 +7943,7 @@ var formConfig_default34 = {
 };
 
 // src/nats/queryConfig.json
-var queryConfig_default34 = {
+var queryConfig_default35 = {
   schema: {
     type: "object",
     properties: {
@@ -8097,8 +8234,8 @@ var DATASOURCE_TYPES = {
     value: "webhook",
     icon: "TbWebhook",
     iconColor: "#8B5CF6",
-    formConfig: formConfig_default29,
-    queryConfigForm: queryConfig_default29,
+    formConfig: formConfig_default30,
+    queryConfigForm: queryConfig_default30,
     listenerConfigForm: listenerConfig_default8,
     supportsListener: true
   },
@@ -8107,8 +8244,8 @@ var DATASOURCE_TYPES = {
     value: "mqtt",
     icon: "SiMqtt",
     iconColor: "#660066",
-    formConfig: formConfig_default30,
-    queryConfigForm: queryConfig_default30,
+    formConfig: formConfig_default31,
+    queryConfigForm: queryConfig_default31,
     listenerConfigForm: listenerConfig_default9,
     supportsListener: true
   },
@@ -8117,8 +8254,8 @@ var DATASOURCE_TYPES = {
     value: "websocket",
     icon: "TbPlugConnected",
     iconColor: "#06B6D4",
-    formConfig: formConfig_default31,
-    queryConfigForm: queryConfig_default31,
+    formConfig: formConfig_default32,
+    queryConfigForm: queryConfig_default32,
     listenerConfigForm: listenerConfig_default10,
     supportsListener: true
   },
@@ -8127,8 +8264,8 @@ var DATASOURCE_TYPES = {
     value: "sse",
     icon: "TbArrowBigDownLines",
     iconColor: "#F59E0B",
-    formConfig: formConfig_default32,
-    queryConfigForm: queryConfig_default32,
+    formConfig: formConfig_default33,
+    queryConfigForm: queryConfig_default33,
     listenerConfigForm: listenerConfig_default11,
     supportsListener: true
   },
@@ -8137,8 +8274,8 @@ var DATASOURCE_TYPES = {
     value: "syslog",
     icon: "TbFileText",
     iconColor: "#64748B",
-    formConfig: formConfig_default33,
-    queryConfigForm: queryConfig_default33,
+    formConfig: formConfig_default34,
+    queryConfigForm: queryConfig_default34,
     listenerConfigForm: listenerConfig_default12,
     supportsListener: true
   },
@@ -8147,10 +8284,19 @@ var DATASOURCE_TYPES = {
     value: "nats",
     icon: "SiNatsdotio",
     iconColor: "#27AAE1",
-    formConfig: formConfig_default34,
-    queryConfigForm: queryConfig_default34,
+    formConfig: formConfig_default35,
+    queryConfigForm: queryConfig_default35,
     listenerConfigForm: listenerConfig_default13,
     supportsListener: true
+  },
+  EXCELCSV: {
+    name: "Excel & CSV",
+    value: "excelcsv",
+    icon: "FaFileExcel",
+    iconColor: "#107c41",
+    formConfig: formConfig_default29,
+    queryConfigForm: queryConfig_default29,
+    supportsListener: false
   }
 };
 var getDatasourceTypeByValue = (value) => {

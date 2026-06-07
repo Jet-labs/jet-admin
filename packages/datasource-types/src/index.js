@@ -91,6 +91,9 @@ import jiraQueryConfigForm from "./jira/queryConfig.json";
 import googleanalyticsFormConfig from "./googleanalytics/formConfig.json";
 import googleanalyticsQueryConfigForm from "./googleanalytics/queryConfig.json";
 
+import excelcsvFormConfig from "./excelcsv/formConfig.json";
+import excelcsvQueryConfigForm from "./excelcsv/queryConfig.json";
+
 // Listener-capable datasource types
 import webhookFormConfig from "./webhook/formConfig.json";
 import webhookQueryConfigForm from "./webhook/queryConfig.json";
@@ -419,6 +422,15 @@ export const DATASOURCE_TYPES = {
     queryConfigForm: natsQueryConfigForm,
     listenerConfigForm: natsListenerConfigForm,
     supportsListener: true,
+  },
+  EXCELCSV: {
+    name: "Excel & CSV",
+    value: "excelcsv",
+    icon: "FaFileExcel",
+    iconColor: "#107c41",
+    formConfig: excelcsvFormConfig,
+    queryConfigForm: excelcsvQueryConfigForm,
+    supportsListener: false,
   },
 };
 

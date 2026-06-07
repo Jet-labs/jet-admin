@@ -8,8 +8,7 @@ import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { WIDGET_PROCESSORS_MAP } from "@jet-admin/widgets-logic";
 import { WidgetAdvancedOptions } from "./widgetAdvancedOptions";
 import { useWorkflows } from "../../../logic/hooks/useWorkflows";
-import { useDataQueries } from "../../../logic/hooks/useDataQueries";
-
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import {
   Checkbox,
   Input,
@@ -51,7 +50,7 @@ export const WidgetConfigEditor = ({
   const dataManifest = builder?.constructor?.dataManifest;
 
   // Fetch workflows list so chart editors can resolve workflow metadata
-  const { workflows } = useWorkflows(tenantID);
+  const { workflows, isLoadingWorkflows, loadWorkflowsError } = useWorkflows(tenantID);
 
   // Extract all referenced page-level data sources from the widget config
   const referencedDataSources = React.useMemo(() => {
@@ -79,6 +78,10 @@ export const WidgetConfigEditor = ({
   const previewStateTree = dataSourceResults;
 
   return (
+    <ReactQueryLoadingErrorWrapper
+      isLoading={isLoadingWorkflows}
+      error={loadWorkflowsError}
+    >
     <div className="flex w-full flex-col gap-3">
       {/* Widget Name */}
       <div className="space-y-1.5">
@@ -207,5 +210,6 @@ export const WidgetConfigEditor = ({
         </TabsContent>
       </Tabs>
     </div>
+    </ReactQueryLoadingErrorWrapper>
   );
 };

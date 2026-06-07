@@ -31,9 +31,10 @@ export const AppPageDeletionForm = ({ tenantID, appPageID }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.DELETE_APP_PAGE_DELETION_SUCCESS);
-        queryClient.invalidateQueries([
+        queryClient.invalidateQueries({
+          queryKey:
           CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID),
-        ]);
+        });
         navigate(-1);
       },
       onError: (error) => {

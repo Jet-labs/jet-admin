@@ -35,6 +35,7 @@ __export(index_exports, {
   CustomCodePgsqlControl: () => CustomCodeEditorControl,
   CustomDynamicKeyValueInputRenderer: () => CustomDynamicKeyValueInputRenderer,
   CustomFieldOperatorValueArrayRenderer: () => CustomFieldOperatorValueArrayRenderer,
+  CustomFileUploadInput: () => CustomFileUploadInput,
   CustomGenericObjectArrayRenderer: () => CustomGenericObjectArrayRenderer,
   CustomGroupLayout: () => CustomGroupLayout,
   CustomHorizontalLayout: () => CustomHorizontalLayout,
@@ -49,12 +50,14 @@ __export(index_exports, {
   CustomTabRenderer: () => CustomTabRenderer,
   CustomTextInput: () => CustomTextInput,
   CustomVerticalLayout: () => CustomVerticalLayout,
+  FileUploadContext: () => FileUploadContext,
   JetCheckboxControl: () => JetCheckboxControl,
   JetCodeEditorControl: () => JetCodeEditorControl,
   JetCodeJavascriptControl: () => JetCodeEditorControl,
   JetCodePgsqlControl: () => JetCodeEditorControl,
   JetCustomDynamicKeyValueInputRenderer: () => JetCustomDynamicKeyValueInputRenderer,
   JetFieldOperatorValueArrayControl: () => JetFieldOperatorValueArrayControl,
+  JetFileUploadControl: () => JetFileUploadControl,
   JetGenericObjectArrayControl: () => JetGenericObjectArrayControl,
   JetGroupLayout: () => JetGroupLayout,
   JetHorizontalLayout: () => JetHorizontalLayout,
@@ -75,6 +78,7 @@ __export(index_exports, {
   codePgsqlTester: () => codeEditorTester,
   dynamicKeyValueInputTester: () => dynamicKeyValueInputTester,
   fieldOperatorValueArrayTester: () => fieldOperatorValueArrayTester,
+  fileUploadTester: () => fileUploadTester,
   genericObjectArrayTester: () => genericObjectArrayTester,
   groupLayoutTester: () => groupLayoutTester,
   jetFormsBaseRenderers: () => jetFormsBaseRenderers,
@@ -94,7 +98,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/renderers/index.js
-var import_react27 = require("@jsonforms/react");
+var import_react29 = require("@jsonforms/react");
 
 // src/renderers/CustomNumberInput.jsx
 var import_react = __toESM(require("react"));
@@ -1319,25 +1323,181 @@ CustomHorizontalLayout.propTypes = {
   cells: import_prop_types18.default.arrayOf(import_prop_types18.default.object)
 };
 
+// src/renderers/CustomFileUploadInput.jsx
+var import_react28 = __toESM(require("react"));
+var import_prop_types19 = __toESM(require("prop-types"));
+var import_lucide_react8 = require("lucide-react");
+var import_ui16 = require("@jet-admin/ui");
+
+// src/context.js
+var import_react27 = __toESM(require("react"));
+var FileUploadContext = import_react27.default.createContext({
+  uploadFile: async (file) => {
+    throw new Error("No upload handler provided");
+  }
+});
+
+// src/renderers/CustomFileUploadInput.jsx
+var CustomFileUploadInput = (props) => {
+  const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
+  const { uploadFile } = (0, import_react28.useContext)(FileUploadContext);
+  const [isUploading, setIsUploading] = (0, import_react28.useState)(false);
+  const [dragActive, setDragActive] = (0, import_react28.useState)(false);
+  const [errorMsg, setErrorMsg] = (0, import_react28.useState)("");
+  const isDisabled = enabled === false;
+  const hasErrors = errors && errors.length > 0 || !!errorMsg;
+  const fileOptions = data || {};
+  const { fileUrl, fileName, fileSize, fileType } = fileOptions;
+  const handleUpload = async (file) => {
+    if (!file) return;
+    setErrorMsg("");
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMsg("File size exceeds 10MB limit.");
+      return;
+    }
+    const fileExt = file.name.split(".").pop().toLowerCase();
+    if (!["csv", "xlsx", "xls"].includes(fileExt)) {
+      setErrorMsg("Invalid file type. Please upload a CSV, XLSX, or XLS file.");
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const response = await uploadFile(file);
+      handleChange(path, {
+        fileUrl: response.url,
+        filePath: response.filePath,
+        fileName: response.fileName,
+        fileSize: response.fileSize,
+        fileType: response.fileType
+      });
+    } catch (err) {
+      setErrorMsg(err.message || err || "Failed to upload file.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleUpload(e.dataTransfer.files[0]);
+    }
+  };
+  const handleChangeInput = (e) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      handleUpload(e.target.files[0]);
+    }
+  };
+  const handleRemove = () => {
+    handleChange(path, {
+      fileUrl: "",
+      filePath: "",
+      fileName: "",
+      fileSize: 0,
+      fileType: ""
+    });
+  };
+  const formatBytes = (bytes) => {
+    if (!bytes) return "0 Bytes";
+    const k = 1024;
+    const dm = 2;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+  };
+  return /* @__PURE__ */ import_react28.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react28.default.createElement(
+    import_ui16.Label,
+    {
+      htmlFor: path,
+      className: `block text-xs font-medium ${hasErrors ? "text-destructive" : "text-muted-foreground"}`
+    },
+    label || description || "Upload File",
+    " ",
+    /* @__PURE__ */ import_react28.default.createElement("span", { className: "text-destructive" }, "*")
+  ), fileUrl ? /* @__PURE__ */ import_react28.default.createElement("div", { className: "flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-md" }, /* @__PURE__ */ import_react28.default.createElement("div", { className: "flex items-center gap-3 overflow-hidden" }, /* @__PURE__ */ import_react28.default.createElement("div", { className: "p-2 bg-primary/10 rounded-md text-primary" }, /* @__PURE__ */ import_react28.default.createElement(import_lucide_react8.FileSpreadsheet, { className: "h-5 w-5" })), /* @__PURE__ */ import_react28.default.createElement("div", { className: "overflow-hidden" }, /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-sm font-medium text-foreground truncate max-w-sm" }, fileName || "Uploaded File"), /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-xs text-muted-foreground" }, formatBytes(fileSize), " \u2022 ", fileType || "Spreadsheet"))), /* @__PURE__ */ import_react28.default.createElement(
+    import_ui16.Button,
+    {
+      type: "button",
+      variant: "destructive",
+      size: "sm",
+      onClick: handleRemove,
+      disabled: isDisabled,
+      className: "flex items-center gap-1.5 shrink-0"
+    },
+    /* @__PURE__ */ import_react28.default.createElement(import_lucide_react8.Trash2, { className: "h-3 w-3" }),
+    "Remove"
+  )) : /* @__PURE__ */ import_react28.default.createElement(
+    "div",
+    {
+      onDragEnter: handleDrag,
+      onDragOver: handleDrag,
+      onDragLeave: handleDrag,
+      onDrop: handleDrop,
+      className: `relative flex flex-col items-center justify-center p-6 border border-dashed rounded-md transition-colors ${dragActive ? "border-primary bg-primary/5" : "border-border bg-background hover:border-muted-foreground/50 hover:bg-muted/50"}`
+    },
+    /* @__PURE__ */ import_react28.default.createElement(
+      "input",
+      {
+        type: "file",
+        id: `file-upload-${path}`,
+        className: "hidden",
+        accept: ".csv, .xlsx, .xls",
+        onChange: handleChangeInput,
+        disabled: isUploading || isDisabled
+      }
+    ),
+    /* @__PURE__ */ import_react28.default.createElement(
+      "label",
+      {
+        htmlFor: `file-upload-${path}`,
+        className: "flex flex-col items-center justify-center cursor-pointer space-y-3 w-full h-full"
+      },
+      isUploading ? /* @__PURE__ */ import_react28.default.createElement("div", { className: "flex flex-col items-center space-y-2" }, /* @__PURE__ */ import_react28.default.createElement("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-primary" }), /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-sm font-medium text-muted-foreground" }, "Uploading file\u2026")) : /* @__PURE__ */ import_react28.default.createElement(import_react28.default.Fragment, null, /* @__PURE__ */ import_react28.default.createElement("div", { className: "p-3 bg-primary/10 text-primary rounded-lg" }, /* @__PURE__ */ import_react28.default.createElement(import_lucide_react8.CloudUpload, { className: "h-6 w-6" })), /* @__PURE__ */ import_react28.default.createElement("div", { className: "text-center" }, /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-sm font-medium text-foreground" }, "Click to upload or drag & drop"), /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-xs text-muted-foreground mt-1" }, "Excel (.xlsx, .xls) or CSV up to 10MB")))
+    )
+  ), (errors?.length > 0 || errorMsg) && /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-xs text-destructive mt-1 flex items-center gap-1" }, /* @__PURE__ */ import_react28.default.createElement(import_lucide_react8.AlertCircle, { className: "h-3 w-3" }), errorMsg || errors));
+};
+CustomFileUploadInput.propTypes = {
+  data: import_prop_types19.default.object,
+  path: import_prop_types19.default.string.isRequired,
+  handleChange: import_prop_types19.default.func.isRequired,
+  label: import_prop_types19.default.string,
+  description: import_prop_types19.default.string,
+  errors: import_prop_types19.default.arrayOf(import_prop_types19.default.string),
+  uischema: import_prop_types19.default.object.isRequired,
+  enabled: import_prop_types19.default.bool
+};
+
 // src/renderers/index.js
-var JetNumberControl = (0, import_react27.withJsonFormsControlProps)(CustomNumberInput);
-var JetTextControl = (0, import_react27.withJsonFormsControlProps)(CustomTextInput);
-var JetSelectControl = (0, import_react27.withJsonFormsControlProps)(CustomSelectInput);
-var JetCheckboxControl = (0, import_react27.withJsonFormsControlProps)(CustomCheckboxInput);
-var JetCodeEditorControl = (0, import_react27.withJsonFormsControlProps)(CustomCodeEditorControl);
-var JetSuggestionControl = (0, import_react27.withJsonFormsControlProps)(CustomSuggestionInput);
-var JetCustomDynamicKeyValueInputRenderer = (0, import_react27.withJsonFormsControlProps)(CustomDynamicKeyValueInputRenderer);
-var JetKeyValueArrayControl = (0, import_react27.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
-var JetKeyValueTypeArrayControl = (0, import_react27.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
-var JetKeyTypeArrayControl = (0, import_react27.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
-var JetStringArrayControl = (0, import_react27.withJsonFormsControlProps)(CustomStringArrayRenderer);
-var JetFieldOperatorValueArrayControl = (0, import_react27.withJsonFormsControlProps)(CustomFieldOperatorValueArrayRenderer);
-var JetGenericObjectArrayControl = (0, import_react27.withJsonFormsControlProps)(CustomGenericObjectArrayRenderer);
-var JetGroupLayout = (0, import_react27.withJsonFormsLayoutProps)(CustomGroupLayout);
-var JetRadioControl = (0, import_react27.withJsonFormsControlProps)(CustomRadioInput);
-var JetVerticalLayout = (0, import_react27.withJsonFormsLayoutProps)(CustomVerticalLayout);
-var JetTabLayout = (0, import_react27.withJsonFormsLayoutProps)(CustomTabRenderer);
-var JetHorizontalLayout = (0, import_react27.withJsonFormsLayoutProps)(CustomHorizontalLayout);
+var JetNumberControl = (0, import_react29.withJsonFormsControlProps)(CustomNumberInput);
+var JetTextControl = (0, import_react29.withJsonFormsControlProps)(CustomTextInput);
+var JetSelectControl = (0, import_react29.withJsonFormsControlProps)(CustomSelectInput);
+var JetCheckboxControl = (0, import_react29.withJsonFormsControlProps)(CustomCheckboxInput);
+var JetCodeEditorControl = (0, import_react29.withJsonFormsControlProps)(CustomCodeEditorControl);
+var JetSuggestionControl = (0, import_react29.withJsonFormsControlProps)(CustomSuggestionInput);
+var JetCustomDynamicKeyValueInputRenderer = (0, import_react29.withJsonFormsControlProps)(CustomDynamicKeyValueInputRenderer);
+var JetKeyValueArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
+var JetKeyValueTypeArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
+var JetKeyTypeArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
+var JetStringArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomStringArrayRenderer);
+var JetFieldOperatorValueArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomFieldOperatorValueArrayRenderer);
+var JetGenericObjectArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomGenericObjectArrayRenderer);
+var JetGroupLayout = (0, import_react29.withJsonFormsLayoutProps)(CustomGroupLayout);
+var JetRadioControl = (0, import_react29.withJsonFormsControlProps)(CustomRadioInput);
+var JetVerticalLayout = (0, import_react29.withJsonFormsLayoutProps)(CustomVerticalLayout);
+var JetTabLayout = (0, import_react29.withJsonFormsLayoutProps)(CustomTabRenderer);
+var JetHorizontalLayout = (0, import_react29.withJsonFormsLayoutProps)(CustomHorizontalLayout);
+var JetFileUploadControl = (0, import_react29.withJsonFormsControlProps)(CustomFileUploadInput);
 
 // src/testers.js
 var import_core = require("@jsonforms/core");
@@ -1575,6 +1735,20 @@ var tabRendererTester = (uischema) => {
   }
   return -1;
 };
+var fileUploadTester = (0, import_core.rankWith)(
+  150,
+  (0, import_core.and)(
+    import_core.isControl,
+    (uischema, rootSchema) => {
+      try {
+        const currentSchema = import_core.Resolve.schema(rootSchema, uischema.scope, rootSchema);
+        return currentSchema?.format === "file" || uischema.options?.fileUpload === true;
+      } catch (e) {
+        return false;
+      }
+    }
+  )
+);
 
 // src/jetFormsRenderers.js
 var jetFormsBaseRenderers = [
@@ -1592,7 +1766,8 @@ var jetFormsBaseRenderers = [
   { tester: genericObjectArrayTester, renderer: JetGenericObjectArrayControl },
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout },
-  { tester: horizontalLayoutTester, renderer: JetHorizontalLayout }
+  { tester: horizontalLayoutTester, renderer: JetHorizontalLayout },
+  { tester: fileUploadTester, renderer: JetFileUploadControl }
 ];
 var jetFormsRenderers = [
   { tester: suggestionInputTester, renderer: JetSuggestionControl },

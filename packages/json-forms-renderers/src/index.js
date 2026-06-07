@@ -28,6 +28,7 @@ export {
   CustomVerticalLayout,
   CustomTabRenderer,
   CustomHorizontalLayout,
+  CustomFileUploadInput,
 } from './renderers/index.js';
 
 // Export HOC wrapped components
@@ -43,6 +44,7 @@ export {
   JetSuggestionControl,
   JetCustomDynamicKeyValueInputRenderer,
   JetRadioControl,
+  JetFileUploadControl,
   
   // Array Components
   JetKeyValueArrayControl,
@@ -80,7 +82,11 @@ export {
   groupLayoutTester,
   verticalLayoutTester,
   tabRendererTester,
+  fileUploadTester,
 } from './testers.js';
+
+export { FileUploadContext } from './context.js';
 
 // Export the complete renderers array
 export { jetFormsRenderers, jetFormsBaseRenderers } from './jetFormsRenderers.js';
+

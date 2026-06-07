@@ -1,0 +1,44 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "fileInfo": {
+        "type": "object",
+        "format": "file",
+        "description": "Upload excel/csv data source",
+        "properties": {
+          "fileUrl": {
+            "type": "string"
+          },
+          "filePath": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "fileSize": {
+            "type": "number"
+          },
+          "fileType": {
+            "type": "string"
+          }
+        },
+        "required": ["fileUrl"]
+      }
+    },
+    "required": ["fileInfo"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/fileInfo",
+        "label": "Datasource File"
+      }
+    ]
+  },
+  "data": {
+    "fileInfo": null
+  }
+}

@@ -9,6 +9,8 @@ import { useWorkflows } from "../../../logic/hooks/useWorkflows";
 import { useDataQueries } from "../../../logic/hooks/useDataQueries";
 import { useAppPages } from "../../../logic/hooks/useAppPages";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import { CONSTANTS } from "../../../constants";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import {
   Button,
   Spinner,
@@ -55,12 +57,12 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
   const [editingAction, setEditingAction] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
 
-  const { workflows = [] } = useWorkflows(tenantID);
-  const { dataQueries = [] } = useDataQueries(tenantID);
-  const { appPages = [] } = useAppPages(tenantID);
+  const { workflows = [], isLoadingWorkflows, loadWorkflowsError } = useWorkflows(tenantID);
+  const { dataQueries = [], isLoadingDataQueries, loadDataQueriesError } = useDataQueries(tenantID);
+  const { appPages = [], isLoadingAppPages, loadAppPagesError } = useAppPages(tenantID);
 
   const invalidate = () => {
-    queryClient.invalidateQueries(["LISTENER_DETAIL", tenantID, listenerID]);
+    queryClient.invalidateQueries({ queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), listenerID] });
   };
 
   const { isPending: isSaving, mutate: saveAction } = useMutation({
@@ -125,6 +127,10 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
   }
 
   return (
+    <ReactQueryLoadingErrorWrapper
+      isLoading={isLoadingWorkflows || isLoadingDataQueries || isLoadingAppPages}
+      error={loadWorkflowsError || loadDataQueriesError || loadAppPagesError}
+    >
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
@@ -233,6 +239,7 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
         </div>
       )}
     </div>
+    </ReactQueryLoadingErrorWrapper>
   );
 };
 

@@ -27,6 +27,14 @@ import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
 import { Input, Label, PageHeader } from "@jet-admin/ui";
 
+const initialValues = {
+  dataQueryTitle: "Untitled",
+  datasourceID: undefined,
+  datasourceType: "",
+  dataQueryOptions: {},
+  runOnLoad: false,
+};
+
 export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
   DataQueryUpdationForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -68,9 +76,10 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
         displaySuccess(
           CONSTANTS.STRINGS.UPDATE_QUERY_FORM_QUERY_UPDATION_SUCCESS
         );
-        queryClient.invalidateQueries([
+        queryClient.invalidateQueries({
+          queryKey:
           CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
-        ]);
+        });
       },
       onError: (error) => {
         displayError(error);
@@ -78,13 +87,13 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
     });
 
   const queryUpdationForm = useFormik({
-    initialValues: {
-      dataQueryTitle: dataQuery?.dataQueryTitle || "Untitled",
-      datasourceID: dataQuery?.datasourceID,
-      datasourceType: dataQuery?.datasourceType || "",
-      dataQueryOptions: dataQuery?.dataQueryOptions || {},
-      runOnLoad: dataQuery?.runOnLoad || false,
-    },
+    initialValues: dataQuery ? {
+      dataQueryTitle: dataQuery.dataQueryTitle || "Untitled",
+      datasourceID: dataQuery.datasourceID,
+      datasourceType: dataQuery.datasourceType || "",
+      dataQueryOptions: dataQuery.dataQueryOptions || {},
+      runOnLoad: dataQuery.runOnLoad || false,
+    } : initialValues,
     enableReinitialize: true, // Re-initialize form when dataQuery changes
     validateOnMount: false,
     validateOnChange: false,

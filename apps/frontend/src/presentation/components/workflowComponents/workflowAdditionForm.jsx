@@ -31,9 +31,10 @@ export const WorkflowAdditionForm = ({ tenantID }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_WORKFLOW_ADDITION_SUCCESS);
-        queryClient.invalidateQueries([
+        queryClient.invalidateQueries({
+          queryKey:
           CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID),
-        ]);
+        });
       },
       onError: (error) => {
         displayError(error);

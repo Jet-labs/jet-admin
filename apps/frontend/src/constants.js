@@ -1018,6 +1018,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/datasources/test`,
       cloneDatasourceByIDAPI: (tenantID, datasourceID) =>
         `/api/v1/tenants/${tenantID}/datasources/${datasourceID}/clone`,
+      uploadDatasourceFileAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/datasources/upload`,
     },
     DATABASE: {
       getAllDataQueriesAPI: (tenantID) =>

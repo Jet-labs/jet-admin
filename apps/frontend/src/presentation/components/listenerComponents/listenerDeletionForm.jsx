@@ -30,9 +30,10 @@ export const ListenerDeletionForm = ({ tenantID, listenerID }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.LISTENER_DELETED_SUCCESS);
-        queryClient.invalidateQueries([
+        queryClient.invalidateQueries({
+          queryKey:
           CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID),
-        ]);
+        });
         navigate(CONSTANTS.ROUTES.VIEW_LISTENERS.path(tenantID));
       },
       onError: (error) => {

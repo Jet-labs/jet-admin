@@ -34,6 +34,8 @@ import GoogleAnalyticsDataSource from "./googleanalytics/datasource";
 // Listeners
 import SyslogDataSource from "./syslog/datasource";
 
+import ExcelCSVDataSource from "./excelcsv/datasource";
+
 const dataSources = {
   postgresql: PostgreSQLDataSource,
   restapi: RestAPIDataSource,
@@ -68,6 +70,8 @@ const dataSources = {
   
   // Listeners
   syslog: SyslogDataSource,
+
+  excelcsv: ExcelCSVDataSource,
 };
 
 export default {

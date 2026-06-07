@@ -27,6 +27,12 @@ import { PageHeader } from "@jet-admin/ui";
 const datasourceOptionsMetadata =
   DATASOURCE_TYPES.POSTGRESQL.formConfig;
 
+const initialValues = {
+  datasourceTitle: "",
+  datasourceType: DATASOURCE_TYPES.POSTGRESQL.value,
+  datasourceOptions: datasourceOptionsMetadata.data,
+};
+
 export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
   DatasourceUpdationForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -69,9 +75,10 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
         displaySuccess(
           CONSTANTS.STRINGS.UPDATE_DATASOURCE_FORM_DATASOURCE_ADDITION_SUCCESS
         );
-        queryClient.invalidateQueries([
-          CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID),
-        ]);
+        queryClient.invalidateQueries({
+          queryKey:
+          [CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID)],
+        });
       },
       onError: (error) => {
         displayError(error);
@@ -79,11 +86,11 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
     });
 
   const datasourceUpdationForm = useFormik({
-    initialValues: {
-      datasourceTitle: datasource?.datasourceTitle || "",
-      datasourceType: datasource?.datasourceType || DATASOURCE_TYPES.POSTGRESQL.value,
-      datasourceOptions: datasource?.datasourceOptions || datasourceOptionsMetadata.data,
-    },
+    initialValues: datasource ? {
+      datasourceTitle: datasource.datasourceTitle || "",
+      datasourceType: datasource.datasourceType || DATASOURCE_TYPES.POSTGRESQL.value,
+      datasourceOptions: datasource.datasourceOptions || datasourceOptionsMetadata.data,
+    } : initialValues,
     enableReinitialize: true, // Re-initialize form when datasource changes
     onSubmit: (data) => {
       updateDatasource(data);

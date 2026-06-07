@@ -51,16 +51,6 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
   // Lifted state: data source results shared between config editor and preview
   const [dataSourceResults, setDataSourceResults] = useState(null);
 
-  const updateWidgetForm = useFormik({
-    initialValues: initialValues,
-    validationSchema: formValidations.updateWidgetFormValidationSchema,
-    validateOnMount: false,
-    validateOnChange: false,
-    onSubmit: (values) => {
-      updateWidget(values);
-    },
-  });
-
   const {
     isLoading: isLoadingWidget,
     data: widget,
@@ -88,25 +78,33 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
       displaySuccess(
         CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_WIDGET_UPDATION_SUCCESS
       );
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({
+        queryKey:
         CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
-      ]);
+      });
     },
     onError: (error) => {
       displayError(error);
     },
   });
 
-  useEffect(() => {
-    if (widget && widget.widgetID) {
-      updateWidgetForm.setValues({
-        widgetTitle: widget.widgetTitle || CONSTANTS.STRINGS.UNTITLED,
-        widgetType: widget.widgetType || WIDGETS_MAP.text.value,
-        widgetDescription: widget.widgetDescription || "",
-        widgetConfig: widget.widgetConfig || { properties: {}, events: {} },
-      });
-    }
-  }, [widget]);
+  const updateWidgetForm = useFormik({
+    initialValues: widget && widget.widgetID ? {
+      widgetTitle: widget.widgetTitle || CONSTANTS.STRINGS.UNTITLED,
+      widgetType: widget.widgetType || WIDGETS_MAP.text.value,
+      widgetDescription: widget.widgetDescription || "",
+      widgetConfig: widget.widgetConfig || { properties: {}, events: {} },
+    } : initialValues,
+    enableReinitialize: true,
+    validationSchema: formValidations.updateWidgetFormValidationSchema,
+    validateOnMount: false,
+    validateOnChange: false,
+    onSubmit: (values) => {
+      updateWidget(values);
+    },
+  });
+
+
 
   return (
     <div className="flex h-full w-full flex-col items-center bg-background">

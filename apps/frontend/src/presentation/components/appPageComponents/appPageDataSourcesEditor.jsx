@@ -23,13 +23,14 @@ import { stopTestWorkflowAPI } from "../../../data/apis/workflow";
 import { executeWorkflowWithStreaming } from "../../../logic/appPageRuntime/executeWorkflowWithStreaming";
 import { resolveValue } from "../../../logic/evaluationEngine";
 import { useSocketStore } from "../../../logic/stores/useSocketStore";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { displaySuccess, displayError } from "../../../utils/notification";
 
 export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
   const { tenantID } = useParams();
-  const { workflows = [] } = useWorkflows(tenantID);
-  const { dataQueries = [] } = useDataQueries(tenantID);
-  const { listeners = [] } = useListeners(tenantID);
+  const { workflows = [], isLoadingWorkflows, loadWorkflowsError } = useWorkflows(tenantID);
+  const { dataQueries = [], isLoadingDataQueries, loadDataQueriesError } = useDataQueries(tenantID);
+  const { listeners = [], isLoadingListeners, loadListenersError } = useListeners(tenantID);
   const dispatch = useAppPageDispatch();
   const stateTree = useAppPageStateTree();
 
@@ -317,6 +318,10 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
   const selectedSource = editingIndex !== null ? dataSources[editingIndex] : null;
 
   return (
+    <ReactQueryLoadingErrorWrapper
+      isLoading={isLoadingWorkflows || isLoadingDataQueries || isLoadingListeners}
+      error={loadWorkflowsError || loadDataQueriesError || loadListenersError}
+    >
     <div className="flex flex-col h-full min-h-0 bg-background">
       {editingIndex !== null && selectedSource ? (
         /* ─── Detail / Edit View ─── */
@@ -732,6 +737,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         </div>
       )}
     </div>
+    </ReactQueryLoadingErrorWrapper>
   );
 };
 

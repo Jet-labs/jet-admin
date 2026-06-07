@@ -17,6 +17,7 @@ import {
   JetTabLayout,
   JetRadioControl,
   JetHorizontalLayout,
+  JetFileUploadControl,
 } from './renderers/index.js';
 
 import {
@@ -38,6 +39,7 @@ import {
   tabRendererTester,
   radioInputTester,
   horizontalLayoutTester,
+  fileUploadTester,
 } from './testers.js';
 
 /**
@@ -60,6 +62,7 @@ export const jetFormsBaseRenderers = [
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout },
   { tester: horizontalLayoutTester, renderer: JetHorizontalLayout },
+  { tester: fileUploadTester, renderer: JetFileUploadControl },
 ];
 
 /**
@@ -72,3 +75,4 @@ export const jetFormsRenderers = [
   { tester: dynamicKeyValueInputTester, renderer: JetCustomDynamicKeyValueInputRenderer },
   ...jetFormsBaseRenderers,
 ];
+
