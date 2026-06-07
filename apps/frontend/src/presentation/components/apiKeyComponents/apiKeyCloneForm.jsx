@@ -32,7 +32,7 @@ export const APIKeyCloneForm = ({ tenantID, apiKeyID }) => {
       displaySuccess(CONSTANTS.STRINGS.CLONE_API_KEY_CLONING_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.API_KEYS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.API_KEYS(tenantID)],
       });
       navigate(-1);
     },

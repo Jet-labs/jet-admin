@@ -6,6 +6,7 @@ const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 const { createClient } = require("@supabase/supabase-js");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const environmentVariables = require("../../environment");
+const fileStorageUtil = require("../../utils/fileStorage.util");
 
 const datasourceController = {};
 
@@ -414,69 +415,7 @@ datasourceController.uploadFile = async (req, res) => {
     const uniqueName = `${Date.now()}-${file.originalname}`;
     const filePath = `excel-csv-datasources/${tenantID}/${uniqueName}`;
 
-    const s3AccessKeyId = environmentVariables.SUPABASE_S3_ACCESS_KEY_ID;
-    const s3SecretAccessKey = environmentVariables.SUPABASE_S3_SECRET_ACCESS_KEY;
-    const useS3 = s3AccessKeyId && s3AccessKeyId !== "will add manually";
-
-    let publicUrl;
-    const bucketName = useS3
-      ? (environmentVariables.SUPABASE_S3_BUCKET || "jet-admin-datasource-file-uploads")
-      : "tenant-assets";
-
-    if (useS3) {
-      Logger.log("info", {
-        message: "datasourceController:uploadFile:s3",
-        params: { bucketName, filePath },
-      });
-
-      const s3Client = new S3Client({
-        endpoint: environmentVariables.SUPABASE_S3_ENDPOINT || "https://apopjzvhqwlrcykesema.storage.supabase.co/storage/v1/s3",
-        region: environmentVariables.SUPABASE_S3_REGION || "ap-south-1",
-        credentials: {
-          accessKeyId: s3AccessKeyId,
-          secretAccessKey: s3SecretAccessKey,
-        },
-        forcePathStyle: true,
-      });
-
-      const command = new PutObjectCommand({
-        Bucket: bucketName,
-        Key: filePath,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      });
-
-      await s3Client.send(command);
-
-      // Construct public URL
-      const supabaseUrl = environmentVariables.SUPABASE_URL || "https://apopjzvhqwlrcykesema.supabase.co";
-      publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucketName}/${filePath}`;
-    } else {
-      // Initialize Supabase Client
-      const supabase = createClient(
-        environmentVariables.SUPABASE_URL,
-        environmentVariables.SUPABASE_ANON_KEY
-      );
-
-      // Upload to Supabase bucket
-      const { data, error: uploadError } = await supabase.storage
-        .from(bucketName)
-        .upload(filePath, file.buffer, {
-          contentType: file.mimetype,
-          upsert: true,
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      // Generate public URL
-      const { data: { publicUrl: generatedUrl } } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(filePath);
-
-      publicUrl = generatedUrl;
-    }
+    const publicUrl = await fileStorageUtil.uploadFile(file.buffer, file.mimetype, filePath);
 
     Logger.log("success", {
       message: "datasourceController:uploadFile:success",

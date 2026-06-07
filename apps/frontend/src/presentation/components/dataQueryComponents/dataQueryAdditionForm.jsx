@@ -37,7 +37,7 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
     onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.ADD_QUERY_FORM_QUERY_ADDITION_SUCCESS);
       queryClient.invalidateQueries({
-        queryKey: CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
+        queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID)],
       });
     },
     onError: (error) => {

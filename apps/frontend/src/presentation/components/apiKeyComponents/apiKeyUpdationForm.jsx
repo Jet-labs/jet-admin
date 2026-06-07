@@ -65,7 +65,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
       );
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID)],
       });
     },
     onError: (error) => {

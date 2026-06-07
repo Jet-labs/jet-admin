@@ -31,7 +31,7 @@ export const DataQueryCloneForm = ({ tenantID, dataQueryID }) => {
         displaySuccess(CONSTANTS.STRINGS.CLONE_QUERY_CLONING_SUCCESS);
         queryClient.invalidateQueries({
           queryKey:
-          CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
+          [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID)],
         });
         navigate(-1);
       },

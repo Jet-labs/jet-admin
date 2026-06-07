@@ -61,7 +61,7 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
         displaySuccess(CONSTANTS.STRINGS.UPDATE_WORKFLOW_FORM_WORKFLOW_UPDATION_SUCCESS);
         queryClient.invalidateQueries({
           queryKey:
-          CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID),
+          [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID)],
         });
       },
       onError: (error) => {

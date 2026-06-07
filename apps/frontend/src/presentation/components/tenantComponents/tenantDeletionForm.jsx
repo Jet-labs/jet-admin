@@ -25,7 +25,7 @@ export const TenantDeletionForm = ({ tenantID }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.DELETE_TENANT_SUCCESS_TOAST);
-      queryClient.invalidateQueries({ queryKey: CONSTANTS.REACT_QUERY_KEYS.TENANTS });
+      queryClient.invalidateQueries({ queryKey: [CONSTANTS.REACT_QUERY_KEYS.TENANTS] });
       navigate(-1);
     },
     onError: (error) => {

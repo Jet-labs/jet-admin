@@ -57,7 +57,7 @@ export const TenantRoleUpdationForm = () => {
         displaySuccess(CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_SUCCESS_TOAST);
         queryClient.invalidateQueries({
           queryKey:
-          CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID),
+          [CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID)],
         });
       },
       onError: (error) => {

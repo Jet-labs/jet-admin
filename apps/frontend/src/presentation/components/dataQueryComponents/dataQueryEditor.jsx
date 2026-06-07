@@ -231,8 +231,10 @@ export const DataQueryEditor = ({
             )}
           </div>
 
-          {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType] &&
-            currentDatasourceType?.queryConfigForm && (
+          {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType] && (
+            currentDatasourceType?.hasDedicatedQueryBuilder && DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType].dedicatedQueryBuilder ? (
+              DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType].dedicatedQueryBuilder({ dataQueryEditorForm })
+            ) : currentDatasourceType?.queryConfigForm ? (
               <div className="border-t border-border pt-4 mt-2">
                 <JsonForms
                   key={uniqueKey}
@@ -245,6 +247,7 @@ export const DataQueryEditor = ({
                   onChange={_handleDatasourceOptionsChange}
                 />
               </div>
+            ) : null
           )}
         </div>
       </Section>

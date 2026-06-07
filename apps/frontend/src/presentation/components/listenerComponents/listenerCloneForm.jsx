@@ -31,7 +31,7 @@ export const ListenerCloneForm = ({ tenantID, listenerID }) => {
       displaySuccess(CONSTANTS.STRINGS.CLONE_LISTENER_CLONING_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID)],
       });
       navigate(-1);
     },

@@ -5,7 +5,7 @@ export default class DataSource {
       this.config = config;
     }
   
-    async execute(query, context) {
+    async execute(query, context, helpers) {
       throw new Error("execute() method must be implemented");
     }
 

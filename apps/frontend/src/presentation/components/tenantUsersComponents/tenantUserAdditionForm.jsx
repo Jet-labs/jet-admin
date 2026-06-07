@@ -40,7 +40,7 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
       retry: false,
       onSuccess: () => {
         displaySuccess(CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_SUCCESS_TOAST);
-        queryClient.invalidateQueries({ queryKey: CONSTANTS.REACT_QUERY_KEYS.TENANTS });
+        queryClient.invalidateQueries({ queryKey: [CONSTANTS.REACT_QUERY_KEYS.TENANTS] });
         onClose();
       },
       onError: (error) => {

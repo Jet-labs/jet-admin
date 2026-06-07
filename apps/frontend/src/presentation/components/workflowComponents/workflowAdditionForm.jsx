@@ -33,7 +33,7 @@ export const WorkflowAdditionForm = ({ tenantID }) => {
         displaySuccess(CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_WORKFLOW_ADDITION_SUCCESS);
         queryClient.invalidateQueries({
           queryKey:
-          CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID),
+          [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID)],
         });
       },
       onError: (error) => {

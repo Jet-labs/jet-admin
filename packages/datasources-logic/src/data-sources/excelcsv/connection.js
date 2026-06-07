@@ -1,67 +1,49 @@
-import axios from "axios";
+/**
+ * connection.js
+ *
+ * Tests whether the configured Excel/CSV file URL is reachable.
+ * All storage strategy selection (S3 → Supabase client → plain HTTP HEAD/GET)
+ * is fully delegated to fileStorage.util.js — this file owns only the
+ * connection-test contract (parameters in, {ok, statusText|error} out).
+ */
+
 import { Logger } from "../../utils/logger.js";
 
-export const excelcsvTestConnection = async ({ datasourceOptions }) => {
+/**
+ * @param {{ datasourceOptions: object, helpers?: object }} params
+ * @returns {Promise<{ ok: boolean, statusText?: string, error?: string }>}
+ */
+export const excelcsvTestConnection = async ({ datasourceOptions, helpers }) => {
   const fileInfo = datasourceOptions?.fileInfo || {};
   const fileUrl = datasourceOptions?.fileUrl || fileInfo.fileUrl;
   const fileName = datasourceOptions?.fileName || fileInfo.fileName;
+  const label = fileName || "uploaded file";
 
+  Logger.log("info", {
+    message: "excelcsv:excelcsvTestConnection:params",
+    params: datasourceOptions,
+  });
 
-  try {
-    Logger.log("info", {
-      message: "excelcsv:excelcsvTestConnection:params",
-      params: datasourceOptions,
-    });
-
-    if (!fileUrl) {
-      return {
-        ok: false,
-        error: "File URL is required. Please upload a file first.",
-      };
-    }
-
-    // Perform a HEAD check or lightweight GET to verify the file is reachable
-    const response = await axios.head(fileUrl, { timeout: 5000 });
-
-    if (response.status >= 200 && response.status < 300) {
-      return {
-        ok: true,
-        statusText: `Successfully reached file: ${fileName || "uploaded file"}`,
-      };
-    } else {
-      return {
-        ok: false,
-        error: `Failed to reach file. HTTP Status: ${response.status}`,
-      };
-    }
-  } catch (err) {
-    Logger.log("error", {
-      message: "excelcsv:excelcsvTestConnection:catch",
-      params: err.message || err,
-    });
-
-    // Fallback to GET if HEAD is not supported by Supabase storage settings or CORS
-    try {
-      const response = await axios.get(fileUrl, {
-        headers: { Range: "bytes=0-0" }, // lightweight byte-range query
-        timeout: 5000,
-      });
-      if (response.status >= 200 && response.status < 300) {
-        return {
-          ok: true,
-          statusText: `Successfully reached file: ${fileName || "uploaded file"}`,
-        };
-      }
-    } catch (innerErr) {
-      return {
-        ok: false,
-        error: `Could not reach file URL: ${err.message || err}`,
-      };
-    }
-
+  if (!fileUrl) {
     return {
       ok: false,
-      error: `Could not reach file URL: ${err.message || err}`,
+      error: "File URL is required. Please upload a file first.",
     };
+  }
+
+  try {
+    if (helpers && helpers.fileStorage && typeof helpers.fileStorage.checkFileExists === "function") {
+      await helpers.fileStorage.checkFileExists(fileUrl);
+    } else {
+      // Fallback or warning
+      throw new Error("Missing fileStorage helper for ExcelCSV connection check.");
+    }
+    return { ok: true, statusText: `Successfully reached file: ${label}` };
+  } catch (err) {
+    Logger.log("error", {
+      message: "excelcsv:excelcsvTestConnection:error",
+      params: err.message || err,
+    });
+    return { ok: false, error: `Could not reach file: ${err.message || err}` };
   }
 };

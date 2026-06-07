@@ -384,7 +384,7 @@ export function useCreateWorkflow() {
     mutationFn: (data) => workflowApi.create(data.tenantID, data.workflow),
     onSuccess: (data, variables) => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({queryKey:'workflows', variables.tenantID});
+      queryClient.invalidateQueries({queryKey:['workflows'], variables.tenantID});
     },
   });
 }

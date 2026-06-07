@@ -78,7 +78,7 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
         );
         queryClient.invalidateQueries({
           queryKey:
-          CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
+          [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID)],
         });
       },
       onError: (error) => {

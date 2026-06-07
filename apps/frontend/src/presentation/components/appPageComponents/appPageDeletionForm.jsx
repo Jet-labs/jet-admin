@@ -33,7 +33,7 @@ export const AppPageDeletionForm = ({ tenantID, appPageID }) => {
         displaySuccess(CONSTANTS.STRINGS.DELETE_APP_PAGE_DELETION_SUCCESS);
         queryClient.invalidateQueries({
           queryKey:
-          CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID),
+          [CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID)],
         });
         navigate(-1);
       },

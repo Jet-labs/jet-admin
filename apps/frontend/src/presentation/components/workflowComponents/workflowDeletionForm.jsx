@@ -29,7 +29,7 @@ export const WorkflowDeletionForm = ({ tenantID, workflowID }) => {
       displaySuccess(CONSTANTS.STRINGS.WORKFLOW_DELETED_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID)],
       });
       navigate(CONSTANTS.ROUTES.VIEW_WORKFLOWS.path(tenantID));
     },

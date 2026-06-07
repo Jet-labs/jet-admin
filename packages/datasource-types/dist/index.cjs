@@ -8322,7 +8322,8 @@ var DATASOURCE_TYPES = {
     iconColor: "#107c41",
     formConfig: formConfig_default29,
     queryConfigForm: queryConfig_default29,
-    supportsListener: false
+    supportsListener: false,
+    hasDedicatedQueryBuilder: true
   }
 };
 var getDatasourceTypeByValue = (value) => {

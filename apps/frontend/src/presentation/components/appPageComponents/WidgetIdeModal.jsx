@@ -87,7 +87,7 @@ export const WidgetIdeModal = ({
           });
           displaySuccess("Widget updated successfully.");
           queryClient.invalidateQueries({
-            queryKey: CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
+            queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID)],
           });
         } else {
           const newWidget = await createWidgetAPI({
@@ -96,7 +96,7 @@ export const WidgetIdeModal = ({
           });
           displaySuccess("Widget created and added to page canvas.");
           queryClient.invalidateQueries({
-            queryKey: CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
+            queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID)],
           });
           if (onAddWidget && newWidget?.widgetID) {
             onAddWidget(newWidget.widgetID);

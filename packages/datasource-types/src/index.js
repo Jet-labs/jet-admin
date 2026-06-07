@@ -431,6 +431,7 @@ export const DATASOURCE_TYPES = {
     formConfig: excelcsvFormConfig,
     queryConfigForm: excelcsvQueryConfigForm,
     supportsListener: false,
+    hasDedicatedQueryBuilder: true,
   },
 };
 

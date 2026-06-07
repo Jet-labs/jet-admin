@@ -30,7 +30,7 @@ export const APIKeyDeletionForm = ({ tenantID, apiKeyID }) => {
       displaySuccess(CONSTANTS.STRINGS.DELETE_API_KEY_DELETION_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID)],
       });
       navigate(-1);
     },

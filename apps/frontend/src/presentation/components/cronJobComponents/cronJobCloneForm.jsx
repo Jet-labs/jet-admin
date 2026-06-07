@@ -32,7 +32,7 @@ export const CronJobCloneForm = ({ tenantID, cronJobID }) => {
       displaySuccess(CONSTANTS.STRINGS.CLONE_CRON_JOB_CLONING_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.CRON_JOBS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.CRON_JOBS(tenantID)],
       });
       navigate(-1);
     },

@@ -1,6 +1,8 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const { DATASOURCE_LOGIC_COMPONENTS } = require("@jet-admin/datasources-logic");
+const environmentVariables = require("../../environment");
+const fileStorageUtil = require("../../utils/fileStorage.util");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 const datasourceService = {};
@@ -75,6 +77,7 @@ datasourceService.testDatasourceConnection = async ({
       datasourceType
     ].testConnection({
       datasourceOptions,
+      helpers: { fileStorage: fileStorageUtil },
     });
     Logger.log("success", {
       message: "datasourceService:testDatasourceConnection:success",

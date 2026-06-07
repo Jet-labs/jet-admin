@@ -80,7 +80,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
       );
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID)],
       });
     },
     onError: (error) => {

@@ -32,7 +32,7 @@ export const ListenerDeletionForm = ({ tenantID, listenerID }) => {
         displaySuccess(CONSTANTS.STRINGS.LISTENER_DELETED_SUCCESS);
         queryClient.invalidateQueries({
           queryKey:
-          CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID),
+          [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID)],
         });
         navigate(CONSTANTS.ROUTES.VIEW_LISTENERS.path(tenantID));
       },

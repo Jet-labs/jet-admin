@@ -29,7 +29,7 @@ export const WidgetDeletionForm = ({ tenantID, widgetID }) => {
       displaySuccess(CONSTANTS.STRINGS.DELETE_WIDGET_DELETION_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID)],
       });
       navigate(-1);
     },

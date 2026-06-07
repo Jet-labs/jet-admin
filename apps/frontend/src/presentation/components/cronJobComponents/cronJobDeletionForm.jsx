@@ -32,7 +32,7 @@ export const CronJobDeletionForm = ({ tenantID, cronJobID }) => {
       displaySuccess(CONSTANTS.STRINGS.CRON_JOB_DELETED_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID)],
       });
       navigate(-1);
     },

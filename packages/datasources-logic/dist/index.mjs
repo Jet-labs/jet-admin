@@ -157,7 +157,7 @@ var postgresqlTestConnection = async ({
 
 // src/data-sources/restapi/connection.js
 import fetch2 from "node-fetch";
-import { URL, URLSearchParams as URLSearchParams2 } from "url";
+import { URL as URL2, URLSearchParams as URLSearchParams2 } from "url";
 import { Agent as HttpsAgent } from "https";
 import { Agent as HttpAgent } from "http";
 var restAPITestConnection = async ({ datasourceOptions }) => {
@@ -182,7 +182,7 @@ var restAPITestConnection = async ({ datasourceOptions }) => {
       message: "restapi:restAPITestConnection:params",
       params: datasourceOptions
     });
-    const urlObj = new URL(baseUrl.trim());
+    const urlObj = new URL2(baseUrl.trim());
     queryParams.forEach(({ key, value }) => {
       if (key) urlObj.searchParams.append(key, value);
     });
@@ -196,7 +196,7 @@ var restAPITestConnection = async ({ datasourceOptions }) => {
     } else if (authType === "bearer" && bearerToken) {
       hdrs["Authorization"] = `Bearer ${bearerToken}`;
     } else if (authType === "oauth2" && oauth2?.tokenUrl) {
-      const tokenUrl = new URL(oauth2.tokenUrl);
+      const tokenUrl = new URL2(oauth2.tokenUrl);
       const tokenAgent = tokenUrl.protocol === "https:" ? new HttpsAgent({ rejectUnauthorized: sslVerify }) : new HttpAgent({ rejectUnauthorized: sslVerify });
       const tokenRes = await fetch2(tokenUrl.toString(), {
         method: "POST",
@@ -270,7 +270,7 @@ var DataSource = class {
     this.datasourceType = config?.datasourceType;
     this.config = config;
   }
-  async execute(query, context) {
+  async execute(query, context, helpers) {
     throw new Error("execute() method must be implemented");
   }
   async subscribe(config, onEvent) {
@@ -3547,111 +3547,270 @@ var SyslogDataSource = class extends DataSource {
 
 // src/data-sources/excelcsv/datasource.js
 import ExcelJS from "exceljs";
-import axios3 from "axios";
-var parseCache = /* @__PURE__ */ new Map();
 var CACHE_TTL_MS = 5 * 60 * 1e3;
+var parseCache = /* @__PURE__ */ new Map();
+function buildCacheKey(parts) {
+  return JSON.stringify(parts);
+}
+function cacheGet(key) {
+  const entry = parseCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp >= CACHE_TTL_MS) {
+    parseCache.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+function cacheSet(key, data) {
+  const now = Date.now();
+  for (const [k, v] of parseCache) {
+    if (now - v.timestamp >= CACHE_TTL_MS) parseCache.delete(k);
+  }
+  parseCache.set(key, { timestamp: now, data });
+}
+function isCsvFile(fileUrl, fileType) {
+  if (fileType && /csv/i.test(fileType)) return true;
+  try {
+    return new URL(fileUrl).pathname.toLowerCase().endsWith(".csv");
+  } catch {
+    return fileUrl.split("?")[0].split("#")[0].toLowerCase().endsWith(".csv");
+  }
+}
+function extractHeaders(headerRowObj) {
+  const headers = [];
+  headerRowObj.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+    const raw = cell.value;
+    headers[colNumber] = raw !== null && raw !== void 0 ? String(raw).trim() : `Column_${colNumber}`;
+  });
+  return headers;
+}
+function resolveCellValue(cellValue) {
+  if (cellValue === null || cellValue === void 0) return null;
+  if (typeof cellValue !== "object") return cellValue;
+  if (cellValue.result !== void 0) return cellValue.result;
+  if (cellValue.text !== void 0) return cellValue.text;
+  if (Array.isArray(cellValue.richText)) {
+    return cellValue.richText.map((t) => t.text).join("");
+  }
+  return cellValue;
+}
+function parseRangeEndRow(range) {
+  if (!range) return Infinity;
+  const digits = range.match(/\d+/g);
+  return digits && digits.length >= 2 ? parseInt(digits[1], 10) : Infinity;
+}
+function evaluateCondition(cellValue, operator, filterValue) {
+  const strCell = cellValue !== null && cellValue !== void 0 ? String(cellValue) : "";
+  const strFilter = filterValue !== null && filterValue !== void 0 ? String(filterValue) : "";
+  const numCell = parseFloat(cellValue);
+  const numFilter = parseFloat(filterValue);
+  const bothNum = !isNaN(numCell) && !isNaN(numFilter);
+  switch (operator) {
+    case "eq":
+      return strCell === strFilter;
+    case "neq":
+      return strCell !== strFilter;
+    case "gt":
+      return bothNum ? numCell > numFilter : strCell > strFilter;
+    case "gte":
+      return bothNum ? numCell >= numFilter : strCell >= strFilter;
+    case "lt":
+      return bothNum ? numCell < numFilter : strCell < strFilter;
+    case "lte":
+      return bothNum ? numCell <= numFilter : strCell <= strFilter;
+    case "contains":
+      return strCell.toLowerCase().includes(strFilter.toLowerCase());
+    case "not_contains":
+      return !strCell.toLowerCase().includes(strFilter.toLowerCase());
+    case "starts_with":
+      return strCell.toLowerCase().startsWith(strFilter.toLowerCase());
+    case "ends_with":
+      return strCell.toLowerCase().endsWith(strFilter.toLowerCase());
+    case "is_empty":
+      return cellValue === null || cellValue === void 0 || strCell === "";
+    case "is_not_empty":
+      return cellValue !== null && cellValue !== void 0 && strCell !== "";
+    default:
+      return true;
+  }
+}
+function applyFilters(rows, filters) {
+  if (!Array.isArray(filters) || filters.length === 0) return rows;
+  const active = filters.filter((f) => f.column && f.column.trim());
+  if (active.length === 0) return rows;
+  return rows.filter((row) => {
+    let result = evaluateCondition(row[active[0].column], active[0].operator, active[0].value);
+    for (let i = 1; i < active.length; i++) {
+      const { column, operator, value, logic } = active[i];
+      const cond = evaluateCondition(row[column], operator, value);
+      result = logic === "OR" ? result || cond : result && cond;
+    }
+    return result;
+  });
+}
+function applySort(rows, sort) {
+  if (!Array.isArray(sort) || sort.length === 0) return rows;
+  const active = sort.filter((s) => s.column && s.column.trim());
+  if (active.length === 0) return rows;
+  return [...rows].sort((a, b) => {
+    for (const { column, direction } of active) {
+      const aVal = a[column];
+      const bVal = b[column];
+      const aNum = parseFloat(aVal);
+      const bNum = parseFloat(bVal);
+      let cmp;
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        cmp = aNum - bNum;
+      } else {
+        const aStr = aVal !== null && aVal !== void 0 ? String(aVal) : "";
+        const bStr = bVal !== null && bVal !== void 0 ? String(bVal) : "";
+        cmp = aStr.localeCompare(bStr);
+      }
+      if (cmp !== 0) return direction === "desc" ? -cmp : cmp;
+    }
+    return 0;
+  });
+}
+function applyColumnProjection(rows, columns) {
+  if (!Array.isArray(columns) || columns.length === 0) return rows;
+  const enabled = columns.filter((c) => c.enabled !== false && c.sourceName && c.sourceName.trim());
+  if (enabled.length === 0) return rows;
+  return rows.map((row) => {
+    const out = {};
+    for (const col of enabled) {
+      const outKey = col.alias && col.alias.trim() ? col.alias.trim() : col.sourceName;
+      out[outKey] = Object.prototype.hasOwnProperty.call(row, col.sourceName) ? row[col.sourceName] : null;
+    }
+    return out;
+  });
+}
 var ExcelCSVDataSource = class extends DataSource {
-  async execute(dataQueryOptions2, context) {
-    Logger.log("info", {
-      message: "excelcsv:ExcelCSVDataSource:execute:params",
-      params: { dataQueryOptions: dataQueryOptions2 }
-    });
+  /**
+   * Fetches and parses the configured Excel or CSV file, then applies the
+   * full visual-query pipeline produced by ExcelCSVQueryBuilder.
+   *
+   * Pipeline (in order):
+   *   1. Fetch raw bytes        — via helpers.fileStorage
+   *   2. Parse into rows        — ExcelJS; result cached by file+sheet+header+range
+   *   3. Apply filters          — columns.filter via AND/OR chain
+   *   4. Apply sort             — multi-key, numeric-aware
+   *   5. Apply column projection — select + alias; referencing original names
+   *   6. Apply row limit        — rows.slice(0, limit)
+   *
+   * @param {object}   dataQueryOptions
+   * @param {string=}  dataQueryOptions.sheetName  Target sheet/tab name
+   * @param {number=}  dataQueryOptions.headerRow  Header row index, 1-based (default 1)
+   * @param {string=}  dataQueryOptions.range      A1-notation upper-bound row filter
+   * @param {number=}  dataQueryOptions.limit      Maximum rows to return (applied last)
+   * @param {Array=}   dataQueryOptions.columns    Column projection/alias rules from builder
+   * @param {Array=}   dataQueryOptions.filters    Filter conditions from builder
+   * @param {Array=}   dataQueryOptions.sort       Sort rules from builder
+   * @param {object}   context
+   * @param {object}   helpers
+   * @returns {Promise<object[]>}
+   */
+  async execute(dataQueryOptions2, context, helpers) {
     const {
       sheetName,
       headerRow = 1,
       range,
-      limit
+      limit,
+      columns = [],
+      filters = [],
+      sort = []
     } = dataQueryOptions2 || {};
     const fileInfo = this.config.datasourceOptions?.fileInfo || {};
     const fileUrl = this.config.datasourceOptions?.fileUrl || fileInfo.fileUrl;
     const fileType = this.config.datasourceOptions?.fileType || fileInfo.fileType;
+    Logger.log("info", {
+      message: "excelcsv:ExcelCSVDataSource:execute:params",
+      params: {
+        fileUrl,
+        sheetName,
+        headerRow,
+        range,
+        limit,
+        columnCount: columns.length,
+        filterCount: filters.length,
+        sortCount: sort.length
+      }
+    });
     if (!fileUrl) {
       throw new Error("No Excel or CSV file URL configured for this data source.");
     }
-    const targetHeaderRow = parseInt(headerRow, 10) || 1;
-    const cacheKey = `${fileUrl}|${sheetName || ""}|${targetHeaderRow}|${range || ""}|${limit || ""}`;
-    const cachedEntry = parseCache.get(cacheKey);
-    if (cachedEntry && Date.now() - cachedEntry.timestamp < CACHE_TTL_MS) {
+    const targetHeaderRow = Math.max(1, parseInt(headerRow, 10) || 1);
+    const cacheKey = buildCacheKey({ fileUrl, sheetName, targetHeaderRow, range });
+    let rawRows = cacheGet(cacheKey);
+    if (rawRows) {
       Logger.log("info", {
         message: "excelcsv:ExcelCSVDataSource:execute:cacheHit",
         params: { fileUrl }
       });
-      return cachedEntry.data;
-    }
-    try {
-      const response = await axios3.get(fileUrl, { responseType: "arraybuffer" });
-      const buffer = Buffer.from(response.data);
-      const workbook = new ExcelJS.Workbook();
-      const isCsv = fileUrl.toLowerCase().split("?")[0].endsWith(".csv") || fileType && fileType.includes("csv");
-      if (isCsv) {
-        const { Readable } = await import("stream");
-        const stream = Readable.from(buffer);
-        await workbook.csv.read(stream);
-      } else {
-        await workbook.xlsx.load(buffer);
-      }
-      const worksheet = sheetName ? workbook.getWorksheet(sheetName) : workbook.worksheets[0];
-      if (!worksheet) {
-        throw new Error(`Worksheet "${sheetName || 0}" not found in the spreadsheet.`);
-      }
-      const headerRowObj = worksheet.getRow(targetHeaderRow);
-      const headers = [];
-      headerRowObj.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-        const val = cell.value;
-        if (val !== null && val !== void 0) {
-          headers[colNumber] = String(val).trim();
+    } else {
+      try {
+        let buffer;
+        if (helpers && helpers.fileStorage && typeof helpers.fileStorage.getFileBuffer === "function") {
+          buffer = await helpers.fileStorage.getFileBuffer(fileUrl);
         } else {
-          headers[colNumber] = `Column_${colNumber}`;
+          throw new Error("Missing fileStorage helper for ExcelCSV execution.");
         }
-      });
-      const data = [];
-      worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-        if (rowNumber <= targetHeaderRow) return;
-        if (range) {
-          const match = range.match(/\d+/g);
-          if (match && match.length >= 2) {
-            const endRow = parseInt(match[1], 10);
-            if (rowNumber > endRow) return;
-          }
+        const workbook = new ExcelJS.Workbook();
+        if (isCsvFile(fileUrl, fileType)) {
+          const { Readable } = await import("stream");
+          await workbook.csv.read(Readable.from(buffer));
+        } else {
+          await workbook.xlsx.load(buffer);
         }
-        const rowData = {};
-        let hasValues = false;
-        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-          const header = headers[colNumber] || `Column_${colNumber}`;
-          let cellValue = cell.value;
-          if (cellValue && typeof cellValue === "object") {
-            if (cellValue.result !== void 0) {
-              cellValue = cellValue.result;
-            } else if (cellValue.text !== void 0) {
-              cellValue = cellValue.text;
-            } else if (Array.isArray(cellValue.richText)) {
-              cellValue = cellValue.richText.map((t) => t.text).join("");
-            }
-          }
-          if (cellValue !== null && cellValue !== void 0) {
-            rowData[header] = cellValue;
-            hasValues = true;
-          } else {
-            rowData[header] = null;
-          }
+        const worksheet = sheetName ? workbook.getWorksheet(sheetName) : workbook.worksheets[0];
+        if (!worksheet) {
+          throw new Error(
+            `Worksheet "${sheetName || "(first sheet)"}" not found in the spreadsheet.`
+          );
+        }
+        const headers = extractHeaders(worksheet.getRow(targetHeaderRow));
+        const rangeEndRow = parseRangeEndRow(range);
+        rawRows = [];
+        worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+          if (rowNumber <= targetHeaderRow) return;
+          if (rowNumber > rangeEndRow) return;
+          const rowData = {};
+          let hasValues = false;
+          row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            const header = headers[colNumber] || `Column_${colNumber}`;
+            const value = resolveCellValue(cell.value);
+            rowData[header] = value;
+            if (value !== null && value !== void 0) hasValues = true;
+          });
+          if (hasValues) rawRows.push(rowData);
         });
-        if (hasValues) {
-          data.push(rowData);
-        }
-      });
-      const finalResult = limit ? data.slice(0, parseInt(limit, 10)) : data;
-      parseCache.set(cacheKey, {
-        timestamp: Date.now(),
-        data: finalResult
-      });
-      return finalResult;
-    } catch (err) {
-      Logger.log("error", {
-        message: "excelcsv:ExcelCSVDataSource:execute:error",
-        params: { error: err.message || err }
-      });
-      throw new Error(`Failed to execute Excel/CSV query: ${err.message || err}`);
+        cacheSet(cacheKey, rawRows);
+        Logger.log("info", {
+          message: "excelcsv:ExcelCSVDataSource:execute:parsed",
+          params: { fileUrl, rawRowCount: rawRows.length }
+        });
+      } catch (err) {
+        Logger.log("error", {
+          message: "excelcsv:ExcelCSVDataSource:execute:error",
+          params: { error: err.message || err }
+        });
+        throw new Error(`Failed to execute Excel/CSV query: ${err.message}`);
+      }
     }
+    let result = applyFilters(rawRows, filters);
+    Logger.log("info", {
+      message: "excelcsv:ExcelCSVDataSource:execute:postFilters",
+      params: { rowCount: result.length }
+    });
+    result = applySort(result, sort);
+    result = applyColumnProjection(result, columns);
+    if (limit) {
+      result = result.slice(0, parseInt(limit, 10));
+    }
+    Logger.log("info", {
+      message: "excelcsv:ExcelCSVDataSource:execute:done",
+      params: { finalRowCount: result.length }
+    });
+    return result;
   }
 };
 
@@ -4173,7 +4332,7 @@ var googlesheetsTestConnection = async ({ datasourceOptions }) => {
 };
 
 // src/data-sources/graphql/connection.js
-import axios4 from "axios";
+import axios3 from "axios";
 var graphqlTestConnection = async ({ datasourceOptions }) => {
   try {
     Logger.log("info", {
@@ -4219,7 +4378,7 @@ var graphqlTestConnection = async ({ datasourceOptions }) => {
         }
       }
     `;
-    const response = await axios4({
+    const response = await axios3({
       method: "POST",
       url: endpoint,
       headers,
@@ -4836,61 +4995,34 @@ var syslogTestConnection = async ({ datasourceOptions }) => {
 };
 
 // src/data-sources/excelcsv/connection.js
-import axios5 from "axios";
-var excelcsvTestConnection = async ({ datasourceOptions }) => {
+var excelcsvTestConnection = async ({ datasourceOptions, helpers }) => {
   const fileInfo = datasourceOptions?.fileInfo || {};
   const fileUrl = datasourceOptions?.fileUrl || fileInfo.fileUrl;
   const fileName = datasourceOptions?.fileName || fileInfo.fileName;
-  try {
-    Logger.log("info", {
-      message: "excelcsv:excelcsvTestConnection:params",
-      params: datasourceOptions
-    });
-    if (!fileUrl) {
-      return {
-        ok: false,
-        error: "File URL is required. Please upload a file first."
-      };
-    }
-    const response = await axios5.head(fileUrl, { timeout: 5e3 });
-    if (response.status >= 200 && response.status < 300) {
-      return {
-        ok: true,
-        statusText: `Successfully reached file: ${fileName || "uploaded file"}`
-      };
-    } else {
-      return {
-        ok: false,
-        error: `Failed to reach file. HTTP Status: ${response.status}`
-      };
-    }
-  } catch (err) {
-    Logger.log("error", {
-      message: "excelcsv:excelcsvTestConnection:catch",
-      params: err.message || err
-    });
-    try {
-      const response = await axios5.get(fileUrl, {
-        headers: { Range: "bytes=0-0" },
-        // lightweight byte-range query
-        timeout: 5e3
-      });
-      if (response.status >= 200 && response.status < 300) {
-        return {
-          ok: true,
-          statusText: `Successfully reached file: ${fileName || "uploaded file"}`
-        };
-      }
-    } catch (innerErr) {
-      return {
-        ok: false,
-        error: `Could not reach file URL: ${err.message || err}`
-      };
-    }
+  const label = fileName || "uploaded file";
+  Logger.log("info", {
+    message: "excelcsv:excelcsvTestConnection:params",
+    params: datasourceOptions
+  });
+  if (!fileUrl) {
     return {
       ok: false,
-      error: `Could not reach file URL: ${err.message || err}`
+      error: "File URL is required. Please upload a file first."
     };
+  }
+  try {
+    if (helpers && helpers.fileStorage && typeof helpers.fileStorage.checkFileExists === "function") {
+      await helpers.fileStorage.checkFileExists(fileUrl);
+    } else {
+      throw new Error("Missing fileStorage helper for ExcelCSV connection check.");
+    }
+    return { ok: true, statusText: `Successfully reached file: ${label}` };
+  } catch (err) {
+    Logger.log("error", {
+      message: "excelcsv:excelcsvTestConnection:error",
+      params: err.message || err
+    });
+    return { ok: false, error: `Could not reach file: ${err.message || err}` };
   }
 };
 

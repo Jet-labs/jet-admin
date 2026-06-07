@@ -31,7 +31,7 @@ export const WorkflowCloneForm = ({ tenantID, workflowID }) => {
       displaySuccess(CONSTANTS.STRINGS.CLONE_WORKFLOW_CLONING_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID)],
       });
       navigate(-1);
     },

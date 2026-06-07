@@ -43,22 +43,6 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
     return await uploadDatasourceFileAPI({ tenantID, file });
   }, [tenantID]);
 
-  // Reset the init flag whenever the datasource type changes so JsonForms
-  // re-initialises cleanly for the new schema without polluting Formik state.
-  const previousDatasourceType = useRef(datasourceEditorForm.values.datasourceType);
-  if (previousDatasourceType.current !== datasourceEditorForm.values.datasourceType) {
-    previousDatasourceType.current = datasourceEditorForm.values.datasourceType;
-    isJsonFormsInitialized.current = false;
-
-    // Explicit type change - set default options for the new type
-    const config = getDatasourceTypeByValue(datasourceEditorForm.values.datasourceType);
-    if (config?.formConfig?.data) {
-      datasourceEditorForm.setFieldValue("datasourceOptions", config.formConfig.data);
-    } else {
-      datasourceEditorForm.setFieldValue("datasourceOptions", {});
-    }
-  }
-
   const currentDatasourceType = getDatasourceTypeByValue(datasourceEditorForm.values.datasourceType);
 
   return (
@@ -94,7 +78,16 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
             </Label>
             <Select
               value={datasourceEditorForm.values.datasourceType}
-              onValueChange={(val) => datasourceEditorForm.setFieldValue("datasourceType", val)}
+              onValueChange={(val) => {
+                datasourceEditorForm.setFieldValue("datasourceType", val);
+                const config = getDatasourceTypeByValue(val);
+                if (config?.formConfig?.data) {
+                  datasourceEditorForm.setFieldValue("datasourceOptions", config.formConfig.data);
+                } else {
+                  datasourceEditorForm.setFieldValue("datasourceOptions", {});
+                }
+                isJsonFormsInitialized.current = false;
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select an option" />

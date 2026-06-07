@@ -31,7 +31,7 @@ export const ListenerAdditionForm = ({ tenantID }) => {
       displaySuccess(CONSTANTS.STRINGS.LISTENER_ADDED_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID)],
       });
       if (newListener?.listenerID) {
         navigate(

@@ -84,7 +84,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
         );
         queryClient.invalidateQueries({
           queryKey:
-          CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID),
+          [CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID)],
         });
       },
       onError: (error) => {

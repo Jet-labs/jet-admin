@@ -31,7 +31,7 @@ export const WidgetCloneForm = ({ tenantID, widgetID }) => {
       displaySuccess(CONSTANTS.STRINGS.CLONE_WIDGET_CLONING_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID)],
       });
       navigate(-1);
     },

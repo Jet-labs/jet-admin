@@ -28,7 +28,7 @@ export const CronJobAdditionForm = ({ tenantID }) => {
       displaySuccess(CONSTANTS.STRINGS.CRON_JOB_ADDED_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID)],
       });
       cronJobAdditionForm.resetForm();
     },

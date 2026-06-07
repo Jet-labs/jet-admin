@@ -3,6 +3,7 @@ const Logger = require("../../../utils/logger");
 const { resolveTemplate } = require("@jet-admin/expression-engine");
 const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
 const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
+const fileStorageUtil = require("../../../utils/fileStorage.util");
 
 const QUERY_TEMPLATE_OPTIONS = {
   allowedRoots: ["inputs"],
@@ -57,7 +58,7 @@ class QueryEngine {
     });
 
     const datasource = await this.getDataSource(query, dataQueryID);
-    const result = await datasource.execute(resolvedTemplate);
+    const result = await datasource.execute(resolvedTemplate, {}, { fileStorage: fileStorageUtil });
 
     this.cache.set(cacheKey, result);
     Logger.log("info", {

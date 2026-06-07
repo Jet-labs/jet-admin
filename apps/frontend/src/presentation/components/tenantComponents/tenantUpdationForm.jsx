@@ -62,7 +62,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
     onSuccess: (tenant) => {
       saveTenantLocally(tenant);
       displaySuccess(CONSTANTS.STRINGS.UPDATE_TENANT_SUCCESS_TOAST);
-      queryClient.invalidateQueries({ queryKey: CONSTANTS.REACT_QUERY_KEYS.TENANTS });
+      queryClient.invalidateQueries({ queryKey: [CONSTANTS.REACT_QUERY_KEYS.TENANTS] });
     },
     onError: (error) => {
       displayError(error);

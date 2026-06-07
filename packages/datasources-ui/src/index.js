@@ -2,6 +2,7 @@ import React from "react";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { QueryResponseView } from "./components/common/queryResponseView";
 import { WebViewQueryResponseView } from "./components/common/webViewQueryResponseView";
+import { ExcelCSVQueryBuilder } from "./components/excelcsv/ExcelCSVQueryBuilder";
 
 // Generic test result UI for all datasources
 const GenericDatasourceTestResultUI = ({ connectionResult }) => {
@@ -92,5 +93,10 @@ export const DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.SSE.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.SYSLOG.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.NATS.value]: createGenericDatasourceUI(),
-  [DATASOURCE_TYPES.EXCELCSV.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.EXCELCSV.value]: {
+    ...createGenericDatasourceUI(),
+    dedicatedQueryBuilder: function ({ dataQueryEditorForm }) {
+      return React.createElement(ExcelCSVQueryBuilder, { dataQueryEditorForm });
+    },
+  },
 };

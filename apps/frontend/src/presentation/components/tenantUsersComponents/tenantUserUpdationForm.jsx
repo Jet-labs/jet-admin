@@ -62,7 +62,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
       );
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.TENANT_USERS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.TENANT_USERS(tenantID)],
       });
     },
     onError: (error) => {
@@ -88,7 +88,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
       );
       queryClient.invalidateQueries({
         queryKey:
-        CONSTANTS.REACT_QUERY_KEYS.TENANT_USERS(tenantID),
+        [CONSTANTS.REACT_QUERY_KEYS.TENANT_USERS(tenantID)],
       });
       navigate(-1);
     },
