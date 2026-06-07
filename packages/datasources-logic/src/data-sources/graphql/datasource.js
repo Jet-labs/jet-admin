@@ -57,7 +57,7 @@ export default class GraphQLDataSource extends DataSource {
         try {
           parsedVariables = typeof variables === "string" ? JSON.parse(variables) : variables;
         } catch (e) {
-          Logger.log("warn", {
+          Logger.log("warning", {
             message: "graphql:GraphQLDataSource:execute:variableParseError",
             params: { error: e.message },
           });
@@ -177,7 +177,7 @@ export default class GraphQLDataSource extends DataSource {
       try {
         parsedVariables = typeof variables === "string" ? JSON.parse(variables) : variables;
       } catch (e) {
-        Logger.log("warn", {
+        Logger.log("warning", {
           message: "graphql:subscribe:variableParseError",
           params: { error: e.message },
         });
