@@ -165,7 +165,7 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
                 </span>
 
               </div>
-              <div className="flex-1 overflow-auto p-4">
+              <div className="flex-1 overflow-auto p-2">
                 {datasourceTestResult !== undefined && datasourceTestResult !== null ? (
                   DATASOURCE_UI_COMPONENTS[
                     datasourceUpdationForm.values.datasourceType

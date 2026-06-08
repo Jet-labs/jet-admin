@@ -36,7 +36,7 @@ export const DatasourceTestingForm = ({
         displaySuccess(CONSTANTS.STRINGS.TEST_DATASOURCE_FORM_TESTING_SUCCESS);
       },
       onError: (error) => {
-        setDatasourceTestResult(false);
+        setDatasourceTestResult(error);
         displayError(error);
       },
     });

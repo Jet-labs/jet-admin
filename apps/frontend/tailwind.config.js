@@ -10,17 +10,18 @@ export default {
     "../../packages/widgets/src/**/*.{js,jsx}",
     "../../packages/widgets-ui/src/**/*.{js,jsx}",
     "../../packages/ui/src/**/*.{js,jsx}",
+    "../../packages/datasources-ui/src/**/*.{js,jsx}",
   ],
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: "hsl(var(--border) / <alpha-value>)",
+        input: "hsl(var(--input) / <alpha-value>)",
+        ring: "hsl(var(--ring) / <alpha-value>)",
+        background: "hsl(var(--background) / <alpha-value>)",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
         primary: {
-          DEFAULT: "rgb(var(--brand-primary-rgb))",
+          DEFAULT: "rgb(var(--brand-primary-rgb) / <alpha-value>)",
           foreground: "var(--brand-text-primary)",
         },
         secondary: {
@@ -28,7 +29,7 @@ export default {
           foreground: "var(--brand-text-primary)",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
+          DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
           foreground: "var(--brand-text-primary)",
         },
         muted: {

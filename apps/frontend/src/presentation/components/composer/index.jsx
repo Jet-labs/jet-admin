@@ -23,7 +23,7 @@ export const Composer = () => {
         <RootRouter />
       </QueryClientProvider>
       <GlobalDialogs />
-      <ToastContainer />
+      <ToastContainer theme="dark" />
     </Suspense>
   );
 };

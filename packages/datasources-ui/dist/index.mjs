@@ -1,5 +1,5 @@
 // src/index.js
-import React9 from "react";
+import React10 from "react";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
 // src/components/common/queryResponseView.js
@@ -599,7 +599,7 @@ function SettingsTab({ opts, update }) {
         limit: e.target.value === "" ? "" : parseInt(e.target.value, 10)
       })
     }
-  ), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "Maximum rows returned after all filters and sorts are applied. Equivalent to", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "rows.slice(0, limit)"), ".")))), /* @__PURE__ */ React8.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React8.createElement(MonoLabel, null, "Full Datasource Call Preview"), /* @__PURE__ */ React8.createElement("div", { className: "rounded-md bg-foreground text-background p-4 font-mono text-[11px] leading-relaxed overflow-x-auto" }, /* @__PURE__ */ React8.createElement("code", { className: "whitespace-pre" }, buildDatasourcePreview(opts))), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "This is the resolved", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "dataQueryOptions"), " ", "object passed to", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "ExcelCSVDataSource.execute()"), ".")));
+  ), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "Maximum rows returned after all filters and sorts are applied. Equivalent to", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "rows.slice(0, limit)"), ".")))), /* @__PURE__ */ React8.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React8.createElement(MonoLabel, null, "Full Datasource Call Preview"), /* @__PURE__ */ React8.createElement("div", { className: "rounded-md bg-foreground text-background p-4 font-mono text-[11px] leading-relaxed overflow-x-auto" }, /* @__PURE__ */ React8.createElement("code", { className: "whitespace-pre" }, buildDatasourcePreview(opts)))));
 }
 function buildDatasourcePreview(opts) {
   const enabledCols = (opts.columns || []).filter((c) => c.enabled && c.sourceName);
@@ -659,54 +659,110 @@ var ExcelCSVQueryBuilder = ({ dataQueryEditorForm }) => {
   })), /* @__PURE__ */ React8.createElement("div", { className: "pt-4 pb-2" }, activeTab === "source" && /* @__PURE__ */ React8.createElement(SourceTab, { opts, update }), activeTab === "columns" && /* @__PURE__ */ React8.createElement(ColumnsTab, { opts, update }), activeTab === "filter" && /* @__PURE__ */ React8.createElement(FilterTab, { opts, update }), activeTab === "sort" && /* @__PURE__ */ React8.createElement(SortTab, { opts, update }), activeTab === "settings" && /* @__PURE__ */ React8.createElement(SettingsTab, { opts, update })));
 };
 
-// src/index.js
+// src/components/common/genericDatasourceTestResultUI.js
+import React9 from "react";
 var GenericDatasourceTestResultUI = ({ connectionResult }) => {
-  let connectionResultClass = "bg-muted/40 border-border text-foreground";
-  let connectionResultText = "Connection not tested";
   console.log("connectionResult", connectionResult);
+  let status = "untested";
+  let title = "Connection not tested";
+  let details = null;
   if (connectionResult === true || connectionResult?.ok === true) {
-    connectionResultClass = "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
-    connectionResultText = connectionResult?.statusText || "Connection successful";
-  } else if (connectionResult === false || connectionResult?.ok === false) {
-    connectionResultClass = "bg-destructive/10 border-destructive/30 text-destructive";
-    connectionResultText = connectionResult?.error || "Connection failed";
-  } else if (connectionResult === void 0) {
-    connectionResultClass = "bg-muted/40 border-border text-foreground";
-    connectionResultText = "Connection not tested";
+    status = "success";
+    title = connectionResult?.statusText || "Connection successful";
+    if (connectionResult?.details) {
+      details = connectionResult.details;
+    } else if (typeof connectionResult === "object" && connectionResult !== null && connectionResult !== true) {
+      const keys = Object.keys(connectionResult).filter((k) => k !== "ok" && k !== "statusText");
+      if (keys.length > 0) {
+        details = connectionResult;
+      }
+    }
+  } else if (connectionResult === void 0 || connectionResult === null) {
+    status = "untested";
+    title = "Connection not tested";
   } else {
-    connectionResultClass = "bg-amber-500/10 border-amber-500/30 text-amber-400";
-    connectionResultText = "Error testing connection";
+    const isError = !connectionResult?.ok;
+    status = isError ? "error" : "warning";
+    if (typeof connectionResult === "string") {
+      title = connectionResult;
+    } else {
+      title = connectionResult?.message || connectionResult?.error || (isError ? "Connection failed" : "Error testing connection");
+      if (connectionResult?.details) {
+        details = connectionResult.details;
+      } else if (connectionResult?.stack) {
+        details = connectionResult.stack;
+      } else if (connectionResult?.response?.data) {
+        details = connectionResult.response.data;
+      } else if (typeof connectionResult === "object") {
+        const filtered = { ...connectionResult };
+        delete filtered.ok;
+        delete filtered.message;
+        delete filtered.error;
+        if (Object.keys(filtered).length > 0) {
+          details = filtered;
+        }
+      }
+    }
   }
-  return React9.createElement(
-    "div",
-    { className: "p-3" },
-    React9.createElement(
-      "div",
-      {
-        className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${connectionResultClass}`
-      },
-      React9.createElement(
-        "div",
-        { className: "!flex !flex-row justify-start items-center" },
-        React9.createElement("span", { className: "!text-sm !font-normal" }, connectionResultText)
-      )
-    )
-  );
+  const styles = {
+    success: {
+      container: "bg-primary/5 border-primary/20 text-primary",
+      badge: "bg-primary/10 text-primary border border-primary/20",
+      badgeText: "Success",
+      icon: /* @__PURE__ */ React9.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React9.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" }))
+    },
+    error: {
+      container: "bg-destructive/5 border-destructive/20 text-destructive",
+      badge: "bg-destructive/10 text-destructive border border-destructive/20",
+      badgeText: "Failed",
+      icon: /* @__PURE__ */ React9.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React9.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" }))
+    },
+    warning: {
+      container: "bg-amber-500/5 border-amber-500/20 text-amber-500",
+      badge: "bg-amber-500/10 text-amber-500 border border-amber-500/20",
+      badgeText: "Warning",
+      icon: /* @__PURE__ */ React9.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React9.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" }))
+    },
+    untested: {
+      container: "bg-muted/30 border-border text-muted-foreground",
+      badge: "bg-muted/50 text-muted-foreground border border-border/50",
+      badgeText: "Untested",
+      icon: /* @__PURE__ */ React9.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React9.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }))
+    }
+  };
+  const currentStyle = styles[status];
+  const renderDetails = () => {
+    if (!details) return null;
+    let text = "";
+    if (typeof details === "string") {
+      text = details;
+    } else {
+      try {
+        text = JSON.stringify(details, null, 2);
+      } catch (e) {
+        text = String(details);
+      }
+    }
+    return /* @__PURE__ */ React9.createElement("div", { className: "mt-4 pt-4 border-t border-current/10 w-full space-y-2" }, /* @__PURE__ */ React9.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80" }, "Details / Logs"), /* @__PURE__ */ React9.createElement("div", { className: "rounded-md bg-foreground text-background p-4 font-mono text-xs leading-relaxed overflow-x-auto max-h-60 border border-border/50" }, /* @__PURE__ */ React9.createElement("code", null, text)));
+  };
+  return /* @__PURE__ */ React9.createElement("div", { className: "w-full" }, /* @__PURE__ */ React9.createElement("div", { className: `w-full flex flex-col justify-start items-start p-4 rounded-md border transition-all duration-200 ${currentStyle.container}` }, /* @__PURE__ */ React9.createElement("div", { className: "flex flex-row justify-between items-center w-full gap-4" }, /* @__PURE__ */ React9.createElement("div", { className: "flex flex-row justify-start items-center gap-3" }, currentStyle.icon, /* @__PURE__ */ React9.createElement("span", { className: "text-sm font-medium tracking-tight" }, title)), /* @__PURE__ */ React9.createElement("span", { className: `text-[10px] font-mono font-medium uppercase px-2 py-0.5 rounded-full ${currentStyle.badge}` }, currentStyle.badgeText)), renderDetails()));
 };
+
+// src/index.js
 var createGenericDatasourceUI = () => ({
   queryResponseView: function({ queryResult }) {
-    return React9.createElement(QueryResponseView, { queryResult });
+    return React10.createElement(QueryResponseView, { queryResult });
   },
   datasourceTestResultUI: function({ connectionResult }) {
-    return React9.createElement(GenericDatasourceTestResultUI, { connectionResult });
+    return React10.createElement(GenericDatasourceTestResultUI, { connectionResult });
   }
 });
 var createWebUrlDatasourceUI = () => ({
   queryResponseView: function({ queryResult }) {
-    return React9.createElement(WebViewQueryResponseView, { queryResult });
+    return React10.createElement(WebViewQueryResponseView, { queryResult });
   },
   datasourceTestResultUI: function({ connectionResult }) {
-    return React9.createElement(GenericDatasourceTestResultUI, { connectionResult });
+    return React10.createElement(GenericDatasourceTestResultUI, { connectionResult });
   }
 });
 var DATASOURCE_UI_COMPONENTS = {
@@ -750,7 +806,7 @@ var DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.EXCELCSV.value]: {
     ...createGenericDatasourceUI(),
     dedicatedQueryBuilder: function({ dataQueryEditorForm }) {
-      return React9.createElement(ExcelCSVQueryBuilder, { dataQueryEditorForm });
+      return React10.createElement(ExcelCSVQueryBuilder, { dataQueryEditorForm });
     }
   }
 };

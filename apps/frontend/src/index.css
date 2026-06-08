@@ -315,3 +315,44 @@ button {
 .react-flow__controls-button path {
   fill: currentColor !important;
 }
+
+/* Toastify Overrides to match UI Guidelines */
+:root {
+  --toastify-toast-width: 320px;
+  --toastify-color-dark: hsl(var(--card));
+  --toastify-color-info: hsl(var(--primary));
+  --toastify-color-success: hsl(var(--primary));
+  --toastify-color-warning: #f59e0b;
+  --toastify-color-error: hsl(var(--destructive));
+  --toastify-toast-background: hsl(var(--card));
+  --toastify-text-color-dark: hsl(var(--foreground));
+  --toastify-font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+
+.Toastify__toast {
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px !important; /* rounded-lg */
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12) !important; /* shadow-lg */
+  font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--card)) !important;
+}
+
+.Toastify__close-button {
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 0.7;
+  transition: 0.15s ease-in-out;
+}
+.Toastify__close-button:hover {
+  color: hsl(var(--foreground)) !important;
+  opacity: 1;
+}
+
+.Toastify__progress-bar--success,
+.Toastify__progress-bar--info {
+  background: hsl(var(--primary));
+}
+
+.Toastify__progress-bar--error {
+  background: hsl(var(--destructive));
+}

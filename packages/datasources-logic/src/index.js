@@ -61,7 +61,7 @@ function _buildGetDatasourceInfo(datasourceType) {
 
 export const DATASOURCE_LOGIC_COMPONENTS = {
   [DATASOURCE_TYPES.POSTGRESQL.value]: {
-    testConnection: async ({ datasourceOptions }) => {
+    testConnection: async ({ datasourceOptions, helpers }) => {
       return await postgresqlTestConnection({
         connectionString: datasourceOptions.connectionString,
         connectionData: {
@@ -71,185 +71,186 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
           user: datasourceOptions.user,
           password: datasourceOptions.password,
         },
+        helpers,
       });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("postgresql"),
   },
   [DATASOURCE_TYPES.RESTAPI.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await restAPITestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await restAPITestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("restapi"),
   },
   [DATASOURCE_TYPES.WEB_URL.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await webURLTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await webURLTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("weburl"),
   },
   [DATASOURCE_TYPES.FIRESTORE.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await firestoreTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await firestoreTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("firestore"),
   },
   [DATASOURCE_TYPES.MYSQL.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await mysqlTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await mysqlTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("mysql"),
   },
   [DATASOURCE_TYPES.MONGODB.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await mongodbTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await mongodbTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("mongodb"),
   },
   [DATASOURCE_TYPES.GOOGLESHEETS.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await googlesheetsTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await googlesheetsTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("googlesheets"),
   },
   [DATASOURCE_TYPES.GRAPHQL.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await graphqlTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await graphqlTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("graphql"),
   },
   // Batch 1 datasources
   [DATASOURCE_TYPES.MSSQL.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await mssqlTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await mssqlTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("mssql"),
   },
   [DATASOURCE_TYPES.SUPABASE.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await supabaseTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await supabaseTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("supabase"),
   },
   [DATASOURCE_TYPES.BIGQUERY.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await bigqueryTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await bigqueryTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("bigquery"),
   },
   [DATASOURCE_TYPES.AIRTABLE.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await airtableTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await airtableTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("airtable"),
   },
   [DATASOURCE_TYPES.KAFKA.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await kafkaTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await kafkaTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("kafka"),
   },
   [DATASOURCE_TYPES.RABBITMQ.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await rabbitmqTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await rabbitmqTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("rabbitmq"),
   },
   [DATASOURCE_TYPES.REDIS.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await redisTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await redisTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("redis"),
   },
   [DATASOURCE_TYPES.S3.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await s3TestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await s3TestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("s3"),
   },
   [DATASOURCE_TYPES.ELASTICSEARCH.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await elasticsearchTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await elasticsearchTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("elasticsearch"),
   },
   [DATASOURCE_TYPES.STRIPE.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await stripeTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await stripeTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("stripe"),
   },
   // Batch 2 datasources
   [DATASOURCE_TYPES.ORACLE.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await oracleTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await oracleTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("oracle"),
   },
   [DATASOURCE_TYPES.SQLITE.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await sqliteTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await sqliteTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("sqlite"),
   },
   [DATASOURCE_TYPES.COCKROACHDB.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await cockroachdbTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await cockroachdbTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("cockroachdb"),
   },
   [DATASOURCE_TYPES.NEO4J.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await neo4jTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await neo4jTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("neo4j"),
   },
   [DATASOURCE_TYPES.TWILIO.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await twilioTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await twilioTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("twilio"),
   },
   [DATASOURCE_TYPES.SENDGRID.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await sendgridTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await sendgridTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("sendgrid"),
   },
   [DATASOURCE_TYPES.SLACK.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await slackTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await slackTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("slack"),
   },
   [DATASOURCE_TYPES.NOTION.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await notionTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await notionTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("notion"),
   },
   [DATASOURCE_TYPES.JIRA.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await jiraTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await jiraTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("jira"),
   },
   [DATASOURCE_TYPES.GOOGLEANALYTICS.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await googleanalyticsTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await googleanalyticsTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("googleanalytics"),
   },
   
   // Listeners
   [DATASOURCE_TYPES.SYSLOG.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await syslogTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await syslogTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("syslog"),
   },
   [DATASOURCE_TYPES.EXCELCSV.value]: {
-    testConnection: async ({ datasourceOptions }) => {
-      return await excelcsvTestConnection({ datasourceOptions });
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await excelcsvTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("excelcsv"),
   },

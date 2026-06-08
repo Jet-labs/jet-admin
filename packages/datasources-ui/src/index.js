@@ -4,37 +4,7 @@ import { QueryResponseView } from "./components/common/queryResponseView";
 import { WebViewQueryResponseView } from "./components/common/webViewQueryResponseView";
 import { ExcelCSVQueryBuilder } from "./components/excelcsv/ExcelCSVQueryBuilder";
 
-// Generic test result UI for all datasources
-const GenericDatasourceTestResultUI = ({ connectionResult }) => {
-  let connectionResultClass = "bg-muted/40 border-border text-foreground";
-  let connectionResultText = "Connection not tested";
-  console.log("connectionResult", connectionResult);
-
-  if (connectionResult === true || (connectionResult?.ok === true)) {
-    connectionResultClass = "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
-    connectionResultText = connectionResult?.statusText || "Connection successful";
-  } else if (connectionResult === false || (connectionResult?.ok === false)) {
-    connectionResultClass = "bg-destructive/10 border-destructive/30 text-destructive";
-    connectionResultText = connectionResult?.error || "Connection failed";
-  } else if (connectionResult === undefined) {
-    connectionResultClass = "bg-muted/40 border-border text-foreground";
-    connectionResultText = "Connection not tested";
-  } else {
-    connectionResultClass = "bg-amber-500/10 border-amber-500/30 text-amber-400";
-    connectionResultText = "Error testing connection";
-  }
-
-  return React.createElement("div", { className: "p-3" },
-    React.createElement("div", {
-      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${connectionResultClass}`
-    },
-      React.createElement("div", { className: "!flex !flex-row justify-start items-center" },
-        React.createElement("span", { className: "!text-sm !font-normal" }, connectionResultText)
-      )
-    )
-  );
-};
-
+import { GenericDatasourceTestResultUI } from "./components/common/genericDatasourceTestResultUI";
 // Helper to create standard datasource UI config
 const createGenericDatasourceUI = () => ({
   queryResponseView: function ({ queryResult }) {

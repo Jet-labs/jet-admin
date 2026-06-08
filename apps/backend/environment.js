@@ -46,5 +46,11 @@ const environmentVariables = {
   SUPABASE_S3_BUCKET: process.env.SUPABASE_S3_BUCKET,
 };
 console.log("environment variables set-----------------------------");
-console.log(environmentVariables);
+const safeEnv = { ...environmentVariables };
+for (const key of Object.keys(safeEnv)) {
+  if (key.includes('KEY') || key.includes('SUPABASE_S3_ENDPOINT') || key.includes('SUPABASE_S3_BUCKET') || key.includes('SECRET') || key.includes('URL') || key.includes('TOKEN') || key.includes('PASSWORD')) {
+    safeEnv[key] = '***';
+  }
+}
+console.log(safeEnv);
 module.exports = environmentVariables;
