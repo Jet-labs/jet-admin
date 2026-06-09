@@ -6,32 +6,34 @@ description: How to add a new node type to the workflow builder
 
 # Creating a Custom Workflow Node
 
-This guide shows how to add a new node type to the visual workflow builder (e.g., an Email Node, Webhook Node, or AI Node).
+This guide shows how to add a new node type to Jet Admin's visual workflow builder and execution engine (e.g., an Email Node, Webhook Node, or AI Node).
 
 ## Overview
 
-Workflow nodes consist of:
+A Workflow Node requires two parts:
+1. **Frontend Component**: A React Flow node UI and configuration panel in `@jet-admin/workflow-nodes`.
+2. **Backend Executor**: The logic that runs inside the pg-boss worker in `apps/backend/modules/workflow/handlers/`.
 
-1. **Frontend Component**: React Flow node UI (`packages/workflow-nodes/`)
-2. **Backend Executor**: Node processing logic (`apps/backend/modules/workflow/`)
+---
 
-## Step 1: Create the Node Component
+## Step 1: Define and Register the Frontend Node
+
+In `packages/workflow-nodes/src/nodes/`, create the visual representation of your node on the DAG canvas.
 
 ```jsx
 // packages/workflow-nodes/src/nodes/EmailNode.jsx
 
 import React from 'react';
 import { Handle, Position } from 'reactflow';
-import { EmailIcon } from '@heroicons/react/24/outline';
 
 export function EmailNode({ data, selected }) {
   return (
     <div className={`workflow-node ${selected ? 'selected' : ''}`}>
+      {/* Input Handle */}
       <Handle type="target" position={Position.Top} />
       
       <div className="node-header">
-        <EmailIcon className="node-icon" />
-        <span>Send Email</span>
+        <span>📧 Send Email</span>
       </div>
       
       <div className="node-body">
@@ -40,172 +42,130 @@ export function EmailNode({ data, selected }) {
         </p>
       </div>
       
+      {/* Output Handle */}
       <Handle type="source" position={Position.Bottom} />
     </div>
   );
 }
+```
 
-// Node type metadata
-EmailNode.nodeType = 'email';
-EmailNode.displayName = 'Send Email';
-EmailNode.category = 'integrations';
-EmailNode.defaultData = {
-  to: '',
-  subject: '',
-  body: ''
+### Map the Node
+
+In `packages/workflow-nodes/src/map.js`, register the node type, schema, and its configuration UI form.
+
+```javascript
+// packages/workflow-nodes/src/map.js
+import { EmailNode } from './nodes/EmailNode';
+import { EmailNodeConfigurator } from './configs/EmailNodeConfigurator';
+
+export const WORKFLOW_NODE_MAP = {
+  // ... existing nodes
+  email: {
+    label: 'Send Email',
+    value: 'email',
+    component: EmailNode,
+    configurator: EmailNodeConfigurator, // The right-sidebar form
+    defaultValue: {
+      title: "Send Email",
+      to: "",
+      subject: "",
+      body: ""
+    },
+    // Used to generate the property panel
+    schema: {
+      type: "object",
+      properties: {
+        to: { type: "string", title: "Recipient Email" },
+        subject: { type: "string", title: "Subject" },
+        body: { type: "string", title: "Body" }
+      }
+    }
+  }
 };
 ```
 
-Register the node:
+---
+
+## Step 2: Implement the Backend Executor
+
+When the Orchestrator reaches your node, it passes the job to a worker. The worker looks up the handler by the node's type.
+
+Create `apps/backend/modules/workflow/handlers/emailHandler.js`:
 
 ```javascript
-// packages/workflow-nodes/src/index.js
-export { EmailNode } from './nodes/EmailNode';
-
-export const NODE_TYPES = {
-  // ... existing
-  email: EmailNode
-};
-```
-
-## Step 2: Create Node Config Panel
-
-For the sidebar that appears when a node is selected:
-
-```jsx
-// packages/workflow-nodes/src/configs/EmailNodeConfig.jsx
-
-export function EmailNodeConfig({ data, onChange }) {
-  return (
-    <div className="node-config">
-      <label>To (Email)</label>
-      <input
-        type="email"
-        value={data.to}
-        onChange={(e) => onChange({ ...data, to: e.target.value })}
-        placeholder="recipient@example.com"
-      />
-      
-      <label>Subject</label>
-      <input
-        type="text"
-        value={data.subject}
-        onChange={(e) => onChange({ ...data, subject: e.target.value })}
-        placeholder="Email subject"
-      />
-      
-      <label>Body</label>
-      <textarea
-        value={data.body}
-        onChange={(e) => onChange({ ...data, body: e.target.value })}
-        placeholder="Email body (supports {{ variables }})"
-        rows={5}
-      />
-    </div>
-  );
-}
-```
-
-## Step 3: Implement Backend Executor
-
-```javascript
-// apps/backend/modules/workflow/nodeExecutors/email.executor.js
+// apps/backend/modules/workflow/handlers/emailHandler.js
 
 const nodemailer = require('nodemailer');
+const { resolveTemplate } = require('@jet-admin/expression-engine');
 
-async function executeEmailNode(nodeData, context) {
-  const { to, subject, body } = nodeData;
+async function execute({ nodeConfig, context, isTestRun }) {
+  // 1. Evaluate template bindings safely
+  const to = await resolveTemplate(nodeConfig.to, context, { mode: 'safe-path' });
+  const subject = await resolveTemplate(nodeConfig.subject, context, { mode: 'safe-path' });
+  const body = await resolveTemplate(nodeConfig.body, context, { mode: 'safe-path' });
   
-  // Replace template variables
-  const processedBody = body.replace(
-    /\{\{(\w+)\}\}/g, 
-    (_, key) => context[key] || ''
-  );
-  
+  if (isTestRun) {
+    console.log(`[TEST RUN] Would send email to ${to}`);
+    return { status: 'success', output: { simulated: true, to } };
+  }
+
+  // 2. Perform the action
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
+    // ... auth config
   });
   
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject,
-    html: processedBody
-  });
-  
-  return {
-    success: true,
-    sentTo: to,
-    timestamp: new Date().toISOString()
-  };
+  try {
+    await transporter.sendMail({ from: process.env.SMTP_FROM, to, subject, text: body });
+
+    // 3. Return the result to be appended to the workflow context log
+    return {
+      status: 'success',
+      output: { deliveredTo: to, timestamp: new Date().toISOString() }
+    };
+  } catch (error) {
+    return {
+      status: 'error',
+      output: { message: error.message }
+    };
+  }
 }
 
-module.exports = { executeEmailNode };
+module.exports = { execute };
 ```
 
-Register the executor:
+---
+
+## Step 3: Register the Handler
+
+Add your handler to the main registry so the worker knows how to process jobs of type `email`.
 
 ```javascript
-// apps/backend/modules/workflow/nodeExecutors/index.js
+// apps/backend/modules/workflow/handlers/index.js
 
-const { executeEmailNode } = require('./email.executor');
+const emailHandler = require('./emailHandler');
 
-const NODE_EXECUTORS = {
-  // ... existing
-  email: executeEmailNode
+const handlers = {
+  // ... existing handlers
+  email: emailHandler,
 };
 
-async function executeNode(type, nodeData, context) {
-  const executor = NODE_EXECUTORS[type];
-  if (!executor) throw new Error(`Unknown node type: ${type}`);
-  return executor(nodeData, context);
+function getHandler(nodeType) {
+  const handler = handlers[nodeType];
+  if (!handler) throw new Error(`No handler found for node type: ${nodeType}`);
+  return handler;
 }
 
-module.exports = { executeNode, NODE_EXECUTORS };
+module.exports = { handlers, getHandler };
 ```
 
-## Step 4: Add Node to Palette
+**Note:** You must also register the handler in the worker process registry (`apps/backend/modules/workflow/workers/handlers/index.js`) if it uses a separate worker pool.
 
-Register in the frontend node palette:
-
-```javascript
-// apps/frontend/src/constants.js
-
-export const WORKFLOW_NODE_PALETTE = [
-  // ... existing categories
-  {
-    category: 'Integrations',
-    nodes: [
-      { type: 'email', label: 'Send Email', icon: 'EmailIcon' },
-      { type: 'webhook', label: 'Webhook', icon: 'WebhookIcon' }
-    ]
-  }
-];
-```
-
-## Node Executor Interface
-
-All executors receive:
-
-```javascript
-async function executeNode(nodeData, context) {
-  // nodeData: { ...user configuration from React Flow node }
-  // context: { ...accumulated data from previous nodes }
-  
-  // Return value is merged into context for next nodes
-  return { outputKey: 'value' };
-}
-```
+---
 
 ## Best Practices
 
-- **Validation**: Validate required fields before execution
-- **Error Messages**: Provide clear messages on failure
-- **Idempotency**: Handle re-runs gracefully where possible
-- **Secrets**: Never log or expose API keys/passwords
-- **Testing**: Add both component tests and executor unit tests
+- **Context Isolation**: Do not modify the `context` object directly inside your handler. Return an `output` object; the Orchestrator will append it to the context log under the node's ID.
+- **Template Resolution**: Always pass user-configured string fields through the `expression-engine` to ensure `{{bindings}}` are evaluated against upstream node outputs before you use them.
+- **Test Mode**: Check `isTestRun`. If true, consider mocking the action (like sending an email or charging a credit card) or interacting with a sandbox environment.
+- **Error Boundaries**: Catch exceptions and return `{ status: 'error', output: ... }` rather than letting the Node.js process crash. The Orchestrator handles retry limits based on the node's definition.
