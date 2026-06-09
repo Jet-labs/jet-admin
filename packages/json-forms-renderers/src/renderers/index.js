@@ -24,6 +24,7 @@ export { CustomVerticalLayout } from './CustomVerticalLayout.jsx';
 export { CustomTabRenderer } from './CustomTabRenderer.jsx';
 export { CustomHorizontalLayout } from './CustomHorizontalLayout.jsx';
 export { CustomFileUploadInput } from './CustomFileUploadInput.jsx';
+export { CustomGoogleOAuthButtonControl } from './CustomGoogleOAuthButtonControl.jsx';
 
 // Import for HOC wrapping
 import { CustomNumberInput } from './CustomNumberInput.jsx';
@@ -45,6 +46,7 @@ import { CustomVerticalLayout } from './CustomVerticalLayout.jsx';
 import { CustomTabRenderer } from './CustomTabRenderer.jsx';
 import { CustomHorizontalLayout } from './CustomHorizontalLayout.jsx';
 import { CustomFileUploadInput } from './CustomFileUploadInput.jsx';
+import { CustomGoogleOAuthButtonControl } from './CustomGoogleOAuthButtonControl.jsx';
 
 // Export HOC wrapped components with Jet prefix for uniformity
 export const JetNumberControl = withJsonFormsControlProps(CustomNumberInput);
@@ -66,4 +68,5 @@ export const JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);
 export const JetTabLayout = withJsonFormsLayoutProps(CustomTabRenderer);
 export const JetHorizontalLayout = withJsonFormsLayoutProps(CustomHorizontalLayout);
 export const JetFileUploadControl = withJsonFormsControlProps(CustomFileUploadInput);
+export const JetGoogleOAuthControl = withJsonFormsControlProps(CustomGoogleOAuthButtonControl);
 

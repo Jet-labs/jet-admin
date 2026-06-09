@@ -1,6 +1,6 @@
 // src/renderers/index.js
 import {
-  withJsonFormsControlProps,
+  withJsonFormsControlProps as withJsonFormsControlProps2,
   withJsonFormsLayoutProps
 } from "@jsonforms/react";
 
@@ -1240,6 +1240,12 @@ var FileUploadContext = React19.createContext({
     throw new Error("No upload handler provided");
   }
 });
+var OAuthContext = React19.createContext({
+  startOAuth: () => {
+    throw new Error("No OAuth handler provided");
+  },
+  loading: false
+});
 
 // src/renderers/CustomFileUploadInput.jsx
 var CustomFileUploadInput = (props) => {
@@ -1382,26 +1388,72 @@ CustomFileUploadInput.propTypes = {
   enabled: PropTypes19.bool
 };
 
+// src/renderers/CustomGoogleOAuthButtonControl.jsx
+import React21, { useContext as useContext2 } from "react";
+import PropTypes20 from "prop-types";
+import { withJsonFormsControlProps } from "@jsonforms/react";
+import { GoogleOAuthButton } from "@jet-admin/ui";
+var CustomGoogleOAuthButtonControlComponent = (props) => {
+  const { data, path, handleChange, label, description, errors, enabled } = props;
+  const { startOAuth, loading } = useContext2(OAuthContext);
+  const hasErrors = errors && errors.length > 0;
+  const isConnected = !!data;
+  const handleOAuthClick = () => {
+    if (startOAuth) {
+      startOAuth((vaultCredentialID) => {
+        handleChange(path, vaultCredentialID);
+      });
+    } else {
+      console.error("OAuthContext missing startOAuth handler");
+    }
+  };
+  return /* @__PURE__ */ React21.createElement(
+    GoogleOAuthButton,
+    {
+      isConnected,
+      credentialId: data,
+      onClick: handleOAuthClick,
+      loading,
+      disabled: !enabled,
+      label,
+      description,
+      hasErrors,
+      errors
+    }
+  );
+};
+CustomGoogleOAuthButtonControlComponent.propTypes = {
+  data: PropTypes20.string,
+  path: PropTypes20.string.isRequired,
+  handleChange: PropTypes20.func.isRequired,
+  label: PropTypes20.string,
+  description: PropTypes20.string,
+  errors: PropTypes20.arrayOf(PropTypes20.string),
+  enabled: PropTypes20.bool
+};
+var CustomGoogleOAuthButtonControl = CustomGoogleOAuthButtonControlComponent;
+
 // src/renderers/index.js
-var JetNumberControl = withJsonFormsControlProps(CustomNumberInput);
-var JetTextControl = withJsonFormsControlProps(CustomTextInput);
-var JetSelectControl = withJsonFormsControlProps(CustomSelectInput);
-var JetCheckboxControl = withJsonFormsControlProps(CustomCheckboxInput);
-var JetCodeEditorControl = withJsonFormsControlProps(CustomCodeEditorControl);
-var JetSuggestionControl = withJsonFormsControlProps(CustomSuggestionInput);
-var JetCustomDynamicKeyValueInputRenderer = withJsonFormsControlProps(CustomDynamicKeyValueInputRenderer);
-var JetKeyValueArrayControl = withJsonFormsControlProps(CustomKeyValueArrayRenderer);
-var JetKeyValueTypeArrayControl = withJsonFormsControlProps(CustomKeyValueTypeArrayRenderer);
-var JetKeyTypeArrayControl = withJsonFormsControlProps(CustomKeyTypeArrayRenderer);
-var JetStringArrayControl = withJsonFormsControlProps(CustomStringArrayRenderer);
-var JetFieldOperatorValueArrayControl = withJsonFormsControlProps(CustomFieldOperatorValueArrayRenderer);
-var JetGenericObjectArrayControl = withJsonFormsControlProps(CustomGenericObjectArrayRenderer);
+var JetNumberControl = withJsonFormsControlProps2(CustomNumberInput);
+var JetTextControl = withJsonFormsControlProps2(CustomTextInput);
+var JetSelectControl = withJsonFormsControlProps2(CustomSelectInput);
+var JetCheckboxControl = withJsonFormsControlProps2(CustomCheckboxInput);
+var JetCodeEditorControl = withJsonFormsControlProps2(CustomCodeEditorControl);
+var JetSuggestionControl = withJsonFormsControlProps2(CustomSuggestionInput);
+var JetCustomDynamicKeyValueInputRenderer = withJsonFormsControlProps2(CustomDynamicKeyValueInputRenderer);
+var JetKeyValueArrayControl = withJsonFormsControlProps2(CustomKeyValueArrayRenderer);
+var JetKeyValueTypeArrayControl = withJsonFormsControlProps2(CustomKeyValueTypeArrayRenderer);
+var JetKeyTypeArrayControl = withJsonFormsControlProps2(CustomKeyTypeArrayRenderer);
+var JetStringArrayControl = withJsonFormsControlProps2(CustomStringArrayRenderer);
+var JetFieldOperatorValueArrayControl = withJsonFormsControlProps2(CustomFieldOperatorValueArrayRenderer);
+var JetGenericObjectArrayControl = withJsonFormsControlProps2(CustomGenericObjectArrayRenderer);
 var JetGroupLayout = withJsonFormsLayoutProps(CustomGroupLayout);
-var JetRadioControl = withJsonFormsControlProps(CustomRadioInput);
+var JetRadioControl = withJsonFormsControlProps2(CustomRadioInput);
 var JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);
 var JetTabLayout = withJsonFormsLayoutProps(CustomTabRenderer);
 var JetHorizontalLayout = withJsonFormsLayoutProps(CustomHorizontalLayout);
-var JetFileUploadControl = withJsonFormsControlProps(CustomFileUploadInput);
+var JetFileUploadControl = withJsonFormsControlProps2(CustomFileUploadInput);
+var JetGoogleOAuthControl = withJsonFormsControlProps2(CustomGoogleOAuthButtonControl);
 
 // src/testers.js
 import {
@@ -1660,6 +1712,13 @@ var fileUploadTester = rankWith(
     }
   )
 );
+var googleOAuthTester = rankWith(
+  200,
+  and(
+    isControl,
+    (uischema) => uischema.options && uischema.options.googleOAuth === true
+  )
+);
 
 // src/jetFormsRenderers.js
 var jetFormsBaseRenderers = [
@@ -1678,7 +1737,8 @@ var jetFormsBaseRenderers = [
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout },
   { tester: horizontalLayoutTester, renderer: JetHorizontalLayout },
-  { tester: fileUploadTester, renderer: JetFileUploadControl }
+  { tester: fileUploadTester, renderer: JetFileUploadControl },
+  { tester: googleOAuthTester, renderer: JetGoogleOAuthControl }
 ];
 var jetFormsRenderers = [
   { tester: suggestionInputTester, renderer: JetSuggestionControl },
@@ -1695,6 +1755,7 @@ export {
   CustomFieldOperatorValueArrayRenderer,
   CustomFileUploadInput,
   CustomGenericObjectArrayRenderer,
+  CustomGoogleOAuthButtonControl,
   CustomGroupLayout,
   CustomHorizontalLayout,
   CustomKeyTypeArrayRenderer,
@@ -1717,6 +1778,7 @@ export {
   JetFieldOperatorValueArrayControl,
   JetFileUploadControl,
   JetGenericObjectArrayControl,
+  JetGoogleOAuthControl,
   JetGroupLayout,
   JetHorizontalLayout,
   JetKeyTypeArrayControl,
@@ -1730,6 +1792,7 @@ export {
   JetTabLayout,
   JetTextControl,
   JetVerticalLayout,
+  OAuthContext,
   checkboxTester,
   codeEditorTester,
   codeEditorTester as codeJavascriptTester,
@@ -1738,6 +1801,7 @@ export {
   fieldOperatorValueArrayTester,
   fileUploadTester,
   genericObjectArrayTester,
+  googleOAuthTester,
   groupLayoutTester,
   jetFormsBaseRenderers,
   jetFormsRenderers,

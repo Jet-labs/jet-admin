@@ -50,6 +50,10 @@ if (isModuleEnabled(constants.MODULES.TENANT)) {
   );
 }
 
+// OAuth integration routes
+expressApp.use("/api/v1/oauth", require("./modules/oauth/oauth.v1.routes"));
+
+
 
 // if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
 //   Logger.log("success", { message: "workflow module enabled" });

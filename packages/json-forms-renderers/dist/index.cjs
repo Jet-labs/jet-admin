@@ -37,6 +37,7 @@ __export(index_exports, {
   CustomFieldOperatorValueArrayRenderer: () => CustomFieldOperatorValueArrayRenderer,
   CustomFileUploadInput: () => CustomFileUploadInput,
   CustomGenericObjectArrayRenderer: () => CustomGenericObjectArrayRenderer,
+  CustomGoogleOAuthButtonControl: () => CustomGoogleOAuthButtonControl,
   CustomGroupLayout: () => CustomGroupLayout,
   CustomHorizontalLayout: () => CustomHorizontalLayout,
   CustomKeyTypeArrayRenderer: () => CustomKeyTypeArrayRenderer,
@@ -59,6 +60,7 @@ __export(index_exports, {
   JetFieldOperatorValueArrayControl: () => JetFieldOperatorValueArrayControl,
   JetFileUploadControl: () => JetFileUploadControl,
   JetGenericObjectArrayControl: () => JetGenericObjectArrayControl,
+  JetGoogleOAuthControl: () => JetGoogleOAuthControl,
   JetGroupLayout: () => JetGroupLayout,
   JetHorizontalLayout: () => JetHorizontalLayout,
   JetKeyTypeArrayControl: () => JetKeyTypeArrayControl,
@@ -72,6 +74,7 @@ __export(index_exports, {
   JetTabLayout: () => JetTabLayout,
   JetTextControl: () => JetTextControl,
   JetVerticalLayout: () => JetVerticalLayout,
+  OAuthContext: () => OAuthContext,
   checkboxTester: () => checkboxTester,
   codeEditorTester: () => codeEditorTester,
   codeJavascriptTester: () => codeEditorTester,
@@ -80,6 +83,7 @@ __export(index_exports, {
   fieldOperatorValueArrayTester: () => fieldOperatorValueArrayTester,
   fileUploadTester: () => fileUploadTester,
   genericObjectArrayTester: () => genericObjectArrayTester,
+  googleOAuthTester: () => googleOAuthTester,
   groupLayoutTester: () => groupLayoutTester,
   jetFormsBaseRenderers: () => jetFormsBaseRenderers,
   jetFormsRenderers: () => jetFormsRenderers,
@@ -98,7 +102,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/renderers/index.js
-var import_react29 = require("@jsonforms/react");
+var import_react31 = require("@jsonforms/react");
 
 // src/renderers/CustomNumberInput.jsx
 var import_react = __toESM(require("react"));
@@ -1336,6 +1340,12 @@ var FileUploadContext = import_react27.default.createContext({
     throw new Error("No upload handler provided");
   }
 });
+var OAuthContext = import_react27.default.createContext({
+  startOAuth: () => {
+    throw new Error("No OAuth handler provided");
+  },
+  loading: false
+});
 
 // src/renderers/CustomFileUploadInput.jsx
 var CustomFileUploadInput = (props) => {
@@ -1478,26 +1488,72 @@ CustomFileUploadInput.propTypes = {
   enabled: import_prop_types19.default.bool
 };
 
+// src/renderers/CustomGoogleOAuthButtonControl.jsx
+var import_react29 = __toESM(require("react"));
+var import_prop_types20 = __toESM(require("prop-types"));
+var import_react30 = require("@jsonforms/react");
+var import_ui17 = require("@jet-admin/ui");
+var CustomGoogleOAuthButtonControlComponent = (props) => {
+  const { data, path, handleChange, label, description, errors, enabled } = props;
+  const { startOAuth, loading } = (0, import_react29.useContext)(OAuthContext);
+  const hasErrors = errors && errors.length > 0;
+  const isConnected = !!data;
+  const handleOAuthClick = () => {
+    if (startOAuth) {
+      startOAuth((vaultCredentialID) => {
+        handleChange(path, vaultCredentialID);
+      });
+    } else {
+      console.error("OAuthContext missing startOAuth handler");
+    }
+  };
+  return /* @__PURE__ */ import_react29.default.createElement(
+    import_ui17.GoogleOAuthButton,
+    {
+      isConnected,
+      credentialId: data,
+      onClick: handleOAuthClick,
+      loading,
+      disabled: !enabled,
+      label,
+      description,
+      hasErrors,
+      errors
+    }
+  );
+};
+CustomGoogleOAuthButtonControlComponent.propTypes = {
+  data: import_prop_types20.default.string,
+  path: import_prop_types20.default.string.isRequired,
+  handleChange: import_prop_types20.default.func.isRequired,
+  label: import_prop_types20.default.string,
+  description: import_prop_types20.default.string,
+  errors: import_prop_types20.default.arrayOf(import_prop_types20.default.string),
+  enabled: import_prop_types20.default.bool
+};
+var CustomGoogleOAuthButtonControl = CustomGoogleOAuthButtonControlComponent;
+
 // src/renderers/index.js
-var JetNumberControl = (0, import_react29.withJsonFormsControlProps)(CustomNumberInput);
-var JetTextControl = (0, import_react29.withJsonFormsControlProps)(CustomTextInput);
-var JetSelectControl = (0, import_react29.withJsonFormsControlProps)(CustomSelectInput);
-var JetCheckboxControl = (0, import_react29.withJsonFormsControlProps)(CustomCheckboxInput);
-var JetCodeEditorControl = (0, import_react29.withJsonFormsControlProps)(CustomCodeEditorControl);
-var JetSuggestionControl = (0, import_react29.withJsonFormsControlProps)(CustomSuggestionInput);
-var JetCustomDynamicKeyValueInputRenderer = (0, import_react29.withJsonFormsControlProps)(CustomDynamicKeyValueInputRenderer);
-var JetKeyValueArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
-var JetKeyValueTypeArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
-var JetKeyTypeArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
-var JetStringArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomStringArrayRenderer);
-var JetFieldOperatorValueArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomFieldOperatorValueArrayRenderer);
-var JetGenericObjectArrayControl = (0, import_react29.withJsonFormsControlProps)(CustomGenericObjectArrayRenderer);
-var JetGroupLayout = (0, import_react29.withJsonFormsLayoutProps)(CustomGroupLayout);
-var JetRadioControl = (0, import_react29.withJsonFormsControlProps)(CustomRadioInput);
-var JetVerticalLayout = (0, import_react29.withJsonFormsLayoutProps)(CustomVerticalLayout);
-var JetTabLayout = (0, import_react29.withJsonFormsLayoutProps)(CustomTabRenderer);
-var JetHorizontalLayout = (0, import_react29.withJsonFormsLayoutProps)(CustomHorizontalLayout);
-var JetFileUploadControl = (0, import_react29.withJsonFormsControlProps)(CustomFileUploadInput);
+var JetNumberControl = (0, import_react31.withJsonFormsControlProps)(CustomNumberInput);
+var JetTextControl = (0, import_react31.withJsonFormsControlProps)(CustomTextInput);
+var JetSelectControl = (0, import_react31.withJsonFormsControlProps)(CustomSelectInput);
+var JetCheckboxControl = (0, import_react31.withJsonFormsControlProps)(CustomCheckboxInput);
+var JetCodeEditorControl = (0, import_react31.withJsonFormsControlProps)(CustomCodeEditorControl);
+var JetSuggestionControl = (0, import_react31.withJsonFormsControlProps)(CustomSuggestionInput);
+var JetCustomDynamicKeyValueInputRenderer = (0, import_react31.withJsonFormsControlProps)(CustomDynamicKeyValueInputRenderer);
+var JetKeyValueArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
+var JetKeyValueTypeArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
+var JetKeyTypeArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
+var JetStringArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomStringArrayRenderer);
+var JetFieldOperatorValueArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomFieldOperatorValueArrayRenderer);
+var JetGenericObjectArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomGenericObjectArrayRenderer);
+var JetGroupLayout = (0, import_react31.withJsonFormsLayoutProps)(CustomGroupLayout);
+var JetRadioControl = (0, import_react31.withJsonFormsControlProps)(CustomRadioInput);
+var JetVerticalLayout = (0, import_react31.withJsonFormsLayoutProps)(CustomVerticalLayout);
+var JetTabLayout = (0, import_react31.withJsonFormsLayoutProps)(CustomTabRenderer);
+var JetHorizontalLayout = (0, import_react31.withJsonFormsLayoutProps)(CustomHorizontalLayout);
+var JetFileUploadControl = (0, import_react31.withJsonFormsControlProps)(CustomFileUploadInput);
+var JetGoogleOAuthControl = (0, import_react31.withJsonFormsControlProps)(CustomGoogleOAuthButtonControl);
 
 // src/testers.js
 var import_core = require("@jsonforms/core");
@@ -1749,6 +1805,13 @@ var fileUploadTester = (0, import_core.rankWith)(
     }
   )
 );
+var googleOAuthTester = (0, import_core.rankWith)(
+  200,
+  (0, import_core.and)(
+    import_core.isControl,
+    (uischema) => uischema.options && uischema.options.googleOAuth === true
+  )
+);
 
 // src/jetFormsRenderers.js
 var jetFormsBaseRenderers = [
@@ -1767,7 +1830,8 @@ var jetFormsBaseRenderers = [
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout },
   { tester: horizontalLayoutTester, renderer: JetHorizontalLayout },
-  { tester: fileUploadTester, renderer: JetFileUploadControl }
+  { tester: fileUploadTester, renderer: JetFileUploadControl },
+  { tester: googleOAuthTester, renderer: JetGoogleOAuthControl }
 ];
 var jetFormsRenderers = [
   { tester: suggestionInputTester, renderer: JetSuggestionControl },

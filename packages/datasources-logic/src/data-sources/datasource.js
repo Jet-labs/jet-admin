@@ -1,8 +1,9 @@
 export default class DataSource {
-    constructor(config) {
+    constructor(config, helpers) {
       this.datasourceID = config?.datasourceID;
       this.datasourceType = config?.datasourceType;
       this.config = config;
+      this.helpers = helpers;
     }
   
     async execute(query, context, helpers) {

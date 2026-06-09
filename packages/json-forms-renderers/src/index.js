@@ -29,6 +29,7 @@ export {
   CustomTabRenderer,
   CustomHorizontalLayout,
   CustomFileUploadInput,
+  CustomGoogleOAuthButtonControl,
 } from './renderers/index.js';
 
 // Export HOC wrapped components
@@ -59,6 +60,7 @@ export {
   JetVerticalLayout,
   JetTabLayout,
   JetHorizontalLayout,
+  JetGoogleOAuthControl,
 } from './renderers/index.js';
 
 // Export testers
@@ -83,9 +85,10 @@ export {
   verticalLayoutTester,
   tabRendererTester,
   fileUploadTester,
+  googleOAuthTester,
 } from './testers.js';
 
-export { FileUploadContext } from './context.js';
+export { FileUploadContext, OAuthContext } from './context.js';
 
 // Export the complete renderers array
 export { jetFormsRenderers, jetFormsBaseRenderers } from './jetFormsRenderers.js';

@@ -4,7 +4,7 @@
     "properties": {
       "connectionOption": {
         "type": "string",
-        "enum": ["serviceAccount", "projectId"],
+        "enum": ["serviceAccount", "oauth2", "projectId"],
         "default": "serviceAccount",
         "description": "Choose authentication method"
       },
@@ -17,6 +17,10 @@
         "type": "string",
         "description": "Service Account JSON key (paste the entire JSON content)",
         "format": "textarea"
+      },
+      "vaultCredentialID": {
+        "type": "string",
+        "description": "Securely stored Google Account credentials"
       },
       "databaseURL": {
         "type": "string",
@@ -36,6 +40,18 @@
         "then": {
           "required": ["serviceAccountKey"]
         }
+      },
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "oauth2"
+            }
+          }
+        },
+        "then": {
+          "required": ["vaultCredentialID"]
+        }
       }
     ]
   },
@@ -47,7 +63,12 @@
         "scope": "#/properties/connectionOption",
         "label": "Authentication Method",
         "options": {
-          "format": "radio"
+          "format": "radio",
+          "enumLabels": {
+            "serviceAccount": "Service Account Key (JSON)",
+            "oauth2": "Sign in with Google (OAuth2)",
+            "projectId": "Application Default Credentials (ADC)"
+          }
         }
       },
       {
@@ -78,6 +99,27 @@
         ]
       },
       {
+        "type": "Group",
+        "label": "Google Authentication",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "oauth2" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/vaultCredentialID",
+            "label": "Google Authentication",
+            "options": {
+              "googleOAuth": true
+            }
+          }
+        ]
+      },
+      {
         "type": "Control",
         "scope": "#/properties/databaseURL",
         "label": "Database URL (Optional)"
@@ -88,6 +130,7 @@
     "connectionOption": "serviceAccount",
     "projectId": "my-firebase-project",
     "serviceAccountKey": "",
+    "vaultCredentialID": "",
     "databaseURL": ""
   }
 }

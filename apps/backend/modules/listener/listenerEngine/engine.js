@@ -20,6 +20,7 @@ const { dataSourceRegistry } = require('@jet-admin/datasources-logic');
 const { addListenerEvent } = require('../../../config/queue.config');
 const { prisma } = require('../../../config/prisma.config');
 const Logger = require('../../../utils/logger');
+const { vaultService } = require('../../vault/vault.service');
 
 const MAX_RETRIES = 10;
 const BASE_RETRY_DELAY_MS = 1000;
@@ -91,7 +92,17 @@ class ListenerEngine {
       }
 
       const DataSource = dataSourceRegistry.getDataSource(datasource.datasourceType);
-      const instance = new DataSource(datasource);
+      const instance = new DataSource(datasource, {
+        getCredential: async (vaultCredentialID) => {
+          return await vaultService.getCredential({
+            tenantID: listener.tenantID,
+            vaultCredentialID,
+          });
+        },
+        getGoogleClientConfig: () => {
+          return vaultService.getGoogleClientConfig();
+        },
+      });
 
       const handle = await instance.subscribe(
         listener.listenerConfig,

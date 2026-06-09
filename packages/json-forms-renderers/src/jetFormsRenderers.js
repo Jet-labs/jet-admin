@@ -18,6 +18,7 @@ import {
   JetRadioControl,
   JetHorizontalLayout,
   JetFileUploadControl,
+  JetGoogleOAuthControl,
 } from './renderers/index.js';
 
 import {
@@ -40,6 +41,7 @@ import {
   radioInputTester,
   horizontalLayoutTester,
   fileUploadTester,
+  googleOAuthTester,
 } from './testers.js';
 
 /**
@@ -63,6 +65,7 @@ export const jetFormsBaseRenderers = [
   { tester: verticalLayoutTester, renderer: JetVerticalLayout },
   { tester: horizontalLayoutTester, renderer: JetHorizontalLayout },
   { tester: fileUploadTester, renderer: JetFileUploadControl },
+  { tester: googleOAuthTester, renderer: JetGoogleOAuthControl },
 ];
 
 /**

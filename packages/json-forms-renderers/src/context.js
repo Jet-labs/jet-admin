@@ -5,3 +5,10 @@ export const FileUploadContext = React.createContext({
     throw new Error("No upload handler provided");
   }
 });
+
+export const OAuthContext = React.createContext({
+  startOAuth: () => {
+    throw new Error("No OAuth handler provided");
+  },
+  loading: false
+});

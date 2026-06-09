@@ -4,6 +4,7 @@ const { resolveTemplate } = require("@jet-admin/expression-engine");
 const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
 const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
 const fileStorageUtil = require("../../../utils/fileStorage.util");
+const { vaultService } = require("../../vault/vault.service");
 
 const QUERY_TEMPLATE_OPTIONS = {
   allowedRoots: ["inputs"],
@@ -58,7 +59,22 @@ class QueryEngine {
     });
 
     const datasource = await this.getDataSource(query, dataQueryID);
-    const result = await datasource.execute(resolvedTemplate, {}, { fileStorage: fileStorageUtil });
+    const result = await datasource.execute(
+      resolvedTemplate,
+      {},
+      {
+        fileStorage: fileStorageUtil,
+        getCredential: async (vaultCredentialID) => {
+          return await vaultService.getCredential({
+            tenantID: query.tenantID,
+            vaultCredentialID,
+          });
+        },
+        getGoogleClientConfig: () => {
+          return vaultService.getGoogleClientConfig();
+        },
+      }
+    );
 
     this.cache.set(cacheKey, result);
     Logger.log("info", {
@@ -100,7 +116,15 @@ class QueryEngine {
     }
 
     const DataSource = dataSourceRegistry.getDataSource(query.datasourceType);
-    const instance = new DataSource(datasourceConfig);
+    const instance = new DataSource(datasourceConfig, {
+      fileStorage: fileStorageUtil,
+      getCredential: async (vaultCredentialID) => {
+        return await vaultService.getCredential({
+          tenantID: query.tenantID,
+          vaultCredentialID,
+        });
+      },
+    });
 
     this.dataSourceCache.set(cacheKey, instance);
     Logger.log("info", {

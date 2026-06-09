@@ -3,6 +3,7 @@ const { prisma } = require("../../config/prisma.config");
 const { DATASOURCE_LOGIC_COMPONENTS } = require("@jet-admin/datasources-logic");
 const fileStorageUtil = require("../../utils/fileStorage.util");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
+const { vaultService } = require("../vault/vault.service");
 
 const datasourceService = {};
 
@@ -76,7 +77,18 @@ datasourceService.testDatasourceConnection = async ({
       datasourceType
     ].testConnection({
       datasourceOptions,
-      helpers: { fileStorage: fileStorageUtil },
+      helpers: {
+        fileStorage: fileStorageUtil,
+        getCredential: async (vaultCredentialID) => {
+          return await vaultService.getCredential({
+            tenantID,
+            vaultCredentialID,
+          });
+        },
+        getGoogleClientConfig: () => {
+          return vaultService.getGoogleClientConfig();
+        },
+      },
     });
 
     if (!connectionResult.ok) {

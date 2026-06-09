@@ -1003,6 +1003,10 @@ export const CONSTANTS = {
       getAuditLogsAPI: (tenantID, page, pageSize) =>
         `/api/v1/tenants/${tenantID}/audit?page=${page}&pageSize=${pageSize}`,
     },
+    OAUTH: {
+      getAuthUrlAPI: (provider, tenantID) =>
+        `/api/v1/oauth/${provider}/auth/${tenantID}`,
+    },
     DATASOURCE: {
       getAllDatasourcesAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/datasources`,

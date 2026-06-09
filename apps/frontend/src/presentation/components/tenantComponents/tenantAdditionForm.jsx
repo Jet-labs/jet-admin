@@ -35,7 +35,7 @@ export const TenantAdditionForm = () => {
     },
     validationSchema: formValidations.addTenantFormValidationSchema,
     onSubmit: ({ tenantTitle, tenantLogoURL }) => {
-      updateTenant({
+      createNewTenant({
         tenantTitle,
         tenantLogoURL,
       });

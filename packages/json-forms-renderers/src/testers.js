@@ -370,3 +370,14 @@ export const fileUploadTester = rankWith(
   )
 );
 
+// ============================================================================
+// Google OAuth Tester
+// ============================================================================
+export const googleOAuthTester = rankWith(
+  200,
+  and(
+    isControl,
+    (uischema) => uischema.options && uischema.options.googleOAuth === true
+  )
+);
+

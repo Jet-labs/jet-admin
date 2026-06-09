@@ -22,22 +22,13 @@
         "type": "object",
         "description": "OAuth2 credentials",
         "properties": {
-          "clientId": {
+          "vaultCredentialID": {
             "type": "string",
-            "description": "OAuth2 Client ID"
-          },
-          "clientSecret": {
-            "type": "string",
-            "description": "OAuth2 Client Secret",
-            "format": "password"
-          },
-          "refreshToken": {
-            "type": "string",
-            "description": "OAuth2 Refresh Token",
-            "format": "password"
+            "description": "Securely stored Google Account credentials",
+            "minLength": 1
           }
         },
-        "required": ["clientId", "clientSecret", "refreshToken"]
+        "required": ["vaultCredentialID"]
       },
       "defaultSpreadsheetId": {
         "type": "string",
@@ -112,7 +103,7 @@
       },
       {
         "type": "Group",
-        "label": "OAuth2 Credentials",
+        "label": "Google Authentication",
         "rule": {
           "effect": "SHOW",
           "condition": {
@@ -123,23 +114,10 @@
         "elements": [
           {
             "type": "Control",
-            "scope": "#/properties/oauth2/properties/clientId",
-            "label": "Client ID"
-          },
-          {
-            "type": "Control",
-            "scope": "#/properties/oauth2/properties/clientSecret",
-            "label": "Client Secret",
+            "scope": "#/properties/oauth2/properties/vaultCredentialID",
+            "label": "Google Account Authorization",
             "options": {
-              "format": "password"
-            }
-          },
-          {
-            "type": "Control",
-            "scope": "#/properties/oauth2/properties/refreshToken",
-            "label": "Refresh Token",
-            "options": {
-              "format": "password"
+              "googleOAuth": true
             }
           }
         ]
@@ -156,9 +134,7 @@
     "connectionName": "MyGoogleSheets",
     "serviceAccountKey": "",
     "oauth2": {
-      "clientId": "",
-      "clientSecret": "",
-      "refreshToken": ""
+      "vaultCredentialID": ""
     },
     "defaultSpreadsheetId": ""
   }

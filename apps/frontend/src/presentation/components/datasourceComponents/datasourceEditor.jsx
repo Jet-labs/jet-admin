@@ -11,9 +11,10 @@ import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES, getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
-import { FileUploadContext } from "@jet-admin/json-forms-renderers";
+import { FileUploadContext, OAuthContext } from "@jet-admin/json-forms-renderers";
 import { DatasourceIcon } from "./datasourceIcon";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Section } from "@jet-admin/ui";
+import { useOAuthPopup } from "../../../logic/hooks/useOAuthPopup";
 
 export const DatasourceEditor = ({ datasourceEditorForm }) => {
   DatasourceEditor.propTypes = {
@@ -21,6 +22,12 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
   };
 
   const { tenantID } = useParams();
+
+  // Initialize the OAuth popup hook to be provided to JSON Forms Custom Renderers
+  const { startOAuth, loading: isOAuthLoading } = useOAuthPopup({
+    provider: "google",
+    tenantID,
+  });
 
   // Track whether JsonForms has completed its initial render cycle.
   const isJsonFormsInitialized = useRef(false);
@@ -125,16 +132,18 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
 
           {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType] && currentDatasourceType?.formConfig && (
             <div className="border-t border-border pt-4 mt-2">
-              <FileUploadContext.Provider value={{ uploadFile: handleUploadFile }}>
-                <JsonForms
-                  schema={currentDatasourceType.formConfig.schema}
-                  uischema={currentDatasourceType.formConfig.uischema}
-                  data={datasourceEditorForm.values.datasourceOptions}
-                  renderers={[...materialRenderers, ...customJSONFormRenderers]}
-                  cells={materialCells}
-                  onChange={handleDatasourceOptionsChange}
-                />
-              </FileUploadContext.Provider>
+              <OAuthContext.Provider value={{ startOAuth, loading: isOAuthLoading }}>
+                <FileUploadContext.Provider value={{ uploadFile: handleUploadFile }}>
+                  <JsonForms
+                    schema={currentDatasourceType.formConfig.schema}
+                    uischema={currentDatasourceType.formConfig.uischema}
+                    data={datasourceEditorForm.values.datasourceOptions}
+                    renderers={[...materialRenderers, ...customJSONFormRenderers]}
+                    cells={materialCells}
+                    onChange={handleDatasourceOptionsChange}
+                  />
+                </FileUploadContext.Provider>
+              </OAuthContext.Provider>
             </div>
           )}
         </div>

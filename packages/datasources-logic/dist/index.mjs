@@ -265,10 +265,11 @@ import { Client as Client2 } from "pg";
 
 // src/data-sources/datasource.js
 var DataSource = class {
-  constructor(config) {
+  constructor(config, helpers) {
     this.datasourceID = config?.datasourceID;
     this.datasourceType = config?.datasourceType;
     this.config = config;
+    this.helpers = helpers;
   }
   async execute(query, context, helpers) {
     throw new Error("execute() method must be implemented");
@@ -532,23 +533,65 @@ var WebURLDataSource = class extends DataSource {
 // src/data-sources/firestore/datasource.js
 import { initializeApp, cert, getApps, getApp, deleteApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { google } from "googleapis";
 var FirestoreDataSource = class extends DataSource {
   constructor(config) {
     super(config);
     this.app = null;
     this.db = null;
   }
-  async getFirestoreDb() {
+  async getFirestoreDb(helpers) {
     if (this.db) return this.db;
-    const { projectId, serviceAccountKey, databaseURL } = this.config.datasourceOptions;
+    const { projectId, serviceAccountKey, vaultCredentialID, databaseURL } = this.config.datasourceOptions;
     const appName = `firestore-${this.config.datasourceID || Date.now()}`;
     try {
       this.app = getApp(appName);
     } catch (e) {
+      let finalKey = serviceAccountKey;
+      const activeHelpers = helpers || this.helpers;
+      if (vaultCredentialID && activeHelpers && typeof activeHelpers.getCredential === "function") {
+        try {
+          const credential2 = await activeHelpers.getCredential(vaultCredentialID);
+          if (credential2) {
+            finalKey = credential2;
+          }
+        } catch (err) {
+          Logger.log("error", {
+            message: "firestore:getFirestoreDb:failed_vault",
+            params: { error: err.message }
+          });
+        }
+      }
       let credential;
-      if (serviceAccountKey) {
-        const serviceAccount = typeof serviceAccountKey === "string" ? JSON.parse(serviceAccountKey) : serviceAccountKey;
-        credential = cert(serviceAccount);
+      if (finalKey) {
+        if (typeof finalKey === "object" && finalKey.refreshToken) {
+          let clientId = null;
+          let clientSecret = null;
+          if (activeHelpers && typeof activeHelpers.getGoogleClientConfig === "function") {
+            const clientConfig = activeHelpers.getGoogleClientConfig();
+            if (clientConfig) {
+              clientId = clientConfig.clientId;
+              clientSecret = clientConfig.clientSecret;
+            }
+          }
+          if (!clientId || !clientSecret) {
+            throw new Error("Google OAuth app credentials are not configured on the server.");
+          }
+          const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+          oauth2Client.setCredentials({ refresh_token: finalKey.refreshToken });
+          credential = {
+            getAccessToken: async () => {
+              const tokenResponse = await oauth2Client.getAccessToken();
+              return {
+                access_token: tokenResponse.token,
+                expires_in: 3600
+              };
+            }
+          };
+        } else {
+          const serviceAccount = typeof finalKey === "string" ? JSON.parse(finalKey) : finalKey;
+          credential = cert(serviceAccount);
+        }
       }
       const appConfig = {
         credential,
@@ -562,14 +605,14 @@ var FirestoreDataSource = class extends DataSource {
     this.db = getFirestore(this.app);
     return this.db;
   }
-  async execute(dataQueryOptions2, context) {
+  async execute(dataQueryOptions2, context, helpers) {
     Logger.log("info", {
       message: "firestore:FirestoreDataSource:execute:params",
       params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
     });
     const { operation, collectionPath, documentId, data, where, orderBy, limit } = dataQueryOptions2;
     try {
-      const db = await this.getFirestoreDb();
+      const db = await this.getFirestoreDb(helpers);
       let result;
       switch (operation) {
         case "get":
@@ -1022,26 +1065,55 @@ var MongoDBDataSource = class extends DataSource {
 };
 
 // src/data-sources/googlesheets/datasource.js
-import { google } from "googleapis";
+import { google as google2 } from "googleapis";
 var GoogleSheetsDataSource = class extends DataSource {
   constructor(config) {
     super(config);
     this.sheets = null;
     this.auth = null;
   }
-  async getAuth() {
+  async getAuth(helpers) {
     if (this.auth) return this.auth;
     const datasourceOptions = this.config.datasourceOptions || {};
     const { authType, serviceAccountKey, oauth2 } = datasourceOptions;
     if (authType === "serviceAccount" && serviceAccountKey) {
       const credentials = typeof serviceAccountKey === "string" ? JSON.parse(serviceAccountKey) : serviceAccountKey;
-      this.auth = new google.auth.GoogleAuth({
+      this.auth = new google2.auth.GoogleAuth({
         credentials,
         scopes: ["https://www.googleapis.com/auth/spreadsheets"]
       });
     } else if (authType === "oauth2" && oauth2) {
-      const { clientId, clientSecret, refreshToken } = oauth2;
-      const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+      const activeHelpers = helpers || this.helpers;
+      let clientId = null;
+      let clientSecret = null;
+      if (activeHelpers && typeof activeHelpers.getGoogleClientConfig === "function") {
+        const clientConfig = activeHelpers.getGoogleClientConfig();
+        if (clientConfig) {
+          clientId = clientConfig.clientId;
+          clientSecret = clientConfig.clientSecret;
+        }
+      }
+      let refreshToken = null;
+      if (oauth2.vaultCredentialID && activeHelpers && typeof activeHelpers.getCredential === "function") {
+        try {
+          const credential = await activeHelpers.getCredential(oauth2.vaultCredentialID);
+          if (credential) {
+            refreshToken = credential.refreshToken;
+          }
+        } catch (err) {
+          Logger.log("error", {
+            message: "googlesheets:getAuth:failed_vault",
+            params: { error: err.message }
+          });
+        }
+      }
+      if (!clientId || !clientSecret) {
+        throw new Error("Google OAuth app credentials are not configured on the server.");
+      }
+      if (!refreshToken) {
+        throw new Error("OAuth2 credentials not found in vault.");
+      }
+      const oauth2Client = new google2.auth.OAuth2(clientId, clientSecret);
       oauth2Client.setCredentials({ refresh_token: refreshToken });
       this.auth = oauth2Client;
     } else {
@@ -1049,13 +1121,13 @@ var GoogleSheetsDataSource = class extends DataSource {
     }
     return this.auth;
   }
-  async getSheetsClient() {
+  async getSheetsClient(helpers) {
     if (this.sheets) return this.sheets;
-    const auth = await this.getAuth();
-    this.sheets = google.sheets({ version: "v4", auth });
+    const auth = await this.getAuth(helpers);
+    this.sheets = google2.sheets({ version: "v4", auth });
     return this.sheets;
   }
-  async execute(dataQueryOptions2, context) {
+  async execute(dataQueryOptions2, context, helpers) {
     Logger.log("info", {
       message: "googlesheets:GoogleSheetsDataSource:execute:params",
       params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
@@ -1077,7 +1149,7 @@ var GoogleSheetsDataSource = class extends DataSource {
       throw new Error("Spreadsheet ID is required");
     }
     try {
-      const sheets = await this.getSheetsClient();
+      const sheets = await this.getSheetsClient(helpers);
       let result;
       const fullRange = sheetName && range && !range.includes("!") ? `${sheetName}!${range}` : range || sheetName;
       switch (operation) {
@@ -3913,28 +3985,80 @@ var webURLTestConnection = async ({ datasourceOptions }) => {
 // src/data-sources/firestore/connection.js
 import { initializeApp as initializeApp2, cert as cert2, getApps as getApps2, deleteApp as deleteApp2 } from "firebase-admin/app";
 import { getFirestore as getFirestore2 } from "firebase-admin/firestore";
-var firestoreTestConnection = async ({ datasourceOptions }) => {
-  const { projectId, serviceAccountKey, databaseURL } = datasourceOptions;
+import { google as google3 } from "googleapis";
+var firestoreTestConnection = async ({ datasourceOptions, helpers }) => {
+  const { projectId, serviceAccountKey, vaultCredentialID, databaseURL } = datasourceOptions;
   let app = null;
   try {
     Logger.log("info", {
       message: "firestore:firestoreTestConnection:params",
       params: { projectId, databaseURL }
     });
-    let credential;
-    if (serviceAccountKey) {
+    let finalKey = serviceAccountKey;
+    if (vaultCredentialID && helpers && typeof helpers.getCredential === "function") {
       try {
-        const serviceAccount = typeof serviceAccountKey === "string" ? JSON.parse(serviceAccountKey) : serviceAccountKey;
-        credential = cert2(serviceAccount);
-      } catch (parseError) {
+        const credential2 = await helpers.getCredential(vaultCredentialID);
+        if (credential2) {
+          finalKey = credential2;
+        }
+      } catch (err) {
         Logger.log("error", {
-          message: "firestore:firestoreTestConnection:parseError",
-          params: { error: parseError.message }
+          message: "firestoreTestConnection:failed_vault",
+          params: { error: err.message }
         });
-        return {
-          ok: false,
-          error: "Invalid service account JSON: " + parseError.message
-        };
+      }
+    }
+    let credential;
+    if (finalKey) {
+      if (typeof finalKey === "object" && finalKey.refreshToken) {
+        try {
+          let clientId = null;
+          let clientSecret = null;
+          if (helpers && typeof helpers.getGoogleClientConfig === "function") {
+            const clientConfig = helpers.getGoogleClientConfig();
+            if (clientConfig) {
+              clientId = clientConfig.clientId;
+              clientSecret = clientConfig.clientSecret;
+            }
+          }
+          if (!clientId || !clientSecret) {
+            throw new Error("Google OAuth app credentials are not configured on the server.");
+          }
+          const oauth2Client = new google3.auth.OAuth2(clientId, clientSecret);
+          oauth2Client.setCredentials({ refresh_token: finalKey.refreshToken });
+          credential = {
+            getAccessToken: async () => {
+              const tokenResponse = await oauth2Client.getAccessToken();
+              return {
+                access_token: tokenResponse.token,
+                expires_in: 3600
+              };
+            }
+          };
+        } catch (oauthError) {
+          Logger.log("error", {
+            message: "firestore:firestoreTestConnection:oauthError",
+            params: { error: oauthError.message }
+          });
+          return {
+            ok: false,
+            error: "Failed to initialize Google OAuth credential: " + oauthError.message
+          };
+        }
+      } else {
+        try {
+          const serviceAccount = typeof finalKey === "string" ? JSON.parse(finalKey) : finalKey;
+          credential = cert2(serviceAccount);
+        } catch (parseError) {
+          Logger.log("error", {
+            message: "firestore:firestoreTestConnection:parseError",
+            params: { error: parseError.message }
+          });
+          return {
+            ok: false,
+            error: "Invalid service account JSON: " + parseError.message
+          };
+        }
       }
     }
     const appName = `test-${Date.now()}`;
@@ -4281,8 +4405,8 @@ var stripeTestConnection = async ({ datasourceOptions }) => {
 };
 
 // src/data-sources/googlesheets/connection.js
-import { google as google2 } from "googleapis";
-var googlesheetsTestConnection = async ({ datasourceOptions }) => {
+import { google as google4 } from "googleapis";
+var googlesheetsTestConnection = async ({ datasourceOptions, helpers }) => {
   try {
     Logger.log("info", {
       message: "googlesheets:googlesheetsTestConnection:params"
@@ -4290,13 +4414,41 @@ var googlesheetsTestConnection = async ({ datasourceOptions }) => {
     let auth;
     if (datasourceOptions.authType === "serviceAccount" && datasourceOptions.serviceAccountKey) {
       const credentials = typeof datasourceOptions.serviceAccountKey === "string" ? JSON.parse(datasourceOptions.serviceAccountKey) : datasourceOptions.serviceAccountKey;
-      auth = new google2.auth.GoogleAuth({
+      auth = new google4.auth.GoogleAuth({
         credentials,
         scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"]
       });
     } else if (datasourceOptions.authType === "oauth2" && datasourceOptions.oauth2) {
-      const { clientId, clientSecret, refreshToken } = datasourceOptions.oauth2;
-      const oauth2Client = new google2.auth.OAuth2(clientId, clientSecret);
+      let clientId = null;
+      let clientSecret = null;
+      if (helpers && typeof helpers.getGoogleClientConfig === "function") {
+        const clientConfig = helpers.getGoogleClientConfig();
+        if (clientConfig) {
+          clientId = clientConfig.clientId;
+          clientSecret = clientConfig.clientSecret;
+        }
+      }
+      let refreshToken = null;
+      if (datasourceOptions.oauth2.vaultCredentialID && helpers && typeof helpers.getCredential === "function") {
+        try {
+          const credential = await helpers.getCredential(datasourceOptions.oauth2.vaultCredentialID);
+          if (credential) {
+            refreshToken = credential.refreshToken;
+          }
+        } catch (err) {
+          Logger.log("error", {
+            message: "googlesheetsTestConnection:failed_vault",
+            params: { error: err.message }
+          });
+        }
+      }
+      if (!clientId || !clientSecret) {
+        throw new Error("Google OAuth app credentials are not configured on the server.");
+      }
+      if (!refreshToken) {
+        throw new Error("OAuth2 credentials not found in vault.");
+      }
+      const oauth2Client = new google4.auth.OAuth2(clientId, clientSecret);
       oauth2Client.setCredentials({ refresh_token: refreshToken });
       auth = oauth2Client;
     } else {
@@ -4305,7 +4457,7 @@ var googlesheetsTestConnection = async ({ datasourceOptions }) => {
         error: "Invalid authentication configuration. Provide service account key or OAuth2 credentials."
       };
     }
-    const sheets = google2.sheets({ version: "v4", auth });
+    const sheets = google4.sheets({ version: "v4", auth });
     if (datasourceOptions.defaultSpreadsheetId) {
       await sheets.spreadsheets.get({
         spreadsheetId: datasourceOptions.defaultSpreadsheetId

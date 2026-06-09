@@ -32,3 +32,4 @@ export { PageHeader } from './components/pageHeader';
 export { Section } from './components/section';
 export { ErrorBoundary } from './components/error-boundary';
 export { TemplateAutocompleteInput } from './components/template-autocomplete-input';
+export { GoogleOAuthButton } from './components/google-oauth-button';

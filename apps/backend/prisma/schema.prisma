@@ -201,6 +201,7 @@ model tblTenants {
   tblUserNotifications                                tblUserNotifications[]
   tblUserTenantConfigMap                              tblUserTenantConfigMap[]
   tblUsersTenantsRelationship                         tblUsersTenantsRelationship[]
+  tblVaultCredentials                                 tblVaultCredentials[]
   tblWidgets                                          tblWidgets[]
   tblWorkflowInstances                                tblWorkflowInstances[]
   tblWorkflows                                        tblWorkflows[]
@@ -506,4 +507,15 @@ model tblAppPages {
   tblTenants         tblTenants  @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAppPagesTenantIDTenantID")
 
   @@index([createdByApiKeyID], map: "idx_tblAppPages_createdByApiKeyID")
+}
+
+model tblVaultCredentials {
+  vaultCredentialID String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantID          String     @db.Uuid
+  name              String     @db.VarChar
+  provider          String     @db.VarChar
+  encryptedData     Json
+  createdAt         DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime   @default(now()) @db.Timestamptz(6)
+  tblTenants        tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction, map: "fkTblVaultCredentialsTenantID")
 }

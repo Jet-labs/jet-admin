@@ -44,6 +44,9 @@ const environmentVariables = {
   SUPABASE_S3_ACCESS_KEY_ID: process.env.SUPABASE_S3_ACCESS_KEY_ID,
   SUPABASE_S3_SECRET_ACCESS_KEY: process.env.SUPABASE_S3_SECRET_ACCESS_KEY,
   SUPABASE_S3_BUCKET: process.env.SUPABASE_S3_BUCKET,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  BACKEND_URL: process.env.BACKEND_URL,
 };
 console.log("environment variables set-----------------------------");
 const safeEnv = { ...environmentVariables };

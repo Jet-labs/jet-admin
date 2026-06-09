@@ -9,7 +9,7 @@ export default class GoogleSheetsDataSource extends DataSource {
     this.auth = null;
   }
 
-  async getAuth() {
+  async getAuth(helpers) {
     if (this.auth) return this.auth;
 
     const datasourceOptions = this.config.datasourceOptions || {};
@@ -25,7 +25,41 @@ export default class GoogleSheetsDataSource extends DataSource {
         scopes: ["https://www.googleapis.com/auth/spreadsheets"],
       });
     } else if (authType === "oauth2" && oauth2) {
-      const { clientId, clientSecret, refreshToken } = oauth2;
+      const activeHelpers = helpers || this.helpers;
+      let clientId = null;
+      let clientSecret = null;
+
+      if (activeHelpers && typeof activeHelpers.getGoogleClientConfig === "function") {
+        const clientConfig = activeHelpers.getGoogleClientConfig();
+        if (clientConfig) {
+          clientId = clientConfig.clientId;
+          clientSecret = clientConfig.clientSecret;
+        }
+      }
+
+      let refreshToken = null;
+
+      if (oauth2.vaultCredentialID && activeHelpers && typeof activeHelpers.getCredential === "function") {
+        try {
+          const credential = await activeHelpers.getCredential(oauth2.vaultCredentialID);
+          if (credential) {
+            refreshToken = credential.refreshToken;
+          }
+        } catch (err) {
+          Logger.log("error", {
+            message: "googlesheets:getAuth:failed_vault",
+            params: { error: err.message },
+          });
+        }
+      }
+
+      if (!clientId || !clientSecret) {
+        throw new Error("Google OAuth app credentials are not configured on the server.");
+      }
+
+      if (!refreshToken) {
+        throw new Error("OAuth2 credentials not found in vault.");
+      }
       
       const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
       oauth2Client.setCredentials({ refresh_token: refreshToken });
@@ -38,15 +72,15 @@ export default class GoogleSheetsDataSource extends DataSource {
     return this.auth;
   }
 
-  async getSheetsClient() {
+  async getSheetsClient(helpers) {
     if (this.sheets) return this.sheets;
     
-    const auth = await this.getAuth();
+    const auth = await this.getAuth(helpers);
     this.sheets = google.sheets({ version: "v4", auth });
     return this.sheets;
   }
 
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions, context, helpers) {
     Logger.log("info", {
       message: "googlesheets:GoogleSheetsDataSource:execute:params",
       params: { dataQueryOptions, datasourceID: this.config.datasourceID },
@@ -72,7 +106,7 @@ export default class GoogleSheetsDataSource extends DataSource {
     }
 
     try {
-      const sheets = await this.getSheetsClient();
+      const sheets = await this.getSheetsClient(helpers);
       let result;
 
       // Build full range with sheet name if provided

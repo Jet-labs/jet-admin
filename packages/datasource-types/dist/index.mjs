@@ -1038,7 +1038,7 @@ var formConfig_default4 = {
     properties: {
       connectionOption: {
         type: "string",
-        enum: ["serviceAccount", "projectId"],
+        enum: ["serviceAccount", "oauth2", "projectId"],
         default: "serviceAccount",
         description: "Choose authentication method"
       },
@@ -1051,6 +1051,10 @@ var formConfig_default4 = {
         type: "string",
         description: "Service Account JSON key (paste the entire JSON content)",
         format: "textarea"
+      },
+      vaultCredentialID: {
+        type: "string",
+        description: "Securely stored Google Account credentials"
       },
       databaseURL: {
         type: "string",
@@ -1070,6 +1074,18 @@ var formConfig_default4 = {
         then: {
           required: ["serviceAccountKey"]
         }
+      },
+      {
+        if: {
+          properties: {
+            connectionOption: {
+              const: "oauth2"
+            }
+          }
+        },
+        then: {
+          required: ["vaultCredentialID"]
+        }
       }
     ]
   },
@@ -1081,7 +1097,12 @@ var formConfig_default4 = {
         scope: "#/properties/connectionOption",
         label: "Authentication Method",
         options: {
-          format: "radio"
+          format: "radio",
+          enumLabels: {
+            serviceAccount: "Service Account Key (JSON)",
+            oauth2: "Sign in with Google (OAuth2)",
+            projectId: "Application Default Credentials (ADC)"
+          }
         }
       },
       {
@@ -1112,6 +1133,27 @@ var formConfig_default4 = {
         ]
       },
       {
+        type: "Group",
+        label: "Google Authentication",
+        rule: {
+          effect: "SHOW",
+          condition: {
+            scope: "#/properties/connectionOption",
+            schema: { const: "oauth2" }
+          }
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/vaultCredentialID",
+            label: "Google Authentication",
+            options: {
+              googleOAuth: true
+            }
+          }
+        ]
+      },
+      {
         type: "Control",
         scope: "#/properties/databaseURL",
         label: "Database URL (Optional)"
@@ -1122,6 +1164,7 @@ var formConfig_default4 = {
     connectionOption: "serviceAccount",
     projectId: "my-firebase-project",
     serviceAccountKey: "",
+    vaultCredentialID: "",
     databaseURL: ""
   }
 };
@@ -2280,22 +2323,13 @@ var formConfig_default7 = {
         type: "object",
         description: "OAuth2 credentials",
         properties: {
-          clientId: {
+          vaultCredentialID: {
             type: "string",
-            description: "OAuth2 Client ID"
-          },
-          clientSecret: {
-            type: "string",
-            description: "OAuth2 Client Secret",
-            format: "password"
-          },
-          refreshToken: {
-            type: "string",
-            description: "OAuth2 Refresh Token",
-            format: "password"
+            description: "Securely stored Google Account credentials",
+            minLength: 1
           }
         },
-        required: ["clientId", "clientSecret", "refreshToken"]
+        required: ["vaultCredentialID"]
       },
       defaultSpreadsheetId: {
         type: "string",
@@ -2370,7 +2404,7 @@ var formConfig_default7 = {
       },
       {
         type: "Group",
-        label: "OAuth2 Credentials",
+        label: "Google Authentication",
         rule: {
           effect: "SHOW",
           condition: {
@@ -2381,23 +2415,10 @@ var formConfig_default7 = {
         elements: [
           {
             type: "Control",
-            scope: "#/properties/oauth2/properties/clientId",
-            label: "Client ID"
-          },
-          {
-            type: "Control",
-            scope: "#/properties/oauth2/properties/clientSecret",
-            label: "Client Secret",
+            scope: "#/properties/oauth2/properties/vaultCredentialID",
+            label: "Google Account Authorization",
             options: {
-              format: "password"
-            }
-          },
-          {
-            type: "Control",
-            scope: "#/properties/oauth2/properties/refreshToken",
-            label: "Refresh Token",
-            options: {
-              format: "password"
+              googleOAuth: true
             }
           }
         ]
@@ -2414,9 +2435,7 @@ var formConfig_default7 = {
     connectionName: "MyGoogleSheets",
     serviceAccountKey: "",
     oauth2: {
-      clientId: "",
-      clientSecret: "",
-      refreshToken: ""
+      vaultCredentialID: ""
     },
     defaultSpreadsheetId: ""
   }

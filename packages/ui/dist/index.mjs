@@ -2128,6 +2128,83 @@ ErrorBoundary.propTypes = {
   fallback: PropTypes5.func,
   title: PropTypes5.string
 };
+
+// src/components/google-oauth-button.jsx
+import React30 from "react";
+import PropTypes6 from "prop-types";
+import { CheckCircle2 as CheckCircle22, AlertCircle } from "lucide-react";
+var GoogleIcon = () => /* @__PURE__ */ React30.createElement(
+  "svg",
+  {
+    className: "mr-2 h-4 w-4",
+    "aria-hidden": "true",
+    focusable: "false",
+    "data-prefix": "fab",
+    "data-icon": "google",
+    role: "img",
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 488 512"
+  },
+  /* @__PURE__ */ React30.createElement(
+    "path",
+    {
+      fill: "currentColor",
+      d: "M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+    }
+  )
+);
+var GoogleOAuthButton = ({
+  isConnected,
+  credentialId,
+  onClick,
+  loading,
+  disabled,
+  label,
+  description,
+  hasErrors,
+  errors
+}) => {
+  return /* @__PURE__ */ React30.createElement("div", { className: "space-y-1.5 w-full" }, /* @__PURE__ */ React30.createElement(
+    Label2,
+    {
+      className: `block text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
+    },
+    label || description || "Google Authentication"
+  ), /* @__PURE__ */ React30.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center gap-3 p-4 border border-border rounded-md bg-card text-card-foreground shadow-sm" }, isConnected ? /* @__PURE__ */ React30.createElement(React30.Fragment, null, /* @__PURE__ */ React30.createElement("div", { className: "flex items-center gap-2 flex-1" }, /* @__PURE__ */ React30.createElement(CheckCircle22, { className: "w-5 h-5 text-emerald-500 flex-shrink-0" }), /* @__PURE__ */ React30.createElement("div", null, /* @__PURE__ */ React30.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Google Account Connected"), /* @__PURE__ */ React30.createElement("p", { className: "text-xs text-muted-foreground font-mono truncate max-w-xs sm:max-w-md" }, "Credential ID: ", credentialId))), /* @__PURE__ */ React30.createElement(
+    Button,
+    {
+      type: "button",
+      variant: "outline",
+      size: "sm",
+      disabled: disabled || loading,
+      onClick
+    },
+    loading ? "Connecting..." : "Reconnect Account"
+  )) : /* @__PURE__ */ React30.createElement(React30.Fragment, null, /* @__PURE__ */ React30.createElement("div", { className: "flex items-center gap-2 flex-1" }, /* @__PURE__ */ React30.createElement(AlertCircle, { className: "w-5 h-5 text-yellow-500 flex-shrink-0" }), /* @__PURE__ */ React30.createElement("div", null, /* @__PURE__ */ React30.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Account authentication required"), /* @__PURE__ */ React30.createElement("p", { className: "text-xs text-muted-foreground" }, "Connect your Google Account to enable database query execution."))), /* @__PURE__ */ React30.createElement(
+    Button,
+    {
+      type: "button",
+      variant: "primary",
+      size: "sm",
+      disabled: disabled || loading,
+      onClick,
+      className: "bg-blue-600 hover:bg-blue-700 text-white flex items-center"
+    },
+    /* @__PURE__ */ React30.createElement(GoogleIcon, null),
+    loading ? "Connecting..." : "Connect Google Account"
+  ))), hasErrors && errors && /* @__PURE__ */ React30.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
+};
+GoogleOAuthButton.propTypes = {
+  isConnected: PropTypes6.bool.isRequired,
+  credentialId: PropTypes6.string,
+  onClick: PropTypes6.func.isRequired,
+  loading: PropTypes6.bool,
+  disabled: PropTypes6.bool,
+  label: PropTypes6.string,
+  description: PropTypes6.string,
+  hasErrors: PropTypes6.bool,
+  errors: PropTypes6.oneOfType([PropTypes6.string, PropTypes6.array])
+};
 export {
   Accordion,
   AccordionContent,
@@ -2184,6 +2261,7 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   ErrorBoundary,
+  GoogleOAuthButton,
   Input,
   InputValuesForm,
   Label2 as Label,
