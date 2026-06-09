@@ -30,18 +30,42 @@ const sidebars = {
       ],
     },
 
+    // Core Concepts Section
+    {
+      type: 'category',
+      label: '💡 Core Concepts',
+      collapsed: false,
+      items: [
+        'concepts/core-glossary',
+        'concepts/data-flow',
+        'concepts/multi-tenancy',
+        'concepts/workflow-architecture',
+        'concepts/workflow-engine',
+        'concepts/widget-workflow-integration',
+        'concepts/input-lifecycle',
+      ],
+    },
+
     // Architecture Section
     {
       type: 'category',
       label: '🏛️ Architecture',
-      collapsed: true,
+      collapsed: false,
       items: [
         'architecture/system-overview',
+        'architecture/application-model',
+        'architecture/widget-system',
+        'architecture/datasource-integration',
+        'architecture/query-engine',
+        'architecture/template-engine',
+        'architecture/workflow-engine',
+        'architecture/etl-pipeline',
+        'architecture/rbac',
+        'architecture/realtime',
+        'architecture/database-schema',
         'architecture/backend-architecture',
         'architecture/frontend-architecture',
-        'architecture/database-schema',
         'architecture/socket-events',
-        'architecture/api-reference',
       ],
     },
 
@@ -126,21 +150,6 @@ const sidebars = {
       ],
     },
 
-    // Core Concepts Section
-    {
-      type: 'category',
-      label: '💡 Core Concepts',
-      collapsed: true,
-      items: [
-        'concepts/data-flow',
-        'concepts/multi-tenancy',
-        'concepts/workflow-architecture',
-        'concepts/workflow-engine',
-        'concepts/widget-workflow-integration',
-        'concepts/input-lifecycle',
-      ],
-    },
-
     // API Reference Section
     {
       type: 'category',
@@ -149,6 +158,7 @@ const sidebars = {
       items: [
         'api-reference/index',
         'api-reference/authentication',
+        'api-reference/api-endpoints',
         'api-reference/websocket',
       ],
     },
@@ -160,6 +170,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'developer/packages-overview',
+        'developer/local-development',
         'developer/creating-datasource',
         'developer/creating-widget',
         'developer/creating-workflow-node',
@@ -184,6 +195,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'troubleshooting/troubleshooting',
+        'troubleshooting/common-issues',
         'troubleshooting/faq',
       ],
     },

@@ -1,5 +1,5 @@
 ---
-id: troubleshooting
+id: common-issues
 title: Troubleshooting & FAQ
 sidebar_label: Troubleshooting
 sidebar_position: 1

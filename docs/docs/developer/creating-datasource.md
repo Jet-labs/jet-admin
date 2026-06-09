@@ -6,157 +6,161 @@ description: How to add support for a new database or API type
 
 # Creating a Custom Datasource
 
-This guide walks through adding support for a new datasource type (e.g., a new database or API).
+This guide walks through adding support for a new datasource type (e.g., a new database or SaaS API) to the Jet Admin Integration Fabric.
 
 ## Overview
 
 Adding a datasource requires changes to three packages:
 
-1. **`datasource-types`**: Define the configuration schema
-2. **`datasources-logic`**: Implement the connection driver
-3. **`datasources-ui`**: Create the connection form (optional, uses JSON Forms)
+1. **`@jet-admin/datasource-types`**: Register the identifier.
+2. **`@jet-admin/datasources-logic`**: Implement the backend connection driver.
+3. **`@jet-admin/datasources-ui`**: Create the connection form for the frontend.
+
+---
 
 ## Step 1: Define the Type
 
-In `packages/datasource-types/src/index.js`, add your new type:
+In `packages/datasource-types/src/index.js`, add your new type to the main registry.
 
 ```javascript
+// packages/datasource-types/src/index.js
+
 export const DATASOURCE_TYPES = {
   // ... existing types
   CLICKHOUSE: {
     name: 'ClickHouse',
     value: 'clickhouse',
-    icon: 'ClickHouseIcon',
-    category: 'database'
+    category: 'database',
+    description: 'Fast open-source OLAP DBMS'
   }
 };
 ```
 
-## Step 2: Create the Driver
+---
 
-In `packages/datasources-logic/src/`, create a new driver file:
+## Step 2: Implement the Driver Logic
+
+The driver handles the actual execution on the backend. Create a new folder in `packages/datasources-logic/src/data-sources/clickhouse/` and implement the `DataSource` interface.
 
 ```javascript
-// packages/datasources-logic/src/clickhouse/index.js
+// packages/datasources-logic/src/data-sources/clickhouse/datasource.js
+import { ClickHouseClient } from '@clickhouse/client';
 
-export class ClickHouseDriver {
-  constructor(config) {
-    this.config = config;
+export class ClickHouseDataSource {
+  constructor(options, credentials) {
+    this.options = options;
+    this.credentials = credentials;
+    this.client = null;
   }
 
+  async connect() {
+    if (!this.client) {
+      this.client = new ClickHouseClient({
+        host: this.options.host,
+        port: this.options.port,
+        username: this.credentials.username,
+        password: this.credentials.password,
+        database: this.options.database
+      });
+    }
+    return this.client;
+  }
+
+  // Called when a user clicks "Test Connection" in the UI
   async testConnection() {
-    // Validate connection and return { success: true } or throw error
-    const client = await this.getClient();
-    await client.query('SELECT 1');
-    return { success: true };
+    try {
+      const client = await this.connect();
+      await client.query('SELECT 1').toPromise();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   }
 
-  async runQuery(query, params = {}) {
-    const client = await this.getClient();
-    const result = await client.query(query, params);
-    return {
-      rows: result.data,
-      fields: result.columns
-    };
-  }
+  // Called when a Query is executed
+  async execute(queryConfig, evaluatedParams) {
+    const client = await this.connect();
+    // Use parameterization! Do not inject variables directly.
+    const result = await client.query(queryConfig.sql, {
+      query_params: evaluatedParams
+    }).toPromise();
 
-  async getTables() {
-    const result = await this.runQuery('SHOW TABLES');
-    return result.rows.map(row => ({ name: row.name }));
-  }
-
-  async getClient() {
-    // Initialize and return the ClickHouse client
-    const { ClickHouse } = require('@clickhouse/client');
-    return new ClickHouse({
-      host: this.config.host,
-      port: this.config.port,
-      username: this.config.username,
-      password: this.config.password,
-      database: this.config.database
-    });
+    return result;
   }
 }
 ```
 
 ### Register the Driver
 
-In `packages/datasources-logic/src/index.js`:
+Expose the driver to the Integration Fabric in `packages/datasources-logic/src/data-sources/index.js`:
 
 ```javascript
-import { ClickHouseDriver } from './clickhouse';
+import { ClickHouseDataSource } from './clickhouse/datasource';
 
-export const DRIVERS = {
+export const DataSourceDrivers = {
   // ... existing drivers
-  clickhouse: ClickHouseDriver
+  clickhouse: ClickHouseDataSource
 };
-
-export function getDriver(type, config) {
-  const Driver = DRIVERS[type];
-  if (!Driver) throw new Error(`Unknown datasource type: ${type}`);
-  return new Driver(config);
-}
 ```
 
-## Step 3: Define Configuration Schema
+---
 
-In `packages/datasource-types/src/schemas/clickhouse.js`:
+## Step 3: Define the Manifest
+
+The manifest tells the Query Engine what capabilities your datasource has and provides instructions for the frontend query editor.
+
+In `packages/datasources-logic/src/data-sources/manifests.js`:
 
 ```javascript
-export const clickhouseSchema = {
-  type: 'object',
-  required: ['host', 'port', 'database'],
-  properties: {
-    host: {
-      type: 'string',
-      title: 'Host',
-      default: 'localhost'
-    },
-    port: {
-      type: 'number',
-      title: 'Port',
-      default: 8123
-    },
-    database: {
-      type: 'string',
-      title: 'Database'
-    },
-    username: {
-      type: 'string',
-      title: 'Username'
-    },
-    password: {
-      type: 'string',
-      title: 'Password',
-      format: 'password'
-    }
+export const DATASOURCE_MANIFESTS = {
+  // ...
+  clickhouse: {
+    name: "ClickHouse",
+    description: "Execute fast analytical queries against ClickHouse.",
+    capabilities: ["read", "write"],
+    queryInstructions: "Write standard ClickHouse SQL. Use {{bindings}} for parameters."
   }
 };
 ```
 
-## Step 4: Test Your Datasource
+---
 
-1. Rebuild packages: `npm run dev:all-packages`
-2. Start the app: `npm run dev:all`
-3. Create a new datasource and select your type
-4. Test the connection
+## Step 4: Create the Configuration UI
 
-## Driver Interface
+Jet Admin uses JSON Forms (or custom React components) to generate the UI for setting up a connection.
 
-All drivers should implement this interface:
+In `packages/datasources-ui/src/components/`, create the form for ClickHouse. It should emit the `options` and `credentials` objects separately, as the backend encrypts `credentials`.
 
-```typescript
-interface DatasourceDriver {
-  testConnection(): Promise<{ success: boolean }>;
-  runQuery(query: string, params?: object): Promise<{ rows: any[], fields: any[] }>;
-  getTables(): Promise<{ name: string }[]>;
-  getColumns?(tableName: string): Promise<{ name: string, type: string }[]>;
-}
+```javascript
+// Example schema for your UI component
+export const clickhouseSchema = {
+  options: {
+    host: 'localhost',
+    port: 8123,
+    database: 'default'
+  },
+  credentials: {
+    username: 'default',
+    password: ''
+  }
+};
 ```
+
+Register this form component in the `datasources-ui` index so the frontend router can render it when "ClickHouse" is selected.
+
+---
+
+## Step 5: Test Your Datasource
+
+1. Rebuild all packages: `npm run dev:all-packages`
+2. Start the backend (`npm run dev` in `apps/backend`) and frontend (`npm run dev` in `apps/frontend`).
+3. Navigate to the **Datasources** tab in the Jet Admin UI.
+4. Click **New Datasource**, select **ClickHouse**, fill out the credentials, and click **Test Connection**.
+
+---
 
 ## Best Practices
 
-- **Error Handling**: Wrap errors with meaningful messages
-- **Connection Pooling**: Reuse connections where possible
-- **Timeouts**: Implement query timeouts to prevent hanging
-- **Sanitization**: Never interpolate user input directly into queries
+- **Security**: Never log `this.credentials` or include passwords in error messages.
+- **Connection Pooling**: If your database library supports connection pooling, use it to prevent exhausting backend resources.
+- **Parameterization**: Always use the native parameterization features of the underlying database driver (e.g., `$1`, `?`) when substituting `evaluatedParams`. Never use string concatenation for SQL queries to prevent SQL injection.

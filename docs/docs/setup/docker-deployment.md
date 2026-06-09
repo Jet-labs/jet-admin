@@ -1,261 +1,89 @@
 ---
-sidebar_position: 4
-title: Docker Deployment
 id: docker-deployment
+title: Self-Hosting & Deployment
+sidebar_label: Docker Deployment
+sidebar_position: 1
+description: Guide to self-hosting Jet Admin via Docker Compose.
 ---
 
-# Comprehensive Docker Deployment Guide
+# Self-Hosting & Deployment
 
-This guide covers deployment strategies for Jet Admin, ranging from simple single-server setups to scalable cloud-native architectures.
+Jet Admin is open-source and designed to be easily self-hosted on your own infrastructure. This ensures your data never leaves your VPC.
 
-## Table of Contents
-1. [Architecture Overview](#architecture-overview)
-2. [Docker Files Explained](#docker-files-explained)
-3. [Strategy 1: Single Server (Docker Compose)](#strategy-1-single-server)
-4. [Strategy 2: Scalable Backend (Microservices)](#strategy-2-scalable-backend)
-5. [Strategy 3: Independent Deployments (Hybrid)](#strategy-3-independent-deployments)
-6. [Strategy 4: Cloud Native (Kubernetes/ECS)](#strategy-4-cloud-native)
-7. [Configuration Reference](#configuration-reference)
-8. [Maintenance & Troubleshooting](#maintenance--troubleshooting)
+## Prerequisites
 
-## Architecture Overview
+To run Jet Admin via Docker, you need:
+- A host machine (Linux/macOS/Windows WSL2) with **Docker** and **Docker Compose** installed.
+- Minimum 2GB RAM.
+- A running PostgreSQL instance (or you can run it within the same Docker network).
 
-```mermaid
-graph TD
-    Client[Browser Client]
-    Frontend["Frontend Container (Nginx)"]
-    Backend["Backend Container (Node.js)"]
-    DB[(PostgreSQL)]
+## Installation via Docker Compose
 
-    Client -->|HTTP Port 80| Frontend
-    Client -->|API/WS Port 8090| Backend
+The easiest way to get started is using the provided `docker-compose.yml` file.
 
-    Backend --> DB
-```
-
-### Key Components
-- **Frontend Container**: Nginx serving React static files on Port 80.
-- **Backend Container**: Node.js Express API listening on Port 8090. Client connects directly.
-- **PostgreSQL**: Database for data storage.
-- **In-Memory Queue**: fastq-based workflow task queue (no external broker needed).
-
----
-
-## Docker Files Explained
-
-Understanding the purpose of each file helps in customizing the deployment.
-
-### 1. `Dockerfile.frontend`
-- **Purpose**: Builds the customized Nginx container for serving the React application.
-- **Key Features**:
-  - Uses `nginx:alpine` as base.
-  - **Multi-Stage Build**: Builds source code inside Docker.
-  - **Runtime Config**: Generates `config.js` at startup using **`docker-entrypoint.frontend.sh`**.
-- **Usage**: Used by the `frontend` service in Docker Compose.
-
-### 2. `Dockerfile.backend`
-- **Purpose**: Builds the Node.js API server container.
-- **Key Features**:
-  - Uses `node:18-slim` for small footprint.
-  - Installs dependencies including local workspace packages (`@jet-admin/*`).
-  - Generates Prisma client.
-  - Runs migration/startup checks via entrypoint.
-- **Usage**: Used by the `backend` service.
-
-### 3. `docker-compose.yml`
-- **Purpose**: The blueprint for running all services together with separated containers.
-- **Services Defined**:
-  - `frontend`: Port 80.
-  - `backend`: Port 8090.
-  - `postgres`: Database.
-- **Networking**: Creates `jet-network` to allow internal communication (e.g., `http://backend:8090`).
-
-### 4. `nginx.frontend.conf`
-- **Purpose**: Configuration for the Nginx server inside the frontend container.
-- **Key Features**:
-  - Listens on Port 80.
-  - Serves static files from `/usr/share/nginx/html`.
-  - Handles SPA routing (redirects 404 to `index.html`).
-  - Enables Gzip compression.
-
-### 5. `docker-entrypoint.backend.sh`
-- **Purpose**: Script that runs every time the **backend container** starts.
-- **Actions**:
-  - Waits for Postgres to be ready.
-  - Runs database migrations (`prisma migrate`).
-  - Seeds database (if `SEED_DATABASE=true`).
-  - Initializes in-memory workflow queues (fastq).
-  - Starts the application.
-
-### 6. `docker-entrypoint.frontend.sh`
-- **Purpose**: Script that runs every time the **frontend container** starts.
-- **Actions**:
-  - Takes `VITE_SERVER_HOST` and `VITE_SOCKET_HOST` environment variables.
-  - Generates `config.js` in the Nginx HTML root.
-  - Starts Nginx.
-
-### 7. `.dockerignore`
-- **Purpose**: Specifies files to exclude from the Docker build context (like `node_modules`, `logs`).
-- **Benefit**: Reduces build time and image size.
-
----
-
-## Strategy 1: Single Server
-**Best for**: On-Premise, Small/Medium Business, Staging, Simple VPS.
-
-This strategy uses `docker-compose` to run all services on a single machine. It is simple to manage and deploy.
-
-### 1. Prerequisites
-- Docker Engine & Docker Compose installed.
-- Git.
-
-### 2. Setup
+### Step 1: Clone the Repository
 ```bash
-# Clone repository
-git clone <repo_url> jet-admin
+git clone https://github.com/Jet-labs/jet-admin.git
 cd jet-admin
-
-
-
-# Configure environment
-cp .env.docker .env
-# Edit .env and set secure passwords!
 ```
 
-### 3. Deployment
+### Step 2: Configure Environment Variables
+Jet Admin requires certain environment variables to be set for the backend to communicate with the database and sign JWTs.
+
+Create a `.env` file in the root directory (you can copy `.env.docker` if available):
+
+```env
+# Required
+DATABASE_URL="postgresql://user:password@db:5432/jetadmin"
+JWT_SECRET="generate-a-secure-random-string-here"
+ENCRYPTION_KEY="32-byte-base64-string-for-datasource-credentials"
+
+# Optional
+PORT=3000
+NODE_ENV=production
+```
+
+### Step 3: Start the Platform
+Run Docker Compose in detached mode:
+
 ```bash
-# Start all services
-docker compose up -d --build
+docker-compose up -d
 ```
 
-### 4. Verification
-- **Frontend**: http://localhost (Port 80)
-- **Backend**: http://localhost:8090 (Port 8090)
-- **Check Status**: `docker compose ps`
+This command will:
+1. Build the `frontend` container (Vite/React build served via Nginx).
+2. Build the `backend` container (Node.js Express API).
+3. Automatically run Prisma schema migrations against the configured `DATABASE_URL` during the backend boot sequence.
 
----
+### Step 4: Access the UI
+Once the containers are healthy, open your browser and navigate to:
+`http://localhost` (or whatever port Nginx is bound to).
 
-## Strategy 2: Scalable Backend
-**Best for**: High Traffic, Enterprise On-Premise, Performance focus.
-
-To handle more concurrent users or workflows, you can scale the Backend service horizontally.
-
-### Important Note on Queue Architecture
-
-Jet Admin uses an **in-memory queue** (fastq) for workflow execution, not RabbitMQ. This means:
-
-- ✅ **Simpler deployment** - No external message broker needed
-- ✅ **Faster local development** - Fewer dependencies
-- ✅ **Good for single-instance** deployments
-- ⚠️ **Queue state is process-local** - Tasks don't distribute across multiple backend instances
-
-For horizontal scaling with distributed queues, you would need to implement a Redis-backed or external queue system.
-
----
-
-## Strategy 3: Independent Deployments
-**Best for**: Flexibility, using PaaS (Vercel/Heroku), or segregating duties.
-
-You can deploy the Frontend and Backend completely separately.
-
-### 1. Frontend Only (Static Hosting)
-Deploy the `apps/frontend` directory to any static host (AWS S3 + CloudFront, Vercel, Netlify).
-
-**Build Configuration**:
-Since the backend URL differs per environment, use **Runtime Configuration**:
-1. Build the app: `npm run build`
-2. Configure your host to inject a `config.js` file at the root:
-   ```javascript
-   window.JET_ADMIN_CONFIG = {
-     SERVER_HOST: "https://api.yourdomain.com",
-     SOCKET_HOST: "https://api.yourdomain.com"
-   };
-   ```
-
-### 2. Backend Only (API Server)
-Deploy the backend as a Node.js service on EC2, DigitalOcean Droplet, or Heroku.
-
-**External Dependencies**:
-You must provide connection strings to external services:
-- `DATABASE_URL` -> Managed RDS / Cloud SQL.
-
----
-
-## Strategy 4: Cloud Native
-**Best for**: Autoscaling, High Availability, AWS/Azure/GCP.
-
-Deploy containers using an orchestrator like Kubernetes (EKS/GKE) or Amazon ECS.
-
-### Kubernetes Manifests (Conceptual)
-
-**Frontend Deployment**:
-- **ReplicaSet**: 2+ replicas of `jet-admin-frontend` image.
-- **ConfigMap**: Mounts `config.js` with the correct Backend Service URL.
-- **Ingress**: Exposes frontend to the internet.
-
-**Backend Deployment**:
-- **Deployment**: `jet-admin-backend` image.
-- **HPA (Horizontal Pod Autoscaler)**: Auto-scale based on CPU/Memory.
-- **Env Vars**: Injected via Secrets (DB credentials).
-
-**Data Layer**:
-- **Do NOT** run Postgres in containers for production cloud. Use managed services (AWS RDS, Cloud SQL) for backups, patching, and HA.
-- The in-memory queue runs inside each backend instance - no external queue service needed.
-
----
+You will be greeted by the initial setup screen to create the primary Tenant Admin account.
 
 ## Configuration Reference
 
-### Frontend Environment Variables
-These control where the Frontend connects to. Can be set in `docker-compose.yml` or injected via `config.js`.
+Key environment variables to tune your deployment:
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `VITE_SERVER_HOST` | `http://localhost:8090` | HTTP URL of the Backend API |
-| `VITE_SOCKET_HOST` | `http://localhost:8090` | WebSocket URL of the Backend |
+- `DATABASE_URL`: Connection string to the operational PostgreSQL DB.
+- `JWT_SECRET`: Secret used to sign user session tokens.
+- `ENCRYPTION_KEY`: A 32-byte (256-bit) base64-encoded string used by `crypto.util.js` to encrypt external datasource passwords. **Do not lose this key, or you will lose access to your datasources.**
+- `LOG_LEVEL`: Set to `debug`, `info` (default), `warn`, or `error`.
+- `WORKER_CONCURRENCY`: (Optional) Tunes how many workflow jobs the pg-boss executor claims at once.
 
-### Backend Environment Variables
-Set these in `docker-compose.yml` or `.env`.
+## Upgrading
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | Postgres connection string |
-| `JWT_ACCESS_TOKEN_SECRET` | Secret for signing tokens |
-| `ENCRYPTION_KEY` | 32-byte key for credential encryption |
+When a new version of Jet Admin is released, follow these steps to upgrade safely:
 
----
+1. **Backup your Database:** Always take a `pg_dump` of your operational PostgreSQL database before upgrading.
+2. **Pull Changes:** `git pull origin main` (or checkout the specific release tag).
+3. **Rebuild Images:** `docker-compose build --no-cache`
+4. **Restart Containers:** `docker-compose up -d`
 
-## Maintenance & Troubleshooting
+The `docker-entrypoint.backend.sh` script automatically runs `npx prisma migrate deploy` on boot, ensuring your database schema is updated to match the new codebase before the Node.js server accepts requests.
 
-### Updating
-To update the application with new code:
-```bash
-# 1. Pull changes
-git pull
+## Reverse Proxy Setup
 
-# 2. Rebuild Frontend Locally (Important!)
-cd apps/frontend && npm install && npm run build
-cd ../..
+If you are exposing Jet Admin to the internet, it is strongly recommended to place it behind a reverse proxy (like Nginx or Caddy) to handle SSL/TLS termination.
 
-# 3. Rebuild Containers
-docker compose up -d --build
-```
-
-### Backups
-**Postgres**:
-```bash
-docker exec jet-admin-postgres pg_dump -U postgres jet_admin_db > backup_$(date +%F).sql
-```
-
-### Common Issues
-
-**Connectivity Failures**:
-- Ensure `config.js` in the frontend container contains the correct backend URL. Check via:
-  `docker exec jet-admin-frontend cat /usr/share/nginx/html/config.js`
-
-**Backend Crash on Startup**:
-- Ensure all peer dependencies (like `react` for shared widgets) are installed in `apps/backend/package.json`.
-- Check logs: `docker logs jet-admin-backend`
-
-**CORS Errors**:
-- Check `CORS_WHITELIST` environment variable in Backend. It must include the Frontend's URL.
+**Note on WebSockets:** Ensure your reverse proxy is configured to support WebSocket upgrades (HTTP `Upgrade` and `Connection` headers), as Socket.IO requires this for real-time features.
