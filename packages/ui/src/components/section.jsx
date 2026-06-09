@@ -15,7 +15,7 @@ const Section = React.forwardRef(
         {(title || description) && (
           <div>
             {title && (
-              <p className="text-xs font-bold text-muted-foreground mb-0.5">
+              <p className="text-xs font-medium text-muted-foreground mb-0.5">
                 {title}
               </p>
             )}

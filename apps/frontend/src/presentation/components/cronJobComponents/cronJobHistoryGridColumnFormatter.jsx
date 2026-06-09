@@ -24,7 +24,7 @@ const STATUS_CONFIG = {
   success: { icon: CheckCircle, className: "text-green-600 dark:text-green-400", bg: "bg-green-950/40  dark:bg-green-950/40  border-green-200  dark:border-green-800" },
   failed: { icon: AlertCircle, className: "text-red-600   dark:text-red-400", bg: "bg-red-950/40    dark:bg-red-950/40    border-red-200    dark:border-red-800" },
   error: { icon: AlertCircle, className: "text-red-600   dark:text-red-400", bg: "bg-red-950/40    dark:bg-red-950/40    border-red-200    dark:border-red-800" },
-  running: { icon: Clock, className: "text-blue-600  dark:text-blue-400", bg: "bg-blue-950/40   dark:bg-blue-950/40   border-blue-200   dark:border-blue-800" },
+  running: { icon: Clock, className: "text-primary  dark:text-primary", bg: "bg-primary/10/40   dark:bg-primary/10/40   border-border/50   dark:border-blue-800" },
   pending: { icon: Clock, className: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50  dark:bg-amber-950/40  border-amber-200  dark:border-amber-800" },
   cancelled: { icon: XCircle, className: "text-muted-foreground/70  dark:text-muted-foreground/70", bg: "bg-background   dark:bg-background/40   border-border   dark:border-border" },
 };

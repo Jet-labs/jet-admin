@@ -35,9 +35,9 @@ const ACTION_TYPES = [
     value: "EXECUTE_QUERY",
     label: "Execute Data Source",
     icon: Database,
-    color: "text-blue-500",
-    bg: "bg-blue-50/50 dark:bg-blue-500/10",
-    border: "border-blue-200 dark:border-blue-500/20",
+    color: "text-primary",
+    bg: "bg-primary/10 dark:bg-primary/10",
+    border: "border-border/50 dark:border-primary/20",
     description: "Run a page-level data source",
   },
   // {
@@ -268,7 +268,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
           >
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-xs font-bold text-foreground">
+                <h4 className="text-xs font-medium text-foreground">
                   {eventLabel}
                 </h4>
                 <p className="text-[10px] text-muted-foreground">
@@ -441,7 +441,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                       {pageDataSources.filter((ds) => ds.alias).map((ds) => (
                                         <SelectItem key={ds.alias} value={ds.alias}>
                                           <span className="flex items-center gap-2">
-                                            <Database className="h-3 w-3 text-blue-500" />
+                                            <Database className="h-3 w-3 text-primary" />
                                             <span className="font-mono">{ds.alias}</span>
                                             <span className="text-muted-foreground text-[9px] ml-1">({ds.type})</span>
                                           </span>
@@ -460,10 +460,10 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                 const inputDefinitions = getInputDefinitionsForAlias(action.config.alias);
                                 if (inputDefinitions.length === 0) return null;
                                 return (
-                                  <div className="rounded-md border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 p-3 space-y-2">
+                                  <div className="rounded-md border border-border/50 dark:border-primary/20 bg-primary/10 dark:bg-primary/10 p-3 space-y-2">
                                     <div className="flex items-center gap-1.5">
-                                      <Info className="h-3 w-3 text-blue-500" />
-                                      <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Input Arguments</p>
+                                      <Info className="h-3 w-3 text-primary" />
+                                      <p className="text-[10px] font-semibold text-primary dark:text-primary uppercase tracking-wider">Input Arguments</p>
                                     </div>
                                     <p className="text-[9px] text-muted-foreground">Override argument values when this data source is executed by this event action.</p>
                                     {inputDefinitions.map((inputDef) => {

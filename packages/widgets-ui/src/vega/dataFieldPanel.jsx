@@ -123,7 +123,7 @@ export const DataFieldPanel = ({
       case 'node': return <GitMerge className="w-3 h-3 shrink-0 text-emerald-500" />;
       case 'output': return <ArrowRightFromLine className="w-3 h-3 shrink-0 text-fuchsia-500" />;
       case 'runtime': return <Zap className="w-3 h-3 shrink-0 text-amber-500" />;
-      case 'datasource': return <Database className="w-3 h-3 shrink-0 text-blue-500" />;
+      case 'datasource': return <Database className="w-3 h-3 shrink-0 text-primary" />;
       default: return <Database className="w-3 h-3 shrink-0 text-muted-foreground" />;
     }
   };
@@ -232,7 +232,7 @@ export const DataFieldPanel = ({
         {fields.length > 0 ? (
           <>
             {renderFieldGroup(quantFields, 'Measures', 'text-emerald-500')}
-            {renderFieldGroup(catFields, 'Dimensions', 'text-blue-500')}
+            {renderFieldGroup(catFields, 'Dimensions', 'text-primary')}
             {renderFieldGroup(tempFields, 'Temporal', 'text-amber-500')}
           </>
         ) : (

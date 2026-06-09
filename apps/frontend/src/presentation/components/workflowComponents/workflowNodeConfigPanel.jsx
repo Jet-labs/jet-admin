@@ -111,7 +111,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
             {showDeleteConfirm && (
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
                     <div className="bg-background rounded-sm shadow-2xl border border-border p-6 w-full max-w-sm animate-in fade-in zoom-in duration-200">
-                        <h4 className="font-bold text-foreground text-lg mb-2">Delete Node?</h4>
+                        <h4 className="font-medium text-foreground text-lg mb-2">Delete Node?</h4>
                         <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                             This will remove the node and all its connections. This action cannot be undone.
                         </p>

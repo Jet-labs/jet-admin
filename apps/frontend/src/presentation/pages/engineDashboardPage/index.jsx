@@ -37,7 +37,7 @@ const EngineDashboardPage = () => {
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-background via-background to-muted/20">
       <div className="px-6 py-4 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <h1 className="text-2xl font-bold tracking-tight flex items-center">
+        <h1 className="text-2xl font-medium tracking-tight flex items-center">
           <Activity className="w-6 h-6 mr-2 text-primary" />
           Engine Management
         </h1>
@@ -98,7 +98,7 @@ const EngineDashboardPage = () => {
                         <div className="flex flex-col">
                           <span className="text-sm font-medium group-hover:text-primary transition-colors">Cron Job {id}</span>
                         </div>
-                        <Badge variant="default" className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 border-blue-500/20">{status.state}</Badge>
+                        <Badge variant="default" className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">{status.state}</Badge>
                       </div>
                     ))
                   )}

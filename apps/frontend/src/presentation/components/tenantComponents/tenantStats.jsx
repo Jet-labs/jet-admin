@@ -83,7 +83,7 @@ export const TenantStats = ({ tenants }) => {
     <div className="bg-background text-foreground h-full w-full overflow-y-auto px-8 py-8 flex flex-col justify-start">
       {/* Title */}
       <div className="mb-6 flex flex-col">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1">
+        <h1 className="text-2xl font-medium tracking-tight text-foreground mb-1">
           {CONSTANTS.STRINGS.TENANTS_STATS_TITLE}
         </h1>
         <p className="text-xs text-muted-foreground">

@@ -8,15 +8,15 @@ import { RefreshCw } from 'lucide-react';
 export const StatusIndicator = ({ executionStatus }) => {
   if (executionStatus === 'running') {
     return (
-      <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10">
-        <RefreshCw className="w-3 h-3 text-white" />
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10">
+        <RefreshCw className="w-3 h-3 text-foreground" />
       </div>
     );
   }
   if (executionStatus === 'completed') {
     return (
       <div className="absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10">
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
         </svg>
       </div>
@@ -25,7 +25,7 @@ export const StatusIndicator = ({ executionStatus }) => {
   if (executionStatus === 'failed') {
     return (
       <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10">
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
@@ -58,13 +58,13 @@ export const getStatusStyles = (executionStatus, defaultHoverColor = 'blue-400')
 /**
  * Returns icon color class based on execution status
  * @param {string} executionStatus - The execution status
- * @param {string} defaultColor - The default color class (e.g., 'text-blue-500')
+ * @param {string} defaultColor - The default color class (e.g., 'text-primary')
  * @returns {string} Tailwind CSS color class
  */
 export const getIconColor = (executionStatus, defaultColor) => {
   switch (executionStatus) {
     case 'running':
-      return 'text-blue-600';
+      return 'text-primary';
     case 'completed':
       return 'text-green-600';
     case 'failed':
@@ -77,13 +77,13 @@ export const getIconColor = (executionStatus, defaultColor) => {
 /**
  * Returns background color class based on execution status
  * @param {string} executionStatus - The execution status
- * @param {string} defaultBg - The default background class (e.g., 'bg-blue-950/40 border-blue-800')
+ * @param {string} defaultBg - The default background class (e.g., 'bg-primary/10/40 border-blue-800')
  * @returns {string} Tailwind CSS background classes
  */
 export const getStatusBgColor = (executionStatus, defaultBg) => {
   switch (executionStatus) {
     case 'running':
-      return 'bg-blue-950/40 border-blue-800';
+      return 'bg-primary/10/40 border-blue-800';
     case 'completed':
       return 'bg-green-950/40 border-green-800';
     case 'failed':

@@ -369,7 +369,7 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
             flex flex-col items-center justify-center px-3 py-3 border-r
             ${isDisabled ? 'bg-brand-dark border-brand-border' :
                             isSuspended ? 'bg-amber-100 border-amber-800' :
-                                executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+                                executionStatus === 'running' ? 'bg-primary/10/40 border-blue-800' :
                                     executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
                                         executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
                                             'bg-violet-50 border-violet-100'}
@@ -378,7 +378,7 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
                     {isSuspended
                         ? <ArrowRightToLine className="w-5 h-5 text-amber-600" />
                         : <FileText className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' :
-                                executionStatus === 'running' ? 'text-blue-600' :
+                                executionStatus === 'running' ? 'text-primary' :
                                     executionStatus === 'completed' ? 'text-green-600' :
                                         executionStatus === 'failed' ? 'text-red-600' :
                                             'text-violet-500'

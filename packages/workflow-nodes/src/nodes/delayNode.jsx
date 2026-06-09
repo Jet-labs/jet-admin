@@ -220,7 +220,7 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
           type="button"
           size="sm"
           onClick={handleSave}
-          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+          className="w-full"
         >
           Save
         </Button>

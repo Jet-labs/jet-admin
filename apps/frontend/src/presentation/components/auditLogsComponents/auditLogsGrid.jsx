@@ -76,7 +76,7 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
         {auditLogsData ? (
           <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
             <div className="w-full px-3 py-2 border-b border-border flex flex-col justify-center items-start">
-              <h1 className="text-lg font-bold leading-tight tracking-tight text-foreground">
+              <h1 className="text-lg font-medium leading-tight tracking-tight text-foreground">
                 {CONSTANTS.STRINGS.VIEW_AUDIT_LOGS_TITLE}
               </h1>
             </div>

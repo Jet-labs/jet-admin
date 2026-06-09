@@ -45,7 +45,7 @@ const AccountPage = () => {
     <div className="flex w-full h-full flex-col justify-start items-center overflow-y-auto">
       <section className="max-w-3xl w-full">
         <div className="p-6 sm:p-8">
-          <h1 className="text-xl font-bold leading-tight tracking-tight text-foreground md:text-2xl ">
+          <h1 className="text-xl font-medium leading-tight tracking-tight text-foreground md:text-2xl ">
             {CONSTANTS.STRINGS.ACCOUNT_PAGE_TITLE || "Your Account"}
           </h1>
 

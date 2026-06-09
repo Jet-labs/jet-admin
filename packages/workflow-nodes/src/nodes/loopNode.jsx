@@ -245,7 +245,7 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
           type="button"
           size="sm"
           onClick={handleSave}
-          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+          className="w-full"
         >
           Save
         </Button>
@@ -277,20 +277,20 @@ export const LoopNode = memo(({ id, data, isConnectable }) => {
 
   const StatusIndicator = () => {
     if (executionStatus === 'running') return (
-      <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10">
-        <Repeat className="w-3 h-3 text-white" />
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10">
+        <Repeat className="w-3 h-3 text-foreground" />
       </div>
     );
     if (executionStatus === 'completed') return (
       <div className="absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10">
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
         </svg>
       </div>
     );
     if (executionStatus === 'failed') return (
       <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10">
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
@@ -319,14 +319,14 @@ export const LoopNode = memo(({ id, data, isConnectable }) => {
           className={`
             flex flex-col items-center justify-center px-3 py-3 border-r
             ${isDisabled ? 'bg-brand-dark border-brand-border' : 
-              executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+              executionStatus === 'running' ? 'bg-primary/10/40 border-blue-800' :
               executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
               executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
               'bg-cyan-950/40 border-cyan-800'
             }
           `}
         >
-          <Repeat className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : executionStatus === 'running' ? 'text-blue-600' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-cyan-500'}`} />
+          <Repeat className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : executionStatus === 'running' ? 'text-primary' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-cyan-500'}`} />
         </div>
 
         {/* Center: Main info */}

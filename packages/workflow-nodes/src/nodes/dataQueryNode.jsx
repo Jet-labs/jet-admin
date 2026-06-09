@@ -227,20 +227,20 @@ export const DataQueryNode = memo(({ id, data, isConnectable }) => {
 
   const StatusIndicator = () => {
     if (executionStatus === 'running') return (
-      <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin">
-        <RefreshCw className="w-3 h-3 text-white" />
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin">
+        <RefreshCw className="w-3 h-3 text-foreground" />
       </div>
     );
     if (executionStatus === 'completed') return (
       <div className="absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
         </svg>
       </div>
     );
     if (executionStatus === 'failed') return (
       <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
@@ -254,13 +254,13 @@ export const DataQueryNode = memo(({ id, data, isConnectable }) => {
       <div className="flex items-stretch">
         <div style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}
           className={`flex flex-col items-center justify-center px-3 py-3 border-r ${isDisabled ? 'bg-brand-dark border-brand-border' :
-              executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+              executionStatus === 'running' ? 'bg-primary/10/40 border-blue-800' :
                 executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
                   executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
-                  'bg-blue-950/40 border-blue-800'
+                  'bg-primary/10/40 border-blue-800'
             }`}
         >
-          <Zap className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : executionStatus === 'running' ? 'text-blue-600' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-blue-500'}`} />
+          <Zap className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : executionStatus === 'running' ? 'text-primary' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-primary'}`} />
         </div>
         <div className="flex-1 px-3 py-2 min-w-0">
           <div className="flex items-center justify-between gap-2">
