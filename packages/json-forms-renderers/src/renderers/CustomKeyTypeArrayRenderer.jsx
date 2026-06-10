@@ -26,13 +26,11 @@ export const CustomKeyTypeArrayRenderer = ({
   };
 
   const handleAddItem = () => {
-    const newItem = itemSchema.properties
-      ? Object.fromEntries(
-          Object.entries(itemSchema.properties).map(([key, propSchema]) => [
-            key,
-            propSchema.default !== undefined ? propSchema.default : "",
-          ])
-        )
+    const newItem = itemSchema?.properties
+      ? {
+          key: itemSchema.properties.key?.default !== undefined ? itemSchema.properties.key.default : "",
+          type: itemSchema.properties.type?.default !== undefined ? itemSchema.properties.type.default : "",
+        }
       : { key: "", type: "" };
     handleChange(path, [...items, newItem]);
   };
@@ -118,7 +116,6 @@ CustomKeyTypeArrayRenderer.propTypes = {
   schema: PropTypes.object.isRequired,
   uischema: PropTypes.object.isRequired,
   label: PropTypes.string,
-  description: PropTypes.string,
   errors: PropTypes.arrayOf(PropTypes.string),
   enabled: PropTypes.bool,
   renderers: PropTypes.arrayOf(PropTypes.object).isRequired,

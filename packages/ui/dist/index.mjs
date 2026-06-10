@@ -64,10 +64,10 @@ var buttonVariants = cva(
         default: "bg-primary/50 text-primary-foreground font-semibold border border-primary/80 hover:border-primary hover:bg-primary/70",
         secondary: "bg-muted text-foreground border border-border/50 hover:bg-muted/80 hover:border-border",
         green: "bg-primary text-primary-foreground font-semibold border border-transparent hover:bg-primary/90",
-        destructive: "bg-red-500/20 text-white hover:bg-red-500/40 border border-red-500/40",
+        destructive: "bg-red-500/20 text-foreground hover:bg-red-500/40 border border-red-500/40",
         white: "bg-foreground text-background hover:opacity-90 border border-transparent",
-        outline: "bg-transparent border border-border text-foreground hover:bg-white/5",
-        ghost: "bg-transparent text-foreground hover:bg-white/5",
+        outline: "bg-transparent border border-border text-foreground hover:bg-background/5",
+        ghost: "bg-transparent text-foreground hover:bg-background/5",
         link: "text-primary/90 hover:text-primary underline-offset-4 hover:underline",
         pill: "bg-muted text-foreground border border-border hover:border-border/80",
         "primary-ghost": "bg-primary/10 text-primary hover:bg-primary/20 border border-transparent",
@@ -409,7 +409,7 @@ var DialogTitle = React8.forwardRef(({ className, ...props }, ref) => /* @__PURE
   {
     ref,
     className: cn(
-      "text-lg font-semibold leading-none tracking-tight",
+      "text-lg font-medium leading-none tracking-tight",
       className
     ),
     ...props
@@ -848,7 +848,7 @@ var Switch = React18.forwardRef(({ className, ...props }, ref) => /* @__PURE__ *
     SwitchPrimitives.Thumb,
     {
       className: cn(
-        "pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
+        "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
       )
     }
   )
@@ -2091,7 +2091,7 @@ var Section = React28.forwardRef(
         ),
         ...props
       },
-      (title || description) && /* @__PURE__ */ React28.createElement("div", null, title && /* @__PURE__ */ React28.createElement("p", { className: "text-xs font-bold text-muted-foreground mb-0.5" }, title), description && /* @__PURE__ */ React28.createElement("p", { className: "text-[11px] text-muted-foreground" }, description)),
+      (title || description) && /* @__PURE__ */ React28.createElement("div", null, title && /* @__PURE__ */ React28.createElement("p", { className: "text-xs font-medium text-muted-foreground mb-0.5" }, title), description && /* @__PURE__ */ React28.createElement("p", { className: "text-[11px] text-muted-foreground" }, description)),
       children
     );
   }

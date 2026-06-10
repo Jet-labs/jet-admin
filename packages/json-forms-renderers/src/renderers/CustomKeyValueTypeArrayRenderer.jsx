@@ -51,7 +51,7 @@ export const CustomKeyValueTypeArrayRenderer = ({
         <p className="text-red-500 text-xs mb-2">{errors}</p>
       )}
 
-      <div className="gap-2">
+      <div className="flex flex-col gap-2">
         {items.map((item, index) => (
           <div key={`${path}-${index}`} className="flex items-center space-x-2">
             {/* Key Field */}
@@ -132,7 +132,6 @@ CustomKeyValueTypeArrayRenderer.propTypes = {
   schema: PropTypes.object.isRequired,
   uischema: PropTypes.object.isRequired,
   label: PropTypes.string,
-  description: PropTypes.string,
   errors: PropTypes.arrayOf(PropTypes.string),
   enabled: PropTypes.bool,
   renderers: PropTypes.arrayOf(PropTypes.object).isRequired,

@@ -41,7 +41,7 @@ export const CustomTabRenderer = (props) => {
       <div className="p-3 border mt-3 border-border rounded-sm bg-background flex flex-col gap-2">
         {activeCategory?.elements.map((element, i) => (
           <JsonFormsDispatch
-            key={i}
+            key={`${activeCategory.label}-${i}`}
             uischema={element}
             schema={schema}
             path={path}

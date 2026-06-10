@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import PropTypes from "prop-types";
-import { withJsonFormsControlProps } from "@jsonforms/react";
 import { OAuthContext } from "../context";
 import { GoogleOAuthButton } from "@jet-admin/ui";
 

@@ -1,5 +1,4 @@
-import { initializeApp, cert, getApps, getApp, deleteApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import { Firestore } from "@google-cloud/firestore";
 import { google } from "googleapis";
 import { Logger } from "../../utils/logger.js";
 import DataSource from "../datasource.js";
@@ -7,7 +6,6 @@ import DataSource from "../datasource.js";
 export default class FirestoreDataSource extends DataSource {
   constructor(config) {
     super(config);
-    this.app = null;
     this.db = null;
   }
 
@@ -15,80 +13,66 @@ export default class FirestoreDataSource extends DataSource {
     if (this.db) return this.db;
 
     const { projectId, serviceAccountKey, vaultCredentialID, databaseURL } = this.config.datasourceOptions;
-    const appName = `firestore-${this.config.datasourceID || Date.now()}`;
 
-    // Check if app already exists
-    try {
-      this.app = getApp(appName);
-    } catch (e) {
-      // App doesn't exist, create it
-      let finalKey = serviceAccountKey;
+    let finalKey = serviceAccountKey;
 
-      const activeHelpers = helpers || this.helpers;
-      if (vaultCredentialID && activeHelpers && typeof activeHelpers.getCredential === "function") {
-        try {
-          const credential = await activeHelpers.getCredential(vaultCredentialID);
-          if (credential) {
-            finalKey = credential;
-          }
-        } catch (err) {
-          Logger.log("error", {
-            message: "firestore:getFirestoreDb:failed_vault",
-            params: { error: err.message },
-          });
+    const activeHelpers = helpers || this.helpers;
+    if (vaultCredentialID && activeHelpers && typeof activeHelpers.getCredential === "function") {
+      try {
+        const credential = await activeHelpers.getCredential(vaultCredentialID);
+        if (credential) {
+          finalKey = credential;
         }
+      } catch (err) {
+        Logger.log("error", {
+          message: "firestore:getFirestoreDb:failed_vault",
+          params: { error: err.message },
+        });
       }
-
-      let credential;
-      if (finalKey) {
-        if (typeof finalKey === "object" && finalKey.refreshToken) {
-          let clientId = null;
-          let clientSecret = null;
-          if (activeHelpers && typeof activeHelpers.getGoogleClientConfig === "function") {
-            const clientConfig = activeHelpers.getGoogleClientConfig();
-            if (clientConfig) {
-              clientId = clientConfig.clientId;
-              clientSecret = clientConfig.clientSecret;
-            }
-          }
-          if (!clientId || !clientSecret) {
-            throw new Error("Google OAuth app credentials are not configured on the server.");
-          }
-          const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
-          oauth2Client.setCredentials({ refresh_token: finalKey.refreshToken });
-          
-          credential = {
-            getAccessToken: async () => {
-              const tokenResponse = await oauth2Client.getAccessToken();
-              return {
-                access_token: tokenResponse.token,
-                expires_in: 3600,
-              };
-            }
-          };
-        } else {
-          const serviceAccount = typeof finalKey === "string"
-            ? JSON.parse(finalKey)
-            : finalKey;
-          credential = cert(serviceAccount);
-        }
-      }
-
-      const appConfig = {
-        credential,
-        projectId,
-      };
-
-      if (databaseURL) {
-        appConfig.databaseURL = databaseURL;
-      }
-
-      this.app = initializeApp(appConfig, appName);
     }
 
-    this.db = getFirestore(this.app);
+    const firestoreConfig = {
+      projectId,
+    };
+
+    if (databaseURL) {
+      firestoreConfig.databaseId = databaseURL;
+    }
+
+    if (finalKey) {
+      if (typeof finalKey === "object" && finalKey.refreshToken) {
+        let clientId = null;
+        let clientSecret = null;
+        if (activeHelpers && typeof activeHelpers.getGoogleClientConfig === "function") {
+          const clientConfig = activeHelpers.getGoogleClientConfig();
+          if (clientConfig) {
+            clientId = clientConfig.clientId;
+            clientSecret = clientConfig.clientSecret;
+          }
+        }
+        if (!clientId || !clientSecret) {
+          throw new Error("Google OAuth app credentials are not configured on the server.");
+        }
+        const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+        oauth2Client.setCredentials({ refresh_token: finalKey.refreshToken });
+        
+        firestoreConfig.authClient = oauth2Client;
+      } else {
+        const serviceAccount = typeof finalKey === "string"
+          ? JSON.parse(finalKey)
+          : finalKey;
+        
+        firestoreConfig.credentials = {
+          client_email: serviceAccount.client_email,
+          private_key: serviceAccount.private_key,
+        };
+      }
+    }
+
+    this.db = new Firestore(firestoreConfig);
     return this.db;
   }
+
 
   async execute(dataQueryOptions, context, helpers) {
     Logger.log("info", {

@@ -15,7 +15,7 @@ export const CustomVerticalLayout = (props) => {
     <div className="flex flex-col gap-2">
       {elements.map((element, index) => (
         <JsonFormsDispatch
-          key={index}
+          key={element.scope || index}
           uischema={element}
           schema={schema}
           path={path}

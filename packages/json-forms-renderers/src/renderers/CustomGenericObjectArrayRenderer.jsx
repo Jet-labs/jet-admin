@@ -27,6 +27,7 @@ export const CustomGenericObjectArrayRenderer = ({
   };
 
   const handleAddItem = () => {
+    if (!itemSchema) return;
     const newItem = itemSchema.properties
       ? Object.fromEntries(
           Object.entries(itemSchema.properties).map(([key, propSchema]) => [
@@ -43,10 +44,6 @@ export const CustomGenericObjectArrayRenderer = ({
     handleChange(path, newItems);
   };
 
-  if (propertyKeys.length === 0) {
-    return null;
-  }
-
   return (
     <div className="p-3 border border-border rounded-sm bg-background">
       <Label className="block mb-1 text-sm font-medium text-foreground">
@@ -57,7 +54,7 @@ export const CustomGenericObjectArrayRenderer = ({
       )}
 
       <div className="flex flex-col gap-2">
-        {items.map((item, index) => (
+        {propertyKeys.length > 0 ? items.map((item, index) => (
           <div key={`${path}-${index}`} className="flex items-center space-x-2">
             {propertyKeys.map((propKey) => (
               <div key={propKey} className="flex-grow">
@@ -85,10 +82,14 @@ export const CustomGenericObjectArrayRenderer = ({
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
-        ))}
+        )) : (
+          <div className="text-xs text-muted-foreground italic py-2">
+            Schema has no properties defined.
+          </div>
+        )}
       </div>
 
-      {items.length === 0 && (
+      {items.length === 0 && propertyKeys.length > 0 && (
         <div className="text-xs text-muted-foreground italic py-2">
           No items added yet.
         </div>

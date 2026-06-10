@@ -1,6 +1,6 @@
 // src/renderers/index.js
 import {
-  withJsonFormsControlProps as withJsonFormsControlProps2,
+  withJsonFormsControlProps,
   withJsonFormsLayoutProps
 } from "@jsonforms/react";
 
@@ -408,12 +408,13 @@ import React7 from "react";
 import PropTypes7 from "prop-types";
 import { TemplateAutocompleteInput as TemplateAutocompleteInput3, Label as Label7 } from "@jet-admin/ui";
 var CustomDynamicKeyValueInputRenderer = (props) => {
-  const { data, path, handleChange, uischema, errors } = props;
+  const { data, path, handleChange, uischema, errors, enabled } = props;
   const keys = uischema?.options?.keys || uischema?.options?.args || [];
   const stateTree = uischema?.options?.stateTree || {};
   const formData = data || {};
   const handleArgChange = (argKey, value) => {
-    handleChange(path, { ...formData, [argKey]: value });
+    const childPath = path ? `${path}.${argKey}` : argKey;
+    handleChange(childPath, value);
   };
   if (keys.length === 0) {
     return null;
@@ -427,17 +428,19 @@ var CustomDynamicKeyValueInputRenderer = (props) => {
         onChange: (value) => handleArgChange(argName, value),
         liveStateTree: stateTree,
         placeholder: `Value for ${argName}...`,
-        size: "sm"
+        size: "sm",
+        readOnly: enabled === false
       }
     ));
-  })), errors && errors.length > 0 && /* @__PURE__ */ React7.createElement("p", { className: "text-red-500 text-xs mt-2" }, errors));
+  })), errors && errors.length > 0 && /* @__PURE__ */ React7.createElement("p", { className: "text-red-500 text-xs mt-2" }, errors.join(", ")));
 };
 CustomDynamicKeyValueInputRenderer.propTypes = {
   data: PropTypes7.object,
   path: PropTypes7.string.isRequired,
   handleChange: PropTypes7.func.isRequired,
   uischema: PropTypes7.object.isRequired,
-  errors: PropTypes7.arrayOf(PropTypes7.string)
+  errors: PropTypes7.arrayOf(PropTypes7.string),
+  enabled: PropTypes7.bool
 };
 
 // src/renderers/CustomKeyValueArrayRenderer.jsx
@@ -476,7 +479,7 @@ var CustomKeyValueArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React8.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React8.createElement(Label8, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React8.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React8.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ React8.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React8.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React8.createElement(
+  return /* @__PURE__ */ React8.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React8.createElement(Label8, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React8.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React8.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React8.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React8.createElement(
     JsonFormsDispatch,
     {
       uischema: {
@@ -533,7 +536,6 @@ CustomKeyValueArrayRenderer.propTypes = {
   schema: PropTypes8.object.isRequired,
   uischema: PropTypes8.object.isRequired,
   label: PropTypes8.string,
-  description: PropTypes8.string,
   errors: PropTypes8.arrayOf(PropTypes8.string),
   enabled: PropTypes8.bool,
   renderers: PropTypes8.arrayOf(PropTypes8.object).isRequired
@@ -575,7 +577,7 @@ var CustomKeyValueTypeArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React9.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React9.createElement(Label9, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React9.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React9.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ React9.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React9.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React9.createElement(
+  return /* @__PURE__ */ React9.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React9.createElement(Label9, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React9.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React9.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React9.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React9.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React9.createElement(
     JsonFormsDispatch2,
     {
       uischema: {
@@ -646,7 +648,6 @@ CustomKeyValueTypeArrayRenderer.propTypes = {
   schema: PropTypes9.object.isRequired,
   uischema: PropTypes9.object.isRequired,
   label: PropTypes9.string,
-  description: PropTypes9.string,
   errors: PropTypes9.arrayOf(PropTypes9.string),
   enabled: PropTypes9.bool,
   renderers: PropTypes9.arrayOf(PropTypes9.object).isRequired
@@ -676,12 +677,10 @@ var CustomKeyTypeArrayRenderer = ({
     templateMode: uischema.options?.templateMode
   };
   const handleAddItem = () => {
-    const newItem = itemSchema.properties ? Object.fromEntries(
-      Object.entries(itemSchema.properties).map(([key, propSchema]) => [
-        key,
-        propSchema.default !== void 0 ? propSchema.default : ""
-      ])
-    ) : { key: "", type: "" };
+    const newItem = itemSchema?.properties ? {
+      key: itemSchema.properties.key?.default !== void 0 ? itemSchema.properties.key.default : "",
+      type: itemSchema.properties.type?.default !== void 0 ? itemSchema.properties.type.default : ""
+    } : { key: "", type: "" };
     handleChange(path, [...items, newItem]);
   };
   const handleRemoveItem = (index) => {
@@ -745,7 +744,6 @@ CustomKeyTypeArrayRenderer.propTypes = {
   schema: PropTypes10.object.isRequired,
   uischema: PropTypes10.object.isRequired,
   label: PropTypes10.string,
-  description: PropTypes10.string,
   errors: PropTypes10.arrayOf(PropTypes10.string),
   enabled: PropTypes10.bool,
   renderers: PropTypes10.arrayOf(PropTypes10.object).isRequired
@@ -769,9 +767,7 @@ var CustomStringArrayRenderer = (props) => {
     handleChange(path, newData);
   };
   const handleItemChange = (index, value) => {
-    const newData = [...arrayData];
-    newData[index] = value;
-    handleChange(path, newData);
+    handleChange(`${path}.${index}`, value);
   };
   if (visible === false) {
     return null;
@@ -861,9 +857,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
     handleChange(path, newItems);
   };
   const handleItemChange = (index, field, value) => {
-    const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
-    handleChange(path, newItems);
+    handleChange(`${path}.${index}.${field}`, value);
   };
   return /* @__PURE__ */ React12.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React12.createElement(Label12, { className: "block mb-2 text-sm font-medium text-foreground" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ React12.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React12.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ React12.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ React12.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React12.createElement(
     TemplateAutocompleteInput5,
@@ -946,6 +940,7 @@ var CustomGenericObjectArrayRenderer = ({
     templateMode: uischema.options?.templateMode
   };
   const handleAddItem = () => {
+    if (!itemSchema) return;
     const newItem = itemSchema.properties ? Object.fromEntries(
       Object.entries(itemSchema.properties).map(([key, propSchema]) => [
         key,
@@ -958,10 +953,7 @@ var CustomGenericObjectArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  if (propertyKeys.length === 0) {
-    return null;
-  }
-  return /* @__PURE__ */ React13.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React13.createElement(Label13, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React13.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React13.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, propertyKeys.map((propKey) => /* @__PURE__ */ React13.createElement("div", { key: propKey, className: "flex-grow" }, /* @__PURE__ */ React13.createElement(
+  return /* @__PURE__ */ React13.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React13.createElement(Label13, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React13.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col gap-2" }, propertyKeys.length > 0 ? items.map((item, index) => /* @__PURE__ */ React13.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, propertyKeys.map((propKey) => /* @__PURE__ */ React13.createElement("div", { key: propKey, className: "flex-grow" }, /* @__PURE__ */ React13.createElement(
     JsonFormsDispatch4,
     {
       uischema: {
@@ -985,7 +977,7 @@ var CustomGenericObjectArrayRenderer = ({
       onClick: () => handleRemoveItem(index)
     },
     /* @__PURE__ */ React13.createElement(Trash26, { className: "w-4 h-4" })
-  )))), items.length === 0 && /* @__PURE__ */ React13.createElement("div", { className: "text-xs text-muted-foreground italic py-2" }, "No items added yet."), /* @__PURE__ */ React13.createElement(
+  ))) : /* @__PURE__ */ React13.createElement("div", { className: "text-xs text-muted-foreground italic py-2" }, "Schema has no properties defined.")), items.length === 0 && propertyKeys.length > 0 && /* @__PURE__ */ React13.createElement("div", { className: "text-xs text-muted-foreground italic py-2" }, "No items added yet."), /* @__PURE__ */ React13.createElement(
     Button8,
     {
       type: "button",
@@ -1023,7 +1015,7 @@ var CustomGroupLayout = (props) => {
   return /* @__PURE__ */ React14.createElement("div", { className: `border border-border rounded-sm p-2 bg-background ${customClass}` }, uischema.label && /* @__PURE__ */ React14.createElement("h3", { className: "text-xs font-medium text-muted-foreground mb-2" }, uischema.label), /* @__PURE__ */ React14.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ React14.createElement(
     JsonFormsDispatch5,
     {
-      key: index,
+      key: element.scope || index,
       uischema: element,
       schema,
       path,
@@ -1127,7 +1119,7 @@ var CustomVerticalLayout = (props) => {
   return /* @__PURE__ */ React16.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ React16.createElement(
     JsonFormsDispatch6,
     {
-      key: index,
+      key: element.scope || index,
       uischema: element,
       schema,
       path,
@@ -1173,7 +1165,7 @@ var CustomTabRenderer = (props) => {
   ))), /* @__PURE__ */ React17.createElement("div", { className: "p-3 border mt-3 border-border rounded-sm bg-background flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ React17.createElement(
     JsonFormsDispatch7,
     {
-      key: i,
+      key: `${activeCategory.label}-${i}`,
       uischema: element,
       schema,
       path,
@@ -1205,7 +1197,7 @@ var CustomHorizontalLayout = (props) => {
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ React18.createElement("div", { className: "flex flex-row gap-2" }, elements.map((element, index) => /* @__PURE__ */ React18.createElement("div", { key: index, className: "flex-1 min-w-0" }, /* @__PURE__ */ React18.createElement(
+  return /* @__PURE__ */ React18.createElement("div", { className: "flex flex-row gap-2" }, elements.map((element, index) => /* @__PURE__ */ React18.createElement("div", { key: element.scope || index, className: "flex-1 min-w-0" }, /* @__PURE__ */ React18.createElement(
     JsonFormsDispatch8,
     {
       uischema: element,
@@ -1237,15 +1229,18 @@ import { Button as Button10, Label as Label15 } from "@jet-admin/ui";
 import React19 from "react";
 var FileUploadContext = React19.createContext({
   uploadFile: async (file) => {
-    throw new Error("No upload handler provided");
+    console.warn("No FileUploadContext provider. Please wrap your application in a FileUploadProvider.");
+    return null;
   }
 });
+FileUploadContext.displayName = "FileUploadContext";
 var OAuthContext = React19.createContext({
   startOAuth: () => {
-    throw new Error("No OAuth handler provided");
+    console.warn("No OAuthContext provider. Please wrap your application in an OAuthProvider.");
   },
   loading: false
 });
+OAuthContext.displayName = "OAuthContext";
 
 // src/renderers/CustomFileUploadInput.jsx
 var CustomFileUploadInput = (props) => {
@@ -1391,7 +1386,6 @@ CustomFileUploadInput.propTypes = {
 // src/renderers/CustomGoogleOAuthButtonControl.jsx
 import React21, { useContext as useContext2 } from "react";
 import PropTypes20 from "prop-types";
-import { withJsonFormsControlProps } from "@jsonforms/react";
 import { GoogleOAuthButton } from "@jet-admin/ui";
 var CustomGoogleOAuthButtonControlComponent = (props) => {
   const { data, path, handleChange, label, description, errors, enabled } = props;
@@ -1434,37 +1428,36 @@ CustomGoogleOAuthButtonControlComponent.propTypes = {
 var CustomGoogleOAuthButtonControl = CustomGoogleOAuthButtonControlComponent;
 
 // src/renderers/index.js
-var JetNumberControl = withJsonFormsControlProps2(CustomNumberInput);
-var JetTextControl = withJsonFormsControlProps2(CustomTextInput);
-var JetSelectControl = withJsonFormsControlProps2(CustomSelectInput);
-var JetCheckboxControl = withJsonFormsControlProps2(CustomCheckboxInput);
-var JetCodeEditorControl = withJsonFormsControlProps2(CustomCodeEditorControl);
-var JetSuggestionControl = withJsonFormsControlProps2(CustomSuggestionInput);
-var JetCustomDynamicKeyValueInputRenderer = withJsonFormsControlProps2(CustomDynamicKeyValueInputRenderer);
-var JetKeyValueArrayControl = withJsonFormsControlProps2(CustomKeyValueArrayRenderer);
-var JetKeyValueTypeArrayControl = withJsonFormsControlProps2(CustomKeyValueTypeArrayRenderer);
-var JetKeyTypeArrayControl = withJsonFormsControlProps2(CustomKeyTypeArrayRenderer);
-var JetStringArrayControl = withJsonFormsControlProps2(CustomStringArrayRenderer);
-var JetFieldOperatorValueArrayControl = withJsonFormsControlProps2(CustomFieldOperatorValueArrayRenderer);
-var JetGenericObjectArrayControl = withJsonFormsControlProps2(CustomGenericObjectArrayRenderer);
+var JetNumberControl = withJsonFormsControlProps(CustomNumberInput);
+var JetTextControl = withJsonFormsControlProps(CustomTextInput);
+var JetSelectControl = withJsonFormsControlProps(CustomSelectInput);
+var JetCheckboxControl = withJsonFormsControlProps(CustomCheckboxInput);
+var JetCodeEditorControl = withJsonFormsControlProps(CustomCodeEditorControl);
+var JetSuggestionControl = withJsonFormsControlProps(CustomSuggestionInput);
+var JetCustomDynamicKeyValueInputRenderer = withJsonFormsControlProps(CustomDynamicKeyValueInputRenderer);
+var JetKeyValueArrayControl = withJsonFormsControlProps(CustomKeyValueArrayRenderer);
+var JetKeyValueTypeArrayControl = withJsonFormsControlProps(CustomKeyValueTypeArrayRenderer);
+var JetKeyTypeArrayControl = withJsonFormsControlProps(CustomKeyTypeArrayRenderer);
+var JetStringArrayControl = withJsonFormsControlProps(CustomStringArrayRenderer);
+var JetFieldOperatorValueArrayControl = withJsonFormsControlProps(CustomFieldOperatorValueArrayRenderer);
+var JetGenericObjectArrayControl = withJsonFormsControlProps(CustomGenericObjectArrayRenderer);
 var JetGroupLayout = withJsonFormsLayoutProps(CustomGroupLayout);
-var JetRadioControl = withJsonFormsControlProps2(CustomRadioInput);
+var JetRadioControl = withJsonFormsControlProps(CustomRadioInput);
 var JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);
 var JetTabLayout = withJsonFormsLayoutProps(CustomTabRenderer);
 var JetHorizontalLayout = withJsonFormsLayoutProps(CustomHorizontalLayout);
-var JetFileUploadControl = withJsonFormsControlProps2(CustomFileUploadInput);
-var JetGoogleOAuthControl = withJsonFormsControlProps2(CustomGoogleOAuthButtonControl);
+var JetFileUploadControl = withJsonFormsControlProps(CustomFileUploadInput);
+var JetGoogleOAuthControl = withJsonFormsControlProps(CustomGoogleOAuthButtonControl);
 
 // src/testers.js
 import {
   rankWith,
   isControl,
   and,
-  formatIs,
   uiTypeIs,
   Resolve
 } from "@jsonforms/core";
-var numberInputTester = (uischema, rootSchema, context) => {
+var numberInputTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
   }
@@ -1482,7 +1475,7 @@ var numberInputTester = (uischema, rootSchema, context) => {
   }
   return -1;
 };
-var textInputTester = (uischema, rootSchema, context) => {
+var textInputTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
   }
@@ -1500,7 +1493,7 @@ var textInputTester = (uischema, rootSchema, context) => {
   }
   return -1;
 };
-var selectInputTester = (uischema, rootSchema, context) => {
+var selectInputTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
   }
@@ -1585,6 +1578,9 @@ var keyValueArrayTester = (uischema, rootSchema) => {
       return -1;
     }
     const itemSchema = schemaAtScope.items;
+    if (!itemSchema) {
+      return -1;
+    }
     if (itemSchema.type !== "object" || itemSchema.properties?.key?.type !== "string" || itemSchema.properties?.value?.type !== "string") {
       return -1;
     }
@@ -1604,6 +1600,9 @@ var keyValueTypeArrayTester = (uischema, rootSchema) => {
       return -1;
     }
     const itemSchema = schemaAtScope.items;
+    if (!itemSchema) {
+      return -1;
+    }
     if (itemSchema.type !== "object" || itemSchema.properties?.key?.type !== "string" || itemSchema.properties?.value?.type !== "string" || itemSchema.properties?.type?.type !== "string") {
       return -1;
     }
@@ -1623,7 +1622,10 @@ var keyTypeArrayTester = (uischema, rootSchema) => {
       return -1;
     }
     const itemSchema = schemaAtScope.items;
-    if (itemSchema.type !== "object" || itemSchema.properties?.key?.type !== "string" || itemSchema.properties?.type?.type !== "string" || itemSchema.properties?.value?.type) {
+    if (!itemSchema) {
+      return -1;
+    }
+    if (itemSchema.type !== "object" || itemSchema.properties?.key?.type !== "string" || itemSchema.properties?.type?.type !== "string" || !!itemSchema.properties?.value?.type) {
       return -1;
     }
     return 60;
@@ -1632,7 +1634,7 @@ var keyTypeArrayTester = (uischema, rootSchema) => {
     return -1;
   }
 };
-var radioInputTester = (uischema, rootSchema, context) => {
+var radioInputTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
   }
@@ -1659,6 +1661,9 @@ var fieldOperatorValueArrayTester = (uischema, rootSchema) => {
       return -1;
     }
     const itemSchema = schemaAtScope.items;
+    if (!itemSchema) {
+      return -1;
+    }
     if (itemSchema.type !== "object" || itemSchema.properties?.field?.type !== "string" || itemSchema.properties?.operator?.type !== "string" || itemSchema.properties?.value?.type !== "string") {
       return -1;
     }
@@ -1672,12 +1677,8 @@ var fieldOperatorValueArrayTester = (uischema, rootSchema) => {
   }
 };
 var groupLayoutTester = rankWith(100, uiTypeIs("Group"));
-var verticalLayoutTester = (uischema) => {
-  return uischema.type === "VerticalLayout" ? 10 : -1;
-};
-var horizontalLayoutTester = (uischema) => {
-  return uischema.type === "HorizontalLayout" ? 10 : -1;
-};
+var verticalLayoutTester = rankWith(10, uiTypeIs("VerticalLayout"));
+var horizontalLayoutTester = rankWith(10, uiTypeIs("HorizontalLayout"));
 var genericObjectArrayTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") return -1;
   try {
@@ -1803,6 +1804,7 @@ export {
   genericObjectArrayTester,
   googleOAuthTester,
   groupLayoutTester,
+  horizontalLayoutTester,
   jetFormsBaseRenderers,
   jetFormsRenderers,
   keyTypeArrayTester,

@@ -558,78 +558,63 @@ var WebURLDataSource = class extends DataSource {
 };
 
 // src/data-sources/firestore/datasource.js
-var import_app = require("firebase-admin/app");
-var import_firestore = require("firebase-admin/firestore");
+var import_firestore = require("@google-cloud/firestore");
 var import_googleapis = require("googleapis");
 var FirestoreDataSource = class extends DataSource {
   constructor(config) {
     super(config);
-    this.app = null;
     this.db = null;
   }
   async getFirestoreDb(helpers) {
     if (this.db) return this.db;
     const { projectId, serviceAccountKey, vaultCredentialID, databaseURL } = this.config.datasourceOptions;
-    const appName = `firestore-${this.config.datasourceID || Date.now()}`;
-    try {
-      this.app = (0, import_app.getApp)(appName);
-    } catch (e) {
-      let finalKey = serviceAccountKey;
-      const activeHelpers = helpers || this.helpers;
-      if (vaultCredentialID && activeHelpers && typeof activeHelpers.getCredential === "function") {
-        try {
-          const credential2 = await activeHelpers.getCredential(vaultCredentialID);
-          if (credential2) {
-            finalKey = credential2;
-          }
-        } catch (err) {
-          Logger.log("error", {
-            message: "firestore:getFirestoreDb:failed_vault",
-            params: { error: err.message }
-          });
+    let finalKey = serviceAccountKey;
+    const activeHelpers = helpers || this.helpers;
+    if (vaultCredentialID && activeHelpers && typeof activeHelpers.getCredential === "function") {
+      try {
+        const credential = await activeHelpers.getCredential(vaultCredentialID);
+        if (credential) {
+          finalKey = credential;
         }
+      } catch (err) {
+        Logger.log("error", {
+          message: "firestore:getFirestoreDb:failed_vault",
+          params: { error: err.message }
+        });
       }
-      let credential;
-      if (finalKey) {
-        if (typeof finalKey === "object" && finalKey.refreshToken) {
-          let clientId = null;
-          let clientSecret = null;
-          if (activeHelpers && typeof activeHelpers.getGoogleClientConfig === "function") {
-            const clientConfig = activeHelpers.getGoogleClientConfig();
-            if (clientConfig) {
-              clientId = clientConfig.clientId;
-              clientSecret = clientConfig.clientSecret;
-            }
-          }
-          if (!clientId || !clientSecret) {
-            throw new Error("Google OAuth app credentials are not configured on the server.");
-          }
-          const oauth2Client = new import_googleapis.google.auth.OAuth2(clientId, clientSecret);
-          oauth2Client.setCredentials({ refresh_token: finalKey.refreshToken });
-          credential = {
-            getAccessToken: async () => {
-              const tokenResponse = await oauth2Client.getAccessToken();
-              return {
-                access_token: tokenResponse.token,
-                expires_in: 3600
-              };
-            }
-          };
-        } else {
-          const serviceAccount = typeof finalKey === "string" ? JSON.parse(finalKey) : finalKey;
-          credential = (0, import_app.cert)(serviceAccount);
-        }
-      }
-      const appConfig = {
-        credential,
-        projectId
-      };
-      if (databaseURL) {
-        appConfig.databaseURL = databaseURL;
-      }
-      this.app = (0, import_app.initializeApp)(appConfig, appName);
     }
-    this.db = (0, import_firestore.getFirestore)(this.app);
+    const firestoreConfig = {
+      projectId
+    };
+    if (databaseURL) {
+      firestoreConfig.databaseId = databaseURL;
+    }
+    if (finalKey) {
+      if (typeof finalKey === "object" && finalKey.refreshToken) {
+        let clientId = null;
+        let clientSecret = null;
+        if (activeHelpers && typeof activeHelpers.getGoogleClientConfig === "function") {
+          const clientConfig = activeHelpers.getGoogleClientConfig();
+          if (clientConfig) {
+            clientId = clientConfig.clientId;
+            clientSecret = clientConfig.clientSecret;
+          }
+        }
+        if (!clientId || !clientSecret) {
+          throw new Error("Google OAuth app credentials are not configured on the server.");
+        }
+        const oauth2Client = new import_googleapis.google.auth.OAuth2(clientId, clientSecret);
+        oauth2Client.setCredentials({ refresh_token: finalKey.refreshToken });
+        firestoreConfig.authClient = oauth2Client;
+      } else {
+        const serviceAccount = typeof finalKey === "string" ? JSON.parse(finalKey) : finalKey;
+        firestoreConfig.credentials = {
+          client_email: serviceAccount.client_email,
+          private_key: serviceAccount.private_key
+        };
+      }
+    }
+    this.db = new import_firestore.Firestore(firestoreConfig);
     return this.db;
   }
   async execute(dataQueryOptions2, context, helpers) {
@@ -4003,12 +3988,10 @@ var webURLTestConnection = async ({ datasourceOptions }) => {
 };
 
 // src/data-sources/firestore/connection.js
-var import_app2 = require("firebase-admin/app");
-var import_firestore2 = require("firebase-admin/firestore");
+var import_firestore2 = require("@google-cloud/firestore");
 var import_googleapis3 = require("googleapis");
 var firestoreTestConnection = async ({ datasourceOptions, helpers }) => {
   const { projectId, serviceAccountKey, vaultCredentialID, databaseURL } = datasourceOptions;
-  let app = null;
   try {
     Logger.log("info", {
       message: "firestore:firestoreTestConnection:params",
@@ -4017,9 +4000,9 @@ var firestoreTestConnection = async ({ datasourceOptions, helpers }) => {
     let finalKey = serviceAccountKey;
     if (vaultCredentialID && helpers && typeof helpers.getCredential === "function") {
       try {
-        const credential2 = await helpers.getCredential(vaultCredentialID);
-        if (credential2) {
-          finalKey = credential2;
+        const credential = await helpers.getCredential(vaultCredentialID);
+        if (credential) {
+          finalKey = credential;
         }
       } catch (err) {
         Logger.log("error", {
@@ -4028,7 +4011,12 @@ var firestoreTestConnection = async ({ datasourceOptions, helpers }) => {
         });
       }
     }
-    let credential;
+    const firestoreConfig = {
+      projectId
+    };
+    if (databaseURL) {
+      firestoreConfig.databaseId = databaseURL;
+    }
     if (finalKey) {
       if (typeof finalKey === "object" && finalKey.refreshToken) {
         try {
@@ -4046,15 +4034,7 @@ var firestoreTestConnection = async ({ datasourceOptions, helpers }) => {
           }
           const oauth2Client = new import_googleapis3.google.auth.OAuth2(clientId, clientSecret);
           oauth2Client.setCredentials({ refresh_token: finalKey.refreshToken });
-          credential = {
-            getAccessToken: async () => {
-              const tokenResponse = await oauth2Client.getAccessToken();
-              return {
-                access_token: tokenResponse.token,
-                expires_in: 3600
-              };
-            }
-          };
+          firestoreConfig.authClient = oauth2Client;
         } catch (oauthError) {
           Logger.log("error", {
             message: "firestore:firestoreTestConnection:oauthError",
@@ -4068,7 +4048,10 @@ var firestoreTestConnection = async ({ datasourceOptions, helpers }) => {
       } else {
         try {
           const serviceAccount = typeof finalKey === "string" ? JSON.parse(finalKey) : finalKey;
-          credential = (0, import_app2.cert)(serviceAccount);
+          firestoreConfig.credentials = {
+            client_email: serviceAccount.client_email,
+            private_key: serviceAccount.private_key
+          };
         } catch (parseError) {
           Logger.log("error", {
             message: "firestore:firestoreTestConnection:parseError",
@@ -4081,16 +4064,7 @@ var firestoreTestConnection = async ({ datasourceOptions, helpers }) => {
         }
       }
     }
-    const appName = `test-${Date.now()}`;
-    const appConfig = {
-      credential,
-      projectId
-    };
-    if (databaseURL) {
-      appConfig.databaseURL = databaseURL;
-    }
-    app = (0, import_app2.initializeApp)(appConfig, appName);
-    const db = (0, import_firestore2.getFirestore)(app);
+    const db = new import_firestore2.Firestore(firestoreConfig);
     const collections = await db.listCollections();
     const collectionNames = collections.map((col) => col.id);
     Logger.log("info", {
@@ -4112,13 +4086,6 @@ var firestoreTestConnection = async ({ datasourceOptions, helpers }) => {
       ok: false,
       error: error.message || error
     };
-  } finally {
-    if (app) {
-      try {
-        await (0, import_app2.deleteApp)(app);
-      } catch (e) {
-      }
-    }
   }
 };
 

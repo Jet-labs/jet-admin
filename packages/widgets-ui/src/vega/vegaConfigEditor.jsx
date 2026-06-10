@@ -115,7 +115,7 @@ export const VegaConfigEditor = ({
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowParseWarning(false)} className="h-7 text-xs">
                   Cancel
                 </Button>
-                <Button type="button" size="sm" onClick={confirmModeSwitch} className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600">
+                <Button type="button" size="sm" onClick={confirmModeSwitch} className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-foreground dark:bg-amber-700 dark:hover:bg-amber-600">
                   Switch & Overwrite
                 </Button>
               </div>

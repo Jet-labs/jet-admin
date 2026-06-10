@@ -807,9 +807,9 @@ var DataQueryNode = (0, import_react3.memo)(({ id, data, isConnectable }) => {
     }
   };
   const StatusIndicator2 = () => {
-    if (executionStatus === "running") return /* @__PURE__ */ import_react3.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.RefreshCw, { className: "w-3 h-3 text-white" }));
-    if (executionStatus === "completed") return /* @__PURE__ */ import_react3.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ import_react3.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react3.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
-    if (executionStatus === "failed") return /* @__PURE__ */ import_react3.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ import_react3.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react3.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    if (executionStatus === "running") return /* @__PURE__ */ import_react3.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.RefreshCw, { className: "w-3 h-3 text-foreground" }));
+    if (executionStatus === "completed") return /* @__PURE__ */ import_react3.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center" }, /* @__PURE__ */ import_react3.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react3.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    if (executionStatus === "failed") return /* @__PURE__ */ import_react3.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center" }, /* @__PURE__ */ import_react3.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react3.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     return null;
   };
   return /* @__PURE__ */ import_react3.default.createElement("div", { className: `relative bg-brand-black border rounded-sm min-w-[280px] max-w-[350px] transition-all duration-150 ${isDisabled ? "border-brand-border opacity-50" : getStatusStyles2()} ${!data.dataQueryID ? "!border-red-400 !bg-red-950/40" : ""}` }, /* @__PURE__ */ import_react3.default.createElement(StatusIndicator2, null), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ import_react3.default.createElement(
@@ -1180,13 +1180,13 @@ var JavascriptNode = (0, import_react5.memo)(({ id, data, isConnectable }) => {
   };
   const StatusIndicator2 = () => {
     if (executionStatus === "running") {
-      return /* @__PURE__ */ import_react5.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.RefreshCw, { className: "w-3 h-3 text-white" }));
+      return /* @__PURE__ */ import_react5.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ import_react5.default.createElement(import_lucide_react3.RefreshCw, { className: "w-3 h-3 text-foreground" }));
     }
     if (executionStatus === "completed") {
-      return /* @__PURE__ */ import_react5.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ import_react5.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react5.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+      return /* @__PURE__ */ import_react5.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center" }, /* @__PURE__ */ import_react5.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react5.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
     }
     if (executionStatus === "failed") {
-      return /* @__PURE__ */ import_react5.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ import_react5.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react5.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+      return /* @__PURE__ */ import_react5.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center" }, /* @__PURE__ */ import_react5.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react5.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     }
     return null;
   };
@@ -1327,9 +1327,9 @@ var StartNode = (0, import_react7.memo)(({ id, data, isConnectable }) => {
     }
   };
   const StatusIndicator2 = () => {
-    if (executionStatus === "running") return /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react7.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react7.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
-    if (executionStatus === "completed") return /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react7.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react7.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
-    if (executionStatus === "failed") return /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react7.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react7.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    if (executionStatus === "running") return /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react7.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react7.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
+    if (executionStatus === "completed") return /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react7.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react7.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    if (executionStatus === "failed") return /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react7.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react7.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     return null;
   };
   return /* @__PURE__ */ import_react7.default.createElement("div", { className: `relative bg-brand-black border rounded-sm min-w-[280px] max-w-[350px] transition-all duration-150 ${getStatusStyles2()}` }, /* @__PURE__ */ import_react7.default.createElement(StatusIndicator2, null), /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ import_react7.default.createElement(
@@ -1543,7 +1543,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
       type: "button",
       size: "sm",
       onClick: handleSave,
-      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+      className: "w-full"
     },
     "Save"
   )));
@@ -1569,9 +1569,9 @@ var LoopNode = (0, import_react9.memo)(({ id, data, isConnectable }) => {
     }
   };
   const StatusIndicator2 = () => {
-    if (executionStatus === "running") return /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.Repeat, { className: "w-3 h-3 text-white" }));
-    if (executionStatus === "completed") return /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react9.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react9.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
-    if (executionStatus === "failed") return /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react9.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react9.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    if (executionStatus === "running") return /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react5.Repeat, { className: "w-3 h-3 text-foreground" }));
+    if (executionStatus === "completed") return /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react9.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react9.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    if (executionStatus === "failed") return /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react9.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react9.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     return null;
   };
   return /* @__PURE__ */ import_react9.default.createElement("div", { className: `
@@ -1822,7 +1822,7 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
       type: "button",
       size: "sm",
       onClick: handleSave,
-      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+      className: "w-full"
     },
     "Save"
   )));
@@ -2089,7 +2089,7 @@ var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
       type: "button",
       size: "sm",
       onClick: handleSave,
-      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+      className: "w-full"
     },
     "Save"
   )));
@@ -2164,13 +2164,13 @@ var EndNode = (0, import_react13.memo)(({ id, data, isConnectable }) => {
   };
   const ExecutionIndicator = () => {
     if (executionStatus === "running") {
-      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
+      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
     }
     if (executionStatus === "completed") {
-      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
     }
     if (executionStatus === "failed") {
-      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     }
     return null;
   };
@@ -2224,13 +2224,13 @@ var import_react15 = __toESM(require("react"));
 var import_lucide_react8 = require("lucide-react");
 var StatusIndicator = ({ executionStatus }) => {
   if (executionStatus === "running") {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react15.default.createElement(import_lucide_react8.RefreshCw, { className: "w-3 h-3 text-white" }));
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react15.default.createElement(import_lucide_react8.RefreshCw, { className: "w-3 h-3 text-foreground" }));
   }
   if (executionStatus === "completed") {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
   }
   if (executionStatus === "failed") {
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-3 h-3 text-foreground", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
   }
   return null;
 };

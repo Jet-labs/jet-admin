@@ -558,8 +558,10 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                     <TemplateAutocompleteInput
                       value={selectedSource.inputValues?.[inputDef.key] || ""}
                       onChange={(val) => {
-                        const updatedInputs = { ...(selectedSource.inputValues || {}), [inputDef.key]: val };
-                        handleSourceChange(editingIndex, "inputValues", updatedInputs);
+                        appPageEditorForm.setFieldValue(
+                          `appPageConfig.dataSources.${editingIndex}.inputValues.${inputDef.key}`,
+                          val
+                        );
                       }}
                       placeholder={`e.g. {{ state.variables.${inputDef.key} }}`}
                       liveStateTree={stateTree ? { state: stateTree } : null}

@@ -14,7 +14,7 @@ export const CustomHorizontalLayout = (props) => {
   return (
     <div className="flex flex-row gap-2">
       {elements.map((element, index) => (
-        <div key={index} className="flex-1 min-w-0">
+        <div key={element.scope || index} className="flex-1 min-w-0">
           <JsonFormsDispatch
             uischema={element}
             schema={schema}

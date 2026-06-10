@@ -22,9 +22,7 @@ export const CustomStringArrayRenderer = (props) => {
   };
 
   const handleItemChange = (index, value) => {
-    const newData = [...arrayData];
-    newData[index] = value;
-    handleChange(path, newData);
+    handleChange(`${path}.${index}`, value);
   };
 
   if (visible === false) {

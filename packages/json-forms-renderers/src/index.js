@@ -83,6 +83,7 @@ export {
   genericObjectArrayTester,
   groupLayoutTester,
   verticalLayoutTester,
+  horizontalLayoutTester,
   tabRendererTester,
   fileUploadTester,
   googleOAuthTester,

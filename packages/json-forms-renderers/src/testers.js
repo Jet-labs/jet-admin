@@ -3,7 +3,6 @@ import {
   rankWith,
   isControl,
   and,
-  formatIs,
   uiTypeIs,
   Resolve,
 } from '@jsonforms/core';
@@ -11,7 +10,7 @@ import {
 // ============================================================================
 // Number Input Tester
 // ============================================================================
-export const numberInputTester = (uischema, rootSchema, context) => {
+export const numberInputTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
   }
@@ -38,7 +37,7 @@ export const numberInputTester = (uischema, rootSchema, context) => {
 // ============================================================================
 // Text Input Tester
 // ============================================================================
-export const textInputTester = (uischema, rootSchema, context) => {
+export const textInputTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
   }
@@ -66,7 +65,7 @@ export const textInputTester = (uischema, rootSchema, context) => {
 // ============================================================================
 // Select Input Tester
 // ============================================================================
-export const selectInputTester = (uischema, rootSchema, context) => {
+export const selectInputTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
   }
@@ -179,6 +178,9 @@ export const keyValueArrayTester = (uischema, rootSchema) => {
       return -1;
     }
     const itemSchema = schemaAtScope.items;
+    if (!itemSchema) {
+      return -1;
+    }
     if (
       itemSchema.type !== "object" ||
       itemSchema.properties?.key?.type !== "string" ||
@@ -206,6 +208,9 @@ export const keyValueTypeArrayTester = (uischema, rootSchema) => {
       return -1;
     }
     const itemSchema = schemaAtScope.items;
+    if (!itemSchema) {
+      return -1;
+    }
     if (
       itemSchema.type !== "object" ||
       itemSchema.properties?.key?.type !== "string" ||
@@ -234,11 +239,14 @@ export const keyTypeArrayTester = (uischema, rootSchema) => {
       return -1;
     }
     const itemSchema = schemaAtScope.items;
+    if (!itemSchema) {
+      return -1;
+    }
     if (
       itemSchema.type !== "object" ||
       itemSchema.properties?.key?.type !== "string" ||
       itemSchema.properties?.type?.type !== "string" ||
-      itemSchema.properties?.value?.type
+      !!itemSchema.properties?.value?.type
     ) {
       return -1;
     }
@@ -252,7 +260,7 @@ export const keyTypeArrayTester = (uischema, rootSchema) => {
 // ============================================================================
 // Radio Input Tester (for radio button groups)
 // ============================================================================
-export const radioInputTester = (uischema, rootSchema, context) => {
+export const radioInputTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
   }
@@ -285,6 +293,9 @@ export const fieldOperatorValueArrayTester = (uischema, rootSchema) => {
       return -1;
     }
     const itemSchema = schemaAtScope.items;
+    if (!itemSchema) {
+      return -1;
+    }
     if (
       itemSchema.type !== "object" ||
       itemSchema.properties?.field?.type !== "string" ||
@@ -313,16 +324,12 @@ export const groupLayoutTester = rankWith(100, uiTypeIs("Group"));
 // ============================================================================
 // Vertical Layout Tester
 // ============================================================================
-export const verticalLayoutTester = (uischema) => {
-  return uischema.type === "VerticalLayout" ? 10 : -1;
-};
+export const verticalLayoutTester = rankWith(10, uiTypeIs("VerticalLayout"));
 
 // ============================================================================
 // Horizontal Layout Tester
 // ============================================================================
-export const horizontalLayoutTester = (uischema) => {
-  return uischema.type === "HorizontalLayout" ? 10 : -1;
-};
+export const horizontalLayoutTester = rankWith(10, uiTypeIs("HorizontalLayout"));
 
 // ============================================================================
 // Generic Object Array Tester (fallback for any object array)

@@ -1800,7 +1800,7 @@ var init_iframeWidget = __esm({
         "iframe",
         {
           src: url,
-          className: "w-full h-full border-0 bg-white",
+          className: "w-full h-full border-0 bg-background",
           sandbox: sandboxValue || void 0,
           referrerPolicy: "no-referrer-when-downgrade",
           title: "Embedded Content"
@@ -3584,7 +3584,7 @@ var FieldPill = ({
     },
     getTypeIconComponent(field.type),
     /* @__PURE__ */ React3.createElement("span", { className: "truncate min-w-0" }, field.name),
-    field.aggregate && field.aggregate !== "none" && /* @__PURE__ */ React3.createElement("span", { className: "text-[8px] uppercase tracking-wider bg-white/10 px-1 py-px rounded font-bold ml-auto shrink-0", title: `Aggregate: ${field.aggregate}` }, field.aggregate.slice(0, 3)),
+    field.aggregate && field.aggregate !== "none" && /* @__PURE__ */ React3.createElement("span", { className: "text-[8px] uppercase tracking-wider bg-background/10 px-1 py-px rounded font-bold ml-auto shrink-0", title: `Aggregate: ${field.aggregate}` }, field.aggregate.slice(0, 3)),
     onRemove && /* @__PURE__ */ React3.createElement(
       "button",
       {
@@ -3593,7 +3593,7 @@ var FieldPill = ({
           e.stopPropagation();
           onRemove();
         },
-        className: "ml-auto h-3.5 w-3.5 rounded-sm flex items-center justify-center hover:bg-white/20 shrink-0",
+        className: "ml-auto h-3.5 w-3.5 rounded-sm flex items-center justify-center hover:bg-background/20 shrink-0",
         title: "Remove"
       },
       /* @__PURE__ */ React3.createElement(X, { className: "w-2.5 h-2.5" })
@@ -4226,7 +4226,7 @@ var VegaConfigEditor = ({
       stateTree,
       liveStateTree
     }
-  )), showParseWarning && /* @__PURE__ */ React8.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React8.createElement(AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React8.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React8.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React8.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React8.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React8.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React8.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React8.createElement(Button3, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React8.createElement(Button3, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React8.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ React8.createElement(
+  )), showParseWarning && /* @__PURE__ */ React8.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React8.createElement(AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React8.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React8.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React8.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React8.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React8.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React8.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React8.createElement(Button3, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React8.createElement(Button3, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-foreground dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React8.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ React8.createElement(
     VegaSpecEditor,
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,

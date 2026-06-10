@@ -1,11 +1,9 @@
-import { initializeApp, cert, getApps, deleteApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import { Firestore } from "@google-cloud/firestore";
 import { google } from "googleapis";
-import { Logger } from "../../utils/logger";
+import { Logger } from "../../utils/logger.js";
 
 export const firestoreTestConnection = async ({ datasourceOptions, helpers }) => {
   const { projectId, serviceAccountKey, vaultCredentialID, databaseURL } = datasourceOptions;
-  let app = null;
   
   try {
     Logger.log("info", {
@@ -29,8 +27,14 @@ export const firestoreTestConnection = async ({ datasourceOptions, helpers }) =>
       }
     }
 
-    // Parse service account key or setup OAuth
-    let credential;
+    const firestoreConfig = {
+      projectId,
+    };
+
+    if (databaseURL) {
+      firestoreConfig.databaseId = databaseURL;
+    }
+
     if (finalKey) {
       if (typeof finalKey === "object" && finalKey.refreshToken) {
         try {
@@ -49,15 +53,7 @@ export const firestoreTestConnection = async ({ datasourceOptions, helpers }) =>
           const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
           oauth2Client.setCredentials({ refresh_token: finalKey.refreshToken });
           
-          credential = {
-            getAccessToken: async () => {
-              const tokenResponse = await oauth2Client.getAccessToken();
-              return {
-                access_token: tokenResponse.token,
-                expires_in: 3600,
-              };
-            }
-          };
+          firestoreConfig.authClient = oauth2Client;
         } catch (oauthError) {
           Logger.log("error", {
             message: "firestore:firestoreTestConnection:oauthError",
@@ -73,7 +69,11 @@ export const firestoreTestConnection = async ({ datasourceOptions, helpers }) =>
           const serviceAccount = typeof finalKey === "string" 
             ? JSON.parse(finalKey) 
             : finalKey;
-          credential = cert(serviceAccount);
+          
+          firestoreConfig.credentials = {
+            client_email: serviceAccount.client_email,
+            private_key: serviceAccount.private_key,
+          };
         } catch (parseError) {
           Logger.log("error", {
             message: "firestore:firestoreTestConnection:parseError",
@@ -87,20 +87,7 @@ export const firestoreTestConnection = async ({ datasourceOptions, helpers }) =>
       }
     }
 
-    // Create a unique app name for testing
-    const appName = `test-${Date.now()}`;
-    
-    const appConfig = {
-      credential,
-      projectId,
-    };
-    
-    if (databaseURL) {
-      appConfig.databaseURL = databaseURL;
-    }
-
-    app = initializeApp(appConfig, appName);
-    const db = getFirestore(app);
+    const db = new Firestore(firestoreConfig);
 
     // Test the connection by listing collections
     const collections = await db.listCollections();
@@ -126,14 +113,5 @@ export const firestoreTestConnection = async ({ datasourceOptions, helpers }) =>
       ok: false,
       error: error.message || error,
     };
-  } finally {
-    // Clean up the test app
-    if (app) {
-      try {
-        await deleteApp(app);
-      } catch (e) {
-        // Ignore cleanup errors
-      }
-    }
   }
 };

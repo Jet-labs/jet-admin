@@ -4,13 +4,14 @@ import PropTypes from 'prop-types';
 import { TemplateAutocompleteInput, Label } from '@jet-admin/ui';
 
 export const CustomDynamicKeyValueInputRenderer = (props) => {
-  const { data, path, handleChange, uischema, errors } = props;
+  const { data, path, handleChange, uischema, errors, enabled } = props;
   const keys = uischema?.options?.keys || uischema?.options?.args || [];
   const stateTree = uischema?.options?.stateTree || {};
   const formData = data || {};
 
   const handleArgChange = (argKey, value) => {
-    handleChange(path, { ...formData, [argKey]: value });
+    const childPath = path ? `${path}.${argKey}` : argKey;
+    handleChange(childPath, value);
   };
 
   if (keys.length === 0) {
@@ -37,13 +38,14 @@ export const CustomDynamicKeyValueInputRenderer = (props) => {
                 liveStateTree={stateTree}
                 placeholder={`Value for ${argName}...`}
                 size="sm"
+                readOnly={enabled === false}
               />
             </div>
           );
         })}
       </div>
       {errors && errors.length > 0 && (
-        <p className="text-red-500 text-xs mt-2">{errors}</p>
+        <p className="text-red-500 text-xs mt-2">{errors.join(", ")}</p>
       )}
     </div>
   );
@@ -55,4 +57,5 @@ CustomDynamicKeyValueInputRenderer.propTypes = {
   handleChange: PropTypes.func.isRequired,
   uischema: PropTypes.object.isRequired,
   errors: PropTypes.arrayOf(PropTypes.string),
+  enabled: PropTypes.bool,
 };

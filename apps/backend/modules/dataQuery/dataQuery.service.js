@@ -369,6 +369,7 @@ dataQueryService.runDataQueryByData = async ({
     const processedDataQuery = {
       ...dataQuery,
       dataQueryID: tempQueryID,
+      tenantID: tenantID,
     };
 
     Logger.log("info", {

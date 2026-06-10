@@ -22,7 +22,7 @@ var QueryResponseJSONTab = ({ data }) => {
       readOnly: true,
       showHeader: false,
       height: "100%",
-      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-200"
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-border"
     }
   ));
 };
@@ -43,7 +43,7 @@ var QueryResponseRAWTab = ({ data }) => {
       readOnly: true,
       showHeader: false,
       height: "100%",
-      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-200"
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-border"
     }
   ));
 };
@@ -69,7 +69,7 @@ var QueryResponseSchemaTab = ({ data }) => {
       readOnly: true,
       showHeader: false,
       height: "100%",
-      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-200"
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-border"
     }
   ));
 };

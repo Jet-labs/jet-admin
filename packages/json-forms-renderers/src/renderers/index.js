@@ -5,28 +5,6 @@ import {
 } from '@jsonforms/react';
 
 // Import all raw renderers
-export { CustomNumberInput } from './CustomNumberInput.jsx';
-export { CustomTextInput } from './CustomTextInput.jsx';
-export { CustomSelectInput } from './CustomSelectInput.jsx';
-export { CustomCheckboxInput } from './CustomCheckboxInput.jsx';
-export { CustomCodeEditorControl } from './CustomCodeEditorControl.jsx';
-export { CustomSuggestionInput } from './CustomSuggestionInput.jsx';
-export { CustomDynamicKeyValueInputRenderer } from './CustomDynamicKeyValueInputRenderer.jsx';
-export { CustomKeyValueArrayRenderer } from './CustomKeyValueArrayRenderer.jsx';
-export { CustomKeyValueTypeArrayRenderer } from './CustomKeyValueTypeArrayRenderer.jsx';
-export { CustomKeyTypeArrayRenderer } from './CustomKeyTypeArrayRenderer.jsx';
-export { CustomStringArrayRenderer } from './CustomStringArrayRenderer.jsx';
-export { CustomFieldOperatorValueArrayRenderer } from './CustomFieldOperatorValueArrayRenderer.jsx';
-export { CustomGenericObjectArrayRenderer } from './CustomGenericObjectArrayRenderer.jsx';
-export { CustomGroupLayout } from './CustomGroupLayout.jsx';
-export { CustomRadioInput } from './CustomRadioInput.jsx';
-export { CustomVerticalLayout } from './CustomVerticalLayout.jsx';
-export { CustomTabRenderer } from './CustomTabRenderer.jsx';
-export { CustomHorizontalLayout } from './CustomHorizontalLayout.jsx';
-export { CustomFileUploadInput } from './CustomFileUploadInput.jsx';
-export { CustomGoogleOAuthButtonControl } from './CustomGoogleOAuthButtonControl.jsx';
-
-// Import for HOC wrapping
 import { CustomNumberInput } from './CustomNumberInput.jsx';
 import { CustomTextInput } from './CustomTextInput.jsx';
 import { CustomSelectInput } from './CustomSelectInput.jsx';
@@ -48,6 +26,30 @@ import { CustomHorizontalLayout } from './CustomHorizontalLayout.jsx';
 import { CustomFileUploadInput } from './CustomFileUploadInput.jsx';
 import { CustomGoogleOAuthButtonControl } from './CustomGoogleOAuthButtonControl.jsx';
 
+// Export raw renderers
+export {
+  CustomNumberInput,
+  CustomTextInput,
+  CustomSelectInput,
+  CustomCheckboxInput,
+  CustomCodeEditorControl,
+  CustomSuggestionInput,
+  CustomDynamicKeyValueInputRenderer,
+  CustomKeyValueArrayRenderer,
+  CustomKeyValueTypeArrayRenderer,
+  CustomKeyTypeArrayRenderer,
+  CustomStringArrayRenderer,
+  CustomFieldOperatorValueArrayRenderer,
+  CustomGenericObjectArrayRenderer,
+  CustomGroupLayout,
+  CustomRadioInput,
+  CustomVerticalLayout,
+  CustomTabRenderer,
+  CustomHorizontalLayout,
+  CustomFileUploadInput,
+  CustomGoogleOAuthButtonControl,
+};
+
 // Export HOC wrapped components with Jet prefix for uniformity
 export const JetNumberControl = withJsonFormsControlProps(CustomNumberInput);
 export const JetTextControl = withJsonFormsControlProps(CustomTextInput);
@@ -68,5 +70,10 @@ export const JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);
 export const JetTabLayout = withJsonFormsLayoutProps(CustomTabRenderer);
 export const JetHorizontalLayout = withJsonFormsLayoutProps(CustomHorizontalLayout);
 export const JetFileUploadControl = withJsonFormsControlProps(CustomFileUploadInput);
+
+// Note: CustomGoogleOAuthButtonControl is already wired to OAuthContext internally,
+// but we wrap it in withJsonFormsControlProps here to seamlessly integrate into
+// the JsonForms rendering pipeline, receiving uischema, schema, and path props.
 export const JetGoogleOAuthControl = withJsonFormsControlProps(CustomGoogleOAuthButtonControl);
+
 

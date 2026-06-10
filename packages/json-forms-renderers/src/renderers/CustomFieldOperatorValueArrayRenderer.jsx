@@ -37,9 +37,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
   };
 
   const handleItemChange = (index, field, value) => {
-    const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
-    handleChange(path, newItems);
+    handleChange(`${path}.${index}.${field}`, value);
   };
 
   return (

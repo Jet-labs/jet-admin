@@ -15,13 +15,13 @@ const buttonVariants = cva(
         green:
           "bg-primary text-primary-foreground font-semibold border border-transparent hover:bg-primary/90",
         destructive:
-          "bg-red-500/20 text-white hover:bg-red-500/40 border border-red-500/40",
+          "bg-red-500/20 text-foreground hover:bg-red-500/40 border border-red-500/40",
         white:
           "bg-foreground text-background hover:opacity-90 border border-transparent",
         outline:
-          "bg-transparent border border-border text-foreground hover:bg-white/5",
+          "bg-transparent border border-border text-foreground hover:bg-background/5",
         ghost:
-          "bg-transparent text-foreground hover:bg-white/5",
+          "bg-transparent text-foreground hover:bg-background/5",
         link:
           "text-primary/90 hover:text-primary underline-offset-4 hover:underline",
         pill:
