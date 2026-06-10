@@ -108,7 +108,7 @@ const SignInPage = () => {
                 <Button
                   type="button"
                   onClick={googleSignIn}
-                  className="text-foreground bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-sm text-sm px-5 py-1.5 text-center inline-flex justify-center items-center  me-2 mb-2 w-full"
+                  className="text-foreground bg-primary hover:bg-primary/90 focus:ring-4 focus:outline-none focus:ring-primary/50 font-medium rounded-sm text-sm px-5 py-1.5 text-center inline-flex justify-center items-center  me-2 mb-2 w-full"
                 >
                   <svg
                     className="w-4 h-4 me-2"

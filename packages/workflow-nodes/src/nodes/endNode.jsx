@@ -47,7 +47,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
         <Button
           type="button"
           onClick={addParameter}
-          className="flex items-center gap-1 px-2 py-1 text-xs bg-brand-black text-[#646cff] hover:bg-[#646cff]/10 rounded-sm transition-colors border border-brand-border"
+          className="flex items-center gap-1 px-2 py-1 text-xs bg-brand-black text-primary hover:bg-primary/10 rounded-sm transition-colors border border-brand-border"
         >
           <Plus className="w-2.5 h-2.5" />
           Add Output
@@ -282,7 +282,7 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
           type="button"
           size="sm"
           onClick={handleSave}
-          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+          className="w-full"
         >
           Save
         </Button>
@@ -374,8 +374,8 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
   const ExecutionIndicator = () => {
     if (executionStatus === 'running') {
       return (
-        <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10">
-          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10">
+          <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         </div>
@@ -384,7 +384,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
     if (executionStatus === 'completed') {
       return (
         <div className="absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10">
-          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
         </div>
@@ -393,7 +393,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
     if (executionStatus === 'failed') {
       return (
         <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10">
-          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
@@ -439,14 +439,14 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
           }}
           className={`
             flex flex-col items-center justify-center px-3 py-3 border-r
-            ${executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+            ${executionStatus === 'running' ? 'bg-primary/10/40 border-blue-800' :
               executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
               executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
               `${statusConfig.bgColor} ${statusConfig.borderColor}`}
           `}
         >
           <StatusIcon className={`w-5 h-5 ${
-            executionStatus === 'running' ? 'text-blue-600' :
+            executionStatus === 'running' ? 'text-primary' :
             executionStatus === 'completed' ? 'text-green-600' :
             executionStatus === 'failed' ? 'text-red-600' :
             statusConfig.textColor

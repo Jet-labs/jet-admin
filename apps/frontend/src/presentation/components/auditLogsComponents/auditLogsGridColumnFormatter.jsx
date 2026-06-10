@@ -177,7 +177,7 @@ export const getFormattedAuditLogColumns = () => {
               chipStyle += " bg-green-950/40 text-green-400";
               break
             case "POST":
-              chipStyle += " bg-blue-950/40 text-blue-400";
+              chipStyle += " bg-primary/10/40 text-primary";
               break;
             case "PUT":
               chipStyle += " bg-yellow-100 text-yellow-800";

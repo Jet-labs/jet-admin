@@ -29,7 +29,7 @@ export const WorkflowConsole = ({
       case 'start':
         return { icon: Play, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
       case 'node_start':
-        return { icon: ArrowRight, color: 'text-blue-500', bgColor: 'bg-blue-950/400/10' };
+        return { icon: ArrowRight, color: 'text-primary', bgColor: 'bg-primary/10/400/10' };
       case 'node_complete':
         return { icon: Check, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
       case 'node_error':
@@ -65,7 +65,7 @@ export const WorkflowConsole = ({
           <Terminal className="size-4 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">Console</span>
           {isRunning && (
-            <span className="flex items-center gap-1.5 text-xs text-blue-500 font-medium">
+            <span className="flex items-center gap-1.5 text-xs text-primary font-medium">
               <Loader className="size-3 animate-spin" />
               Running
             </span>

@@ -50,7 +50,7 @@ export const IframeWidget = ({
 
       <iframe
         src={url}
-        className="w-full h-full border-0 bg-white"
+        className="w-full h-full border-0 bg-background"
         sandbox={sandboxValue || undefined}
         referrerPolicy="no-referrer-when-downgrade"
         title="Embedded Content"

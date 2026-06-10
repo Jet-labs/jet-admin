@@ -85,7 +85,7 @@
     <header class="h-16 border-b border-gray-800 flex items-center justify-between px-6 bg-gray-900/50 backdrop-blur-md z-10">
         <div class="flex items-center gap-3">
             <div class="w-3 h-3 rounded-full bg-accent-success animate-pulse"></div>
-            <h1 class="text-lg font-bold tracking-tight text-white">Jet<span class="text-primary-500">Rabbit</span> Monitor</h1>
+            <h1 class="text-lg font-medium tracking-tight text-foreground">Jet<span class="text-primary-500">Rabbit</span> Monitor</h1>
         </div>
         <div class="flex items-center gap-4 text-sm text-gray-400">
             <div class="flex items-center gap-2">
@@ -287,7 +287,7 @@
             Array.from(state.channels).sort().forEach(ch => {
                 const isActive = state.activeChannel === ch;
                 const cls = isActive 
-                    ? 'bg-gray-800 text-white border-gray-600' 
+                    ? 'bg-gray-800 text-foreground border-gray-600'
                     : 'text-gray-400 hover:bg-gray-800 border-transparent';
                     
                 html += `

@@ -428,7 +428,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 className="justify-start bg-background hover:bg-muted font-medium border-border"
                                             >
                                                 {node.value === 'start' && <Play className="size-3.5 mr-2 text-emerald-500" />}
-                                                {node.value === 'dataQuery' && <Zap className="size-4 mr-2 text-blue-500" />}
+                                                {node.value === 'dataQuery' && <Zap className="size-4 mr-2 text-primary" />}
 
                                                 {node.value === 'javascript' && <Code className="size-4 mr-2 text-amber-500" />}
                                                 {node.value === 'condition' && <GitBranch className="size-4 mr-2 text-indigo-500" />}

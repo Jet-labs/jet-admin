@@ -114,22 +114,22 @@ export const StartNode = memo(({ id, data, isConnectable }) => {
 
   const StatusIndicator = () => {
     if (executionStatus === 'running') return (
-      <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10">
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
       </div>
     );
     if (executionStatus === 'completed') return (
       <div className="absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10">
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
         </svg>
       </div>
     );
     if (executionStatus === 'failed') return (
       <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10">
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
@@ -142,13 +142,13 @@ export const StartNode = memo(({ id, data, isConnectable }) => {
       <StatusIndicator />
       <div className="flex items-stretch">
         <div style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}
-          className={`flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+          className={`flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === 'running' ? 'bg-primary/10/40 border-blue-800' :
             executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
               executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
                 'bg-green-950/40 border-green-800'
             }`}
         >
-          <Play className={`w-5 h-5 ${executionStatus === 'running' ? 'text-blue-600' :
+          <Play className={`w-5 h-5 ${executionStatus === 'running' ? 'text-primary' :
             executionStatus === 'completed' ? 'text-green-600' :
               executionStatus === 'failed' ? 'text-red-600' :
                 'text-green-500'

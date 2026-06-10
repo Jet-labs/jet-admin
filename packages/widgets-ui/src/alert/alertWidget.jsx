@@ -41,11 +41,11 @@ export const AlertWidget = ({
 
   // Visual style configurations
   const styles = {
-    info: "bg-blue-500/10 border-blue-500/20 text-blue-400",
+    info: "bg-primary/10 border-primary/20 text-primary",
     success: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
     warning: "bg-amber-500/10 border-amber-500/20 text-amber-400",
     error: "bg-rose-500/10 border-rose-500/20 text-rose-400",
-  }[variant] || "bg-blue-500/10 border-blue-500/20 text-blue-400";
+  }[variant] || "bg-primary/10 border-primary/20 text-primary";
 
   const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
 

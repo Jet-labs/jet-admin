@@ -123,7 +123,7 @@ export const DataQueryInputsForm = ({
     <Dialog open={open} onOpenChange={(v) => { if (!v) onDecline(); }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold tracking-tight">
+          <DialogTitle className="text-lg font-medium tracking-tight">
             {CONSTANTS.STRINGS.DATA_QUERY_INPUTS_FORM_TITLE}
           </DialogTitle>
         </DialogHeader>
