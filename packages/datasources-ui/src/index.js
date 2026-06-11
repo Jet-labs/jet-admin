@@ -3,8 +3,21 @@ import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { QueryResponseView } from "./components/common/queryResponseView";
 import { WebViewQueryResponseView } from "./components/common/webViewQueryResponseView";
 import { ExcelCSVQueryBuilder } from "./components/excelcsv/ExcelCSVQueryBuilder";
+import { GoogleSheetsDatasourceEditor } from "./components/googlesheets/GoogleSheetsDatasourceEditor";
+import { GoogleSheetsQueryEditor } from "./components/googlesheets/GoogleSheetsQueryEditor";
 
 import { GenericDatasourceTestResultUI } from "./components/common/genericDatasourceTestResultUI";
+
+// ─── Context exports (definitions only — providers live in frontend app) ──────
+export { DatasourceEditorContext, useDatasourceEditorContext } from "./context/DatasourceEditorContext";
+export { QueryEditorContext, useQueryEditorContext } from "./context/QueryEditorContext";
+
+// ─── Shared editor primitives ─────────────────────────────────────────────────
+export { EditorTabBar } from "./primitives/EditorTabBar";
+export { MonoLabel, InfoCallout, LogicChip, EmptyState } from "./primitives/EditorPrimitives";
+
+// ─── Datasource UI component registry ─────────────────────────────────────────
+
 // Helper to create standard datasource UI config
 const createGenericDatasourceUI = () => ({
   queryResponseView: function ({ queryResult }) {
@@ -32,7 +45,15 @@ export const DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.FIRESTORE.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.MYSQL.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.MONGODB.value]: createGenericDatasourceUI(),
-  [DATASOURCE_TYPES.GOOGLESHEETS.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.GOOGLESHEETS.value]: {
+    ...createGenericDatasourceUI(),
+    dedicatedDatasourceEditor: function ({ datasourceEditorForm }) {
+      return React.createElement(GoogleSheetsDatasourceEditor, { datasourceEditorForm });
+    },
+    dedicatedQueryEditor: function ({ queryEditorForm }) {
+      return React.createElement(GoogleSheetsQueryEditor, { queryEditorForm });
+    },
+  },
   [DATASOURCE_TYPES.GRAPHQL.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.RABBITMQ.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.KAFKA.value]: createGenericDatasourceUI(),
@@ -65,8 +86,8 @@ export const DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.NATS.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.EXCELCSV.value]: {
     ...createGenericDatasourceUI(),
-    dedicatedQueryBuilder: function ({ dataQueryEditorForm }) {
-      return React.createElement(ExcelCSVQueryBuilder, { dataQueryEditorForm });
+    dedicatedQueryEditor: function ({ queryEditorForm }) {
+      return React.createElement(ExcelCSVQueryBuilder, { queryEditorForm });
     },
   },
 };

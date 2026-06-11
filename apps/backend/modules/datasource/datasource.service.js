@@ -413,6 +413,93 @@ datasourceService.cloneDatasourceByID = async ({
   }
 };
 
+/**
+ * Proxies an action call through an instantiated DataSource class.
+ * Loads the datasource from DB, resolves credentials, and dispatches.
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {number} param0.datasourceID
+ * @param {string} param0.action         — Method name on the DataSource class (e.g. "listSpreadsheets")
+ * @param {object} param0.params         — Arguments to pass to the action method
+ * @returns {Promise<any>}
+ */
+datasourceService.proxyDatasourceAction = async ({
+  userID,
+  tenantID,
+  datasourceID,
+  action,
+  params,
+}) => {
+  Logger.log("info", {
+    message: "datasourceService:proxyDatasourceAction:params",
+    params: { userID, tenantID, datasourceID, action, params },
+  });
+
+  try {
+    // 1. Load the datasource from DB
+    const datasource = await prisma.tblDatasources.findUnique({
+      where: {
+        datasourceID: datasourceID,
+        tenantID: tenantID,
+      },
+    });
+
+    if (!datasource) {
+      throw new Error(`Datasource ${datasourceID} not found.`);
+    }
+
+    // 2. Instantiate the DataSource class via registry
+    const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
+    const DataSourceClass = dataSourceRegistry.getDataSource(datasource.datasourceType);
+
+    const helpers = {
+      fileStorage: fileStorageUtil,
+      getCredential: async (vaultCredentialID) => {
+        return await vaultService.getCredential({
+          tenantID,
+          vaultCredentialID,
+        });
+      },
+      getGoogleClientConfig: () => {
+        return vaultService.getGoogleClientConfig();
+      },
+    };
+
+    const dsInstance = new DataSourceClass(
+      {
+        datasourceID: datasource.datasourceID,
+        datasourceType: datasource.datasourceType,
+        datasourceOptions: datasource.datasourceOptions,
+      },
+      helpers
+    );
+
+    // 3. Validate the action method exists
+    if (typeof dsInstance[action] !== "function") {
+      throw new Error(
+        `Action '${action}' is not supported by datasource type '${datasource.datasourceType}'.`
+      );
+    }
+
+    // 4. Execute the action
+    const result = await dsInstance[action](params, {}, helpers);
+
+    Logger.log("success", {
+      message: "datasourceService:proxyDatasourceAction:success",
+      params: { userID, datasourceID, action },
+    });
+
+    return result;
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceService:proxyDatasourceAction:error",
+      params: { userID, datasourceID, action, error: error.message || error },
+    });
+    throw error;
+  }
+};
 
 
 

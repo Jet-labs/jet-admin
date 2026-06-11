@@ -3,11 +3,11 @@ import {
   materialRenderers,
 } from "@jsonforms/material-renderers";
 import { JsonForms } from "@jsonforms/react";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import { uploadDatasourceFileAPI } from "../../../data/apis/datasource";
-import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
+import { DATASOURCE_UI_COMPONENTS, DatasourceEditorContext } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES, getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
@@ -15,6 +15,37 @@ import { FileUploadContext, OAuthContext } from "@jet-admin/json-forms-renderers
 import { DatasourceIcon } from "./datasourceIcon";
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Section } from "@jet-admin/ui";
 import { useOAuthPopup } from "../../../logic/hooks/useOAuthPopup";
+
+/**
+ * Builds a strict DatasourceEditorForm interface from the raw Formik form.
+ * Dedicated editors can only access the methods exposed here — they cannot
+ * touch datasourceTitle, datasourceType, or other unrelated fields.
+ */
+function buildDatasourceEditorForm(formikForm) {
+  return {
+    // Read-only accessors
+    get datasourceOptions() {
+      return formikForm.values.datasourceOptions;
+    },
+    get datasourceTitle() {
+      return formikForm.values.datasourceTitle;
+    },
+    get datasourceType() {
+      return formikForm.values.datasourceType;
+    },
+
+    // Controlled mutation methods
+    setDatasourceOptions: (options) => {
+      formikForm.setFieldValue("datasourceOptions", options);
+    },
+    patchDatasourceOptions: (patch) => {
+      formikForm.setFieldValue("datasourceOptions", {
+        ...formikForm.values.datasourceOptions,
+        ...patch,
+      });
+    },
+  };
+}
 
 export const DatasourceEditor = ({ datasourceEditorForm }) => {
   DatasourceEditor.propTypes = {
@@ -51,6 +82,32 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
   }, [tenantID]);
 
   const currentDatasourceType = getDatasourceTypeByValue(datasourceEditorForm.values.datasourceType);
+
+  // Build the strict editor form interface for dedicated editors
+  const strictEditorForm = useMemo(
+    () => buildDatasourceEditorForm(datasourceEditorForm),
+    [datasourceEditorForm]
+  );
+
+  // Build the DatasourceEditorContext value with all platform capabilities
+  const datasourceEditorContextValue = useMemo(
+    () => ({
+      tenantID,
+      oauth: {
+        startOAuth,
+        loading: isOAuthLoading,
+      },
+      fileUpload: {
+        uploadFile: handleUploadFile,
+      },
+    }),
+    [tenantID, startOAuth, isOAuthLoading, handleUploadFile]
+  );
+
+  // Check if this datasource type has a dedicated editor AND it's actually registered
+  const hasDedicatedEditor =
+    currentDatasourceType?.hasDedicatedDatasourceEditor &&
+    DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType]?.dedicatedDatasourceEditor;
 
   return (
     <div className="w-full">
@@ -130,21 +187,31 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
             </div>
           )}
 
-          {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType] && currentDatasourceType?.formConfig && (
-            <div className="border-t border-border pt-4 mt-2">
-              <OAuthContext.Provider value={{ startOAuth, loading: isOAuthLoading }}>
-                <FileUploadContext.Provider value={{ uploadFile: handleUploadFile }}>
-                  <JsonForms
-                    schema={currentDatasourceType.formConfig.schema}
-                    uischema={currentDatasourceType.formConfig.uischema}
-                    data={datasourceEditorForm.values.datasourceOptions}
-                    renderers={[...materialRenderers, ...customJSONFormRenderers]}
-                    cells={materialCells}
-                    onChange={handleDatasourceOptionsChange}
-                  />
-                </FileUploadContext.Provider>
-              </OAuthContext.Provider>
-            </div>
+          {/* Render dedicated datasource editor OR JsonForms fallback */}
+          {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType] && (
+            hasDedicatedEditor ? (
+              <div className="border-t border-border pt-4 mt-2">
+                <DatasourceEditorContext.Provider value={datasourceEditorContextValue}>
+                  {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType]
+                    .dedicatedDatasourceEditor({ datasourceEditorForm: strictEditorForm })}
+                </DatasourceEditorContext.Provider>
+              </div>
+            ) : currentDatasourceType?.formConfig ? (
+              <div className="border-t border-border pt-4 mt-2">
+                <OAuthContext.Provider value={{ startOAuth, loading: isOAuthLoading }}>
+                  <FileUploadContext.Provider value={{ uploadFile: handleUploadFile }}>
+                    <JsonForms
+                      schema={currentDatasourceType.formConfig.schema}
+                      uischema={currentDatasourceType.formConfig.uischema}
+                      data={datasourceEditorForm.values.datasourceOptions}
+                      renderers={[...materialRenderers, ...customJSONFormRenderers]}
+                      cells={materialCells}
+                      onChange={handleDatasourceOptionsChange}
+                    />
+                  </FileUploadContext.Provider>
+                </OAuthContext.Provider>
+              </div>
+            ) : null
           )}
         </div>
       </Section>

@@ -274,6 +274,52 @@ export const uploadDatasourceFileAPI = async ({ tenantID, file }) => {
   }
 };
 
-
+/**
+ * Proxy a datasource action through the backend.
+ * Used by dedicated editors to call datasource-specific helper methods
+ * (e.g. listSpreadsheets, listSheets) without exposing credentials.
+ *
+ * @param {Object} param0
+ * @param {string|number} param0.tenantID
+ * @param {string|number} param0.datasourceID
+ * @param {string} param0.action          — Method name on the DataSource class
+ * @param {object} [param0.params]        — Arguments for the action method
+ * @returns {Promise<any>} The result from the backend
+ */
+export const proxyDatasourceActionAPI = async ({
+  tenantID,
+  datasourceID,
+  action,
+  params,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATASOURCE.proxyDatasourceActionAPI(tenantID, datasourceID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        { action, params },
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success === true) {
+        return response.data.result;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
 
 

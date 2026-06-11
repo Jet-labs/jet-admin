@@ -443,6 +443,68 @@ datasourceController.uploadFile = async (req, res) => {
   }
 };
 
+/**
+ * Proxies an action call to an instantiated DataSource class.
+ *
+ * Dedicated editors use this endpoint to call datasource-specific helper methods
+ * (e.g. listSpreadsheets, listSheets, previewData) without exposing credentials
+ * to the frontend.
+ *
+ * POST /api/v1/tenants/:tenantID/datasources/:datasourceID/proxy
+ * Body: { action: "listSpreadsheets", params: { query: "Budget", pageToken: null } }
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+datasourceController.proxyDatasourceAction = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, datasourceID } = req.params;
+    const { action, params } = req.body;
+
+    Logger.log("info", {
+      message: "datasourceController:proxyDatasourceAction:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        datasourceID,
+        action,
+        params,
+      },
+    });
+
+    if (!action || typeof action !== "string") {
+      throw new Error("Missing or invalid 'action' in request body.");
+    }
+
+    const result = await datasourceService.proxyDatasourceAction({
+      userID: user.userID,
+      tenantID,
+      datasourceID,
+      action,
+      params: params || {},
+    });
+
+    Logger.log("success", {
+      message: "datasourceController:proxyDatasourceAction:success",
+      params: { action, datasourceID },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      result,
+      message: `Proxy action '${action}' executed successfully.`,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:proxyDatasourceAction:error",
+      params: {
+        error: error.message || error,
+      },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
 module.exports = {
   datasourceController,
 };

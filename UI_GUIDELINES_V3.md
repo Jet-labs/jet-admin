@@ -26,7 +26,7 @@ dominant decorative element — never photography, never atmospheric gradients.
 - White canvas product track — no dark-canvas marketing, no full-bleed gradients.
 - Square-ish button radii (`rounded-sm` / 6px) — never pill-shaped.
 - Near-black text ON the emerald button (the "lit surface" idiom) — never white-on-green.
-- Composited product UI mockups as decoration; compositing always uses `rounded-lg` containers.
+- Composited product UI mockups as decoration; compositing always uses `rounded-md` containers.
 - Code blocks always in `bg-canvas-night` deep near-black with system mono.
 
 ---
@@ -158,9 +158,9 @@ Base unit: **8px**. All component internal spacing must use these increments.
 |---|---|---|---|
 | `xs` | 4px | `rounded` | Form inputs, hairline tags |
 | `sm` | 6px | `rounded-md` | **Buttons** (signature shape), code blocks |
-| `md` | 8px | `rounded-lg` | Compact cards, alerts, dropdowns |
-| `lg` | 12px | `rounded-xl` | Feature cards, pricing cards, product mockups |
-| `xl` | 16px | `rounded-2xl` | Modal dialogs, large chrome |
+| `md` | 8px | `rounded-lg` | Compact cards, alerts, dropdowns, Feature cards, pricing cards, product mockups, Modal dialogs, large chrome |
+| `lg` | 12px | `rounded-xl` | Dont use |
+| `xl` | 16px | `rounded-2xl` | Dont use |
 | `full` | 9999px | `rounded-full` | Pill tags, avatars |
 
 > **Critical:** Buttons are **never** pill-shaped (`rounded-full`). The 6px square-ish radius is
@@ -444,7 +444,7 @@ Every configurator closes with a single full-width save button using `Button var
 ### Help Callout Containers
 
 ```jsx
-<div className="rounded-lg border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
+<div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
   <div className="font-semibold text-xs text-foreground">📘 Title</div>
   {/* body */}
 </div>
@@ -601,7 +601,7 @@ import { Label } from "@jet-admin/ui";
 
 ```jsx
 /* ✅ Correct */
-<div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm">
+<div className="rounded-md border border-border bg-card overflow-hidden shadow-sm">
   <div className="flex items-center justify-between px-3 py-2 bg-muted/50 border-b border-border">
 
 /* ❌ Wrong */

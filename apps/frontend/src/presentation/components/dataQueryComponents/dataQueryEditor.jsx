@@ -5,7 +5,8 @@ import {
 import { JsonForms } from "@jsonforms/react";
 import React, { useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
-import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
+import { DATASOURCE_UI_COMPONENTS, QueryEditorContext } from "@jet-admin/datasources-ui";
+import { proxyDatasourceActionAPI } from "../../../data/apis/datasource";
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { MODES } from "@jet-admin/expression-engine";
 import { CONSTANTS } from "../../../constants";
@@ -111,6 +112,39 @@ const injectQueryInputsIntoUiSchema = (uiSchema, injection) => {
   return nextUiSchema;
 };
 
+/**
+ * Builds a strict QueryEditorForm interface from the raw Formik form.
+ * Dedicated query editors can only access the methods exposed here — they cannot
+ * touch dataQueryTitle, datasourceID, or other unrelated fields.
+ */
+function buildQueryEditorForm(formikForm) {
+  return {
+    // Read-only accessors
+    get dataQueryOptions() {
+      return formikForm.values.dataQueryOptions;
+    },
+    get dataQueryTitle() {
+      return formikForm.values.dataQueryTitle;
+    },
+    get datasourceType() {
+      return formikForm.values.datasourceType;
+    },
+    get datasourceID() {
+      return formikForm.values.datasourceID;
+    },
+
+    // Controlled mutation methods
+    setQueryOptions: (options) => {
+      formikForm.setFieldValue("dataQueryOptions", options);
+    },
+    patchQueryOptions: (patch) => {
+      formikForm.setFieldValue("dataQueryOptions", {
+        ...formikForm.values.dataQueryOptions,
+        ...patch,
+      });
+    },
+  };
+}
 
 export const DataQueryEditor = ({
   dataQueryEditorForm,
@@ -143,12 +177,10 @@ export const DataQueryEditor = ({
     currentDatasourceType?.queryConfigForm?.uischema,
     dataQueryEditorForm.values.dataQueryOptions?.inputDefinitions,
   ]);
-  console.log({ datasourceID: dataQueryEditorForm?.values?.datasourceID })
 
-  // This handler specifically updates the 'datasourceOptions' part of Formik's state
+  // This handler specifically updates the 'dataQueryOptions' part of Formik's state
   const _handleDatasourceOptionsChange = useCallback(
     ({ data }) => {
-      console.log("data", data);
       dataQueryEditorForm.setFieldValue("dataQueryOptions", data);
     },
     [dataQueryEditorForm]
@@ -156,7 +188,6 @@ export const DataQueryEditor = ({
 
   const _handleDatasourceTypeChange = useCallback(
     (val) => {
-      console.log("SELECT FIRED onValueChange WITH:", val);
       if (!val) return; // Prevent phantom empty events from clearing the ID
       dataQueryEditorForm.setFieldValue("datasourceID", val);
       const selectedDatasource = datasources.find(
@@ -171,6 +202,37 @@ export const DataQueryEditor = ({
     },
     [dataQueryEditorForm, datasources]
   );
+
+  // Build the strict query editor form interface for dedicated editors
+  const strictQueryEditorForm = useMemo(
+    () => buildQueryEditorForm(dataQueryEditorForm),
+    [dataQueryEditorForm]
+  );
+
+  // Build the QueryEditorContext value with all platform capabilities
+  const queryEditorContextValue = useMemo(
+    () => ({
+      tenantID,
+      datasourceID: dataQueryEditorForm.values.datasourceID,
+      datasourceType: dataQueryEditorForm.values.datasourceType,
+      apiProxy: {
+        post: async (action, params) => {
+          return await proxyDatasourceActionAPI({
+            tenantID,
+            datasourceID: dataQueryEditorForm.values.datasourceID,
+            action,
+            params,
+          });
+        },
+      },
+    }),
+    [tenantID, dataQueryEditorForm.values.datasourceID, dataQueryEditorForm.values.datasourceType]
+  );
+
+  // Check if this datasource type has a dedicated query editor AND it's actually registered
+  const hasDedicatedQueryEditor =
+    currentDatasourceType?.hasDedicatedQueryEditor &&
+    DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType]?.dedicatedQueryEditor;
 
   return (
     <ReactQueryLoadingErrorWrapper isLoading={isLoadingDatasources} error={loadDatasourcesError}>
@@ -231,9 +293,15 @@ export const DataQueryEditor = ({
             )}
           </div>
 
+          {/* Render dedicated query editor OR JsonForms fallback */}
           {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType] && (
-            currentDatasourceType?.hasDedicatedQueryBuilder && DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType].dedicatedQueryBuilder ? (
-              DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType].dedicatedQueryBuilder({ dataQueryEditorForm })
+            hasDedicatedQueryEditor ? (
+              <div className="border-t border-border pt-4 mt-2">
+                <QueryEditorContext.Provider value={queryEditorContextValue}>
+                  {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType]
+                    .dedicatedQueryEditor({ queryEditorForm: strictQueryEditorForm })}
+                </QueryEditorContext.Provider>
+              </div>
             ) : currentDatasourceType?.queryConfigForm ? (
               <div className="border-t border-border pt-4 mt-2">
                 <JsonForms

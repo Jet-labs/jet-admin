@@ -718,25 +718,30 @@ function buildDatasourcePreview(opts) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export const ExcelCSVQueryBuilder = ({ dataQueryEditorForm }) => {
-  const raw = dataQueryEditorForm?.values?.dataQueryOptions || {};
+/**
+ * @param {Object} props
+ * @param {import("../../context/QueryEditorContext").QueryEditorForm} props.queryEditorForm
+ *   Strict interface: { dataQueryOptions, setQueryOptions, patchQueryOptions, ... }
+ */
+export const ExcelCSVQueryBuilder = ({ queryEditorForm }) => {
+  const raw = queryEditorForm?.dataQueryOptions || {};
   const opts = normalise(raw);
 
   const [activeTab, setActiveTab] = useState("source");
 
   /**
-   * Merges `updates` into `dataQueryOptions` and writes back via Formik.
+   * Merges `updates` into `dataQueryOptions` via the strict editor form.
    * Always preserves the full normalised shape so callers only send diffs.
    */
   const update = useCallback(
     (updates) => {
-      dataQueryEditorForm.setFieldValue("dataQueryOptions", {
+      queryEditorForm.setQueryOptions({
         ...opts,
         ...updates,
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dataQueryEditorForm, JSON.stringify(opts)]
+    [queryEditorForm, JSON.stringify(opts)]
   );
 
   // Badge counts for each tab

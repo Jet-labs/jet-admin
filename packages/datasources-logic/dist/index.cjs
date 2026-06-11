@@ -1092,7 +1092,10 @@ var GoogleSheetsDataSource = class extends DataSource {
       const credentials = typeof serviceAccountKey === "string" ? JSON.parse(serviceAccountKey) : serviceAccountKey;
       this.auth = new import_googleapis2.google.auth.GoogleAuth({
         credentials,
-        scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+        scopes: [
+          "https://www.googleapis.com/auth/spreadsheets",
+          "https://www.googleapis.com/auth/drive.readonly"
+        ]
       });
     } else if (authType === "oauth2" && oauth2) {
       const activeHelpers = helpers || this.helpers;
@@ -1145,7 +1148,7 @@ var GoogleSheetsDataSource = class extends DataSource {
       params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
     });
     const {
-      operation,
+      operation = "read",
       spreadsheetId,
       sheetName,
       range,
@@ -1292,6 +1295,92 @@ var GoogleSheetsDataSource = class extends DataSource {
       }
     }
     return [[data]];
+  }
+  // ─── Proxy-callable helper methods ──────────────────────────────────────────
+  // These are invoked via POST /datasources/:id/proxy from dedicated editors.
+  /**
+   * Lists spreadsheets the authenticated user has access to.
+   * Uses Google Drive API to search for spreadsheet files.
+   *
+   * @param {Object} params
+   * @param {string} [params.query]      — Search term to filter by title
+   * @param {string} [params.pageToken]  — Token for next page
+   * @param {number} [params.pageSize]   — Results per page (default 20)
+   * @returns {Promise<{ spreadsheets: Array, nextPageToken: string|null }>}
+   */
+  async listSpreadsheets(params = {}, context, helpers) {
+    const { query, pageToken, pageSize = 20 } = params;
+    const auth = await this.getAuth(helpers);
+    const drive = import_googleapis2.google.drive({ version: "v3", auth });
+    let q = "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false";
+    if (query && query.trim()) {
+      const safeQuery = query.trim().replace(/'/g, "\\'");
+      q += ` and name contains '${safeQuery}'`;
+    }
+    const response = await drive.files.list({
+      q,
+      pageSize,
+      pageToken: pageToken || void 0,
+      fields: "nextPageToken, files(id, name, modifiedTime, owners, webViewLink)",
+      orderBy: "modifiedTime desc"
+    });
+    return {
+      spreadsheets: (response.data.files || []).map((f) => ({
+        id: f.id,
+        name: f.name,
+        modifiedTime: f.modifiedTime,
+        owner: f.owners?.[0]?.displayName || null,
+        webViewLink: f.webViewLink || null
+      })),
+      nextPageToken: response.data.nextPageToken || null
+    };
+  }
+  /**
+   * Lists all sheets/tabs in a given spreadsheet.
+   * Reuses the existing getSpreadsheetInfo method.
+   *
+   * @param {Object} params
+   * @param {string} params.spreadsheetId
+   * @returns {Promise<{ title: string, sheets: Array }>}
+   */
+  async listSheets(params = {}, context, helpers) {
+    const { spreadsheetId } = params;
+    if (!spreadsheetId) {
+      throw new Error("spreadsheetId is required");
+    }
+    const sheets = await this.getSheetsClient(helpers);
+    return await this.getSpreadsheetInfo(sheets, spreadsheetId);
+  }
+  /**
+   * Returns the first N rows from a sheet for preview purposes.
+   *
+   * @param {Object} params
+   * @param {string} params.spreadsheetId
+   * @param {string} [params.sheetName]  — Sheet tab name (default "Sheet1")
+   * @param {string} [params.range]      — Override range in A1 notation
+   * @param {number} [params.limit]      — Max rows to return (default 5)
+   * @returns {Promise<{ headers: string[], rows: string[][], totalRows: number }>}
+   */
+  async previewData(params = {}, context, helpers) {
+    const { spreadsheetId, sheetName = "Sheet1", range, limit = 5 } = params;
+    if (!spreadsheetId) {
+      throw new Error("spreadsheetId is required");
+    }
+    const sheets = await this.getSheetsClient(helpers);
+    const previewRange = range || `${sheetName}!A1:Z${limit + 1}`;
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: previewRange,
+      majorDimension: "ROWS"
+    });
+    const values = response.data.values || [];
+    const headers = values.length > 0 ? values[0] : [];
+    const rows = values.length > 1 ? values.slice(1, limit + 1) : [];
+    return {
+      headers,
+      rows,
+      totalRows: values.length > 0 ? values.length - 1 : 0
+    };
   }
 };
 

@@ -8093,7 +8093,9 @@ var DATASOURCE_TYPES = {
     icon: "SiGooglesheets",
     iconColor: "#0F9D58",
     formConfig: formConfig_default7,
-    queryConfigForm: queryConfig_default7
+    queryConfigForm: queryConfig_default7,
+    hasDedicatedDatasourceEditor: true,
+    hasDedicatedQueryEditor: true
   },
   GRAPHQL: {
     name: "GraphQL",
@@ -8342,7 +8344,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default29,
     queryConfigForm: queryConfig_default29,
     supportsListener: false,
-    hasDedicatedQueryBuilder: true
+    hasDedicatedQueryEditor: true
   }
 };
 var getDatasourceTypeByValue = (value) => {

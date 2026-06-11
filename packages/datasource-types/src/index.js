@@ -183,6 +183,8 @@ export const DATASOURCE_TYPES = {
     iconColor: "#0F9D58",
     formConfig: googlesheetsFormConfig,
     queryConfigForm: googlesheetsQueryConfigForm,
+    hasDedicatedDatasourceEditor: true,
+    hasDedicatedQueryEditor: true,
   },
   GRAPHQL: {
     name: "GraphQL",
@@ -431,7 +433,7 @@ export const DATASOURCE_TYPES = {
     formConfig: excelcsvFormConfig,
     queryConfigForm: excelcsvQueryConfigForm,
     supportsListener: false,
-    hasDedicatedQueryBuilder: true,
+    hasDedicatedQueryEditor: true,
   },
 };
 

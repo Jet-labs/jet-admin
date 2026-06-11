@@ -1024,6 +1024,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/datasources/${datasourceID}/clone`,
       uploadDatasourceFileAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/datasources/upload`,
+      proxyDatasourceActionAPI: (tenantID, datasourceID) =>
+        `/api/v1/tenants/${tenantID}/datasources/${datasourceID}/proxy`,
     },
     DATABASE: {
       getAllDataQueriesAPI: (tenantID) =>

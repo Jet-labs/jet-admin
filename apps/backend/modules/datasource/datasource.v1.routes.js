@@ -73,4 +73,12 @@ router.delete(
   datasourceController.deleteDatasourceByID
 );
 
+// Datasource proxy — dedicated editors call DS-specific helper methods through backend
+router.post(
+  "/:datasourceID/proxy",
+    validate(datasourceIdParamSchema, "params"),
+  authMiddleware.checkUserPermissions(["tenant:datasource:read"]),
+  datasourceController.proxyDatasourceAction
+);
+
 module.exports = router;
