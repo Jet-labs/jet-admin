@@ -1458,12 +1458,14 @@ var init_statWidget = __esm({
         return direction === "down" ? "text-emerald-500" : "text-red-500";
       }, [trend, trendDirection]);
       const TrendIcon = trend?.direction === "up" ? import_lucide_react11.TrendingUp : trend?.direction === "down" ? import_lucide_react11.TrendingDown : import_lucide_react11.Minus;
+      const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
       return /* @__PURE__ */ import_react23.default.createElement(
         "div",
         {
-          className: "flex flex-col items-center justify-center w-full h-full p-4 gap-1",
+          className: "flex flex-col items-center justify-center w-full h-full p-4 gap-1 relative",
           style: { textAlign: align, alignItems: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start" }
         },
+        isLoading && /* @__PURE__ */ import_react23.default.createElement("div", { className: "absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]" }, /* @__PURE__ */ import_react23.default.createElement("div", { className: "flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border" }, /* @__PURE__ */ import_react23.default.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ import_react23.default.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Updating...")),
         /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-xs font-medium text-muted-foreground uppercase tracking-wider leading-none" }, label),
         /* @__PURE__ */ import_react23.default.createElement("div", { className: "flex items-baseline gap-1" }, prefix && /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-lg font-medium text-muted-foreground" }, prefix), /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-3xl font-bold text-foreground tabular-nums tracking-tight" }, displayValue), suffix && /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-lg font-medium text-muted-foreground" }, suffix)),
         trend && /* @__PURE__ */ import_react23.default.createElement("div", { className: `flex items-center gap-1 mt-0.5 ${trendColor}` }, /* @__PURE__ */ import_react23.default.createElement(TrendIcon, { className: "h-3.5 w-3.5" }), /* @__PURE__ */ import_react23.default.createElement("span", { className: "text-xs font-semibold" }, trend.value))

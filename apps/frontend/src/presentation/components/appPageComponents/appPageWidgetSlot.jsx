@@ -198,6 +198,8 @@ export const AppPageWidgetSlot = ({
   const widgetStyleProps = resolvedConfig?.properties?.style || {};
   const customCSS = widgetStyleProps.customCSS;
   const customCSSClassName = customCSS ? `custom-widget-${widgetID}` : "";
+  const containerCss = resolvedConfig?.properties?.containerTailwindCss || "";
+  const widgetCss = resolvedConfig?.properties?.widgetTailwindCss || "";
 
   const widgetInlineStyle = {
     ...(widgetStyleProps.backgroundColor && { backgroundColor: widgetStyleProps.backgroundColor }),
@@ -227,7 +229,7 @@ export const AppPageWidgetSlot = ({
       <Card
         className={`!h-full !w-full flex-grow relative rounded-none overflow-hidden bg-background/95 transition-all duration-200 ${
           widgetStyleProps.showBorder !== false ? "border shadow-sm" : ""
-        } ${isMouseHover ? "border-primary" : "border-border/80"} ${customCSSClassName}`}
+        } ${isMouseHover ? "border-primary" : "border-border/80"} ${customCSSClassName} ${containerCss}`}
         style={widgetInlineStyle}
         onMouseEnter={editable ? () => setIsMouseHover(true) : null}
         onMouseLeave={editable ? () => setIsMouseHover(false) : null}
@@ -327,7 +329,7 @@ export const AppPageWidgetSlot = ({
             {/* Widget Content */}
             {RenderedWidgetComponent
               ? (
-                <div className="min-h-0 flex-1 bg-background">
+                <div className={`min-h-0 flex-1 bg-transparent ${widgetCss}`}>
                   <ErrorBoundary title="Widget Render Error">
                     <MemoizedWidgetContent
                       RenderedWidgetComponent={RenderedWidgetComponent}
