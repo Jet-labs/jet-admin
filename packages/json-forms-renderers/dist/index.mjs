@@ -50,7 +50,7 @@ var CustomNumberInput = (props) => {
     Label,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
+      className: `block mb-1 ${hasErrors ? "text-red-500" : ""}`
     },
     label || description
   ), /* @__PURE__ */ React.createElement(
@@ -97,7 +97,7 @@ var CustomTextInput = (props) => {
     Label2,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
+      className: `block mb-1 ${hasErrors ? "text-red-500" : ""}`
     },
     label || description
   ), isPassword ? /* @__PURE__ */ React2.createElement(
@@ -191,7 +191,7 @@ var CustomSelectInput = (props) => {
     Label3,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
+      className: `block mb-1 ${hasErrors ? "text-red-500" : ""}`
     },
     label || description
   ), /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React3.createElement(Select, { value: data || "", onValueChange: (val) => handleChange(path, val), disabled: isDisabled }, /* @__PURE__ */ React3.createElement(
@@ -306,7 +306,7 @@ var CustomCodeEditorControl = ({
     Label5,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
+      className: `block mb-1 ${hasErrors ? "text-red-500" : ""}`
     },
     label || description
   ), hint && /* @__PURE__ */ React5.createElement("p", { className: "text-[10px] text-muted-foreground mb-1" }, hint), /* @__PURE__ */ React5.createElement(
@@ -355,7 +355,7 @@ var CustomSuggestionInput = (props) => {
     Label6,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"} flex justify-between items-center`
+      className: `block mb-1 ${hasErrors ? "text-red-500" : ""} flex justify-between items-center`
     },
     /* @__PURE__ */ React6.createElement("span", null, label || description),
     suggestions && suggestions.length > 0 && /* @__PURE__ */ React6.createElement(
@@ -479,7 +479,7 @@ var CustomKeyValueArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React8.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React8.createElement(Label8, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React8.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React8.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React8.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React8.createElement(
+  return /* @__PURE__ */ React8.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React8.createElement(Label8, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React8.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React8.createElement("div", { key: `${path}-${index}`, className: "flex items-end space-x-2" }, /* @__PURE__ */ React8.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React8.createElement(
     JsonFormsDispatch,
     {
       uischema: {
@@ -577,7 +577,7 @@ var CustomKeyValueTypeArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React9.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React9.createElement(Label9, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React9.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React9.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React9.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React9.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React9.createElement(
+  return /* @__PURE__ */ React9.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React9.createElement(Label9, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React9.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React9.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React9.createElement("div", { key: `${path}-${index}`, className: "flex items-end space-x-2" }, /* @__PURE__ */ React9.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React9.createElement(
     JsonFormsDispatch2,
     {
       uischema: {
@@ -687,7 +687,7 @@ var CustomKeyTypeArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React10.createElement("div", { className: "p-3 border mt-3 border-border rounded-sm bg-background" }, /* @__PURE__ */ React10.createElement(Label10, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React10.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React10.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React10.createElement(
+  return /* @__PURE__ */ React10.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React10.createElement(Label10, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React10.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React10.createElement("div", { key: `${path}-${index}`, className: "flex items-end space-x-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React10.createElement(
     JsonFormsDispatch3,
     {
       uischema: {
@@ -953,7 +953,7 @@ var CustomGenericObjectArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React13.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React13.createElement(Label13, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React13.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col gap-2" }, propertyKeys.length > 0 ? items.map((item, index) => /* @__PURE__ */ React13.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, propertyKeys.map((propKey) => /* @__PURE__ */ React13.createElement("div", { key: propKey, className: "flex-grow" }, /* @__PURE__ */ React13.createElement(
+  return /* @__PURE__ */ React13.createElement("div", { className: "p-3 border border-border rounded-sm bg-background" }, /* @__PURE__ */ React13.createElement(Label13, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React13.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col gap-2" }, propertyKeys.length > 0 ? items.map((item, index) => /* @__PURE__ */ React13.createElement("div", { key: `${path}-${index}`, className: "flex items-end space-x-2" }, propertyKeys.map((propKey) => /* @__PURE__ */ React13.createElement("div", { key: propKey, className: "flex-grow" }, /* @__PURE__ */ React13.createElement(
     JsonFormsDispatch4,
     {
       uischema: {
@@ -1073,7 +1073,7 @@ var CustomRadioInput = (props) => {
   return /* @__PURE__ */ React15.createElement("div", { className: "" }, /* @__PURE__ */ React15.createElement(
     Label14,
     {
-      className: `block mb-2 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
+      className: `block mb-2 ${hasErrors ? "text-red-500" : ""}`
     },
     label || description
   ), /* @__PURE__ */ React15.createElement(
@@ -1143,37 +1143,41 @@ CustomVerticalLayout.propTypes = {
 import React17, { useState as useState3 } from "react";
 import PropTypes17 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch7 } from "@jsonforms/react";
-import { Button as Button9 } from "@jet-admin/ui";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@jet-admin/ui";
 var CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
   const categories = uischema.elements || [];
-  const [activeTab, setActiveTab] = useState3(0);
+  const [activeTab, setActiveTab] = useState3("0");
   if (!categories || categories.length === 0) {
     return null;
   }
-  const activeCategory = categories[activeTab];
-  return /* @__PURE__ */ React17.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ React17.createElement("div", { className: "flex border-border" }, categories.map((category, index) => /* @__PURE__ */ React17.createElement(
-    Button9,
+  return /* @__PURE__ */ React17.createElement("div", { className: "custom-tabs-container bg-background  !rounded-md" }, /* @__PURE__ */ React17.createElement(Tabs, { value: activeTab, onValueChange: setActiveTab, className: "w-full flex flex-col" }, /* @__PURE__ */ React17.createElement(TabsList, { className: "h-auto" }, categories.map((category, index) => /* @__PURE__ */ React17.createElement(
+    TabsTrigger,
     {
       key: category.label || `tab-${index}`,
-      variant: "ghost",
-      className: `px-4 mr-2 py-2 text-sm font-medium rounded-sm ${index === activeTab ? "text-primary bg-primary/5" : "text-foreground"}`,
-      onClick: () => setActiveTab(index),
-      type: "button"
+      value: String(index)
     },
     category.label
-  ))), /* @__PURE__ */ React17.createElement("div", { className: "p-3 border mt-3 border-border rounded-sm bg-background flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ React17.createElement(
-    JsonFormsDispatch7,
+  ))), /* @__PURE__ */ React17.createElement("div", { className: "p-2 rounded-md bg-background" }, categories.map((category, index) => /* @__PURE__ */ React17.createElement(
+    TabsContent,
     {
-      key: `${activeCategory.label}-${i}`,
-      uischema: element,
-      schema,
-      path,
-      enabled,
-      renderers,
-      cells
-    }
-  ))));
+      key: category.label || `tab-content-${index}`,
+      value: String(index),
+      className: "mt-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none flex flex-col space-y-2"
+    },
+    category.elements.map((element, i) => /* @__PURE__ */ React17.createElement(
+      JsonFormsDispatch7,
+      {
+        key: `${category.label}-${i}`,
+        uischema: element,
+        schema,
+        path,
+        enabled,
+        renderers,
+        cells
+      }
+    ))
+  )))));
 };
 CustomTabRenderer.propTypes = {
   uischema: PropTypes17.shape({
@@ -1223,7 +1227,7 @@ CustomHorizontalLayout.propTypes = {
 import React20, { useState as useState4, useContext } from "react";
 import PropTypes19 from "prop-types";
 import { CloudUpload, FileSpreadsheet, Trash2 as Trash27, AlertCircle } from "lucide-react";
-import { Button as Button10, Label as Label15 } from "@jet-admin/ui";
+import { Button as Button9, Label as Label15 } from "@jet-admin/ui";
 
 // src/context.js
 import React19 from "react";
@@ -1325,13 +1329,13 @@ var CustomFileUploadInput = (props) => {
     Label15,
     {
       htmlFor: path,
-      className: `block text-xs font-medium ${hasErrors ? "text-destructive" : "text-muted-foreground"}`
+      className: `block ${hasErrors ? "text-destructive" : ""}`
     },
     label || description || "Upload File",
     " ",
     /* @__PURE__ */ React20.createElement("span", { className: "text-destructive" }, "*")
   ), fileUrl ? /* @__PURE__ */ React20.createElement("div", { className: "flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-md" }, /* @__PURE__ */ React20.createElement("div", { className: "flex items-center gap-3 overflow-hidden" }, /* @__PURE__ */ React20.createElement("div", { className: "p-2 bg-primary/10 rounded-md text-primary" }, /* @__PURE__ */ React20.createElement(FileSpreadsheet, { className: "h-5 w-5" })), /* @__PURE__ */ React20.createElement("div", { className: "overflow-hidden" }, /* @__PURE__ */ React20.createElement("p", { className: "text-sm font-medium text-foreground truncate max-w-sm" }, fileName || "Uploaded File"), /* @__PURE__ */ React20.createElement("p", { className: "text-xs text-muted-foreground" }, formatBytes(fileSize), " \u2022 ", fileType || "Spreadsheet"))), /* @__PURE__ */ React20.createElement(
-    Button10,
+    Button9,
     {
       type: "button",
       variant: "destructive",

@@ -750,7 +750,7 @@ var init_tableConfigEditor = __esm({
           [field]: value
         });
       };
-      return /* @__PURE__ */ React10.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Data Array Template"), /* @__PURE__ */ React10.createElement(
+      return /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Data Array Template"), /* @__PURE__ */ React10.createElement(
         TemplateAutocompleteInput3,
         {
           value: config.dataArrayTemplate || config.dataMapping?.dataArrayPath || "",
@@ -758,7 +758,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "e.g. {{ state.queries.my_query.data }}",
           liveStateTree
         }
-      ), /* @__PURE__ */ React10.createElement("p", { className: "text-[0.65rem] text-muted-foreground" }, "Mustache template evaluating to an array of objects.")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Total Count Template ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React10.createElement(
+      ), /* @__PURE__ */ React10.createElement("p", { className: "text-[0.65rem] text-muted-foreground" }, "Mustache template evaluating to an array of objects.")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Total Count Template ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React10.createElement(
         TemplateAutocompleteInput3,
         {
           value: pagination.totalTemplate || config.dataMapping?.totalCountPath || "",
@@ -766,7 +766,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "e.g. {{ state.queries.my_query.total }}",
           liveStateTree
         }
-      ), /* @__PURE__ */ React10.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use array length.")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React10.createElement(
+      ), /* @__PURE__ */ React10.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use array length.")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React10.createElement(
         TemplateAutocompleteInput3,
         {
           value: config.isLoading || "",
@@ -872,13 +872,13 @@ var init_tableConfigEditor = __esm({
             className: "h-3.5 w-3.5"
           }
         ), /* @__PURE__ */ React10.createElement(Label3, { htmlFor: `col-edit-${idx}`, className: "text-[10px] ml-1.5 text-muted-foreground cursor-pointer" }, "Editable Column"))
-      )))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ React10.createElement(
+      )))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ React10.createElement(
         Switch2,
         {
           checked: pagination.enabled,
           onCheckedChange: handlePaginationToggle
         }
-      )), pagination.enabled && /* @__PURE__ */ React10.createElement("div", { className: "space-y-2 bg-muted/30 p-3 rounded-md border mt-1" }, /* @__PURE__ */ React10.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Configure pagination actions in the ", /* @__PURE__ */ React10.createElement("strong", null, "Events"), " tab using the ", /* @__PURE__ */ React10.createElement("strong", null, "On Page Change"), " event. Event data: ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.page }}"), ",", " ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.offset }}"), ",", " ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.pageSize }}")))), /* @__PURE__ */ React10.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Search Box"), /* @__PURE__ */ React10.createElement(
+      )), pagination.enabled && /* @__PURE__ */ React10.createElement("div", { className: "space-y-2 bg-muted/30 p-2 rounded-md border mt-1" }, /* @__PURE__ */ React10.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Configure pagination actions in the ", /* @__PURE__ */ React10.createElement("strong", null, "Events"), " tab using the ", /* @__PURE__ */ React10.createElement("strong", null, "On Page Change"), " event. Event data: ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.page }}"), ",", " ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.offset }}"), ",", " ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.pageSize }}")))), /* @__PURE__ */ React10.createElement("div", { className: "grid grid-cols-2 gap-2 border-t pt-2 mt-2" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Search Box"), /* @__PURE__ */ React10.createElement(
         Switch2,
         {
           checked: search.enabled,
@@ -899,7 +899,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "Search placeholder...",
           className: "h-7 text-xs"
         }
-      ))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Export Data"), /* @__PURE__ */ React10.createElement(
+      ))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Export Data"), /* @__PURE__ */ React10.createElement(
         Switch2,
         {
           checked: exportConfig.enabled,
@@ -928,20 +928,20 @@ var init_tableConfigEditor = __esm({
         },
         /* @__PURE__ */ React10.createElement(SelectTrigger3, { className: "h-7 text-xs w-[70px]" }, /* @__PURE__ */ React10.createElement(SelectValue3, null)),
         /* @__PURE__ */ React10.createElement(SelectContent3, null, /* @__PURE__ */ React10.createElement(SelectItem3, { value: "csv" }, "CSV"), /* @__PURE__ */ React10.createElement(SelectItem3, { value: "json" }, "JSON"))
-      ))))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-3 border-t pt-4" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Multi-Row Selection"), /* @__PURE__ */ React10.createElement(
+      ))))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-2 border-t pt-2 mt-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Multi-Row Selection"), /* @__PURE__ */ React10.createElement(
         Switch2,
         {
           checked: multiSelect.enabled,
           onCheckedChange: (v) => handleConfigChange("multiSelect", { ...multiSelect, enabled: v })
         }
-      )), multiSelect.enabled && /* @__PURE__ */ React10.createElement("div", { className: "space-y-2 bg-muted/30 p-3 rounded border" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2 pb-2 border-b" }, /* @__PURE__ */ React10.createElement(
+      )), multiSelect.enabled && /* @__PURE__ */ React10.createElement("div", { className: "space-y-2 bg-muted/30 p-2 rounded border" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2 pb-2 border-b" }, /* @__PURE__ */ React10.createElement(
         Checkbox2,
         {
           id: "ms-select-all",
           checked: multiSelect.showSelectAll,
           onCheckedChange: (v) => handleConfigChange("multiSelect", { ...multiSelect, showSelectAll: !!v })
         }
-      ), /* @__PURE__ */ React10.createElement(Label3, { htmlFor: "ms-select-all", className: "text-[10px] cursor-pointer" }, 'Show "Select All" Checkbox')), /* @__PURE__ */ React10.createElement("div", { className: "pt-1" }, /* @__PURE__ */ React10.createElement("div", { className: "flex justify-between items-center mb-2" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-[10px] font-medium" }, "Bulk Actions"), /* @__PURE__ */ React10.createElement(Button5, { type: "button", variant: "outline", size: "sm", onClick: handleAddBulkAction, className: "h-6 text-[10px] px-2" }, /* @__PURE__ */ React10.createElement(Plus2, { className: "mr-1 h-3 w-3" }), " Add Action")), (!multiSelect.actions || multiSelect.actions.length === 0) && /* @__PURE__ */ React10.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No bulk actions configured. Selection will be tracked in widgetState."), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, (multiSelect.actions || []).map((act, idx) => /* @__PURE__ */ React10.createElement("div", { key: idx, className: "flex items-center gap-1.5 bg-background p-1.5 rounded border" }, /* @__PURE__ */ React10.createElement(
+      ), /* @__PURE__ */ React10.createElement(Label3, { htmlFor: "ms-select-all", className: "text-[10px] cursor-pointer" }, 'Show "Select All" Checkbox')), /* @__PURE__ */ React10.createElement("div", { className: "pt-1" }, /* @__PURE__ */ React10.createElement("div", { className: "flex justify-between items-center mb-2" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-[10px] font-medium" }, "Bulk Actions"), /* @__PURE__ */ React10.createElement(Button5, { type: "button", variant: "outline", size: "sm", onClick: handleAddBulkAction, className: "h-6 text-[10px] px-2" }, /* @__PURE__ */ React10.createElement(Plus2, { className: "mr-1 h-3 w-3" }), " Add Action")), (!multiSelect.actions || multiSelect.actions.length === 0) && /* @__PURE__ */ React10.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No bulk actions configured. Selection will be tracked in widgetState."), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1" }, (multiSelect.actions || []).map((act, idx) => /* @__PURE__ */ React10.createElement("div", { key: idx, className: "flex items-center gap-1.5 bg-background p-1.5 rounded border" }, /* @__PURE__ */ React10.createElement(
         Input5,
         {
           value: act.label,
@@ -957,7 +957,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "actionKey",
           className: "h-6 text-[10px] font-mono flex-1"
         }
-      ), /* @__PURE__ */ React10.createElement(Select3, { value: act.variant || "default", onValueChange: (v) => handleUpdateBulkAction(idx, "variant", v) }, /* @__PURE__ */ React10.createElement(SelectTrigger3, { className: "h-6 text-[10px] w-20" }, /* @__PURE__ */ React10.createElement(SelectValue3, null)), /* @__PURE__ */ React10.createElement(SelectContent3, null, /* @__PURE__ */ React10.createElement(SelectItem3, { value: "default" }, "Default"), /* @__PURE__ */ React10.createElement(SelectItem3, { value: "destructive" }, "Danger"), /* @__PURE__ */ React10.createElement(SelectItem3, { value: "outline" }, "Outline"))), /* @__PURE__ */ React10.createElement(Button5, { type: "button", variant: "ghost", size: "icon", onClick: () => handleRemoveBulkAction(idx), className: "h-6 w-6 text-destructive shrink-0" }, /* @__PURE__ */ React10.createElement(Trash2, { className: "h-3 w-3" })))))))), /* @__PURE__ */ React10.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Inline Row Editing"), /* @__PURE__ */ React10.createElement(
+      ), /* @__PURE__ */ React10.createElement(Select3, { value: act.variant || "default", onValueChange: (v) => handleUpdateBulkAction(idx, "variant", v) }, /* @__PURE__ */ React10.createElement(SelectTrigger3, { className: "h-6 text-[10px] w-20" }, /* @__PURE__ */ React10.createElement(SelectValue3, null)), /* @__PURE__ */ React10.createElement(SelectContent3, null, /* @__PURE__ */ React10.createElement(SelectItem3, { value: "default" }, "Default"), /* @__PURE__ */ React10.createElement(SelectItem3, { value: "destructive" }, "Danger"), /* @__PURE__ */ React10.createElement(SelectItem3, { value: "outline" }, "Outline"))), /* @__PURE__ */ React10.createElement(Button5, { type: "button", variant: "ghost", size: "icon", onClick: () => handleRemoveBulkAction(idx), className: "h-6 w-6 text-destructive shrink-0" }, /* @__PURE__ */ React10.createElement(Trash2, { className: "h-3 w-3" })))))))), /* @__PURE__ */ React10.createElement("div", { className: "grid grid-cols-2 gap-2 border-t pt-2 mt-2" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Inline Row Editing"), /* @__PURE__ */ React10.createElement(
         Switch2,
         {
           checked: editing.enabled,
@@ -966,7 +966,7 @@ var init_tableConfigEditor = __esm({
             if (v && bulkEdit.enabled) handleConfigChange("bulkEdit", { ...bulkEdit, enabled: false });
           }
         }
-      )), /* @__PURE__ */ React10.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Adds an Edit button to each row. Fires ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 border rounded" }, "onRowSave"), ".")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Excel-Style Bulk Edit"), /* @__PURE__ */ React10.createElement(
+      )), /* @__PURE__ */ React10.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Adds an Edit button to each row. Fires ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 border rounded" }, "onRowSave"), ".")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Excel-Style Bulk Edit"), /* @__PURE__ */ React10.createElement(
         Switch2,
         {
           checked: bulkEdit.enabled,
@@ -1002,7 +1002,7 @@ var init_buttonConfigEditor = __esm({
     ButtonConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
       const liveStateTree = useMemo8(() => ({ state: stateTree }), [stateTree]);
-      return /* @__PURE__ */ React11.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ React11.createElement(
+      return /* @__PURE__ */ React11.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ React11.createElement(
         TemplateAutocompleteInput4,
         {
           value: config.text || "",
@@ -1010,7 +1010,7 @@ var init_buttonConfigEditor = __esm({
           placeholder: "Click Me",
           liveStateTree
         }
-      )), /* @__PURE__ */ React11.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ React11.createElement(
+      )), /* @__PURE__ */ React11.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ React11.createElement(
         Select4,
         {
           value: config.variant || "default",
@@ -1018,7 +1018,7 @@ var init_buttonConfigEditor = __esm({
         },
         /* @__PURE__ */ React11.createElement(SelectTrigger4, { className: "text-xs" }, /* @__PURE__ */ React11.createElement(SelectValue4, { placeholder: "Select variant" })),
         /* @__PURE__ */ React11.createElement(SelectContent4, null, /* @__PURE__ */ React11.createElement(SelectItem4, { value: "default" }, "Default"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "destructive" }, "Destructive"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "outline" }, "Outline"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "secondary" }, "Secondary"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "ghost" }, "Ghost"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "link" }, "Link"))
-      )), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React11.createElement(
+      )), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React11.createElement(
         Select4,
         {
           value: config.size || "default",
@@ -1026,7 +1026,7 @@ var init_buttonConfigEditor = __esm({
         },
         /* @__PURE__ */ React11.createElement(SelectTrigger4, { className: "text-xs" }, /* @__PURE__ */ React11.createElement(SelectValue4, { placeholder: "Select size" })),
         /* @__PURE__ */ React11.createElement(SelectContent4, null, /* @__PURE__ */ React11.createElement(SelectItem4, { value: "default" }, "Default"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "sm" }, "Small"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "lg" }, "Large"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "icon" }, "Icon"))
-      ))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React11.createElement(
+      ))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React11.createElement(
         TemplateAutocompleteInput4,
         {
           value: config.isLoading || "",
@@ -1054,7 +1054,7 @@ var init_datePickerConfigEditor = __esm({
     DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
       const liveStateTree = useMemo14(() => ({ state: stateTree }), [stateTree]);
-      return /* @__PURE__ */ React18.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React18.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React18.createElement(
+      return /* @__PURE__ */ React18.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React18.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React18.createElement(
         Input12,
         {
           type: "text",
@@ -1063,7 +1063,7 @@ var init_datePickerConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
           placeholder: "e.g. Select date"
         }
-      )), /* @__PURE__ */ React18.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Placeholder"), /* @__PURE__ */ React18.createElement(
+      )), /* @__PURE__ */ React18.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Placeholder"), /* @__PURE__ */ React18.createElement(
         Input12,
         {
           type: "text",
@@ -1079,7 +1079,7 @@ var init_datePickerConfigEditor = __esm({
           checked: !!config.enableTime,
           onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
         }
-      ), /* @__PURE__ */ React18.createElement(Label11, { htmlFor: "date-picker-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React18.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Default Value"), /* @__PURE__ */ React18.createElement(
+      ), /* @__PURE__ */ React18.createElement(Label11, { htmlFor: "date-picker-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React18.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Default Value"), /* @__PURE__ */ React18.createElement(
         TemplateAutocompleteInput10,
         {
           value: config.defaultValue || "",
@@ -1087,7 +1087,7 @@ var init_datePickerConfigEditor = __esm({
           placeholder: "e.g. {{state.variables.myDate}} or ISO string",
           liveStateTree
         }
-      )), /* @__PURE__ */ React18.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React18.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React18.createElement(
+      )), /* @__PURE__ */ React18.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ React18.createElement(Label11, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React18.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React18.createElement(
         TemplateAutocompleteInput10,
         {
           value: config.isLoading || "",
@@ -1115,7 +1115,7 @@ var init_dateRangePickerConfigEditor = __esm({
     DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
       const liveStateTree = useMemo15(() => ({ state: stateTree }), [stateTree]);
-      return /* @__PURE__ */ React19.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React19.createElement(
+      return /* @__PURE__ */ React19.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React19.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React19.createElement(
         Input13,
         {
           type: "text",
@@ -1124,7 +1124,7 @@ var init_dateRangePickerConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
           placeholder: "e.g. Select date range"
         }
-      )), /* @__PURE__ */ React19.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Start Placeholder"), /* @__PURE__ */ React19.createElement(
+      )), /* @__PURE__ */ React19.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React19.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Start Placeholder"), /* @__PURE__ */ React19.createElement(
         Input13,
         {
           type: "text",
@@ -1133,7 +1133,7 @@ var init_dateRangePickerConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.placeholderStart", e.target.value),
           placeholder: "Start date"
         }
-      )), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "End Placeholder"), /* @__PURE__ */ React19.createElement(
+      )), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "End Placeholder"), /* @__PURE__ */ React19.createElement(
         Input13,
         {
           type: "text",
@@ -1149,7 +1149,7 @@ var init_dateRangePickerConfigEditor = __esm({
           checked: !!config.enableTime,
           onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
         }
-      ), /* @__PURE__ */ React19.createElement(Label12, { htmlFor: "date-range-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React19.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Default Start"), /* @__PURE__ */ React19.createElement(
+      ), /* @__PURE__ */ React19.createElement(Label12, { htmlFor: "date-range-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ React19.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React19.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Default Start"), /* @__PURE__ */ React19.createElement(
         TemplateAutocompleteInput11,
         {
           value: config.defaultStart || "",
@@ -1157,7 +1157,7 @@ var init_dateRangePickerConfigEditor = __esm({
           placeholder: "e.g. {{state.variables.startDate}}",
           liveStateTree
         }
-      )), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Default End"), /* @__PURE__ */ React19.createElement(
+      )), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Default End"), /* @__PURE__ */ React19.createElement(
         TemplateAutocompleteInput11,
         {
           value: config.defaultEnd || "",
@@ -1165,7 +1165,7 @@ var init_dateRangePickerConfigEditor = __esm({
           placeholder: "e.g. {{state.variables.endDate}}",
           liveStateTree
         }
-      ))), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React19.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React19.createElement(
+      ))), /* @__PURE__ */ React19.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ React19.createElement(Label12, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React19.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React19.createElement(
         TemplateAutocompleteInput11,
         {
           value: config.isLoading || "",
@@ -1644,7 +1644,7 @@ var init_formWidget = __esm({
           if (!field.key) return null;
           const fieldType = field.type || "text";
           const inputId = `form-field-${field.key}-${idx}`;
-          return /* @__PURE__ */ React25.createElement("div", { key: idx, className: "space-y-1.5" }, fieldType !== "checkbox" && /* @__PURE__ */ React25.createElement(Label14, { htmlFor: inputId, className: "text-xs font-semibold text-foreground" }, field.label || field.key, field.required && /* @__PURE__ */ React25.createElement("span", { className: "text-rose-500 ml-0.5" }, "*")), fieldType === "select" ? /* @__PURE__ */ React25.createElement(
+          return /* @__PURE__ */ React25.createElement("div", { key: idx, className: "space-y-1" }, fieldType !== "checkbox" && /* @__PURE__ */ React25.createElement(Label14, { htmlFor: inputId, className: "text-xs font-semibold text-foreground" }, field.label || field.key, field.required && /* @__PURE__ */ React25.createElement("span", { className: "text-rose-500 ml-0.5" }, "*")), fieldType === "select" ? /* @__PURE__ */ React25.createElement(
             Select10,
             {
               value: String(formData[field.key] ?? ""),
@@ -4219,7 +4219,7 @@ var VegaConfigEditor = ({
     widgetEditorForm.setFieldValue("widgetConfig.editorMode", "visual");
     setShowParseWarning(false);
   };
-  return /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-3 w-full" }, isVegaLite && /* @__PURE__ */ React8.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ React8.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ React8.createElement(Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-2 w-full" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ React8.createElement(
+  return /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-2 w-full" }, isVegaLite && /* @__PURE__ */ React8.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ React8.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ React8.createElement(Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-2 w-full" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ React8.createElement(
     ShelfBuilder,
     {
       widgetEditorForm,
@@ -4228,7 +4228,7 @@ var VegaConfigEditor = ({
       stateTree,
       liveStateTree
     }
-  )), showParseWarning && /* @__PURE__ */ React8.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React8.createElement(AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React8.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React8.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React8.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React8.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React8.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React8.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React8.createElement(Button3, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React8.createElement(Button3, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-foreground dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React8.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ React8.createElement(
+  )), showParseWarning && /* @__PURE__ */ React8.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React8.createElement(AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React8.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React8.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React8.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React8.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React8.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React8.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React8.createElement(Button3, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React8.createElement(Button3, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-foreground dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React8.createElement(
     VegaSpecEditor,
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,
@@ -4236,7 +4236,7 @@ var VegaConfigEditor = ({
       workflowContext,
       workflow: resolvedSelectedWorkflow
     }
-  )), /* @__PURE__ */ React8.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React8.createElement(Label2, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React8.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React8.createElement(
+  ), /* @__PURE__ */ React8.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ React8.createElement(Label2, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React8.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React8.createElement(
     TemplateAutocompleteInput2,
     {
       value: widgetEditorForm.values.widgetConfig?.isLoading || "",
@@ -4376,7 +4376,7 @@ import { TemplateAutocompleteInput as TemplateAutocompleteInput5 } from "@jet-ad
 var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = useMemo9(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ React12.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Content"), /* @__PURE__ */ React12.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports Markdown formatting and ", /* @__PURE__ */ React12.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates. Full JS expressions supported."), /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ React12.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Content"), /* @__PURE__ */ React12.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports Markdown formatting and ", /* @__PURE__ */ React12.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates. Full JS expressions supported."), /* @__PURE__ */ React12.createElement(
     TemplateAutocompleteInput5,
     {
       isTextArea: true,
@@ -4386,7 +4386,7 @@ var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{ state.queries.myQuery.data[0].name }}",
       liveStateTree
     }
-  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React12.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React12.createElement(
+  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React12.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React12.createElement(
     TemplateAutocompleteInput5,
     {
       value: config.isLoading || "",
@@ -4394,7 +4394,7 @@ var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
       liveStateTree
     }
-  )), /* @__PURE__ */ React12.createElement("div", { className: "grid grid-cols-3 gap-3" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Format"), /* @__PURE__ */ React12.createElement(
+  )), /* @__PURE__ */ React12.createElement("div", { className: "grid grid-cols-3 gap-2" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Format"), /* @__PURE__ */ React12.createElement(
     Select5,
     {
       value: config.format || "markdown",
@@ -4402,7 +4402,7 @@ var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React12.createElement(SelectTrigger5, { className: "text-xs" }, /* @__PURE__ */ React12.createElement(SelectValue5, null)),
     /* @__PURE__ */ React12.createElement(SelectContent5, null, /* @__PURE__ */ React12.createElement(SelectItem5, { value: "markdown" }, "Markdown"), /* @__PURE__ */ React12.createElement(SelectItem5, { value: "plain" }, "Plain Text"))
-  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ React12.createElement(
+  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ React12.createElement(
     Select5,
     {
       value: config.textAlign || "left",
@@ -4410,7 +4410,7 @@ var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React12.createElement(SelectTrigger5, { className: "text-xs" }, /* @__PURE__ */ React12.createElement(SelectValue5, null)),
     /* @__PURE__ */ React12.createElement(SelectContent5, null, /* @__PURE__ */ React12.createElement(SelectItem5, { value: "left" }, "Left"), /* @__PURE__ */ React12.createElement(SelectItem5, { value: "center" }, "Center"), /* @__PURE__ */ React12.createElement(SelectItem5, { value: "right" }, "Right"))
-  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React12.createElement(
+  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React12.createElement(
     Select5,
     {
       value: config.fontSize || "sm",
@@ -4433,7 +4433,7 @@ import { TemplateAutocompleteInput as TemplateAutocompleteInput6 } from "@jet-ad
 var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = useMemo10(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React13.createElement(
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ React13.createElement(
     Input7,
     {
       type: "text",
@@ -4442,7 +4442,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
       placeholder: "e.g. Total Revenue"
     }
-  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Value"), /* @__PURE__ */ React13.createElement(
+  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Value"), /* @__PURE__ */ React13.createElement(
     TemplateAutocompleteInput6,
     {
       value: config.valueTemplate || "",
@@ -4450,7 +4450,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.stats.data[0].count}}",
       liveStateTree
     }
-  ), /* @__PURE__ */ React13.createElement("p", { className: "text-[10px] text-muted-foreground" }, "The primary metric value. Use template expressions to bind to data sources.")), /* @__PURE__ */ React13.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Prefix"), /* @__PURE__ */ React13.createElement(
+  ), /* @__PURE__ */ React13.createElement("p", { className: "text-[10px] text-muted-foreground" }, "The primary metric value. Use template expressions to bind to data sources.")), /* @__PURE__ */ React13.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Prefix"), /* @__PURE__ */ React13.createElement(
     Input7,
     {
       type: "text",
@@ -4459,7 +4459,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.prefix", e.target.value),
       placeholder: "e.g. $"
     }
-  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Suffix"), /* @__PURE__ */ React13.createElement(
+  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Suffix"), /* @__PURE__ */ React13.createElement(
     Input7,
     {
       type: "text",
@@ -4468,7 +4468,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.suffix", e.target.value),
       placeholder: "e.g. users"
     }
-  ))), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Trend Value"), /* @__PURE__ */ React13.createElement(
+  ))), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Trend Value"), /* @__PURE__ */ React13.createElement(
     TemplateAutocompleteInput6,
     {
       value: config.trendTemplate || "",
@@ -4476,7 +4476,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.stats.data[0].change_pct}}",
       liveStateTree
     }
-  ), /* @__PURE__ */ React13.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Optional percentage change. Positive = up trend, negative = down trend.")), /* @__PURE__ */ React13.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Trend Semantics"), /* @__PURE__ */ React13.createElement(
+  ), /* @__PURE__ */ React13.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Optional percentage change. Positive = up trend, negative = down trend.")), /* @__PURE__ */ React13.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Trend Semantics"), /* @__PURE__ */ React13.createElement(
     Select6,
     {
       value: config.trendDirection || "up-is-good",
@@ -4484,7 +4484,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React13.createElement(SelectTrigger6, { className: "text-xs" }, /* @__PURE__ */ React13.createElement(SelectValue6, null)),
     /* @__PURE__ */ React13.createElement(SelectContent6, null, /* @__PURE__ */ React13.createElement(SelectItem6, { value: "up-is-good" }, "Up = Good (green)"), /* @__PURE__ */ React13.createElement(SelectItem6, { value: "down-is-good" }, "Down = Good (green)"))
-  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ React13.createElement(
+  )), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ React13.createElement(
     Select6,
     {
       value: config.textAlign || "center",
@@ -4492,7 +4492,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React13.createElement(SelectTrigger6, { className: "text-xs" }, /* @__PURE__ */ React13.createElement(SelectValue6, null)),
     /* @__PURE__ */ React13.createElement(SelectContent6, null, /* @__PURE__ */ React13.createElement(SelectItem6, { value: "left" }, "Left"), /* @__PURE__ */ React13.createElement(SelectItem6, { value: "center" }, "Center"), /* @__PURE__ */ React13.createElement(SelectItem6, { value: "right" }, "Right"))
-  ))), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React13.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React13.createElement(
+  ))), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label6, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React13.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React13.createElement(
     TemplateAutocompleteInput6,
     {
       value: config.isLoading || "",
@@ -4515,7 +4515,7 @@ import { TemplateAutocompleteInput as TemplateAutocompleteInput7 } from "@jet-ad
 var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = useMemo11(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ React14.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Type / Variant"), /* @__PURE__ */ React14.createElement(
+  return /* @__PURE__ */ React14.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React14.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Type / Variant"), /* @__PURE__ */ React14.createElement(
     Select7,
     {
       value: config.variant || "info",
@@ -4523,7 +4523,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React14.createElement(SelectTrigger7, { className: "text-xs" }, /* @__PURE__ */ React14.createElement(SelectValue7, null)),
     /* @__PURE__ */ React14.createElement(SelectContent7, null, /* @__PURE__ */ React14.createElement(SelectItem7, { value: "info" }, "Info (Blue)"), /* @__PURE__ */ React14.createElement(SelectItem7, { value: "success" }, "Success (Green)"), /* @__PURE__ */ React14.createElement(SelectItem7, { value: "warning" }, "Warning (Amber)"), /* @__PURE__ */ React14.createElement(SelectItem7, { value: "error" }, "Error (Red)"))
-  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Title (Optional)"), /* @__PURE__ */ React14.createElement(
+  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Title (Optional)"), /* @__PURE__ */ React14.createElement(
     TemplateAutocompleteInput7,
     {
       value: config.title || "",
@@ -4531,7 +4531,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. Warning!",
       liveStateTree
     }
-  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Message"), /* @__PURE__ */ React14.createElement(
+  )), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Message"), /* @__PURE__ */ React14.createElement(
     TemplateAutocompleteInput7,
     {
       isTextArea: true,
@@ -4547,7 +4547,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       checked: config.dismissible ?? true,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.dismissible", !!checked)
     }
-  ), /* @__PURE__ */ React14.createElement(Label7, { htmlFor: "alert-dismissible", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow user to dismiss/close the banner")), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React14.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React14.createElement(
+  ), /* @__PURE__ */ React14.createElement(Label7, { htmlFor: "alert-dismissible", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow user to dismiss/close the banner")), /* @__PURE__ */ React14.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ React14.createElement(Label7, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React14.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React14.createElement(
     TemplateAutocompleteInput7,
     {
       value: config.isLoading || "",
@@ -4594,7 +4594,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
     const list = optionsStr.split(",").map((s) => s.trim()).filter(Boolean);
     handleFieldChange(idx, "options", list);
   };
-  return /* @__PURE__ */ React15.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React15.createElement("div", { className: "grid grid-cols-2 gap-3 pb-3 border-b" }, /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Submit Button Text"), /* @__PURE__ */ React15.createElement(
+  return /* @__PURE__ */ React15.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React15.createElement("div", { className: "grid grid-cols-2 gap-2 pb-2 border-b" }, /* @__PURE__ */ React15.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Submit Button Text"), /* @__PURE__ */ React15.createElement(
     Input9,
     {
       type: "text",
@@ -4602,7 +4602,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       value: config.submitLabel || "Submit",
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.submitLabel", e.target.value)
     }
-  )), /* @__PURE__ */ React15.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Size / Spacing"), /* @__PURE__ */ React15.createElement(
+  )), /* @__PURE__ */ React15.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React15.createElement(Label8, { className: "text-xs font-medium text-foreground" }, "Size / Spacing"), /* @__PURE__ */ React15.createElement(
     Select8,
     {
       value: config.size || "default",
@@ -4621,7 +4621,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
     },
     /* @__PURE__ */ React15.createElement(Plus3, { className: "h-3 w-3" }),
     " Add Field"
-  )), /* @__PURE__ */ React15.createElement("div", { className: "space-y-3 max-h-[350px] overflow-y-auto pr-1" }, fields.map((field, idx) => /* @__PURE__ */ React15.createElement("div", { key: idx, className: "p-3 border rounded bg-muted/10 relative space-y-2" }, /* @__PURE__ */ React15.createElement(
+  )), /* @__PURE__ */ React15.createElement("div", { className: "space-y-2 max-h-[350px] overflow-y-auto pr-1" }, fields.map((field, idx) => /* @__PURE__ */ React15.createElement("div", { key: idx, className: "p-2 border rounded bg-muted/10 relative space-y-2" }, /* @__PURE__ */ React15.createElement(
     Button6,
     {
       type: "button",
@@ -4675,7 +4675,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       onChange: (e) => handleOptionsChange(idx, e.target.value),
       placeholder: "admin, member, guest"
     }
-  )), /* @__PURE__ */ React15.createElement("div", { className: "grid grid-cols-2 gap-2 pt-1.5 border-t border-dashed" }, /* @__PURE__ */ React15.createElement("div", { className: "flex items-center gap-1.5" }, /* @__PURE__ */ React15.createElement(
+  )), /* @__PURE__ */ React15.createElement("div", { className: "grid grid-cols-2 gap-2 pt-1 border-t border-dashed" }, /* @__PURE__ */ React15.createElement("div", { className: "flex items-center gap-1.5" }, /* @__PURE__ */ React15.createElement(
     Checkbox4,
     {
       id: `field-req-${idx}`,
@@ -4712,7 +4712,7 @@ import { TemplateAutocompleteInput as TemplateAutocompleteInput8 } from "@jet-ad
 var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = useMemo12(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ React16.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ React16.createElement(
+  return /* @__PURE__ */ React16.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ React16.createElement(
     TemplateAutocompleteInput8,
     {
       value: config.src || "",
@@ -4720,7 +4720,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.user.data.avatar_url}}",
       liveStateTree
     }
-  ), /* @__PURE__ */ React16.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content.")), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ React16.createElement(
+  ), /* @__PURE__ */ React16.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content.")), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ React16.createElement(
     Input10,
     {
       type: "text",
@@ -4729,7 +4729,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.alt", e.target.value),
       placeholder: "e.g. Profile photo"
     }
-  )), /* @__PURE__ */ React16.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Object Fit"), /* @__PURE__ */ React16.createElement(
+  )), /* @__PURE__ */ React16.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Object Fit"), /* @__PURE__ */ React16.createElement(
     Select9,
     {
       value: config.objectFit || "cover",
@@ -4737,7 +4737,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React16.createElement(SelectTrigger9, { className: "text-xs" }, /* @__PURE__ */ React16.createElement(SelectValue9, null)),
     /* @__PURE__ */ React16.createElement(SelectContent9, null, /* @__PURE__ */ React16.createElement(SelectItem9, { value: "cover" }, "Cover (crop to fit)"), /* @__PURE__ */ React16.createElement(SelectItem9, { value: "contain" }, "Contain (show all)"), /* @__PURE__ */ React16.createElement(SelectItem9, { value: "fill" }, "Fill (stretch)"), /* @__PURE__ */ React16.createElement(SelectItem9, { value: "none" }, "Original Size"))
-  )), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Corner Radius"), /* @__PURE__ */ React16.createElement(
+  )), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Corner Radius"), /* @__PURE__ */ React16.createElement(
     Select9,
     {
       value: config.borderRadius || "none",
@@ -4745,7 +4745,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ React16.createElement(SelectTrigger9, { className: "text-xs" }, /* @__PURE__ */ React16.createElement(SelectValue9, null)),
     /* @__PURE__ */ React16.createElement(SelectContent9, null, /* @__PURE__ */ React16.createElement(SelectItem9, { value: "none" }, "Square (None)"), /* @__PURE__ */ React16.createElement(SelectItem9, { value: "sm" }, "Small"), /* @__PURE__ */ React16.createElement(SelectItem9, { value: "md" }, "Medium"), /* @__PURE__ */ React16.createElement(SelectItem9, { value: "lg" }, "Large"), /* @__PURE__ */ React16.createElement(SelectItem9, { value: "full" }, "Circle (Full)"))
-  ))), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React16.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React16.createElement(
+  ))), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React16.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React16.createElement(
     TemplateAutocompleteInput8,
     {
       value: config.isLoading || "",
@@ -4768,7 +4768,7 @@ import { TemplateAutocompleteInput as TemplateAutocompleteInput9 } from "@jet-ad
 var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = useMemo13(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ React17.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Embed URL / Target Source"), /* @__PURE__ */ React17.createElement(
+  return /* @__PURE__ */ React17.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React17.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Embed URL / Target Source"), /* @__PURE__ */ React17.createElement(
     TemplateAutocompleteInput9,
     {
       value: config.url || "",
@@ -4776,35 +4776,35 @@ var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. https://example.com",
       liveStateTree
     }
-  ), /* @__PURE__ */ React17.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).")), /* @__PURE__ */ React17.createElement("div", { className: "space-y-2 border-t pt-3" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Sandbox Security Options"), /* @__PURE__ */ React17.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug mb-2" }, "Toggle capabilities granted to the embedded page. Restricted by default."), /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React17.createElement(
+  ), /* @__PURE__ */ React17.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).")), /* @__PURE__ */ React17.createElement("div", { className: "space-y-2 border-t pt-2 mt-2" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Sandbox Security Options"), /* @__PURE__ */ React17.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug mb-1" }, "Toggle capabilities granted to the embedded page. Restricted by default."), /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React17.createElement(
     Checkbox5,
     {
       id: "iframe-scripts",
       checked: config.allowScripts ?? true,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowScripts", !!checked)
     }
-  ), /* @__PURE__ */ React17.createElement(Label10, { htmlFor: "iframe-scripts", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow JavaScript execution (allow-scripts)")), /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ React17.createElement(
+  ), /* @__PURE__ */ React17.createElement(Label10, { htmlFor: "iframe-scripts", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow JavaScript execution (allow-scripts)")), /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2 mt-1" }, /* @__PURE__ */ React17.createElement(
     Checkbox5,
     {
       id: "iframe-forms",
       checked: config.allowForms ?? true,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowForms", !!checked)
     }
-  ), /* @__PURE__ */ React17.createElement(Label10, { htmlFor: "iframe-forms", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow form submission (allow-forms)")), /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ React17.createElement(
+  ), /* @__PURE__ */ React17.createElement(Label10, { htmlFor: "iframe-forms", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow form submission (allow-forms)")), /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2 mt-1" }, /* @__PURE__ */ React17.createElement(
     Checkbox5,
     {
       id: "iframe-popups",
       checked: config.allowPopups ?? false,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowPopups", !!checked)
     }
-  ), /* @__PURE__ */ React17.createElement(Label10, { htmlFor: "iframe-popups", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow popups & new windows (allow-popups)")), /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ React17.createElement(
+  ), /* @__PURE__ */ React17.createElement(Label10, { htmlFor: "iframe-popups", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow popups & new windows (allow-popups)")), /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2 mt-1" }, /* @__PURE__ */ React17.createElement(
     Checkbox5,
     {
       id: "iframe-origin",
       checked: config.allowSameOrigin ?? false,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowSameOrigin", !!checked)
     }
-  ), /* @__PURE__ */ React17.createElement(Label10, { htmlFor: "iframe-origin", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow sharing local storage/cookies (allow-same-origin)"))), /* @__PURE__ */ React17.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React17.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React17.createElement(
+  ), /* @__PURE__ */ React17.createElement(Label10, { htmlFor: "iframe-origin", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow sharing local storage/cookies (allow-same-origin)"))), /* @__PURE__ */ React17.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ React17.createElement(Label10, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React17.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React17.createElement(
     TemplateAutocompleteInput9,
     {
       value: config.isLoading || "",
@@ -4830,7 +4830,7 @@ import { Label as Label13, Switch as Switch3, CodeEditor as CodeEditor2, Templat
 var HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = useMemo16(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ React20.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "HTML Markup"), /* @__PURE__ */ React20.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports standard HTML structure, inline styles, and ", /* @__PURE__ */ React20.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates."), /* @__PURE__ */ React20.createElement(
+  return /* @__PURE__ */ React20.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "HTML Markup"), /* @__PURE__ */ React20.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports standard HTML structure, inline styles, and ", /* @__PURE__ */ React20.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates."), /* @__PURE__ */ React20.createElement(
     CodeEditor2,
     {
       language: "html",
@@ -4844,7 +4844,7 @@ var HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       showLineNumbers: true,
       title: "HTML Source"
     }
-  )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "CSS Stylesheet"), /* @__PURE__ */ React20.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Custom styles scoped to this widget's sandboxed iframe container."), /* @__PURE__ */ React20.createElement(
+  )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "CSS Stylesheet"), /* @__PURE__ */ React20.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Custom styles scoped to this widget's sandboxed iframe container."), /* @__PURE__ */ React20.createElement(
     CodeEditor2,
     {
       language: "css",
@@ -4858,7 +4858,7 @@ var HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       showLineNumbers: true,
       title: "CSS Styles"
     }
-  )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React20.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React20.createElement(
+  )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React20.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React20.createElement(
     TemplateAutocompleteInput12,
     {
       value: config.isLoading || "",
@@ -4866,7 +4866,7 @@ var HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
       liveStateTree
     }
-  )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-3 pt-2 border-t border-border/60" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-semibold text-foreground uppercase tracking-wider" }, "Sandbox Security"), /* @__PURE__ */ React20.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-0.5 pr-2" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "Execute JavaScript"), /* @__PURE__ */ React20.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Allows running <script> tags inside the iframe sandbox.")), /* @__PURE__ */ React20.createElement(
+  )), /* @__PURE__ */ React20.createElement("div", { className: "space-y-2 pt-2 mt-2 border-t border-border/60" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-semibold text-foreground uppercase tracking-wider" }, "Sandbox Security"), /* @__PURE__ */ React20.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React20.createElement("div", { className: "space-y-0.5 pr-2" }, /* @__PURE__ */ React20.createElement(Label13, { className: "text-xs font-medium text-foreground" }, "Execute JavaScript"), /* @__PURE__ */ React20.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Allows running <script> tags inside the iframe sandbox.")), /* @__PURE__ */ React20.createElement(
     Switch3,
     {
       checked: config.allowScripts === true || config.allowScripts === "true",

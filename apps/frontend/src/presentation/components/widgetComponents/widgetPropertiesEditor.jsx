@@ -27,10 +27,10 @@ export const WidgetPropertiesEditor = ({ widgetEditorForm }) => {
   }, [widgetEditorForm]);
 
   return (
-    <div className="space-y-3">
-      <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+    <div className="space-y-2 mt-2">
+      <Label className="text-xs font-semibold text-foreground uppercase tracking-wider">
         Custom Properties
-      </h3>
+      </Label>
 
       {/* Container Tailwind CSS */}
       <div className="space-y-1.5">

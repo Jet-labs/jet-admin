@@ -176,7 +176,7 @@ export const WidgetIdeModal = ({
             >
               {/* Left Panel: Configuration Editors */}
               <ResizablePanel defaultSize={50} minSize={30}>
-                <div className="h-full overflow-y-auto p-5 pb-16 bg-background">
+                <div className="h-full overflow-y-auto p-2 bg-background">
                   <WidgetConfigEditor
                     widgetEditorForm={widgetForm}
                     dataSourceResults={previewStateTree}

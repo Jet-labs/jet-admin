@@ -26,36 +26,36 @@ const ACTION_TYPES = [
     value: "SET_VARIABLE",
     label: "Set Page Variable",
     icon: Key,
-    color: "text-amber-500",
-    bg: "bg-amber-50/50 dark:bg-amber-500/10",
-    border: "border-amber-200 dark:border-amber-500/20",
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border/50",
     description: "Update a page state variable",
   },
   {
     value: "EXECUTE_QUERY",
     label: "Execute Data Source",
     icon: Database,
-    color: "text-blue-500",
-    bg: "bg-blue-50/50 dark:bg-blue-500/10",
-    border: "border-blue-200 dark:border-blue-500/20",
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border/50",
     description: "Run a page-level data source",
   },
   // {
   //   value: "CALL_WIDGET_METHOD",
   //   label: "Call Widget Method",
   //   icon: PanelTop,
-  //   color: "text-purple-500",
-  //   bg: "bg-purple-50/50 dark:bg-purple-500/10",
-  //   border: "border-purple-200 dark:border-purple-500/20",
+  //   color: "text-muted-foreground",
+  //   bg: "bg-muted/50",
+  //   border: "border-border/50",
   //   description: "Invoke a method on another widget",
   // },
   {
     value: "SHOW_TOAST",
     label: "Show Toast",
     icon: MessageSquare,
-    color: "text-emerald-500",
-    bg: "bg-emerald-50/50 dark:bg-emerald-500/10",
-    border: "border-emerald-200 dark:border-emerald-500/20",
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border/50",
     description: "Show a toast notification",
   },
 ];
@@ -233,7 +233,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {Object.entries(events).map(([eventType, actions]) => {
         const eventInfo = supportedEventTypes.find((et) => et.value === eventType);
         const eventLabel = eventInfo?.label || eventType;
@@ -264,7 +264,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
         return (
           <div
             key={eventType}
-            className="rounded-md border border-border bg-muted/20 p-3 space-y-3"
+            className="rounded-md border border-border bg-muted/20 p-2 space-y-2"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -288,9 +288,9 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
             </div>
 
             {hasEventInputs && (
-              <div className="rounded-md border border-purple-200 dark:border-purple-500/20 bg-purple-50/50 dark:bg-purple-500/5 p-2">
-                <p className="text-[10px] font-semibold text-purple-600 dark:text-purple-400 mb-1.5 flex items-center gap-1">
-                  <Info className="h-3 w-3" /> Available Event Context
+              <div className="rounded-md border border-primary/20 bg-primary/5 p-2">
+                <p className="text-[10px] font-semibold text-primary mb-1.5 flex items-center gap-1">
+                  <Info className="h-3 w-3 text-primary" /> Available Event Context
                 </p>
                 <div className="space-y-1">
                   {eventInputDefinitions.map((inputDef, idx) => (
@@ -316,9 +316,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                   return (
                     <Card
                       key={actionIndex}
-                      className={`transition-all border border-border/50 bg-background ${
-                        isExpanded ? "overflow-visible ring-1 ring-primary/20 shadow-md" : "overflow-hidden hover:shadow-sm"
-                      }`}
+                      className={`transition-all border border-border/50 bg-background`}
                     >
                       <div
                         className="flex items-center justify-between p-2.5 cursor-pointer hover:bg-muted/10"
@@ -365,7 +363,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                       </div>
 
                       {isExpanded && (
-                        <div className="p-3 border-t border-border/50 bg-muted/10 space-y-3.5 animate-in slide-in-from-top-1 duration-200">
+                        <div className="p-2 border-t border-border/50 bg-muted/10 space-y-2 animate-in slide-in-from-top-1 duration-200">
                           <div className="space-y-1">
                             <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                               Action Type
@@ -423,7 +421,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                           )}
 
                           {action.actionType === "EXECUTE_QUERY" && (
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                               <div className="space-y-1">
                                 <Label className="text-[10px] text-muted-foreground font-semibold">Data Source</Label>
                                 {pageDataSources.length > 0 ? (
@@ -441,7 +439,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                       {pageDataSources.filter((ds) => ds.alias).map((ds) => (
                                         <SelectItem key={ds.alias} value={ds.alias}>
                                           <span className="flex items-center gap-2">
-                                            <Database className="h-3 w-3 text-blue-500" />
+                                            <Database className="h-3 w-3 text-muted-foreground" />
                                             <span className="font-mono">{ds.alias}</span>
                                             <span className="text-muted-foreground text-[9px] ml-1">({ds.type})</span>
                                           </span>
@@ -460,10 +458,10 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                 const inputDefinitions = getInputDefinitionsForAlias(action.config.alias);
                                 if (inputDefinitions.length === 0) return null;
                                 return (
-                                  <div className="rounded-md border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 p-3 space-y-2">
+                                  <div className="rounded-md border border-border bg-muted/30 p-2 space-y-2">
                                     <div className="flex items-center gap-1.5">
-                                      <Info className="h-3 w-3 text-blue-500" />
-                                      <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Input Arguments</p>
+                                      <Info className="h-3 w-3 text-muted-foreground" />
+                                      <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
                                     </div>
                                     <p className="text-[9px] text-muted-foreground">Override argument values when this data source is executed by this event action.</p>
                                     {inputDefinitions.map((inputDef) => {
@@ -498,7 +496,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                             const availableMethods = selectedWidget ? getWidgetMethods(selectedWidget.widgetType) : [];
                             const selectedMethod = availableMethods.find((m) => m.name === action.config?.methodName);
                             return (
-                            <div className="space-y-3">
+                              <div className="space-y-2">
                               <div className="space-y-1">
                                 <Label className="text-[10px] text-muted-foreground font-semibold">Target Widget</Label>
                                 {pageWidgets.length > 0 ? (
@@ -516,7 +514,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                       {pageWidgets.map((w) => (
                                         <SelectItem key={w.widgetID} value={String(w.widgetID)}>
                                           <span className="flex items-center gap-2">
-                                            <PanelTop className="h-3 w-3 text-purple-500" />
+                                            <PanelTop className="h-3 w-3 text-muted-foreground" />
                                             <span>{w.widgetTitle}</span>
                                             <span className="text-muted-foreground text-[9px] font-mono ml-1">({w.widgetType})</span>
                                           </span>
@@ -555,7 +553,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                         </SelectContent>
                                       </Select>
                                       {selectedMethod && (
-                                        <p className="text-[9px] text-purple-600 dark:text-purple-400 flex items-center gap-1 mt-1">
+                                          <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1">
                                           <Info className="h-3 w-3" />
                                           {selectedMethod.description}
                                         </p>
@@ -616,7 +614,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
       })}
 
       {availableEventTypes.length > 0 && (
-        <div className="pt-2">
+        <div>
           <Select onValueChange={(val) => handleAddAction(val)}>
             <SelectTrigger className="text-xs w-full bg-background border-dashed">
               <SelectValue placeholder="Add event handler trigger..." />

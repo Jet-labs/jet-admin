@@ -1,16 +1,12 @@
-/**
- * GoogleSheetsDatasourceEditor.jsx
- *
- * Dedicated datasource editor for Google Sheets.
- * Multi-step wizard: Auth method → OAuth/Service Account → Default spreadsheet (optional).
- *
- * Consumes DatasourceEditorContext for OAuth helpers.
- * Receives strict datasourceEditorForm: { datasourceOptions, setDatasourceOptions, patchDatasourceOptions }
- */
-
 import React, { useState, useCallback } from "react";
 import { useDatasourceEditorContext } from "../../context/DatasourceEditorContext";
-import { InfoCallout } from "../../primitives/EditorPrimitives";
+import {
+  Input,
+  Label,
+  Button,
+  Textarea,
+  Callout,
+} from "@jet-admin/ui";
 import {
   KeyRound,
   Globe,
@@ -36,7 +32,7 @@ function StepIndicator({ steps, currentStep }) {
                 isComplete ? "text-primary" : "text-muted-foreground/30"
               }`} />
             )}
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-medium transition-colors ${
               isActive
                 ? "bg-muted text-foreground"
                 : isComplete
@@ -66,25 +62,21 @@ function AuthMethodCard({ icon: Icon, title, description, isSelected, onClick })
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-start gap-3 p-4 rounded-md border-2 text-left transition-all w-full ${
+      className={`flex items-start gap-3 p-3.5 rounded-sm border text-left transition-all w-full ${
         isSelected
-          ? "border-foreground bg-muted/20 shadow-sm"
-          : "border-border hover:border-muted-foreground/30 hover:bg-muted/10"
+          ? "border-primary bg-primary/10 text-foreground shadow-sm"
+          : "border-border bg-background text-muted-foreground hover:bg-muted/30"
       }`}
     >
-      <div className={`p-2 rounded-md shrink-0 border ${
-        isSelected ? "bg-background text-foreground border-border shadow-sm" : "bg-muted text-muted-foreground border-transparent"
-      }`}>
-        <Icon className="h-5 w-5" />
-      </div>
-      <div className="min-w-0">
-        <p className={`text-sm font-semibold ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
+      <Icon className={`h-5 w-5 shrink-0 mt-0.5 ${isSelected ? "text-primary" : "text-muted-foreground/80"}`} />
+      <div className="min-w-0 flex-1">
+        <p className={`text-sm font-medium ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
           {title}
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
       </div>
       {isSelected && (
-        <Check className="h-4 w-4 text-foreground shrink-0 ml-auto mt-1" />
+        <Check className="h-4 w-4 text-primary shrink-0 ml-auto mt-0.5" />
       )}
     </button>
   );
@@ -185,30 +177,31 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
           {/* Service Account Key Input */}
           {authType === "serviceAccount" && (
             <div className="space-y-3 pt-2">
-              <label className="text-xs font-medium text-foreground">
+              <Label>
                 Service Account JSON Key
-              </label>
-              <textarea
-                className="w-full min-h-[160px] rounded-md border border-input bg-background px-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y"
+              </Label>
+              <Textarea
+                className="min-h-[160px] font-mono text-xs"
                 placeholder='Paste the entire JSON key content here...'
                 value={options.serviceAccountKey || ""}
                 onChange={handleServiceAccountKeyChange}
               />
               {hasServiceAccountKey && (
                 <div className="flex items-center gap-2 text-xs text-foreground">
-                  <ShieldCheck className="h-3.5 w-3.5" />
+                  <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                   <span>Key provided</span>
                 </div>
               )}
-              <button
+              <Button
                 type="button"
                 disabled={!hasServiceAccountKey}
                 onClick={handleServiceAccountContinue}
-                className="w-full flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                variant="green"
+                className="w-full"
               >
                 Continue
                 <ChevronRight className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           )}
 
@@ -216,44 +209,48 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
           {authType === "oauth2" && (
             <div className="space-y-3 pt-2">
               {isOAuthConnected ? (
-                <div className="flex items-center gap-3 p-3 rounded-md border border-border bg-muted/30">
-                  <ShieldCheck className="h-5 w-5 text-foreground shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground">Google Account Connected</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                <div className="flex items-center gap-3 p-3 rounded-sm border border-primary/20 bg-primary/5">
+                  <ShieldCheck className="h-5 w-5 text-primary shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground">Google Account Connected</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 font-mono truncate">
                       Credential ID: {options.oauth2.vaultCredentialID}
                     </p>
                   </div>
-                  <button
+                  <Button
                     type="button"
                     onClick={handleOAuthConnect}
-                    className="ml-auto text-xs text-foreground underline-offset-2 hover:underline shrink-0"
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground h-7 text-xs font-normal"
                   >
                     Reconnect
-                  </button>
+                  </Button>
                 </div>
               ) : (
-                <InfoCallout>
+                <Callout>
                   You'll be redirected to Google to authorize access to your spreadsheets.
                   Credentials are stored securely in the vault.
-                </InfoCallout>
+                </Callout>
               )}
 
               {isOAuthConnected ? (
-                <button
+                <Button
                   type="button"
                   onClick={() => setCurrentStep(1)}
-                  className="w-full flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                  variant="green"
+                  className="w-full"
                 >
                   Continue
                   <ChevronRight className="h-4 w-4" />
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
                   type="button"
                   onClick={handleOAuthConnect}
                   disabled={oauth.loading}
-                  className="w-full flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  variant="green"
+                  className="w-full"
                 >
                   {oauth.loading ? (
                     <>
@@ -266,7 +263,7 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
                       Connect Google Account
                     </>
                   )}
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -276,30 +273,31 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
       {/* ── Step 1: Configuration ── */}
       {currentStep === 1 && (
         <div className="space-y-4">
-          <button
+          <Button
             type="button"
             onClick={() => setCurrentStep(0)}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground h-7 px-2 -ml-2 font-normal"
           >
             ← Back to authentication
-          </button>
+          </Button>
 
           {/* Connection status */}
-          <div className="flex items-center gap-2 p-2.5 rounded-md border border-border bg-muted/30 text-xs">
-            <ShieldCheck className="h-4 w-4 text-foreground shrink-0" />
-            <span className="text-foreground font-medium">
+          <div className="flex items-center gap-2 p-2.5 rounded-sm border border-primary/20 bg-primary/5 text-xs text-primary">
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            <span className="font-semibold">
               {authType === "oauth2" ? "OAuth 2.0" : "Service Account"} — Connected
             </span>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-foreground" htmlFor="gs-connectionName">
+            <Label htmlFor="gs-connectionName">
               Connection Name
-            </label>
-            <input
+            </Label>
+            <Input
               id="gs-connectionName"
               type="text"
-              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               placeholder="My Google Sheets"
               value={options.connectionName || ""}
               onChange={handleConnectionNameChange}
@@ -307,15 +305,14 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-foreground" htmlFor="gs-defaultSpreadsheetId">
+            <Label htmlFor="gs-defaultSpreadsheetId">
               Default Spreadsheet ID <span className="text-muted-foreground">(optional)</span>
-            </label>
+            </Label>
             <div className="flex items-center gap-2">
               <FileSpreadsheet className="h-4 w-4 text-muted-foreground shrink-0" />
-              <input
+              <Input
                 id="gs-defaultSpreadsheetId"
                 type="text"
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
                 value={options.defaultSpreadsheetId || ""}
                 onChange={handleDefaultSpreadsheetIdChange}

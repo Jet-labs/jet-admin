@@ -8,9 +8,9 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* URL Embed */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Embed URL / Target Source</Label>
         <TemplateAutocompleteInput
           value={config.url || ""}
@@ -24,9 +24,9 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Sandbox Settings */}
-      <div className="space-y-2 border-t pt-3">
+      <div className="space-y-2 border-t pt-2 mt-2">
         <Label className="text-xs font-medium text-foreground">Sandbox Security Options</Label>
-        <p className="text-[10px] text-muted-foreground leading-snug mb-2">
+        <p className="text-[10px] text-muted-foreground leading-snug mb-1">
           Toggle capabilities granted to the embedded page. Restricted by default.
         </p>
 
@@ -45,7 +45,7 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </div>
 
         {/* Forms */}
-        <div className="flex items-center gap-2 mt-1.5">
+        <div className="flex items-center gap-2 mt-1">
           <Checkbox
             id="iframe-forms"
             checked={config.allowForms ?? true}
@@ -59,7 +59,7 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </div>
 
         {/* Popups */}
-        <div className="flex items-center gap-2 mt-1.5">
+        <div className="flex items-center gap-2 mt-1">
           <Checkbox
             id="iframe-popups"
             checked={config.allowPopups ?? false}
@@ -73,7 +73,7 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </div>
 
         {/* Same Origin */}
-        <div className="flex items-center gap-2 mt-1.5">
+        <div className="flex items-center gap-2 mt-1">
           <Checkbox
             id="iframe-origin"
             checked={config.allowSameOrigin ?? false}
@@ -88,7 +88,7 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Is Loading Template */}
-      <div className="space-y-1.5 mt-2">
+      <div className="space-y-1 mt-2">
         <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
         <TemplateAutocompleteInput
           value={config.isLoading || ""}

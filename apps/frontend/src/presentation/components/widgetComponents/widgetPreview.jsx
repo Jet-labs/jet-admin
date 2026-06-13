@@ -4,7 +4,7 @@ import { resolveWidgetData } from "@jet-admin/widgets-logic";
 import PropTypes from "prop-types";
 import { useCallback, useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
-import { Spinner, CodeEditor, ErrorBoundary } from "@jet-admin/ui";
+import { Spinner, CodeEditor, ErrorBoundary, Label } from "@jet-admin/ui";
 import { StringUtils } from "../../../utils/string";
 
 export const WidgetPreview = ({
@@ -131,15 +131,15 @@ export const WidgetPreview = ({
           </button>
           
           {showDebug && (
-            <label className="flex items-center gap-1.5 cursor-pointer" onClick={(e) => e.stopPropagation()}>
+            <Label className="flex items-center gap-1.5 cursor-pointer" onClick={(e) => e.stopPropagation()}>
               <input 
                 type="checkbox" 
                 checked={isTruncated} 
                 onChange={(e) => setIsTruncated(e.target.checked)}
                 className="w-3 h-3 accent-primary"
               />
-              <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">Truncate Large Data</span>
-            </label>
+              Truncate Large Data
+            </Label>
           )}
         </div>
 

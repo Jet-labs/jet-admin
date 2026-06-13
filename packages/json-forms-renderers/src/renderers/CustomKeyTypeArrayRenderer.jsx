@@ -41,7 +41,7 @@ export const CustomKeyTypeArrayRenderer = ({
   };
 
   return (
-    <div className="p-3 border mt-3 border-border rounded-sm bg-background">
+    <div className="p-3 border border-border rounded-sm bg-background">
       <Label className="block mb-1 text-sm font-medium text-foreground">
         {label || uischema.label || "Items"}
       </Label>
@@ -51,7 +51,7 @@ export const CustomKeyTypeArrayRenderer = ({
 
       <div className="flex flex-col gap-2">
         {items.map((item, index) => (
-          <div key={`${path}-${index}`} className="flex items-center space-x-2">
+          <div key={`${path}-${index}`} className="flex items-end space-x-2">
             {/* Key Field */}
             <div className="flex-grow">
               <JsonFormsDispatch

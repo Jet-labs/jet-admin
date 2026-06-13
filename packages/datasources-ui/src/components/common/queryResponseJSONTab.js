@@ -7,7 +7,7 @@ export const QueryResponseJSONTab = ({ data }) => {
     data: PropTypes.object,
   };
   return (
-    <div className="w-100 flex-grow h-full overflow-y-auto pb-5">
+    <div className="w-100 flex-grow h-full overflow-y-auto">
       <CodeEditor
         value={JSON.stringify(data, null, 2)}
         language="json"

@@ -743,7 +743,7 @@ var init_tableConfigEditor = __esm({
           [field]: value
         });
       };
-      return /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Data Array Template"), /* @__PURE__ */ import_react10.default.createElement(
+      return /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Data Array Template"), /* @__PURE__ */ import_react10.default.createElement(
         import_ui9.TemplateAutocompleteInput,
         {
           value: config.dataArrayTemplate || config.dataMapping?.dataArrayPath || "",
@@ -751,7 +751,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "e.g. {{ state.queries.my_query.data }}",
           liveStateTree
         }
-      ), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[0.65rem] text-muted-foreground" }, "Mustache template evaluating to an array of objects.")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Total Count Template ", /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react10.default.createElement(
+      ), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[0.65rem] text-muted-foreground" }, "Mustache template evaluating to an array of objects.")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Total Count Template ", /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react10.default.createElement(
         import_ui9.TemplateAutocompleteInput,
         {
           value: pagination.totalTemplate || config.dataMapping?.totalCountPath || "",
@@ -759,7 +759,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "e.g. {{ state.queries.my_query.total }}",
           liveStateTree
         }
-      ), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use array length.")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react10.default.createElement(
+      ), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use array length.")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react10.default.createElement(
         import_ui9.TemplateAutocompleteInput,
         {
           value: config.isLoading || "",
@@ -865,13 +865,13 @@ var init_tableConfigEditor = __esm({
             className: "h-3.5 w-3.5"
           }
         ), /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { htmlFor: `col-edit-${idx}`, className: "text-[10px] ml-1.5 text-muted-foreground cursor-pointer" }, "Editable Column"))
-      )))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ import_react10.default.createElement(
+      )))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ import_react10.default.createElement(
         import_ui8.Switch,
         {
           checked: pagination.enabled,
           onCheckedChange: handlePaginationToggle
         }
-      )), pagination.enabled && /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2 bg-muted/30 p-3 rounded-md border mt-1" }, /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Configure pagination actions in the ", /* @__PURE__ */ import_react10.default.createElement("strong", null, "Events"), " tab using the ", /* @__PURE__ */ import_react10.default.createElement("strong", null, "On Page Change"), " event. Event data: ", /* @__PURE__ */ import_react10.default.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.page }}"), ",", " ", /* @__PURE__ */ import_react10.default.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.offset }}"), ",", " ", /* @__PURE__ */ import_react10.default.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.pageSize }}")))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Search Box"), /* @__PURE__ */ import_react10.default.createElement(
+      )), pagination.enabled && /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2 bg-muted/30 p-2 rounded-md border mt-1" }, /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Configure pagination actions in the ", /* @__PURE__ */ import_react10.default.createElement("strong", null, "Events"), " tab using the ", /* @__PURE__ */ import_react10.default.createElement("strong", null, "On Page Change"), " event. Event data: ", /* @__PURE__ */ import_react10.default.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.page }}"), ",", " ", /* @__PURE__ */ import_react10.default.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.offset }}"), ",", " ", /* @__PURE__ */ import_react10.default.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[10px]" }, "{{ event.pageSize }}")))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "grid grid-cols-2 gap-2 border-t pt-2 mt-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Search Box"), /* @__PURE__ */ import_react10.default.createElement(
         import_ui8.Switch,
         {
           checked: search.enabled,
@@ -892,7 +892,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "Search placeholder...",
           className: "h-7 text-xs"
         }
-      ))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Export Data"), /* @__PURE__ */ import_react10.default.createElement(
+      ))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Export Data"), /* @__PURE__ */ import_react10.default.createElement(
         import_ui8.Switch,
         {
           checked: exportConfig.enabled,
@@ -921,20 +921,20 @@ var init_tableConfigEditor = __esm({
         },
         /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectTrigger, { className: "h-7 text-xs w-[70px]" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectValue, null)),
         /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectContent, null, /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectItem, { value: "csv" }, "CSV"), /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectItem, { value: "json" }, "JSON"))
-      ))))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-3 border-t pt-4" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Multi-Row Selection"), /* @__PURE__ */ import_react10.default.createElement(
+      ))))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2 border-t pt-2 mt-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Multi-Row Selection"), /* @__PURE__ */ import_react10.default.createElement(
         import_ui8.Switch,
         {
           checked: multiSelect.enabled,
           onCheckedChange: (v) => handleConfigChange("multiSelect", { ...multiSelect, enabled: v })
         }
-      )), multiSelect.enabled && /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2 bg-muted/30 p-3 rounded border" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 pb-2 border-b" }, /* @__PURE__ */ import_react10.default.createElement(
+      )), multiSelect.enabled && /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2 bg-muted/30 p-2 rounded border" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 pb-2 border-b" }, /* @__PURE__ */ import_react10.default.createElement(
         import_ui8.Checkbox,
         {
           id: "ms-select-all",
           checked: multiSelect.showSelectAll,
           onCheckedChange: (v) => handleConfigChange("multiSelect", { ...multiSelect, showSelectAll: !!v })
         }
-      ), /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { htmlFor: "ms-select-all", className: "text-[10px] cursor-pointer" }, 'Show "Select All" Checkbox')), /* @__PURE__ */ import_react10.default.createElement("div", { className: "pt-1" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex justify-between items-center mb-2" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-[10px] font-medium" }, "Bulk Actions"), /* @__PURE__ */ import_react10.default.createElement(import_ui8.Button, { type: "button", variant: "outline", size: "sm", onClick: handleAddBulkAction, className: "h-6 text-[10px] px-2" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react9.Plus, { className: "mr-1 h-3 w-3" }), " Add Action")), (!multiSelect.actions || multiSelect.actions.length === 0) && /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No bulk actions configured. Selection will be tracked in widgetState."), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1.5" }, (multiSelect.actions || []).map((act, idx) => /* @__PURE__ */ import_react10.default.createElement("div", { key: idx, className: "flex items-center gap-1.5 bg-background p-1.5 rounded border" }, /* @__PURE__ */ import_react10.default.createElement(
+      ), /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { htmlFor: "ms-select-all", className: "text-[10px] cursor-pointer" }, 'Show "Select All" Checkbox')), /* @__PURE__ */ import_react10.default.createElement("div", { className: "pt-1" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex justify-between items-center mb-2" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-[10px] font-medium" }, "Bulk Actions"), /* @__PURE__ */ import_react10.default.createElement(import_ui8.Button, { type: "button", variant: "outline", size: "sm", onClick: handleAddBulkAction, className: "h-6 text-[10px] px-2" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react9.Plus, { className: "mr-1 h-3 w-3" }), " Add Action")), (!multiSelect.actions || multiSelect.actions.length === 0) && /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No bulk actions configured. Selection will be tracked in widgetState."), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1" }, (multiSelect.actions || []).map((act, idx) => /* @__PURE__ */ import_react10.default.createElement("div", { key: idx, className: "flex items-center gap-1.5 bg-background p-1.5 rounded border" }, /* @__PURE__ */ import_react10.default.createElement(
         import_ui8.Input,
         {
           value: act.label,
@@ -950,7 +950,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "actionKey",
           className: "h-6 text-[10px] font-mono flex-1"
         }
-      ), /* @__PURE__ */ import_react10.default.createElement(import_ui8.Select, { value: act.variant || "default", onValueChange: (v) => handleUpdateBulkAction(idx, "variant", v) }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectTrigger, { className: "h-6 text-[10px] w-20" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectValue, null)), /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectContent, null, /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectItem, { value: "destructive" }, "Danger"), /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectItem, { value: "outline" }, "Outline"))), /* @__PURE__ */ import_react10.default.createElement(import_ui8.Button, { type: "button", variant: "ghost", size: "icon", onClick: () => handleRemoveBulkAction(idx), className: "h-6 w-6 text-destructive shrink-0" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react9.Trash2, { className: "h-3 w-3" })))))))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "grid grid-cols-2 gap-4 border-t pt-4" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Inline Row Editing"), /* @__PURE__ */ import_react10.default.createElement(
+      ), /* @__PURE__ */ import_react10.default.createElement(import_ui8.Select, { value: act.variant || "default", onValueChange: (v) => handleUpdateBulkAction(idx, "variant", v) }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectTrigger, { className: "h-6 text-[10px] w-20" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectValue, null)), /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectContent, null, /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectItem, { value: "destructive" }, "Danger"), /* @__PURE__ */ import_react10.default.createElement(import_ui8.SelectItem, { value: "outline" }, "Outline"))), /* @__PURE__ */ import_react10.default.createElement(import_ui8.Button, { type: "button", variant: "ghost", size: "icon", onClick: () => handleRemoveBulkAction(idx), className: "h-6 w-6 text-destructive shrink-0" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react9.Trash2, { className: "h-3 w-3" })))))))), /* @__PURE__ */ import_react10.default.createElement("div", { className: "grid grid-cols-2 gap-2 border-t pt-2 mt-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Inline Row Editing"), /* @__PURE__ */ import_react10.default.createElement(
         import_ui8.Switch,
         {
           checked: editing.enabled,
@@ -959,7 +959,7 @@ var init_tableConfigEditor = __esm({
             if (v && bulkEdit.enabled) handleConfigChange("bulkEdit", { ...bulkEdit, enabled: false });
           }
         }
-      )), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Adds an Edit button to each row. Fires ", /* @__PURE__ */ import_react10.default.createElement("code", { className: "bg-background px-1 border rounded" }, "onRowSave"), ".")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Excel-Style Bulk Edit"), /* @__PURE__ */ import_react10.default.createElement(
+      )), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Adds an Edit button to each row. Fires ", /* @__PURE__ */ import_react10.default.createElement("code", { className: "bg-background px-1 border rounded" }, "onRowSave"), ".")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react10.default.createElement(import_ui8.Label, { className: "text-xs font-medium text-foreground" }, "Excel-Style Bulk Edit"), /* @__PURE__ */ import_react10.default.createElement(
         import_ui8.Switch,
         {
           checked: bulkEdit.enabled,
@@ -995,7 +995,7 @@ var init_buttonConfigEditor = __esm({
     ButtonConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
       const liveStateTree = (0, import_react11.useMemo)(() => ({ state: stateTree }), [stateTree]);
-      return /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ import_react11.default.createElement(
+      return /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ import_react11.default.createElement(
         import_ui11.TemplateAutocompleteInput,
         {
           value: config.text || "",
@@ -1003,7 +1003,7 @@ var init_buttonConfigEditor = __esm({
           placeholder: "Click Me",
           liveStateTree
         }
-      )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ import_react11.default.createElement(
+      )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Select,
         {
           value: config.variant || "default",
@@ -1011,7 +1011,7 @@ var init_buttonConfigEditor = __esm({
         },
         /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectValue, { placeholder: "Select variant" })),
         /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectContent, null, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "destructive" }, "Destructive"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "outline" }, "Outline"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "secondary" }, "Secondary"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "ghost" }, "Ghost"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "link" }, "Link"))
-      )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ import_react11.default.createElement(
+      )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Select,
         {
           value: config.size || "default",
@@ -1019,7 +1019,7 @@ var init_buttonConfigEditor = __esm({
         },
         /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectValue, { placeholder: "Select size" })),
         /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectContent, null, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "sm" }, "Small"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "lg" }, "Large"), /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { value: "icon" }, "Icon"))
-      ))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react11.default.createElement(
+      ))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react11.default.createElement(
         import_ui11.TemplateAutocompleteInput,
         {
           value: config.isLoading || "",
@@ -1047,7 +1047,7 @@ var init_datePickerConfigEditor = __esm({
     DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
       const liveStateTree = (0, import_react18.useMemo)(() => ({ state: stateTree }), [stateTree]);
-      return /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ import_react18.default.createElement(
+      return /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ import_react18.default.createElement(
         import_ui23.Input,
         {
           type: "text",
@@ -1056,7 +1056,7 @@ var init_datePickerConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
           placeholder: "e.g. Select date"
         }
-      )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { className: "text-xs font-medium text-foreground" }, "Placeholder"), /* @__PURE__ */ import_react18.default.createElement(
+      )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { className: "text-xs font-medium text-foreground" }, "Placeholder"), /* @__PURE__ */ import_react18.default.createElement(
         import_ui23.Input,
         {
           type: "text",
@@ -1072,7 +1072,7 @@ var init_datePickerConfigEditor = __esm({
           checked: !!config.enableTime,
           onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
         }
-      ), /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { htmlFor: "date-picker-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { className: "text-xs font-medium text-foreground" }, "Default Value"), /* @__PURE__ */ import_react18.default.createElement(
+      ), /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { htmlFor: "date-picker-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { className: "text-xs font-medium text-foreground" }, "Default Value"), /* @__PURE__ */ import_react18.default.createElement(
         import_ui24.TemplateAutocompleteInput,
         {
           value: config.defaultValue || "",
@@ -1080,7 +1080,7 @@ var init_datePickerConfigEditor = __esm({
           placeholder: "e.g. {{state.variables.myDate}} or ISO string",
           liveStateTree
         }
-      )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react18.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react18.default.createElement(
+      )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ import_react18.default.createElement(import_ui23.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react18.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react18.default.createElement(
         import_ui24.TemplateAutocompleteInput,
         {
           value: config.isLoading || "",
@@ -1108,7 +1108,7 @@ var init_dateRangePickerConfigEditor = __esm({
     DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
       const liveStateTree = (0, import_react19.useMemo)(() => ({ state: stateTree }), [stateTree]);
-      return /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ import_react19.default.createElement(
+      return /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ import_react19.default.createElement(
         import_ui25.Input,
         {
           type: "text",
@@ -1117,7 +1117,7 @@ var init_dateRangePickerConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
           placeholder: "e.g. Select date range"
         }
-      )), /* @__PURE__ */ import_react19.default.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Start Placeholder"), /* @__PURE__ */ import_react19.default.createElement(
+      )), /* @__PURE__ */ import_react19.default.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Start Placeholder"), /* @__PURE__ */ import_react19.default.createElement(
         import_ui25.Input,
         {
           type: "text",
@@ -1126,7 +1126,7 @@ var init_dateRangePickerConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.placeholderStart", e.target.value),
           placeholder: "Start date"
         }
-      )), /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "End Placeholder"), /* @__PURE__ */ import_react19.default.createElement(
+      )), /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "End Placeholder"), /* @__PURE__ */ import_react19.default.createElement(
         import_ui25.Input,
         {
           type: "text",
@@ -1142,7 +1142,7 @@ var init_dateRangePickerConfigEditor = __esm({
           checked: !!config.enableTime,
           onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.enableTime", !!checked)
         }
-      ), /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { htmlFor: "date-range-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ import_react19.default.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Default Start"), /* @__PURE__ */ import_react19.default.createElement(
+      ), /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { htmlFor: "date-range-enable-time", className: "text-xs text-muted-foreground cursor-pointer" }, "Enable Time picking (granularity to hours, minutes, seconds)")), /* @__PURE__ */ import_react19.default.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Default Start"), /* @__PURE__ */ import_react19.default.createElement(
         import_ui26.TemplateAutocompleteInput,
         {
           value: config.defaultStart || "",
@@ -1150,7 +1150,7 @@ var init_dateRangePickerConfigEditor = __esm({
           placeholder: "e.g. {{state.variables.startDate}}",
           liveStateTree
         }
-      )), /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Default End"), /* @__PURE__ */ import_react19.default.createElement(
+      )), /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Default End"), /* @__PURE__ */ import_react19.default.createElement(
         import_ui26.TemplateAutocompleteInput,
         {
           value: config.defaultEnd || "",
@@ -1158,7 +1158,7 @@ var init_dateRangePickerConfigEditor = __esm({
           placeholder: "e.g. {{state.variables.endDate}}",
           liveStateTree
         }
-      ))), /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react19.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react19.default.createElement(
+      ))), /* @__PURE__ */ import_react19.default.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ import_react19.default.createElement(import_ui25.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react19.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react19.default.createElement(
         import_ui26.TemplateAutocompleteInput,
         {
           value: config.isLoading || "",
@@ -1637,7 +1637,7 @@ var init_formWidget = __esm({
           if (!field.key) return null;
           const fieldType = field.type || "text";
           const inputId = `form-field-${field.key}-${idx}`;
-          return /* @__PURE__ */ import_react25.default.createElement("div", { key: idx, className: "space-y-1.5" }, fieldType !== "checkbox" && /* @__PURE__ */ import_react25.default.createElement(import_ui30.Label, { htmlFor: inputId, className: "text-xs font-semibold text-foreground" }, field.label || field.key, field.required && /* @__PURE__ */ import_react25.default.createElement("span", { className: "text-rose-500 ml-0.5" }, "*")), fieldType === "select" ? /* @__PURE__ */ import_react25.default.createElement(
+          return /* @__PURE__ */ import_react25.default.createElement("div", { key: idx, className: "space-y-1" }, fieldType !== "checkbox" && /* @__PURE__ */ import_react25.default.createElement(import_ui30.Label, { htmlFor: inputId, className: "text-xs font-semibold text-foreground" }, field.label || field.key, field.required && /* @__PURE__ */ import_react25.default.createElement("span", { className: "text-rose-500 ml-0.5" }, "*")), fieldType === "select" ? /* @__PURE__ */ import_react25.default.createElement(
             import_ui30.Select,
             {
               value: String(formData[field.key] ?? ""),
@@ -4230,7 +4230,7 @@ var VegaConfigEditor = ({
     widgetEditorForm.setFieldValue("widgetConfig.editorMode", "visual");
     setShowParseWarning(false);
   };
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col gap-3 w-full" }, isVegaLite && /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ import_react8.default.createElement(import_ui5.Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col gap-2 w-full" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ import_react8.default.createElement(
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col gap-2 w-full" }, isVegaLite && /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ import_react8.default.createElement(import_ui5.Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col gap-2 w-full" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ import_react8.default.createElement(
     ShelfBuilder,
     {
       widgetEditorForm,
@@ -4239,7 +4239,7 @@ var VegaConfigEditor = ({
       stateTree,
       liveStateTree
     }
-  )), showParseWarning && /* @__PURE__ */ import_react8.default.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react7.AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react8.default.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ import_react8.default.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ import_react8.default.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui5.Button, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ import_react8.default.createElement(import_ui5.Button, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-foreground dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ import_react8.default.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ import_react8.default.createElement(
+  )), showParseWarning && /* @__PURE__ */ import_react8.default.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react7.AlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react8.default.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ import_react8.default.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ import_react8.default.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui5.Button, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ import_react8.default.createElement(import_ui5.Button, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-foreground dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ import_react8.default.createElement(
     VegaSpecEditor,
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,
@@ -4247,7 +4247,7 @@ var VegaConfigEditor = ({
       workflowContext,
       workflow: resolvedSelectedWorkflow
     }
-  )), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui5.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react8.default.createElement(
+  ), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui5.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react8.default.createElement(
     import_ui6.TemplateAutocompleteInput,
     {
       value: widgetEditorForm.values.widgetConfig?.isLoading || "",
@@ -4387,7 +4387,7 @@ var import_ui13 = require("@jet-admin/ui");
 var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = (0, import_react12.useMemo)(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Content"), /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports Markdown formatting and ", /* @__PURE__ */ import_react12.default.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates. Full JS expressions supported."), /* @__PURE__ */ import_react12.default.createElement(
+  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Content"), /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports Markdown formatting and ", /* @__PURE__ */ import_react12.default.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates. Full JS expressions supported."), /* @__PURE__ */ import_react12.default.createElement(
     import_ui13.TemplateAutocompleteInput,
     {
       isTextArea: true,
@@ -4397,7 +4397,7 @@ var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "# Heading\n\nSome **bold** and *italic* text.\n\nValue: {{ state.queries.myQuery.data[0].name }}",
       liveStateTree
     }
-  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react12.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react12.default.createElement(
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react12.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react12.default.createElement(
     import_ui13.TemplateAutocompleteInput,
     {
       value: config.isLoading || "",
@@ -4405,7 +4405,7 @@ var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
       liveStateTree
     }
-  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "grid grid-cols-3 gap-3" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Format"), /* @__PURE__ */ import_react12.default.createElement(
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "grid grid-cols-3 gap-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Format"), /* @__PURE__ */ import_react12.default.createElement(
     import_ui12.Select,
     {
       value: config.format || "markdown",
@@ -4413,7 +4413,7 @@ var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectValue, null)),
     /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectContent, null, /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectItem, { value: "markdown" }, "Markdown"), /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectItem, { value: "plain" }, "Plain Text"))
-  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ import_react12.default.createElement(
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ import_react12.default.createElement(
     import_ui12.Select,
     {
       value: config.textAlign || "left",
@@ -4421,7 +4421,7 @@ var TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectValue, null)),
     /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectContent, null, /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectItem, { value: "left" }, "Left"), /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectItem, { value: "center" }, "Center"), /* @__PURE__ */ import_react12.default.createElement(import_ui12.SelectItem, { value: "right" }, "Right"))
-  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ import_react12.default.createElement(
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react12.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ import_react12.default.createElement(
     import_ui12.Select,
     {
       value: config.fontSize || "sm",
@@ -4444,7 +4444,7 @@ var import_ui15 = require("@jet-admin/ui");
 var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = (0, import_react13.useMemo)(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ import_react13.default.createElement(
+  return /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Label"), /* @__PURE__ */ import_react13.default.createElement(
     import_ui14.Input,
     {
       type: "text",
@@ -4453,7 +4453,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.label", e.target.value),
       placeholder: "e.g. Total Revenue"
     }
-  )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Value"), /* @__PURE__ */ import_react13.default.createElement(
+  )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Value"), /* @__PURE__ */ import_react13.default.createElement(
     import_ui15.TemplateAutocompleteInput,
     {
       value: config.valueTemplate || "",
@@ -4461,7 +4461,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.stats.data[0].count}}",
       liveStateTree
     }
-  ), /* @__PURE__ */ import_react13.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "The primary metric value. Use template expressions to bind to data sources.")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Prefix"), /* @__PURE__ */ import_react13.default.createElement(
+  ), /* @__PURE__ */ import_react13.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "The primary metric value. Use template expressions to bind to data sources.")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Prefix"), /* @__PURE__ */ import_react13.default.createElement(
     import_ui14.Input,
     {
       type: "text",
@@ -4470,7 +4470,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.prefix", e.target.value),
       placeholder: "e.g. $"
     }
-  )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Suffix"), /* @__PURE__ */ import_react13.default.createElement(
+  )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Suffix"), /* @__PURE__ */ import_react13.default.createElement(
     import_ui14.Input,
     {
       type: "text",
@@ -4479,7 +4479,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.suffix", e.target.value),
       placeholder: "e.g. users"
     }
-  ))), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Trend Value"), /* @__PURE__ */ import_react13.default.createElement(
+  ))), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Trend Value"), /* @__PURE__ */ import_react13.default.createElement(
     import_ui15.TemplateAutocompleteInput,
     {
       value: config.trendTemplate || "",
@@ -4487,7 +4487,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.stats.data[0].change_pct}}",
       liveStateTree
     }
-  ), /* @__PURE__ */ import_react13.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Optional percentage change. Positive = up trend, negative = down trend.")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Trend Semantics"), /* @__PURE__ */ import_react13.default.createElement(
+  ), /* @__PURE__ */ import_react13.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Optional percentage change. Positive = up trend, negative = down trend.")), /* @__PURE__ */ import_react13.default.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Trend Semantics"), /* @__PURE__ */ import_react13.default.createElement(
     import_ui14.Select,
     {
       value: config.trendDirection || "up-is-good",
@@ -4495,7 +4495,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectValue, null)),
     /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectContent, null, /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectItem, { value: "up-is-good" }, "Up = Good (green)"), /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectItem, { value: "down-is-good" }, "Down = Good (green)"))
-  )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ import_react13.default.createElement(
+  )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Align"), /* @__PURE__ */ import_react13.default.createElement(
     import_ui14.Select,
     {
       value: config.textAlign || "center",
@@ -4503,7 +4503,7 @@ var StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectValue, null)),
     /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectContent, null, /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectItem, { value: "left" }, "Left"), /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectItem, { value: "center" }, "Center"), /* @__PURE__ */ import_react13.default.createElement(import_ui14.SelectItem, { value: "right" }, "Right"))
-  ))), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react13.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react13.default.createElement(
+  ))), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react13.default.createElement(import_ui14.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react13.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react13.default.createElement(
     import_ui15.TemplateAutocompleteInput,
     {
       value: config.isLoading || "",
@@ -4526,7 +4526,7 @@ var import_ui17 = require("@jet-admin/ui");
 var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = (0, import_react14.useMemo)(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Type / Variant"), /* @__PURE__ */ import_react14.default.createElement(
+  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Type / Variant"), /* @__PURE__ */ import_react14.default.createElement(
     import_ui16.Select,
     {
       value: config.variant || "info",
@@ -4534,7 +4534,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ import_react14.default.createElement(import_ui16.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react14.default.createElement(import_ui16.SelectValue, null)),
     /* @__PURE__ */ import_react14.default.createElement(import_ui16.SelectContent, null, /* @__PURE__ */ import_react14.default.createElement(import_ui16.SelectItem, { value: "info" }, "Info (Blue)"), /* @__PURE__ */ import_react14.default.createElement(import_ui16.SelectItem, { value: "success" }, "Success (Green)"), /* @__PURE__ */ import_react14.default.createElement(import_ui16.SelectItem, { value: "warning" }, "Warning (Amber)"), /* @__PURE__ */ import_react14.default.createElement(import_ui16.SelectItem, { value: "error" }, "Error (Red)"))
-  )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Title (Optional)"), /* @__PURE__ */ import_react14.default.createElement(
+  )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Title (Optional)"), /* @__PURE__ */ import_react14.default.createElement(
     import_ui17.TemplateAutocompleteInput,
     {
       value: config.title || "",
@@ -4542,7 +4542,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. Warning!",
       liveStateTree
     }
-  )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Message"), /* @__PURE__ */ import_react14.default.createElement(
+  )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Message"), /* @__PURE__ */ import_react14.default.createElement(
     import_ui17.TemplateAutocompleteInput,
     {
       isTextArea: true,
@@ -4558,7 +4558,7 @@ var AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       checked: config.dismissible ?? true,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.dismissible", !!checked)
     }
-  ), /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { htmlFor: "alert-dismissible", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow user to dismiss/close the banner")), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react14.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react14.default.createElement(
+  ), /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { htmlFor: "alert-dismissible", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow user to dismiss/close the banner")), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ import_react14.default.createElement(import_ui16.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react14.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react14.default.createElement(
     import_ui17.TemplateAutocompleteInput,
     {
       value: config.isLoading || "",
@@ -4605,7 +4605,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
     const list = optionsStr.split(",").map((s) => s.trim()).filter(Boolean);
     handleFieldChange(idx, "options", list);
   };
-  return /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "grid grid-cols-2 gap-3 pb-3 border-b" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react15.default.createElement(import_ui18.Label, { className: "text-xs font-medium text-foreground" }, "Submit Button Text"), /* @__PURE__ */ import_react15.default.createElement(
+  return /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "grid grid-cols-2 gap-2 pb-2 border-b" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react15.default.createElement(import_ui18.Label, { className: "text-xs font-medium text-foreground" }, "Submit Button Text"), /* @__PURE__ */ import_react15.default.createElement(
     import_ui18.Input,
     {
       type: "text",
@@ -4613,7 +4613,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       value: config.submitLabel || "Submit",
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.submitLabel", e.target.value)
     }
-  )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react15.default.createElement(import_ui18.Label, { className: "text-xs font-medium text-foreground" }, "Size / Spacing"), /* @__PURE__ */ import_react15.default.createElement(
+  )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react15.default.createElement(import_ui18.Label, { className: "text-xs font-medium text-foreground" }, "Size / Spacing"), /* @__PURE__ */ import_react15.default.createElement(
     import_ui18.Select,
     {
       value: config.size || "default",
@@ -4632,7 +4632,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
     },
     /* @__PURE__ */ import_react15.default.createElement(import_lucide_react10.Plus, { className: "h-3 w-3" }),
     " Add Field"
-  )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-3 max-h-[350px] overflow-y-auto pr-1" }, fields.map((field, idx) => /* @__PURE__ */ import_react15.default.createElement("div", { key: idx, className: "p-3 border rounded bg-muted/10 relative space-y-2" }, /* @__PURE__ */ import_react15.default.createElement(
+  )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-2 max-h-[350px] overflow-y-auto pr-1" }, fields.map((field, idx) => /* @__PURE__ */ import_react15.default.createElement("div", { key: idx, className: "p-2 border rounded bg-muted/10 relative space-y-2" }, /* @__PURE__ */ import_react15.default.createElement(
     import_ui18.Button,
     {
       type: "button",
@@ -4686,7 +4686,7 @@ var FormConfigEditor = ({ widgetEditorForm }) => {
       onChange: (e) => handleOptionsChange(idx, e.target.value),
       placeholder: "admin, member, guest"
     }
-  )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "grid grid-cols-2 gap-2 pt-1.5 border-t border-dashed" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex items-center gap-1.5" }, /* @__PURE__ */ import_react15.default.createElement(
+  )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "grid grid-cols-2 gap-2 pt-1 border-t border-dashed" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex items-center gap-1.5" }, /* @__PURE__ */ import_react15.default.createElement(
     import_ui18.Checkbox,
     {
       id: `field-req-${idx}`,
@@ -4723,7 +4723,7 @@ var import_ui20 = require("@jet-admin/ui");
 var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = (0, import_react16.useMemo)(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ import_react16.default.createElement(
+  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ import_react16.default.createElement(
     import_ui20.TemplateAutocompleteInput,
     {
       value: config.src || "",
@@ -4731,7 +4731,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.user.data.avatar_url}}",
       liveStateTree
     }
-  ), /* @__PURE__ */ import_react16.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content.")), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ import_react16.default.createElement(
+  ), /* @__PURE__ */ import_react16.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content.")), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ import_react16.default.createElement(
     import_ui19.Input,
     {
       type: "text",
@@ -4740,7 +4740,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.alt", e.target.value),
       placeholder: "e.g. Profile photo"
     }
-  )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Object Fit"), /* @__PURE__ */ import_react16.default.createElement(
+  )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Object Fit"), /* @__PURE__ */ import_react16.default.createElement(
     import_ui19.Select,
     {
       value: config.objectFit || "cover",
@@ -4748,7 +4748,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectValue, null)),
     /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectContent, null, /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectItem, { value: "cover" }, "Cover (crop to fit)"), /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectItem, { value: "contain" }, "Contain (show all)"), /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectItem, { value: "fill" }, "Fill (stretch)"), /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectItem, { value: "none" }, "Original Size"))
-  )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Corner Radius"), /* @__PURE__ */ import_react16.default.createElement(
+  )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Corner Radius"), /* @__PURE__ */ import_react16.default.createElement(
     import_ui19.Select,
     {
       value: config.borderRadius || "none",
@@ -4756,7 +4756,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
     },
     /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectValue, null)),
     /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectContent, null, /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectItem, { value: "none" }, "Square (None)"), /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectItem, { value: "sm" }, "Small"), /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectItem, { value: "md" }, "Medium"), /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectItem, { value: "lg" }, "Large"), /* @__PURE__ */ import_react16.default.createElement(import_ui19.SelectItem, { value: "full" }, "Circle (Full)"))
-  ))), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react16.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react16.default.createElement(
+  ))), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ import_react16.default.createElement(import_ui19.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react16.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react16.default.createElement(
     import_ui20.TemplateAutocompleteInput,
     {
       value: config.isLoading || "",
@@ -4779,7 +4779,7 @@ var import_ui22 = require("@jet-admin/ui");
 var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = (0, import_react17.useMemo)(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { className: "text-xs font-medium text-foreground" }, "Embed URL / Target Source"), /* @__PURE__ */ import_react17.default.createElement(
+  return /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { className: "text-xs font-medium text-foreground" }, "Embed URL / Target Source"), /* @__PURE__ */ import_react17.default.createElement(
     import_ui22.TemplateAutocompleteInput,
     {
       value: config.url || "",
@@ -4787,35 +4787,35 @@ var IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. https://example.com",
       liveStateTree
     }
-  ), /* @__PURE__ */ import_react17.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).")), /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-2 border-t pt-3" }, /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { className: "text-xs font-medium text-foreground" }, "Sandbox Security Options"), /* @__PURE__ */ import_react17.default.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug mb-2" }, "Toggle capabilities granted to the embedded page. Restricted by default."), /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react17.default.createElement(
+  ), /* @__PURE__ */ import_react17.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).")), /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-2 border-t pt-2 mt-2" }, /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { className: "text-xs font-medium text-foreground" }, "Sandbox Security Options"), /* @__PURE__ */ import_react17.default.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug mb-1" }, "Toggle capabilities granted to the embedded page. Restricted by default."), /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react17.default.createElement(
     import_ui21.Checkbox,
     {
       id: "iframe-scripts",
       checked: config.allowScripts ?? true,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowScripts", !!checked)
     }
-  ), /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { htmlFor: "iframe-scripts", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow JavaScript execution (allow-scripts)")), /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ import_react17.default.createElement(
+  ), /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { htmlFor: "iframe-scripts", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow JavaScript execution (allow-scripts)")), /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex items-center gap-2 mt-1" }, /* @__PURE__ */ import_react17.default.createElement(
     import_ui21.Checkbox,
     {
       id: "iframe-forms",
       checked: config.allowForms ?? true,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowForms", !!checked)
     }
-  ), /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { htmlFor: "iframe-forms", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow form submission (allow-forms)")), /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ import_react17.default.createElement(
+  ), /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { htmlFor: "iframe-forms", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow form submission (allow-forms)")), /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex items-center gap-2 mt-1" }, /* @__PURE__ */ import_react17.default.createElement(
     import_ui21.Checkbox,
     {
       id: "iframe-popups",
       checked: config.allowPopups ?? false,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowPopups", !!checked)
     }
-  ), /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { htmlFor: "iframe-popups", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow popups & new windows (allow-popups)")), /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex items-center gap-2 mt-1.5" }, /* @__PURE__ */ import_react17.default.createElement(
+  ), /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { htmlFor: "iframe-popups", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow popups & new windows (allow-popups)")), /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex items-center gap-2 mt-1" }, /* @__PURE__ */ import_react17.default.createElement(
     import_ui21.Checkbox,
     {
       id: "iframe-origin",
       checked: config.allowSameOrigin ?? false,
       onCheckedChange: (checked) => widgetEditorForm.setFieldValue("widgetConfig.allowSameOrigin", !!checked)
     }
-  ), /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { htmlFor: "iframe-origin", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow sharing local storage/cookies (allow-same-origin)"))), /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-1.5 mt-2" }, /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react17.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react17.default.createElement(
+  ), /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { htmlFor: "iframe-origin", className: "text-xs text-muted-foreground cursor-pointer" }, "Allow sharing local storage/cookies (allow-same-origin)"))), /* @__PURE__ */ import_react17.default.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ import_react17.default.createElement(import_ui21.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react17.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react17.default.createElement(
     import_ui22.TemplateAutocompleteInput,
     {
       value: config.isLoading || "",
@@ -4841,7 +4841,7 @@ var import_ui27 = require("@jet-admin/ui");
 var HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = (0, import_react20.useMemo)(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-medium text-foreground" }, "HTML Markup"), /* @__PURE__ */ import_react20.default.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports standard HTML structure, inline styles, and ", /* @__PURE__ */ import_react20.default.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates."), /* @__PURE__ */ import_react20.default.createElement(
+  return /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-medium text-foreground" }, "HTML Markup"), /* @__PURE__ */ import_react20.default.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Supports standard HTML structure, inline styles, and ", /* @__PURE__ */ import_react20.default.createElement("code", { className: "font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]" }, "{{expression}}"), " templates."), /* @__PURE__ */ import_react20.default.createElement(
     import_ui27.CodeEditor,
     {
       language: "html",
@@ -4855,7 +4855,7 @@ var HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       showLineNumbers: true,
       title: "HTML Source"
     }
-  )), /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-medium text-foreground" }, "CSS Stylesheet"), /* @__PURE__ */ import_react20.default.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Custom styles scoped to this widget's sandboxed iframe container."), /* @__PURE__ */ import_react20.default.createElement(
+  )), /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-medium text-foreground" }, "CSS Stylesheet"), /* @__PURE__ */ import_react20.default.createElement("p", { className: "text-[10px] text-muted-foreground leading-snug" }, "Custom styles scoped to this widget's sandboxed iframe container."), /* @__PURE__ */ import_react20.default.createElement(
     import_ui27.CodeEditor,
     {
       language: "css",
@@ -4869,7 +4869,7 @@ var HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       showLineNumbers: true,
       title: "CSS Styles"
     }
-  )), /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react20.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react20.default.createElement(
+  )), /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ import_react20.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ import_react20.default.createElement(
     import_ui27.TemplateAutocompleteInput,
     {
       value: config.isLoading || "",
@@ -4877,7 +4877,7 @@ var HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{ state.queries.myQuery.isLoading }}",
       liveStateTree
     }
-  )), /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-3 pt-2 border-t border-border/60" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-semibold text-foreground uppercase tracking-wider" }, "Sandbox Security"), /* @__PURE__ */ import_react20.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-0.5 pr-2" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-medium text-foreground" }, "Execute JavaScript"), /* @__PURE__ */ import_react20.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Allows running <script> tags inside the iframe sandbox.")), /* @__PURE__ */ import_react20.default.createElement(
+  )), /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-2 pt-2 mt-2 border-t border-border/60" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-semibold text-foreground uppercase tracking-wider" }, "Sandbox Security"), /* @__PURE__ */ import_react20.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react20.default.createElement("div", { className: "space-y-0.5 pr-2" }, /* @__PURE__ */ import_react20.default.createElement(import_ui27.Label, { className: "text-xs font-medium text-foreground" }, "Execute JavaScript"), /* @__PURE__ */ import_react20.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Allows running <script> tags inside the iframe sandbox.")), /* @__PURE__ */ import_react20.default.createElement(
     import_ui27.Switch,
     {
       checked: config.allowScripts === true || config.allowScripts === "true",

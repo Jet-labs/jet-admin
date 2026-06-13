@@ -8,9 +8,9 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Label */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Label</Label>
         <Input
           type="text"
@@ -22,7 +22,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Value Template */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Value</Label>
         <TemplateAutocompleteInput
           value={config.valueTemplate || ""}
@@ -36,8 +36,8 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Prefix & Suffix */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Prefix</Label>
           <Input
             type="text"
@@ -47,7 +47,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
             placeholder="e.g. $"
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Suffix</Label>
           <Input
             type="text"
@@ -60,7 +60,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Trend */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Trend Value</Label>
         <TemplateAutocompleteInput
           value={config.trendTemplate || ""}
@@ -74,8 +74,8 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Trend Direction */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Trend Semantics</Label>
           <Select
             value={config.trendDirection || "up-is-good"}
@@ -92,7 +92,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </div>
 
         {/* Text Align */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Align</Label>
           <Select
             value={config.textAlign || "center"}
@@ -111,7 +111,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Is Loading Template */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
         <TemplateAutocompleteInput
           value={config.isLoading || ""}

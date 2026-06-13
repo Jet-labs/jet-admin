@@ -47,7 +47,7 @@ export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
   }, [onChange, formData]);
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full p-2 space-y-2">
       <JsonForms
         schema={schema}
         uischema={uischema}
@@ -57,6 +57,7 @@ export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
       />
 
       {/* Help callout */}
+
       <div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
         <div className="font-semibold text-xs text-foreground">📘 How This Works</div>
 
@@ -88,10 +89,13 @@ export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
         </div>
       </div>
 
+
       {/* ✅ Correct: variant="default" — no raw color overrides */}
+
       <Button type="button" size="sm" onClick={handleSave} className="w-full">
         Save
       </Button>
+
     </div>
   );
 };

@@ -53,7 +53,7 @@ export const CustomKeyValueArrayRenderer = ({
 
       <div className="flex flex-col gap-2">
         {items.map((item, index) => (
-          <div key={`${path}-${index}`} className="flex items-center space-x-2">
+          <div key={`${path}-${index}`} className="flex items-end space-x-2">
             {/* Key Field */}
             <div className="flex-grow">
               <JsonFormsDispatch

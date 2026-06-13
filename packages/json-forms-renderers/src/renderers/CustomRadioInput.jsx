@@ -44,9 +44,7 @@ export const CustomRadioInput = (props) => {
   return (
     <div className="">
       <Label
-        className={`block mb-2 text-xs font-medium ${
-          hasErrors ? "text-red-500" : "text-muted-foreground"
-        }`}
+        className={`block mb-2 ${hasErrors ? "text-red-500" : ""}`}
       >
         {label || description}
       </Label>

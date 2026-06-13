@@ -3,7 +3,7 @@ import { Plus, Settings, Trash2 } from 'lucide-react';
 import PropTypes from "prop-types";
 
 
-import { Button, Checkbox, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Button, Checkbox, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 /**
  * Panel for editing workflow input parameter schema (workflowOptions.inputDefinitions).
  * Allows users to define the expected input parameters for a workflow.
@@ -97,25 +97,25 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
                     <SelectItem value="array">Array</SelectItem>
                   </SelectContent>
                 </Select>
-                <label className="flex items-center gap-1 text-[10px] text-foreground flex-shrink-0">
+                <Label className="flex items-center gap-1">
                   <Checkbox
                     checked={inputDef.required || false}
                     onCheckedChange={(checked) => _handleUpdateInputDef(index, "required", checked)}
                   />
                   Required
-                </label>
+                </Label>
               </div>
               {/* Default value input */}
               <div className="flex flex-col gap-1">
                 <span className="text-[9px] text-muted-foreground font-medium">Default value</span>
                 {(inputDef.type || "string") === "boolean" ? (
-                  <label className="flex items-center gap-1.5 text-[10px] text-foreground">
+                  <Label className="flex items-center gap-1.5">
                     <Checkbox
                       checked={inputDef.defaultValue === true}
                       onCheckedChange={(checked) => _handleUpdateInputDef(index, "defaultValue", checked)}
                     />
                     {inputDef.defaultValue === true ? "true" : "false"}
-                  </label>
+                  </Label>
                 ) : (
                   <Input
                     type={(inputDef.type || "string") === "number" ? "number" : "text"}

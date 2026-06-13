@@ -9,9 +9,9 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Content */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Content</Label>
         <p className="text-[10px] text-muted-foreground leading-snug">
           Supports Markdown formatting and <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]">{"{{expression}}"}</code> templates. Full JS expressions supported.
@@ -27,7 +27,7 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Is Loading Template */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
         <TemplateAutocompleteInput
           value={config.isLoading || ""}
@@ -37,9 +37,9 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-2">
         {/* Format */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Format</Label>
           <Select
             value={config.format || "markdown"}
@@ -56,7 +56,7 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </div>
 
         {/* Text Align */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Align</Label>
           <Select
             value={config.textAlign || "left"}
@@ -74,7 +74,7 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </div>
 
         {/* Font Size */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Size</Label>
           <Select
             value={config.fontSize || "sm"}

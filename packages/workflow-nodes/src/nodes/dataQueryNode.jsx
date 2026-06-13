@@ -159,39 +159,43 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
   }, [onQueryTest, formData.dataQueryID]);
 
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full">
       <JsonForms schema={schema} uischema={uischema} data={formData} renderers={workflowNodeRenderers} onChange={handleFormChange} />
-
       {/* Help callout */}
-      <div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
-        <div className="font-semibold text-xs text-foreground">📘 Query Inputs</div>
-        <div>
-          <span className="font-medium text-foreground">Input Format:</span>
-          <div className="ml-3 mt-0.5 font-mono text-[9px] space-y-0.5">
-            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.input.userId}}'}</code> → pass input value</div>
-            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.queryResult.id}}'}</code> → from previous query</div>
-            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'id_{{ctx.input.id}}'}</code> → string interpolation</div>
+      <div className='px-2'>
+        <div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
+          <div className="font-semibold text-xs text-foreground">📘 Query Inputs</div>
+          <div>
+            <span className="font-medium text-foreground">Input Format:</span>
+            <div className="ml-3 mt-0.5 font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.input.userId}}'}</code> → pass input value</div>
+              <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.queryResult.id}}'}</code> → from previous query</div>
+              <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'id_{{ctx.input.id}}'}</code> → string interpolation</div>
+            </div>
           </div>
-        </div>
-        <div>
-          <span className="font-medium text-foreground">Access Result:</span>
-          <div className="ml-3 mt-0.5">
-            Stored in <code className="bg-brand-dark px-1 py-0.5 rounded-sm border border-border font-mono">{'ctx.{outputVariable}'}</code> for use in next nodes.
+          <div>
+            <span className="font-medium text-foreground">Access Result:</span>
+            <div className="ml-3 mt-0.5">
+              Stored in <code className="bg-brand-dark px-1 py-0.5 rounded-sm border border-border font-mono">{'ctx.{outputVariable}'}</code> for use in next nodes.
+            </div>
           </div>
         </div>
       </div>
 
+
       {/* ✅ Correct button row — no raw color overrides */}
-      <div className="flex items-center gap-2">
-        {onQueryTest && formData.dataQueryID && (
-          <Button type="button" variant="outline" size="sm" onClick={handleOpenTest} className="flex items-center gap-1.5">
-            <Play className="h-3 w-3" />
-            Test Query
+      <div className="px-2 mt-2">
+        <div className="flex items-center gap-2">
+          {onQueryTest && formData.dataQueryID && (
+            <Button type="button" variant="outline" size="sm" onClick={handleOpenTest} className="flex items-center gap-1.5">
+              <Play className="h-3 w-3" />
+              Test Query
+            </Button>
+          )}
+          <Button type="button" size="sm" onClick={handleSave} className="flex-1">
+            {strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || 'Save'}
           </Button>
-        )}
-        <Button type="button" size="sm" onClick={handleSave} className="flex-1">
-          {strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || 'Save'}
-        </Button>
+        </div>
       </div>
     </div>
   );

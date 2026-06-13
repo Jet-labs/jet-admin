@@ -7,9 +7,9 @@ export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* HTML Source */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">HTML Markup</Label>
         <p className="text-[10px] text-muted-foreground leading-snug">
           Supports standard HTML structure, inline styles, and <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]">{"{{expression}}"}</code> templates.
@@ -29,7 +29,7 @@ export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* CSS Stylesheet */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">CSS Stylesheet</Label>
         <p className="text-[10px] text-muted-foreground leading-snug">
           Custom styles scoped to this widget's sandboxed iframe container.
@@ -49,7 +49,7 @@ export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Is Loading Template */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">
           Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span>
         </Label>
@@ -62,7 +62,7 @@ export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Sandbox Isolation Flags */}
-      <div className="space-y-3 pt-2 border-t border-border/60">
+      <div className="space-y-2 pt-2 mt-2 border-t border-border/60">
         <Label className="text-xs font-semibold text-foreground uppercase tracking-wider">Sandbox Security</Label>
         
         {/* Allow Scripts */}

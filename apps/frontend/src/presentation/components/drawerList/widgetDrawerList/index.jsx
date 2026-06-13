@@ -55,8 +55,9 @@ export const WidgetDrawerList = () => {
   };
 
   return (
-    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
-      <Button
+    <div className="bg-background flex h-full w-full flex-col gap-2 overflow-hidden">
+      <div className="p-2 pb-0">
+        <Button
         onClick={_navigateToAddMoreWidget}
         variant="secondary"
         className="w-full justify-start"
@@ -64,9 +65,10 @@ export const WidgetDrawerList = () => {
         <Plus className="!w-4 !h-4 !text-primary mr-1" />
         {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
       </Button>
+      </div>
 
       {/* Search Input - Small Size (size="sm") per Section 29 */}
-      <div className="relative">
+      <div className="relative p-2 py-0">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" />
         <Input
           type="text"
@@ -79,7 +81,7 @@ export const WidgetDrawerList = () => {
       </div>
 
       {isLoadingWidgets ? (
-        <div role="status" className="animate-pulse w-full space-y-2">
+        <div role="status" className="animate-pulse w-full space-y-2 p-2">
           <div className="h-9 bg-muted rounded-md w-full" />
           <div className="h-9 bg-muted rounded-md w-full" />
           <div className="h-9 bg-muted rounded-md w-full" />
@@ -88,7 +90,7 @@ export const WidgetDrawerList = () => {
       ) : widgets && widgets.length > 0 ? (
         <div 
           onScroll={_handleScroll}
-          className="flex-1 h-full w-full overflow-y-auto pb-10 space-y-1"
+          className="flex-1 h-full w-full overflow-y-auto p-2 pb-10 space-y-1"
         >
           {widgets.map((widget) => {
             const key = `widget_${widget.widgetID}`;

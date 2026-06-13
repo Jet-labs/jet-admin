@@ -726,6 +726,7 @@ var queryConfig_default2 = {
       },
       body: {
         type: "string",
+        format: "code-json",
         description: "Request body (for POST/PUT/PATCH)"
       },
       inputDefinitions: {
@@ -854,7 +855,11 @@ var queryConfig_default2 = {
             elements: [
               {
                 type: "Control",
-                scope: "#/properties/body"
+                scope: "#/properties/body",
+                options: {
+                  height: "240px",
+                  showHeader: true
+                }
               }
             ]
           }

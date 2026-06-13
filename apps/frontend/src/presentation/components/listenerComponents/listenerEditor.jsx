@@ -98,28 +98,57 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
     <div className="space-y-4">
       {/* Identity section */}
       <Section title="Identity">
-        <div className="space-y-1.5">
-          <Label htmlFor="listenerTitle">
-            {CONSTANTS.STRINGS.LISTENER_EDITOR_FORM_TITLE_FIELD_LABEL}{" "}
-            <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            type="text"
-            name="listenerTitle"
-            id="listenerTitle"
-            placeholder={
-              CONSTANTS.STRINGS.LISTENER_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER
-            }
-            required={true}
-            onChange={listenerEditorForm.handleChange}
-            onBlur={listenerEditorForm.handleBlur}
-            value={listenerEditorForm.values.listenerTitle}
-          />
-          {listenerEditorForm.errors.listenerTitle && (
-            <p className="text-xs text-red-500">
-              {listenerEditorForm.errors.listenerTitle}
-            </p>
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="md:col-span-3 space-y-1.5">
+            <Label htmlFor="listenerTitle">
+              {CONSTANTS.STRINGS.LISTENER_EDITOR_FORM_TITLE_FIELD_LABEL}{" "}
+              <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              type="text"
+              name="listenerTitle"
+              id="listenerTitle"
+              placeholder={
+                CONSTANTS.STRINGS.LISTENER_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER
+              }
+              required={true}
+              onChange={listenerEditorForm.handleChange}
+              onBlur={listenerEditorForm.handleBlur}
+              value={listenerEditorForm.values.listenerTitle}
+            />
+            {listenerEditorForm.errors.listenerTitle && (
+              <p className="text-xs text-red-500">
+                {listenerEditorForm.errors.listenerTitle}
+              </p>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="listenerStatus">Status</Label>
+            <Select
+              value={listenerEditorForm.values.status}
+              onValueChange={(val) =>
+                listenerEditorForm.setFieldValue("status", val)
+              }
+            >
+              <SelectTrigger id="listenerStatus">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">
+                  <span className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    Active
+                  </span>
+                </SelectItem>
+                <SelectItem value="inactive">
+                  <span className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-zinc-500" />
+                    Inactive
+                  </span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="listenerDescription">Description</Label>
@@ -234,33 +263,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
 
 
 
-      {/* Status toggle */}
-      <Section title={CONSTANTS.STRINGS.LISTENER_EDITOR_FORM_STATUS_FIELD_LABEL}>
-        <Select
-          value={listenerEditorForm.values.status}
-          onValueChange={(val) =>
-            listenerEditorForm.setFieldValue("status", val)
-          }
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="active">
-              <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                Active
-              </span>
-            </SelectItem>
-            <SelectItem value="inactive">
-              <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-zinc-500" />
-                Inactive
-              </span>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </Section>
+
     </div>
     </ReactQueryLoadingErrorWrapper>
   );

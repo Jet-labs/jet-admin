@@ -131,7 +131,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
     }, [title, description, collectionType, fields, outputVariable, expiryMinutes, onChange]);
 
     return (
-        <div className="w-full space-y-5">
+        <div className="w-full p-2 space-y-2">
 
             {/* Title */}
             <div className="space-y-1.5">
@@ -201,7 +201,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                             className="rounded-md border border-border p-3 bg-muted/20 space-y-2">
                             <div className="flex gap-2 items-center">
                                 <div className="flex-1">
-                                    <Label className="text-[9px] text-muted-foreground">Key</Label>
+                                    <Label>Key</Label>
                                     <Input
                                         value={field.key}
                                         onChange={e => updateField(field.id, { key: e.target.value.replace(/\s/g, '_') })}
@@ -210,7 +210,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                                     />
                                 </div>
                                 <div className="flex-1">
-                                    <Label className="text-[9px] text-muted-foreground">Label</Label>
+                                    <Label>Label</Label>
                                     <Input
                                         value={field.label}
                                         onChange={e => updateField(field.id, { label: e.target.value })}
@@ -227,7 +227,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
                             <div className="flex gap-2 items-center">
                                 <div className="flex-1">
-                                    <Label className="text-[9px] text-muted-foreground">Type</Label>
+                                    <Label>Type</Label>
                                     <Select
                                         value={field.fieldType}
                                         onValueChange={val => updateField(field.id, { fieldType: val })}>
@@ -244,7 +244,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                                     </Select>
                                 </div>
                                 <div className="flex-1">
-                                    <Label className="text-[9px] text-muted-foreground">Placeholder</Label>
+                                    <Label>Placeholder</Label>
                                     <Input
                                         value={field.placeholder}
                                         onChange={e => updateField(field.id, { placeholder: e.target.value })}
@@ -252,18 +252,18 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                                         className="h-7 text-xs"
                                     />
                                 </div>
-                                <label className="flex items-center gap-1 text-[10px] text-muted-foreground flex-shrink-0 mt-4">
+                                <Label className="flex items-center gap-1">
                                     <Checkbox
                                         checked={field.required}
                                         onCheckedChange={v => updateField(field.id, { required: v })}
                                     />
                                     Req.
-                                </label>
+                                </Label>
                             </div>
 
                             {field.fieldType === 'select' && (
                                 <div>
-                                    <Label className="text-[9px] text-muted-foreground">
+                                    <Label>
                                         Options <span className="text-muted-foreground/50">(comma-separated)</span>
                                     </Label>
                                     <Input

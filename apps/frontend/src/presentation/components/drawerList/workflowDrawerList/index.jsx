@@ -19,8 +19,9 @@ export const WorkflowDrawerList = () => {
   };
 
   return (
-    <div className="bg-background h-full overflow-hidden p-3 w-full flex flex-col gap-3">
-      <Button
+    <div className="bg-background h-full overflow-hidden w-full flex flex-col gap-2">
+      <div className="p-2 pb-0">
+        <Button
         onClick={_navigateToAddMoreWorkflow}
         variant="secondary"
         className="w-full justify-start"
@@ -28,16 +29,17 @@ export const WorkflowDrawerList = () => {
         <Plus className="size-4 mr-2" />
         {CONSTANTS.STRINGS.ADD_WORKFLOW_BUTTON_TEXT}
       </Button>
+      </div>
 
       {isLoadingWorkflows || isFetchingWorkflows ? (
-        <div role="status" className="animate-pulse w-full space-y-2">
+        <div role="status" className="animate-pulse w-full space-y-2 p-2">
           <div className="h-9 bg-muted rounded-sm w-full" />
           <div className="h-9 bg-muted rounded-sm w-full" />
           <div className="h-9 bg-muted rounded-sm w-full" />
           <div className="h-9 bg-muted rounded-sm w-full" />
         </div>
       ) : workflows && workflows.length > 0 ? (
-        <div className="flex-1 w-full overflow-y-auto pb-10 space-y-1">
+        <div className="flex-1 w-full overflow-y-auto p-2 pb-10 space-y-1">
           {workflows.map((workflow) => {
             const key = `workflow_${workflow.workflowID}`;
             const isActive = routeParam?.workflowID == workflow.workflowID;

@@ -42,7 +42,7 @@ import { useWorkflowRun } from "./useWorkflowRun";
 import { useEffect } from "react";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
-import { Button, Checkbox, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Button, Checkbox, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 // Dagre graph for auto-layout
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -389,11 +389,11 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         {/* Sidebar Controls */}
                         <ResizablePanel defaultSize={20} className="flex flex-col h-full overflow-hidden">
 
-                            <div className="flex-1 overflow-y-auto space-y-4 p-4 flex flex-col justify-start items-stretch bg-background">
+                                <div className="flex-1 overflow-y-auto space-y-2 p-2 flex flex-col justify-start items-stretch bg-background">
                                 <div>
-                                    <label htmlFor="title" className="block mb-1.5 text-xs font-medium text-muted-foreground">
+                                        <Label htmlFor="title" className="block mb-1.5">
                                         {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_LABEL}
-                                    </label>
+                                        </Label>
                                     <Input
                                         type="text"
                                         name="title"
@@ -409,7 +409,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                     )}
                                 </div>
 
-                                <div className="flex flex-col gap-1.5">
+                                    <div className="flex flex-col gap-2">
                                     <p className="text-[10px] font-bold text-muted-foreground tracking-wider mb-0.5">Nodes</p>
                                     {Object.values(WORKFLOW_NODES_MAP)
                                         .filter(node => {
@@ -443,7 +443,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
                                 <div className="flex flex-col gap-2">
                                     <div>
-                                        <label className="text-[10px] text-muted-foreground mb-1 block font-medium">Edge Style</label>
+                                            <Label className="mb-1 block">Edge Style</Label>
                                         <Select
                                             value={values.edgeType || 'smoothstep'}
                                             onValueChange={(val) => {
@@ -464,7 +464,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         </Select>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <label className="text-[10px] text-muted-foreground font-medium">Snap to Grid</label>
+                                            <Label>Snap to Grid</Label>
                                         <Checkbox
                                             checked={values.snapToGrid ?? true}
                                             onCheckedChange={(checked) => setFieldValue("snapToGrid", checked)}

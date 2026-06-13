@@ -208,9 +208,16 @@ button {
 }
 
 /* Scrollbar styling */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--brand-border-mid) transparent;
+  }
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -218,12 +225,16 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--brand-border);
-  border-radius: 3px;
+  background-color: var(--brand-border-mid);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--brand-border-light);
+  background-color: var(--brand-text-dark);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-corner {

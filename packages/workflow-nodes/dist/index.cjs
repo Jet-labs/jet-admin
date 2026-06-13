@@ -440,7 +440,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
     onChange({ title, description, branches, errorHandling });
   }, [onChange, title, description, branches, errorHandling]);
   const activeBranch = branches[activeIdx];
-  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "w-full space-y-4" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Task Name"), /* @__PURE__ */ import_react2.default.createElement(
+  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "w-full p-2 space-y-2 pb-0" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Task Name"), /* @__PURE__ */ import_react2.default.createElement(
     import_ui.Input,
     {
       value: title,
@@ -457,28 +457,23 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       placeholder: "What does this condition check?",
       className: "w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-brand-dark transition-colors"
     }
-  )), /* @__PURE__ */ import_react2.default.createElement("div", { className: "rounded-md border border-border overflow-hidden" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center bg-muted/50 border-b border-border overflow-x-auto" }, branches.map((branch, idx) => /* @__PURE__ */ import_react2.default.createElement(
-    "div",
+  )), /* @__PURE__ */ import_react2.default.createElement("div", { className: "rounded-md border border-border overflow-hidden bg-background" }, /* @__PURE__ */ import_react2.default.createElement(import_ui.Tabs, { value: String(activeIdx), onValueChange: (val) => setActiveIdx(Number(val)), className: "w-full" }, /* @__PURE__ */ import_react2.default.createElement(import_ui.TabsList, { className: "h-auto" }, branches.map((branch, idx) => /* @__PURE__ */ import_react2.default.createElement(
+    import_ui.TabsTrigger,
     {
       key: branch.id,
-      className: `
-                group flex items-center gap-1.5 px-3 py-2.5 cursor-pointer
-                text-xs font-medium border-r border-border
-                whitespace-nowrap transition-all select-none
-                ${activeIdx === idx ? "bg-brand-dark text-primary shadow-[inset_0_-2px_0_hsl(var(--primary))]" : "text-muted-foreground hover:text-foreground hover:bg-brand-dark/60"}
-              `,
-      onClick: () => setActiveIdx(idx)
+      value: String(idx),
+      className: ""
     },
     /* @__PURE__ */ import_react2.default.createElement(
       "span",
       {
         className: `
-                  w-4 h-4 rounded-full flex items-center justify-center
-                  text-[9px] font-bold shrink-0 transition-colors
-                  ${activeIdx === idx ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground group-hover:bg-muted/80"}
-                `
+                    mr-1
+
+                  `
       },
-      idx + 1
+      idx + 1,
+      "."
     ),
     /* @__PURE__ */ import_react2.default.createElement("span", { className: "truncate max-w-[80px]" }, branch.label || `Branch ${idx + 1}`),
     branches.length > 1 && /* @__PURE__ */ import_react2.default.createElement(
@@ -491,7 +486,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
           e.stopPropagation();
           removeBranch(idx);
         },
-        className: "ml-0.5 w-3.5 h-3.5 text-muted-foreground/30 hover:text-destructive rounded-sm opacity-0 group-hover:opacity-100 transition-all"
+        className: "ml-0.5 w-3.5 h-3.5 text-muted-foreground/30 hover:text-destructive rounded-sm opacity-0 group-hover:opacity-100 transition-all p-0"
       },
       "\xD7"
     )
@@ -501,19 +496,18 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       type: "button",
       variant: "ghost",
       onClick: addBranch,
-      className: "px-3 py-2.5 text-xs text-primary hover:text-primary/80 hover:bg-brand-dark/60 transition-colors flex items-center gap-1 whitespace-nowrap h-auto"
+      className: "px-3 py-1 text-xs text-primary hover:text-primary/80 hover:bg-brand-dark/60 transition-colors flex items-center gap-1 whitespace-nowrap h-7"
     },
     /* @__PURE__ */ import_react2.default.createElement(import_lucide_react.Plus, { className: "w-2.5 h-2.5" }),
     "Add branch"
-  )), activeBranch ? /* @__PURE__ */ import_react2.default.createElement(
+  )), activeBranch ? /* @__PURE__ */ import_react2.default.createElement(import_ui.TabsContent, { value: String(activeIdx), className: "m-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none" }, /* @__PURE__ */ import_react2.default.createElement(
     BranchEditor,
     {
-      key: activeBranch.id,
       branch: activeBranch,
       onChange: (updated) => updateBranch(activeIdx, updated),
       stateTree: ctxStateTree
     }
-  ) : /* @__PURE__ */ import_react2.default.createElement("div", { className: "p-4 text-xs text-muted-foreground text-center" }, "No branches yet \u2014 click ", /* @__PURE__ */ import_react2.default.createElement("strong", null, "Add branch"), " above.")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded-md text-xs text-muted-foreground" }, /* @__PURE__ */ import_react2.default.createElement("span", { className: "w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0" }, "\u2205"), /* @__PURE__ */ import_react2.default.createElement("span", null, /* @__PURE__ */ import_react2.default.createElement("span", { className: "font-semibold text-foreground" }, "else"), " ", "\u2014 taken when none of the branches above match")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "On Error"), /* @__PURE__ */ import_react2.default.createElement(import_ui.Select, { value: errorHandling, onValueChange: setErrorHandling }, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectTrigger, { className: "h-8 text-xs" }, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectValue, null)), /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectContent, null, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectItem, { value: "fail_workflow", className: "text-xs" }, "Fail Workflow"), /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectItem, { value: "continue", className: "text-xs" }, "Continue to Default Branch")))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "p-3 rounded-md border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1.5" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "font-semibold text-xs text-primary" }, "\u{1F4A1} Writing Conditions"), /* @__PURE__ */ import_react2.default.createElement("div", null, "Use ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "{{ctx.field}}"), " in left and right inputs \u2014 e.g.", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "{{ctx.input.severity}}"), "."), /* @__PURE__ */ import_react2.default.createElement("div", null, "The right side can also be a plain literal like", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "High"), " or", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "3"), "."), /* @__PURE__ */ import_react2.default.createElement("div", null, "For complex logic, use ", /* @__PURE__ */ import_react2.default.createElement("strong", null, "JS Expression"), " \u2014 raw JS where", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "ctx.field"), " is a direct variable (no braces)."), /* @__PURE__ */ import_react2.default.createElement("div", null, "Branches are evaluated ", /* @__PURE__ */ import_react2.default.createElement("strong", null, "top \u2192 bottom"), "; first match wins.")), /* @__PURE__ */ import_react2.default.createElement(import_ui.Button, { type: "button", onClick: handleSave, className: "w-full", size: "sm" }, strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || "Save Condition"));
+  )) : /* @__PURE__ */ import_react2.default.createElement("div", { className: "p-4 text-xs text-muted-foreground text-center bg-background" }, "No branches yet \u2014 click ", /* @__PURE__ */ import_react2.default.createElement("strong", null, "Add branch"), " above."))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded-md text-xs text-muted-foreground" }, /* @__PURE__ */ import_react2.default.createElement("span", { className: "w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0" }, "\u2205"), /* @__PURE__ */ import_react2.default.createElement("span", null, /* @__PURE__ */ import_react2.default.createElement("span", { className: "font-semibold text-foreground" }, "else"), " ", "\u2014 taken when none of the branches above match")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "On Error"), /* @__PURE__ */ import_react2.default.createElement(import_ui.Select, { value: errorHandling, onValueChange: setErrorHandling }, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectTrigger, { className: "h-8 text-xs" }, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectValue, null)), /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectContent, null, /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectItem, { value: "fail_workflow", className: "text-xs" }, "Fail Workflow"), /* @__PURE__ */ import_react2.default.createElement(import_ui.SelectItem, { value: "continue", className: "text-xs" }, "Continue to Default Branch")))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "p-3 rounded-md border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1.5" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "font-semibold text-xs text-primary" }, "\u{1F4A1} Writing Conditions"), /* @__PURE__ */ import_react2.default.createElement("div", null, "Use ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "{{ctx.field}}"), " in left and right inputs \u2014 e.g.", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "{{ctx.input.severity}}"), "."), /* @__PURE__ */ import_react2.default.createElement("div", null, "The right side can also be a plain literal like", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "High"), " or", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "3"), "."), /* @__PURE__ */ import_react2.default.createElement("div", null, "For complex logic, use ", /* @__PURE__ */ import_react2.default.createElement("strong", null, "JS Expression"), " \u2014 raw JS where", " ", /* @__PURE__ */ import_react2.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border font-mono" }, "ctx.field"), " is a direct variable (no braces)."), /* @__PURE__ */ import_react2.default.createElement("div", null, "Branches are evaluated ", /* @__PURE__ */ import_react2.default.createElement("strong", null, "top \u2192 bottom"), "; first match wins.")), /* @__PURE__ */ import_react2.default.createElement(import_ui.Button, { type: "button", onClick: handleSave, className: "w-full", size: "sm" }, strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || "Save Condition"));
 };
 var ConditionNode = (0, import_react2.memo)(({ data, isConnectable }) => {
   const isDisabled = data?.isDisabled ?? false;
@@ -777,7 +771,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleOpenTest = (0, import_react3.useCallback)(() => {
     if (onQueryTest && formData.dataQueryID) onQueryTest(formData.dataQueryID);
   }, [onQueryTest, formData.dataQueryID]);
-  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "w-full space-y-3" }, /* @__PURE__ */ import_react3.default.createElement(import_react4.JsonForms, { schema, uischema, data: formData, renderers: import_json_forms_renderers.jetFormsRenderers, onChange: handleFormChange }), /* @__PURE__ */ import_react3.default.createElement("div", { className: "rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "font-semibold text-xs text-foreground" }, "\u{1F4D8} Query Inputs"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-medium text-foreground" }, "Input Format:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "ml-3 mt-0.5 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-medium text-foreground" }, "Access Result:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "ml-3 mt-0.5" }, "Stored in ", /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 py-0.5 rounded-sm border border-border font-mono" }, "ctx.{outputVariable}"), " for use in next nodes."))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, onQueryTest && formData.dataQueryID && /* @__PURE__ */ import_react3.default.createElement(import_ui2.Button, { type: "button", variant: "outline", size: "sm", onClick: handleOpenTest, className: "flex items-center gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.Play, { className: "h-3 w-3" }), "Test Query"), /* @__PURE__ */ import_react3.default.createElement(import_ui2.Button, { type: "button", size: "sm", onClick: handleSave, className: "flex-1" }, strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || "Save")));
+  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "w-full" }, /* @__PURE__ */ import_react3.default.createElement(import_react4.JsonForms, { schema, uischema, data: formData, renderers: import_json_forms_renderers.jetFormsRenderers, onChange: handleFormChange }), /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "font-semibold text-xs text-foreground" }, "\u{1F4D8} Query Inputs"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-medium text-foreground" }, "Input Format:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "ml-3 mt-0.5 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 rounded-sm border border-border" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-medium text-foreground" }, "Access Result:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "ml-3 mt-0.5" }, "Stored in ", /* @__PURE__ */ import_react3.default.createElement("code", { className: "bg-brand-dark px-1 py-0.5 rounded-sm border border-border font-mono" }, "ctx.{outputVariable}"), " for use in next nodes.")))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-2 mt-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, onQueryTest && formData.dataQueryID && /* @__PURE__ */ import_react3.default.createElement(import_ui2.Button, { type: "button", variant: "outline", size: "sm", onClick: handleOpenTest, className: "flex items-center gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(import_lucide_react2.Play, { className: "h-3 w-3" }), "Test Query"), /* @__PURE__ */ import_react3.default.createElement(import_ui2.Button, { type: "button", size: "sm", onClick: handleSave, className: "flex-1" }, strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || "Save"))));
 };
 var DataQueryNode = (0, import_react3.memo)(({ id, data, isConnectable }) => {
   const { dataQueries, nodeExecutionStatus } = useWorkflowNodes();
@@ -1136,7 +1130,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = (0, import_react5.useCallback)(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: "w-full" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react5.default.createElement(
+  return /* @__PURE__ */ import_react5.default.createElement("div", { className: "w-full" }, /* @__PURE__ */ import_react5.default.createElement(
     import_react6.JsonForms,
     {
       schema,
@@ -1145,7 +1139,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: import_json_forms_renderers.jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ import_react5.default.createElement("div", { className: "p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "font-semibold text-brand-text-primary text-xs" }, "\u{1F4D8} Writing JavaScript Code"), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Access Context:"), /* @__PURE__ */ import_react5.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.input.paramName"), " \u2192 workflow input"), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.queryResult"), " \u2192 previous node output"), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.item"), " \u2192 current loop item"))), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Return Value:"), /* @__PURE__ */ import_react5.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, "Use ", /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 py-0.5 rounded-sm font-mono" }, "return yourValue;"), " to store result in output variable.")), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Available Globals:"), /* @__PURE__ */ import_react5.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm font-mono text-[9px]" }, "JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat"))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-amber-600 bg-amber-50 border border-amber-800 rounded-sm p-1.5 mt-2" }, /* @__PURE__ */ import_react5.default.createElement("strong", null, "\u26A0\uFE0F Note:"), " Code runs in a sandbox. No network access, filesystem, or require().")), /* @__PURE__ */ import_react5.default.createElement(
+  ), /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-2" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "font-semibold text-brand-text-primary text-xs" }, "\u{1F4D8} Writing JavaScript Code"), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Access Context:"), /* @__PURE__ */ import_react5.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.input.paramName"), " \u2192 workflow input"), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.queryResult"), " \u2192 previous node output"), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.item"), " \u2192 current loop item"))), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Return Value:"), /* @__PURE__ */ import_react5.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, "Use ", /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 py-0.5 rounded-sm font-mono" }, "return yourValue;"), " to store result in output variable.")), /* @__PURE__ */ import_react5.default.createElement("div", null, /* @__PURE__ */ import_react5.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Available Globals:"), /* @__PURE__ */ import_react5.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, /* @__PURE__ */ import_react5.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm font-mono text-[9px]" }, "JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat"))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-amber-600 bg-amber-50 border border-amber-800 rounded-sm p-1.5 mt-2" }, /* @__PURE__ */ import_react5.default.createElement("strong", null, "\u26A0\uFE0F Note:"), " Code runs in a sandbox. No network access, filesystem, or require()."))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-2 mt-2" }, /* @__PURE__ */ import_react5.default.createElement(
     import_ui3.Button,
     {
       type: "button",
@@ -1298,7 +1292,7 @@ var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = (0, import_react7.useCallback)(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "w-full space-y-4" }, /* @__PURE__ */ import_react7.default.createElement(
+  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "w-full p-2 space-y-2" }, /* @__PURE__ */ import_react7.default.createElement(
     import_react8.JsonForms,
     {
       schema,
@@ -1528,7 +1522,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = (0, import_react9.useCallback)(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "w-full" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react9.default.createElement(
+  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "w-full" }, /* @__PURE__ */ import_react9.default.createElement(
     import_react10.JsonForms,
     {
       schema,
@@ -1537,7 +1531,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: import_json_forms_renderers.jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ import_react9.default.createElement("div", { className: "p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "font-semibold text-brand-text-primary text-xs" }, "\u{1F4D8} Loop Configuration"), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Source Array Format:"), /* @__PURE__ */ import_react9.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "{{ctx.queryResult}}"), " \u2192 array from previous node"), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "{{ctx.input.items}}"), " \u2192 array from input"))), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Inside Loop Body:"), /* @__PURE__ */ import_react9.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.item"), " \u2192 current array element"), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.index"), " \u2192 current iteration index (0-based)"))), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Handles:"), /* @__PURE__ */ import_react9.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, /* @__PURE__ */ import_react9.default.createElement("strong", null, "Loop (cyan):"), " Executes for each item \u2192 ", /* @__PURE__ */ import_react9.default.createElement("strong", null, "Completed (green):"), " After all iterations"))), /* @__PURE__ */ import_react9.default.createElement(
+  ), /* @__PURE__ */ import_react9.default.createElement("div", { className: "px-2" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "font-semibold text-brand-text-primary text-xs" }, "\u{1F4D8} Loop Configuration"), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Source Array Format:"), /* @__PURE__ */ import_react9.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "{{ctx.queryResult}}"), " \u2192 array from previous node"), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "{{ctx.input.items}}"), " \u2192 array from input"))), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Inside Loop Body:"), /* @__PURE__ */ import_react9.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.item"), " \u2192 current array element"), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "ctx.index"), " \u2192 current iteration index (0-based)"))), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Handles:"), /* @__PURE__ */ import_react9.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, /* @__PURE__ */ import_react9.default.createElement("strong", null, "Loop (cyan):"), " Executes for each item \u2192 ", /* @__PURE__ */ import_react9.default.createElement("strong", null, "Completed (green):"), " After all iterations")))), /* @__PURE__ */ import_react9.default.createElement("div", { className: "px-2 mt-2" }, /* @__PURE__ */ import_react9.default.createElement(
     import_ui5.Button,
     {
       type: "button",
@@ -1807,7 +1801,7 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = (0, import_react11.useCallback)(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ import_react11.default.createElement("div", { className: "w-full" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react11.default.createElement(
+  return /* @__PURE__ */ import_react11.default.createElement("div", { className: "w-full" }, /* @__PURE__ */ import_react11.default.createElement(
     import_react12.JsonForms,
     {
       schema,
@@ -1816,7 +1810,7 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: import_json_forms_renderers.jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ import_react11.default.createElement("div", { className: "p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "font-semibold text-brand-text-primary text-xs" }, "\u{1F4D8} Delay Types"), /* @__PURE__ */ import_react11.default.createElement("div", null, /* @__PURE__ */ import_react11.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Fixed Duration:"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, "Set exact wait time using minutes, seconds, and milliseconds.")), /* @__PURE__ */ import_react11.default.createElement("div", null, /* @__PURE__ */ import_react11.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "From Variable:"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px]" }, /* @__PURE__ */ import_react11.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "{{ctx.waitTime}}"), " \u2192 value in milliseconds")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-green-600 bg-green-50 border border-green-800 rounded-sm p-1.5 mt-2" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, "\u2713 Non-blocking:"), " Delay uses queue scheduling. Workflow resources are released during wait.")), /* @__PURE__ */ import_react11.default.createElement(
+  ), /* @__PURE__ */ import_react11.default.createElement("div", { className: "px-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "font-semibold text-brand-text-primary text-xs" }, "\u{1F4D8} Delay Types"), /* @__PURE__ */ import_react11.default.createElement("div", null, /* @__PURE__ */ import_react11.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Fixed Duration:"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, "Set exact wait time using minutes, seconds, and milliseconds.")), /* @__PURE__ */ import_react11.default.createElement("div", null, /* @__PURE__ */ import_react11.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "From Variable:"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px]" }, /* @__PURE__ */ import_react11.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "{{ctx.waitTime}}"), " \u2192 value in milliseconds")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-green-600 bg-green-50 border border-green-800 rounded-sm p-1.5 mt-2" }, /* @__PURE__ */ import_react11.default.createElement("strong", null, "\u2713 Non-blocking:"), " Delay uses queue scheduling. Workflow resources are released during wait."))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "px-2 mt-2" }, /* @__PURE__ */ import_react11.default.createElement(
     import_ui6.Button,
     {
       type: "button",
@@ -1909,7 +1903,7 @@ var END_STATUS = {
   FAILURE: "failure",
   CANCELLED: "cancelled"
 };
-var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
+var OutputParameterEditor = ({ parameters, onChange, availableVariables, stateTree }) => {
   const addParameter = () => {
     const newParam = {
       id: `output_${Date.now()}`,
@@ -1932,8 +1926,9 @@ var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
     import_ui7.Button,
     {
       type: "button",
-      onClick: addParameter,
-      className: "flex items-center gap-1 px-2 py-1 text-xs bg-brand-black text-[#646cff] hover:bg-[#646cff]/10 rounded-sm transition-colors border border-brand-border"
+      variant: "primary-ghost",
+      size: "sm",
+      onClick: addParameter
     },
     /* @__PURE__ */ import_react13.default.createElement(import_lucide_react7.Plus, { className: "w-2.5 h-2.5" }),
     "Add Output"
@@ -1943,55 +1938,90 @@ var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
       key: param.id,
       className: "border border-brand-border rounded-sm p-2 bg-brand-dark"
     },
-    /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react13.default.createElement(import_lucide_react7.ChevronLeft, { className: "w-3 h-3 text-red-500" }), /* @__PURE__ */ import_react13.default.createElement(
+    /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react13.default.createElement(
       import_ui7.Input,
       {
         type: "text",
+        size: "sm",
         value: param.name,
         onChange: (e) => updateParameter(index, "name", e.target.value.replace(/[^a-zA-Z0-9_]/g, "")),
-        className: "text-xs font-mono font-medium text-brand-text-primary bg-brand-black border border-brand-border rounded-sm px-2 py-1 w-28 focus:outline-none focus:border-[#646cff]",
+        className: "font-mono w-28",
         placeholder: "outputName"
       }
     )), /* @__PURE__ */ import_react13.default.createElement(
       import_ui7.Button,
       {
         type: "button",
+        variant: "destructive-ghost",
+        size: "icon",
+        square: true,
         onClick: () => removeParameter(index),
-        className: "p-1 bg-brand-black text-brand-text-primary hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors",
         title: "Remove output"
       },
       /* @__PURE__ */ import_react13.default.createElement(import_lucide_react7.Trash2, { className: "w-3 h-3" })
     )),
-    /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("label", { className: "text-[10px] text-brand-text-primary" }, "Source Variable"), /* @__PURE__ */ import_react13.default.createElement(
-      import_ui7.Input,
+    /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("label", { className: "text-[10px] text-brand-text-primary mb-1 block" }, "Source Variable"), /* @__PURE__ */ import_react13.default.createElement(
+      import_ui7.TemplateAutocompleteInput,
       {
-        type: "text",
         value: param.sourceVariable,
-        onChange: (e) => updateParameter(index, "sourceVariable", e.target.value),
+        onChange: (val) => updateParameter(index, "sourceVariable", val),
         placeholder: "{{ctx.result}} or a literal value",
-        className: "w-full text-xs text-brand-text-primary p-1.5 border border-brand-border rounded-sm font-mono bg-brand-black focus:outline-none focus:border-[#646cff]"
+        liveStateTree: stateTree
       }
-    ), availableVariables.length > 0 && /* @__PURE__ */ import_react13.default.createElement("p", { className: "text-[9px] text-brand-text-primary mt-0.5" }, "Available: ", availableVariables.slice(0, 5).map((v) => `ctx.${v.variable}`).join(", "), availableVariables.length > 5 && "...")),
+    ), availableVariables.length > 0 && /* @__PURE__ */ import_react13.default.createElement("p", { className: "text-[9px] text-brand-text-primary mt-1" }, "Available: ", availableVariables.slice(0, 5).map((v) => `ctx.${v.variable}`).join(", "), availableVariables.length > 5 && "...")),
     /* @__PURE__ */ import_react13.default.createElement("div", { className: "mt-2" }, /* @__PURE__ */ import_react13.default.createElement("label", { className: "text-[10px] text-brand-text-primary" }, "Description"), /* @__PURE__ */ import_react13.default.createElement(
       import_ui7.Input,
       {
         type: "text",
+        size: "sm",
         value: param.description,
         onChange: (e) => updateParameter(index, "description", e.target.value),
-        placeholder: "What this output represents",
-        className: "w-full text-xs text-brand-text-primary p-1.5 border border-brand-border rounded-sm bg-brand-black focus:outline-none focus:border-[#646cff]"
+        placeholder: "What this output represents"
       }
     ))
   ))));
 };
 var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { strings, workflowNodes } = useWorkflowNodes();
+  const { strings, workflowNodes, workflowEdges, workflowInputDefinitions } = useWorkflowNodes();
   const [formData, setFormData] = (0, import_react13.useState)({
     title: data?.title || "End",
     description: data?.description || "",
     status: data?.status || END_STATUS.SUCCESS,
     outputParameters: data?.outputParameters || []
   });
+  const upstreamStateTree = (0, import_react13.useMemo)(() => {
+    const tree = { ctx: { input: {} } };
+    if (workflowInputDefinitions && workflowInputDefinitions.length > 0) {
+      workflowInputDefinitions.forEach((inputDef) => {
+        if (inputDef.key) {
+          tree.ctx.input[inputDef.key] = "";
+        }
+      });
+    }
+    if (nodeId && workflowEdges && workflowEdges.length > 0) {
+      const upstreamIds = /* @__PURE__ */ new Set();
+      const visited = /* @__PURE__ */ new Set();
+      const queue = [nodeId];
+      while (queue.length > 0) {
+        const id = queue.shift();
+        if (visited.has(id)) continue;
+        visited.add(id);
+        const incomingEdges = workflowEdges.filter((e) => e.target === id);
+        for (const edge of incomingEdges) {
+          if (!visited.has(edge.source)) {
+            upstreamIds.add(edge.source);
+            queue.push(edge.source);
+          }
+        }
+      }
+      workflowNodes?.forEach((node) => {
+        if (node.id !== nodeId && upstreamIds.has(node.id) && node.data?.outputVariable) {
+          tree.ctx[node.data.outputVariable] = {};
+        }
+      });
+    }
+    return tree;
+  }, [workflowNodes, workflowEdges, workflowInputDefinitions, nodeId]);
   (0, import_react13.useEffect)(() => {
     if (data) {
       setFormData({
@@ -2067,7 +2097,7 @@ var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = (0, import_react13.useCallback)(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ import_react13.default.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react13.default.createElement(
+  return /* @__PURE__ */ import_react13.default.createElement("div", { className: "w-full p-2 space-y-2" }, /* @__PURE__ */ import_react13.default.createElement(
     import_react14.JsonForms,
     {
       schema,
@@ -2076,12 +2106,13 @@ var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: import_json_forms_renderers.jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ import_react13.default.createElement("div", { className: "border-t border-brand-border pt-4" }, /* @__PURE__ */ import_react13.default.createElement(
+  ), /* @__PURE__ */ import_react13.default.createElement("div", { className: "" }, /* @__PURE__ */ import_react13.default.createElement(
     OutputParameterEditor,
     {
       parameters: formData.outputParameters,
       onChange: handleParametersChange,
-      availableVariables
+      availableVariables,
+      stateTree: upstreamStateTree
     }
   )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "font-semibold text-brand-text-primary text-xs" }, "\u{1F4D8} Workflow Output"), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Source Variable Format:"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "{{ctx.queryResult}}"), " \u2192 from previous node"), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("code", { className: "bg-brand-black px-1 rounded-sm" }, "{{ctx.processedData}}"), " \u2192 from script node"))), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Completion Status:"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, /* @__PURE__ */ import_react13.default.createElement("strong", null, "Success:"), " Normal completion \u2022 ", /* @__PURE__ */ import_react13.default.createElement("strong", null, "Failure:"), " Ended with error \u2022 ", /* @__PURE__ */ import_react13.default.createElement("strong", null, "Cancelled:"), " Manual stop")), /* @__PURE__ */ import_react13.default.createElement("div", null, /* @__PURE__ */ import_react13.default.createElement("span", { className: "font-medium text-brand-text-primary" }, "Multiple End Nodes:"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "ml-3 mt-0.5 text-brand-text-primary" }, "You can have multiple End nodes for different outcomes (e.g., success/failure branches)."))), /* @__PURE__ */ import_react13.default.createElement(
     import_ui7.Button,
@@ -2092,7 +2123,7 @@ var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
       className: "w-full"
     },
     "Save"
-  )));
+  ));
 };
 var EndNode = (0, import_react13.memo)(({ id, data, isConnectable }) => {
   const { strings, nodeExecutionStatus } = useWorkflowNodes();
@@ -2356,7 +2387,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       expiryMinutes: Number(expiryMinutes) || 60
     });
   }, [title, description, collectionType, fields, outputVariable, expiryMinutes, onChange]);
-  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "w-full space-y-5" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Modal title"), /* @__PURE__ */ import_react16.default.createElement(
+  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "w-full p-2 space-y-2" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Modal title"), /* @__PURE__ */ import_react16.default.createElement(
     import_ui8.Input,
     {
       value: title,
@@ -2390,7 +2421,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       key: field.id,
       className: "rounded-md border border-border p-3 bg-muted/20 space-y-2"
     },
-    /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Key"), /* @__PURE__ */ import_react16.default.createElement(
+    /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, null, "Key"), /* @__PURE__ */ import_react16.default.createElement(
       import_ui8.Input,
       {
         value: field.key,
@@ -2398,7 +2429,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
         placeholder: "field_name",
         className: "h-7 text-xs font-mono"
       }
-    )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Label"), /* @__PURE__ */ import_react16.default.createElement(
+    )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, null, "Label"), /* @__PURE__ */ import_react16.default.createElement(
       import_ui8.Input,
       {
         value: field.label,
@@ -2419,7 +2450,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       },
       /* @__PURE__ */ import_react16.default.createElement(import_lucide_react9.Trash2, { className: "w-2.5 h-2.5" })
     )),
-    /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Type"), /* @__PURE__ */ import_react16.default.createElement(
+    /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, null, "Type"), /* @__PURE__ */ import_react16.default.createElement(
       import_ui8.Select,
       {
         value: field.fieldType,
@@ -2427,7 +2458,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       },
       /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectTrigger, { className: "h-7 text-xs" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectValue, null)),
       /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectContent, null, FIELD_TYPES.map((t) => /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectItem, { key: t.value, value: t.value, className: "text-xs" }, t.label)))
-    )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Placeholder"), /* @__PURE__ */ import_react16.default.createElement(
+    )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, null, "Placeholder"), /* @__PURE__ */ import_react16.default.createElement(
       import_ui8.Input,
       {
         value: field.placeholder,
@@ -2435,14 +2466,14 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
         placeholder: "Optional hint",
         className: "h-7 text-xs"
       }
-    )), /* @__PURE__ */ import_react16.default.createElement("label", { className: "flex items-center gap-1 text-[10px] text-muted-foreground flex-shrink-0 mt-4" }, /* @__PURE__ */ import_react16.default.createElement(
+    )), /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "flex items-center gap-1" }, /* @__PURE__ */ import_react16.default.createElement(
       import_ui8.Checkbox,
       {
         checked: field.required,
         onCheckedChange: (v) => updateField(field.id, { required: v })
       }
     ), "Req.")),
-    field.fieldType === "select" && /* @__PURE__ */ import_react16.default.createElement("div", null, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Options ", /* @__PURE__ */ import_react16.default.createElement("span", { className: "text-muted-foreground/50" }, "(comma-separated)")), /* @__PURE__ */ import_react16.default.createElement(
+    field.fieldType === "select" && /* @__PURE__ */ import_react16.default.createElement("div", null, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, null, "Options ", /* @__PURE__ */ import_react16.default.createElement("span", { className: "text-muted-foreground/50" }, "(comma-separated)")), /* @__PURE__ */ import_react16.default.createElement(
       import_ui8.Input,
       {
         value: field.options,

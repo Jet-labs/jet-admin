@@ -2,55 +2,56 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { JsonFormsDispatch } from '@jsonforms/react';
-import { Button } from '@jet-admin/ui';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@jet-admin/ui';
 
 export const CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
   const categories = uischema.elements || [];
 
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState("0");
 
   if (!categories || categories.length === 0) {
     return null;
   }
 
-  const activeCategory = categories[activeTab];
-
   return (
-    <div className="custom-tabs-container">
-      {/* Tab Headers */}
-      <div className="flex border-border">
-        {categories.map((category, index) => (
-          <Button
-            key={category.label || `tab-${index}`}
-            variant="ghost"
-            className={`px-4 mr-2 py-2 text-sm font-medium rounded-sm ${
-              index === activeTab
-                ? "text-primary bg-primary/5"
-                : "text-foreground"
-            }`}
-            onClick={() => setActiveTab(index)}
-            type="button"
-          >
-            {category.label}
-          </Button>
-        ))}
-      </div>
+    <div className="custom-tabs-container bg-background  !rounded-md">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col">
+        {/* Tab Headers */}
+        <TabsList className="h-auto">
+          {categories.map((category, index) => (
+            <TabsTrigger
+              key={category.label || `tab-${index}`}
+              value={String(index)}
+            >
+              {category.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      {/* Tab Content */}
-      <div className="p-3 border mt-3 border-border rounded-sm bg-background flex flex-col gap-2">
-        {activeCategory?.elements.map((element, i) => (
-          <JsonFormsDispatch
-            key={`${activeCategory.label}-${i}`}
-            uischema={element}
-            schema={schema}
-            path={path}
-            enabled={enabled}
-            renderers={renderers}
-            cells={cells}
-          />
-        ))}
-      </div>
+        {/* Tab Content */}
+        <div className="p-2 rounded-md bg-background">
+          {categories.map((category, index) => (
+            <TabsContent
+              key={category.label || `tab-content-${index}`}
+              value={String(index)}
+              className="mt-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none flex flex-col space-y-2"
+            >
+              {category.elements.map((element, i) => (
+                <JsonFormsDispatch
+                  key={`${category.label}-${i}`}
+                  uischema={element}
+                  schema={schema}
+                  path={path}
+                  enabled={enabled}
+                  renderers={renderers}
+                  cells={cells}
+                />
+              ))}
+            </TabsContent>
+          ))}
+        </div>
+      </Tabs>
     </div>
   );
 };

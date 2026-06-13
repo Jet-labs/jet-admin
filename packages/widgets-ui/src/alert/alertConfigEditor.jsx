@@ -8,9 +8,9 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Variant Selection */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Type / Variant</Label>
         <Select
           value={config.variant || "info"}
@@ -29,7 +29,7 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Alert Title */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Title (Optional)</Label>
         <TemplateAutocompleteInput
           value={config.title || ""}
@@ -40,7 +40,7 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Alert Message */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Message</Label>
         <TemplateAutocompleteInput
           isTextArea={true}
@@ -66,7 +66,7 @@ export const AlertConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Is Loading Template */}
-      <div className="space-y-1.5 mt-2">
+      <div className="space-y-1 mt-2">
         <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
         <TemplateAutocompleteInput
           value={config.isLoading || ""}

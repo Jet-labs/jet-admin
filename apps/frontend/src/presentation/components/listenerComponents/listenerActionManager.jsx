@@ -262,7 +262,7 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
 
   return (
     <Card className="">
-      <div className="border-b rounded-t-md border-border/50 bg-background p-4 flex items-center justify-between">
+      <div className="border-b rounded-t-md border-border/50 bg-background p-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
 
           <h3 className="text-sm font-semibold text-foreground tracking-tight">
@@ -271,9 +271,9 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-4 space-y-4">
-        <div className="space-y-4">
-          <div className="space-y-2">
+      <form onSubmit={handleSubmit} className="p-2 space-y-2">
+        <div className="space-y-2">
+          <div className="space-y-1">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Step Type</Label>
             <Select
               value={formData.actionType}
@@ -298,8 +298,8 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
             </Select>
           </div>
 
-          <div className="rounded-sm border border-border/50 bg-background/40 p-5">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="rounded-sm border border-border/50 bg-background/40 p-2">
+            <div className="flex items-center gap-2 mb-2">
               <selectedType.icon className={`h-4 w-4 ${selectedType.color}`} />
               <h4 className="text-sm font-medium text-foreground">Configuration Details</h4>
             </div>
@@ -314,7 +314,7 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
             />
           </div>
 
-          <div className="flex items-center justify-between rounded-sm border border-border/50 bg-background/40 p-4">
+          <div className="flex items-center justify-between rounded-sm border border-border/50 bg-background/40 p-2">
             <div className="flex items-center gap-3">
               <div className={`flex h-8 w-8 items-center justify-center rounded-sm ${formData.isEnabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                 {formData.isEnabled ? <Play className="h-4 w-4" /> : <CircleSlash className="h-4 w-4" />}
@@ -376,8 +376,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
   switch (type) {
     case "transform":
       return (
-        <div className="space-y-4 animate-in fade-in duration-300">
-          <div className="rounded-sm border border-border/60 overflow-hidden shadow-sm">
+        <div className="space-y-2 animate-in fade-in duration-300">
+
             <CodeEditor
               height={220}
               language="javascript"
@@ -389,7 +389,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               title="Transform Script (JS)"
               stateTree={LISTENER_EVENT_STATE_TREE}
             />
-          </div>
+
           <p className="text-[10px] text-muted-foreground italic">
             Receives <code>event</code> in scope. Return the transformed event object, or return <code>null</code> / <code>undefined</code> to filter out (discard) the event.
           </p>
@@ -397,8 +397,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
       );
     case "trigger_workflow":
       return (
-        <div className="space-y-5 animate-in fade-in duration-300">
-           <div className="space-y-2">
+        <div className="space-y-2 animate-in fade-in duration-300">
+          <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Select Workflow</Label>
             <Select 
               value={config.workflowID || ""} 
@@ -424,8 +424,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <div className="flex justify-between items-end mb-2">
+          <div className="space-y-1">
+            <div className="flex justify-between items-end mb-1">
               <div>
                 <Label className="text-xs text-muted-foreground">Input Values</Label>
                 {renderModeToggle()}
@@ -434,7 +434,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
             </div>
             
             {isJsonMode ? (
-              <div className="rounded-sm border border-border/60 overflow-hidden ring-1 ring-black/5 shadow-sm">
+
                 <CodeEditor
                   height={180}
                   language="json"
@@ -452,14 +452,14 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                   showHeader={true}
                   title="Input Parameters (JSON)"
                 />
-              </div>
+
             ) : (() => {
               const selected = workflows.find(w => w.workflowID === config.workflowID);
                 const inputDefinitions = selected?.inputs || [];
               
               if (!config.workflowID) {
                 return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-sm text-center bg-background/20">
+                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
                     Select a workflow above to configure its inputs.
                   </p>
                 );
@@ -467,7 +467,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               
                 if (inputDefinitions.length === 0) {
                 return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-sm text-center bg-background/20">
+                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
                     This workflow has no inputs defined.
                   </p>
                 );
@@ -477,7 +477,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                 const normalizedInputDefs = inputDefinitions.map(inputDef => ({ ...inputDef, key: inputDef.key || inputDef.name }));
 
               return (
-                <div className="rounded-sm border border-border/60 bg-background/30 p-4 shadow-sm">
+                <div className="rounded-sm border border-border/60 bg-background/30 p-2 shadow-sm">
                   <InputValuesForm
                     inputDefinitions={normalizedInputDefs}
                     values={typeof config.inputValues === 'object' ? config.inputValues : {}}
@@ -493,6 +493,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                       }
                       onChange({ ...config, inputValues: updated });
                     }}
+                    className="space-y-2"
                   />
                 </div>
               );
@@ -502,8 +503,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
       );
     case "trigger_query":
       return (
-        <div className="space-y-5 animate-in fade-in duration-300">
-          <div className="space-y-2">
+        <div className="space-y-2 animate-in fade-in duration-300">
+          <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Select Data Query</Label>
             <Select 
               value={config.dataQueryID || ""} 
@@ -528,8 +529,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <div className="flex justify-between items-end mb-2">
+          <div className="space-y-1">
+            <div className="flex justify-between items-end mb-1">
               <div>
                 <Label className="text-xs text-muted-foreground">Argument Values</Label>
                 {renderModeToggle()}
@@ -538,7 +539,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
             </div>
             
             {isJsonMode ? (
-              <div className="rounded-sm border border-border/60 overflow-hidden ring-1 ring-black/5 shadow-sm">
+
                 <CodeEditor
                   height={180}
                   language="json"
@@ -556,14 +557,14 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                   showHeader={true}
                   title="Query Arguments (JSON)"
                 />
-              </div>
+
             ) : (() => {
               const selected = dataQueries.find(q => q.dataQueryID === config.dataQueryID);
                 const inputDefinitions = selected?.dataQueryOptions?.inputDefinitions || selected?.dataQueryOptions?.options?.arguments || selected?.dataQueryOptions?.arguments || [];
               
               if (!config.dataQueryID) {
                 return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-sm text-center bg-background/20">
+                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
                     Select a data query above to configure its arguments.
                   </p>
                 );
@@ -571,7 +572,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               
                 if (inputDefinitions.length === 0) {
                 return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-4 rounded-sm text-center bg-background/20">
+                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
                     This query has no arguments defined.
                   </p>
                 );
@@ -581,7 +582,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                 const normalizedInputDefs = inputDefinitions.map(inputDef => ({ ...inputDef, key: inputDef.key || inputDef.name }));
 
               return (
-                <div className="rounded-sm border border-border/60 bg-background/30 p-4 shadow-sm">
+                <div className="rounded-sm border border-border/60 bg-background/30 p-2 shadow-sm">
                   <InputValuesForm
                     inputDefinitions={normalizedInputDefs}
                     values={typeof config.inputValues === 'object' ? config.inputValues : {}}
@@ -597,6 +598,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
                       }
                       onChange({ ...config, inputValues: updated });
                     }}
+                    className="space-y-2"
                   />
                 </div>
               );
@@ -606,8 +608,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
       );
     case "save_to_buffer":
       return (
-        <div className="space-y-5 animate-in fade-in duration-300">
-          <div className="space-y-2">
+        <div className="space-y-2 animate-in fade-in duration-300">
+          <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Buffer Name</Label>
             <Input
               value={config.bufferName || "default"}
@@ -615,8 +617,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               className="bg-background font-medium"
             />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-             <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Retention Policy</Label>
               <Select value={config.retentionPolicy || "count"} onValueChange={(val) => onChange({ ...config, retentionPolicy: val })}>
                 <SelectTrigger className="bg-background">
@@ -630,7 +632,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               </Select>
             </div>
             {(config.retentionPolicy === "count" || config.retentionPolicy === "both" || !config.retentionPolicy) && (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">Max Events to Keep</Label>
                 <Input
                   type="number"
@@ -641,7 +643,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               </div>
             )}
             {(config.retentionPolicy === "time" || config.retentionPolicy === "both") && (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">Max Age (Hours)</Label>
                 <Input
                   type="number"
@@ -657,8 +659,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
       );
     case "push_to_app_page":
       return (
-        <div className="space-y-5 animate-in fade-in duration-300">
-          <div className="space-y-2">
+        <div className="space-y-2 animate-in fade-in duration-300">
+          <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Select App Page</Label>
             <Select 
               value={config.appPageID || ""} 
@@ -677,8 +679,8 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
             </Select>
             <p className="text-[10px] text-muted-foreground">The App Page to push data to.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Custom Channel Name (Optional)</Label>
               <Input
                 value={config.channelName || ""}
@@ -688,7 +690,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               />
               <p className="text-[10px] text-muted-foreground">Defaults to `listener:${listenerID}`.</p>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Update Mode</Label>
               <Select value={config.mode || "replace"} onValueChange={(val) => onChange({ ...config, mode: val })}>
                 <SelectTrigger className="bg-background">
@@ -702,7 +704,7 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
               </Select>
             </div>
             {(config.mode === "append" || config.mode === "prepend") && (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">Max Array Length</Label>
                 <Input
                   type="number"
@@ -730,7 +732,7 @@ ActionForm.propTypes = {
   action: PropTypes.object,
   onSave: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  isSaving: PropTypes.boolean,
+  isSaving: PropTypes.bool,
 };
 
 ActionConfigEditor.propTypes = {

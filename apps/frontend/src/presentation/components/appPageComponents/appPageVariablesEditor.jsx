@@ -139,8 +139,8 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
     <div className="flex flex-col h-full min-h-0 bg-background">
       {editingIndex !== null && selectedVariable ? (
         /* ─── Detail / Edit View ─── */
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-3">
+        <div className="flex-1 overflow-y-auto">
+          <div className="flex items-center justify-between border-b border-border">
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -160,9 +160,9 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-2 p-2">
             {/* Variable Key */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Variable Key / Name
               </Label>
@@ -183,7 +183,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
             </div>
 
             {/* Variable Type */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Variable Type
               </Label>
@@ -205,7 +205,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
             </div>
 
             {/* Default Value */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Default Value
               </Label>
@@ -213,7 +213,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
             </div>
 
             {/* Description */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Description
               </Label>
@@ -230,7 +230,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
       ) : (
         /* ─── List View ─── */
         <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex items-center justify-between p-3 border-b border-border">
+            <div className="flex items-center justify-between p-2 border-b border-border">
             <div>
               <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Page Variables
@@ -241,9 +241,9 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
+            <div className="flex-1 overflow-y-auto p-2 space-y-2">
             {variables.length === 0 ? (
-              <div className="rounded-md border border-dashed border-border bg-muted/30 p-3 text-center flex flex-col items-center justify-center py-10">
+                <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-center flex flex-col items-center justify-center py-10">
                 <Key className="h-8 w-8 text-muted-foreground/50 mb-2" />
                 <p className="text-xs font-medium text-foreground">No Page Variables</p>
                 <p className="text-[10px] text-muted-foreground/70 max-w-[200px] mt-1">
@@ -256,9 +256,9 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
                   return (
                     <div
                       key={index}
-                      className="rounded-md border border-border bg-card p-3 flex flex-col hover:shadow-sm transition-shadow group"
+                      className="rounded-md border border-border bg-card p-2 flex flex-col hover:shadow-sm transition-shadow group"
                     >
-                      <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted/50 border border-border">
                           <Key className="h-4 w-4 text-primary" />
                         </div>
@@ -319,7 +319,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
               </div>
             )}
 
-            <div className="pt-2">
+              <div className="">
               <Button
                 type="button"
                 variant="outline"

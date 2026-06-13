@@ -92,7 +92,7 @@ export const FormWidget = ({
                     const inputId = `form-field-${field.key}-${idx}`;
 
                     return (
-                        <div key={idx} className="space-y-1.5">
+                        <div key={idx} className="space-y-1">
                             {fieldType !== "checkbox" && (
                                 <Label htmlFor={inputId} className="text-xs font-semibold text-foreground">
                                     {field.label || field.key}

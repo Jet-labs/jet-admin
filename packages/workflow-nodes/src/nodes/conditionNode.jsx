@@ -25,6 +25,10 @@ import {
   Textarea,
   TemplateAutocompleteInput,
   CodeEditor,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
 } from '@jet-admin/ui';
 import { Plus, Trash2, Ban } from 'lucide-react';
 
@@ -400,7 +404,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
   const activeBranch = branches[activeIdx];
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full p-2 space-y-2 pb-0">
 
       {/* Title */}
       <div className="space-y-1.5">
@@ -430,78 +434,66 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* Branch panel */}
-      <div className="rounded-md border border-border overflow-hidden">
-
-        {/* Tab bar */}
-        <div className="flex items-center bg-muted/50 border-b border-border overflow-x-auto">
-          {branches.map((branch, idx) => (
-            <div
-              key={branch.id}
-              className={`
-                group flex items-center gap-1.5 px-3 py-2.5 cursor-pointer
-                text-xs font-medium border-r border-border
-                whitespace-nowrap transition-all select-none
-                ${activeIdx === idx
-                ? 'bg-brand-dark text-primary shadow-[inset_0_-2px_0_hsl(var(--primary))]'
-                : 'text-muted-foreground hover:text-foreground hover:bg-brand-dark/60'
-                }
-              `}
-              onClick={() => setActiveIdx(idx)}
-            >
-              <span
-                className={`
-                  w-4 h-4 rounded-full flex items-center justify-center
-                  text-[9px] font-bold shrink-0 transition-colors
-                  ${activeIdx === idx
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-muted text-muted-foreground group-hover:bg-muted/80'
-                  }
-                `}
+      <div className="rounded-md border border-border overflow-hidden bg-background">
+        <Tabs value={String(activeIdx)} onValueChange={(val) => setActiveIdx(Number(val))} className="w-full">
+          {/* Tab bar */}
+          <TabsList className="h-auto">
+            {branches.map((branch, idx) => (
+              <TabsTrigger
+                key={branch.id}
+                value={String(idx)}
+                className=""
               >
-                {idx + 1}
-              </span>
-              <span className="truncate max-w-[80px]">
-                {branch.label || `Branch ${idx + 1}`}
-              </span>
-              {branches.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={e => { e.stopPropagation(); removeBranch(idx); }}
-                  className="ml-0.5 w-3.5 h-3.5 text-muted-foreground/30 hover:text-destructive rounded-sm opacity-0 group-hover:opacity-100 transition-all"
+                <span
+                  className={`
+                    mr-1
+
+                  `}
                 >
-                  ×
-                </Button>
-              )}
-            </div>
-          ))}
+                  {idx + 1}.
+                </span>
+                <span className="truncate max-w-[80px]">
+                  {branch.label || `Branch ${idx + 1}`}
+                </span>
+                {branches.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={e => { e.stopPropagation(); removeBranch(idx); }}
+                    className="ml-0.5 w-3.5 h-3.5 text-muted-foreground/30 hover:text-destructive rounded-sm opacity-0 group-hover:opacity-100 transition-all p-0"
+                  >
+                    ×
+                  </Button>
+                )}
+              </TabsTrigger>
+            ))}
 
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={addBranch}
-            className="px-3 py-2.5 text-xs text-primary hover:text-primary/80 hover:bg-brand-dark/60 transition-colors flex items-center gap-1 whitespace-nowrap h-auto"
-          >
-            <Plus className="w-2.5 h-2.5" />
-            Add branch
-          </Button>
-        </div>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={addBranch}
+              className="px-3 py-1 text-xs text-primary hover:text-primary/80 hover:bg-brand-dark/60 transition-colors flex items-center gap-1 whitespace-nowrap h-7"
+            >
+              <Plus className="w-2.5 h-2.5" />
+              Add branch
+            </Button>
+          </TabsList>
 
-        {activeBranch
-          ? (
-            <BranchEditor
-              key={activeBranch.id}
-              branch={activeBranch}
-              onChange={updated => updateBranch(activeIdx, updated)}
-              stateTree={ctxStateTree}
-            />
+          {activeBranch ? (
+            <TabsContent value={String(activeIdx)} className="m-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
+              <BranchEditor
+                branch={activeBranch}
+                onChange={updated => updateBranch(activeIdx, updated)}
+                stateTree={ctxStateTree}
+              />
+            </TabsContent>
           ) : (
-            <div className="p-4 text-xs text-muted-foreground text-center">
+              <div className="p-4 text-xs text-muted-foreground text-center bg-background">
               No branches yet — click <strong>Add branch</strong> above.
             </div>
-          )
-        }
+          )}
+        </Tabs>
       </div>
 
       {/* else indicator */}
@@ -532,6 +524,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* Help callout */}
+
       <div className="p-3 rounded-md border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1.5">
         <div className="font-semibold text-xs text-primary">💡 Writing Conditions</div>
         <div>
@@ -551,10 +544,13 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
         <div>Branches are evaluated <strong>top → bottom</strong>; first match wins.</div>
       </div>
 
+
       {/* ✅ Correct: Button variant="default", no raw color overrides */}
+
       <Button type="button" onClick={handleSave} className="w-full" size="sm">
         {strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || 'Save Condition'}
       </Button>
+
     </div>
   );
 };

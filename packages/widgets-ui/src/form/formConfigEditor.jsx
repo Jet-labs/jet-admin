@@ -36,10 +36,10 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-2">
             {/* Global Form Settings */}
-            <div className="grid grid-cols-2 gap-3 pb-3 border-b">
-                <div className="space-y-1.5">
+            <div className="grid grid-cols-2 gap-2 pb-2 border-b">
+                <div className="space-y-1">
                     <Label className="text-xs font-medium text-foreground">Submit Button Text</Label>
                     <Input
                         type="text"
@@ -48,7 +48,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                         onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.submitLabel", e.target.value)}
                     />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                     <Label className="text-xs font-medium text-foreground">Size / Spacing</Label>
                     <Select
                         value={config.size || "default"}
@@ -80,9 +80,9 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
             </div>
 
             {/* Field Item Editors */}
-            <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
                 {fields.map((field, idx) => (
-                    <div key={idx} className="p-3 border rounded bg-muted/10 relative space-y-2">
+                    <div key={idx} className="p-2 border rounded bg-muted/10 relative space-y-2">
                         <Button
                             type="button"
                             variant="ghost"
@@ -170,42 +170,42 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                             </div>
                         )}
 
-                        <div className="grid grid-cols-2 gap-2 pt-1.5 border-t border-dashed">
+                        <div className="grid grid-cols-2 gap-2 pt-1 border-t border-dashed">
                             {/* Required Check */}
                             <div className="flex items-center gap-1.5">
                                 <Checkbox
                                     id={`field-req-${idx}`}
                                     checked={!!field.required}
                                     onCheckedChange={(val) => handleFieldChange(idx, "required", !!val)}
-                                />
-                                <Label htmlFor={`field-req-${idx}`} className="text-[10px] text-muted-foreground cursor-pointer font-medium">
-                                    Required field
-                                </Label>
-                            </div>
-
-                            {/* Default Value */}
-                            <div className="space-y-0.5">
-                                <Label className="text-[9px] text-muted-foreground block leading-none">Default Value</Label>
-                                <Input
-                                    type="text"
-                                    className="text-[10px] h-6 font-mono px-1.5"
-                                    value={field.defaultValue || ""}
-                                    onChange={(e) => handleFieldChange(idx, "defaultValue", e.target.value)}
-                                    placeholder="e.g. {{widgets.table1.selectedRow.name}}"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                ))}
-                {fields.length === 0 && (
-                    <div className="text-center p-4 border border-dashed text-xs text-muted-foreground rounded">
-                        Click 'Add Field' above to define dynamic form fields.
-                    </div>
-                )}
-            </div>
-
-            {/* Show Reset Option */}
-            <div className="flex items-center gap-2 pt-2">
+                                  />
+                                  <Label htmlFor={`field-req-${idx}`} className="text-[10px] text-muted-foreground cursor-pointer font-medium">
+                                      Required field
+                                  </Label>
+                              </div>
+  
+                              {/* Default Value */}
+                              <div className="space-y-0.5">
+                                  <Label className="text-[9px] text-muted-foreground block leading-none">Default Value</Label>
+                                  <Input
+                                      type="text"
+                                      className="text-[10px] h-6 font-mono px-1.5"
+                                      value={field.defaultValue || ""}
+                                      onChange={(e) => handleFieldChange(idx, "defaultValue", e.target.value)}
+                                      placeholder="e.g. {{widgets.table1.selectedRow.name}}"
+                                  />
+                              </div>
+                          </div>
+                      </div>
+                  ))}
+                  {fields.length === 0 && (
+                      <div className="text-center p-4 border border-dashed text-xs text-muted-foreground rounded">
+                          Click 'Add Field' above to define dynamic form fields.
+                      </div>
+                  )}
+              </div>
+  
+              {/* Show Reset Option */}
+              <div className="flex items-center gap-2 pt-2">
                 <Checkbox
                     id="form-show-reset"
                     checked={config.showReset ?? false}

@@ -14,7 +14,8 @@ import {
     SelectValue,
     SelectContent,
     SelectItem,
-    Label
+    Label,
+    Section
 } from "@jet-admin/ui";
 
 /**
@@ -41,7 +42,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
     return (
         <div className="fixed right-0 top-0 h-full w-[400px] bg-background shadow-2xl border-l border-border z-[1000] flex flex-col pb-4">
             {/* Header */}
-            <div className="flex justify-between items-center px-4 py-3 border-b border-border bg-background">
+            <div className="flex justify-between items-center p-2 border-b border-border bg-background">
                 <h3 className="font-semibold text-foreground tracking-tight">
                     {WORKFLOW_NODES_MAP[node.type]?.label || 'Node Configuration'}
                 </h3>
@@ -72,12 +73,14 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
             </div>
             
             {/* Configurator Content */}
-            <div className="flex-1 overflow-y-auto p-4 bg-background">
+            <div className="flex-1 overflow-y-auto bg-background">
                 <NodeConfigurator data={node.data} onChange={(newData) => onChange(node.id, newData)} nodeId={node.id} />
+
 
                 {/* Advanced Settings — Join Mode */}
                 {node.type !== 'start' && node.type !== 'end' && (
-                    <Accordion type="single" collapsible className="mt-3 border border-border rounded-sm bg-background">
+                    <div className='p-2'>
+                        <Accordion type="single" collapsible className="border border-border rounded-sm bg-background">
                         <AccordionItem value="advanced" className="border-none">
                             <AccordionTrigger className="px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:no-underline data-[state=open]:border-b data-[state=open]:border-border">
                                 Advanced Settings
@@ -104,7 +107,8 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
-                )}
+                    </div>)
+                }
             </div>
 
             {/* Delete Confirmation Modal Overlay */}

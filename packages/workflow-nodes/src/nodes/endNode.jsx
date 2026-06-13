@@ -3,7 +3,7 @@ import { Handle, Position } from 'reactflow';
 import { JsonForms } from '@jsonforms/react';
 import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
-import { Button, Input } from '@jet-admin/ui';
+import { Button, Input, TemplateAutocompleteInput } from '@jet-admin/ui';
 import { Square, Check, X, AlertTriangle, Plus, Trash2, ChevronLeft } from 'lucide-react';
 
 // ============================================================================
@@ -18,7 +18,7 @@ const END_STATUS = {
 // ============================================================================
 // OutputParameterEditor - For defining workflow output parameters
 // ============================================================================
-const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
+const OutputParameterEditor = ({ parameters, onChange, availableVariables, stateTree }) => {
   const addParameter = () => {
     const newParam = {
       id: `output_${Date.now()}`,
@@ -46,8 +46,9 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
         <label className="text-xs font-medium text-brand-text-primary">Output Parameters</label>
         <Button
           type="button"
+          variant="primary-ghost"
+          size="sm"
           onClick={addParameter}
-          className="flex items-center gap-1 px-2 py-1 text-xs bg-brand-black text-[#646cff] hover:bg-[#646cff]/10 rounded-sm transition-colors border border-brand-border"
         >
           <Plus className="w-2.5 h-2.5" />
           Add Output
@@ -71,19 +72,22 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <ChevronLeft className="w-3 h-3 text-red-500" />
+
                   <Input
                     type="text"
+                    size="sm"
                     value={param.name}
                     onChange={(e) => updateParameter(index, 'name', e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
-                    className="text-xs font-mono font-medium text-brand-text-primary bg-brand-black border border-brand-border rounded-sm px-2 py-1 w-28 focus:outline-none focus:border-[#646cff]"
+                    className="font-mono w-28"
                     placeholder="outputName"
                   />
                 </div>
                 <Button
                   type="button"
+                  variant="destructive-ghost"
+                  size="icon"
+                  square
                   onClick={() => removeParameter(index)}
-                  className="p-1 bg-brand-black text-brand-text-primary hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
                   title="Remove output"
                 >
                   <Trash2 className="w-3 h-3" />
@@ -92,16 +96,15 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
 
               {/* Source Variable */}
               <div>
-                <label className="text-[10px] text-brand-text-primary">Source Variable</label>
-                <Input
-                  type="text"
+                <label className="text-[10px] text-brand-text-primary mb-1 block">Source Variable</label>
+                <TemplateAutocompleteInput
                   value={param.sourceVariable}
-                  onChange={(e) => updateParameter(index, 'sourceVariable', e.target.value)}
+                  onChange={(val) => updateParameter(index, 'sourceVariable', val)}
                   placeholder="{{ctx.result}} or a literal value"
-                  className="w-full text-xs text-brand-text-primary p-1.5 border border-brand-border rounded-sm font-mono bg-brand-black focus:outline-none focus:border-[#646cff]"
+                  liveStateTree={stateTree}
                 />
                 {availableVariables.length > 0 && (
-                  <p className="text-[9px] text-brand-text-primary mt-0.5">
+                  <p className="text-[9px] text-brand-text-primary mt-1">
                     Available: {availableVariables.slice(0, 5).map(v => `ctx.${v.variable}`).join(', ')}
                     {availableVariables.length > 5 && '...'}
                   </p>
@@ -113,10 +116,10 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
                 <label className="text-[10px] text-brand-text-primary">Description</label>
                 <Input
                   type="text"
+                  size="sm"
                   value={param.description}
                   onChange={(e) => updateParameter(index, 'description', e.target.value)}
                   placeholder="What this output represents"
-                  className="w-full text-xs text-brand-text-primary p-1.5 border border-brand-border rounded-sm bg-brand-black focus:outline-none focus:border-[#646cff]"
                 />
               </div>
             </div>
@@ -131,13 +134,51 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
 // EndNodeConfigurator - JSON Forms based configuration
 // ============================================================================
 export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { strings, workflowNodes } = useWorkflowNodes();
+  const { strings, workflowNodes, workflowEdges, workflowInputDefinitions } = useWorkflowNodes();
   const [formData, setFormData] = useState({
     title: data?.title || 'End',
     description: data?.description || '',
     status: data?.status || END_STATUS.SUCCESS,
     outputParameters: data?.outputParameters || [],
   });
+
+  // Build upstream state tree for mustache auto-complete
+  const upstreamStateTree = useMemo(() => {
+    const tree = { ctx: { input: {} } };
+
+    if (workflowInputDefinitions && workflowInputDefinitions.length > 0) {
+      workflowInputDefinitions.forEach(inputDef => {
+        if (inputDef.key) {
+          tree.ctx.input[inputDef.key] = "";
+        }
+      });
+    }
+
+    if (nodeId && workflowEdges && workflowEdges.length > 0) {
+      const upstreamIds = new Set();
+      const visited = new Set();
+      const queue = [nodeId];
+      while (queue.length > 0) {
+        const id = queue.shift();
+        if (visited.has(id)) continue;
+        visited.add(id);
+        const incomingEdges = workflowEdges.filter(e => e.target === id);
+        for (const edge of incomingEdges) {
+          if (!visited.has(edge.source)) {
+            upstreamIds.add(edge.source);
+            queue.push(edge.source);
+          }
+        }
+      }
+
+      workflowNodes?.forEach(node => {
+        if (node.id !== nodeId && upstreamIds.has(node.id) && node.data?.outputVariable) {
+          tree.ctx[node.data.outputVariable] = {};
+        }
+      });
+    }
+    return tree;
+  }, [workflowNodes, workflowEdges, workflowInputDefinitions, nodeId]);
 
   // Sync form data when data prop changes
   useEffect(() => {
@@ -231,62 +272,61 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
   }, [onChange, formData]);
 
   return (
-    <div className="w-full h-full">
-      <div className="space-y-4">
-        {/* Basic settings via JSON Forms */}
-        <JsonForms
-          schema={schema}
-          uischema={uischema}
-          data={formData}
-          renderers={workflowNodeRenderers}
-          onChange={handleFormChange}
+    <div className="w-full p-2 space-y-2">
+      {/* Basic settings via JSON Forms */}
+      <JsonForms
+        schema={schema}
+        uischema={uischema}
+        data={formData}
+        renderers={workflowNodeRenderers}
+        onChange={handleFormChange}
+      />
+
+      {/* Output parameters editor */}
+      <div className="">
+        <OutputParameterEditor
+          parameters={formData.outputParameters}
+          onChange={handleParametersChange}
+          availableVariables={availableVariables}
+          stateTree={upstreamStateTree}
         />
-
-        {/* Output parameters editor */}
-        <div className="border-t border-brand-border pt-4">
-          <OutputParameterEditor
-            parameters={formData.outputParameters}
-            onChange={handleParametersChange}
-            availableVariables={availableVariables}
-          />
-        </div>
-
-        {/* Comprehensive instructions */}
-        <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
-          <div className="font-semibold text-brand-text-primary text-xs">📘 Workflow Output</div>
-
-          <div>
-            <span className="font-medium text-brand-text-primary">Source Variable Format:</span>
-            <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
-              <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.queryResult}}"}</code> → from previous node</div>
-              <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.processedData}}"}</code> → from script node</div>
-            </div>
-          </div>
-
-          <div>
-            <span className="font-medium text-brand-text-primary">Completion Status:</span>
-            <div className="ml-3 mt-0.5 text-brand-text-primary">
-              <strong>Success:</strong> Normal completion • <strong>Failure:</strong> Ended with error • <strong>Cancelled:</strong> Manual stop
-            </div>
-          </div>
-
-          <div>
-            <span className="font-medium text-brand-text-primary">Multiple End Nodes:</span>
-            <div className="ml-3 mt-0.5 text-brand-text-primary">
-              You can have multiple End nodes for different outcomes (e.g., success/failure branches).
-            </div>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          size="sm"
-          onClick={handleSave}
-          className="w-full"
-        >
-          Save
-        </Button>
       </div>
+
+      {/* Comprehensive instructions */}
+      <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
+        <div className="font-semibold text-brand-text-primary text-xs">📘 Workflow Output</div>
+
+        <div>
+          <span className="font-medium text-brand-text-primary">Source Variable Format:</span>
+          <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
+            <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.queryResult}}"}</code> → from previous node</div>
+            <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.processedData}}"}</code> → from script node</div>
+          </div>
+        </div>
+
+        <div>
+          <span className="font-medium text-brand-text-primary">Completion Status:</span>
+          <div className="ml-3 mt-0.5 text-brand-text-primary">
+            <strong>Success:</strong> Normal completion • <strong>Failure:</strong> Ended with error • <strong>Cancelled:</strong> Manual stop
+          </div>
+        </div>
+
+        <div>
+          <span className="font-medium text-brand-text-primary">Multiple End Nodes:</span>
+          <div className="ml-3 mt-0.5 text-brand-text-primary">
+            You can have multiple End nodes for different outcomes (e.g., success/failure branches).
+          </div>
+        </div>
+      </div>
+
+      <Button
+        type="button"
+        size="sm"
+        onClick={handleSave}
+        className="w-full"
+      >
+        Save
+      </Button>
     </div>
   );
 };

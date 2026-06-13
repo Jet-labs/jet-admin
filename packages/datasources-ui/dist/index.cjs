@@ -31,17 +31,12 @@ var index_exports = {};
 __export(index_exports, {
   DATASOURCE_UI_COMPONENTS: () => DATASOURCE_UI_COMPONENTS,
   DatasourceEditorContext: () => DatasourceEditorContext,
-  EditorTabBar: () => EditorTabBar,
-  EmptyState: () => EmptyState,
-  InfoCallout: () => InfoCallout2,
-  LogicChip: () => LogicChip2,
-  MonoLabel: () => MonoLabel2,
   QueryEditorContext: () => QueryEditorContext,
   useDatasourceEditorContext: () => useDatasourceEditorContext,
   useQueryEditorContext: () => useQueryEditorContext
 });
 module.exports = __toCommonJS(index_exports);
-var import_react16 = __toESM(require("react"));
+var import_react14 = __toESM(require("react"));
 var import_datasource_types = require("@jet-admin/datasource-types");
 
 // src/components/common/queryResponseView.js
@@ -56,7 +51,7 @@ var QueryResponseJSONTab = ({ data }) => {
   QueryResponseJSONTab.propTypes = {
     data: import_prop_types.default.object
   };
-  return /* @__PURE__ */ import_react.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ import_react.default.createElement(
+  return /* @__PURE__ */ import_react.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto" }, /* @__PURE__ */ import_react.default.createElement(
     import_ui.CodeEditor,
     {
       value: JSON.stringify(data, null, 2),
@@ -218,22 +213,12 @@ var QueryResponseTableTab = ({
 // src/components/common/queryResponseView.js
 var import_prop_types5 = __toESM(require("prop-types"));
 var QueryResponseView = ({ queryResult }) => {
-  const [tab, setTab] = (0, import_react5.useState)(0);
+  const [activeTab, setActiveTab] = (0, import_react5.useState)("json");
   console.log("queryResult", queryResult);
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex flex-col h-full overflow-hidden p-4" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center" }, ["Table", "JSON", "Raw", "Data Schema"].map((label, index) => /* @__PURE__ */ import_react5.default.createElement(
-    import_ui4.Button,
-    {
-      key: label,
-      variant: "ghost",
-      className: `px-4 mr-2 py-2 text-sm font-medium rounded-sm transition-colors ${index === tab ? "text-primary bg-primary/5" : "text-foreground hover:bg-muted"}`,
-      onClick: () => setTab(index),
-      type: "button"
-    },
-    label
-  ))), /* @__PURE__ */ import_react5.default.createElement("div", { className: "p-3 border mt-3 border-border rounded-sm bg-background flex flex-col gap-2 overflow-y-auto flex-1" }, tab === 0 && /* @__PURE__ */ import_react5.default.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab === 1 && /* @__PURE__ */ import_react5.default.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab === 2 && /* @__PURE__ */ import_react5.default.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab === 3 && /* @__PURE__ */ import_react5.default.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
+  return /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex flex-col h-full overflow-hidden bg-background" }, /* @__PURE__ */ import_react5.default.createElement(import_ui4.Tabs, { value: activeTab, onValueChange: setActiveTab, className: "flex flex-col h-full" }, /* @__PURE__ */ import_react5.default.createElement(import_ui4.TabsList, null, /* @__PURE__ */ import_react5.default.createElement(import_ui4.TabsTrigger, { value: "json" }, "JSON"), /* @__PURE__ */ import_react5.default.createElement(import_ui4.TabsTrigger, { value: "table" }, "Table"), /* @__PURE__ */ import_react5.default.createElement(import_ui4.TabsTrigger, { value: "raw" }, "Raw"), /* @__PURE__ */ import_react5.default.createElement(import_ui4.TabsTrigger, { value: "schema" }, "Data Schema")), /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1 min-h-0 overflow-y-auto bg-background" }, /* @__PURE__ */ import_react5.default.createElement(import_ui4.TabsContent, { value: "json", className: "mt-0 h-full focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none" }, /* @__PURE__ */ import_react5.default.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" })), /* @__PURE__ */ import_react5.default.createElement(import_ui4.TabsContent, { value: "table", className: "mt-0 h-full focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none" }, /* @__PURE__ */ import_react5.default.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" })), /* @__PURE__ */ import_react5.default.createElement(import_ui4.TabsContent, { value: "raw", className: "mt-0 h-full focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none" }, /* @__PURE__ */ import_react5.default.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" })), /* @__PURE__ */ import_react5.default.createElement(import_ui4.TabsContent, { value: "schema", className: "mt-0 h-full focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none" }, /* @__PURE__ */ import_react5.default.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })))));
 };
 QueryResponseView.propTypes = {
-  queryResult: import_prop_types5.default.object
+  queryResult: import_prop_types5.default.any
 };
 
 // src/components/common/webViewQueryResponseView.js
@@ -324,29 +309,8 @@ function normalise(opts = {}) {
     sort: Array.isArray(opts.sort) ? opts.sort : []
   };
 }
-function MonoLabel({ children }) {
-  return /* @__PURE__ */ import_react8.default.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, children);
-}
-function InfoCallout({ children }) {
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "rounded-md border border-primary/20 bg-primary/5 p-3 text-[11px] text-primary/80 flex gap-2" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Info, { className: "h-3.5 w-3.5 mt-0.5 shrink-0" }), /* @__PURE__ */ import_react8.default.createElement("span", null, children));
-}
-function Badge({ count }) {
-  if (!count) return null;
-  return /* @__PURE__ */ import_react8.default.createElement("span", { className: "ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold" }, count);
-}
-function LogicChip({ value, onChange }) {
-  return /* @__PURE__ */ import_react8.default.createElement(
-    "button",
-    {
-      type: "button",
-      onClick: () => onChange(value === "AND" ? "OR" : "AND"),
-      className: `text-[9px] font-bold px-2 py-0.5 rounded border transition-colors ${value === "AND" ? "bg-primary/10 text-primary border-primary/30" : "bg-amber-50 text-amber-600 border-amber-200"}`
-    },
-    value
-  );
-}
 function SourceTab({ opts, update }) {
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react8.default.createElement(InfoCallout, null, "Configure which sheet and header row to read. Leave Sheet Name blank to use the first available sheet."), /* @__PURE__ */ import_react8.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { htmlFor: "sheetName" }, "Sheet Name"), /* @__PURE__ */ import_react8.default.createElement(
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Callout, null, "Configure which sheet and header row to read. Leave Sheet Name blank to use the first available sheet."), /* @__PURE__ */ import_react8.default.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { htmlFor: "sheetName" }, "Sheet Name"), /* @__PURE__ */ import_react8.default.createElement(
     import_ui6.Input,
     {
       id: "sheetName",
@@ -355,7 +319,7 @@ function SourceTab({ opts, update }) {
       value: opts.sheetName,
       onChange: (e) => update({ sheetName: e.target.value })
     }
-  ), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Leave blank to read the first sheet.")), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { htmlFor: "headerRow" }, "Header Row"), /* @__PURE__ */ import_react8.default.createElement(
+  ), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Leave blank to read the first sheet.")), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { htmlFor: "headerRow" }, "Header Row"), /* @__PURE__ */ import_react8.default.createElement(
     import_ui6.Input,
     {
       id: "headerRow",
@@ -385,11 +349,18 @@ function ColumnsTab({ opts, update }) {
     [next[index], next[target]] = [next[target], next[index]];
     update({ columns: next });
   };
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react8.default.createElement(InfoCallout, null, "Declare each column from your spreadsheet. Use ", /* @__PURE__ */ import_react8.default.createElement("strong", null, "Alias"), " ", "to rename it in query results. Leave empty to include all columns as-is."), columns.length === 0 ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "rounded-md border border-border border-dashed bg-muted/30 py-8 flex flex-col items-center gap-2" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Columns2, { className: "h-8 w-8 text-muted-foreground/40" }), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm text-muted-foreground text-center" }, "No columns declared \u2014 all spreadsheet columns will be returned."), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Button, { type: "button", variant: "outline", size: "sm", onClick: addColumn }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Column")) : /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center px-1" }, /* @__PURE__ */ import_react8.default.createElement("span", null), /* @__PURE__ */ import_react8.default.createElement(MonoLabel, null, "Source Column"), /* @__PURE__ */ import_react8.default.createElement(MonoLabel, null, "Alias (optional)"), /* @__PURE__ */ import_react8.default.createElement(MonoLabel, null, "Type"), /* @__PURE__ */ import_react8.default.createElement("span", null), /* @__PURE__ */ import_react8.default.createElement("span", null), /* @__PURE__ */ import_react8.default.createElement("span", null)), columns.map((col, idx) => /* @__PURE__ */ import_react8.default.createElement(
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Callout, null, "Declare each column from your spreadsheet. Use ", /* @__PURE__ */ import_react8.default.createElement("strong", null, "Alias"), " ", "to rename it in query results. Leave empty to include all columns as-is."), columns.length === 0 ? /* @__PURE__ */ import_react8.default.createElement(
+    import_ui6.EmptyState,
+    {
+      icon: import_lucide_react.Columns2,
+      message: "No columns declared \u2014 all spreadsheet columns will be returned.",
+      action: /* @__PURE__ */ import_react8.default.createElement(import_ui6.Button, { type: "button", variant: "outline", size: "sm", onClick: addColumn }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Column")
+    }
+  ) : /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center px-1" }, /* @__PURE__ */ import_react8.default.createElement("span", null), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Source Column"), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Alias (optional)"), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Type"), /* @__PURE__ */ import_react8.default.createElement("span", null), /* @__PURE__ */ import_react8.default.createElement("span", null), /* @__PURE__ */ import_react8.default.createElement("span", null)), columns.map((col, idx) => /* @__PURE__ */ import_react8.default.createElement(
     "div",
     {
       key: col.id,
-      className: `grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center rounded-md border px-2 py-1.5 transition-colors ${col.enabled ? "border-border bg-background" : "border-border/50 bg-muted/30 opacity-60"}`
+      className: `grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center rounded-sm border px-2 py-2 transition-colors ${col.enabled ? "border-border bg-background" : "border-border/50 bg-muted/30 opacity-60"}`
     },
     /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.GripVertical, { className: "h-3.5 w-3.5 text-muted-foreground/40 cursor-grab" }),
     /* @__PURE__ */ import_react8.default.createElement(
@@ -471,16 +442,23 @@ function FilterTab({ opts, update }) {
   });
   const removeFilter = (id) => update({ filters: filters.filter((f) => f.id !== id) });
   const patchFilter = (id, patch) => update({ filters: filters.map((f) => f.id === id ? { ...f, ...patch } : f) });
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react8.default.createElement(InfoCallout, null, "Filter rows after fetching. Multiple conditions are applied in order. Use the ", /* @__PURE__ */ import_react8.default.createElement("strong", null, "AND / OR"), " chip to control how each condition combines with the next."), filters.length === 0 ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "rounded-md border border-dashed border-border bg-muted/30 py-8 flex flex-col items-center gap-2" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Filter, { className: "h-8 w-8 text-muted-foreground/40" }), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm text-muted-foreground" }, "No filters applied \u2014 all rows will be returned."), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Button, { type: "button", variant: "outline", size: "sm", onClick: addFilter }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Filter")) : /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, filters.map((filter, idx) => {
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Callout, null, "Filter rows after fetching. Multiple conditions are applied in order. Use the ", /* @__PURE__ */ import_react8.default.createElement("strong", null, "AND / OR"), " chip to control how each condition combines with the next."), filters.length === 0 ? /* @__PURE__ */ import_react8.default.createElement(
+    import_ui6.EmptyState,
+    {
+      icon: import_lucide_react.Filter,
+      message: "No filters applied \u2014 all rows will be returned.",
+      action: /* @__PURE__ */ import_react8.default.createElement(import_ui6.Button, { type: "button", variant: "outline", size: "sm", onClick: addFilter }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Filter")
+    }
+  ) : /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, filters.map((filter, idx) => {
     const operatorDef = FILTER_OPERATORS.find((o) => o.value === filter.operator);
     const needsValue = operatorDef?.needsValue !== false;
     return /* @__PURE__ */ import_react8.default.createElement("div", { key: filter.id, className: "space-y-1" }, idx > 0 && /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 py-0.5 pl-1" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "h-px flex-1 bg-border" }), /* @__PURE__ */ import_react8.default.createElement(
-      LogicChip,
+      import_ui6.LogicChip,
       {
         value: filter.logic,
         onChange: (val) => patchFilter(filter.id, { logic: val })
       }
-    ), /* @__PURE__ */ import_react8.default.createElement("div", { className: "h-px flex-1 bg-border" })), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2" }, /* @__PURE__ */ import_react8.default.createElement(
+    ), /* @__PURE__ */ import_react8.default.createElement("div", { className: "h-px flex-1 bg-border" })), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 rounded-sm border border-border bg-background px-3 py-2" }, /* @__PURE__ */ import_react8.default.createElement(
       import_ui6.Input,
       {
         placeholder: "Column name",
@@ -515,7 +493,7 @@ function FilterTab({ opts, update }) {
       },
       /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Trash2, { className: "h-3.5 w-3.5" })
     )));
-  }), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Button, { type: "button", variant: "outline", size: "sm", onClick: addFilter, className: "w-full" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Condition")), filters.length > 0 && /* @__PURE__ */ import_react8.default.createElement("div", { className: "rounded-md border border-border bg-muted/30 p-3 space-y-1" }, /* @__PURE__ */ import_react8.default.createElement(MonoLabel, null, "Dynamic values"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-[11px] text-muted-foreground mt-1" }, "Use", " ", /* @__PURE__ */ import_react8.default.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "{{inputs.paramName}}"), " ", "in Value fields to inject runtime inputs from the query engine.")));
+  }), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Button, { type: "button", variant: "outline", size: "sm", onClick: addFilter, className: "w-full" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Condition")), filters.length > 0 && /* @__PURE__ */ import_react8.default.createElement("div", { className: "rounded-sm border border-border bg-muted/30 p-3 space-y-1" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Dynamic values"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-[11px] text-muted-foreground mt-1" }, "Use", " ", /* @__PURE__ */ import_react8.default.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "{{inputs.paramName}}"), " ", "in Value fields to inject runtime inputs from the query engine.")));
 }
 function SortTab({ opts, update }) {
   const sort = opts.sort;
@@ -531,11 +509,18 @@ function SortTab({ opts, update }) {
     [next[index], next[target]] = [next[target], next[index]];
     update({ sort: next });
   };
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react8.default.createElement(InfoCallout, null, "Sort rows after fetching and filtering. Rules are applied from top to bottom \u2014 the first rule is the primary sort key."), sort.length === 0 ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "rounded-md border border-dashed border-border bg-muted/30 py-8 flex flex-col items-center gap-2" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.ArrowUpDown, { className: "h-8 w-8 text-muted-foreground/40" }), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm text-muted-foreground" }, "No sort rules \u2014 rows returned in spreadsheet order."), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Button, { type: "button", variant: "outline", size: "sm", onClick: addSort }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Sort Rule")) : /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center px-1" }, /* @__PURE__ */ import_react8.default.createElement("span", null), /* @__PURE__ */ import_react8.default.createElement(MonoLabel, null, "#"), /* @__PURE__ */ import_react8.default.createElement(MonoLabel, null, "Column"), /* @__PURE__ */ import_react8.default.createElement(MonoLabel, null, "Direction"), /* @__PURE__ */ import_react8.default.createElement("span", null)), sort.map((rule, idx) => /* @__PURE__ */ import_react8.default.createElement(
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Callout, null, "Sort rows after fetching and filtering. Rules are applied from top to bottom \u2014 the first rule is the primary sort key."), sort.length === 0 ? /* @__PURE__ */ import_react8.default.createElement(
+    import_ui6.EmptyState,
+    {
+      icon: import_lucide_react.ArrowUpDown,
+      message: "No sort rules \u2014 rows returned in spreadsheet order.",
+      action: /* @__PURE__ */ import_react8.default.createElement(import_ui6.Button, { type: "button", variant: "outline", size: "sm", onClick: addSort }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Sort Rule")
+    }
+  ) : /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center px-1" }, /* @__PURE__ */ import_react8.default.createElement("span", null), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "#"), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Column"), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Direction"), /* @__PURE__ */ import_react8.default.createElement("span", null)), sort.map((rule, idx) => /* @__PURE__ */ import_react8.default.createElement(
     "div",
     {
       key: rule.id,
-      className: "grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center rounded-md border border-border bg-background px-2 py-1.5"
+      className: "grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center rounded-sm border border-border bg-background px-2 py-2"
     },
     /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col gap-0.5" }, /* @__PURE__ */ import_react8.default.createElement(
       "button",
@@ -594,7 +579,7 @@ function SortTab({ opts, update }) {
   )), /* @__PURE__ */ import_react8.default.createElement(import_ui6.Button, { type: "button", variant: "outline", size: "sm", onClick: addSort, className: "w-full" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react.Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Sort Rule")));
 }
 function SettingsTab({ opts, update }) {
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ import_react8.default.createElement(InfoCallout, null, "Advanced fetch settings. ", /* @__PURE__ */ import_react8.default.createElement("strong", null, "Range"), " limits which rows are read from the file itself (before any filters). ", /* @__PURE__ */ import_react8.default.createElement("strong", null, "Limit"), " ", "caps the final result count."), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react8.default.createElement(MonoLabel, null, "Row Range"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { htmlFor: "range" }, "A1-Notation Range"), /* @__PURE__ */ import_react8.default.createElement(
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Callout, null, "Advanced fetch settings. ", /* @__PURE__ */ import_react8.default.createElement("strong", null, "Range"), " limits which rows are read from the file itself (before any filters). ", /* @__PURE__ */ import_react8.default.createElement("strong", null, "Limit"), " ", "caps the final result count."), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Row Range"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { htmlFor: "range" }, "A1-Notation Range"), /* @__PURE__ */ import_react8.default.createElement(
     import_ui6.Input,
     {
       id: "range",
@@ -603,7 +588,7 @@ function SettingsTab({ opts, update }) {
       value: opts.range,
       onChange: (e) => update({ range: e.target.value })
     }
-  ), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Restricts rows read from the spreadsheet at the file-parse level. Format:", " ", /* @__PURE__ */ import_react8.default.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "A1:Z100"), ". Leave blank for all rows.")), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { htmlFor: "limit" }, "Row Limit"), /* @__PURE__ */ import_react8.default.createElement(
+  ), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Restricts rows read from the spreadsheet at the file-parse level. Format:", " ", /* @__PURE__ */ import_react8.default.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "A1:Z100"), ". Leave blank for all rows.")), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { htmlFor: "limit" }, "Row Limit"), /* @__PURE__ */ import_react8.default.createElement(
     import_ui6.Input,
     {
       id: "limit",
@@ -616,7 +601,7 @@ function SettingsTab({ opts, update }) {
         limit: e.target.value === "" ? "" : parseInt(e.target.value, 10)
       })
     }
-  ), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Maximum rows returned after all filters and sorts are applied. Equivalent to", " ", /* @__PURE__ */ import_react8.default.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "rows.slice(0, limit)"), ".")))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react8.default.createElement(MonoLabel, null, "Full Datasource Call Preview"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "rounded-md bg-foreground text-background p-4 font-mono text-[11px] leading-relaxed overflow-x-auto" }, /* @__PURE__ */ import_react8.default.createElement("code", { className: "whitespace-pre" }, buildDatasourcePreview(opts)))));
+  ), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Maximum rows returned after all filters and sorts are applied. Equivalent to", " ", /* @__PURE__ */ import_react8.default.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "rows.slice(0, limit)"), ".")))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Full Datasource Call Preview"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "rounded-sm bg-muted/40 border border-border p-4 font-mono text-[11px] leading-relaxed overflow-x-auto text-foreground" }, /* @__PURE__ */ import_react8.default.createElement("code", { className: "whitespace-pre" }, buildDatasourcePreview(opts)))));
 }
 function buildDatasourcePreview(opts) {
   const enabledCols = (opts.columns || []).filter((c) => c.enabled && c.sourceName);
@@ -658,26 +643,15 @@ var ExcelCSVQueryBuilder = ({ queryEditorForm }) => {
     filter: opts.filters.filter((f) => f.column).length,
     sort: opts.sort.filter((s) => s.column).length
   };
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "border-t border-border mt-4 pt-4 space-y-0" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-0.5 border-b border-border pb-0 -mb-px" }, TABS.map((tab) => {
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-0" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.Tabs, { value: activeTab, onValueChange: setActiveTab, className: "w-full" }, /* @__PURE__ */ import_react8.default.createElement(import_ui6.TabsList, null, TABS.map((tab) => {
     const Icon = tab.icon;
-    const isActive = activeTab === tab.id;
-    return /* @__PURE__ */ import_react8.default.createElement(
-      "button",
-      {
-        key: tab.id,
-        type: "button",
-        onClick: () => setActiveTab(tab.id),
-        className: `inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${isActive ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"}`
-      },
-      /* @__PURE__ */ import_react8.default.createElement(Icon, { className: "h-3.5 w-3.5" }),
-      tab.label,
-      /* @__PURE__ */ import_react8.default.createElement(Badge, { count: badges[tab.id] })
-    );
-  })), /* @__PURE__ */ import_react8.default.createElement("div", { className: "pt-4 pb-2" }, activeTab === "source" && /* @__PURE__ */ import_react8.default.createElement(SourceTab, { opts, update }), activeTab === "columns" && /* @__PURE__ */ import_react8.default.createElement(ColumnsTab, { opts, update }), activeTab === "filter" && /* @__PURE__ */ import_react8.default.createElement(FilterTab, { opts, update }), activeTab === "sort" && /* @__PURE__ */ import_react8.default.createElement(SortTab, { opts, update }), activeTab === "settings" && /* @__PURE__ */ import_react8.default.createElement(SettingsTab, { opts, update })));
+    const badgeCount = badges[tab.id];
+    return /* @__PURE__ */ import_react8.default.createElement(import_ui6.TabsTrigger, { key: tab.id, value: tab.id, className: "gap-2 px-3 py-2 text-xs" }, /* @__PURE__ */ import_react8.default.createElement(Icon, { className: "h-3.5 w-3.5" }), tab.label, badgeCount > 0 && /* @__PURE__ */ import_react8.default.createElement("span", { className: "ml-2 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold" }, badgeCount));
+  })), /* @__PURE__ */ import_react8.default.createElement(import_ui6.TabsContent, { value: "source", className: "mt-2 pb-2" }, /* @__PURE__ */ import_react8.default.createElement(SourceTab, { opts, update })), /* @__PURE__ */ import_react8.default.createElement(import_ui6.TabsContent, { value: "columns", className: "mt-2 pb-2" }, /* @__PURE__ */ import_react8.default.createElement(ColumnsTab, { opts, update })), /* @__PURE__ */ import_react8.default.createElement(import_ui6.TabsContent, { value: "filter", className: "mt-2 pb-2" }, /* @__PURE__ */ import_react8.default.createElement(FilterTab, { opts, update })), /* @__PURE__ */ import_react8.default.createElement(import_ui6.TabsContent, { value: "sort", className: "mt-2 pb-2" }, /* @__PURE__ */ import_react8.default.createElement(SortTab, { opts, update })), /* @__PURE__ */ import_react8.default.createElement(import_ui6.TabsContent, { value: "settings", className: "mt-2 pb-2" }, /* @__PURE__ */ import_react8.default.createElement(SettingsTab, { opts, update }))));
 };
 
 // src/components/googlesheets/GoogleSheetsDatasourceEditor.jsx
-var import_react11 = __toESM(require("react"));
+var import_react10 = __toESM(require("react"));
 
 // src/context/DatasourceEditorContext.js
 var import_react9 = __toESM(require("react"));
@@ -692,50 +666,27 @@ var useDatasourceEditorContext = () => {
   return ctx;
 };
 
-// src/primitives/EditorPrimitives.jsx
-var import_react10 = __toESM(require("react"));
+// src/components/googlesheets/GoogleSheetsDatasourceEditor.jsx
+var import_ui7 = require("@jet-admin/ui");
 var import_lucide_react2 = require("lucide-react");
-function MonoLabel2({ children }) {
-  return /* @__PURE__ */ import_react10.default.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, children);
+function StepIndicator({ steps, currentStep }) {
+  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-1 mb-6" }, steps.map((step, i) => {
+    const isActive = i === currentStep;
+    const isComplete = i < currentStep;
+    return /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, { key: step.id }, i > 0 && /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.ChevronRight, { className: `h-3.5 w-3.5 shrink-0 ${isComplete ? "text-primary" : "text-muted-foreground/30"}` }), /* @__PURE__ */ import_react10.default.createElement("div", { className: `flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-medium transition-colors ${isActive ? "bg-muted text-foreground" : isComplete ? "bg-muted/50 text-foreground/70" : "text-muted-foreground/50"}` }, isComplete ? /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.Check, { className: "h-3 w-3" }) : /* @__PURE__ */ import_react10.default.createElement("span", { className: "h-4 w-4 flex items-center justify-center rounded-full border text-[10px] font-bold border-current" }, i + 1), step.label));
+  }));
 }
-function InfoCallout2({ children }) {
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "rounded-md border border-primary/20 bg-primary/5 p-3 text-[11px] text-primary/80 flex gap-2" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.Info, { className: "h-3.5 w-3.5 mt-0.5 shrink-0" }), /* @__PURE__ */ import_react10.default.createElement("span", null, children));
-}
-function LogicChip2({ value, onChange }) {
+function AuthMethodCard({ icon: Icon, title, description, isSelected, onClick }) {
   return /* @__PURE__ */ import_react10.default.createElement(
     "button",
     {
       type: "button",
-      onClick: () => onChange(value === "AND" ? "OR" : "AND"),
-      className: `text-[9px] font-bold px-2 py-0.5 rounded border transition-colors ${value === "AND" ? "bg-primary/10 text-primary border-primary/30" : "bg-amber-50 text-amber-600 border-amber-200"}`
-    },
-    value
-  );
-}
-function EmptyState({ icon: Icon, message, action }) {
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "rounded-md border border-border border-dashed bg-muted/30 py-8 flex flex-col items-center gap-2" }, Icon && /* @__PURE__ */ import_react10.default.createElement(Icon, { className: "h-8 w-8 text-muted-foreground/40" }), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-sm text-muted-foreground text-center" }, message), action);
-}
-
-// src/components/googlesheets/GoogleSheetsDatasourceEditor.jsx
-var import_lucide_react3 = require("lucide-react");
-function StepIndicator({ steps, currentStep }) {
-  return /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-1 mb-6" }, steps.map((step, i) => {
-    const isActive = i === currentStep;
-    const isComplete = i < currentStep;
-    return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, { key: step.id }, i > 0 && /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.ChevronRight, { className: `h-3.5 w-3.5 shrink-0 ${isComplete ? "text-primary" : "text-muted-foreground/30"}` }), /* @__PURE__ */ import_react11.default.createElement("div", { className: `flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${isActive ? "bg-muted text-foreground" : isComplete ? "bg-muted/50 text-foreground/70" : "text-muted-foreground/50"}` }, isComplete ? /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.Check, { className: "h-3 w-3" }) : /* @__PURE__ */ import_react11.default.createElement("span", { className: "h-4 w-4 flex items-center justify-center rounded-full border text-[10px] font-bold border-current" }, i + 1), step.label));
-  }));
-}
-function AuthMethodCard({ icon: Icon, title, description, isSelected, onClick }) {
-  return /* @__PURE__ */ import_react11.default.createElement(
-    "button",
-    {
-      type: "button",
       onClick,
-      className: `flex items-start gap-3 p-4 rounded-md border-2 text-left transition-all w-full ${isSelected ? "border-foreground bg-muted/20 shadow-sm" : "border-border hover:border-muted-foreground/30 hover:bg-muted/10"}`
+      className: `flex items-start gap-3 p-3.5 rounded-sm border text-left transition-all w-full ${isSelected ? "border-primary bg-primary/10 text-foreground shadow-sm" : "border-border bg-background text-muted-foreground hover:bg-muted/30"}`
     },
-    /* @__PURE__ */ import_react11.default.createElement("div", { className: `p-2 rounded-md shrink-0 border ${isSelected ? "bg-background text-foreground border-border shadow-sm" : "bg-muted text-muted-foreground border-transparent"}` }, /* @__PURE__ */ import_react11.default.createElement(Icon, { className: "h-5 w-5" })),
-    /* @__PURE__ */ import_react11.default.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ import_react11.default.createElement("p", { className: `text-sm font-semibold ${isSelected ? "text-foreground" : "text-muted-foreground"}` }, title), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-xs text-muted-foreground mt-0.5" }, description)),
-    isSelected && /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.Check, { className: "h-4 w-4 text-foreground shrink-0 ml-auto mt-1" })
+    /* @__PURE__ */ import_react10.default.createElement(Icon, { className: `h-5 w-5 shrink-0 mt-0.5 ${isSelected ? "text-primary" : "text-muted-foreground/80"}` }),
+    /* @__PURE__ */ import_react10.default.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ import_react10.default.createElement("p", { className: `text-sm font-medium ${isSelected ? "text-foreground" : "text-muted-foreground"}` }, title), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-xs text-muted-foreground mt-0.5" }, description)),
+    isSelected && /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.Check, { className: "h-4 w-4 text-primary shrink-0 ml-auto mt-0.5" })
   );
 }
 var STEPS = [
@@ -745,16 +696,16 @@ var STEPS = [
 var GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
   const { oauth } = useDatasourceEditorContext();
   const options = datasourceEditorForm.datasourceOptions || {};
-  const [currentStep, setCurrentStep] = (0, import_react11.useState)(
+  const [currentStep, setCurrentStep] = (0, import_react10.useState)(
     options.authType && (options.serviceAccountKey || options.oauth2?.vaultCredentialID) ? 1 : 0
   );
   const authType = options.authType || "serviceAccount";
   const isOAuthConnected = !!options.oauth2?.vaultCredentialID;
   const hasServiceAccountKey = !!options.serviceAccountKey;
-  const handleAuthTypeChange = (0, import_react11.useCallback)((type) => {
+  const handleAuthTypeChange = (0, import_react10.useCallback)((type) => {
     datasourceEditorForm.patchDatasourceOptions({ authType: type });
   }, [datasourceEditorForm]);
-  const handleOAuthConnect = (0, import_react11.useCallback)(() => {
+  const handleOAuthConnect = (0, import_react10.useCallback)(() => {
     oauth.startOAuth(
       (vaultCredentialID) => {
         datasourceEditorForm.patchDatasourceOptions({
@@ -764,127 +715,132 @@ var GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
       }
     );
   }, [oauth, datasourceEditorForm]);
-  const handleServiceAccountKeyChange = (0, import_react11.useCallback)((e) => {
+  const handleServiceAccountKeyChange = (0, import_react10.useCallback)((e) => {
     datasourceEditorForm.patchDatasourceOptions({
       serviceAccountKey: e.target.value
     });
   }, [datasourceEditorForm]);
-  const handleServiceAccountContinue = (0, import_react11.useCallback)(() => {
+  const handleServiceAccountContinue = (0, import_react10.useCallback)(() => {
     if (hasServiceAccountKey) {
       setCurrentStep(1);
     }
   }, [hasServiceAccountKey]);
-  const handleConnectionNameChange = (0, import_react11.useCallback)((e) => {
+  const handleConnectionNameChange = (0, import_react10.useCallback)((e) => {
     datasourceEditorForm.patchDatasourceOptions({
       connectionName: e.target.value
     });
   }, [datasourceEditorForm]);
-  const handleDefaultSpreadsheetIdChange = (0, import_react11.useCallback)((e) => {
+  const handleDefaultSpreadsheetIdChange = (0, import_react10.useCallback)((e) => {
     datasourceEditorForm.patchDatasourceOptions({
       defaultSpreadsheetId: e.target.value
     });
   }, [datasourceEditorForm]);
-  return /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react11.default.createElement(StepIndicator, { steps: STEPS, currentStep }), currentStep === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react11.default.createElement(
+  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react10.default.createElement(StepIndicator, { steps: STEPS, currentStep }), currentStep === 0 && /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react10.default.createElement(
     AuthMethodCard,
     {
-      icon: import_lucide_react3.KeyRound,
+      icon: import_lucide_react2.KeyRound,
       title: "Service Account",
       description: "Use a Google Cloud service account JSON key for server-to-server authentication.",
       isSelected: authType === "serviceAccount",
       onClick: () => handleAuthTypeChange("serviceAccount")
     }
-  ), /* @__PURE__ */ import_react11.default.createElement(
+  ), /* @__PURE__ */ import_react10.default.createElement(
     AuthMethodCard,
     {
-      icon: import_lucide_react3.Globe,
+      icon: import_lucide_react2.Globe,
       title: "OAuth 2.0",
       description: "Connect your Google Account interactively. Best for accessing personal spreadsheets.",
       isSelected: authType === "oauth2",
       onClick: () => handleAuthTypeChange("oauth2")
     }
-  )), authType === "serviceAccount" && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3 pt-2" }, /* @__PURE__ */ import_react11.default.createElement("label", { className: "text-xs font-medium text-foreground" }, "Service Account JSON Key"), /* @__PURE__ */ import_react11.default.createElement(
-    "textarea",
+  )), authType === "serviceAccount" && /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-3 pt-2" }, /* @__PURE__ */ import_react10.default.createElement(import_ui7.Label, null, "Service Account JSON Key"), /* @__PURE__ */ import_react10.default.createElement(
+    import_ui7.Textarea,
     {
-      className: "w-full min-h-[160px] rounded-md border border-input bg-background px-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y",
+      className: "min-h-[160px] font-mono text-xs",
       placeholder: "Paste the entire JSON key content here...",
       value: options.serviceAccountKey || "",
       onChange: handleServiceAccountKeyChange
     }
-  ), hasServiceAccountKey && /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-2 text-xs text-foreground" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.ShieldCheck, { className: "h-3.5 w-3.5" }), /* @__PURE__ */ import_react11.default.createElement("span", null, "Key provided")), /* @__PURE__ */ import_react11.default.createElement(
-    "button",
+  ), hasServiceAccountKey && /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 text-xs text-foreground" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.ShieldCheck, { className: "h-3.5 w-3.5 text-primary" }), /* @__PURE__ */ import_react10.default.createElement("span", null, "Key provided")), /* @__PURE__ */ import_react10.default.createElement(
+    import_ui7.Button,
     {
       type: "button",
       disabled: !hasServiceAccountKey,
       onClick: handleServiceAccountContinue,
-      className: "w-full flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+      variant: "green",
+      className: "w-full"
     },
     "Continue",
-    /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.ChevronRight, { className: "h-4 w-4" })
-  )), authType === "oauth2" && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3 pt-2" }, isOAuthConnected ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-3 p-3 rounded-md border border-border bg-muted/30" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.ShieldCheck, { className: "h-5 w-5 text-foreground shrink-0" }), /* @__PURE__ */ import_react11.default.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-sm font-medium text-foreground" }, "Google Account Connected"), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-xs text-muted-foreground mt-0.5" }, "Credential ID: ", options.oauth2.vaultCredentialID)), /* @__PURE__ */ import_react11.default.createElement(
-    "button",
+    /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.ChevronRight, { className: "h-4 w-4" })
+  )), authType === "oauth2" && /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-3 pt-2" }, isOAuthConnected ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-3 p-3 rounded-sm border border-primary/20 bg-primary/5" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.ShieldCheck, { className: "h-5 w-5 text-primary shrink-0" }), /* @__PURE__ */ import_react10.default.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Google Account Connected"), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-xs text-muted-foreground mt-0.5 font-mono truncate" }, "Credential ID: ", options.oauth2.vaultCredentialID)), /* @__PURE__ */ import_react10.default.createElement(
+    import_ui7.Button,
     {
       type: "button",
       onClick: handleOAuthConnect,
-      className: "ml-auto text-xs text-foreground underline-offset-2 hover:underline shrink-0"
+      variant: "ghost",
+      size: "sm",
+      className: "text-muted-foreground hover:text-foreground h-7 text-xs font-normal"
     },
     "Reconnect"
-  )) : /* @__PURE__ */ import_react11.default.createElement(InfoCallout2, null, "You'll be redirected to Google to authorize access to your spreadsheets. Credentials are stored securely in the vault."), isOAuthConnected ? /* @__PURE__ */ import_react11.default.createElement(
-    "button",
+  )) : /* @__PURE__ */ import_react10.default.createElement(import_ui7.Callout, null, "You'll be redirected to Google to authorize access to your spreadsheets. Credentials are stored securely in the vault."), isOAuthConnected ? /* @__PURE__ */ import_react10.default.createElement(
+    import_ui7.Button,
     {
       type: "button",
       onClick: () => setCurrentStep(1),
-      className: "w-full flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+      variant: "green",
+      className: "w-full"
     },
     "Continue",
-    /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.ChevronRight, { className: "h-4 w-4" })
-  ) : /* @__PURE__ */ import_react11.default.createElement(
-    "button",
+    /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.ChevronRight, { className: "h-4 w-4" })
+  ) : /* @__PURE__ */ import_react10.default.createElement(
+    import_ui7.Button,
     {
       type: "button",
       onClick: handleOAuthConnect,
       disabled: oauth.loading,
-      className: "w-full flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+      variant: "green",
+      className: "w-full"
     },
-    oauth.loading ? /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.Loader2, { className: "h-4 w-4 animate-spin" }), "Connecting...") : /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.Globe, { className: "h-4 w-4" }), "Connect Google Account")
-  ))), currentStep === 1 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react11.default.createElement(
-    "button",
+    oauth.loading ? /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.Loader2, { className: "h-4 w-4 animate-spin" }), "Connecting...") : /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.Globe, { className: "h-4 w-4" }), "Connect Google Account")
+  ))), currentStep === 1 && /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react10.default.createElement(
+    import_ui7.Button,
     {
       type: "button",
       onClick: () => setCurrentStep(0),
-      className: "text-xs text-muted-foreground hover:text-foreground transition-colors"
+      variant: "ghost",
+      size: "sm",
+      className: "text-muted-foreground hover:text-foreground h-7 px-2 -ml-2 font-normal"
     },
     "\u2190 Back to authentication"
-  ), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-2 p-2.5 rounded-md border border-border bg-muted/30 text-xs" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.ShieldCheck, { className: "h-4 w-4 text-foreground shrink-0" }), /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-foreground font-medium" }, authType === "oauth2" ? "OAuth 2.0" : "Service Account", " \u2014 Connected")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement("label", { className: "text-xs font-medium text-foreground", htmlFor: "gs-connectionName" }, "Connection Name"), /* @__PURE__ */ import_react11.default.createElement(
-    "input",
+  ), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 p-2.5 rounded-sm border border-primary/20 bg-primary/5 text-xs text-primary" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.ShieldCheck, { className: "h-4 w-4 shrink-0" }), /* @__PURE__ */ import_react10.default.createElement("span", { className: "font-semibold" }, authType === "oauth2" ? "OAuth 2.0" : "Service Account", " \u2014 Connected")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react10.default.createElement(import_ui7.Label, { htmlFor: "gs-connectionName" }, "Connection Name"), /* @__PURE__ */ import_react10.default.createElement(
+    import_ui7.Input,
     {
       id: "gs-connectionName",
       type: "text",
-      className: "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
       placeholder: "My Google Sheets",
       value: options.connectionName || "",
       onChange: handleConnectionNameChange
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement("label", { className: "text-xs font-medium text-foreground", htmlFor: "gs-defaultSpreadsheetId" }, "Default Spreadsheet ID ", /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-muted-foreground" }, "(optional)")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react11.default.createElement(import_lucide_react3.FileSpreadsheet, { className: "h-4 w-4 text-muted-foreground shrink-0" }), /* @__PURE__ */ import_react11.default.createElement(
-    "input",
+  )), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react10.default.createElement(import_ui7.Label, { htmlFor: "gs-defaultSpreadsheetId" }, "Default Spreadsheet ID ", /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-muted-foreground" }, "(optional)")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react10.default.createElement(import_lucide_react2.FileSpreadsheet, { className: "h-4 w-4 text-muted-foreground shrink-0" }), /* @__PURE__ */ import_react10.default.createElement(
+    import_ui7.Input,
     {
       id: "gs-defaultSpreadsheetId",
       type: "text",
-      className: "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
       placeholder: "e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms",
       value: options.defaultSpreadsheetId || "",
       onChange: handleDefaultSpreadsheetIdChange
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[11px] text-muted-foreground" }, "Found in the spreadsheet URL: docs.google.com/spreadsheets/d/", /* @__PURE__ */ import_react11.default.createElement("strong", null, "SPREADSHEET_ID"), "/edit"))));
+  )), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-[11px] text-muted-foreground" }, "Found in the spreadsheet URL: docs.google.com/spreadsheets/d/", /* @__PURE__ */ import_react10.default.createElement("strong", null, "SPREADSHEET_ID"), "/edit"))));
 };
 
 // src/components/googlesheets/GoogleSheetsQueryEditor.jsx
-var import_react14 = __toESM(require("react"));
+var import_react12 = __toESM(require("react"));
 
 // src/context/QueryEditorContext.js
-var import_react12 = __toESM(require("react"));
-var QueryEditorContext = (0, import_react12.createContext)(null);
+var import_react11 = __toESM(require("react"));
+var QueryEditorContext = (0, import_react11.createContext)(null);
 var useQueryEditorContext = () => {
-  const ctx = (0, import_react12.useContext)(QueryEditorContext);
+  const ctx = (0, import_react11.useContext)(QueryEditorContext);
   if (!ctx) {
     throw new Error(
       "useQueryEditorContext() must be used inside a <QueryEditorContext.Provider>. This provider is wired in the frontend app's DataQueryEditor component."
@@ -893,54 +849,30 @@ var useQueryEditorContext = () => {
   return ctx;
 };
 
-// src/primitives/EditorTabBar.jsx
-var import_react13 = __toESM(require("react"));
-function TabBadge({ count }) {
-  if (!count) return null;
-  return /* @__PURE__ */ import_react13.default.createElement("span", { className: "ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold" }, count);
-}
-var EditorTabBar = ({ tabs, activeTab, onTabChange, badges = {} }) => {
-  return /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex items-center gap-0.5 border-b border-border pb-0 -mb-px" }, tabs.map((tab) => {
-    const Icon = tab.icon;
-    const isActive = activeTab === tab.id;
-    return /* @__PURE__ */ import_react13.default.createElement(
-      "button",
-      {
-        key: tab.id,
-        type: "button",
-        onClick: () => onTabChange(tab.id),
-        className: `inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${isActive ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"}`
-      },
-      Icon && /* @__PURE__ */ import_react13.default.createElement(Icon, { className: "h-3.5 w-3.5" }),
-      tab.label,
-      /* @__PURE__ */ import_react13.default.createElement(TabBadge, { count: badges[tab.id] })
-    );
-  }));
-};
-
 // src/components/googlesheets/GoogleSheetsQueryEditor.jsx
-var import_lucide_react4 = require("lucide-react");
+var import_ui8 = require("@jet-admin/ui");
+var import_lucide_react3 = require("lucide-react");
 var OPERATIONS = [
-  { id: "read", label: "Read", icon: import_lucide_react4.BookOpen, description: "Fetch data from a sheet range" },
-  { id: "write", label: "Write", icon: import_lucide_react4.PenLine, description: "Write data to a sheet range" },
-  { id: "append", label: "Append", icon: import_lucide_react4.Plus, description: "Append rows to the end of a sheet" },
-  { id: "update", label: "Update", icon: import_lucide_react4.PenLine, description: "Update cells in a range" },
-  { id: "clear", label: "Clear", icon: import_lucide_react4.Trash2, description: "Clear data from a range" },
-  { id: "getSpreadsheetInfo", label: "Get Info", icon: import_lucide_react4.Info, description: "Get spreadsheet metadata" }
+  { id: "read", label: "Read", icon: import_lucide_react3.BookOpen, description: "Fetch data from a sheet range" },
+  { id: "write", label: "Write", icon: import_lucide_react3.PenLine, description: "Write data to a sheet range" },
+  { id: "append", label: "Append", icon: import_lucide_react3.Plus, description: "Append rows to the end of a sheet" },
+  { id: "update", label: "Update", icon: import_lucide_react3.PenLine, description: "Update cells in a range" },
+  { id: "clear", label: "Clear", icon: import_lucide_react3.Trash2, description: "Clear data from a range" },
+  { id: "getSpreadsheetInfo", label: "Get Info", icon: import_lucide_react3.Info, description: "Get spreadsheet metadata" }
 ];
 var TABS2 = [
-  { id: "source", label: "Source", icon: import_lucide_react4.FileSpreadsheet },
-  { id: "options", label: "Options", icon: import_lucide_react4.Settings2 },
-  { id: "preview", label: "Preview", icon: import_lucide_react4.Eye }
+  { id: "source", label: "Source", icon: import_lucide_react3.FileSpreadsheet },
+  { id: "options", label: "Options", icon: import_lucide_react3.Settings2 },
+  { id: "preview", label: "Preview", icon: import_lucide_react3.Eye }
 ];
 function SpreadsheetSearch({ onSelect, selectedId, apiProxy }) {
-  const [query, setQuery] = (0, import_react14.useState)("");
-  const [results, setResults] = (0, import_react14.useState)([]);
-  const [loading, setLoading] = (0, import_react14.useState)(false);
-  const [nextPageToken, setNextPageToken] = (0, import_react14.useState)(null);
-  const [searched, setSearched] = (0, import_react14.useState)(false);
-  const debounceRef = (0, import_react14.useRef)(null);
-  const doSearch = (0, import_react14.useCallback)(async (searchQuery, pageToken) => {
+  const [query, setQuery] = (0, import_react12.useState)("");
+  const [results, setResults] = (0, import_react12.useState)([]);
+  const [loading, setLoading] = (0, import_react12.useState)(false);
+  const [nextPageToken, setNextPageToken] = (0, import_react12.useState)(null);
+  const [searched, setSearched] = (0, import_react12.useState)(false);
+  const debounceRef = (0, import_react12.useRef)(null);
+  const doSearch = (0, import_react12.useCallback)(async (searchQuery, pageToken) => {
     setLoading(true);
     try {
       const res = await apiProxy.post("listSpreadsheets", {
@@ -962,33 +894,44 @@ function SpreadsheetSearch({ onSelect, selectedId, apiProxy }) {
       setLoading(false);
     }
   }, [apiProxy]);
-  (0, import_react14.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       doSearch(query, null);
     }, 400);
     return () => clearTimeout(debounceRef.current);
   }, [query, doSearch]);
-  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "relative" }, /* @__PURE__ */ import_react14.default.createElement(import_lucide_react4.Search, { className: "absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react14.default.createElement(
-    "input",
+  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "relative flex-1 flex items-center" }, /* @__PURE__ */ import_react12.default.createElement(import_lucide_react3.Search, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Input,
     {
       type: "text",
-      className: "flex h-9 w-full rounded-md border border-input bg-background pl-8 pr-3 py-1 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+      className: "pl-8",
       placeholder: "Search spreadsheets...",
       value: query,
       onChange: (e) => setQuery(e.target.value)
     }
-  ), loading && /* @__PURE__ */ import_react14.default.createElement(import_lucide_react4.Loader2, { className: "absolute right-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground animate-spin" })), /* @__PURE__ */ import_react14.default.createElement("div", { className: "max-h-[240px] overflow-y-auto rounded-md border border-border" }, results.length === 0 && !loading && searched ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "p-6 text-center text-sm text-muted-foreground" }, "No spreadsheets found") : /* @__PURE__ */ import_react14.default.createElement("div", { className: "divide-y divide-border" }, results.map((ss) => /* @__PURE__ */ import_react14.default.createElement(
+  ), loading && /* @__PURE__ */ import_react12.default.createElement("div", { className: "absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" }, /* @__PURE__ */ import_react12.default.createElement(import_lucide_react3.Loader2, { className: "h-3.5 w-3.5 text-muted-foreground animate-spin" }))), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Button,
+    {
+      type: "button",
+      variant: "outline",
+      size: "icon",
+      className: "h-8 w-8",
+      onClick: () => doSearch(query, null),
+      title: "Refresh list"
+    },
+    /* @__PURE__ */ import_react12.default.createElement(import_lucide_react3.RefreshCw, { className: "h-4 w-4 text-muted-foreground hover:text-foreground" })
+  )), results.length === 0 && !loading && searched ? /* @__PURE__ */ import_react12.default.createElement("div", { className: "p-6 text-center text-sm text-muted-foreground" }, "No spreadsheets found") : results?.length > 0 && /* @__PURE__ */ import_react12.default.createElement("div", { className: "max-h-[240px] overflow-y-auto rounded-sm border border-border" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex flex-col" }, results.map((ss) => /* @__PURE__ */ import_react12.default.createElement(
     "button",
     {
       key: ss.id,
       type: "button",
       onClick: () => onSelect(ss),
-      className: `w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${selectedId === ss.id ? "bg-muted/50 border-l-2 border-l-foreground" : "hover:bg-muted/30 border-l-2 border-l-transparent"}`
+      className: `w-full flex items-center gap-3 px-3 py-2 text-left transition-colors border-l-2 border-t border-t-border first:border-t-0 ${selectedId === ss.id ? "bg-primary/10 text-primary border-l-primary" : "hover:bg-muted/30 border-l-transparent text-muted-foreground"}`
     },
-    /* @__PURE__ */ import_react14.default.createElement(import_lucide_react4.FileSpreadsheet, { className: `h-4 w-4 shrink-0 ${selectedId === ss.id ? "text-foreground" : "text-muted-foreground"}` }),
-    /* @__PURE__ */ import_react14.default.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-sm font-medium text-foreground truncate" }, ss.name), /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[11px] text-muted-foreground truncate" }, ss.owner && `${ss.owner} \xB7 `, ss.modifiedTime && new Date(ss.modifiedTime).toLocaleDateString())),
-    ss.webViewLink && /* @__PURE__ */ import_react14.default.createElement(
+    /* @__PURE__ */ import_react12.default.createElement(import_lucide_react3.FileSpreadsheet, { className: `h-4 w-4 shrink-0 ${selectedId === ss.id ? "text-primary" : "text-muted-foreground"}` }),
+    /* @__PURE__ */ import_react12.default.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-xs font-medium text-foreground truncate" }, ss.name), /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-[10px] text-muted-foreground truncate" }, ss.owner && `${ss.owner} \xB7 `, ss.modifiedTime && new Date(ss.modifiedTime).toLocaleDateString())),
+    ss.webViewLink && /* @__PURE__ */ import_react12.default.createElement(
       "a",
       {
         href: ss.webViewLink,
@@ -997,23 +940,25 @@ function SpreadsheetSearch({ onSelect, selectedId, apiProxy }) {
         onClick: (e) => e.stopPropagation(),
         className: "text-muted-foreground hover:text-foreground"
       },
-      /* @__PURE__ */ import_react14.default.createElement(import_lucide_react4.ExternalLink, { className: "h-3.5 w-3.5" })
+      /* @__PURE__ */ import_react12.default.createElement(import_lucide_react3.ExternalLink, { className: "h-3.5 w-3.5" })
     )
-  )))), nextPageToken && !loading && /* @__PURE__ */ import_react14.default.createElement(
-    "button",
+  )))), nextPageToken && !loading && /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Button,
     {
       type: "button",
       onClick: () => doSearch(query, nextPageToken),
-      className: "w-full text-center text-xs text-foreground hover:underline py-1"
+      variant: "ghost",
+      size: "sm",
+      className: "w-full py-1 text-xs"
     },
     "Load more..."
   ));
 }
 function SheetSelector({ spreadsheetId, selectedSheet, onSelect, apiProxy }) {
-  const [sheets, setSheets] = (0, import_react14.useState)([]);
-  const [loading, setLoading] = (0, import_react14.useState)(false);
-  const [spreadsheetTitle, setSpreadsheetTitle] = (0, import_react14.useState)("");
-  (0, import_react14.useEffect)(() => {
+  const [sheets, setSheets] = (0, import_react12.useState)([]);
+  const [loading, setLoading] = (0, import_react12.useState)(false);
+  const [spreadsheetTitle, setSpreadsheetTitle] = (0, import_react12.useState)("");
+  (0, import_react12.useEffect)(() => {
     if (!spreadsheetId) return;
     let cancelled = false;
     setLoading(true);
@@ -1035,24 +980,24 @@ function SheetSelector({ spreadsheetId, selectedSheet, onSelect, apiProxy }) {
   }, [spreadsheetId, apiProxy]);
   if (!spreadsheetId) return null;
   if (loading) {
-    return /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex items-center gap-2 text-xs text-muted-foreground p-2" }, /* @__PURE__ */ import_react14.default.createElement(import_lucide_react4.Loader2, { className: "h-3.5 w-3.5 animate-spin" }), "Loading sheets...");
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex items-center gap-2 text-xs text-muted-foreground p-2" }, /* @__PURE__ */ import_react12.default.createElement(import_lucide_react3.Loader2, { className: "h-3.5 w-3.5 animate-spin" }), "Loading sheets...");
   }
-  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, spreadsheetTitle && /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[11px] text-muted-foreground" }, "Sheets in ", /* @__PURE__ */ import_react14.default.createElement("strong", null, spreadsheetTitle)), /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex flex-wrap gap-1.5" }, sheets.map((sheet) => /* @__PURE__ */ import_react14.default.createElement(
+  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, spreadsheetTitle && /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Sheets in ", spreadsheetTitle), /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex flex-wrap gap-1.5" }, sheets.map((sheet) => /* @__PURE__ */ import_react12.default.createElement(
     "button",
     {
       key: sheet.sheetId,
       type: "button",
       onClick: () => onSelect(sheet.title),
-      className: `inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${selectedSheet === sheet.title ? "bg-muted text-foreground border-border" : "bg-muted/10 text-muted-foreground border-border hover:border-muted-foreground/30 hover:text-foreground"}`
+      className: `inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-medium border transition-colors ${selectedSheet === sheet.title ? "bg-primary/10 text-primary border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:bg-muted/50"}`
     },
-    /* @__PURE__ */ import_react14.default.createElement(import_lucide_react4.Table2, { className: "h-3 w-3" }),
+    /* @__PURE__ */ import_react12.default.createElement(import_lucide_react3.Table2, { className: "h-3 w-3" }),
     sheet.title
   ))));
 }
 function DataPreview({ spreadsheetId, sheetName, apiProxy }) {
-  const [preview, setPreview] = (0, import_react14.useState)(null);
-  const [loading, setLoading] = (0, import_react14.useState)(false);
-  const fetchPreview = (0, import_react14.useCallback)(async () => {
+  const [preview, setPreview] = (0, import_react12.useState)(null);
+  const [loading, setLoading] = (0, import_react12.useState)(false);
+  const fetchPreview = (0, import_react12.useCallback)(async () => {
     if (!spreadsheetId || !sheetName) return;
     setLoading(true);
     try {
@@ -1069,45 +1014,47 @@ function DataPreview({ spreadsheetId, sheetName, apiProxy }) {
       setLoading(false);
     }
   }, [spreadsheetId, sheetName, apiProxy]);
-  (0, import_react14.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     fetchPreview();
   }, [fetchPreview]);
   if (!spreadsheetId || !sheetName) {
-    return /* @__PURE__ */ import_react14.default.createElement(
-      EmptyState,
+    return /* @__PURE__ */ import_react12.default.createElement(
+      import_ui8.EmptyState,
       {
-        icon: import_lucide_react4.Eye,
+        icon: import_lucide_react3.Eye,
         message: "Select a spreadsheet and sheet to preview data."
       }
     );
   }
   if (loading) {
-    return /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex items-center justify-center gap-2 p-8 text-sm text-muted-foreground" }, /* @__PURE__ */ import_react14.default.createElement(import_lucide_react4.Loader2, { className: "h-4 w-4 animate-spin" }), "Loading preview...");
+    return /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex items-center justify-center gap-2 p-8 text-sm text-muted-foreground" }, /* @__PURE__ */ import_react12.default.createElement(import_lucide_react3.Loader2, { className: "h-4 w-4 animate-spin" }), "Loading preview...");
   }
   if (!preview || preview.headers.length === 0) {
-    return /* @__PURE__ */ import_react14.default.createElement(EmptyState, { icon: import_lucide_react4.Table2, message: "No data found in the selected range." });
+    return /* @__PURE__ */ import_react12.default.createElement(import_ui8.EmptyState, { icon: import_lucide_react3.Table2, message: "No data found in the selected range." });
   }
-  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[11px] text-muted-foreground" }, "Showing ", preview.rows.length, " of ", preview.totalRows, " rows"), /* @__PURE__ */ import_react14.default.createElement(
-    "button",
+  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-[11px] text-muted-foreground" }, "Showing ", preview.rows.length, " of ", preview.totalRows, " rows"), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Button,
     {
       type: "button",
       onClick: fetchPreview,
-      className: "text-[11px] text-foreground underline-offset-2 hover:underline"
+      variant: "link",
+      size: "sm",
+      className: "h-auto p-0 text-[11px] font-normal"
     },
     "Refresh"
-  )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "overflow-x-auto rounded-md border border-border" }, /* @__PURE__ */ import_react14.default.createElement("table", { className: "w-full text-xs" }, /* @__PURE__ */ import_react14.default.createElement("thead", null, /* @__PURE__ */ import_react14.default.createElement("tr", { className: "bg-muted/50" }, preview.headers.map((h, i) => /* @__PURE__ */ import_react14.default.createElement("th", { key: i, className: "px-3 py-1.5 text-left font-semibold text-foreground whitespace-nowrap border-b border-border" }, h)))), /* @__PURE__ */ import_react14.default.createElement("tbody", null, preview.rows.map((row, ri) => /* @__PURE__ */ import_react14.default.createElement("tr", { key: ri, className: "border-b border-border last:border-0 hover:bg-muted/20" }, preview.headers.map((_, ci) => /* @__PURE__ */ import_react14.default.createElement("td", { key: ci, className: "px-3 py-1.5 text-foreground whitespace-nowrap max-w-[200px] truncate" }, row[ci] ?? ""))))))));
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "overflow-x-auto rounded-sm border border-border" }, /* @__PURE__ */ import_react12.default.createElement("table", { className: "w-full text-xs" }, /* @__PURE__ */ import_react12.default.createElement("thead", null, /* @__PURE__ */ import_react12.default.createElement("tr", { className: "bg-muted/50" }, preview.headers.map((h, i) => /* @__PURE__ */ import_react12.default.createElement("th", { key: i, className: "px-3 py-1.5 text-left font-semibold text-foreground whitespace-nowrap border-b border-border" }, h)))), /* @__PURE__ */ import_react12.default.createElement("tbody", null, preview.rows.map((row, ri) => /* @__PURE__ */ import_react12.default.createElement("tr", { key: ri, className: "border-b border-border last:border-0 hover:bg-muted/20" }, preview.headers.map((_, ci) => /* @__PURE__ */ import_react12.default.createElement("td", { key: ci, className: "px-3 py-1.5 text-foreground whitespace-nowrap max-w-[200px] truncate" }, row[ci] ?? ""))))))));
 }
 var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
   const { apiProxy } = useQueryEditorContext();
   const opts = queryEditorForm.dataQueryOptions || {};
-  const [activeTab, setActiveTab] = (0, import_react14.useState)("source");
-  const patch = (0, import_react14.useCallback)((updates) => {
+  const [activeTab, setActiveTab] = (0, import_react12.useState)("source");
+  const patch = (0, import_react12.useCallback)((updates) => {
     queryEditorForm.patchQueryOptions(updates);
   }, [queryEditorForm]);
   const operation = opts.operation || "read";
   const spreadsheetId = opts.spreadsheetId || "";
   const sheetName = opts.sheetName || "";
-  (0, import_react14.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     if (!opts.operation) {
       patch({ operation: "read" });
     }
@@ -1115,37 +1062,41 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
   const badges = {
     source: spreadsheetId ? 1 : 0
   };
-  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-0" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "pb-4" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "text-xs font-medium text-foreground mb-2 block" }, "Operation"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "grid grid-cols-3 gap-1.5" }, OPERATIONS.map((op) => {
+  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-0" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "pb-4" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, { className: "mb-2 block" }, "Operation"), /* @__PURE__ */ import_react12.default.createElement("div", { className: "grid grid-cols-3 gap-1.5" }, OPERATIONS.map((op) => {
     const Icon = op.icon;
     const isSelected = operation === op.id;
-    return /* @__PURE__ */ import_react14.default.createElement(
+    return /* @__PURE__ */ import_react12.default.createElement(
       "button",
       {
         key: op.id,
         type: "button",
         onClick: () => patch({ operation: op.id }),
-        className: `flex items-center gap-2 p-2.5 rounded-md border text-left transition-all ${isSelected ? "border-foreground bg-muted/20 shadow-sm" : "border-border hover:border-muted-foreground/30 hover:bg-muted/10"}`
+        className: `flex items-center gap-2 p-2.5 rounded-sm border text-left transition-all ${isSelected ? "border-primary bg-primary/10 text-primary shadow-sm" : "border-border bg-background text-muted-foreground hover:bg-muted/30"}`
       },
-      /* @__PURE__ */ import_react14.default.createElement(Icon, { className: `h-3.5 w-3.5 shrink-0 ${isSelected ? "text-foreground" : "text-muted-foreground"}` }),
-      /* @__PURE__ */ import_react14.default.createElement("span", { className: `text-xs font-medium ${isSelected ? "text-foreground" : "text-muted-foreground"}` }, op.label)
+      /* @__PURE__ */ import_react12.default.createElement(Icon, { className: "h-3.5 w-3.5 shrink-0" }),
+      /* @__PURE__ */ import_react12.default.createElement("span", { className: "text-xs font-medium" }, op.label)
     );
-  }))), /* @__PURE__ */ import_react14.default.createElement(EditorTabBar, { tabs: TABS2, activeTab, onTabChange: setActiveTab, badges }), /* @__PURE__ */ import_react14.default.createElement("div", { className: "pt-4 pb-2" }, activeTab === "source" && /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "text-xs font-medium text-foreground" }, "Spreadsheet ID"), /* @__PURE__ */ import_react14.default.createElement(
-    "input",
+  }))), /* @__PURE__ */ import_react12.default.createElement(import_ui8.Tabs, { value: activeTab, onValueChange: setActiveTab, className: "w-full" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.TabsList, null, TABS2.map((tab) => {
+    const Icon = tab.icon;
+    const badgeCount = badges[tab.id];
+    return /* @__PURE__ */ import_react12.default.createElement(import_ui8.TabsTrigger, { key: tab.id, value: tab.id, className: "gap-1.5 px-3 py-2 text-xs" }, Icon && /* @__PURE__ */ import_react12.default.createElement(Icon, { className: "h-3.5 w-3.5" }), tab.label, badgeCount > 0 && /* @__PURE__ */ import_react12.default.createElement("span", { className: "ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold" }, badgeCount));
+  })), /* @__PURE__ */ import_react12.default.createElement(import_ui8.TabsContent, { value: "source", className: "mt-4 pb-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, null, "Spreadsheet ID"), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Input,
     {
       type: "text",
-      className: "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm font-mono text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+      className: "font-mono text-xs",
       placeholder: "Enter spreadsheet ID or search below...",
       value: spreadsheetId,
       onChange: (e) => patch({ spreadsheetId: e.target.value })
     }
-  )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "text-xs font-medium text-muted-foreground flex items-center gap-1" }, /* @__PURE__ */ import_react14.default.createElement(import_lucide_react4.Search, { className: "h-3 w-3" }), "Or search your spreadsheets"), /* @__PURE__ */ import_react14.default.createElement(
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, { className: "text-muted-foreground flex items-center gap-1 font-normal" }, /* @__PURE__ */ import_react12.default.createElement(import_lucide_react3.Search, { className: "h-3 w-3" }), "Or search your spreadsheets"), /* @__PURE__ */ import_react12.default.createElement(
     SpreadsheetSearch,
     {
       apiProxy,
       selectedId: spreadsheetId,
       onSelect: (ss) => patch({ spreadsheetId: ss.id })
     }
-  )), spreadsheetId && /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5 pt-2 border-t border-border" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "text-xs font-medium text-foreground" }, "Sheet / Tab"), /* @__PURE__ */ import_react14.default.createElement(
+  )), spreadsheetId && /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5 pt-2 border-t border-border" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, null, "Sheet / Tab"), /* @__PURE__ */ import_react12.default.createElement(
     SheetSelector,
     {
       spreadsheetId,
@@ -1153,71 +1104,66 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
       onSelect: (name) => patch({ sheetName: name }),
       apiProxy
     }
-  )), spreadsheetId && (operation === "read" || operation === "write" || operation === "append" || operation === "update" || operation === "clear") && /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "text-xs font-medium text-foreground" }, "Range (A1 notation)"), /* @__PURE__ */ import_react14.default.createElement(
-    "input",
+  )), spreadsheetId && (operation === "read" || operation === "write" || operation === "append" || operation === "update" || operation === "clear") && /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, null, "Range (A1 notation)"), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Input,
     {
       type: "text",
-      className: "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm font-mono text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+      className: "font-mono text-xs",
       placeholder: "A1:Z1000",
       value: opts.range || "",
       onChange: (e) => patch({ range: e.target.value })
     }
-  ))), activeTab === "options" && /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-4" }, operation === "read" && /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "text-xs font-medium text-foreground" }, "Major Dimension"), /* @__PURE__ */ import_react14.default.createElement(
-    "select",
+  )))), /* @__PURE__ */ import_react12.default.createElement(import_ui8.TabsContent, { value: "options", className: "mt-4 pb-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-4" }, operation === "read" && /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, null, "Major Dimension"), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Select,
     {
-      className: "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
       value: opts.majorDimension || "ROWS",
-      onChange: (e) => patch({ majorDimension: e.target.value })
+      onValueChange: (val) => patch({ majorDimension: val })
     },
-    /* @__PURE__ */ import_react14.default.createElement("option", { value: "ROWS" }, "Rows"),
-    /* @__PURE__ */ import_react14.default.createElement("option", { value: "COLUMNS" }, "Columns")
-  )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react14.default.createElement(
-    "input",
+    /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectTrigger, null, /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectValue, null)),
+    /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectContent, null, /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectItem, { value: "ROWS" }, "Rows"), /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectItem, { value: "COLUMNS" }, "Columns"))
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Checkbox,
     {
-      type: "checkbox",
       id: "gs-includeHeaders",
       checked: opts.includeHeaders !== false,
-      onChange: (e) => patch({ includeHeaders: e.target.checked }),
-      className: "h-4 w-4 rounded border-input"
+      onCheckedChange: (checked) => patch({ includeHeaders: checked })
     }
-  ), /* @__PURE__ */ import_react14.default.createElement("label", { htmlFor: "gs-includeHeaders", className: "text-xs text-foreground" }, "Treat first row as headers"))), (operation === "write" || operation === "update" || operation === "append") && /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "text-xs font-medium text-foreground" }, "Data (JSON array of arrays)"), /* @__PURE__ */ import_react14.default.createElement(
-    "textarea",
+  ), /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, { htmlFor: "gs-includeHeaders", className: "cursor-pointer text-xs text-foreground font-normal" }, "Treat first row as headers"))), (operation === "write" || operation === "update" || operation === "append") && /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, null, "Data (JSON array of arrays)"), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Textarea,
     {
-      className: "w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y",
+      className: "min-h-[120px] font-mono text-xs",
       placeholder: '[["Header1", "Header2"], ["Value1", "Value2"]]',
       value: opts.data || "",
       onChange: (e) => patch({ data: e.target.value })
     }
-  )), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "text-xs font-medium text-foreground" }, "Value Input Option"), /* @__PURE__ */ import_react14.default.createElement(
-    "select",
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, null, "Value Input Option"), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Select,
     {
-      className: "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
       value: opts.valueInputOption || "USER_ENTERED",
-      onChange: (e) => patch({ valueInputOption: e.target.value })
+      onValueChange: (val) => patch({ valueInputOption: val })
     },
-    /* @__PURE__ */ import_react14.default.createElement("option", { value: "USER_ENTERED" }, "User Entered"),
-    /* @__PURE__ */ import_react14.default.createElement("option", { value: "RAW" }, "Raw")
-  ))), operation === "append" && /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "text-xs font-medium text-foreground" }, "Insert Data Option"), /* @__PURE__ */ import_react14.default.createElement(
-    "select",
+    /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectTrigger, null, /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectValue, null)),
+    /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectContent, null, /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectItem, { value: "USER_ENTERED" }, "User Entered"), /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectItem, { value: "RAW" }, "Raw"))
+  ))), operation === "append" && /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui8.Label, null, "Insert Data Option"), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui8.Select,
     {
-      className: "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
       value: opts.insertDataOption || "INSERT_ROWS",
-      onChange: (e) => patch({ insertDataOption: e.target.value })
+      onValueChange: (val) => patch({ insertDataOption: val })
     },
-    /* @__PURE__ */ import_react14.default.createElement("option", { value: "INSERT_ROWS" }, "Insert Rows"),
-    /* @__PURE__ */ import_react14.default.createElement("option", { value: "OVERWRITE" }, "Overwrite")
-  )), operation === "getSpreadsheetInfo" && /* @__PURE__ */ import_react14.default.createElement(InfoCallout2, null, "This operation returns spreadsheet metadata including sheet names, row/column counts, and locale. No additional options required."), operation === "clear" && /* @__PURE__ */ import_react14.default.createElement(InfoCallout2, null, "This will clear all data in the specified range. The range is configured in the Source tab.")), activeTab === "preview" && /* @__PURE__ */ import_react14.default.createElement(
+    /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectTrigger, null, /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectValue, null)),
+    /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectContent, null, /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectItem, { value: "INSERT_ROWS" }, "Insert Rows"), /* @__PURE__ */ import_react12.default.createElement(import_ui8.SelectItem, { value: "OVERWRITE" }, "Overwrite"))
+  )), operation === "getSpreadsheetInfo" && /* @__PURE__ */ import_react12.default.createElement(import_ui8.Callout, null, "This operation returns spreadsheet metadata including sheet names, row/column counts, and locale. No additional options required."), operation === "clear" && /* @__PURE__ */ import_react12.default.createElement(import_ui8.Callout, null, "This will clear all data in the specified range. The range is configured in the Source tab."))), /* @__PURE__ */ import_react12.default.createElement(import_ui8.TabsContent, { value: "preview", className: "mt-4 pb-2" }, /* @__PURE__ */ import_react12.default.createElement(
     DataPreview,
     {
       spreadsheetId,
       sheetName,
       apiProxy
     }
-  )));
+  ))));
 };
 
 // src/components/common/genericDatasourceTestResultUI.js
-var import_react15 = __toESM(require("react"));
+var import_react13 = __toESM(require("react"));
 var GenericDatasourceTestResultUI = ({ connectionResult }) => {
   console.log("connectionResult", connectionResult);
   let status = "untested";
@@ -1266,25 +1212,25 @@ var GenericDatasourceTestResultUI = ({ connectionResult }) => {
       container: "bg-primary/5 border-primary/20 text-primary",
       badge: "bg-primary/10 text-primary border border-primary/20",
       badgeText: "Success",
-      icon: /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" }))
+      icon: /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" }))
     },
     error: {
       container: "bg-destructive/5 border-destructive/20 text-destructive",
       badge: "bg-destructive/10 text-destructive border border-destructive/20",
       badgeText: "Failed",
-      icon: /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" }))
+      icon: /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" }))
     },
     warning: {
       container: "bg-amber-500/5 border-amber-500/20 text-amber-500",
       badge: "bg-amber-500/10 text-amber-500 border border-amber-500/20",
       badgeText: "Warning",
-      icon: /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" }))
+      icon: /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" }))
     },
     untested: {
       container: "bg-muted/30 border-border text-muted-foreground",
       badge: "bg-muted/50 text-muted-foreground border border-border/50",
       badgeText: "Untested",
-      icon: /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }))
+      icon: /* @__PURE__ */ import_react13.default.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ import_react13.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }))
     }
   };
   const currentStyle = styles[status];
@@ -1300,26 +1246,26 @@ var GenericDatasourceTestResultUI = ({ connectionResult }) => {
         text = String(details);
       }
     }
-    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "mt-4 pt-4 border-t border-current/10 w-full space-y-2" }, /* @__PURE__ */ import_react15.default.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80" }, "Details / Logs"), /* @__PURE__ */ import_react15.default.createElement("div", { className: "rounded-md bg-foreground text-background p-4 font-mono text-xs leading-relaxed overflow-x-auto max-h-60 border border-border/50" }, /* @__PURE__ */ import_react15.default.createElement("code", null, text)));
+    return /* @__PURE__ */ import_react13.default.createElement("div", { className: "mt-4 pt-4 border-t border-current/10 w-full space-y-2" }, /* @__PURE__ */ import_react13.default.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80" }, "Details / Logs"), /* @__PURE__ */ import_react13.default.createElement("div", { className: "rounded-md bg-foreground text-background p-4 font-mono text-xs leading-relaxed overflow-x-auto max-h-60 border border-border/50" }, /* @__PURE__ */ import_react13.default.createElement("code", null, text)));
   };
-  return /* @__PURE__ */ import_react15.default.createElement("div", { className: "w-full" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: `w-full flex flex-col justify-start items-start p-4 rounded-md border transition-all duration-200 ${currentStyle.container}` }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex flex-row justify-between items-center w-full gap-4" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex flex-row justify-start items-center gap-3" }, currentStyle.icon, /* @__PURE__ */ import_react15.default.createElement("span", { className: "text-sm font-medium tracking-tight" }, title)), /* @__PURE__ */ import_react15.default.createElement("span", { className: `text-[10px] font-mono font-medium uppercase px-2 py-0.5 rounded-full ${currentStyle.badge}` }, currentStyle.badgeText)), renderDetails()));
+  return /* @__PURE__ */ import_react13.default.createElement("div", { className: "w-full" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: `w-full flex flex-col justify-start items-start p-4 rounded-md border transition-all duration-200 ${currentStyle.container}` }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex flex-row justify-between items-center w-full gap-4" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex flex-row justify-start items-center gap-3" }, currentStyle.icon, /* @__PURE__ */ import_react13.default.createElement("span", { className: "text-sm font-medium tracking-tight" }, title)), /* @__PURE__ */ import_react13.default.createElement("span", { className: `text-[10px] font-mono font-medium uppercase px-2 py-0.5 rounded-full ${currentStyle.badge}` }, currentStyle.badgeText)), renderDetails()));
 };
 
 // src/index.js
 var createGenericDatasourceUI = () => ({
   queryResponseView: function({ queryResult }) {
-    return import_react16.default.createElement(QueryResponseView, { queryResult });
+    return import_react14.default.createElement(QueryResponseView, { queryResult });
   },
   datasourceTestResultUI: function({ connectionResult }) {
-    return import_react16.default.createElement(GenericDatasourceTestResultUI, { connectionResult });
+    return import_react14.default.createElement(GenericDatasourceTestResultUI, { connectionResult });
   }
 });
 var createWebUrlDatasourceUI = () => ({
   queryResponseView: function({ queryResult }) {
-    return import_react16.default.createElement(WebViewQueryResponseView, { queryResult });
+    return import_react14.default.createElement(WebViewQueryResponseView, { queryResult });
   },
   datasourceTestResultUI: function({ connectionResult }) {
-    return import_react16.default.createElement(GenericDatasourceTestResultUI, { connectionResult });
+    return import_react14.default.createElement(GenericDatasourceTestResultUI, { connectionResult });
   }
 });
 var DATASOURCE_UI_COMPONENTS = {
@@ -1332,10 +1278,10 @@ var DATASOURCE_UI_COMPONENTS = {
   [import_datasource_types.DATASOURCE_TYPES.GOOGLESHEETS.value]: {
     ...createGenericDatasourceUI(),
     dedicatedDatasourceEditor: function({ datasourceEditorForm }) {
-      return import_react16.default.createElement(GoogleSheetsDatasourceEditor, { datasourceEditorForm });
+      return import_react14.default.createElement(GoogleSheetsDatasourceEditor, { datasourceEditorForm });
     },
     dedicatedQueryEditor: function({ queryEditorForm }) {
-      return import_react16.default.createElement(GoogleSheetsQueryEditor, { queryEditorForm });
+      return import_react14.default.createElement(GoogleSheetsQueryEditor, { queryEditorForm });
     }
   },
   [import_datasource_types.DATASOURCE_TYPES.GRAPHQL.value]: createGenericDatasourceUI(),
@@ -1371,7 +1317,7 @@ var DATASOURCE_UI_COMPONENTS = {
   [import_datasource_types.DATASOURCE_TYPES.EXCELCSV.value]: {
     ...createGenericDatasourceUI(),
     dedicatedQueryEditor: function({ queryEditorForm }) {
-      return import_react16.default.createElement(ExcelCSVQueryBuilder, { queryEditorForm });
+      return import_react14.default.createElement(ExcelCSVQueryBuilder, { queryEditorForm });
     }
   }
 };

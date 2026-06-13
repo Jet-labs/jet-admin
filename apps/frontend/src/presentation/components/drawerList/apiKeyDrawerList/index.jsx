@@ -18,8 +18,9 @@ export const APIKeyDrawerList = () => {
   };
 
   return (
-    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
-      <Button
+    <div className="bg-background flex h-full w-full flex-col gap-2 overflow-hidden">
+      <div className="p-2 pb-0">
+        <Button
         onClick={_navigateToAddNotification}
         variant="secondary"
         className="w-full justify-start"
@@ -27,15 +28,16 @@ export const APIKeyDrawerList = () => {
         <Plus className="mr-2 h-4 w-4" />
         {CONSTANTS.STRINGS.ADD_API_KEY_BUTTON_TEXT}
       </Button>
+      </div>
 
       {isLoadingAPIKeys || isFetchingAPIKeys ? (
-        <div role="status" className="animate-pulse w-full space-y-2">
+        <div role="status" className="animate-pulse w-full space-y-2 p-2">
           <div className="h-9 rounded-md bg-muted" />
           <div className="h-9 rounded-md bg-muted" />
           <div className="h-9 rounded-md bg-muted" />
         </div>
       ) : apiKeys && apiKeys.length > 0 ? (
-          <div className="flex-1 w-full overflow-y-auto pb-10 space-y-1">
+          <div className="flex-1 w-full overflow-y-auto p-2 pb-10 space-y-1">
           {apiKeys.map((apiKey) => {
             const key = `apiKey_${apiKey.apiKeyID}`;
             const isActive = routeParam?.apiKeyID == apiKey.apiKeyID;

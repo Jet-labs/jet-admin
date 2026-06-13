@@ -1,15 +1,3 @@
-/**
- * ExcelCSVQueryBuilder.jsx
- *
- * Visual query builder for Excel / CSV data sources — Microsoft Fabric-style.
- *
- * Produces a `dataQueryOptions` shape that maps directly to datasource.js:
- *   { sheetName, headerRow, range, limit }            ← core datasource.js params
- *   { columns, filters, sort }                        ← extended visual-query params
- *                                                        (applied as post-processing
- *                                                         in datasource.js execute())
- */
-
 import React, { useState, useCallback, useRef } from "react";
 import {
   Input,
@@ -20,6 +8,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Callout,
+  EmptyState,
+  LogicChip,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
 } from "@jet-admin/ui";
 import {
   Plus,
@@ -36,7 +31,6 @@ import {
   EyeOff,
   MoveUp,
   MoveDown,
-  Info,
 } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -97,66 +91,19 @@ function normalise(opts = {}) {
   };
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-/** Mono-label used as section dividers inside panels */
-function MonoLabel({ children }) {
-  return (
-    <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-      {children}
-    </p>
-  );
-}
-
-/** Callout box (info variant) */
-function InfoCallout({ children }) {
-  return (
-    <div className="rounded-md border border-primary/20 bg-primary/5 p-3 text-[11px] text-primary/80 flex gap-2">
-      <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-      <span>{children}</span>
-    </div>
-  );
-}
-
-/** Badge count shown on tabs when rules are configured */
-function Badge({ count }) {
-  if (!count) return null;
-  return (
-    <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
-      {count}
-    </span>
-  );
-}
-
-/** AND / OR toggle chip */
-function LogicChip({ value, onChange }) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(value === "AND" ? "OR" : "AND")}
-      className={`text-[9px] font-bold px-2 py-0.5 rounded border transition-colors ${value === "AND"
-          ? "bg-primary/10 text-primary border-primary/30"
-          : "bg-amber-50 text-amber-600 border-amber-200"
-        }`}
-    >
-      {value}
-    </button>
-  );
-}
-
 // ─── Tab Panels ───────────────────────────────────────────────────────────────
 
 /** SOURCE TAB — sheetName, headerRow */
 function SourceTab({ opts, update }) {
   return (
-    <div className="space-y-4">
-      <InfoCallout>
+    <div className="space-y-2">
+      <Callout>
         Configure which sheet and header row to read. Leave Sheet Name blank to
         use the first available sheet.
-      </InfoCallout>
+      </Callout>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-2">
           <Label htmlFor="sheetName">Sheet Name</Label>
           <Input
             id="sheetName"
@@ -170,7 +117,7 @@ function SourceTab({ opts, update }) {
           </p>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label htmlFor="headerRow">Header Row</Label>
           <Input
             id="headerRow"
@@ -219,31 +166,37 @@ function ColumnsTab({ opts, update }) {
   };
 
   return (
-    <div className="space-y-4">
-      <InfoCallout>
+    <div className="space-y-2">
+      <Callout>
         Declare each column from your spreadsheet. Use <strong>Alias</strong>{" "}
         to rename it in query results. Leave empty to include all columns as-is.
-      </InfoCallout>
+      </Callout>
 
       {columns.length === 0 ? (
-        <div className="rounded-md border border-border border-dashed bg-muted/30 py-8 flex flex-col items-center gap-2">
-          <Columns2 className="h-8 w-8 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground text-center">
-            No columns declared — all spreadsheet columns will be returned.
-          </p>
-          <Button type="button" variant="outline" size="sm" onClick={addColumn}>
-            <Plus className="h-3.5 w-3.5 mr-1" />
-            Add Column
-          </Button>
-        </div>
+        <EmptyState
+          icon={Columns2}
+          message="No columns declared — all spreadsheet columns will be returned."
+          action={
+            <Button type="button" variant="outline" size="sm" onClick={addColumn}>
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              Add Column
+            </Button>
+          }
+        />
       ) : (
         <div className="space-y-2">
           {/* Header row */}
           <div className="grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center px-1">
             <span />
-            <MonoLabel>Source Column</MonoLabel>
-            <MonoLabel>Alias (optional)</MonoLabel>
-            <MonoLabel>Type</MonoLabel>
+              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+                Source Column
+              </Label>
+              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+                Alias (optional)
+              </Label>
+              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+                Type
+              </Label>
             <span />
             <span />
             <span />
@@ -252,7 +205,7 @@ function ColumnsTab({ opts, update }) {
           {columns.map((col, idx) => (
             <div
               key={col.id}
-              className={`grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center rounded-md border px-2 py-1.5 transition-colors ${col.enabled
+              className={`grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center rounded-sm border px-2 py-2 transition-colors ${col.enabled
                   ? "border-border bg-background"
                   : "border-border/50 bg-muted/30 opacity-60"
                 }`}
@@ -369,22 +322,24 @@ function FilterTab({ opts, update }) {
     update({ filters: filters.map((f) => (f.id === id ? { ...f, ...patch } : f)) });
 
   return (
-    <div className="space-y-4">
-      <InfoCallout>
+    <div className="space-y-2">
+      <Callout>
         Filter rows after fetching. Multiple conditions are applied in order.
         Use the <strong>AND / OR</strong> chip to control how each condition
         combines with the next.
-      </InfoCallout>
+      </Callout>
 
       {filters.length === 0 ? (
-        <div className="rounded-md border border-dashed border-border bg-muted/30 py-8 flex flex-col items-center gap-2">
-          <FilterIcon className="h-8 w-8 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground">No filters applied — all rows will be returned.</p>
-          <Button type="button" variant="outline" size="sm" onClick={addFilter}>
-            <Plus className="h-3.5 w-3.5 mr-1" />
-            Add Filter
-          </Button>
-        </div>
+        <EmptyState
+          icon={FilterIcon}
+          message="No filters applied — all rows will be returned."
+          action={
+            <Button type="button" variant="outline" size="sm" onClick={addFilter}>
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              Add Filter
+            </Button>
+          }
+        />
       ) : (
         <div className="space-y-2">
           {filters.map((filter, idx) => {
@@ -405,7 +360,7 @@ function FilterTab({ opts, update }) {
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2">
+                <div className="flex items-center gap-2 rounded-sm border border-border bg-background px-3 py-2">
                   {/* Column name */}
                   <Input
                     placeholder="Column name"
@@ -469,8 +424,10 @@ function FilterTab({ opts, update }) {
 
       {/* Template hint */}
       {filters.length > 0 && (
-        <div className="rounded-md border border-border bg-muted/30 p-3 space-y-1">
-          <MonoLabel>Dynamic values</MonoLabel>
+        <div className="rounded-sm border border-border bg-muted/30 p-3 space-y-1">
+          <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+            Dynamic values
+          </Label>
           <p className="text-[11px] text-muted-foreground mt-1">
             Use{" "}
             <code className="bg-background px-1 rounded border border-border font-mono">
@@ -508,36 +465,44 @@ function SortTab({ opts, update }) {
   };
 
   return (
-    <div className="space-y-4">
-      <InfoCallout>
+    <div className="space-y-2">
+      <Callout>
         Sort rows after fetching and filtering. Rules are applied from top to
         bottom — the first rule is the primary sort key.
-      </InfoCallout>
+      </Callout>
 
       {sort.length === 0 ? (
-        <div className="rounded-md border border-dashed border-border bg-muted/30 py-8 flex flex-col items-center gap-2">
-          <ArrowUpDown className="h-8 w-8 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground">No sort rules — rows returned in spreadsheet order.</p>
-          <Button type="button" variant="outline" size="sm" onClick={addSort}>
-            <Plus className="h-3.5 w-3.5 mr-1" />
-            Add Sort Rule
-          </Button>
-        </div>
+        <EmptyState
+          icon={ArrowUpDown}
+          message="No sort rules — rows returned in spreadsheet order."
+          action={
+            <Button type="button" variant="outline" size="sm" onClick={addSort}>
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              Add Sort Rule
+            </Button>
+          }
+        />
       ) : (
         <div className="space-y-2">
           {/* Priority indicator header */}
           <div className="grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center px-1">
             <span />
-            <MonoLabel>#</MonoLabel>
-            <MonoLabel>Column</MonoLabel>
-            <MonoLabel>Direction</MonoLabel>
+              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+                #
+              </Label>
+              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+                Column
+              </Label>
+              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+                Direction
+              </Label>
             <span />
           </div>
 
           {sort.map((rule, idx) => (
             <div
               key={rule.id}
-              className="grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center rounded-md border border-border bg-background px-2 py-1.5"
+              className="grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center rounded-sm border border-border bg-background px-2 py-2"
             >
               {/* Move up/down */}
               <div className="flex flex-col gap-0.5">
@@ -620,16 +585,18 @@ function SortTab({ opts, update }) {
 function SettingsTab({ opts, update }) {
   return (
     <div className="space-y-5">
-      <InfoCallout>
+      <Callout>
         Advanced fetch settings. <strong>Range</strong> limits which rows are
         read from the file itself (before any filters). <strong>Limit</strong>{" "}
         caps the final result count.
-      </InfoCallout>
+      </Callout>
 
       <div className="space-y-3">
-        <MonoLabel>Row Range</MonoLabel>
+        <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+          Row Range
+        </Label>
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="range">A1-Notation Range</Label>
             <Input
               id="range"
@@ -648,7 +615,7 @@ function SettingsTab({ opts, update }) {
             </p>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="limit">Row Limit</Label>
             <Input
               id="limit"
@@ -676,8 +643,10 @@ function SettingsTab({ opts, update }) {
       </div>
 
       <div className="space-y-3">
-        <MonoLabel>Full Datasource Call Preview</MonoLabel>
-        <div className="rounded-md bg-foreground text-background p-4 font-mono text-[11px] leading-relaxed overflow-x-auto">
+        <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+          Full Datasource Call Preview
+        </Label>
+        <div className="rounded-sm bg-muted/40 border border-border p-4 font-mono text-[11px] leading-relaxed overflow-x-auto text-foreground">
           <code className="whitespace-pre">
             {buildDatasourcePreview(opts)}
           </code>
@@ -752,38 +721,48 @@ export const ExcelCSVQueryBuilder = ({ queryEditorForm }) => {
   };
 
   return (
-    <div className="border-t border-border mt-4 pt-4 space-y-0">
-      {/* ── Tab bar ── */}
-      <div className="flex items-center gap-0.5 border-b border-border pb-0 -mb-px">
-        {TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${isActive
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              {tab.label}
-              <Badge count={badges[tab.id]} />
-            </button>
-          );
-        })}
-      </div>
+    <div className="space-y-0">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        {/* ── Tab bar ── */}
+        <TabsList>
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const badgeCount = badges[tab.id];
+            return (
+              <TabsTrigger key={tab.id} value={tab.id} className="gap-2 px-3 py-2 text-xs">
+                <Icon className="h-3.5 w-3.5" />
+                {tab.label}
+                {badgeCount > 0 && (
+                  <span className="ml-2 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
+                    {badgeCount}
+                  </span>
+                )}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
 
-      {/* ── Tab panel ── */}
-      <div className="pt-4 pb-2">
-        {activeTab === "source" && <SourceTab opts={opts} update={update} />}
-        {activeTab === "columns" && <ColumnsTab opts={opts} update={update} />}
-        {activeTab === "filter" && <FilterTab opts={opts} update={update} />}
-        {activeTab === "sort" && <SortTab opts={opts} update={update} />}
-        {activeTab === "settings" && <SettingsTab opts={opts} update={update} />}
-      </div>
+        {/* ── Tab panels ── */}
+        <TabsContent value="source" className="mt-2 pb-2">
+          <SourceTab opts={opts} update={update} />
+        </TabsContent>
+
+        <TabsContent value="columns" className="mt-2 pb-2">
+          <ColumnsTab opts={opts} update={update} />
+        </TabsContent>
+
+        <TabsContent value="filter" className="mt-2 pb-2">
+          <FilterTab opts={opts} update={update} />
+        </TabsContent>
+
+        <TabsContent value="sort" className="mt-2 pb-2">
+          <SortTab opts={opts} update={update} />
+        </TabsContent>
+
+        <TabsContent value="settings" className="mt-2 pb-2">
+          <SettingsTab opts={opts} update={update} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

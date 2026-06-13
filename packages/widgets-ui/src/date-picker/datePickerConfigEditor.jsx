@@ -8,8 +8,8 @@ export const DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-1.5">
+    <div className="space-y-2">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Label</Label>
         <Input
           type="text"
@@ -20,7 +20,7 @@ export const DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
         />
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Placeholder</Label>
         <Input
           type="text"
@@ -42,7 +42,7 @@ export const DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </Label>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Default Value</Label>
         <TemplateAutocompleteInput
           value={config.defaultValue || ''}
@@ -53,7 +53,7 @@ export const DatePickerConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Is Loading Template */}
-      <div className="space-y-1.5 mt-2">
+      <div className="space-y-1 mt-2">
         <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
         <TemplateAutocompleteInput
           value={config.isLoading || ""}

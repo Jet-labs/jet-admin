@@ -19,8 +19,8 @@ export const CustomSuggestionInput = (props) => {
     <div className="relative mb-3">
       <Label
         htmlFor={path}
-        className={`block mb-1 text-xs font-medium ${
-          hasErrors ? "text-red-500" : "text-muted-foreground"
+        className={`block mb-1 ${
+          hasErrors ? "text-red-500" : ""
         } flex justify-between items-center`}
       >
         <span>{label || description}</span>

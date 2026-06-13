@@ -35,6 +35,7 @@
       },
       "body": {
         "type": "string",
+        "format": "code-json",
         "description": "Request body (for POST/PUT/PATCH)"
       },
       "inputDefinitions": {
@@ -163,7 +164,11 @@
             "elements": [
               {
                 "type": "Control",
-                "scope": "#/properties/body"
+                "scope": "#/properties/body",
+                "options": {
+                  "height": "240px",
+                  "showHeader": true
+                }
               }
             ]
           }

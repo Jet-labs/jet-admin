@@ -77,7 +77,7 @@ export const VegaConfigEditor = ({
   };
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-2 w-full">
       {isVegaLite && (
         <div className="flex flex-row items-center gap-2">
           <span className="text-xs font-medium text-muted-foreground">Visual Editor</span>
@@ -125,18 +125,16 @@ export const VegaConfigEditor = ({
       )}
 
       {!showParseWarning && currentMode === 'raw' && (
-        <div className="min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background">
-          <VegaSpecEditor
-            value={widgetEditorForm.values.widgetConfig?.vegaSpec}
-            onChange={(spec) => widgetEditorForm.setFieldValue('widgetConfig.vegaSpec', spec)}
-            workflowContext={workflowContext}
-            workflow={resolvedSelectedWorkflow}
-          />
-        </div>
+        <VegaSpecEditor
+          value={widgetEditorForm.values.widgetConfig?.vegaSpec}
+          onChange={(spec) => widgetEditorForm.setFieldValue('widgetConfig.vegaSpec', spec)}
+          workflowContext={workflowContext}
+          workflow={resolvedSelectedWorkflow}
+        />
       )}
 
       {/* Is Loading Template */}
-      <div className="space-y-1.5 mt-2">
+      <div className="space-y-1 mt-2">
         <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
         <TemplateAutocompleteInput
           value={widgetEditorForm.values.widgetConfig?.isLoading || ""}

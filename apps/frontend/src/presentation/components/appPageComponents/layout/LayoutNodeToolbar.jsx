@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Trash, Box, Layout, Lock, Paintbrush, X, Settings } from "lucide-react";
+import { Label } from "@jet-admin/ui";
 
 export default function LayoutNodeToolbar({
   node,
@@ -236,7 +237,7 @@ export default function LayoutNodeToolbar({
           
           {/* Padding config */}
           <div className="flex flex-col gap-1">
-            <label className="text-[10px] text-muted-foreground/60 font-semibold">Padding</label>
+            <Label>Padding</Label>
             <select
               className="bg-foreground/80 border border-border/30 rounded text-xs px-1.5 py-1 text-background outline-none focus:border-primary"
               value={node.style?.padding || ""}
@@ -253,7 +254,7 @@ export default function LayoutNodeToolbar({
 
           {/* Margin config */}
           <div className="flex flex-col gap-1">
-            <label className="text-[10px] text-muted-foreground/60 font-semibold">Margin</label>
+            <Label>Margin</Label>
             <select
               className="bg-foreground/80 border border-border/30 rounded text-xs px-1.5 py-1 text-background outline-none focus:border-primary"
               value={node.style?.margin || ""}
@@ -270,7 +271,7 @@ export default function LayoutNodeToolbar({
           {/* Gap config (rows, stacks) */}
           {(node.type === "row" || node.type === "stack" || node.type === "column") && (
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-muted-foreground/60 font-semibold">Gap / Spacing</label>
+              <Label>Gap / Spacing</Label>
               <select
                 className="bg-foreground/80 border border-border/30 rounded text-xs px-1.5 py-1 text-background outline-none focus:border-primary"
                 value={node.style?.gap || ""}
@@ -290,7 +291,7 @@ export default function LayoutNodeToolbar({
           {/* Border Radius config */}
           {(node.type === "widget" || node.type === "container" || node.type === "stack") && (
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-muted-foreground/60 font-semibold">Border Radius</label>
+              <Label>Border Radius</Label>
               <select
                 className="bg-foreground/80 border border-border/30 rounded text-xs px-1.5 py-1 text-background outline-none focus:border-primary"
                 value={node.style?.borderRadius || ""}
@@ -311,7 +312,7 @@ export default function LayoutNodeToolbar({
           {/* Alignment config */}
           {(node.type === "row" || node.type === "stack") && (
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-muted-foreground/60 font-semibold">Alignment</label>
+              <Label>Alignment</Label>
               <select
                 className="bg-foreground/80 border border-border/30 rounded text-xs px-1.5 py-1 text-background outline-none focus:border-primary"
                 value={node.style?.alignItems || ""}

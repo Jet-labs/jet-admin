@@ -55,7 +55,7 @@ export const CustomGenericObjectArrayRenderer = ({
 
       <div className="flex flex-col gap-2">
         {propertyKeys.length > 0 ? items.map((item, index) => (
-          <div key={`${path}-${index}`} className="flex items-center space-x-2">
+          <div key={`${path}-${index}`} className="flex items-end space-x-2">
             {propertyKeys.map((propKey) => (
               <div key={propKey} className="flex-grow">
                 <JsonFormsDispatch

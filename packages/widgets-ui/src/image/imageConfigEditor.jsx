@@ -8,9 +8,9 @@ export const ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Image Source */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Image URL / Source</Label>
         <TemplateAutocompleteInput
           value={config.src || ""}
@@ -24,7 +24,7 @@ export const ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Alternative Text */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Alt Text (Accessibility)</Label>
         <Input
           type="text"
@@ -35,9 +35,9 @@ export const ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         {/* Object Fit */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Object Fit</Label>
           <Select
             value={config.objectFit || "cover"}
@@ -56,7 +56,7 @@ export const ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </div>
 
         {/* Border Radius */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Corner Radius</Label>
           <Select
             value={config.borderRadius || "none"}
@@ -77,7 +77,7 @@ export const ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* Is Loading Template */}
-      <div className="space-y-1.5 mt-2">
+      <div className="space-y-1 mt-2">
         <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
         <TemplateAutocompleteInput
           value={config.isLoading || ""}

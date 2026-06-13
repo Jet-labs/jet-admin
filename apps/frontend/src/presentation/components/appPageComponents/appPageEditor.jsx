@@ -14,8 +14,8 @@ export const AppPageSettingsEditor = ({ appPageEditorForm }) => {
     appPageEditorForm: PropTypes.object.isRequired,
   };
   return (
-    <div className="w-full space-y-3 p-4">
-      <div className="space-y-1.5">
+    <div className="w-full space-y-2 p-2">
+      <div className="space-y-2">
         <Label htmlFor="appPageTitle">
           {CONSTANTS.STRINGS.APP_PAGE_EDITOR_FORM_NAME_FIELD_LABEL}
         </Label>
@@ -67,15 +67,15 @@ export const AppPageEditor = ({ appPageEditorForm, tenantID, onAddWidget }) => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-      <Tabs defaultValue="widgets" className="flex flex-col h-full w-full min-h-0">
-        <TabsList className="grid grid-cols-5 w-full shrink-0 p-0 bg-muted/20">
+      <Tabs defaultValue="widgets" className="flex flex-col h-full w-full">
+        <TabsList>
           <TabsTrigger value="widgets" className="text-[11px] font-semibold py-2">Widgets</TabsTrigger>
           <TabsTrigger value="datasources" className="text-[11px] font-semibold py-2">Data</TabsTrigger>
           <TabsTrigger value="variables" className="text-[11px] font-semibold py-2">Vars</TabsTrigger>
           <TabsTrigger value="settings" className="text-[11px] font-semibold py-2">Settings</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="widgets" className="flex-1 min-h-0 m-0 overflow-y-auto">
+        <TabsContent value="widgets" className="flex-1 min-h-0 m-0 data-[state=active]:flex data-[state=active]:flex-col data-[state=inactive]:hidden overflow-hidden">
           <AppPageWidgetList
             tenantID={tenantID}
             placedWidgets={appPageEditorForm.values.appPageConfig.widgets}
@@ -84,11 +84,11 @@ export const AppPageEditor = ({ appPageEditorForm, tenantID, onAddWidget }) => {
           />
         </TabsContent>
         
-        <TabsContent value="datasources" className="flex-1 min-h-0 m-0 overflow-y-auto">
+        <TabsContent value="datasources" className="flex-1 min-h-0 m-0 data-[state=active]:flex data-[state=active]:flex-col data-[state=inactive]:hidden overflow-hidden">
           <AppPageDataSourcesEditor appPageEditorForm={appPageEditorForm} />
         </TabsContent>
         
-        <TabsContent value="variables" className="flex-1 min-h-0 m-0 overflow-y-auto">
+        <TabsContent value="variables" className="flex-1 min-h-0 m-0 data-[state=active]:flex data-[state=active]:flex-col data-[state=inactive]:hidden overflow-hidden">
           <AppPageVariablesEditor appPageEditorForm={appPageEditorForm} />
         </TabsContent>
         

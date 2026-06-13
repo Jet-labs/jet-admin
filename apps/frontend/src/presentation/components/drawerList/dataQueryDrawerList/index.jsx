@@ -21,8 +21,9 @@ export const DataQueryDrawerList = () => {
   };
 
   return (
-    <div className="bg-background h-full overflow-hidden p-3 w-full flex flex-col gap-3">
-      <Button
+    <div className="bg-background h-full overflow-hidden w-full flex flex-col gap-2">
+      <div className="p-2 pb-0">
+        <Button
         onClick={_navigateToAddMoreQuery}
         variant="secondary"
         className="w-full justify-start"
@@ -30,16 +31,17 @@ export const DataQueryDrawerList = () => {
         <Plus className="size-4 mr-2" />
         {CONSTANTS.STRINGS.ADD_QUERY_BUTTON_TEXT}
       </Button>
+      </div>
 
       {isLoadingDataQueries || isFetchingDataQueries ? (
-        <div role="status" className="animate-pulse w-full space-y-2">
+        <div role="status" className="animate-pulse w-full space-y-2 p-2">
           <div className="h-9 bg-muted rounded-sm w-full" />
           <div className="h-9 bg-muted rounded-sm w-full" />
           <div className="h-9 bg-muted rounded-sm w-full" />
           <div className="h-9 bg-muted rounded-sm w-full" />
         </div>
       ) : dataQueries && dataQueries.length > 0 ? (
-          <div className="flex-1 w-full overflow-y-auto pb-10 space-y-1">
+          <div className="flex-1 w-full overflow-y-auto p-2 pb-10 space-y-1">
           {dataQueries.map((dataQuery) => {
             const key = `dataQuery_${dataQuery.dataQueryID}`;
             const isActive = routeParam?.dataQueryID == dataQuery.dataQueryID;

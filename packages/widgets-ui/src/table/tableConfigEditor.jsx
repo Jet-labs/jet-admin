@@ -176,10 +176,10 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-2">
       {/* ═══ Data Source Mapping ═══ */}
-      <div className="space-y-3">
-        <div className="space-y-1.5">
+      <div className="space-y-2">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">
             Data Array Template
           </Label>
@@ -194,7 +194,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
           </p>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">
             Total Count Template <span className="text-muted-foreground font-normal">(optional)</span>
           </Label>
@@ -209,7 +209,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
           </p>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">
             Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span>
           </Label>
@@ -394,7 +394,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* ═══ Pagination ═══ */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label className="text-xs font-medium text-foreground">
             Pagination
@@ -406,7 +406,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </div>
 
         {pagination.enabled && (
-          <div className="space-y-2 bg-muted/30 p-3 rounded-md border mt-1">
+          <div className="space-y-2 bg-muted/30 p-2 rounded-md border mt-1">
             <p className="text-[0.6rem] text-muted-foreground">
               Configure pagination actions in the <strong>Events</strong> tab
               using the <strong>On Page Change</strong> event.
@@ -419,8 +419,8 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* ═══ Search & Export ═══ */}
-      <div className="grid grid-cols-2 gap-4 border-t pt-4">
-        <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2 border-t pt-2 mt-2">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-xs font-medium text-foreground">Search Box</Label>
             <Switch
@@ -448,7 +448,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
           )}
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-xs font-medium text-foreground">Export Data</Label>
             <Switch
@@ -492,7 +492,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* ═══ Multi-Select & Bulk Actions ═══ */}
-      <div className="space-y-3 border-t pt-4">
+      <div className="space-y-2 border-t pt-2 mt-2">
         <div className="flex items-center justify-between">
           <Label className="text-xs font-medium text-foreground">Multi-Row Selection</Label>
           <Switch
@@ -501,7 +501,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
           />
         </div>
         {multiSelect.enabled && (
-          <div className="space-y-2 bg-muted/30 p-3 rounded border">
+          <div className="space-y-2 bg-muted/30 p-2 rounded border">
             <div className="flex items-center gap-2 pb-2 border-b">
               <Checkbox
                 id="ms-select-all"
@@ -521,7 +521,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
               {(!multiSelect.actions || multiSelect.actions.length === 0) && (
                 <p className="text-[10px] text-muted-foreground italic">No bulk actions configured. Selection will be tracked in widgetState.</p>
               )}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {(multiSelect.actions || []).map((act, idx) => (
                   <div key={idx} className="flex items-center gap-1.5 bg-background p-1.5 rounded border">
                     <Input
@@ -558,8 +558,8 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
       </div>
 
       {/* ═══ Row Editing Features ═══ */}
-      <div className="grid grid-cols-2 gap-4 border-t pt-4">
-        <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2 border-t pt-2 mt-2">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-xs font-medium text-foreground">Inline Row Editing</Label>
             <Switch
@@ -575,7 +575,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-xs font-medium text-foreground">Excel-Style Bulk Edit</Label>
             <Switch

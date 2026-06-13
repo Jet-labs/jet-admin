@@ -190,14 +190,14 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
           {/* Render dedicated datasource editor OR JsonForms fallback */}
           {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType] && (
             hasDedicatedEditor ? (
-              <div className="border-t border-border pt-4 mt-2">
+
                 <DatasourceEditorContext.Provider value={datasourceEditorContextValue}>
                   {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType]
                     .dedicatedDatasourceEditor({ datasourceEditorForm: strictEditorForm })}
                 </DatasourceEditorContext.Provider>
-              </div>
+
             ) : currentDatasourceType?.formConfig ? (
-              <div className="border-t border-border pt-4 mt-2">
+
                 <OAuthContext.Provider value={{ startOAuth, loading: isOAuthLoading }}>
                   <FileUploadContext.Provider value={{ uploadFile: handleUploadFile }}>
                     <JsonForms
@@ -210,7 +210,7 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
                     />
                   </FileUploadContext.Provider>
                 </OAuthContext.Provider>
-              </div>
+
             ) : null
           )}
         </div>

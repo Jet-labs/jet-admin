@@ -82,9 +82,9 @@ export const WidgetConfigEditor = ({
       isLoading={isLoadingWorkflows}
       error={loadWorkflowsError}
     >
-    <div className="flex w-full flex-col gap-3">
+      <div className="flex w-full flex-col gap-2">
       {/* Widget Name */}
-      <div className="space-y-1.5">
+        <div className="space-y-1">
         <Label
           htmlFor="widgetTitle"
           className="text-xs font-medium text-foreground"
@@ -105,7 +105,7 @@ export const WidgetConfigEditor = ({
       </div>
 
       {/* Widget Type */}
-      <div className="space-y-1.5">
+        <div className="space-y-1">
         <Label
           htmlFor="widgetType"
           className="text-xs font-medium text-foreground"
@@ -144,13 +144,13 @@ export const WidgetConfigEditor = ({
           TABBED EDITOR: Data / Properties / Events
           ═══════════════════════════════════════════ */}
       <Tabs defaultValue="data" className="w-full">
-        <TabsList className="w-full grid grid-cols-3">
+          <TabsList>
           <TabsTrigger value="data" className="text-xs">Data</TabsTrigger>
           <TabsTrigger value="properties" className="text-xs">Properties</TabsTrigger>
           <TabsTrigger value="events" className="text-xs">Events</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="data" className="mt-3 space-y-3">
+          <TabsContent value="data" className="mt-2">
           <div className="space-y-2 rounded-md border border-border bg-muted/20 p-3">
             <Label className="text-xs font-semibold text-foreground">Referenced Page Data Sources</Label>
             <p className="text-[10px] text-muted-foreground leading-normal">
@@ -165,7 +165,7 @@ export const WidgetConfigEditor = ({
                 {referencedDataSources.map(({ alias, type }) => (
                   <div
                     key={alias}
-                    className="flex items-center justify-between rounded border border-border/50 bg-background px-2.5 py-1.5 font-mono text-xs text-foreground shadow-sm"
+                    className="flex items-center justify-between rounded-md border border-border/50 bg-background px-2.5 py-1.5 font-mono text-xs text-foreground shadow-sm"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`h-2.5 w-2.5 rounded-full animate-pulse shrink-0 ${type === 'workflow' ? 'bg-purple-500' : 'bg-emerald-500'}`} />
@@ -179,7 +179,7 @@ export const WidgetConfigEditor = ({
           </div>
         </TabsContent>
 
-        <TabsContent value="properties" className="mt-3 space-y-3">
+          <TabsContent value="properties" className="mt-2">
           {/* Type-Specific Config Editor (chart options, table columns, etc.) */}
           {ConfigEditorComponent && (
             <ConfigEditorComponent
@@ -201,7 +201,7 @@ export const WidgetConfigEditor = ({
           <WidgetPropertiesEditor widgetEditorForm={widgetEditorForm} />
         </TabsContent>
 
-        <TabsContent value="events" className="mt-3">
+          <TabsContent value="events" className="mt-2">
           <WidgetEventsEditor 
             widgetEditorForm={widgetEditorForm} 
             stateTree={previewStateTree}

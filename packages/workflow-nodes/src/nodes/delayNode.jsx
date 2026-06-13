@@ -184,16 +184,16 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
 
   return (
     <div className="w-full">
-      <div className="space-y-3">
-        <JsonForms
-          schema={schema}
-          uischema={uischema}
-          data={formData}
-          renderers={workflowNodeRenderers}
-          onChange={handleFormChange}
-        />
+      <JsonForms
+        schema={schema}
+        uischema={uischema}
+        data={formData}
+        renderers={workflowNodeRenderers}
+        onChange={handleFormChange}
+      />
 
-        {/* Comprehensive instructions */}
+      {/* Comprehensive instructions */}
+      <div className="px-2">
         <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
           <div className="font-semibold text-brand-text-primary text-xs">📘 Delay Types</div>
 
@@ -215,7 +215,9 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
             <strong>✓ Non-blocking:</strong> Delay uses queue scheduling. Workflow resources are released during wait.
           </div>
         </div>
+      </div>
 
+      <div className="px-2 mt-2">
         <Button
           type="button"
           size="sm"

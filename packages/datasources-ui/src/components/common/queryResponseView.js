@@ -1,4 +1,4 @@
-import { Button } from "@jet-admin/ui";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@jet-admin/ui";
 import React, { useState } from "react";
 import { QueryResponseJSONTab } from "./queryResponseJSONTab";
 import { QueryResponseRAWTab } from "./queryResponseRawTab";
@@ -7,47 +7,39 @@ import { QueryResponseTableTab } from "./queryResponseTableTab";
 import PropTypes from "prop-types";
 
 export const QueryResponseView = ({ queryResult }) => {
-  const [tab, setTab] = useState(0);
+  const [activeTab, setActiveTab] = useState("json");
 
   console.log("queryResult", queryResult);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden p-4">
-      <div className="flex items-center">
-        {["Table", "JSON", "Raw", "Data Schema"].map((label, index) => (
-          <Button
-            key={label}
-            variant="ghost"
-            className={`px-4 mr-2 py-2 text-sm font-medium rounded-sm transition-colors ${
-              index === tab
-                ? "text-primary bg-primary/5"
-                : "text-foreground hover:bg-muted"
-            }`}
-            onClick={() => setTab(index)}
-            type="button"
-          >
-            {label}
-          </Button>
-        ))}
-      </div>
-      <div className="p-3 border mt-3 border-border rounded-sm bg-background flex flex-col gap-2 overflow-y-auto flex-1">
-        {tab === 0 && (
-          <QueryResponseTableTab data={queryResult ? queryResult : ""} />
-        )}
-        {tab === 1 && (
-          <QueryResponseJSONTab data={queryResult ? queryResult : ""} />
-        )}
-        {tab === 2 && (
-          <QueryResponseRAWTab data={queryResult ? queryResult : ""} />
-        )}
-        {tab === 3 && (
-          <QueryResponseSchemaTab data={queryResult ? queryResult : {}} />
-        )}
-      </div>
+    <div className="flex flex-col h-full overflow-hidden bg-background">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
+        <TabsList>
+          <TabsTrigger value="json">JSON</TabsTrigger>
+          <TabsTrigger value="table">Table</TabsTrigger>
+          <TabsTrigger value="raw">Raw</TabsTrigger>
+          <TabsTrigger value="schema">Data Schema</TabsTrigger>
+        </TabsList>
+
+        <div className="flex-1 min-h-0 overflow-y-auto bg-background">
+          <TabsContent value="json" className="mt-0 h-full focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
+            <QueryResponseJSONTab data={queryResult ? queryResult : ""} />
+          </TabsContent>
+          <TabsContent value="table" className="mt-0 h-full focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
+            <QueryResponseTableTab data={queryResult ? queryResult : ""} />
+          </TabsContent>
+          <TabsContent value="raw" className="mt-0 h-full focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
+            <QueryResponseRAWTab data={queryResult ? queryResult : ""} />
+          </TabsContent>
+          <TabsContent value="schema" className="mt-0 h-full focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
+            <QueryResponseSchemaTab data={queryResult ? queryResult : {}} />
+          </TabsContent>
+        </div>
+      </Tabs>
     </div>
   );
 };
 
 QueryResponseView.propTypes = {
-  queryResult: PropTypes.object,
+  queryResult: PropTypes.any,
 };

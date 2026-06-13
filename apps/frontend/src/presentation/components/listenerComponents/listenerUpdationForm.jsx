@@ -122,9 +122,13 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
           >
             <div className="mx-auto w-full max-w-2xl">
               <Tabs defaultValue="config" className="w-full">
-                <TabsList className="">
-                  <TabsTrigger value="config">General Configuration</TabsTrigger>
-                  <TabsTrigger value="actions">Pipeline Steps ({listener?.actions?.length || 0})</TabsTrigger>
+                <TabsList>
+                  <TabsTrigger value="config">
+                    General Configuration
+                  </TabsTrigger>
+                  <TabsTrigger value="actions">
+                    Pipeline Steps ({listener?.actions?.length || 0})
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="config">

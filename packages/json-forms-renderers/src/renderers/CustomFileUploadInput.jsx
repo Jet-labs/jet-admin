@@ -99,9 +99,7 @@ export const CustomFileUploadInput = (props) => {
     <div className="space-y-2">
       <Label
         htmlFor={path}
-        className={`block text-xs font-medium ${
-          hasErrors ? "text-destructive" : "text-muted-foreground"
-        }`}
+        className={`block ${hasErrors ? "text-destructive" : ""}`}
       >
         {label || description || "Upload File"} <span className="text-destructive">*</span>
       </Label>

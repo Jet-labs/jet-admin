@@ -7,24 +7,26 @@ const Section = React.forwardRef(
       <div
         ref={ref}
         className={cn(
-          "rounded-md border border-border bg-card p-4 space-y-3",
+          "rounded-md border border-border bg-card overflow-hidden",
           className
         )}
         {...props}
       >
         {(title || description) && (
-          <div>
+          <div className="border-b border-border bg-muted/15 p-2">
             {title && (
-              <p className="text-xs font-medium text-muted-foreground mb-0.5">
+              <h3 className="text-xs font-semibold text-foreground">
                 {title}
-              </p>
+              </h3>
             )}
             {description && (
-              <p className="text-[11px] text-muted-foreground">{description}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{description}</p>
             )}
           </div>
         )}
-        {children}
+        <div className="p-2 space-y-2">
+          {children}
+        </div>
       </div>
     );
   }

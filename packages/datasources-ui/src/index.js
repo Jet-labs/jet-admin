@@ -12,9 +12,6 @@ import { GenericDatasourceTestResultUI } from "./components/common/genericDataso
 export { DatasourceEditorContext, useDatasourceEditorContext } from "./context/DatasourceEditorContext";
 export { QueryEditorContext, useQueryEditorContext } from "./context/QueryEditorContext";
 
-// ─── Shared editor primitives ─────────────────────────────────────────────────
-export { EditorTabBar } from "./primitives/EditorTabBar";
-export { MonoLabel, InfoCallout, LogicChip, EmptyState } from "./primitives/EditorPrimitives";
 
 // ─── Datasource UI component registry ─────────────────────────────────────────
 

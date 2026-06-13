@@ -25,8 +25,9 @@ export const DatasourceDrawerList = () => {
   };
 
   return (
-    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
-      <Button
+    <div className="bg-background flex h-full w-full flex-col gap-2 overflow-hidden">
+      <div className="p-2 pb-0">
+        <Button
         onClick={_navigateToAddMoreDatasource}
         variant="secondary"
         className="w-full justify-start"
@@ -34,16 +35,17 @@ export const DatasourceDrawerList = () => {
         <Plus className="w-4 h-4 mr-2" />
         {CONSTANTS.STRINGS.ADD_DATASOURCE_BUTTON_TEXT}
       </Button>
+      </div>
 
       {isLoadingDatasources || isFetchingDatasources ? (
-        <div role="status" className="animate-pulse w-full space-y-2">
+        <div role="status" className="animate-pulse w-full space-y-2 p-2">
           <div className="h-9 bg-muted rounded-md w-full" />
           <div className="h-9 bg-muted rounded-md w-full" />
           <div className="h-9 bg-muted rounded-md w-full" />
           <div className="h-9 bg-muted rounded-md w-full" />
         </div>
       ) : datasources && datasources.length > 0 ? (
-          <div className="flex-1 w-full overflow-y-auto pb-10 space-y-1">
+          <div className="flex-1 w-full overflow-y-auto p-2 pb-10 space-y-1">
           {datasources.map((datasource) => {
             const key = `datasource_${datasource.datasourceID}`;
             const isActive =

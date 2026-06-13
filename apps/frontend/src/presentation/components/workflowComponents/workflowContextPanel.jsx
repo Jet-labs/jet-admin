@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Check, Copy, FileJson } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-import { Button, CodeEditor } from "@jet-admin/ui";
+import { Button, CodeEditor, Label } from "@jet-admin/ui";
 import { StringUtils } from "../../../utils/string";
 
 /**
@@ -54,15 +54,15 @@ export const WorkflowContextPanel = ({
           )}
         </div>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-1.5 cursor-pointer" title="Truncate massive arrays/strings to prevent browser freeze">
+          <Label className="flex items-center gap-1.5 cursor-pointer" title="Truncate massive arrays/strings to prevent browser freeze">
             <input 
               type="checkbox" 
               checked={isTruncated} 
               onChange={(e) => setIsTruncated(e.target.checked)}
               className="w-3 h-3 accent-primary"
             />
-            <span className="text-[10px] text-muted-foreground font-medium">Truncate</span>
-          </label>
+            Truncate
+          </Label>
           <Button
             onClick={handleCopyAll}
             type='button'

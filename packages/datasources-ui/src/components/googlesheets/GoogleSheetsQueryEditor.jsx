@@ -1,17 +1,23 @@
-/**
- * GoogleSheetsQueryEditor.jsx
- *
- * Dedicated query editor for Google Sheets.
- * Rich UI: Operation picker → Spreadsheet search → Sheet selector → Range → Preview.
- *
- * Consumes QueryEditorContext for apiProxy (to call listSpreadsheets, listSheets, previewData).
- * Receives strict queryEditorForm: { dataQueryOptions, setQueryOptions, patchQueryOptions }
- */
-
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useQueryEditorContext } from "../../context/QueryEditorContext";
-import { EditorTabBar } from "../../primitives/EditorTabBar";
-import { InfoCallout, EmptyState } from "../../primitives/EditorPrimitives";
+import {
+  Input,
+  Label,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea,
+  Checkbox,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Callout,
+  EmptyState,
+} from "@jet-admin/ui";
 import {
   BookOpen,
   PenLine,
@@ -26,6 +32,7 @@ import {
   ExternalLink,
   Info,
   Eye,
+  RefreshCw,
 } from "lucide-react";
 
 // ─── Operation cards ─────────────────────────────────────────────────────────
@@ -89,44 +96,59 @@ function SpreadsheetSearch({ onSelect, selectedId, apiProxy }) {
 
   return (
     <div className="space-y-2">
-      <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-        <input
-          type="text"
-          className="flex h-9 w-full rounded-md border border-input bg-background pl-8 pr-3 py-1 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          placeholder="Search spreadsheets..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        {loading && (
-          <Loader2 className="absolute right-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground animate-spin" />
-        )}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1 flex items-center">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input
+            type="text"
+            className="pl-8"
+            placeholder="Search spreadsheets..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {loading && (
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+              <Loader2 className="h-3.5 w-3.5 text-muted-foreground animate-spin" />
+            </div>
+          )}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => doSearch(query, null)}
+          title="Refresh list"
+        >
+          <RefreshCw className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+        </Button>
       </div>
+      {results.length === 0 && !loading && searched ? (
+        <div className="p-6 text-center text-sm text-muted-foreground">
+          No spreadsheets found
+        </div>
+      ) :
+        results?.length > 0 &&
+        <div className="max-h-[240px] overflow-y-auto rounded-sm border border-border">
 
-      <div className="max-h-[240px] overflow-y-auto rounded-md border border-border">
-        {results.length === 0 && !loading && searched ? (
-          <div className="p-6 text-center text-sm text-muted-foreground">
-            No spreadsheets found
-          </div>
-        ) : (
-          <div className="divide-y divide-border">
+          <div className="flex flex-col">
             {results.map((ss) => (
               <button
                 key={ss.id}
                 type="button"
                 onClick={() => onSelect(ss)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors ${
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors border-l-2 border-t border-t-border first:border-t-0 ${
                   selectedId === ss.id
-                    ? "bg-muted/50 border-l-2 border-l-foreground"
-                    : "hover:bg-muted/30 border-l-2 border-l-transparent"
+                  ? "bg-primary/10 text-primary border-l-primary"
+                  : "hover:bg-muted/30 border-l-transparent text-muted-foreground"
                 }`}
               >
                 <FileSpreadsheet className={`h-4 w-4 shrink-0 ${
-                  selectedId === ss.id ? "text-foreground" : "text-muted-foreground"
+                  selectedId === ss.id ? "text-primary" : "text-muted-foreground"
                 }`} />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-foreground truncate">{ss.name}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">
+                  <p className="text-xs font-medium text-foreground truncate">{ss.name}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">
                     {ss.owner && `${ss.owner} · `}
                     {ss.modifiedTime && new Date(ss.modifiedTime).toLocaleDateString()}
                   </p>
@@ -145,17 +167,20 @@ function SpreadsheetSearch({ onSelect, selectedId, apiProxy }) {
               </button>
             ))}
           </div>
-        )}
+
       </div>
+      }
 
       {nextPageToken && !loading && (
-        <button
+        <Button
           type="button"
           onClick={() => doSearch(query, nextPageToken)}
-          className="w-full text-center text-xs text-foreground hover:underline py-1"
+          variant="ghost"
+          size="sm"
+          className="w-full py-1 text-xs"
         >
           Load more...
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -202,8 +227,8 @@ function SheetSelector({ spreadsheetId, selectedSheet, onSelect, apiProxy }) {
   return (
     <div className="space-y-1.5">
       {spreadsheetTitle && (
-        <p className="text-[11px] text-muted-foreground">
-          Sheets in <strong>{spreadsheetTitle}</strong>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Sheets in {spreadsheetTitle}
         </p>
       )}
       <div className="flex flex-wrap gap-1.5">
@@ -212,10 +237,10 @@ function SheetSelector({ spreadsheetId, selectedSheet, onSelect, apiProxy }) {
             key={sheet.sheetId}
             type="button"
             onClick={() => onSelect(sheet.title)}
-            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-medium border transition-colors ${
               selectedSheet === sheet.title
-                ? "bg-muted text-foreground border-border"
-                : "bg-muted/10 text-muted-foreground border-border hover:border-muted-foreground/30 hover:text-foreground"
+              ? "bg-primary/10 text-primary border-primary shadow-sm"
+              : "bg-background text-muted-foreground border-border hover:bg-muted/50"
             }`}
           >
             <Table2 className="h-3 w-3" />
@@ -285,15 +310,17 @@ function DataPreview({ spreadsheetId, sheetName, apiProxy }) {
         <p className="text-[11px] text-muted-foreground">
           Showing {preview.rows.length} of {preview.totalRows} rows
         </p>
-        <button
+        <Button
           type="button"
           onClick={fetchPreview}
-          className="text-[11px] text-foreground underline-offset-2 hover:underline"
+          variant="link"
+          size="sm"
+          className="h-auto p-0 text-[11px] font-normal"
         >
           Refresh
-        </button>
+        </Button>
       </div>
-      <div className="overflow-x-auto rounded-md border border-border">
+      <div className="overflow-x-auto rounded-sm border border-border">
         <table className="w-full text-xs">
           <thead>
             <tr className="bg-muted/50">
@@ -352,7 +379,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
     <div className="space-y-0">
       {/* ── Operation picker ── */}
       <div className="pb-4">
-        <label className="text-xs font-medium text-foreground mb-2 block">Operation</label>
+        <Label className="mb-2 block">Operation</Label>
         <div className="grid grid-cols-3 gap-1.5">
           {OPERATIONS.map((op) => {
             const Icon = op.icon;
@@ -362,18 +389,14 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
                 key={op.id}
                 type="button"
                 onClick={() => patch({ operation: op.id })}
-                className={`flex items-center gap-2 p-2.5 rounded-md border text-left transition-all ${
+                className={`flex items-center gap-2 p-2.5 rounded-sm border text-left transition-all ${
                   isSelected
-                    ? "border-foreground bg-muted/20 shadow-sm"
-                    : "border-border hover:border-muted-foreground/30 hover:bg-muted/10"
+                  ? "border-primary bg-primary/10 text-primary shadow-sm"
+                  : "border-border bg-background text-muted-foreground hover:bg-muted/30"
                 }`}
               >
-                <Icon className={`h-3.5 w-3.5 shrink-0 ${
-                  isSelected ? "text-foreground" : "text-muted-foreground"
-                }`} />
-                <span className={`text-xs font-medium ${
-                  isSelected ? "text-foreground" : "text-muted-foreground"
-                }`}>
+                <Icon className="h-3.5 w-3.5 shrink-0" />
+                <span className="text-xs font-medium">
                   {op.label}
                 </span>
               </button>
@@ -382,18 +405,34 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
         </div>
       </div>
 
-      <EditorTabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} badges={badges} />
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList>
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const badgeCount = badges[tab.id];
+            return (
+              <TabsTrigger key={tab.id} value={tab.id} className="gap-1.5 px-3 py-2 text-xs">
+                {Icon && <Icon className="h-3.5 w-3.5" />}
+                {tab.label}
+                {badgeCount > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
+                    {badgeCount}
+                  </span>
+                )}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
 
-      <div className="pt-4 pb-2">
         {/* ── Source tab ── */}
-        {activeTab === "source" && (
+        <TabsContent value="source" className="mt-4 pb-2">
           <div className="space-y-4">
             {/* Spreadsheet ID — manual input OR search */}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Spreadsheet ID</label>
-              <input
+              <Label>Spreadsheet ID</Label>
+              <Input
                 type="text"
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm font-mono text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="font-mono text-xs"
                 placeholder="Enter spreadsheet ID or search below..."
                 value={spreadsheetId}
                 onChange={(e) => patch({ spreadsheetId: e.target.value })}
@@ -402,10 +441,10 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
 
             {/* Search available spreadsheets */}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+              <Label className="text-muted-foreground flex items-center gap-1 font-normal">
                 <Search className="h-3 w-3" />
                 Or search your spreadsheets
-              </label>
+              </Label>
               <SpreadsheetSearch
                 apiProxy={apiProxy}
                 selectedId={spreadsheetId}
@@ -416,7 +455,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
             {/* Sheet selector */}
             {spreadsheetId && (
               <div className="space-y-1.5 pt-2 border-t border-border">
-                <label className="text-xs font-medium text-foreground">Sheet / Tab</label>
+                <Label>Sheet / Tab</Label>
                 <SheetSelector
                   spreadsheetId={spreadsheetId}
                   selectedSheet={sheetName}
@@ -429,10 +468,10 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
             {/* Range */}
             {spreadsheetId && (operation === "read" || operation === "write" || operation === "append" || operation === "update" || operation === "clear") && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Range (A1 notation)</label>
-                <input
+                <Label>Range (A1 notation)</Label>
+                <Input
                   type="text"
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm font-mono text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="font-mono text-xs"
                   placeholder="A1:Z1000"
                   value={opts.range || ""}
                   onChange={(e) => patch({ range: e.target.value })}
@@ -440,35 +479,37 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
               </div>
             )}
           </div>
-        )}
+        </TabsContent>
 
         {/* ── Options tab ── */}
-        {activeTab === "options" && (
+        <TabsContent value="options" className="mt-4 pb-2">
           <div className="space-y-4">
             {(operation === "read") && (
               <>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Major Dimension</label>
-                  <select
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  <Label>Major Dimension</Label>
+                  <Select
                     value={opts.majorDimension || "ROWS"}
-                    onChange={(e) => patch({ majorDimension: e.target.value })}
+                    onValueChange={(val) => patch({ majorDimension: val })}
                   >
-                    <option value="ROWS">Rows</option>
-                    <option value="COLUMNS">Columns</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ROWS">Rows</SelectItem>
+                      <SelectItem value="COLUMNS">Columns</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="gs-includeHeaders"
                     checked={opts.includeHeaders !== false}
-                    onChange={(e) => patch({ includeHeaders: e.target.checked })}
-                    className="h-4 w-4 rounded border-input"
+                    onCheckedChange={(checked) => patch({ includeHeaders: checked })}
                   />
-                  <label htmlFor="gs-includeHeaders" className="text-xs text-foreground">
+                  <Label htmlFor="gs-includeHeaders" className="cursor-pointer text-xs text-foreground font-normal">
                     Treat first row as headers
-                  </label>
+                  </Label>
                 </div>
               </>
             )}
@@ -476,66 +517,74 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
             {(operation === "write" || operation === "update" || operation === "append") && (
               <>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Data (JSON array of arrays)</label>
-                  <textarea
-                    className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y"
+                  <Label>Data (JSON array of arrays)</Label>
+                  <Textarea
+                    className="min-h-[120px] font-mono text-xs"
                     placeholder='[["Header1", "Header2"], ["Value1", "Value2"]]'
                     value={opts.data || ""}
                     onChange={(e) => patch({ data: e.target.value })}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Value Input Option</label>
-                  <select
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  <Label>Value Input Option</Label>
+                  <Select
                     value={opts.valueInputOption || "USER_ENTERED"}
-                    onChange={(e) => patch({ valueInputOption: e.target.value })}
+                    onValueChange={(val) => patch({ valueInputOption: val })}
                   >
-                    <option value="USER_ENTERED">User Entered</option>
-                    <option value="RAW">Raw</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USER_ENTERED">User Entered</SelectItem>
+                      <SelectItem value="RAW">Raw</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </>
             )}
 
             {operation === "append" && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Insert Data Option</label>
-                <select
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                <Label>Insert Data Option</Label>
+                <Select
                   value={opts.insertDataOption || "INSERT_ROWS"}
-                  onChange={(e) => patch({ insertDataOption: e.target.value })}
+                  onValueChange={(val) => patch({ insertDataOption: val })}
                 >
-                  <option value="INSERT_ROWS">Insert Rows</option>
-                  <option value="OVERWRITE">Overwrite</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INSERT_ROWS">Insert Rows</SelectItem>
+                    <SelectItem value="OVERWRITE">Overwrite</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             )}
 
             {operation === "getSpreadsheetInfo" && (
-              <InfoCallout>
+              <Callout>
                 This operation returns spreadsheet metadata including sheet names, row/column counts, and locale.
                 No additional options required.
-              </InfoCallout>
+              </Callout>
             )}
 
             {operation === "clear" && (
-              <InfoCallout>
+              <Callout>
                 This will clear all data in the specified range. The range is configured in the Source tab.
-              </InfoCallout>
+              </Callout>
             )}
           </div>
-        )}
+        </TabsContent>
 
         {/* ── Preview tab ── */}
-        {activeTab === "preview" && (
+        <TabsContent value="preview" className="mt-4 pb-2">
           <DataPreview
             spreadsheetId={spreadsheetId}
             sheetName={sheetName}
             apiProxy={apiProxy}
           />
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

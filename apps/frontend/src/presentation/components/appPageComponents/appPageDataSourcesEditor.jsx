@@ -325,8 +325,8 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     <div className="flex flex-col h-full min-h-0 bg-background">
       {editingIndex !== null && selectedSource ? (
         /* ─── Detail / Edit View ─── */
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-3">
+          <div className="flex-1 overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-border">
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -346,9 +346,9 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
           </div>
 
-          <div className="space-y-4">
+            <div className="space-y-2 p-2">
             {/* Alias field */}
-            <div className="space-y-1.5">
+              <div className="space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Alias / Reference Name
               </Label>
@@ -369,7 +369,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
 
             {/* Type selector */}
-            <div className="space-y-1.5">
+              <div className="space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Source Type
               </Label>
@@ -389,7 +389,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
 
             {/* Target Select */}
-            <div className="space-y-1.5">
+              <div className="space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 {selectedSource.type === "query"
                   ? "Select Query"
@@ -450,7 +450,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
             {/* Custom Channel Name (for listener) */}
             {selectedSource.type === "listener" && (
-              <div className="space-y-1.5">
+                <div className="space-y-2">
                 <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Custom Channel Name (Optional)
                 </Label>
@@ -468,7 +468,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             )}
 
             {/* Trigger Mode */}
-            <div className="space-y-1.5">
+              <div className="space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Trigger Mode
               </Label>
@@ -498,7 +498,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                     No page variables defined. Define variables in the Variables tab first.
                   </p>
                 ) : (
-                  <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                      <div className="space-y-2 max-h-36 overflow-y-auto">
                     {variables.map((v) => {
                       const path = `variables.${v.key}`;
                       const isChecked = selectedSource.refreshOn?.includes(path);
@@ -530,7 +530,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             )}
 
             {/* Polling Interval */}
-            <div className="space-y-1.5">
+              <div className="space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Refetch Interval (ms)
               </Label>
@@ -548,7 +548,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
             {/* Input Arguments Form */}
             {getSourceInputDefinitions(selectedSource).length > 0 && (
-              <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2">
+                <div className="rounded-md border border-border bg-muted/30 p-2 space-y-2">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Parameters / Arguments
                 </p>
@@ -575,7 +575,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
       ) : (
         /* ─── List View ─── */
         <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex items-center justify-between p-3 border-b border-border">
+              <div className="flex items-center justify-between p-2 border-b border-border">
             <div>
               <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Page Data Sources
@@ -586,9 +586,9 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
+              <div className="flex-1 overflow-y-auto p-2 space-y-2">
             {dataSources.length === 0 ? (
-              <div className="rounded-md border border-dashed border-border bg-muted/30 p-3 text-center flex flex-col items-center justify-center py-10">
+                  <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-center flex flex-col items-center justify-center py-10">
                 <Layers className="h-8 w-8 text-muted-foreground/50 mb-2" />
                 <p className="text-xs font-medium text-foreground">No Page Data Sources</p>
                 <p className="text-[10px] text-muted-foreground/70 max-w-[200px] mt-1">
@@ -610,9 +610,9 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                   return (
                     <div
                       key={index}
-                      className="rounded-md border border-border bg-card p-3 flex flex-col hover:shadow-sm transition-shadow group"
+                      className="rounded-md border border-border bg-card p-2 flex flex-col hover:shadow-sm transition-shadow group"
                     >
-                      <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted/50 border border-border">
                             <Icon className="h-4 w-4 text-primary" />
@@ -723,7 +723,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               </div>
             )}
 
-            <div className="pt-2">
+                <div className="">
               <Button
                 type="button"
                 variant="outline"

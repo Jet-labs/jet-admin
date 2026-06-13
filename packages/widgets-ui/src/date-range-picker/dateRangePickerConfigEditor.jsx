@@ -8,8 +8,8 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => 
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-1.5">
+    <div className="space-y-2">
+      <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Label</Label>
         <Input
           type="text"
@@ -20,8 +20,8 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => 
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Start Placeholder</Label>
           <Input
             type="text"
@@ -32,7 +32,7 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => 
           />
         </div>
         
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">End Placeholder</Label>
           <Input
             type="text"
@@ -55,8 +55,8 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => 
         </Label>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Default Start</Label>
           <TemplateAutocompleteInput
             value={config.defaultStart || ''}
@@ -66,7 +66,7 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => 
           />
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Default End</Label>
           <TemplateAutocompleteInput
             value={config.defaultEnd || ''}
@@ -78,7 +78,7 @@ export const DateRangePickerConfigEditor = ({ widgetEditorForm, stateTree }) => 
       </div>
 
       {/* Is Loading Template */}
-      <div className="space-y-1.5 mt-2">
+      <div className="space-y-1 mt-2">
         <Label className="text-xs font-medium text-foreground">Is Loading Template <span className="text-muted-foreground font-normal">(optional)</span></Label>
         <TemplateAutocompleteInput
           value={config.isLoading || ""}

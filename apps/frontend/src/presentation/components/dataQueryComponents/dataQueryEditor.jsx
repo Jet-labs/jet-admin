@@ -238,7 +238,7 @@ export const DataQueryEditor = ({
     <ReactQueryLoadingErrorWrapper isLoading={isLoadingDatasources} error={loadDatasourcesError}>
     <div className="w-full">
       <Section title="Query Configuration">
-        <div className="space-y-4">
+          <div className="space-y-2">
           <div className="space-y-1.5">
             <Label htmlFor="dataQueryTitle">
               {CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_LABEL} <span className="text-destructive">*</span>
@@ -296,14 +296,14 @@ export const DataQueryEditor = ({
           {/* Render dedicated query editor OR JsonForms fallback */}
           {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType] && (
             hasDedicatedQueryEditor ? (
-              <div className="border-t border-border pt-4 mt-2">
+
                 <QueryEditorContext.Provider value={queryEditorContextValue}>
                   {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType]
                     .dedicatedQueryEditor({ queryEditorForm: strictQueryEditorForm })}
                 </QueryEditorContext.Provider>
-              </div>
+
             ) : currentDatasourceType?.queryConfigForm ? (
-              <div className="border-t border-border pt-4 mt-2">
+
                 <JsonForms
                   key={uniqueKey}
                   schema={currentDatasourceType.queryConfigForm.schema}
@@ -314,7 +314,7 @@ export const DataQueryEditor = ({
                   validationMode="ValidateAndShow"
                   onChange={_handleDatasourceOptionsChange}
                 />
-              </div>
+
             ) : null
           )}
         </div>

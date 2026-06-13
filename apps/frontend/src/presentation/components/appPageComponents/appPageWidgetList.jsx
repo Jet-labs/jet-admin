@@ -126,8 +126,8 @@ export const AppPageWidgetList = ({
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3 bg-background">
-      <div className="flex items-center justify-between">
+    <div className="flex min-h-0 flex-1 flex-col gap-2 bg-background overflow-hidden">
+      <div className="flex items-center justify-between p-2 pb-0">
         <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           {CONSTANTS.STRINGS.APP_PAGE_WIDGET_LIST_WIDGETS_TITLE}
         </span>
@@ -147,7 +147,7 @@ export const AppPageWidgetList = ({
       </div>
 
       {/* Search Input - Small Size (size="sm") per Section 29 */}
-      <div className="relative">
+      <div className="relative p-2 py-0">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" />
         <Input
           type="text"
@@ -161,7 +161,7 @@ export const AppPageWidgetList = ({
 
       <div 
         onScroll={_handleScroll}
-        className="flex w-full flex-1 flex-col gap-2 min-h-0 overflow-y-auto"
+        className="flex w-full flex-1 flex-col gap-2 min-h-0 overflow-y-auto p-2"
       >
         <ReactQueryLoadingErrorWrapper
           isLoading={isLoadingWidgets}

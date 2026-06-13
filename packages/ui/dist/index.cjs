@@ -50,6 +50,7 @@ __export(index_exports, {
   AvatarImage: () => AvatarImage,
   Badge: () => Badge,
   Button: () => Button,
+  Callout: () => Callout,
   Card: () => Card,
   CardContent: () => CardContent,
   CardDescription: () => CardDescription,
@@ -83,11 +84,13 @@ __export(index_exports, {
   DropdownMenuSubContent: () => DropdownMenuSubContent,
   DropdownMenuSubTrigger: () => DropdownMenuSubTrigger,
   DropdownMenuTrigger: () => DropdownMenuTrigger,
+  EmptyState: () => EmptyState,
   ErrorBoundary: () => ErrorBoundary,
   GoogleOAuthButton: () => GoogleOAuthButton,
   Input: () => Input,
   InputValuesForm: () => InputValuesForm,
   Label: () => Label2,
+  LogicChip: () => LogicChip,
   PageHeader: () => PageHeader,
   Popover: () => Popover,
   PopoverContent: () => PopoverContent,
@@ -705,7 +708,7 @@ var React11 = __toESM(require("react"));
 var LabelPrimitive = __toESM(require("@radix-ui/react-label"));
 var import_class_variance_authority4 = require("class-variance-authority");
 var labelVariants = (0, import_class_variance_authority4.cva)(
-  "text-xs font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+  "text-xs font-medium text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 );
 var Label2 = React11.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React11.createElement(
   LabelPrimitive.Root,
@@ -793,13 +796,13 @@ var ScrollBar = React14.forwardRef(
       orientation,
       className: cn(
         "flex touch-none select-none transition-colors",
-        orientation === "vertical" && "h-full w-2.5 border-l border-l-transparent p-[1px]",
-        orientation === "horizontal" && "h-2.5 flex-col border-t border-t-transparent p-[1px]",
+        orientation === "vertical" && "h-full w-2 border-l border-l-transparent p-[2px]",
+        orientation === "horizontal" && "h-2 flex-col border-t border-t-transparent p-[2px]",
         className
       ),
       ...props
     },
-    /* @__PURE__ */ React14.createElement(ScrollAreaPrimitive.ScrollAreaThumb, { className: "relative flex-1 rounded-full bg-border" })
+    /* @__PURE__ */ React14.createElement(ScrollAreaPrimitive.ScrollAreaThumb, { className: "relative flex-1 rounded-full bg-muted-foreground/30 hover:bg-muted-foreground/50 transition-colors duration-150" })
   )
 );
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
@@ -992,7 +995,7 @@ var TabsList = React19.forwardRef(({ className, ...props }, ref) => /* @__PURE__
   {
     ref,
     className: cn(
-      "inline-flex  items-end justify-start rounded-none border-b border-border bg-transparent p-0 text-muted-foreground w-full",
+      "inline-flex items-center justify-start border-b border-border bg-transparent p-0 h-9 w-full rounded-none gap-0 text-muted-foreground overflow-x-auto h-auto ",
       className
     ),
     ...props
@@ -1004,7 +1007,7 @@ var TabsTrigger = React19.forwardRef(({ className, ...props }, ref) => /* @__PUR
   {
     ref,
     className: cn(
-      "inline-flex items-center justify-center whitespace-nowrap px-4 py-3 border-b-2 border-transparent -mb-px text-[14px] font-medium tracking-[0.2px] ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:shadow-none hover:text-foreground",
+      "inline-flex items-center justify-center whitespace-nowrap px-4 py-2 h-9 text-xs font-semibold rounded-none border-b-2 border-transparent transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent",
       className
     ),
     ...props
@@ -1484,9 +1487,9 @@ var CodeEditor = React23.forwardRef(({
     "div",
     {
       className: cn(
-        "flex flex-col overflow-hidden rounded border text-sm shadow-sm transition-colors",
+        "flex flex-col overflow-hidden rounded-md border text-sm shadow-sm transition-colors",
         status === "error" ? "border-destructive/50 ring-1 ring-destructive/20" : "border-border hover:border-border/80",
-        isExpanded ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-background" : "relative bg-background",
+        isExpanded ? "fixed inset-4 z-50 rounded-md shadow-2xl ring-1 ring-border/50 bg-background" : "relative bg-background",
         className
       ),
       ...props
@@ -2209,13 +2212,13 @@ var Section = React28.forwardRef(
       {
         ref,
         className: cn(
-          "rounded-md border border-border bg-card p-4 space-y-3",
+          "rounded-md border border-border bg-card overflow-hidden",
           className
         ),
         ...props
       },
-      (title || description) && /* @__PURE__ */ React28.createElement("div", null, title && /* @__PURE__ */ React28.createElement("p", { className: "text-xs font-medium text-muted-foreground mb-0.5" }, title), description && /* @__PURE__ */ React28.createElement("p", { className: "text-[11px] text-muted-foreground" }, description)),
-      children
+      (title || description) && /* @__PURE__ */ React28.createElement("div", { className: "border-b border-border bg-muted/15 p-2" }, title && /* @__PURE__ */ React28.createElement("h3", { className: "text-xs font-semibold text-foreground" }, title), description && /* @__PURE__ */ React28.createElement("p", { className: "text-[11px] text-muted-foreground mt-0.5" }, description)),
+      /* @__PURE__ */ React28.createElement("div", { className: "p-2 space-y-2" }, children)
     );
   }
 );
@@ -2328,4 +2331,65 @@ GoogleOAuthButton.propTypes = {
   hasErrors: import_prop_types6.default.bool,
   errors: import_prop_types6.default.oneOfType([import_prop_types6.default.string, import_prop_types6.default.array])
 };
+
+// src/components/callout.jsx
+var React31 = __toESM(require("react"));
+var import_lucide_react13 = require("lucide-react");
+var Callout = React31.forwardRef(({ className, children, icon: Icon2 = import_lucide_react13.Info, ...props }, ref) => {
+  return /* @__PURE__ */ React31.createElement(
+    "div",
+    {
+      ref,
+      className: cn(
+        "rounded-sm border border-primary/20 bg-primary/5 p-3 text-[11px] text-primary flex gap-2",
+        className
+      ),
+      ...props
+    },
+    /* @__PURE__ */ React31.createElement(Icon2, { className: "h-3.5 w-3.5 mt-0.5 shrink-0" }),
+    /* @__PURE__ */ React31.createElement("span", { className: "flex-1" }, children)
+  );
+});
+Callout.displayName = "Callout";
+
+// src/components/empty-state.jsx
+var React32 = __toESM(require("react"));
+var EmptyState = React32.forwardRef(({ className, icon: Icon2, message, action, ...props }, ref) => {
+  return /* @__PURE__ */ React32.createElement(
+    "div",
+    {
+      ref,
+      className: cn(
+        "rounded-sm border border-border border-dashed bg-muted/30 py-8 flex flex-col items-center gap-2",
+        className
+      ),
+      ...props
+    },
+    Icon2 && /* @__PURE__ */ React32.createElement(Icon2, { className: "h-8 w-8 text-muted-foreground/40" }),
+    /* @__PURE__ */ React32.createElement("p", { className: "text-sm text-muted-foreground text-center" }, message),
+    action
+  );
+});
+EmptyState.displayName = "EmptyState";
+
+// src/components/logic-chip.jsx
+var React33 = __toESM(require("react"));
+var LogicChip = React33.forwardRef(({ className, value, onChange, ...props }, ref) => {
+  return /* @__PURE__ */ React33.createElement(
+    "button",
+    {
+      ref,
+      type: "button",
+      onClick: () => onChange(value === "AND" ? "OR" : "AND"),
+      className: cn(
+        "text-[9px] font-bold px-2 py-0.5 rounded border transition-colors",
+        value === "AND" ? "bg-primary/10 text-primary border-primary/30" : "bg-amber-50 text-amber-600 border-amber-200",
+        className
+      ),
+      ...props
+    },
+    value
+  );
+});
+LogicChip.displayName = "LogicChip";
 //# sourceMappingURL=index.cjs.map
