@@ -15,10 +15,10 @@ const tenantRoleController = {};
 tenantRoleController.createRole = async (req, res) => {
   try {
     const { tenantID } = req.params;
-    const { roleTitle, roleDescription, permissionIDs } = req.body;
+    const { roleTitle, roleDescription, permissionIDs, assetPermissions } = req.body;
     Logger.log("info", {
       message: "tenantRoleController:createRole:params",
-      params: { tenantID, roleTitle, roleDescription, permissionIDs },
+      params: { tenantID, roleTitle, roleDescription, permissionIDs, assetPermissions },
     });
 
     await tenantRoleService.createRole({
@@ -26,6 +26,7 @@ tenantRoleController.createRole = async (req, res) => {
       roleTitle,
       roleDescription,
       permissionIDs,
+      assetPermissions,
     });
 
     Logger.log("success", {
@@ -162,11 +163,11 @@ tenantRoleController.getTenantRoleByID = async (req, res) => {
 tenantRoleController.updateTenantRoleByID = async (req, res) => {
   try {
     const { tenantID, roleID } = req.params;
-    const { roleTitle, roleDescription, permissionIDs } = req.body;
+    const { roleTitle, roleDescription, permissionIDs, assetPermissions } = req.body;
 
     Logger.log("info", {
       message: "tenantRoleController:updateTenantRoleByID:params",
-      params: { tenantID, roleID, roleTitle, roleDescription, permissionIDs },
+      params: { tenantID, roleID, roleTitle, roleDescription, permissionIDs, assetPermissions },
     });
 
     await tenantRoleService.updateTenantRoleByID({
@@ -175,6 +176,7 @@ tenantRoleController.updateTenantRoleByID = async (req, res) => {
       roleTitle,
       roleDescription,
       permissionIDs,
+      assetPermissions,
     });
 
     Logger.log("success", {

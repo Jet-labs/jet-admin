@@ -4,7 +4,7 @@ import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import { AppPage } from "../models/appPage";
 
-export const getAllAppPagesAPI = async ({ tenantID }) => {
+export const getAllAppPagesAPI = async ({ tenantID, search, page, pageSize }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -12,12 +12,27 @@ export const getAllAppPagesAPI = async ({ tenantID }) => {
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.get(url, {
+        params: {
+          search,
+          page,
+          pageSize,
+        },
         headers: {
           authorization: `Bearer ${bearerToken}`,
         },
       });
       if (response.data && response.data.success === true) {
-        return AppPage.toList(response.data.appPages);
+        const appPagesList = response.data.appPages ? AppPage.toList(response.data.appPages) : [];
+        if (response.data.totalCount !== undefined) {
+          return {
+            appPages: appPagesList,
+            totalCount: response.data.totalCount,
+            totalPages: response.data.totalPages,
+            page: response.data.page,
+            pageSize: response.data.pageSize,
+          };
+        }
+        return appPagesList;
       } else if (response.data.error) {
         throw response.data.error;
       } else {

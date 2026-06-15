@@ -12,27 +12,27 @@ const {
 // Role management routes
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:role:list"]),
+  authMiddleware.authorize("role", "list"),
   tenantRoleController.getAllTenantRoles
 );
 
 router.post(
   "/",
     validate(createRoleSchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:role:create"]),
+  authMiddleware.authorize("role", "create"),
   tenantRoleController.createRole
 );
 
 router.get(
   "/permissions",
-  authMiddleware.checkUserPermissions(["tenant:permissions:list"]),
+  authMiddleware.authorize("permission", "list"),
   tenantRoleController.getAllTenantPermissions
 );
 
 router.get(
   "/:roleID",
     validate(roleIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:role:read"]),
+  authMiddleware.authorize("role", "read", { paramKey: "roleID" }),
   tenantRoleController.getTenantRoleByID
 );
 
@@ -42,14 +42,14 @@ router.patch(
         params: roleIdParamSchema,
         body: updateRoleSchema,
     }),
-  authMiddleware.checkUserPermissions(["tenant:role:update"]),
+  authMiddleware.authorize("role", "update", { paramKey: "roleID" }),
   tenantRoleController.updateTenantRoleByID
 );
 
 router.delete(
   "/:roleID",
     validate(roleIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:role:delete"]),
+  authMiddleware.authorize("role", "delete", { paramKey: "roleID" }),
   tenantRoleController.deleteTenantRoleByID
 );
 

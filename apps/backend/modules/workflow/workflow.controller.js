@@ -3,6 +3,7 @@
  * Handles API requests for workflow execution.
  */
 const { workflowService } = require("./workflow.service");
+const { authorizedExecuteWorkflow } = require("../../utils/authorizedProxy");
 
 const Logger = require("../../utils/logger");
 const { expressUtils } = require("../../utils/express.utils");
@@ -19,11 +20,27 @@ workflowController.getAllWorkflows = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const { search, page, pageSize } = req.query;
     const authContext = getServiceAuthContext(req);
-    Logger.log("info", { message: "WorkflowController:getAllWorkflows:params", params: { userID: user.userID, tenantID, authContext } });
-    const workflows = await workflowService.getAllWorkflows({ userID: user.userID, tenantID, authContext });
-    Logger.log("success", { message: "WorkflowController:getAllWorkflows:success", params: { workflowLength: workflows.length } });
-    expressUtils.sendResponse(res, true, { workflows });
+    Logger.log("info", { message: "WorkflowController:getAllWorkflows:params", params: { userID: user.userID, tenantID, search, page, pageSize, authContext } });
+    
+    const result = await workflowService.getAllWorkflows({
+      userID: user.userID,
+      tenantID,
+      search,
+      page,
+      pageSize,
+      authContext
+    });
+    
+    Logger.log("success", { message: "WorkflowController:getAllWorkflows:success", params: { workflowLength: result.workflows.length } });
+    expressUtils.sendResponse(res, true, {
+      workflows: result.workflows,
+      totalCount: result.totalCount,
+      totalPages: result.totalPages,
+      page: result.page,
+      pageSize: result.pageSize,
+    });
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:getAllWorkflows:error", params: { error: error.message } });
     expressUtils.sendResponse(res, false, {}, error);
@@ -146,7 +163,12 @@ workflowController.executeWorkflow = async (req, res) => {
 
     Logger.log("info", { message: "WorkflowController:executeWorkflow:params", params: { workflowID, tenantID, authContext } });
 
-    const result = await workflowService.executeWorkflow({ workflowID, tenantID, inputValues, authContext });
+    const result = await authorizedExecuteWorkflow({ 
+      workflowID, 
+      tenantID, 
+      inputValues, 
+      executionCtx: req.executionCtx 
+    });
 
     Logger.log("success", { message: "WorkflowController:executeWorkflow:success", params: { instanceID: result.instanceID } });
     expressUtils.sendResponse(res, true, result);

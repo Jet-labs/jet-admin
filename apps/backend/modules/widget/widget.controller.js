@@ -3,6 +3,9 @@ const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { widgetService } = require("./widget.service");
 const { getServiceAuthContext } = require("../../utils/auth.context.utils");
+const fileStorageUtil = require("../../utils/fileStorage.util");
+const environmentVariables = require("../../environment");
+const { GetObjectCommand } = require("@aws-sdk/client-s3");
 
 const widgetController = {};
 
@@ -186,12 +189,14 @@ widgetController.cloneWidgetByID = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, widgetID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "widgetController:cloneWidgetByID:params",
       params: {
         userID: user.userID,
         tenantID,
         widgetID,
+        authContext,
       },
     });
 
@@ -199,6 +204,7 @@ widgetController.cloneWidgetByID = async (req, res) => {
       userID: user.userID,
       tenantID,
       widgetID,
+      authContext,
     });
 
     Logger.log("success", {
@@ -297,12 +303,14 @@ widgetController.deleteWidgetByID = async (req, res) => {
     const { user } = req;
     const { tenantID, widgetID } = req.params; // Assuming `widgetID` identifies the query to update
 
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "widgetController:deleteWidgetByID:params",
       params: {
         userID: user.userID,
         tenantID,
         widgetID,
+        authContext,
       },
     });
 
@@ -310,6 +318,7 @@ widgetController.deleteWidgetByID = async (req, res) => {
       userID: user.userID,
       tenantID,
       widgetID,
+      authContext,
     });
 
     Logger.log("success", {
@@ -334,5 +343,91 @@ widgetController.deleteWidgetByID = async (req, res) => {
   }
 };
 
-module.exports = { widgetController };
+/**
+ * Uploads a widget file (Image/Document) to Supabase storage.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+widgetController.uploadFile = async (req, res) => {
+  try {
+    const { tenantID } = req.params;
+    const file = req.file;
 
+    if (!file) {
+      throw new Error("No file uploaded.");
+    }
+
+    Logger.log("info", {
+      message: "widgetController:uploadFile:params",
+      params: {
+        tenantID,
+        fileName: file.originalname,
+        fileSize: file.size,
+        fileType: file.mimetype,
+      },
+    });
+
+    // Create unique filename and upload path
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    const filePath = `widget-files/${tenantID}/${uniqueName}`;
+
+    // Upload to default bucket and get the public URL
+    const publicUrl = await fileStorageUtil.uploadFile(file.buffer, file.mimetype, filePath);
+
+    Logger.log("success", {
+      message: "widgetController:uploadFile:success",
+      params: {
+        url: publicUrl,
+        filePath,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      url: publicUrl,
+      filePath,
+      fileName: file.originalname,
+      fileSize: file.size,
+      fileType: file.mimetype,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "widgetController:uploadFile:error",
+      params: {
+        error: error.message || error,
+      },
+    });
+    return expressUtils.sendResponse(res, false, {}, error.message || error);
+  }
+};
+
+/**
+ * Serves a file from S3 using a proxy endpoint.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+widgetController.serveFile = async (req, res) => {
+  try {
+    const filePath = req.query.path;
+    if (!filePath) {
+      return res.status(400).send("Path is required");
+    }
+
+    const bucketName = environmentVariables.SUPABASE_S3_BUCKET || "jet-admin-datasource-file-uploads";
+    const s3 = fileStorageUtil.getS3Client();
+
+    const command = new GetObjectCommand({ Bucket: bucketName, Key: filePath });
+    const s3Res = await s3.send(command);
+
+    res.setHeader("Content-Type", s3Res.ContentType || "application/octet-stream");
+    // Ensure CORS headers are present if needed, though they should be handled by middleware
+    s3Res.Body.pipe(res);
+  } catch (error) {
+    Logger.log("error", {
+      message: "widgetController:serveFile:error",
+      params: { error: error.message || error },
+    });
+    res.status(404).send("File not found");
+  }
+};
+
+module.exports = { widgetController };

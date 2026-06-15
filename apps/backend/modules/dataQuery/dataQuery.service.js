@@ -4,7 +4,8 @@ const { isUUID } = require("validator");
 const { v4: uuid } = require("uuid");
 const dataQueryService = {};
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
-const { resolveInputs, extractQueryDefinitions } = require("../../utils/input.util");
+const { authorizedExecuteDataQuery, createQueryEngine, defaultDatasourceFetcher } = require("../../utils/authorizedProxy");
+const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 
 dataQueryService.getDataQueriesWithDatasource = async ({
   userID,
@@ -56,21 +57,62 @@ dataQueryService.getDataQueriesWithDatasource = async ({
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-dataQueryService.getAllDataQueries = async ({ userID, tenantID }) => {
+dataQueryService.getAllDataQueries = async ({ userID, tenantID, search, page, pageSize }) => {
   Logger.log("info", {
     message: "dataQueryService:getAllDataQueries:params",
     params: {
       userID,
       tenantID,
+      search,
+      page,
+      pageSize,
     },
   });
 
   try {
-    const dataQueries = await prisma.tblDataQueries.findMany({
-      where: {
-        tenantID: tenantID,
+    const where = {
+      tenantID: tenantID,
+    };
+
+    if (search) {
+      where.OR = [
+        {
+          dataQueryTitle: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          dataQueryDescription: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          datasourceType: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+    }
+
+    const findManyOptions = {
+      where,
+      orderBy: {
+        createdAt: "desc",
       },
-    });
+    };
+
+    if (page && pageSize) {
+      findManyOptions.skip = (page - 1) * pageSize;
+      findManyOptions.take = pageSize;
+    }
+
+    const [dataQueries, totalCount] = await Promise.all([
+      prisma.tblDataQueries.findMany(findManyOptions),
+      prisma.tblDataQueries.count({ where }),
+    ]);
 
     // Transform the result to include counts in a more accessible format
     const transformedQueries = dataQueries.map((query) => ({
@@ -83,9 +125,17 @@ dataQueryService.getAllDataQueries = async ({ userID, tenantID }) => {
       params: {
         userID,
         dataQueriesLength: transformedQueries?.length,
+        totalCount,
       },
     });
-    return transformedQueries;
+
+    return {
+      dataQueries: transformedQueries,
+      totalCount,
+      page: page || 1,
+      pageSize: pageSize || transformedQueries.length,
+      totalPages: pageSize ? Math.ceil(totalCount / pageSize) : 1,
+    };
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryService:getAllDataQueries:failure",
@@ -136,7 +186,10 @@ dataQueryService.createDataQuery = async ({
 
   try {
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
-    await prisma.tblDataQueries.create({
+    if (!creatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
+    const createdQuery = await prisma.tblDataQueries.create({
       data: {
         tenantID: tenantID,
         dataQueryTitle,
@@ -148,6 +201,9 @@ dataQueryService.createDataQuery = async ({
         runOnLoad,
       },
     });
+
+    await grantCreatorAccess(tenantID, "dataquery", createdQuery.dataQueryID, authContext, userID);
+
     Logger.log("success", {
       message: "dataQueryService:createDataQuery:success",
       params: {
@@ -184,6 +240,7 @@ dataQueryService.createBulkDataQuery = async ({
   userID,
   tenantID,
   dataQueriesData,
+  authContext,
 }) => {
   Logger.log("info", {
     message: "dataQueryService:createDataQuery:params",
@@ -191,10 +248,17 @@ dataQueryService.createBulkDataQuery = async ({
       userID,
       tenantID,
       dataQueriesData,
+      authContext,
     },
   });
 
   try {
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const finalCreatorID = creatorID || userID;
+    if (!finalCreatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
+
     const dataQueries = await prisma.tblDataQueries.createManyAndReturn({
       data: dataQueriesData.map((dataQueryData) => ({
         tenantID: tenantID,
@@ -202,10 +266,15 @@ dataQueryService.createBulkDataQuery = async ({
         dataQueryOptions: dataQueryData.dataQueryOptions,
         datasourceID: dataQueryData.datasourceID,
         datasourceType: dataQueryData.datasourceType,
-        creatorID: userID,
+        creatorID: finalCreatorID,
+        createdByApiKeyID: createdByApiKeyID,
         runOnLoad: dataQueryData.runOnLoad,
       })),
     });
+
+    for (const q of dataQueries) {
+      await grantCreatorAccess(tenantID, "dataquery", q.dataQueryID, authContext, finalCreatorID);
+    }
 
     Logger.log("success", {
       message: "dataQueryService:createDataQuery:success",
@@ -236,6 +305,7 @@ dataQueryService.createBulkDataQuery = async ({
  * @param {string} param0.tenantID
  * @param {number} param0.dataQueryID
  * @param {object} param0.inputValues
+ * @param {object} param0.executionCtx
  * @returns {Promise<object>}
  */
 dataQueryService.runDataQueryByID = async ({
@@ -243,6 +313,7 @@ dataQueryService.runDataQueryByID = async ({
   tenantID,
   dataQueryID,
   inputValues,
+  executionCtx,
 }) => {
   Logger.log("info", {
     message: "dataQueryService:runDataQueryByID:params",
@@ -278,38 +349,12 @@ dataQueryService.runDataQueryByID = async ({
       throw new Error(`Database query with ID ${dataQueryID} not found`);
     }
 
-    // Resolve & validate inputs through the unified pipeline
-    const inputDefinitions = extractQueryDefinitions(dataQuery);
-    const { resolved, errors, valid } = await resolveInputs({
-      type: 'query', inputDefinitions, inputValues: inputValues || {},
-    });
 
-    if (!valid) {
-      Logger.log("error", {
-        message: "dataQueryService:runDataQueryByID:inputValidationFailed",
-        params: { dataQueryID, errors },
-      });
-      throw new Error(`Query input validation failed: ${JSON.stringify(errors)}`);
-    }
 
-    const queryRunner = createQueryEngine();
-
-    Logger.log("info", {
-      message: "dataQueryService:runDataQueryByID:queryRunner.run",
-      params: {
-        userID,
-        tenantID,
-        dataQueryID,
-        inputValues,
-        inputDefinitions: dataQuery.dataQueryOptions?.inputDefinitions,
-        resolvedInputs: resolved,
-      },
-    });
-
-    const results = await executeDataQuery({
-      engine: queryRunner,
+    const results = await authorizedExecuteDataQuery({
       dataQueryID,
-      executionInputs: resolved,
+      inputValues, // proxy now handles resolution!
+      executionCtx,
     });
 
     Logger.log("success", {
@@ -383,50 +428,19 @@ dataQueryService.runDataQueryByData = async ({
     });
 
     const queryRunner = createQueryEngine({
-      queryFetcher: async (queryId) => {
-        if (queryId == tempQueryID) {
-          return processedDataQuery;
-        }
-
-        return prisma.tblDataQueries.findFirst({
-          where: {
-            dataQueryID: queryId,
-          },
-        });
-      },
+      queryFetcher: async () => ({
+        ...dataQuery,
+        dataQueryID: tempQueryID,
+        tblDatasources: null, // we'll use the raw config
+      }),
       datasourceFetcher: defaultDatasourceFetcher,
     });
 
-    // Resolve & validate inputs through the unified pipeline
-    const inputDefinitions = extractQueryDefinitions(processedDataQuery);
-    const { resolved, errors, valid } = await resolveInputs({
-      type: 'query', inputDefinitions, inputValues: inputValues || {},
-    });
-
-    if (!valid) {
-      Logger.log("error", {
-        message: "dataQueryService:runDataQueryByData:inputValidationFailed",
-        params: { tempQueryID, errors },
-      });
-      throw new Error(`Query input validation failed: ${JSON.stringify(errors)}`);
-    }
-
-    Logger.log("info", {
-      message: "dataQueryService:runDataQueryByData:queryRunner.run",
-      params: {
-        userID,
-        tenantID,
-        tempQueryID,
-        inputValues,
-        inputDefinitions: processedDataQuery.dataQueryOptions?.inputDefinitions,
-        resolvedInputs: resolved,
-      },
-    });
-
-    const results = await executeDataQuery({
+    const results = await authorizedExecuteDataQuery({
       engine: queryRunner,
       dataQueryID: tempQueryID,
       executionInputs: resolved,
+      executionCtx,
     });
 
     Logger.log("success", {
@@ -528,6 +542,7 @@ dataQueryService.cloneDataQueryByID = async ({
   userID,
   tenantID,
   dataQueryID,
+  authContext,
 }) => {
   Logger.log("info", {
     message: "dataQueryService:cloneDataQueryByID:params",
@@ -535,6 +550,7 @@ dataQueryService.cloneDataQueryByID = async ({
       userID,
       tenantID,
       dataQueryID,
+      authContext,
     },
   });
 
@@ -548,18 +564,27 @@ dataQueryService.cloneDataQueryByID = async ({
     if (!dataQuery) {
       throw new Error("Database query not found");
     }
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const finalCreatorID = creatorID || userID;
+    if (!finalCreatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
     const newDataQuery = await prisma.tblDataQueries.create({
       data: {
         tenantID: tenantID,
         dataQueryTitle: dataQuery.dataQueryTitle + " (Copy)",
         dataQueryOptions: dataQuery.dataQueryOptions,
-        creatorID: userID,
+        creatorID: finalCreatorID,
+        createdByApiKeyID,
         runOnLoad: dataQuery.runOnLoad,
         datasourceID: dataQuery.datasourceID,
         datasourceType: dataQuery.datasourceType,
         dataQueryDescription: dataQuery.dataQueryDescription
       },
     });
+
+    await grantCreatorAccess(tenantID, "dataquery", newDataQuery.dataQueryID, authContext, finalCreatorID);
+
     Logger.log("success", {
       message: "dataQueryService:cloneDataQueryByID:success",
       params: {
@@ -694,6 +719,8 @@ dataQueryService.deleteDataQueryByID = async ({
       },
     });
 
+    await removePoliciesForResource(tenantID, `dataquery:${dataQueryID}`);
+
     Logger.log("success", {
       message: "dataQueryService:deleteDataQueryByID:success",
       params: {
@@ -718,72 +745,6 @@ dataQueryService.deleteDataQueryByID = async ({
   }
 };
 
-// --- Execution Adapter Logic ---
-const { keyValueTypeArrayToObject } = require("../../utils/json.util");
-const { QueryEngine } = require("./queryEngine/engine");
-
-async function defaultQueryFetcher(queryID) {
-  return prisma.tblDataQueries.findFirst({
-    where: { dataQueryID: queryID },
-  });
-}
-
-async function defaultDatasourceFetcher(datasourceID) {
-  if (!datasourceID || !isUUID(datasourceID)) {
-    return null;
-  }
-  return prisma.tblDatasources.findFirst({
-    where: { datasourceID },
-  });
-}
-
-function createQueryEngine({
-  queryFetcher = defaultQueryFetcher,
-  datasourceFetcher = defaultDatasourceFetcher,
-} = {}) {
-  return new QueryEngine(queryFetcher, datasourceFetcher);
-}
-
-function buildDataQueryExecutionInputs(inputDefinitions = [], inputValues = {}) {
-  const normalizedInputDefinitions = Array.isArray(inputDefinitions)
-    ? inputDefinitions
-    : [];
-
-  const mappedInputsToValues = normalizedInputDefinitions.map((inputDef) => ({
-    ...inputDef,
-    value: inputValues?.[inputDef.key],
-  }));
-
-  return {
-    mappedInputsToValues,
-    kvtObject: keyValueTypeArrayToObject(mappedInputsToValues),
-  };
-}
-
-async function executeDataQuery({
-  engine,
-  dataQueryID,
-  inputDefinitions = [],
-  inputValues = {},
-  executionInputs,
-}) {
-  const activeEngine = engine || createQueryEngine();
-  const runtimeInputs =
-    executionInputs ?? buildDataQueryExecutionInputs(inputDefinitions, inputValues).kvtObject;
-
-  return activeEngine.executeQuery(dataQueryID, runtimeInputs);
-}
-
-// Assign execution methods to service to simplify imports across codebase
-dataQueryService.createQueryEngine = createQueryEngine;
-dataQueryService.buildDataQueryExecutionInputs = buildDataQueryExecutionInputs;
-dataQueryService.executeDataQuery = executeDataQuery;
-
 module.exports = { 
   dataQueryService, 
-  createQueryEngine, 
-  buildDataQueryExecutionInputs, 
-  executeDataQuery,
-  defaultQueryFetcher,
-  defaultDatasourceFetcher
 };

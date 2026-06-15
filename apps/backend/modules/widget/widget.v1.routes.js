@@ -10,33 +10,56 @@ const {
   listWidgetsQuerySchema,
 } = require("./widget.validator");
 
+const multer = require("multer");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+});
+
 // Database widget routes
 
 router.get(
   "/",
   validate(listWidgetsQuerySchema, "query"),
-  authMiddleware.checkUserPermissions(["tenant:widget:list"]),
+  authMiddleware.authorize("widget", "list"),
   widgetController.getAllWidgets
 );
 
 router.post(
   "/",
   validate(createWidgetSchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:widget:create"]),
+  authMiddleware.authorize("widget", "create"),
   widgetController.createWidget
+);
+
+router.post(
+  "/upload",
+  authMiddleware.authorize("widget", "create"),
+  upload.single("file"),
+  widgetController.uploadFile
+);
+
+router.get(
+  "/files",
+  widgetController.serveFile
 );
 
 router.get(
   "/:widgetID",
   validate(widgetIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:widget:read"]),
+  authMiddleware.authorize("widget", "read"),
   widgetController.getWidgetByID
 );
 
 router.post(
   "/:widgetID/clone",
   validate(widgetIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:widget:clone"]),
+  authMiddleware.authorize([
+    { resource: "widget", action: "create" },
+    { resource: "widget", action: "read", paramKey: "widgetID" }
+  ]),
   widgetController.cloneWidgetByID
 );
 
@@ -46,14 +69,18 @@ router.patch(
     params: widgetIdParamSchema,
     body: updateWidgetSchema,
   }),
-  authMiddleware.checkUserPermissions(["tenant:widget:update"]),
+  authMiddleware.authorize("widget", "update", {
+    paramKey: "widgetID",
+  }),
   widgetController.updateWidgetByID
 );
 
 router.delete(
   "/:widgetID",
   validate(widgetIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:widget:delete"]),
+  authMiddleware.authorize("widget", "delete", {
+    paramKey: "widgetID",
+  }),
   widgetController.deleteWidgetByID
 );
 

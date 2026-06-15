@@ -147,16 +147,18 @@ export const AppPageWidgetList = ({
       </div>
 
       {/* Search Input - Small Size (size="sm") per Section 29 */}
-      <div className="relative p-2 py-0">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" />
-        <Input
-          type="text"
-          size="sm"
-          placeholder="Search widgets..."
-          className="pl-8 w-full border-border/50 focus:border-primary/30"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      <div className="px-2 py-0">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" />
+          <Input
+            type="text"
+            size="sm"
+            placeholder="Search widgets..."
+            className="pl-8 w-full border-border/50 focus:border-primary/30"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       <div 

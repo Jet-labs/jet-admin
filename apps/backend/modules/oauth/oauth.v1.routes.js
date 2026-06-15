@@ -7,7 +7,7 @@ const { authMiddleware } = require("../auth/auth.middleware");
 router.get(
   "/google/auth/:tenantID",
   authMiddleware.authProvider,
-  authMiddleware.checkUserPermissions(["tenant:datasource"]),
+  authMiddleware.authorize("datasource", "update"),
   oauthController.getGoogleAuthUrl
 );
 
@@ -15,7 +15,7 @@ router.get(
 router.get(
   "/:tenantID/google/url",
   authMiddleware.authProvider,
-  authMiddleware.checkUserPermissions(["tenant:datasource"]),
+  authMiddleware.authorize("datasource", "update"),
   oauthController.getGoogleAuthUrl
 );
 

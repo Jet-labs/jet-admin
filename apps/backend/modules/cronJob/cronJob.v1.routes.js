@@ -3,11 +3,13 @@ const router = express.Router({ mergeParams: true });
 const { cronJobController } = require("./cronJob.controller");
 const { authMiddleware } = require("../auth/auth.middleware");
 const { validate, validateAll } = require("../../utils/validation.utils");
+const { cronJobMiddleware } = require("./cronJob.middleware");
 const {
   createCronJobSchema,
   updateCronJobSchema,
   cronJobIdParamSchema,
   cronJobHistoryQuerySchema,
+  listCronJobsQuerySchema,
 } = require("./cronJob.validator");
 
 // --- Cron Job Routes ---
@@ -15,14 +17,15 @@ const {
 // GET / - Get all Cron Jobs
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:cronjob:list"]),
+  validate(listCronJobsQuerySchema, "query"),
+  authMiddleware.authorize("cronjob", "list"),
   cronJobController.getAllCronJobs
 );
 
 // GET /status/connections - Get all connection statuses
 router.get(
   "/status/connections",
-  authMiddleware.checkUserPermissions(["tenant:cronjob:list"]),
+  authMiddleware.authorize("cronjob", "list"),
   cronJobController.getConnectionStatus
 );
 
@@ -30,7 +33,17 @@ router.get(
 router.post(
   "/",
   validate(createCronJobSchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:cronjob:create"]),
+  authMiddleware.authorize([
+    {
+      resource: "cronjob",
+      action: "create",
+    },
+    {
+      resource: "workflow",
+      action: "execute",
+      bodyKey: "workflowID",
+    }
+  ]),
   cronJobController.createCronJob
 );
 
@@ -38,7 +51,9 @@ router.post(
 router.get(
   "/:cronJobID",
   validate(cronJobIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:cronjob:read"]),
+  authMiddleware.authorize("cronjob", "read", {
+    paramKey: "cronJobID",
+  }),
   cronJobController.getCronJobByID
 );
 
@@ -49,7 +64,19 @@ router.patch(
     params: cronJobIdParamSchema,
     body: updateCronJobSchema,
   }),
-  authMiddleware.checkUserPermissions(["tenant:cronjob:update"]),
+  authMiddleware.authorize([
+    {
+      resource: "cronjob",
+      action: "update",
+      paramKey: "cronJobID",
+    },
+    {
+      resource: "workflow",
+      action: "execute",
+      bodyKey: "workflowID",
+      skipIfMissing: true,
+    }
+  ]),
   cronJobController.updateCronJobByID
 );
 
@@ -57,7 +84,9 @@ router.patch(
 router.delete(
   "/:cronJobID",
   validate(cronJobIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:cronjob:delete"]),
+  authMiddleware.authorize("cronjob", "delete", {
+    paramKey: "cronJobID",
+  }),
   cronJobController.deleteCronJobByID
 );
 
@@ -65,9 +94,15 @@ router.delete(
 router.post(
   "/:cronJobID/clone",
   validate(cronJobIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:cronjob:create"]),
+  cronJobMiddleware.resolveWorkflowIDFromDB,
+  authMiddleware.authorize([
+    { resource: "cronjob", action: "create" },
+    { resource: "cronjob", action: "read", paramKey: "cronJobID" },
+    { resource: "workflow", action: "execute", reqKey: "workflowID", skipIfMissing: true }
+  ]),
   cronJobController.cloneCronJob
 );
+
 
 // --- Job History Routes ---
 
@@ -78,10 +113,9 @@ router.get(
     params: cronJobIdParamSchema,
     query: cronJobHistoryQuerySchema,
   }),
-  authMiddleware.checkUserPermissions([
-    "tenant:cronjob:read",
-    "tenant:cronjob:history:read",
-  ]),
+  authMiddleware.authorize("cronjob", "read", {
+    paramKey: "cronJobID",
+  }),
   cronJobController.getCronJobHistoryByID
 );
 

@@ -143,7 +143,7 @@ CustomTextInput.propTypes = {
 import React3, { useState } from "react";
 import PropTypes3 from "prop-types";
 import { RefreshCw } from "lucide-react";
-import { Button, Label as Label3, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Button, Label as Label3, SearchSelect } from "@jet-admin/ui";
 var CustomSelectInput = (props) => {
   const {
     data,
@@ -187,6 +187,10 @@ var CustomSelectInput = (props) => {
     }
   };
   const hasErrors = errors && errors.length > 0;
+  const selectOptions = options.map((optionValue) => ({
+    value: optionValue,
+    label: getDisplayName(optionValue)
+  }));
   return /* @__PURE__ */ React3.createElement("div", { className: "" }, /* @__PURE__ */ React3.createElement(
     Label3,
     {
@@ -194,15 +198,17 @@ var CustomSelectInput = (props) => {
       className: `block mb-1 ${hasErrors ? "text-red-500" : ""}`
     },
     label || description
-  ), /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React3.createElement(Select, { value: data || "", onValueChange: (val) => handleChange(path, val), disabled: isDisabled }, /* @__PURE__ */ React3.createElement(
-    SelectTrigger,
+  ), /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React3.createElement(
+    SearchSelect,
     {
-      id: path,
-      size: "sm",
+      value: data || "",
+      onChange: (val) => handleChange(path, val),
+      options: selectOptions,
+      disabled: isDisabled,
+      placeholder: uischema?.options?.placeholder || "Select an option",
       className: `${hasErrors ? "border-red-500" : ""}`
-    },
-    /* @__PURE__ */ React3.createElement(SelectValue, { placeholder: uischema?.options?.placeholder || "Select an option" })
-  ), /* @__PURE__ */ React3.createElement(SelectContent, null, options.map((optionValue) => /* @__PURE__ */ React3.createElement(SelectItem, { key: optionValue, value: optionValue }, getDisplayName(optionValue))))), showRefreshButton && onRefresh && /* @__PURE__ */ React3.createElement(
+    }
+  ), showRefreshButton && onRefresh && /* @__PURE__ */ React3.createElement(
     Button,
     {
       type: "button",
@@ -820,7 +826,7 @@ CustomStringArrayRenderer.propTypes = {
 import React12 from "react";
 import PropTypes12 from "prop-types";
 import { Trash2 as Trash25 } from "lucide-react";
-import { Button as Button7, Label as Label12, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2, TemplateAutocompleteInput as TemplateAutocompleteInput5 } from "@jet-admin/ui";
+import { Button as Button7, Label as Label12, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, TemplateAutocompleteInput as TemplateAutocompleteInput5 } from "@jet-admin/ui";
 var CustomFieldOperatorValueArrayRenderer = ({
   data,
   path,
@@ -870,7 +876,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
       mode: templateMode,
       className: errors && errors.length > 0 ? "ring-1 ring-red-500 rounded-sm" : ""
     }
-  )), /* @__PURE__ */ React12.createElement("div", { className: "w-36" }, /* @__PURE__ */ React12.createElement(Select2, { value: item.operator || "==", onValueChange: (val) => handleItemChange(index, "operator", val), disabled: isDisabled }, /* @__PURE__ */ React12.createElement(SelectTrigger2, { size: "sm" }, /* @__PURE__ */ React12.createElement(SelectValue2, null)), /* @__PURE__ */ React12.createElement(SelectContent2, null, operatorOptions.map((op) => /* @__PURE__ */ React12.createElement(SelectItem2, { key: op, value: op }, op))))), /* @__PURE__ */ React12.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React12.createElement(
+  )), /* @__PURE__ */ React12.createElement("div", { className: "w-36" }, /* @__PURE__ */ React12.createElement(Select, { value: item.operator || "==", onValueChange: (val) => handleItemChange(index, "operator", val), disabled: isDisabled }, /* @__PURE__ */ React12.createElement(SelectTrigger, { size: "sm" }, /* @__PURE__ */ React12.createElement(SelectValue, null)), /* @__PURE__ */ React12.createElement(SelectContent, null, operatorOptions.map((op) => /* @__PURE__ */ React12.createElement(SelectItem, { key: op, value: op }, op))))), /* @__PURE__ */ React12.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React12.createElement(
     TemplateAutocompleteInput5,
     {
       placeholder: "Value",
@@ -1431,6 +1437,70 @@ CustomGoogleOAuthButtonControlComponent.propTypes = {
 };
 var CustomGoogleOAuthButtonControl = CustomGoogleOAuthButtonControlComponent;
 
+// src/renderers/CustomSearchSelectInput.jsx
+import React22 from "react";
+import PropTypes21 from "prop-types";
+import { Label as Label16, SearchSelect as SearchSelect2 } from "@jet-admin/ui";
+var CustomSearchSelectInput = (props) => {
+  const {
+    data,
+    path,
+    handleChange,
+    label,
+    description,
+    errors,
+    required,
+    uischema,
+    enabled
+  } = props;
+  const isDisabled = enabled === false;
+  const hasErrors = errors && errors.length > 0;
+  const selectOptions = uischema?.options?.options || [];
+  const onSearchChange = uischema?.options?.onSearchChange;
+  const onLoadMore = uischema?.options?.onLoadMore;
+  const hasNextPage = uischema?.options?.hasNextPage;
+  const isFetchingNextPage = uischema?.options?.isFetchingNextPage;
+  const isLoading = uischema?.options?.isLoading;
+  const placeholder = uischema?.options?.placeholder || "Select an option...";
+  return /* @__PURE__ */ React22.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React22.createElement(
+    Label16,
+    {
+      htmlFor: path,
+      className: `${hasErrors ? "text-red-500" : ""}`
+    },
+    label || description,
+    " ",
+    required ? /* @__PURE__ */ React22.createElement("span", { className: "text-destructive" }, "*") : null
+  ), /* @__PURE__ */ React22.createElement(
+    SearchSelect2,
+    {
+      value: data ? String(data) : "",
+      onChange: (val) => handleChange(path, val),
+      options: selectOptions,
+      disabled: isDisabled,
+      placeholder,
+      className: `text-xs bg-background ${hasErrors ? "border-red-500" : ""}`,
+      onSearchChange,
+      onLoadMore,
+      hasNextPage,
+      isFetchingNextPage,
+      isLoading
+    }
+  ), hasErrors && /* @__PURE__ */ React22.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
+};
+CustomSearchSelectInput.propTypes = {
+  data: PropTypes21.oneOfType([PropTypes21.string, PropTypes21.number]),
+  path: PropTypes21.string.isRequired,
+  handleChange: PropTypes21.func.isRequired,
+  label: PropTypes21.string,
+  description: PropTypes21.string,
+  errors: PropTypes21.arrayOf(PropTypes21.string),
+  schema: PropTypes21.object.isRequired,
+  uischema: PropTypes21.object.isRequired,
+  enabled: PropTypes21.bool,
+  required: PropTypes21.bool
+};
+
 // src/renderers/index.js
 var JetNumberControl = withJsonFormsControlProps(CustomNumberInput);
 var JetTextControl = withJsonFormsControlProps(CustomTextInput);
@@ -1451,6 +1521,7 @@ var JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);
 var JetTabLayout = withJsonFormsLayoutProps(CustomTabRenderer);
 var JetHorizontalLayout = withJsonFormsLayoutProps(CustomHorizontalLayout);
 var JetFileUploadControl = withJsonFormsControlProps(CustomFileUploadInput);
+var JetSearchSelectControl = withJsonFormsControlProps(CustomSearchSelectInput);
 var JetGoogleOAuthControl = withJsonFormsControlProps(CustomGoogleOAuthButtonControl);
 
 // src/testers.js
@@ -1515,6 +1586,13 @@ var selectInputTester = (uischema, rootSchema) => {
   }
   return -1;
 };
+var searchSelectTester = rankWith(
+  150,
+  and(
+    isControl,
+    (uischema) => uischema.options && uischema.options.isSearchSelect === true
+  )
+);
 var checkboxTester = (uischema, schema) => {
   if (uischema.type !== "Control") {
     return -1;
@@ -1730,6 +1808,7 @@ var jetFormsBaseRenderers = [
   { tester: tabRendererTester, renderer: JetTabLayout },
   { tester: numberInputTester, renderer: JetNumberControl },
   { tester: textInputTester, renderer: JetTextControl },
+  { tester: searchSelectTester, renderer: JetSearchSelectControl },
   { tester: selectInputTester, renderer: JetSelectControl },
   { tester: radioInputTester, renderer: JetRadioControl },
   { tester: checkboxTester, renderer: JetCheckboxControl },

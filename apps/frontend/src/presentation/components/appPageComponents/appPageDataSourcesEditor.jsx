@@ -1,20 +1,26 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useWorkflows } from "../../../logic/hooks/useWorkflows";
-import { useDataQueries } from "../../../logic/hooks/useDataQueries";
-import { useListeners } from "../../../logic/hooks/useListeners";
+import { useInfiniteWorkflows } from "../../../logic/hooks/useWorkflows";
+import { useInfiniteDataQueries } from "../../../logic/hooks/useDataQueries";
+import { useInfiniteListeners } from "../../../logic/hooks/useListeners";
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@uidotdev/usehooks";
+import { getWorkflowByIDAPI } from "../../../data/apis/workflow";
+import { getDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { getListenerByIDAPI } from "../../../data/apis/listener";
 import { useAppPageDispatch, appPageActions, useAppPageStateTree } from "../../../logic/appPageRuntime";
 import {
   Button,
   Input,
   Label,
+  Checkbox,
+  SearchSelect,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Checkbox,
 } from "@jet-admin/ui";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { Plus, Trash2, Edit2, Play, Square, Database, GitBranch, Layers, Loader2, ArrowLeft, RefreshCw } from "lucide-react";
@@ -25,12 +31,46 @@ import { resolveValue } from "../../../logic/evaluationEngine";
 import { useSocketStore } from "../../../logic/stores/useSocketStore";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { displaySuccess, displayError } from "../../../utils/notification";
+import { CONSTANTS } from "../../../constants";
 
 export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
   const { tenantID } = useParams();
-  const { workflows = [], isLoadingWorkflows, loadWorkflowsError } = useWorkflows(tenantID);
-  const { dataQueries = [], isLoadingDataQueries, loadDataQueriesError } = useDataQueries(tenantID);
-  const { listeners = [], isLoadingListeners, loadListenersError } = useListeners(tenantID);
+
+  // Search/pagination states
+  const [workflowSearch, setWorkflowSearch] = useState("");
+  const debouncedWorkflowSearch = useDebounce(workflowSearch, 300);
+  const {
+    workflows = [],
+    isLoadingWorkflows,
+    isFetchingNextPage: isFetchingNextWorkflowsPage,
+    hasNextPage: hasNextWorkflowsPage,
+    fetchNextPage: fetchNextWorkflowsPage,
+    loadWorkflowsError,
+  } = useInfiniteWorkflows(tenantID, debouncedWorkflowSearch);
+
+  const [querySearch, setQuerySearch] = useState("");
+  const debouncedQuerySearch = useDebounce(querySearch, 300);
+  const {
+    dataQueries = [],
+    isLoadingDataQueries,
+    isFetchingNextPage: isFetchingNextQueriesPage,
+    hasNextPage: hasNextQueriesPage,
+    fetchNextPage: fetchNextQueriesPage,
+    loadDataQueriesError,
+  } = useInfiniteDataQueries(tenantID, debouncedQuerySearch);
+
+  const [listenerSearch, setListenerSearch] = useState("");
+  const debouncedListenerSearch = useDebounce(listenerSearch, 300);
+  // Wait, let's verify if useInfiniteListeners is exported from useListeners, yes it is!
+  const {
+    listeners = [],
+    isLoadingListeners,
+    isFetchingNextPage: isFetchingNextListenersPage,
+    hasNextPage: hasNextListenersPage,
+    fetchNextPage: fetchNextListenersPage,
+    loadListenersError,
+  } = useInfiniteListeners(tenantID, debouncedListenerSearch);
+
   const dispatch = useAppPageDispatch();
   const stateTree = useAppPageStateTree();
 
@@ -301,13 +341,40 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     updateDataSources(updated);
   };
 
+  const selectedSource = editingIndex !== null ? dataSources[editingIndex] : null;
+
+  // Selected detail queries to resolve details for items not on the current paginated view
+  const selectedQueryID = selectedSource?.type === "query" ? selectedSource.queryID : null;
+  const { data: selectedQueryDetail } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), "detail", selectedQueryID],
+    queryFn: () => getDataQueryByIDAPI({ tenantID, dataQueryID: selectedQueryID }),
+    enabled: Boolean(tenantID) && Boolean(selectedQueryID),
+    refetchOnWindowFocus: false,
+  });
+
+  const selectedWorkflowID = selectedSource?.type === "workflow" ? selectedSource.workflowID : null;
+  const { data: selectedWorkflowDetail } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "detail", selectedWorkflowID],
+    queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID: selectedWorkflowID }),
+    enabled: Boolean(tenantID) && Boolean(selectedWorkflowID),
+    refetchOnWindowFocus: false,
+  });
+
+  const selectedListenerID = selectedSource?.type === "listener" ? selectedSource.listenerID : null;
+  const { data: selectedListenerDetail } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), "detail", selectedListenerID],
+    queryFn: () => getListenerByIDAPI({ tenantID, listenerID: selectedListenerID }),
+    enabled: Boolean(tenantID) && Boolean(selectedListenerID),
+    refetchOnWindowFocus: false,
+  });
+
   const getSourceInputDefinitions = (source) => {
     if (source.type === "query" && source.queryID) {
-      const query = dataQueries.find((q) => String(q.dataQueryID) === String(source.queryID));
+      const query = selectedQueryDetail || dataQueries.find((q) => String(q.dataQueryID) === String(source.queryID));
       return query?.dataQueryOptions?.inputDefinitions || [];
     }
     if (source.type === "workflow" && source.workflowID) {
-      const wf = workflows.find((w) => String(w.workflowID) === String(source.workflowID));
+      const wf = selectedWorkflowDetail || workflows.find((w) => String(w.workflowID) === String(source.workflowID));
       const inputDefinitions = wf?.workflowOptions?.inputDefinitions;
       if (Array.isArray(inputDefinitions)) return inputDefinitions;
       return [];
@@ -315,13 +382,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     return [];
   };
 
-  const selectedSource = editingIndex !== null ? dataSources[editingIndex] : null;
-
   return (
-    <ReactQueryLoadingErrorWrapper
-      isLoading={isLoadingWorkflows || isLoadingDataQueries || isLoadingListeners}
-      error={loadWorkflowsError || loadDataQueriesError || loadListenersError}
-    >
     <div className="flex flex-col h-full min-h-0 bg-background">
       {editingIndex !== null && selectedSource ? (
         /* ─── Detail / Edit View ─── */
@@ -398,53 +459,53 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                     : "Select Listener"}
               </Label>
               {selectedSource.type === "query" ? (
-                <Select
+                <SearchSelect
                   value={selectedSource.queryID ? String(selectedSource.queryID) : ""}
-                  onValueChange={(val) => handleSourceChange(editingIndex, "queryID", val)}
-                >
-                  <SelectTrigger className="text-xs">
-                    <SelectValue placeholder="Choose a query…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {dataQueries.map((q) => (
-                      <SelectItem key={q.dataQueryID} value={String(q.dataQueryID)}>
-                        {q.dataQueryTitle}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={(val) => handleSourceChange(editingIndex, "queryID", val)}
+                  options={dataQueries.map((q) => ({
+                    value: String(q.dataQueryID),
+                    label: q.dataQueryTitle,
+                  }))}
+                  onSearchChange={setQuerySearch}
+                  onLoadMore={fetchNextQueriesPage}
+                  hasNextPage={hasNextQueriesPage}
+                  isFetchingNextPage={isFetchingNextQueriesPage}
+                  isLoading={isLoadingDataQueries}
+                  placeholder="Choose a query…"
+                  selectedLabel={selectedQueryDetail?.dataQueryTitle}
+                />
               ) : selectedSource.type === "workflow" ? (
-                <Select
+                <SearchSelect
                   value={selectedSource.workflowID ? String(selectedSource.workflowID) : ""}
-                  onValueChange={(val) => handleSourceChange(editingIndex, "workflowID", val)}
-                >
-                  <SelectTrigger className="text-xs">
-                    <SelectValue placeholder="Choose a workflow…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {workflows.map((w) => (
-                      <SelectItem key={w.workflowID} value={String(w.workflowID)}>
-                        {w.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                ) : (
-                  <Select
-                    value={selectedSource.listenerID ? String(selectedSource.listenerID) : ""}
-                    onValueChange={(val) => handleSourceChange(editingIndex, "listenerID", val)}
-                  >
-                    <SelectTrigger className="text-xs">
-                      <SelectValue placeholder="Choose a listener…" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {listeners.map((l) => (
-                        <SelectItem key={l.listenerID} value={String(l.listenerID)}>
-                          {l.listenerTitle || `Listener ${l.listenerID}`}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  onChange={(val) => handleSourceChange(editingIndex, "workflowID", val)}
+                  options={workflows.map((w) => ({
+                    value: String(w.workflowID),
+                    label: w.title,
+                  }))}
+                  onSearchChange={setWorkflowSearch}
+                  onLoadMore={fetchNextWorkflowsPage}
+                  hasNextPage={hasNextWorkflowsPage}
+                  isFetchingNextPage={isFetchingNextWorkflowsPage}
+                  isLoading={isLoadingWorkflows}
+                  placeholder="Choose a workflow…"
+                  selectedLabel={selectedWorkflowDetail?.title}
+                />
+              ) : (
+                <SearchSelect
+                  value={selectedSource.listenerID ? String(selectedSource.listenerID) : ""}
+                  onChange={(val) => handleSourceChange(editingIndex, "listenerID", val)}
+                  options={listeners.map((l) => ({
+                    value: String(l.listenerID),
+                    label: l.listenerTitle || `Listener ${l.listenerID}`,
+                  }))}
+                  onSearchChange={setListenerSearch}
+                  onLoadMore={fetchNextListenersPage}
+                  hasNextPage={hasNextListenersPage}
+                  isFetchingNextPage={isFetchingNextListenersPage}
+                  isLoading={isLoadingListeners}
+                  placeholder="Choose a listener…"
+                  selectedLabel={selectedListenerDetail?.listenerTitle || (selectedListenerDetail?.listenerID ? `Listener ${selectedListenerDetail.listenerID}` : "")}
+                />
               )}
             </div>
 
@@ -739,7 +800,6 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         </div>
       )}
     </div>
-    </ReactQueryLoadingErrorWrapper>
   );
 };
 

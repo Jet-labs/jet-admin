@@ -15,19 +15,26 @@ appPageController.getAllAppPages = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const { search, page, pageSize } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "appPageController:getAllAppPages:params",
       params: {
         userID: user.userID,
         tenantID,
+        search,
+        page,
+        pageSize,
         authContext,
       },
     });
 
-    const appPages = await appPageService.getAllAppPages({
+    const result = await appPageService.getAllAppPages({
       userID: user.userID,
       tenantID,
+      search,
+      page,
+      pageSize,
       authContext,
     });
 
@@ -36,12 +43,16 @@ appPageController.getAllAppPages = async (req, res) => {
       params: {
         userID: user.userID,
         tenantID,
-        appPagesLength: appPages.length,
+        appPagesLength: result.appPages.length,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      appPages,
+      appPages: result.appPages,
+      totalCount: result.totalCount,
+      totalPages: result.totalPages,
+      page: result.page,
+      pageSize: result.pageSize,
       message: "App pages fetched successfully.",
     });
   } catch (error) {
@@ -165,12 +176,14 @@ appPageController.cloneAppPageByID = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, appPageID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "appPageController:cloneAppPageByID:params",
       params: {
         userID: user.userID,
         tenantID,
         appPageID,
+        authContext,
       },
     });
 
@@ -178,6 +191,7 @@ appPageController.cloneAppPageByID = async (req, res) => {
       userID: user.userID,
       tenantID,
       appPageID,
+      authContext,
     });
 
     Logger.log("success", {

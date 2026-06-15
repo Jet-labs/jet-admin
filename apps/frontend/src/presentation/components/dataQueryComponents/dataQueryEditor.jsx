@@ -3,24 +3,22 @@ import {
   materialRenderers,
 } from "@jsonforms/material-renderers";
 import { JsonForms } from "@jsonforms/react";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_UI_COMPONENTS, QueryEditorContext } from "@jet-admin/datasources-ui";
-import { proxyDatasourceActionAPI } from "../../../data/apis/datasource";
+import { proxyDatasourceActionAPI, getDatasourceByIDAPI } from "../../../data/apis/datasource";
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { MODES } from "@jet-admin/expression-engine";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
-import { useDatasourceOptions } from "../../../logic/hooks/useDatasourceOptions";
+import { useInfiniteDatasourceOptions } from "../../../logic/hooks/useDatasourceOptions";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@uidotdev/usehooks";
 import {
   Input,
   Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  SearchSelect,
   Section,
 } from "@jet-admin/ui";
 
@@ -159,7 +157,26 @@ export const DataQueryEditor = ({
   const uniqueKey = dataQueryID
     ? `dataQueryEditor_${tenantID}_${dataQueryID}`
     : `dataQueryEditor_${tenantID}`;
-  const { datasources, isLoadingDatasources, loadDatasourcesError } = useDatasourceOptions(tenantID);
+
+  const [datasourceSearch, setDatasourceSearch] = useState("");
+  const debouncedDatasourceSearch = useDebounce(datasourceSearch, 300);
+
+  const {
+    datasources,
+    isLoadingDatasources,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    loadDatasourcesError,
+  } = useInfiniteDatasourceOptions(tenantID, debouncedDatasourceSearch);
+
+  const selectedDatasourceID = dataQueryEditorForm.values.datasourceID;
+  const { data: selectedDatasourceDetail } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID), "detail", selectedDatasourceID],
+    queryFn: () => getDatasourceByIDAPI({ tenantID, datasourceID: selectedDatasourceID }),
+    enabled: Boolean(tenantID) && Boolean(selectedDatasourceID) && isNaN(Number(selectedDatasourceID)) === false,
+    refetchOnWindowFocus: false,
+  });
 
   // Get the current datasource type config
   const currentDatasourceType = getDatasourceTypeByValue(dataQueryEditorForm.values.datasourceType);
@@ -235,7 +252,6 @@ export const DataQueryEditor = ({
     DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType]?.dedicatedQueryEditor;
 
   return (
-    <ReactQueryLoadingErrorWrapper isLoading={isLoadingDatasources} error={loadDatasourcesError}>
     <div className="w-full">
       <Section title="Query Configuration">
           <div className="space-y-2">
@@ -270,21 +286,20 @@ export const DataQueryEditor = ({
                 Loading data sources...
               </div>
             ) : (
-              <Select
-                  value={dataQueryEditorForm.values.datasourceID ? String(dataQueryEditorForm.values.datasourceID) : undefined}
-                onValueChange={_handleDatasourceTypeChange}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select datasource" />
-                </SelectTrigger>
-                <SelectContent>
-                  {datasources?.map((datasource) => (
-                    <SelectItem key={datasource.value} value={String(datasource.value)}>
-                      {datasource.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchSelect
+                value={dataQueryEditorForm.values.datasourceID ? String(dataQueryEditorForm.values.datasourceID) : ""}
+                onChange={_handleDatasourceTypeChange}
+                options={datasources?.map((datasource) => ({
+                  value: String(datasource.value),
+                  label: datasource.label,
+                })) || []}
+                onSearchChange={setDatasourceSearch}
+                onLoadMore={fetchNextPage}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                isLoading={isLoadingDatasources}
+                placeholder="Select datasource"
+              />
             )}
             {dataQueryEditorForm.touched.datasourceID && dataQueryEditorForm.errors.datasourceID && (
               <p className="text-xs text-red-500">
@@ -320,6 +335,5 @@ export const DataQueryEditor = ({
         </div>
       </Section>
     </div>
-    </ReactQueryLoadingErrorWrapper>
   );
 };

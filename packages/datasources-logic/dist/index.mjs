@@ -1721,11 +1721,8 @@ var RabbitMQDataSource = class extends DataSource {
       messages.push(messageData);
       if (consumeMode === "preview") {
         channel.nack(msg, false, true);
-      } else if (consumeMode === "consume" || consumeMode === "consumeAndStore") {
+      } else if (consumeMode === "consume") {
         channel.ack(msg);
-        if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-          await context.executeDataQuery(storeDestination.dataQueryId, { message: content });
-        }
       }
     }
     return {
@@ -1951,9 +1948,6 @@ var KafkaDataSource = class extends DataSource {
               offset: message.offset,
               timestamp: message.timestamp
             });
-            if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-              await context.executeDataQuery(storeDestination.dataQueryId, { message: content });
-            }
             if (messages.length >= messageCount) {
               clearTimeout(timeout);
               resolve();
@@ -2196,17 +2190,11 @@ var RedisDataSource = class extends DataSource {
       case "lpop": {
         const result = await redis.lpop(key);
         const parsed = parseValue(result);
-        if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-          await context.executeDataQuery(storeDestination.dataQueryId, { message: parsed });
-        }
         return { key, value: parsed };
       }
       case "rpop": {
         const result = await redis.rpop(key);
         const parsed = parseValue(result);
-        if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-          await context.executeDataQuery(storeDestination.dataQueryId, { message: parsed });
-        }
         return { key, value: parsed };
       }
       case "lrange": {
@@ -2263,11 +2251,6 @@ var RedisDataSource = class extends DataSource {
           }
           return { id, data };
         });
-        if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-          for (const msg of messages) {
-            await context.executeDataQuery(storeDestination.dataQueryId, { message: msg });
-          }
-        }
         return { key, messages, count: messages.length };
       }
       case "xrange": {

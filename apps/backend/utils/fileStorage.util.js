@@ -198,10 +198,10 @@ class FileStorageUtil {
    * @param {string}  filePath   Storage key / path within the bucket
    * @returns {Promise<string>}  Public URL of the uploaded file
    */
-  async uploadFile(fileBuffer, mimetype, filePath) {
-    const bucketName = this.useS3
+  async uploadFile(fileBuffer, mimetype, filePath, customBucket = null) {
+    const bucketName = customBucket || (this.useS3
       ? (environmentVariables.SUPABASE_S3_BUCKET || "jet-admin-datasource-file-uploads")
-      : "tenant-assets";
+      : "tenant-assets");
 
     if (this.useS3) {
       const s3 = this.getS3Client();

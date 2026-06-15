@@ -4,7 +4,7 @@ import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import { DataQuery } from "../models/dataQuery";
 
-export const getAllDataQueriesAPI = async ({ tenantID }) => {
+export const getAllDataQueriesAPI = async ({ tenantID, search, page, pageSize }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -12,12 +12,27 @@ export const getAllDataQueriesAPI = async ({ tenantID }) => {
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.get(url, {
+        params: {
+          search,
+          page,
+          pageSize,
+        },
         headers: {
           authorization: `Bearer ${bearerToken}`,
         },
       });
       if (response.data && response.data.success === true) {
-        return DataQuery.toList(response.data.dataQueries);
+        const dataQueriesList = response.data.dataQueries ? DataQuery.toList(response.data.dataQueries) : [];
+        if (response.data.totalCount !== undefined) {
+          return {
+            dataQueries: dataQueriesList,
+            totalCount: response.data.totalCount,
+            totalPages: response.data.totalPages,
+            page: response.data.page,
+            pageSize: response.data.pageSize,
+          };
+        }
+        return dataQueriesList;
       } else if (response.data.error) {
         throw response.data.error;
       } else {

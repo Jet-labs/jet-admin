@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   createListenerActionAPI,
   updateListenerActionAPI,
   deleteListenerActionAPI,
 } from "../../../data/apis/listener";
-import { useWorkflows } from "../../../logic/hooks/useWorkflows";
-import { useDataQueries } from "../../../logic/hooks/useDataQueries";
-import { useAppPages } from "../../../logic/hooks/useAppPages";
+import { useInfiniteWorkflows } from "../../../logic/hooks/useWorkflows";
+import { useInfiniteDataQueries } from "../../../logic/hooks/useDataQueries";
+import { useInfiniteAppPages } from "../../../logic/hooks/useAppPages";
+import { getWorkflowByIDAPI } from "../../../data/apis/workflow";
+import { getDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { getAppPageByIDAPI } from "../../../data/apis/appPage";
+import { useDebounce } from "@uidotdev/usehooks";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CONSTANTS } from "../../../constants";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
@@ -27,6 +31,7 @@ import {
   InputValuesForm,
   CardFooter,
   CardTitle,
+  SearchSelect,
 } from "@jet-admin/ui";
 import { MODES } from "@jet-admin/expression-engine";
 import { Zap, Search, Save, Smartphone, Plus, Trash2, Edit2, Play, CircleSlash, ArrowRight, Wand2 } from "lucide-react";
@@ -57,13 +62,11 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
   const [editingAction, setEditingAction] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
 
-  const { workflows = [], isLoadingWorkflows, loadWorkflowsError } = useWorkflows(tenantID);
-  const { dataQueries = [], isLoadingDataQueries, loadDataQueriesError } = useDataQueries(tenantID);
-  const { appPages = [], isLoadingAppPages, loadAppPagesError } = useAppPages(tenantID);
-
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), listenerID] });
   };
+
+
 
   const { isPending: isSaving, mutate: saveAction } = useMutation({
     mutationFn: (data) => {
@@ -118,19 +121,13 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
           setEditingAction(null);
           setIsAdding(false);
         }}
-        workflows={workflows}
-        dataQueries={dataQueries}
-        appPages={appPages}
+        tenantID={tenantID}
         listenerID={listenerID}
       />
     );
   }
 
   return (
-    <ReactQueryLoadingErrorWrapper
-      isLoading={isLoadingWorkflows || isLoadingDataQueries || isLoadingAppPages}
-      error={loadWorkflowsError || loadDataQueriesError || loadAppPagesError}
-    >
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
@@ -239,11 +236,10 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
         </div>
       )}
     </div>
-    </ReactQueryLoadingErrorWrapper>
   );
 };
 
-const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries, appPages, listenerID }) => {
+const ActionForm = ({ action, onSave, onCancel, isSaving, tenantID, listenerID }) => {
   const [formData, setFormData] = useState(
     action || {
       actionType: "transform",
@@ -303,13 +299,11 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
               <selectedType.icon className={`h-4 w-4 ${selectedType.color}`} />
               <h4 className="text-sm font-medium text-foreground">Configuration Details</h4>
             </div>
-            <ActionConfigEditor
+             <ActionConfigEditor
               type={formData.actionType}
               config={formData.actionConfig}
               onChange={(config) => setFormData({ ...formData, actionConfig: config })}
-              workflows={workflows}
-              dataQueries={dataQueries}
-              appPages={appPages}
+              tenantID={tenantID}
               listenerID={listenerID}
             />
           </div>
@@ -347,7 +341,341 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, workflows, dataQueries
   );
 };
 
-const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQueries = [], appPages = [], listenerID }) => {
+const TriggerWorkflowConfig = ({ config, onChange, tenantID, renderModeToggle, isJsonMode, getJsonString }) => {
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
+
+  const {
+    workflows = [],
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    isLoadingWorkflows,
+  } = useInfiniteWorkflows(tenantID, debouncedSearch);
+
+  const selectedWorkflowID = config.workflowID;
+  const { data: selectedWorkflowDetail } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "detail", selectedWorkflowID],
+    queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID: selectedWorkflowID }),
+    enabled: Boolean(tenantID) && Boolean(selectedWorkflowID),
+    refetchOnWindowFocus: false,
+  });
+
+  const selectedWorkflow = selectedWorkflowDetail || workflows.find(w => w.workflowID === selectedWorkflowID);
+
+  return (
+    <div className="space-y-2 animate-in fade-in duration-300">
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">Select Workflow</Label>
+        <SearchSelect
+          value={config.workflowID || ""}
+          onChange={(val) => {
+            const selected = workflows.find(w => w.workflowID === val) || (selectedWorkflowDetail?.workflowID === val ? selectedWorkflowDetail : null);
+            const defaultMapping = {};
+            if (selected && selected.inputs) {
+              selected.inputs.forEach(input => {
+                const key = input.key || input.name;
+                if (key) defaultMapping[key] = `{{event.${key}}}`;
+              });
+            }
+            onChange({ ...config, workflowID: val, inputValues: defaultMapping });
+          }}
+          options={workflows.map(w => ({
+            value: w.workflowID,
+            label: w.title
+          }))}
+          onSearchChange={setSearch}
+          onLoadMore={fetchNextPage}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          isLoading={isLoadingWorkflows}
+          placeholder="Choose a workflow..."
+          selectedLabel={selectedWorkflowDetail?.title}
+        />
+      </div>
+      <div className="space-y-1">
+        <div className="flex justify-between items-end mb-1">
+          <div>
+            <Label className="text-xs text-muted-foreground">Input Values</Label>
+            {renderModeToggle()}
+          </div>
+          <span className="text-[10px] text-muted-foreground/60 mb-1">Supports {"{{event.property}}"} syntax</span>
+        </div>
+        
+        {isJsonMode ? (
+          <CodeEditor
+            height={180}
+            language="json"
+            value={getJsonString(config.inputValues)}
+            onChange={(val) => {
+              try {
+                const parsed = JSON.parse(val);
+                onChange({ ...config, inputValues: parsed });
+              } catch (e) {
+                onChange({ ...config, inputValues: val });
+              }
+            }}
+            showFormatButton={true}
+            showExpandButton={false}
+            showHeader={true}
+            title="Input Parameters (JSON)"
+          />
+        ) : (() => {
+          const inputDefinitions = selectedWorkflow?.inputs || [];
+          
+          if (!config.workflowID) {
+            return (
+              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
+                Select a workflow above to configure its inputs.
+              </p>
+            );
+          }
+          
+          if (inputDefinitions.length === 0) {
+            return (
+              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
+                This workflow has no inputs defined.
+              </p>
+            );
+          }
+          
+          const normalizedInputDefs = inputDefinitions.map(inputDef => ({ ...inputDef, key: inputDef.key || inputDef.name }));
+
+          return (
+            <div className="rounded-sm border border-border/60 bg-background/30 p-2 shadow-sm">
+              <InputValuesForm
+                inputDefinitions={normalizedInputDefs}
+                values={typeof config.inputValues === 'object' ? config.inputValues : {}}
+                stateTree={LISTENER_EVENT_STATE_TREE}
+                templateMode={MODES.SAFE_PATH}
+                onChange={(key, val) => {
+                  const currentMapping = typeof config.inputValues === 'object' ? config.inputValues : {};
+                  const updated = { ...currentMapping };
+                  if (val === undefined || val === null || val === "") {
+                    delete updated[key];
+                  } else {
+                    updated[key] = val;
+                  }
+                  onChange({ ...config, inputValues: updated });
+                }}
+                className="space-y-2"
+              />
+            </div>
+          );
+        })()}
+      </div>
+    </div>
+  );
+};
+
+const TriggerQueryConfig = ({ config, onChange, tenantID, renderModeToggle, isJsonMode, getJsonString }) => {
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
+
+  const {
+    dataQueries = [],
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    isLoadingDataQueries,
+  } = useInfiniteDataQueries(tenantID, debouncedSearch);
+
+  const selectedQueryID = config.dataQueryID;
+  const { data: selectedQueryDetail } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), "detail", selectedQueryID],
+    queryFn: () => getDataQueryByIDAPI({ tenantID, dataQueryID: selectedQueryID }),
+    enabled: Boolean(tenantID) && Boolean(selectedQueryID),
+    refetchOnWindowFocus: false,
+  });
+
+  const selectedQuery = selectedQueryDetail || dataQueries.find(q => q.dataQueryID === selectedQueryID);
+
+  return (
+    <div className="space-y-2 animate-in fade-in duration-300">
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">Select Data Query</Label>
+        <SearchSelect
+          value={config.dataQueryID || ""}
+          onChange={(val) => {
+            const selected = dataQueries.find(q => q.dataQueryID === val) || (selectedQueryDetail?.dataQueryID === val ? selectedQueryDetail : null);
+            const defaultMapping = {};
+            const inputDefinitions = selected?.dataQueryOptions?.inputDefinitions || selected?.dataQueryOptions?.options?.arguments || selected?.dataQueryOptions?.arguments || [];
+            inputDefinitions.forEach(inputDef => {
+              const key = inputDef.key || inputDef.name;
+              if (key) defaultMapping[key] = `{{event.${key}}}`;
+            });
+            onChange({ ...config, dataQueryID: val, inputValues: defaultMapping });
+          }}
+          options={dataQueries.map(q => ({
+            value: q.dataQueryID,
+            label: q.dataQueryTitle
+          }))}
+          onSearchChange={setSearch}
+          onLoadMore={fetchNextPage}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          isLoading={isLoadingDataQueries}
+          placeholder="Choose a data query..."
+          selectedLabel={selectedQueryDetail?.dataQueryTitle}
+        />
+      </div>
+      <div className="space-y-1">
+        <div className="flex justify-between items-end mb-1">
+          <div>
+            <Label className="text-xs text-muted-foreground">Argument Values</Label>
+            {renderModeToggle()}
+          </div>
+          <span className="text-[10px] text-muted-foreground/60 mb-1">Supports {"{{event.property}}"} syntax</span>
+        </div>
+        
+        {isJsonMode ? (
+          <CodeEditor
+            height={180}
+            language="json"
+            value={getJsonString(config.inputValues)}
+            onChange={(val) => {
+              try {
+                const parsed = JSON.parse(val);
+                onChange({ ...config, inputValues: parsed });
+              } catch (e) {
+                onChange({ ...config, inputValues: val });
+              }
+            }}
+            showFormatButton={true}
+            showExpandButton={false}
+            showHeader={true}
+            title="Query Arguments (JSON)"
+          />
+        ) : (() => {
+          const inputDefinitions = selectedQuery?.dataQueryOptions?.inputDefinitions || selectedQuery?.dataQueryOptions?.options?.arguments || selectedQuery?.dataQueryOptions?.arguments || [];
+          
+          if (!config.dataQueryID) {
+            return (
+              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
+                Select a data query above to configure its arguments.
+              </p>
+            );
+          }
+          
+          if (inputDefinitions.length === 0) {
+            return (
+              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
+                This query has no arguments defined.
+              </p>
+            );
+          }
+          
+          const normalizedInputDefs = inputDefinitions.map(inputDef => ({ ...inputDef, key: inputDef.key || inputDef.name }));
+
+          return (
+            <div className="rounded-sm border border-border/60 bg-background/30 p-2 shadow-sm">
+              <InputValuesForm
+                inputDefinitions={normalizedInputDefs}
+                values={typeof config.inputValues === 'object' ? config.inputValues : {}}
+                stateTree={LISTENER_EVENT_STATE_TREE}
+                templateMode={MODES.SAFE_PATH}
+                onChange={(key, val) => {
+                  const currentMapping = typeof config.inputValues === 'object' ? config.inputValues : {};
+                  const updated = { ...currentMapping };
+                  if (val === undefined || val === null || val === "") {
+                    delete updated[key];
+                  } else {
+                    updated[key] = val;
+                  }
+                  onChange({ ...config, inputValues: updated });
+                }}
+                className="space-y-2"
+              />
+            </div>
+          );
+        })()}
+      </div>
+    </div>
+  );
+};
+
+const PushToAppPageConfig = ({ config, onChange, tenantID, listenerID }) => {
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
+
+  const {
+    appPages = [],
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    isLoadingAppPages,
+  } = useInfiniteAppPages(tenantID, debouncedSearch);
+
+  const selectedAppPageID = config.appPageID;
+  const { data: selectedAppPageDetail } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID), "detail", selectedAppPageID],
+    queryFn: () => getAppPageByIDAPI({ tenantID, appPageID: selectedAppPageID }),
+    enabled: Boolean(tenantID) && Boolean(selectedAppPageID),
+    refetchOnWindowFocus: false,
+  });
+
+  return (
+    <div className="space-y-2 animate-in fade-in duration-300">
+      <div className="space-y-1">
+        <Label className="text-xs text-muted-foreground">Select App Page</Label>
+        <SearchSelect
+          value={config.appPageID || ""}
+          onChange={(val) => onChange({ ...config, appPageID: val })}
+          options={appPages.map(page => ({
+            value: page.appPageID,
+            label: `${page.appPageTitle} (${page.appPageID})`
+          }))}
+          onSearchChange={setSearch}
+          onLoadMore={fetchNextPage}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          isLoading={isLoadingAppPages}
+          placeholder="Choose an app page..."
+          selectedLabel={selectedAppPageDetail ? `${selectedAppPageDetail.appPageTitle} (${selectedAppPageDetail.appPageID})` : ""}
+        />
+        <p className="text-[10px] text-muted-foreground">The App Page to push data to.</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">Custom Channel Name (Optional)</Label>
+          <Input
+            value={config.channelName || ""}
+            onChange={(e) => onChange({ ...config, channelName: e.target.value })}
+            placeholder="Leave empty to use listener ID"
+            className="font-mono text-sm bg-background"
+          />
+          <p className="text-[10px] text-muted-foreground">Defaults to `listener:${listenerID}`.</p>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">Update Mode</Label>
+          <Select value={config.mode || "replace"} onValueChange={(val) => onChange({ ...config, mode: val })}>
+            <SelectTrigger className="bg-background">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="replace">Replace Data</SelectItem>
+              <SelectItem value="append">Append to Array</SelectItem>
+              <SelectItem value="prepend">Prepend to Array</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {(config.mode === "append" || config.mode === "prepend") && (
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Max Array Length</Label>
+            <Input
+              type="number"
+              value={config.maxArrayLength || 1000}
+              onChange={(e) => onChange({ ...config, maxArrayLength: parseInt(e.target.value) || 1000 })}
+              className="bg-background font-mono text-sm"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const ActionConfigEditor = ({ type, config, onChange, tenantID, listenerID }) => {
   const [isJsonMode, setIsJsonMode] = useState(false);
 
   const getJsonString = (val) => {
@@ -377,19 +705,17 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
     case "transform":
       return (
         <div className="space-y-2 animate-in fade-in duration-300">
-
-            <CodeEditor
-              height={220}
-              language="javascript"
-              value={config.script || ""}
-              onChange={(val) => onChange({ ...config, script: val })}
-              showFormatButton={true}
-              showExpandButton={false}
-              showHeader={true}
-              title="Transform Script (JS)"
-              stateTree={LISTENER_EVENT_STATE_TREE}
-            />
-
+          <CodeEditor
+            height={220}
+            language="javascript"
+            value={config.script || ""}
+            onChange={(val) => onChange({ ...config, script: val })}
+            showFormatButton={true}
+            showExpandButton={false}
+            showHeader={true}
+            title="Transform Script (JS)"
+            stateTree={LISTENER_EVENT_STATE_TREE}
+          />
           <p className="text-[10px] text-muted-foreground italic">
             Receives <code>event</code> in scope. Return the transformed event object, or return <code>null</code> / <code>undefined</code> to filter out (discard) the event.
           </p>
@@ -397,214 +723,25 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
       );
     case "trigger_workflow":
       return (
-        <div className="space-y-2 animate-in fade-in duration-300">
-          <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">Select Workflow</Label>
-            <Select 
-              value={config.workflowID || ""} 
-              onValueChange={(val) => {
-                const selected = workflows.find(w => w.workflowID === val);
-                const defaultMapping = {};
-                if (selected && selected.inputs) {
-                  selected.inputs.forEach(input => {
-                    const key = input.key || input.name;
-                    if (key) defaultMapping[key] = `{{event.${key}}}`;
-                  });
-                }
-                onChange({ ...config, workflowID: val, inputValues: defaultMapping });
-              }}
-            >
-              <SelectTrigger className="font-mono text-sm bg-background">
-                <SelectValue placeholder="Choose a workflow..." />
-              </SelectTrigger>
-              <SelectContent>
-                {workflows.map(w => (
-                  <SelectItem key={w.workflowID} value={w.workflowID}>{w.title}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1">
-            <div className="flex justify-between items-end mb-1">
-              <div>
-                <Label className="text-xs text-muted-foreground">Input Values</Label>
-                {renderModeToggle()}
-              </div>
-              <span className="text-[10px] text-muted-foreground/60 mb-1">Supports {"{{event.property}}"} syntax</span>
-            </div>
-            
-            {isJsonMode ? (
-
-                <CodeEditor
-                  height={180}
-                  language="json"
-                  value={getJsonString(config.inputValues)}
-                  onChange={(val) => {
-                    try {
-                      const parsed = JSON.parse(val);
-                      onChange({ ...config, inputValues: parsed });
-                    } catch (e) {
-                      onChange({ ...config, inputValues: val });
-                    }
-                  }}
-                  showFormatButton={true}
-                  showExpandButton={false}
-                  showHeader={true}
-                  title="Input Parameters (JSON)"
-                />
-
-            ) : (() => {
-              const selected = workflows.find(w => w.workflowID === config.workflowID);
-                const inputDefinitions = selected?.inputs || [];
-              
-              if (!config.workflowID) {
-                return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
-                    Select a workflow above to configure its inputs.
-                  </p>
-                );
-              }
-              
-                if (inputDefinitions.length === 0) {
-                return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
-                    This workflow has no inputs defined.
-                  </p>
-                );
-              }
-
-                // Normalizing inputDef schema if necessary
-                const normalizedInputDefs = inputDefinitions.map(inputDef => ({ ...inputDef, key: inputDef.key || inputDef.name }));
-
-              return (
-                <div className="rounded-sm border border-border/60 bg-background/30 p-2 shadow-sm">
-                  <InputValuesForm
-                    inputDefinitions={normalizedInputDefs}
-                    values={typeof config.inputValues === 'object' ? config.inputValues : {}}
-                    stateTree={LISTENER_EVENT_STATE_TREE}
-                    templateMode={MODES.SAFE_PATH}
-                    onChange={(key, val) => {
-                      const currentMapping = typeof config.inputValues === 'object' ? config.inputValues : {};
-                      const updated = { ...currentMapping };
-                      if (val === undefined || val === null || val === "") {
-                        delete updated[key];
-                      } else {
-                        updated[key] = val;
-                      }
-                      onChange({ ...config, inputValues: updated });
-                    }}
-                    className="space-y-2"
-                  />
-                </div>
-              );
-            })()}
-          </div>
-        </div>
+        <TriggerWorkflowConfig
+          config={config}
+          onChange={onChange}
+          tenantID={tenantID}
+          renderModeToggle={renderModeToggle}
+          isJsonMode={isJsonMode}
+          getJsonString={getJsonString}
+        />
       );
     case "trigger_query":
       return (
-        <div className="space-y-2 animate-in fade-in duration-300">
-          <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">Select Data Query</Label>
-            <Select 
-              value={config.dataQueryID || ""} 
-              onValueChange={(val) => {
-                const selected = dataQueries.find(q => q.dataQueryID === val);
-                const defaultMapping = {};
-                const inputDefinitions = selected?.dataQueryOptions?.inputDefinitions || selected?.dataQueryOptions?.options?.arguments || selected?.dataQueryOptions?.arguments || [];
-                inputDefinitions.forEach(inputDef => {
-                  const key = inputDef.key || inputDef.name;
-                  if (key) defaultMapping[key] = `{{event.${key}}}`;
-                });
-                onChange({ ...config, dataQueryID: val, inputValues: defaultMapping });
-              }}
-            >
-              <SelectTrigger className="font-mono text-sm bg-background">
-                <SelectValue placeholder="Choose a data query..." />
-              </SelectTrigger>
-              <SelectContent>
-                {dataQueries.map(q => (
-                  <SelectItem key={q.dataQueryID} value={q.dataQueryID}>{q.dataQueryTitle}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1">
-            <div className="flex justify-between items-end mb-1">
-              <div>
-                <Label className="text-xs text-muted-foreground">Argument Values</Label>
-                {renderModeToggle()}
-              </div>
-              <span className="text-[10px] text-muted-foreground/60 mb-1">Supports {"{{event.property}}"} syntax</span>
-            </div>
-            
-            {isJsonMode ? (
-
-                <CodeEditor
-                  height={180}
-                  language="json"
-                  value={getJsonString(config.inputValues)}
-                  onChange={(val) => {
-                    try {
-                      const parsed = JSON.parse(val);
-                      onChange({ ...config, inputValues: parsed });
-                    } catch (e) {
-                      onChange({ ...config, inputValues: val });
-                    }
-                  }}
-                  showFormatButton={true}
-                  showExpandButton={false}
-                  showHeader={true}
-                  title="Query Arguments (JSON)"
-                />
-
-            ) : (() => {
-              const selected = dataQueries.find(q => q.dataQueryID === config.dataQueryID);
-                const inputDefinitions = selected?.dataQueryOptions?.inputDefinitions || selected?.dataQueryOptions?.options?.arguments || selected?.dataQueryOptions?.arguments || [];
-              
-              if (!config.dataQueryID) {
-                return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
-                    Select a data query above to configure its arguments.
-                  </p>
-                );
-              }
-              
-                if (inputDefinitions.length === 0) {
-                return (
-                  <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
-                    This query has no arguments defined.
-                  </p>
-                );
-              }
-
-                // Normalizing inputDef schema if necessary
-                const normalizedInputDefs = inputDefinitions.map(inputDef => ({ ...inputDef, key: inputDef.key || inputDef.name }));
-
-              return (
-                <div className="rounded-sm border border-border/60 bg-background/30 p-2 shadow-sm">
-                  <InputValuesForm
-                    inputDefinitions={normalizedInputDefs}
-                    values={typeof config.inputValues === 'object' ? config.inputValues : {}}
-                    stateTree={LISTENER_EVENT_STATE_TREE}
-                    templateMode={MODES.SAFE_PATH}
-                    onChange={(key, val) => {
-                      const currentMapping = typeof config.inputValues === 'object' ? config.inputValues : {};
-                      const updated = { ...currentMapping };
-                      if (val === undefined || val === null || val === "") {
-                        delete updated[key];
-                      } else {
-                        updated[key] = val;
-                      }
-                      onChange({ ...config, inputValues: updated });
-                    }}
-                    className="space-y-2"
-                  />
-                </div>
-              );
-            })()}
-          </div>
-        </div>
+        <TriggerQueryConfig
+          config={config}
+          onChange={onChange}
+          tenantID={tenantID}
+          renderModeToggle={renderModeToggle}
+          isJsonMode={isJsonMode}
+          getJsonString={getJsonString}
+        />
       );
     case "save_to_buffer":
       return (
@@ -659,63 +796,12 @@ const ActionConfigEditor = ({ type, config, onChange, workflows = [], dataQuerie
       );
     case "push_to_app_page":
       return (
-        <div className="space-y-2 animate-in fade-in duration-300">
-          <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">Select App Page</Label>
-            <Select 
-              value={config.appPageID || ""} 
-              onValueChange={(val) => onChange({ ...config, appPageID: val })}
-            >
-              <SelectTrigger className="font-mono text-sm bg-background">
-                <SelectValue placeholder="Choose an app page..." />
-              </SelectTrigger>
-              <SelectContent>
-                {appPages.map(page => (
-                  <SelectItem key={page.appPageID} value={page.appPageID}>
-                    {page.appPageTitle} <span className="text-muted-foreground ml-2">({page.appPageID})</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-[10px] text-muted-foreground">The App Page to push data to.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">Custom Channel Name (Optional)</Label>
-              <Input
-                value={config.channelName || ""}
-                onChange={(e) => onChange({ ...config, channelName: e.target.value })}
-                placeholder="Leave empty to use listener ID"
-                className="font-mono text-sm bg-background"
-              />
-              <p className="text-[10px] text-muted-foreground">Defaults to `listener:${listenerID}`.</p>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">Update Mode</Label>
-              <Select value={config.mode || "replace"} onValueChange={(val) => onChange({ ...config, mode: val })}>
-                <SelectTrigger className="bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="replace">Replace Data</SelectItem>
-                  <SelectItem value="append">Append to Array</SelectItem>
-                  <SelectItem value="prepend">Prepend to Array</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {(config.mode === "append" || config.mode === "prepend") && (
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Max Array Length</Label>
-                <Input
-                  type="number"
-                  value={config.maxArrayLength || 1000}
-                  onChange={(e) => onChange({ ...config, maxArrayLength: parseInt(e.target.value) || 1000 })}
-                  className="bg-background font-mono text-sm"
-                />
-              </div>
-            )}
-          </div>
-        </div>
+        <PushToAppPageConfig
+          config={config}
+          onChange={onChange}
+          tenantID={tenantID}
+          listenerID={listenerID}
+        />
       );
     default:
       return null;
@@ -733,11 +819,15 @@ ActionForm.propTypes = {
   onSave: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   isSaving: PropTypes.bool,
+  tenantID: PropTypes.string.isRequired,
+  listenerID: PropTypes.string.isRequired,
 };
 
 ActionConfigEditor.propTypes = {
   type: PropTypes.string.isRequired,
   config: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  tenantID: PropTypes.string.isRequired,
+  listenerID: PropTypes.string.isRequired,
 };
 

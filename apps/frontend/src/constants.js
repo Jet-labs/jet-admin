@@ -1069,6 +1069,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/widgets/data`,
       deleteWidgetByID: (tenantID, widgetID) =>
         `/api/v1/tenants/${tenantID}/widgets/${widgetID}`,
+      uploadWidgetFileAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/widgets/upload`,
 
       getAllAppPagesAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/app-pages/`,

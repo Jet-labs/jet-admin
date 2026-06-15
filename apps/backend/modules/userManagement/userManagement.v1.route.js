@@ -13,21 +13,21 @@ const {
 // User management routes
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:user:list"]),
+  authMiddleware.authorize("user", "list"),
   userManagementController.getAllTenantUsers
 );
 
 router.get(
   "/:tenantUserID",
     validate(tenantUserIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:user:read"]),
+  authMiddleware.authorize("user", "read", { paramKey: "tenantUserID" }),
   userManagementController.getTenantUserByID
 );
 
 router.delete(
   "/:tenantUserID",
     validate(tenantUserIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:user:delete"]),
+  authMiddleware.authorize("user", "delete", { paramKey: "tenantUserID" }),
   userManagementController.removeTenantUserFromTenantByID
 );
 
@@ -37,14 +37,14 @@ router.patch(
         params: tenantUserIdParamSchema,
         body: updateUserRolesSchema,
     }),
-  authMiddleware.checkUserPermissions(["tenant:user:update"]),
+  authMiddleware.authorize("user", "update", { paramKey: "tenantUserID" }),
   userManagementController.updateTenantUserRolesByID
 );
 
 router.post(
   "/",
     validate(addUserToTenantSchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:user:create"]),
+  authMiddleware.authorize("user", "create"),
   userManagementMiddleware.checkTenantUserAdditionLimit,
   userManagementController.addUserToTenant
 );

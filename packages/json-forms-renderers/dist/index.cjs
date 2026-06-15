@@ -103,7 +103,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/renderers/index.js
-var import_react30 = require("@jsonforms/react");
+var import_react31 = require("@jsonforms/react");
 
 // src/renderers/CustomNumberInput.jsx
 var import_react = __toESM(require("react"));
@@ -288,6 +288,10 @@ var CustomSelectInput = (props) => {
     }
   };
   const hasErrors = errors && errors.length > 0;
+  const selectOptions = options.map((optionValue) => ({
+    value: optionValue,
+    label: getDisplayName(optionValue)
+  }));
   return /* @__PURE__ */ import_react3.default.createElement("div", { className: "" }, /* @__PURE__ */ import_react3.default.createElement(
     import_ui3.Label,
     {
@@ -295,15 +299,17 @@ var CustomSelectInput = (props) => {
       className: `block mb-1 ${hasErrors ? "text-red-500" : ""}`
     },
     label || description
-  ), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(import_ui3.Select, { value: data || "", onValueChange: (val) => handleChange(path, val), disabled: isDisabled }, /* @__PURE__ */ import_react3.default.createElement(
-    import_ui3.SelectTrigger,
+  ), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(
+    import_ui3.SearchSelect,
     {
-      id: path,
-      size: "sm",
+      value: data || "",
+      onChange: (val) => handleChange(path, val),
+      options: selectOptions,
+      disabled: isDisabled,
+      placeholder: uischema?.options?.placeholder || "Select an option",
       className: `${hasErrors ? "border-red-500" : ""}`
-    },
-    /* @__PURE__ */ import_react3.default.createElement(import_ui3.SelectValue, { placeholder: uischema?.options?.placeholder || "Select an option" })
-  ), /* @__PURE__ */ import_react3.default.createElement(import_ui3.SelectContent, null, options.map((optionValue) => /* @__PURE__ */ import_react3.default.createElement(import_ui3.SelectItem, { key: optionValue, value: optionValue }, getDisplayName(optionValue))))), showRefreshButton && onRefresh && /* @__PURE__ */ import_react3.default.createElement(
+    }
+  ), showRefreshButton && onRefresh && /* @__PURE__ */ import_react3.default.createElement(
     import_ui3.Button,
     {
       type: "button",
@@ -1532,27 +1538,92 @@ CustomGoogleOAuthButtonControlComponent.propTypes = {
 };
 var CustomGoogleOAuthButtonControl = CustomGoogleOAuthButtonControlComponent;
 
+// src/renderers/CustomSearchSelectInput.jsx
+var import_react30 = __toESM(require("react"));
+var import_prop_types21 = __toESM(require("prop-types"));
+var import_ui18 = require("@jet-admin/ui");
+var CustomSearchSelectInput = (props) => {
+  const {
+    data,
+    path,
+    handleChange,
+    label,
+    description,
+    errors,
+    required,
+    uischema,
+    enabled
+  } = props;
+  const isDisabled = enabled === false;
+  const hasErrors = errors && errors.length > 0;
+  const selectOptions = uischema?.options?.options || [];
+  const onSearchChange = uischema?.options?.onSearchChange;
+  const onLoadMore = uischema?.options?.onLoadMore;
+  const hasNextPage = uischema?.options?.hasNextPage;
+  const isFetchingNextPage = uischema?.options?.isFetchingNextPage;
+  const isLoading = uischema?.options?.isLoading;
+  const placeholder = uischema?.options?.placeholder || "Select an option...";
+  return /* @__PURE__ */ import_react30.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react30.default.createElement(
+    import_ui18.Label,
+    {
+      htmlFor: path,
+      className: `${hasErrors ? "text-red-500" : ""}`
+    },
+    label || description,
+    " ",
+    required ? /* @__PURE__ */ import_react30.default.createElement("span", { className: "text-destructive" }, "*") : null
+  ), /* @__PURE__ */ import_react30.default.createElement(
+    import_ui18.SearchSelect,
+    {
+      value: data ? String(data) : "",
+      onChange: (val) => handleChange(path, val),
+      options: selectOptions,
+      disabled: isDisabled,
+      placeholder,
+      className: `text-xs bg-background ${hasErrors ? "border-red-500" : ""}`,
+      onSearchChange,
+      onLoadMore,
+      hasNextPage,
+      isFetchingNextPage,
+      isLoading
+    }
+  ), hasErrors && /* @__PURE__ */ import_react30.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
+};
+CustomSearchSelectInput.propTypes = {
+  data: import_prop_types21.default.oneOfType([import_prop_types21.default.string, import_prop_types21.default.number]),
+  path: import_prop_types21.default.string.isRequired,
+  handleChange: import_prop_types21.default.func.isRequired,
+  label: import_prop_types21.default.string,
+  description: import_prop_types21.default.string,
+  errors: import_prop_types21.default.arrayOf(import_prop_types21.default.string),
+  schema: import_prop_types21.default.object.isRequired,
+  uischema: import_prop_types21.default.object.isRequired,
+  enabled: import_prop_types21.default.bool,
+  required: import_prop_types21.default.bool
+};
+
 // src/renderers/index.js
-var JetNumberControl = (0, import_react30.withJsonFormsControlProps)(CustomNumberInput);
-var JetTextControl = (0, import_react30.withJsonFormsControlProps)(CustomTextInput);
-var JetSelectControl = (0, import_react30.withJsonFormsControlProps)(CustomSelectInput);
-var JetCheckboxControl = (0, import_react30.withJsonFormsControlProps)(CustomCheckboxInput);
-var JetCodeEditorControl = (0, import_react30.withJsonFormsControlProps)(CustomCodeEditorControl);
-var JetSuggestionControl = (0, import_react30.withJsonFormsControlProps)(CustomSuggestionInput);
-var JetCustomDynamicKeyValueInputRenderer = (0, import_react30.withJsonFormsControlProps)(CustomDynamicKeyValueInputRenderer);
-var JetKeyValueArrayControl = (0, import_react30.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
-var JetKeyValueTypeArrayControl = (0, import_react30.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
-var JetKeyTypeArrayControl = (0, import_react30.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
-var JetStringArrayControl = (0, import_react30.withJsonFormsControlProps)(CustomStringArrayRenderer);
-var JetFieldOperatorValueArrayControl = (0, import_react30.withJsonFormsControlProps)(CustomFieldOperatorValueArrayRenderer);
-var JetGenericObjectArrayControl = (0, import_react30.withJsonFormsControlProps)(CustomGenericObjectArrayRenderer);
-var JetGroupLayout = (0, import_react30.withJsonFormsLayoutProps)(CustomGroupLayout);
-var JetRadioControl = (0, import_react30.withJsonFormsControlProps)(CustomRadioInput);
-var JetVerticalLayout = (0, import_react30.withJsonFormsLayoutProps)(CustomVerticalLayout);
-var JetTabLayout = (0, import_react30.withJsonFormsLayoutProps)(CustomTabRenderer);
-var JetHorizontalLayout = (0, import_react30.withJsonFormsLayoutProps)(CustomHorizontalLayout);
-var JetFileUploadControl = (0, import_react30.withJsonFormsControlProps)(CustomFileUploadInput);
-var JetGoogleOAuthControl = (0, import_react30.withJsonFormsControlProps)(CustomGoogleOAuthButtonControl);
+var JetNumberControl = (0, import_react31.withJsonFormsControlProps)(CustomNumberInput);
+var JetTextControl = (0, import_react31.withJsonFormsControlProps)(CustomTextInput);
+var JetSelectControl = (0, import_react31.withJsonFormsControlProps)(CustomSelectInput);
+var JetCheckboxControl = (0, import_react31.withJsonFormsControlProps)(CustomCheckboxInput);
+var JetCodeEditorControl = (0, import_react31.withJsonFormsControlProps)(CustomCodeEditorControl);
+var JetSuggestionControl = (0, import_react31.withJsonFormsControlProps)(CustomSuggestionInput);
+var JetCustomDynamicKeyValueInputRenderer = (0, import_react31.withJsonFormsControlProps)(CustomDynamicKeyValueInputRenderer);
+var JetKeyValueArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
+var JetKeyValueTypeArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
+var JetKeyTypeArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
+var JetStringArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomStringArrayRenderer);
+var JetFieldOperatorValueArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomFieldOperatorValueArrayRenderer);
+var JetGenericObjectArrayControl = (0, import_react31.withJsonFormsControlProps)(CustomGenericObjectArrayRenderer);
+var JetGroupLayout = (0, import_react31.withJsonFormsLayoutProps)(CustomGroupLayout);
+var JetRadioControl = (0, import_react31.withJsonFormsControlProps)(CustomRadioInput);
+var JetVerticalLayout = (0, import_react31.withJsonFormsLayoutProps)(CustomVerticalLayout);
+var JetTabLayout = (0, import_react31.withJsonFormsLayoutProps)(CustomTabRenderer);
+var JetHorizontalLayout = (0, import_react31.withJsonFormsLayoutProps)(CustomHorizontalLayout);
+var JetFileUploadControl = (0, import_react31.withJsonFormsControlProps)(CustomFileUploadInput);
+var JetSearchSelectControl = (0, import_react31.withJsonFormsControlProps)(CustomSearchSelectInput);
+var JetGoogleOAuthControl = (0, import_react31.withJsonFormsControlProps)(CustomGoogleOAuthButtonControl);
 
 // src/testers.js
 var import_core = require("@jsonforms/core");
@@ -1610,6 +1681,13 @@ var selectInputTester = (uischema, rootSchema) => {
   }
   return -1;
 };
+var searchSelectTester = (0, import_core.rankWith)(
+  150,
+  (0, import_core.and)(
+    import_core.isControl,
+    (uischema) => uischema.options && uischema.options.isSearchSelect === true
+  )
+);
 var checkboxTester = (uischema, schema) => {
   if (uischema.type !== "Control") {
     return -1;
@@ -1825,6 +1903,7 @@ var jetFormsBaseRenderers = [
   { tester: tabRendererTester, renderer: JetTabLayout },
   { tester: numberInputTester, renderer: JetNumberControl },
   { tester: textInputTester, renderer: JetTextControl },
+  { tester: searchSelectTester, renderer: JetSearchSelectControl },
   { tester: selectInputTester, renderer: JetSelectControl },
   { tester: radioInputTester, renderer: JetRadioControl },
   { tester: checkboxTester, renderer: JetCheckboxControl },

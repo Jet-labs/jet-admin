@@ -228,18 +228,22 @@ describe('resolveInputs', () => {
   // ─── Definition fetching fallback ─────────────────────────────────────
 
   it('calls getInputDefinitions when type and id are provided but definitions are not', async () => {
-    const inputArgsUtil = require('../../../utils/input.util');
-    jest.spyOn(inputArgsUtil, 'getInputDefinitions').mockResolvedValueOnce([
-      { key: 'x', type: 'number', required: true },
-    ]);
+    const { prisma } = require('../../../config/prisma.config');
+    jest.spyOn(prisma.tblWorkflows, 'findUnique').mockResolvedValueOnce({
+      workflowOptions: {
+        inputDefinitions: [{ key: 'x', type: 'number', required: true }]
+      }
+    });
 
-    const result = await inputArgsUtil.resolveInputs({
+    const result = await resolveInputs({
       type: 'workflow',
-      id: 'wf-123',
+      id: '123e4567-e89b-12d3-a456-426614174000',
       inputValues: { x: '10' },
     });
 
-    expect(inputArgsUtil.getInputDefinitions).toHaveBeenCalledWith('workflow', 'wf-123');
+    expect(prisma.tblWorkflows.findUnique).toHaveBeenCalledWith({
+      where: { workflowID: '123e4567-e89b-12d3-a456-426614174000' }
+    });
     expect(result.valid).toBe(true);
     expect(result.resolved.x).toBe(10);
   });

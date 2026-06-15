@@ -47,3 +47,4 @@ export { HtmlWidget } from "./html/htmlWidget";
 export { HtmlConfigEditor } from "./html/htmlConfigEditor";
 
 // Shared components removed, TemplateAutocompleteInput moved to @jet-admin/ui
+export { WidgetEditorContext } from "./context/WidgetEditorContext";

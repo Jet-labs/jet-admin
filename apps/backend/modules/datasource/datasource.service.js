@@ -4,6 +4,7 @@ const { DATASOURCE_LOGIC_COMPONENTS } = require("@jet-admin/datasources-logic");
 const fileStorageUtil = require("../../utils/fileStorage.util");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 const { vaultService } = require("../vault/vault.service");
+const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 
 const datasourceService = {};
 
@@ -14,28 +15,72 @@ const datasourceService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-datasourceService.getAllDatasources = async ({ userID, tenantID }) => {
+datasourceService.getAllDatasources = async ({ userID, tenantID, search, page, pageSize }) => {
   Logger.log("info", {
     message: "datasourceService:getAllDatasources:params",
     params: {
       userID,
       tenantID,
+      search,
+      page,
+      pageSize,
     },
   });
   try {
-    const datasources = await prisma.tblDatasources.findMany({
-      where: {
-        tenantID: tenantID,
+    const where = {
+      tenantID: tenantID,
+    };
+
+    if (search) {
+      where.OR = [
+        {
+          datasourceTitle: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          datasourceType: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+    }
+
+    const findManyOptions = {
+      where,
+      orderBy: {
+        createdAt: "desc",
       },
-    });
+    };
+
+    if (page && pageSize) {
+      findManyOptions.skip = (page - 1) * pageSize;
+      findManyOptions.take = pageSize;
+    }
+
+    const [datasources, totalCount] = await Promise.all([
+      prisma.tblDatasources.findMany(findManyOptions),
+      prisma.tblDatasources.count({ where }),
+    ]);
+
     Logger.log("success", {
       message: "datasourceService:getAllDatasources:success",
       params: {
         userID,
         datasourcesLength: datasources?.length,
+        totalCount,
       },
     });
-    return datasources;
+
+    return {
+      datasources,
+      totalCount,
+      page: page || 1,
+      pageSize: pageSize || datasources.length,
+      totalPages: pageSize ? Math.ceil(totalCount / pageSize) : 1,
+    };
   } catch (error) {
     Logger.log("error", {
       message: "datasourceService:getAllDatasources:error",
@@ -154,6 +199,10 @@ datasourceService.createDatasource = async ({
   });
   try {
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const finalCreatorID = creatorID || userID;
+    if (!finalCreatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
     const newDatasource = await prisma.tblDatasources.create({
       data: {
         tenantID: tenantID,
@@ -165,6 +214,9 @@ datasourceService.createDatasource = async ({
         datasourceTags,
       },
     });
+
+    await grantCreatorAccess(tenantID, "datasource", newDatasource.datasourceID, authContext, finalCreatorID);
+
     Logger.log("success", {
       message: "datasourceService:createDatasource:success",
       params: {
@@ -216,6 +268,9 @@ datasourceService.deleteDatasourceByID = async ({
         tenantID: tenantID,
       },
     });
+
+    await removePoliciesForResource(tenantID, `datasource:${datasourceID}`);
+
     Logger.log("success", {
       message: "datasourceService:deleteDatasourceByID:success",
       params: {
@@ -363,6 +418,7 @@ datasourceService.cloneDatasourceByID = async ({
   userID,
   tenantID,
   datasourceID,
+  authContext,
 }) => {
   Logger.log("info", {
     message: "datasourceService:cloneDatasourceByID:params",
@@ -370,6 +426,7 @@ datasourceService.cloneDatasourceByID = async ({
       userID,
       tenantID,
       datasourceID,
+      authContext,
     },
   });
   try {
@@ -382,16 +439,25 @@ datasourceService.cloneDatasourceByID = async ({
     if (!datasource) {
       throw new Error("Datasource not found");
     }
-    const newDatasource = await prisma.tblDatasources.create({
-      data: {
-        tenantID: tenantID,
-        datasourceTitle: datasource.datasourceTitle + " (Copy)",
-        datasourceType: datasource.datasourceType,
-        datasourceOptions: datasource.datasourceOptions,
-        datasourceTags: datasource.datasourceTags,
-        creatorID: userID,
-      },
-    });
+        const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+        const finalCreatorID = creatorID || userID;
+        if (!finalCreatorID && !createdByApiKeyID) {
+          throw new Error("Creator ID or Created By API Key ID is required");
+        }
+        const newDatasource = await prisma.tblDatasources.create({
+          data: {
+            tenantID: tenantID,
+            datasourceTitle: datasource.datasourceTitle + " (Copy)",
+            datasourceType: datasource.datasourceType,
+            datasourceOptions: datasource.datasourceOptions,
+            datasourceTags: datasource.datasourceTags,
+            creatorID: creatorID || userID,
+            createdByApiKeyID,
+          },
+        });
+
+        await grantCreatorAccess(tenantID, "datasource", newDatasource.datasourceID, authContext, finalCreatorID);
+
     Logger.log("success", {
       message: "datasourceService:cloneDatasourceByID:success",
       params: {

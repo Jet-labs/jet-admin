@@ -5,6 +5,7 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 const { workflowController } = require("./workflow.controller");
 const { authMiddleware } = require("../auth/auth.middleware");
+const { workflowMiddleware } = require("./workflow.middleware");
 const { validate, validateAll } = require("../../utils/validation.utils");
 const {
   createWorkflowSchema,
@@ -13,13 +14,15 @@ const {
   testWorkflowSchema,
   workflowIdParamSchema,
   instanceIdParamSchema,
+  listWorkflowsQuerySchema,
 } = require("./workflow.validator");
 const dataCollectionRoutes = require("./dataCollection/dataController.route");
 
 // List all workflows
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:workflow:list"]),
+  validate(listWorkflowsQuerySchema, "query"),
+  authMiddleware.authorize("workflow", "list"),
   workflowController.getAllWorkflows
 );
 
@@ -27,7 +30,11 @@ router.get(
 router.post(
   "/",
   validate(createWorkflowSchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:workflow:create"]),
+  workflowMiddleware.extractWorkflowDataQueryIDs,
+  authMiddleware.authorize([
+    { resource: "workflow", action: "create" },
+    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true }
+  ]),
   workflowController.createWorkflow
 );
 
@@ -35,7 +42,7 @@ router.post(
 router.get(
   "/:workflowID",
   validate(workflowIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:workflow:read"]),
+  authMiddleware.authorize("workflow", "read", { paramKey: "workflowID" }),
   workflowController.getWorkflowByID
 );
 
@@ -46,7 +53,11 @@ router.patch(
     params: workflowIdParamSchema,
     body: updateWorkflowSchema,
   }),
-  authMiddleware.checkUserPermissions(["tenant:workflow:update"]),
+  workflowMiddleware.extractWorkflowDataQueryIDs,
+  authMiddleware.authorize([
+    { resource: "workflow", action: "update", paramKey: "workflowID" },
+    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true }
+  ]),
   workflowController.updateWorkflow
 );
 
@@ -54,7 +65,7 @@ router.patch(
 router.delete(
   "/:workflowID",
   validate(workflowIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:workflow:delete"]),
+  authMiddleware.authorize("workflow", "delete", { paramKey: "workflowID" }),
   workflowController.deleteWorkflow
 );
 
@@ -62,9 +73,15 @@ router.delete(
 router.post(
   "/:workflowID/clone",
   validate(workflowIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:workflow:create"]),
+  workflowMiddleware.resolveWorkflowDataQueryIDsFromDB,
+  authMiddleware.authorize([
+    { resource: "workflow", action: "create" },
+    { resource: "workflow", action: "read", paramKey: "workflowID" },
+    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true }
+  ]),
   workflowController.cloneWorkflow
 );
+
 
 // Execute workflow (async - returns instanceID immediately)
 router.post(
@@ -73,7 +90,7 @@ router.post(
     params: workflowIdParamSchema,
     body: executeWorkflowSchema,
   }),
-  authMiddleware.checkUserPermissions(["tenant:workflow:execute"]),
+  authMiddleware.authorize("workflow", "execute", { paramKey: "workflowID" }),
   workflowController.executeWorkflow
 );
 
@@ -81,7 +98,8 @@ router.post(
 router.get(
   "/instances/:instanceID",
   validate(instanceIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:workflow:read"]),
+  workflowMiddleware.resolveWorkflowIDFromInstance,
+  authMiddleware.authorize("workflow", "read", { reqKey: "workflowID" }),
   workflowController.getRunStatus
 );
 
@@ -89,7 +107,11 @@ router.get(
 router.post(
   "/test",
   validate(testWorkflowSchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:workflow:execute"]),
+  workflowMiddleware.extractWorkflowDataQueryIDs,
+  authMiddleware.authorize([
+    { resource: "workflow", action: "test" },
+    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true }
+  ]),
   workflowController.testWorkflow
 );
 
@@ -97,7 +119,8 @@ router.post(
 router.delete(
   "/instances/:instanceID/stop",
   validate(instanceIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:workflow:execute"]),
+  workflowMiddleware.resolveWorkflowIDFromInstance,
+  authMiddleware.authorize("workflow", "execute", { reqKey: "workflowID" }),
   workflowController.stopTestWorkflow
 );
 
@@ -105,13 +128,13 @@ router.delete(
 router.post(
   "/instances/:instanceID/widget",
   validate(instanceIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:workflow:read"]),
+  workflowMiddleware.resolveWorkflowIDFromInstance,
+  authMiddleware.authorize("workflow", "read", { reqKey: "workflowID" }),
   workflowController.getRunStatusForWidget
 );
 
 router.use(
   "/data-collection",
-  authMiddleware.checkUserPermissions(["tenant:workflow:read"]),
   dataCollectionRoutes
 );
 

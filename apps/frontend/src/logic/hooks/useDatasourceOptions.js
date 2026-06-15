@@ -1,7 +1,7 @@
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { useMemo } from "react";
-import { useDatasources } from "./useDatasources";
+import { useDatasources, useInfiniteDatasources } from "./useDatasources";
 
 const DIRECT_QUERY_DATASOURCES = Object.keys(DATASOURCE_TYPES)
   .map((key) => {
@@ -51,5 +51,43 @@ export const useDatasourceOptions = (tenantID) => {
     loadDatasourcesError,
     isRefetchingDatasources,
     refetchDatasources,
+  };
+};
+
+export const useInfiniteDatasourceOptions = (tenantID, searchQuery = "") => {
+  const {
+    datasources: _datasources,
+    isLoadingDatasources,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    loadDatasourcesError,
+  } = useInfiniteDatasources(tenantID, searchQuery);
+
+  const datasources = useMemo(() => {
+    const list = _datasources && _datasources.length > 0
+      ? _datasources.map((datasource) => {
+          return {
+            label: datasource.datasourceTitle,
+            value: datasource.datasourceID,
+            type: datasource.datasourceType,
+          };
+        })
+      : [];
+
+    const filteredDirect = DIRECT_QUERY_DATASOURCES.filter(d =>
+      !searchQuery || d.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return [...list, ...filteredDirect];
+  }, [_datasources, searchQuery]);
+
+  return {
+    datasources,
+    isLoadingDatasources,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    loadDatasourcesError,
   };
 };

@@ -2086,7 +2086,7 @@ var Section = React28.forwardRef(
       {
         ref,
         className: cn(
-          "rounded-md border border-border bg-card overflow-hidden",
+          "rounded-md border border-border bg-card",
           className
         ),
         ...props
@@ -2266,6 +2266,318 @@ var LogicChip = React33.forwardRef(({ className, value, onChange, ...props }, re
   );
 });
 LogicChip.displayName = "LogicChip";
+
+// src/components/search-select.jsx
+import * as React34 from "react";
+import { Check as Check4, ChevronDown as ChevronDown3, Search, Loader2 as Loader22 } from "lucide-react";
+import * as SelectPrimitive2 from "@radix-ui/react-select";
+var SearchSelect = React34.forwardRef(
+  ({
+    value,
+    onChange,
+    options = [],
+    placeholder = "Select option...",
+    searchPlaceholder = "Search...",
+    onSearchChange,
+    onLoadMore,
+    hasNextPage = false,
+    isFetchingNextPage = false,
+    isLoading = false,
+    className,
+    disabled = false,
+    selectedLabel
+  }, ref) => {
+    const [open, setOpen] = React34.useState(false);
+    const [localQuery, setLocalQuery] = React34.useState("");
+    const searchInputRef = React34.useRef(null);
+    React34.useEffect(() => {
+      if (!open) {
+        setLocalQuery("");
+        if (onSearchChange) {
+          onSearchChange("");
+        }
+      } else {
+        setTimeout(() => {
+          searchInputRef.current?.focus();
+        }, 50);
+      }
+    }, [open, onSearchChange]);
+    const handleSearchChange = (e) => {
+      const val = e.target.value;
+      setLocalQuery(val);
+      if (onSearchChange) {
+        onSearchChange(val);
+      }
+    };
+    const handleScroll = (e) => {
+      const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+      if (scrollHeight - scrollTop - clientHeight < 20) {
+        if (hasNextPage && !isFetchingNextPage && onLoadMore) {
+          onLoadMore();
+        }
+      }
+    };
+    const filteredOptions = React34.useMemo(() => {
+      if (onSearchChange) {
+        return options;
+      }
+      if (!localQuery) {
+        return options;
+      }
+      return options.filter(
+        (option) => option.label.toLowerCase().includes(localQuery.toLowerCase())
+      );
+    }, [options, localQuery, onSearchChange]);
+    const selectedOption = React34.useMemo(() => {
+      return options.find((opt) => opt.value === value);
+    }, [options, value]);
+    return /* @__PURE__ */ React34.createElement(
+      SelectPrimitive2.Root,
+      {
+        open,
+        onOpenChange: setOpen,
+        value: value === "" ? "___EMPTY___" : value || void 0,
+        onValueChange: (val) => {
+          onChange(val === "___EMPTY___" ? "" : val);
+        },
+        disabled
+      },
+      /* @__PURE__ */ React34.createElement(SelectPrimitive2.Trigger, { asChild: true }, /* @__PURE__ */ React34.createElement(
+        "button",
+        {
+          ref,
+          type: "button",
+          disabled,
+          className: cn(
+            "flex h-8 w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom px-2.5 py-1.5 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
+            className
+          )
+        },
+        /* @__PURE__ */ React34.createElement("span", { className: "truncate" }, selectedOption ? selectedOption.label : selectedLabel || placeholder),
+        /* @__PURE__ */ React34.createElement(ChevronDown3, { className: "h-4 w-4 opacity-50 shrink-0 ml-2" })
+      )),
+      /* @__PURE__ */ React34.createElement(SelectPrimitive2.Portal, null, /* @__PURE__ */ React34.createElement(
+        SelectPrimitive2.Content,
+        {
+          position: "popper",
+          onOpenAutoFocus: (e) => {
+            e.preventDefault();
+            searchInputRef.current?.focus();
+          },
+          className: "relative z-[1200] max-h-96 min-w-[200px] w-[var(--radix-select-trigger-width)] overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1"
+        },
+        /* @__PURE__ */ React34.createElement(
+          "div",
+          {
+            className: "border-b border-border/50 p-2",
+            onKeyDown: (e) => e.stopPropagation(),
+            onPointerDown: (e) => e.stopPropagation()
+          },
+          /* @__PURE__ */ React34.createElement("div", { className: "relative" }, /* @__PURE__ */ React34.createElement(Search, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" }), /* @__PURE__ */ React34.createElement(
+            Input,
+            {
+              ref: searchInputRef,
+              type: "text",
+              placeholder: searchPlaceholder,
+              className: "pl-8 w-full bg-background border-border/50 focus:border-primary/30",
+              value: localQuery,
+              onChange: handleSearchChange
+            }
+          ))
+        ),
+        /* @__PURE__ */ React34.createElement(
+          SelectPrimitive2.Viewport,
+          {
+            onScroll: handleScroll,
+            className: "max-h-[220px] overflow-y-auto p-1 space-y-0.5"
+          },
+          isLoading ? /* @__PURE__ */ React34.createElement("div", { className: "flex items-center justify-center p-4 text-xs text-muted-foreground" }, /* @__PURE__ */ React34.createElement(Loader22, { className: "h-4 w-4 animate-spin mr-2" }), "Loading...") : filteredOptions.length === 0 ? /* @__PURE__ */ React34.createElement("div", { className: "p-4 text-center text-xs text-muted-foreground" }, "No options found") : /* @__PURE__ */ React34.createElement(React34.Fragment, null, filteredOptions.map((option) => {
+            const isSelected = option.value === value;
+            const itemValue = option.value === "" ? "___EMPTY___" : option.value;
+            return /* @__PURE__ */ React34.createElement(
+              SelectPrimitive2.Item,
+              {
+                key: option.value,
+                value: itemValue,
+                className: cn(
+                  "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm text-left outline-none focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                  isSelected && "font-medium"
+                )
+              },
+              /* @__PURE__ */ React34.createElement("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center" }, /* @__PURE__ */ React34.createElement(SelectPrimitive2.ItemIndicator, null, /* @__PURE__ */ React34.createElement(Check4, { className: "h-4 w-4 text-primary" }))),
+              /* @__PURE__ */ React34.createElement(SelectPrimitive2.ItemText, null, /* @__PURE__ */ React34.createElement("span", { className: "truncate" }, option.label))
+            );
+          }), isFetchingNextPage && /* @__PURE__ */ React34.createElement("div", { className: "flex items-center justify-center p-2 text-[10px] text-muted-foreground animate-pulse" }, /* @__PURE__ */ React34.createElement(Loader22, { className: "h-3 w-3 animate-spin mr-1.5" }), "Loading more..."))
+        )
+      ))
+    );
+  }
+);
+SearchSelect.displayName = "SearchSelect";
+
+// src/components/multi-search-select.jsx
+import * as React35 from "react";
+import { Check as Check5, ChevronDown as ChevronDown4, Search as Search2, Loader2 as Loader23, X as X2 } from "lucide-react";
+import * as PopoverPrimitive2 from "@radix-ui/react-popover";
+var MultiSearchSelect = React35.forwardRef(
+  ({
+    value = [],
+    onChange,
+    options = [],
+    placeholder = "Select options...",
+    searchPlaceholder = "Search...",
+    isLoading = false,
+    disabled = false,
+    className,
+    badgeVariant = "outline",
+    badgeClassName,
+    renderLabel,
+    maxDisplayed = 5
+  }, ref) => {
+    const [open, setOpen] = React35.useState(false);
+    const [localQuery, setLocalQuery] = React35.useState("");
+    const searchInputRef = React35.useRef(null);
+    React35.useEffect(() => {
+      if (!open) {
+        setLocalQuery("");
+      }
+    }, [open]);
+    const handleSearchChange = (e) => {
+      setLocalQuery(e.target.value);
+    };
+    const filteredOptions = React35.useMemo(() => {
+      if (!localQuery) {
+        return options;
+      }
+      const q = localQuery.toLowerCase();
+      return options.filter(
+        (option) => option.label.toLowerCase().includes(q) || option.description && option.description.toLowerCase().includes(q)
+      );
+    }, [options, localQuery]);
+    const toggleOption = React35.useCallback(
+      (optionValue) => {
+        const newValue = value.includes(optionValue) ? value.filter((v) => v !== optionValue) : [...value, optionValue];
+        onChange(newValue);
+      },
+      [value, onChange]
+    );
+    const removeOption = React35.useCallback(
+      (optionValue, e) => {
+        e.stopPropagation();
+        onChange(value.filter((v) => v !== optionValue));
+      },
+      [value, onChange]
+    );
+    const optionMap = React35.useMemo(() => {
+      const map = {};
+      options.forEach((opt) => {
+        map[opt.value] = opt;
+      });
+      return map;
+    }, [options]);
+    const displayedValues = value.slice(0, maxDisplayed);
+    const overflowCount = value.length - maxDisplayed;
+    return /* @__PURE__ */ React35.createElement(PopoverPrimitive2.Root, { open, onOpenChange: setOpen }, /* @__PURE__ */ React35.createElement(PopoverPrimitive2.Trigger, { asChild: true }, /* @__PURE__ */ React35.createElement(
+      "button",
+      {
+        ref,
+        type: "button",
+        disabled,
+        className: cn(
+          "flex min-h-8 w-full items-center flex-wrap gap-1 rounded-sm border border-input-custom bg-input-custom px-2 py-1 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50 text-left",
+          className
+        )
+      },
+      value.length > 0 ? /* @__PURE__ */ React35.createElement(React35.Fragment, null, displayedValues.map((v) => {
+        const opt = optionMap[v];
+        return /* @__PURE__ */ React35.createElement(
+          Badge,
+          {
+            key: v,
+            variant: badgeVariant,
+            className: cn(
+              "shrink-0 gap-1 pr-1 text-xs font-normal",
+              badgeClassName
+            )
+          },
+          /* @__PURE__ */ React35.createElement("span", { className: "truncate max-w-[120px]" }, opt ? opt.label : v),
+          /* @__PURE__ */ React35.createElement(
+            "span",
+            {
+              role: "button",
+              tabIndex: -1,
+              className: "rounded-sm p-0 hover:bg-muted-foreground/20 cursor-pointer",
+              onPointerDown: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              },
+              onClick: (e) => removeOption(v, e)
+            },
+            /* @__PURE__ */ React35.createElement(X2, { className: "h-3 w-3" })
+          )
+        );
+      }), overflowCount > 0 && /* @__PURE__ */ React35.createElement("span", { className: "text-xs text-muted-foreground" }, "+", overflowCount, " more")) : /* @__PURE__ */ React35.createElement("span", { className: "text-sm text-muted-foreground py-0.5" }, placeholder),
+      /* @__PURE__ */ React35.createElement(ChevronDown4, { className: "h-4 w-4 opacity-50 shrink-0 ml-auto" })
+    )), /* @__PURE__ */ React35.createElement(PopoverPrimitive2.Portal, null, /* @__PURE__ */ React35.createElement(
+      PopoverPrimitive2.Content,
+      {
+        align: "start",
+        sideOffset: 4,
+        onOpenAutoFocus: (e) => {
+          e.preventDefault();
+          setTimeout(() => searchInputRef.current?.focus(), 0);
+        },
+        className: "z-[1200] w-[var(--radix-popover-trigger-width)] max-h-80 overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
+      },
+      /* @__PURE__ */ React35.createElement(
+        "div",
+        {
+          className: "border-b border-border/50 p-2",
+          onKeyDown: (e) => e.stopPropagation()
+        },
+        /* @__PURE__ */ React35.createElement("div", { className: "relative" }, /* @__PURE__ */ React35.createElement(Search2, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" }), /* @__PURE__ */ React35.createElement(
+          Input,
+          {
+            ref: searchInputRef,
+            type: "text",
+            placeholder: searchPlaceholder,
+            className: "pl-8 w-full bg-background border-border/50 focus:border-primary/30",
+            value: localQuery,
+            onChange: handleSearchChange
+          }
+        ))
+      ),
+      /* @__PURE__ */ React35.createElement("div", { className: "max-h-[220px] overflow-y-auto p-1 space-y-0.5" }, isLoading ? /* @__PURE__ */ React35.createElement("div", { className: "flex items-center justify-center p-4 text-xs text-muted-foreground" }, /* @__PURE__ */ React35.createElement(Loader23, { className: "h-4 w-4 animate-spin mr-2" }), "Loading...") : filteredOptions.length === 0 ? /* @__PURE__ */ React35.createElement("div", { className: "p-4 text-center text-xs text-muted-foreground" }, "No options found") : filteredOptions.map((option) => {
+        const isSelected = value.includes(option.value);
+        return /* @__PURE__ */ React35.createElement(
+          "div",
+          {
+            key: option.value,
+            role: "option",
+            "aria-selected": isSelected,
+            className: cn(
+              "relative flex w-full cursor-pointer select-none items-start rounded-sm py-1.5 pl-8 pr-2 text-sm text-left outline-none hover:bg-muted",
+              isSelected && "font-medium"
+            ),
+            onClick: () => toggleOption(option.value)
+          },
+          /* @__PURE__ */ React35.createElement("span", { className: "absolute left-2 top-2 flex h-3.5 w-3.5 items-center justify-center" }, isSelected && /* @__PURE__ */ React35.createElement(Check5, { className: "h-4 w-4 text-primary" })),
+          renderLabel ? renderLabel(option) : /* @__PURE__ */ React35.createElement("div", { className: "flex flex-col" }, /* @__PURE__ */ React35.createElement("span", { className: "truncate" }, option.label), option.description && /* @__PURE__ */ React35.createElement("span", { className: "text-xs text-muted-foreground truncate" }, option.description))
+        );
+      })),
+      value.length > 0 && /* @__PURE__ */ React35.createElement("div", { className: "border-t border-border/50 px-2 py-1.5 text-[11px] text-muted-foreground flex items-center justify-between" }, /* @__PURE__ */ React35.createElement("span", null, value.length, " selected"), /* @__PURE__ */ React35.createElement(
+        "button",
+        {
+          type: "button",
+          className: "text-xs text-muted-foreground hover:text-foreground transition-colors",
+          onClick: () => onChange([])
+        },
+        "Clear all"
+      ))
+    )));
+  }
+);
+MultiSearchSelect.displayName = "MultiSearchSelect";
 export {
   Accordion,
   AccordionContent,
@@ -2329,6 +2641,7 @@ export {
   InputValuesForm,
   Label2 as Label,
   LogicChip,
+  MultiSearchSelect,
   PageHeader,
   Popover,
   PopoverContent,
@@ -2337,6 +2650,7 @@ export {
   RadioGroupItem,
   ScrollArea,
   ScrollBar,
+  SearchSelect,
   Section,
   Select,
   SelectContent,

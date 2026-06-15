@@ -4,7 +4,7 @@ import { JsonForms } from '@jsonforms/react';
 import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
 import { Zap, RefreshCw, Ban, Play } from 'lucide-react';
-import { Button } from '@jet-admin/ui';
+import { Button, Label } from '@jet-admin/ui';
 
 const ERROR_HANDLING_OPTIONS = {
   FAIL_WORKFLOW: 'fail_workflow',
@@ -14,7 +14,21 @@ const ERROR_HANDLING_OPTIONS = {
 };
 
 export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, workflowEdges, workflowInputDefinitions, onQueryTest } = useWorkflowNodes();
+  const {
+    dataQueries,
+    strings,
+    onRefreshDataQueries,
+    workflowNodes,
+    workflowEdges,
+    workflowInputDefinitions,
+    onQueryTest,
+    querySearch,
+    setQuerySearch,
+    fetchNextQueriesPage,
+    hasNextQueriesPage,
+    isFetchingNextQueriesPage,
+    isLoadingDataQueries,
+  } = useWorkflowNodes();
   const [formData, setFormData] = useState({
     title: data?.title || '',
     description: data?.description || '',
@@ -50,13 +64,12 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
   }, [dataQueries, formData.dataQueryID]);
 
   const schema = useMemo(() => {
-    const queryEnums = dataQueries?.map(q => String(q.dataQueryID)) || [''];
     return {
       type: 'object',
       properties: {
+        dataQueryID: { type: 'string', title: 'Data Query' },
         title: { type: 'string', title: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL || 'Node Title' },
         description: { type: 'string', title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || 'Description' },
-        dataQueryID: { type: 'string', title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL || 'Data Query', enum: queryEnums.length > 0 ? queryEnums : [''] },
         inputValues: { type: 'object', title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || 'Inputs' },
         outputVariable: { type: 'string', title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || 'Output Variable Name', pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$' },
         timeoutSeconds: { type: 'integer', title: strings.WORKFLOW_EDITOR_TIMEOUT_LABEL || 'Timeout (seconds)', minimum: 1, maximum: 3600, default: 300 },
@@ -67,7 +80,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       },
       required: ['dataQueryID'],
     };
-  }, [dataQueries, strings]);
+  }, [strings]);
 
   const upstreamStateTree = useMemo(() => {
     const tree = { ctx: { input: {} } };
@@ -108,15 +121,25 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
 
   const uischema = useMemo(() => {
     const generalElements = [
+
       { type: 'Control', scope: '#/properties/title', options: { placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER || 'Enter node title' } },
       { type: 'Control', scope: '#/properties/description', options: { placeholder: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_PLACEHOLDER || 'Describe what this node does...', multi: true, rows: 2 } },
       {
-        type: 'Control', scope: '#/properties/dataQueryID', options: {
-          placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SELECT_LABEL || 'Select a query',
-          enumLabels: dataQueries?.reduce((acc, q) => { acc[String(q.dataQueryID)] = q.dataQueryTitle; return acc; }, {}) || {},
-          showRefreshButton: !!onRefreshDataQueries,
-          onRefresh: onRefreshDataQueries,
-        },
+        type: 'Control',
+        scope: '#/properties/dataQueryID',
+        options: {
+          isSearchSelect: true,
+          placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_PLACEHOLDER || 'Select a data query…',
+          options: (dataQueries || []).map((q) => ({
+            value: String(q.dataQueryID),
+            label: q.dataQueryTitle,
+          })),
+          onSearchChange: setQuerySearch,
+          onLoadMore: fetchNextQueriesPage,
+          hasNextPage: hasNextQueriesPage,
+          isFetchingNextPage: isFetchingNextQueriesPage,
+          isLoading: isLoadingDataQueries,
+        }
       },
     ];
     if (selectedQuery?.dataQueryOptions?.inputDefinitions?.length > 0) {
@@ -152,7 +175,14 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     };
   }, [dataQueries, strings, selectedQuery, upstreamStateTree, onRefreshDataQueries]);
 
-  const handleFormChange = useCallback(({ data: newData }) => { setFormData(newData); }, []);
+  const handleFormChange = useCallback(({ data: newData }) => {
+    setFormData(prev => {
+      if (prev.dataQueryID !== newData.dataQueryID) {
+        return { ...newData, inputValues: {} };
+      }
+      return newData;
+    });
+  }, []);
   const handleSave = useCallback(() => { onChange(formData); }, [onChange, formData]);
   const handleOpenTest = useCallback(() => {
     if (onQueryTest && formData.dataQueryID) onQueryTest(formData.dataQueryID);
@@ -160,7 +190,9 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
 
   return (
     <div className="w-full">
+
       <JsonForms schema={schema} uischema={uischema} data={formData} renderers={workflowNodeRenderers} onChange={handleFormChange} />
+
       {/* Help callout */}
       <div className='px-2'>
         <div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">

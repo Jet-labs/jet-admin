@@ -7,6 +7,7 @@ import React, { useCallback } from "react";
 import { addTenantRoleAPI } from "../../../data/apis/tenantRole";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput";
+import { TenantAssetPermissionsInput } from "./tenantAssetPermissionsInput";
 import { formValidations } from "../../../utils/formValidation";
 
 import { Button, Spinner, Input, Label, PageHeader, Section } from "@jet-admin/ui";
@@ -23,10 +24,10 @@ export const TenantRoleAdditionForm = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isPending: isAddingTenantRole, mutate: addTenantRole } = useMutation({
-    mutationFn: ({ roleTitle, roleDescription, permissionIDs }) =>
+    mutationFn: ({ roleTitle, roleDescription, permissionIDs, assetPermissions }) =>
       addTenantRoleAPI({
         tenantID,
-        data: { roleTitle, roleDescription, permissionIDs },
+        data: { roleTitle, roleDescription, permissionIDs, assetPermissions },
       }),
     retry: false,
     onSuccess: () => {
@@ -47,10 +48,11 @@ export const TenantRoleAdditionForm = () => {
       roleTitle: "",
       roleDescription: "",
       permissionIDs: [],
+      assetPermissions: [],
     },
     validationSchema: formValidations.addTenantRoleFormValidationSchema,
-    onSubmit: ({ roleTitle, roleDescription, permissionIDs }) => {
-      addTenantRole({ roleTitle, roleDescription, permissionIDs });
+    onSubmit: ({ roleTitle, roleDescription, permissionIDs, assetPermissions }) => {
+      addTenantRole({ roleTitle, roleDescription, permissionIDs, assetPermissions });
     },
   });
 
@@ -84,7 +86,7 @@ export const TenantRoleAdditionForm = () => {
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
         <section className="mx-auto max-w-2xl w-full">
           <form
-            className="space-y-4"
+            className="space-y-2"
             onSubmit={addTenantRoleForm.handleSubmit}
             noValidate
           >
@@ -135,7 +137,7 @@ export const TenantRoleAdditionForm = () => {
               </div>
             </Section>
 
-            <Section title="Permissions" description="Access controls granted by this role.">
+            <Section title="General Permissions" description="Access controls granted by this role globally.">
               <TenantPermissionSelectionInput
                 label={
                   CONSTANTS.STRINGS
@@ -151,7 +153,22 @@ export const TenantRoleAdditionForm = () => {
               />
             </Section>
 
-
+            <Section title="Asset Permissions" description="Restrict access to specific resources (pages, queries, workflows, etc.).">
+              <TenantAssetPermissionsInput
+                value={addTenantRoleForm.values.assetPermissions}
+                onChange={(event) => {
+                  addTenantRoleForm.setFieldValue(
+                    "assetPermissions",
+                    event.target.value
+                  );
+                }}
+                error={
+                  addTenantRoleForm.touched.assetPermissions
+                    ? addTenantRoleForm.errors.assetPermissions
+                    : undefined
+                }
+              />
+            </Section>
           </form>
         </section>
       </div>

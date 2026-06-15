@@ -38,7 +38,11 @@ oauthController.getGoogleAuthUrl = async (req, res) => {
 
     // Sign the state using the vault encryption key, valid for 10 minutes
     const stateToken = jwt.sign(
-      { tenantID },
+      { 
+        tenantID,
+        creatorID: req.user?.userID || null,
+        createdByApiKeyID: req.authContext?.apiKey?.apiKeyID || null
+      },
       process.env.VAULT_ENCRYPTION_KEY,
       { expiresIn: "10m" }
     );
@@ -110,7 +114,7 @@ oauthController.handleGoogleCallback = async (req, res) => {
       throw new Error("Invalid or expired state token");
     }
 
-    const { tenantID } = decoded;
+    const { tenantID, creatorID, createdByApiKeyID } = decoded;
 
     const { clientId, clientSecret } = vaultService.getGoogleClientConfig();
 
@@ -165,6 +169,8 @@ oauthController.handleGoogleCallback = async (req, res) => {
       provider: "google",
       name: credentialName,
       data: vaultData,
+      creatorID,
+      createdByApiKeyID,
     });
 
     return res.send(`

@@ -1,6 +1,8 @@
 const Logger = require("../../utils/logger"); // Adjust path as needed
 const { prisma } = require("../../config/prisma.config"); // Adjust path as needed
 const constants = require("../../constants");
+const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
+const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 const cronJobService = {};
 
@@ -31,7 +33,7 @@ cronJobService.createCronJob = async ({
   timeoutSeconds,
   retryAttempts,
   retryDelaySeconds,
-  // Note: nextRunAt is typically calculated by the scheduler, not set directly on creation
+  authContext,
 }) => {
   Logger.log("info", {
     message: "cronJobService:createCronJob:params",
@@ -47,10 +49,16 @@ cronJobService.createCronJob = async ({
       timeoutSeconds,
       retryAttempts,
       retryDelaySeconds,
+      authContext,
     },
   });
 
   try {
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const finalCreatorID = creatorID || userID;
+    if (!finalCreatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
     const newCronJob = await prisma.tblCronJobs.create({
       data: {
         cronJobTitle,
@@ -63,11 +71,15 @@ cronJobService.createCronJob = async ({
         timeoutSeconds,
         retryAttempts,
         retryDelaySeconds,
+        creatorID,
+        createdByApiKeyID,
       },
       include: {
         tblWorkflows: true,
       },
     });
+
+    await grantCreatorAccess(tenantID, "cronjob", newCronJob.cronJobID, authContext, finalCreatorID);
 
     Logger.log("success", {
       message: "cronJobService:createCronJob:success",
@@ -117,27 +129,69 @@ cronJobService.createCronJob = async ({
  * @param {number} [param0.tenantID] - Page number for pagination
  * @returns {Promise<Array<object>>} A list of cron job objects
  */
-cronJobService.getAllCronJobs = async ({ userID, tenantID }) => {
+cronJobService.getAllCronJobs = async ({ userID, tenantID, search, page, pageSize }) => {
   Logger.log("info", {
     message: "cronJobService:getAllCronJobs:params",
-    params: { userID, tenantID },
+    params: { userID, tenantID, search, page, pageSize },
   });
 
   try {
-    const cronJobs = await prisma.tblCronJobs.findMany({
-      where: {
-        tenantID: tenantID,
-      },
+    const where = {
+      tenantID: tenantID,
+    };
+
+    if (search) {
+      where.OR = [
+        {
+          cronJobTitle: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          cronJobDescription: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          cronJobSchedule: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+    }
+
+    const findManyOptions = {
+      where,
       orderBy: {
         createdAt: "desc", // Or order by title, etc.
       },
-    });
+    };
+
+    if (page && pageSize) {
+      findManyOptions.skip = (page - 1) * pageSize;
+      findManyOptions.take = pageSize;
+    }
+
+    const [cronJobs, totalCount] = await Promise.all([
+      prisma.tblCronJobs.findMany(findManyOptions),
+      prisma.tblCronJobs.count({ where }),
+    ]);
 
     Logger.log("success", {
       message: "cronJobService:getAllCronJobs:success",
-      params: { userID, count: cronJobs.length },
+      params: { userID, count: cronJobs.length, totalCount },
     });
-    return cronJobs;
+
+    return {
+      cronJobs,
+      totalCount,
+      page: page || 1,
+      pageSize: pageSize || cronJobs.length,
+      totalPages: pageSize ? Math.ceil(totalCount / pageSize) : 1,
+    };
   } catch (error) {
     Logger.log("error", {
       message: "cronJobService:getAllCronJobs:failure",
@@ -313,6 +367,9 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
       params: { userID, tenantID, cronJobID },
     });
     await cronJobService.deleteScheduledCronJob({ cronJobID });
+
+    await removePoliciesForResource(tenantID, `cronjob:${cronJobID}`);
+
     Logger.log("success", {
       message: "cronJobService:deleteCronJobByID:success",
       params: { userID, tenantID, cronJobID },
@@ -335,10 +392,10 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
  * @param {number} param0.cronJobID - The ID of the cron job to clone
  * @returns {Promise<object>} The cloned cron job object
  */
-cronJobService.cloneCronJob = async ({ userID, tenantID, cronJobID }) => {
+cronJobService.cloneCronJob = async ({ userID, tenantID, cronJobID, authContext }) => {
   Logger.log("info", {
     message: "cronJobService:cloneCronJob:params",
-    params: { userID, tenantID, cronJobID },
+    params: { userID, tenantID, cronJobID, authContext },
   });
 
   try {
@@ -353,6 +410,11 @@ cronJobService.cloneCronJob = async ({ userID, tenantID, cronJobID }) => {
       throw new Error(`Cron job with ID ${cronJobID} not found.`);
     }
 
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const finalCreatorID = creatorID || userID;
+    if (!finalCreatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
     const newCronJob = await prisma.tblCronJobs.create({
       data: {
         cronJobTitle: existing.cronJobTitle + " (Copy)",
@@ -365,11 +427,15 @@ cronJobService.cloneCronJob = async ({ userID, tenantID, cronJobID }) => {
         timeoutSeconds: existing.timeoutSeconds,
         retryAttempts: existing.retryAttempts,
         retryDelaySeconds: existing.retryDelaySeconds,
+        creatorID,
+        createdByApiKeyID,
       },
       include: {
         tblWorkflows: true,
       },
     });
+
+    await grantCreatorAccess(tenantID, "cronjob", newCronJob.cronJobID, authContext, finalCreatorID);
 
     Logger.log("success", {
       message: "cronJobService:cloneCronJob:success",

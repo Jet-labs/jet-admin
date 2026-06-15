@@ -4,14 +4,11 @@
  */
 const { prisma } = require("../../config/prisma.config");
 const Logger = require("../../utils/logger");
-const { startWorkflow } = require("./workflowEngine/engine");
 const {
   formatAuthContextForLog,
   getCreationContextFromAuthContext,
 } = require("../../utils/auth.context.utils");
-
-const { resolveTemplate } = require("@jet-admin/expression-engine");
-const { extractWorkflowDefinitions, resolveInputs } = require("../../utils/input.util");
+const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 
 function mapWorkflowNodeForPersistence(node, workflowID) {
   return {
@@ -61,34 +58,68 @@ const workflowService = {}
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-workflowService.getAllWorkflows = async ({ userID, tenantID, authContext }) => {
+workflowService.getAllWorkflows = async ({ userID, tenantID, search, page, pageSize, authContext }) => {
   Logger.log("info", {
     message: "workflowService:getAllWorkflows:params",
     params: {
       userID,
       tenantID,
+      search,
+      page,
+      pageSize,
       ...formatAuthContextForLog(authContext),
     },
   });
 
   try {
-    const workflows = await prisma.tblWorkflows.findMany({
-      where: {
-        tenantID: tenantID,
+    const where = {
+      tenantID: tenantID,
+    };
+
+    if (search) {
+      where.title = {
+        contains: search,
+        mode: "insensitive",
+      };
+    }
+
+    const findManyOptions = {
+      where,
+      orderBy: {
+        createdAt: "desc",
       },
       include: {
         tblWorkflowNodes: true,
         tblWorkflowEdge: true,
       },
-    });
+    };
+
+    if (page && pageSize) {
+      findManyOptions.skip = (page - 1) * pageSize;
+      findManyOptions.take = pageSize;
+    }
+
+    const [workflows, totalCount] = await Promise.all([
+      prisma.tblWorkflows.findMany(findManyOptions),
+      prisma.tblWorkflows.count({ where }),
+    ]);
+
     Logger.log("success", {
       message: "workflowService:getAllWorkflows:success",
       params: {
         userID,
         workflowLength: workflows?.length,
+        totalCount,
       },
     });
-    return workflows;
+
+    return {
+      workflows,
+      totalCount,
+      page: page || 1,
+      pageSize: pageSize || workflows.length,
+      totalPages: pageSize ? Math.ceil(totalCount / pageSize) : 1,
+    };
   } catch (error) {
     Logger.log("error", {
       message: "workflowService:getAllWorkflows:failure",
@@ -142,12 +173,16 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges,
 
   try {
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const finalCreatorID = creatorID || userID;
+    if (!finalCreatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
     const workflowCreationTransaction = await prisma.$transaction(async (tx) => {
       const workflow = await tx.tblWorkflows.create({
         data: {
           tenantID: tenantID,
           title,
-          creatorID,
+          creatorID: finalCreatorID,
           createdByApiKeyID,
           workflowOptions: workflowOptions || {},
         },
@@ -172,6 +207,8 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges,
 
       return workflow;
     });
+
+    await grantCreatorAccess(tenantID, "workflow", workflowCreationTransaction.workflowID, authContext, finalCreatorID);
 
     Logger.log("success", {
       message: "workflowService:createWorkflow:success",
@@ -328,6 +365,8 @@ workflowService.deleteWorkflow = async ({ userID, tenantID, workflowID, authCont
       });
     });
 
+    await removePoliciesForResource(tenantID, `workflow:${workflowID}`);
+
     Logger.log("success", {
       message: "workflowService:deleteWorkflow:success",
       params: {
@@ -380,6 +419,10 @@ workflowService.cloneWorkflow = async ({ userID, tenantID, workflowID, authConte
     }
 
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const finalCreatorID = creatorID || userID;
+    if (!finalCreatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
     const crypto = require('crypto');
 
     const workflowCloneTransaction = await prisma.$transaction(async (tx) => {
@@ -387,7 +430,7 @@ workflowService.cloneWorkflow = async ({ userID, tenantID, workflowID, authConte
         data: {
           tenantID: tenantID,
           title: existing.title + " (Copy)",
-          creatorID,
+          creatorID: finalCreatorID,
           createdByApiKeyID,
           workflowOptions: existing.workflowOptions || {},
         },
@@ -434,6 +477,8 @@ workflowService.cloneWorkflow = async ({ userID, tenantID, workflowID, authConte
       return workflow;
     });
 
+    await grantCreatorAccess(tenantID, "workflow", workflowCloneTransaction.workflowID, authContext, finalCreatorID);
+
     Logger.log("success", {
       message: "workflowService:cloneWorkflow:success",
       params: {
@@ -464,45 +509,7 @@ workflowService.cloneWorkflow = async ({ userID, tenantID, workflowID, authConte
  * @param {object} param0.inputValues - Input parameters for workflow
  * @returns {Promise<{instanceID: string}>}
  */
-workflowService.executeWorkflow = async ({ workflowID, tenantID, inputValues = {} }) => {
-  Logger.log("info", {
-    message: "workflowService:executeWorkflow:params",
-    params: { workflowID, tenantID, inputValues },
-  });
 
-  try {
-    // Resolve & validate inputs through the unified pipeline
-    const workflow = await prisma.tblWorkflows.findUnique({ where: { workflowID } });
-    const inputDefinitions = workflow ? extractWorkflowDefinitions(workflow) : [];
-    const { resolved, errors, valid } = await resolveInputs({
-      type: 'workflow', inputDefinitions, inputValues: inputValues,
-    });
-
-    if (!valid) {
-      Logger.log("error", {
-        message: "workflowService:executeWorkflow:inputValidationFailed",
-        params: { workflowID, errors },
-      });
-      throw new Error(`Workflow input validation failed: ${JSON.stringify(errors)}`);
-    }
-
-    // Start workflow with resolved inputs
-    const result = await startWorkflow({ workflowID, tenantID, inputValues: resolved });
-
-    Logger.log("success", {
-      message: "workflowService:executeWorkflow:started",
-      params: { instanceID: result.instanceID },
-    });
-
-    return result;
-  } catch (error) {
-    Logger.log("error", {
-      message: "workflowService:executeWorkflow:failure",
-      params: { workflowID, error: error.message },
-    });
-    throw error;
-  }
-};
 
 /**
  * Get the status and logs of a workflow run.

@@ -6,25 +6,62 @@
 const { prisma } = require('../../config/prisma.config');
 const { listenerEngine } = require('./listenerEngine/engine');
 const Logger = require('../../utils/logger');
+const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
+const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 const listenerService = {
 
   // ─── Listener CRUD ────────────────────────────────────────────────────────
 
-  async getAllListeners({ tenantID }) {
+  async getAllListeners({ tenantID, search, page, pageSize }) {
     Logger.log("info", {
       message: "listenerService:getAllListeners:params",
-      params: { tenantID },
+      params: { tenantID, search, page, pageSize },
     });
     try {
-      const listeners = await prisma.tblListeners.findMany({
-        where: { tenantID },
+      const where = { tenantID };
+
+      if (search) {
+        where.OR = [
+          {
+            listenerTitle: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+          {
+            listenerDescription: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+          {
+            listenerType: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        ];
+      }
+
+      const findManyOptions = {
+        where,
         include: {
           tblListenerActions: { orderBy: { orderIndex: 'asc' } },
           tblDatasources: { select: { datasourceID: true, datasourceTitle: true, datasourceType: true } },
         },
         orderBy: { createdAt: 'desc' },
-      });
+      };
+
+      if (page && pageSize) {
+        findManyOptions.skip = (page - 1) * pageSize;
+        findManyOptions.take = pageSize;
+      }
+
+      const [listeners, totalCount] = await Promise.all([
+        prisma.tblListeners.findMany(findManyOptions),
+        prisma.tblListeners.count({ where }),
+      ]);
 
       for (const listener of listeners) {
         const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
@@ -33,9 +70,16 @@ const listenerService = {
 
       Logger.log("success", {
         message: "listenerService:getAllListeners:success",
-        params: { count: listeners.length },
+        params: { count: listeners.length, totalCount },
       });
-      return listeners;
+
+      return {
+        listeners,
+        totalCount,
+        page: page || 1,
+        pageSize: pageSize || listeners.length,
+        totalPages: pageSize ? Math.ceil(totalCount / pageSize) : 1,
+      };
     } catch (error) {
       Logger.log("error", {
         message: "listenerService:getAllListeners:error",
@@ -78,12 +122,17 @@ const listenerService = {
     }
   },
 
-  async createListener({ tenantID, data }) {
+  async createListener({ tenantID, userID, data, authContext }) {
     Logger.log("info", {
       message: "listenerService:createListener:params",
-      params: { tenantID, data },
+      params: { tenantID, userID, data, authContext },
     });
     try {
+      const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+      const finalCreatorID = creatorID || userID;
+      if (!finalCreatorID && !createdByApiKeyID) {
+        throw new Error("Creator ID or Created By API Key ID is required");
+      }
       const listener = await prisma.$transaction(async (tx) => {
         const created = await tx.tblListeners.create({
           data: {
@@ -95,6 +144,8 @@ const listenerService = {
             listenerConfig: data.listenerConfig || {},
             status: data.status || 'inactive',
             endpointPath: data.endpointPath || null,
+            creatorID: finalCreatorID,
+            createdByApiKeyID,
           },
           include: {
             tblListenerActions: { orderBy: { orderIndex: 'asc' } },
@@ -118,6 +169,8 @@ const listenerService = {
 
         return created;
       });
+
+      await grantCreatorAccess(tenantID, "listener", listener.listenerID, authContext, creatorID || userID);
 
       Logger.log('success', {
         message: 'listenerService:createListener:success',
@@ -246,6 +299,8 @@ const listenerService = {
         where: { listenerID },
       });
 
+      await removePoliciesForResource(tenantID, `listener:${listenerID}`);
+
       Logger.log('success', {
         message: 'listenerService:deleteListener:success',
         params: { listenerID },
@@ -263,10 +318,10 @@ const listenerService = {
 
   // ─── Clone ────────────────────────────────────────────────────────────
 
-  async cloneListener({ tenantID, listenerID }) {
+  async cloneListener({ tenantID, listenerID, userID, authContext }) {
     Logger.log("info", {
       message: "listenerService:cloneListener:params",
-      params: { tenantID, listenerID },
+      params: { tenantID, listenerID, userID, authContext },
     });
     try {
       const existing = await prisma.tblListeners.findFirst({
@@ -275,6 +330,11 @@ const listenerService = {
       });
       if (!existing) throw new Error("Listener not found");
 
+      const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+      const finalCreatorID = creatorID || userID;
+      if (!finalCreatorID && !createdByApiKeyID) {
+        throw new Error("Creator ID or Created By API Key ID is required");
+      }
       const newListener = await prisma.$transaction(async (tx) => {
         const created = await tx.tblListeners.create({
           data: {
@@ -285,6 +345,8 @@ const listenerService = {
             listenerType: existing.listenerType,
             listenerConfig: existing.listenerConfig,
             status: "inactive",
+            creatorID: finalCreatorID,
+            createdByApiKeyID,
           },
         });
 
@@ -303,6 +365,8 @@ const listenerService = {
 
         return created;
       });
+
+      await grantCreatorAccess(tenantID, "listener", newListener.listenerID, authContext, finalCreatorID);
 
       Logger.log("success", {
         message: "listenerService:cloneListener:success",

@@ -27,6 +27,8 @@ cronJobController.createCronJob = async (req, res) => {
       retryDelaySeconds,
     } = req.body;
 
+    const authContext = getServiceAuthContext(req);
+
     Logger.log("info", {
       message: "cronJobController:createCronJob:params",
       params: {
@@ -41,6 +43,7 @@ cronJobController.createCronJob = async (req, res) => {
         timeoutSeconds,
         retryAttempts,
         retryDelaySeconds,
+        authContext,
       },
     });
 
@@ -56,6 +59,7 @@ cronJobController.createCronJob = async (req, res) => {
       timeoutSeconds,
       retryAttempts,
       retryDelaySeconds,
+      authContext,
     });
 
     Logger.log("success", {
@@ -104,15 +108,19 @@ cronJobController.getAllCronJobs = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const { search, page, pageSize } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "cronJobController:getAllCronJobs:params",
-      params: { userID: user.userID, tenantID, authContext },
+      params: { userID: user.userID, tenantID, search, page, pageSize, authContext },
     });
 
-    const cronJobs = await cronJobService.getAllCronJobs({
+    const result = await cronJobService.getAllCronJobs({
       userID: user.userID,
       tenantID,
+      search,
+      page,
+      pageSize,
       authContext,
     });
 
@@ -121,12 +129,16 @@ cronJobController.getAllCronJobs = async (req, res) => {
       params: {
         userID: user.userID,
         tenantID,
-        cronJobsLength: cronJobs.length,
+        cronJobsLength: result.cronJobs.length,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      cronJobs,
+      cronJobs: result.cronJobs,
+      totalCount: result.totalCount,
+      totalPages: result.totalPages,
+      page: result.page,
+      pageSize: result.pageSize,
       message: "Cron jobs fetched successfully.",
     });
   } catch (error) {
@@ -344,15 +356,17 @@ cronJobController.cloneCronJob = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, cronJobID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "cronJobController:cloneCronJob:params",
-      params: { userID: user.userID, tenantID, cronJobID },
+      params: { userID: user.userID, tenantID, cronJobID, authContext },
     });
 
     const clonedCronJob = await cronJobService.cloneCronJob({
       userID: user.userID,
       tenantID: tenantID,
       cronJobID: cronJobID,
+      authContext,
     });
 
     Logger.log("success", {

@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useMemo, useRef } from "react";
-import { ArrowRightToLine, Braces, Clock, Code, Columns, Eraser, FileJson, GitBranch, Map, Play, Repeat, Square, Terminal, Zap } from 'lucide-react';
+import { ArrowRightToLine, Braces, Clock, Code, Columns, Eraser, FileJson, GitBranch, Map as MapIcon, Play, Repeat, Square, Terminal, Zap } from 'lucide-react';
 import ReactFlow, {
     ReactFlowProvider,
     Controls,
@@ -28,8 +28,11 @@ import {
     ResizablePanelGroup,
 } from "../ui/resizable";
 
-import { useDataQueries } from "../../../logic/hooks/useDataQueries";
-import { useDatasources } from "../../../logic/hooks/useDatasources";
+import { useInfiniteDataQueries } from "../../../logic/hooks/useDataQueries";
+import { useInfiniteDatasources } from "../../../logic/hooks/useDatasources";
+import { getDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { useQueries } from "@tanstack/react-query";
+import debounce from "lodash/debounce";
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
 import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
 import { WorkflowConsole } from "./workflowConsole";
@@ -40,7 +43,6 @@ import { DataQueryTestingPanel } from "../dataQueryComponents/dataQueryTestingPa
 import { useParams } from "react-router-dom";
 import { useWorkflowRun } from "./useWorkflowRun";
 import { useEffect } from "react";
-import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 import { Button, Checkbox, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 // Dagre graph for auto-layout
@@ -123,8 +125,64 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     // Destructure for cleaner access
     const { values, setFieldValue, errors, handleChange, handleBlur } = workflowEditorForm;
     const { tenantID } = useParams();
-    const { dataQueries, refetchDataQueries, isLoadingDataQueries, loadDataQueriesError } = useDataQueries(tenantID);
-    const { datasources, refetchDatasources, isLoadingDatasources, loadDatasourcesError } = useDatasources(tenantID);
+    
+    // Infinite Search Hooks
+    const [querySearch, setQuerySearch] = useState("");
+    const debouncedSetQuerySearch = useMemo(() => debounce(setQuerySearch, 300), []);
+    const { 
+        dataQueries = [], 
+        refetchDataQueries, 
+        isLoadingDataQueries, 
+        loadDataQueriesError,
+        fetchNextPage: fetchNextQueriesPage,
+        hasNextPage: hasNextQueriesPage,
+        isFetchingNextPage: isFetchingNextQueriesPage
+    } = useInfiniteDataQueries(tenantID, querySearch);
+
+    const [datasourceSearch, setDatasourceSearch] = useState("");
+    const debouncedSetDatasourceSearch = useMemo(() => debounce(setDatasourceSearch, 300), []);
+    const { 
+        datasources = [], 
+        refetchDatasources, 
+        isLoadingDatasources, 
+        loadDatasourcesError,
+        fetchNextPage: fetchNextDatasourcesPage,
+        hasNextPage: hasNextDatasourcesPage,
+        isFetchingNextPage: isFetchingNextDatasourcesPage
+    } = useInfiniteDatasources(tenantID, datasourceSearch);
+
+    // Collect Data Query IDs from Nodes to fetch specific details
+    const neededQueryIDs = useMemo(() => {
+        const ids = new Set();
+        values.nodes?.forEach((node) => {
+            if (node.type === "dataQuery" && node.data?.dataQueryID) {
+                ids.add(String(node.data.dataQueryID));
+            }
+        });
+        return Array.from(ids);
+    }, [values.nodes]);
+
+    // Fetch details for specific node references
+    const queryDetails = useQueries({
+        queries: neededQueryIDs.map((id) => ({
+            queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), "detail", id],
+            queryFn: () => getDataQueryByIDAPI({ tenantID, dataQueryID: id }),
+            staleTime: Infinity,
+        }))
+    });
+
+    // Create a union of infinite paginated list and specifically resolved node references
+    const unionDataQueries = useMemo(() => {
+        const map = new Map();
+        dataQueries.forEach(q => map.set(String(q.dataQueryID), q));
+        queryDetails.forEach(qRes => {
+            if (qRes.data && qRes.data.dataQueryID) {
+                map.set(String(qRes.data.dataQueryID), qRes.data);
+            }
+        });
+        return Array.from(map.values());
+    }, [dataQueries, queryDetails]);
+
     const [selectedNodeId, setSelectedNodeId] = useState(null);
     const [showSchemaPanel, setShowSchemaPanel] = useState(false);
     const [showMiniMap, setShowMiniMap] = useState(true);
@@ -365,7 +423,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
     return (
         <WorkflowNodesProvider
-            dataQueries={dataQueries}
+            dataQueries={unionDataQueries}
             datasources={datasources}
             strings={CONSTANTS.STRINGS}
             onRefreshDataQueries={refetchDataQueries}
@@ -377,8 +435,22 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             workflowContext={workflowContext}
             tenantID={tenantID}
             onQueryTest={handleQueryTest}
+            
+            // Infinite Scroll props for UI
+            querySearch={querySearch}
+            setQuerySearch={debouncedSetQuerySearch}
+            fetchNextQueriesPage={fetchNextQueriesPage}
+            hasNextQueriesPage={hasNextQueriesPage}
+            isFetchingNextQueriesPage={isFetchingNextQueriesPage}
+            isLoadingDataQueries={isLoadingDataQueries}
+            
+            datasourceSearch={datasourceSearch}
+            setDatasourceSearch={debouncedSetDatasourceSearch}
+            fetchNextDatasourcesPage={fetchNextDatasourcesPage}
+            hasNextDatasourcesPage={hasNextDatasourcesPage}
+            isFetchingNextDatasourcesPage={isFetchingNextDatasourcesPage}
+            isLoadingDatasources={isLoadingDatasources}
         >
-        <ReactQueryLoadingErrorWrapper isLoading={isLoadingDataQueries || isLoadingDatasources} error={loadDataQueriesError || loadDatasourcesError}>
             <WorkflowEdgeContext.Provider value={{ deleteEdge, updateEdge }}>
                 <ReactFlowProvider>
                     <ResizablePanelGroup
@@ -413,9 +485,6 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                     <p className="text-[10px] font-bold text-muted-foreground tracking-wider mb-0.5">Nodes</p>
                                     {Object.values(WORKFLOW_NODES_MAP)
                                         .filter(node => {
-                                            if (node.value === 'dataQuery' && (!dataQueries || dataQueries.length === 0)) {
-                                                return false;
-                                            }
                                             return true;
                                         })
                                         .map((node) => (
@@ -623,7 +692,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         >
                                             <Controls>
                                                 <ControlButton onClick={() => setShowMiniMap(!showMiniMap)} title="Toggle MiniMap">
-                                                    <Map />
+                                                    <MapIcon />
                                                 </ControlButton>
                                             </Controls>
                                             {showMiniMap && <MiniMap />}
@@ -723,7 +792,6 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
                 </ReactFlowProvider>
             </WorkflowEdgeContext.Provider>
-        </ReactQueryLoadingErrorWrapper>
         </WorkflowNodesProvider>
     );
 };

@@ -156,10 +156,7 @@ export default class KafkaDataSource extends DataSource {
               timestamp: message.timestamp,
             });
 
-            // If consumeAndStore, execute the store query
-            if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-              await context.executeDataQuery(storeDestination.dataQueryId, { message: content });
-            }
+
 
             if (messages.length >= messageCount) {
               clearTimeout(timeout);

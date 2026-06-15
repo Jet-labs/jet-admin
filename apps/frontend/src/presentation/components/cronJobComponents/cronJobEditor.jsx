@@ -1,19 +1,17 @@
-import React from "react";
-import { useCallback, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { CONSTANTS } from "../../../constants";
 import { CronJobScheduler } from "./cronJobScheduler";
-import { useWorkflows } from "../../../logic/hooks/useWorkflows";
+import { useInfiniteWorkflows } from "../../../logic/hooks/useWorkflows";
+import { getWorkflowByIDAPI } from "../../../data/apis/workflow";
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@uidotdev/usehooks";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
   Input,
   Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  SearchSelect,
   InputValuesForm,
   Switch,
   Section,
@@ -34,7 +32,25 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
   };
 
   const { tenantID } = useParams();
-  const { workflows, isLoadingWorkflows, loadWorkflowsError } = useWorkflows(tenantID);
+  const [workflowSearch, setWorkflowSearch] = useState("");
+  const debouncedWorkflowSearch = useDebounce(workflowSearch, 300);
+
+  const {
+    workflows,
+    isLoadingWorkflows,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    loadWorkflowsError,
+  } = useInfiniteWorkflows(tenantID, debouncedWorkflowSearch);
+
+  const selectedWorkflowID = cronJobEditorForm.values?.workflowID;
+  const { data: selectedWorkflowDetail } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "detail", selectedWorkflowID],
+    queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID: selectedWorkflowID }),
+    enabled: Boolean(tenantID) && Boolean(selectedWorkflowID),
+    refetchOnWindowFocus: false,
+  });
 
   const _handleOnScheduleChange = useCallback(
     (value) => {
@@ -45,19 +61,19 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
 
   const selectedWorkflow = useMemo(
     () =>
+      selectedWorkflowDetail ||
       workflows?.find(
         (w) =>
           String(w.workflowID) ===
-          String(cronJobEditorForm.values?.workflowID)
-      ) ?? null,
-    [workflows, cronJobEditorForm.values?.workflowID]
+          String(selectedWorkflowID)
+      ) || null,
+    [selectedWorkflowDetail, workflows, selectedWorkflowID]
   );
 
   const touched = cronJobEditorForm.touched ?? {};
   const errors = cronJobEditorForm.errors ?? {};
 
   return (
-    <ReactQueryLoadingErrorWrapper isLoading={isLoadingWorkflows} error={loadWorkflowsError}>
     <div className="w-full space-y-3">
 
       {/* ── Identity ──────────────────────────────────────────────────────── */}
@@ -113,30 +129,26 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
         <div className="space-y-1.5">
           <Label htmlFor="workflowID">Workflow</Label>
           {workflows ? (
-            <Select
+            <SearchSelect
               value={
                 cronJobEditorForm.values.workflowID
                   ? String(cronJobEditorForm.values.workflowID)
                   : ""
               }
-              onValueChange={(val) =>
+              onChange={(val) =>
                 cronJobEditorForm.setFieldValue("workflowID", val)
               }
-            >
-              <SelectTrigger id="workflowID">
-                <SelectValue placeholder="Select a workflow…" />
-              </SelectTrigger>
-              <SelectContent>
-                {workflows.map((workflow) => (
-                  <SelectItem
-                    key={`workflow_item_${workflow.workflowID}`}
-                    value={String(workflow.workflowID)}
-                  >
-                    {workflow.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              options={workflows.map((workflow) => ({
+                value: String(workflow.workflowID),
+                label: workflow.title,
+              }))}
+              onSearchChange={setWorkflowSearch}
+              onLoadMore={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              isLoading={isLoadingWorkflows}
+              placeholder="Select a workflow…"
+            />
           ) : (
             <div className="flex h-8 w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom px-2.5 py-1.5 text-sm text-muted-foreground animate-pulse">
               <span>Loading workflows...</span>
@@ -239,6 +251,5 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
       </div>
 
     </div>
-    </ReactQueryLoadingErrorWrapper>
   );
 };

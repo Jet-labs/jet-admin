@@ -28,6 +28,7 @@ import {
   UserCog,
   Users,
   Activity,
+  Workflow
 } from "lucide-react";
 
 import {
@@ -178,7 +179,7 @@ export const MainDrawerList = () => {
     {
       type: "link",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_WORKFLOWS_TITLE,
-      icon: GitBranch,
+      icon: Workflow,
       path: CONSTANTS.ROUTES.VIEW_WORKFLOWS.path(tenantID),
     },
     {

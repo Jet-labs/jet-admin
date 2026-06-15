@@ -47,12 +47,26 @@ formValidations.addTenantRoleFormValidationSchema = Yup.object().shape({
   roleTitle: Yup.string().required("Role name is required").trim(),
   roleDescription: Yup.string().required("Role description is required").trim(),
   permissionIDs: Yup.array().of(Yup.string()),
+  assetPermissions: Yup.array().of(
+    Yup.object().shape({
+      resourceType: Yup.string().required("Resource type is required"),
+      resourceID: Yup.string().required("Resource ID is required"),
+      action: Yup.string().required("Action is required"),
+    })
+  ),
 });
 
 formValidations.updateTenantRoleFormValidationSchema = Yup.object().shape({
   roleTitle: Yup.string().required("Role name is required").trim(),
   roleDescription: Yup.string().required("Role description is required").trim(),
   permissionIDs: Yup.array().of(Yup.string()),
+  assetPermissions: Yup.array().of(
+    Yup.object().shape({
+      resourceType: Yup.string().required("Resource type is required"),
+      resourceID: Yup.string().required("Resource ID is required"),
+      action: Yup.string().required("Action is required"),
+    })
+  ),
 });
 
 formValidations.addDashboardFormValidationSchema = Yup.object().shape({

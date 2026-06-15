@@ -1,14 +1,17 @@
 import React, { useCallback, useState, useMemo } from "react";
-import { Plus, Trash2, Key, Database, PanelTop, MessageSquare, ChevronDown, ChevronUp, Info } from 'lucide-react';
+import { Plus, Trash2, Key, Database, PanelTop, MessageSquare, ChevronDown, ChevronUp, Info, GitBranch } from 'lucide-react';
 import PropTypes from "prop-types";
 import { getWidgetEventTypes, getWidgetMethods, getEventInputDefinitions } from "@jet-admin/widget-types";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { useParams } from "react-router-dom";
 import { useQueryClient, useQueries } from "@tanstack/react-query";
-import { useDataQueries } from "../../../logic/hooks/useDataQueries";
-import { useWorkflows } from "../../../logic/hooks/useWorkflows";
+import { useInfiniteDataQueries } from "../../../logic/hooks/useDataQueries";
+import { useInfiniteWorkflows } from "../../../logic/hooks/useWorkflows";
 import { CONSTANTS } from "../../../constants";
 import { getWidgetByIDAPI } from "../../../data/apis/widget";
+import { getDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { getWorkflowByIDAPI } from "../../../data/apis/workflow";
+import { useDebounce } from "@uidotdev/usehooks";
 
 import {
   Button,
@@ -19,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
   Card,
+  SearchSelect,
 } from "@jet-admin/ui";
 
 const ACTION_TYPES = [
@@ -58,6 +62,24 @@ const ACTION_TYPES = [
     border: "border-border/50",
     description: "Show a toast notification",
   },
+  {
+    value: "TRIGGER_WORKFLOW",
+    label: "Trigger Workflow",
+    icon: GitBranch,
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border/50",
+    description: "Run a background workflow directly",
+  },
+  {
+    value: "TRIGGER_QUERY",
+    label: "Trigger Query",
+    icon: Database,
+    color: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border/50",
+    description: "Run a data query directly",
+  },
 ];
 
 const getShallowKeys = (obj) => {
@@ -77,8 +99,13 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
 
   const { tenantID } = useParams();
   const queryClient = useQueryClient();
-  const { dataQueries = [] } = useDataQueries(tenantID);
-  const { workflows = [] } = useWorkflows(tenantID);
+  const [querySearch, setQuerySearch] = useState("");
+  const debouncedQuerySearch = useDebounce(querySearch, 300);
+  const { dataQueries = [], isLoadingDataQueries, fetchNextPage: fetchNextQueriesPage, hasNextPage: hasNextQueriesPage, isFetchingNextPage: isFetchingNextQueriesPage } = useInfiniteDataQueries(tenantID, debouncedQuerySearch);
+
+  const [workflowSearch, setWorkflowSearch] = useState("");
+  const debouncedWorkflowSearch = useDebounce(workflowSearch, 300);
+  const { workflows = [], isLoadingWorkflows, fetchNextPage: fetchNextWorkflowsPage, hasNextPage: hasNextWorkflowsPage, isFetchingNextPage: isFetchingNextWorkflowsPage } = useInfiniteWorkflows(tenantID, debouncedWorkflowSearch);
 
   // Page-level data sources from appPageConfig
   const pageDataSources = useMemo(
@@ -86,20 +113,72 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
     [appPageEditorForm?.values?.appPageConfig?.dataSources]
   );
 
+  const events = widgetEditorForm.values.widgetConfig?.events || {};
+
+  // Collect all queryIDs and workflowIDs needed for input definitions
+  const neededQueryIDs = useMemo(() => {
+    const ids = new Set();
+    pageDataSources.forEach(ds => { if (ds.type === "query" && ds.queryID) ids.add(String(ds.queryID)); });
+    Object.values(events).flat().forEach(action => {
+      if (action.actionType === "TRIGGER_QUERY" && action.config?.queryID) ids.add(String(action.config.queryID));
+    });
+    return Array.from(ids);
+  }, [pageDataSources, events]);
+
+  const neededWorkflowIDs = useMemo(() => {
+    const ids = new Set();
+    pageDataSources.forEach(ds => { if (ds.type === "workflow" && ds.workflowID) ids.add(String(ds.workflowID)); });
+    Object.values(events).flat().forEach(action => {
+      if (action.actionType === "TRIGGER_WORKFLOW" && action.config?.workflowID) ids.add(String(action.config.workflowID));
+    });
+    return Array.from(ids);
+  }, [pageDataSources, events]);
+
+  const queryDetails = useQueries({
+    queries: neededQueryIDs.map((id) => ({
+      queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), "detail", id],
+      queryFn: () => getDataQueryByIDAPI({ tenantID, dataQueryID: id }),
+      staleTime: Infinity,
+    }))
+  });
+
+  const workflowDetails = useQueries({
+    queries: neededWorkflowIDs.map((id) => ({
+      queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "detail", id],
+      queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID: id }),
+      staleTime: Infinity,
+    }))
+  });
+
+  const resolvedQueries = useMemo(() => queryDetails.map(q => q.data).filter(Boolean), [queryDetails]);
+  const resolvedWorkflows = useMemo(() => workflowDetails.map(q => q.data).filter(Boolean), [workflowDetails]);
+
   // Look up input definitions for a page-level data source by alias
   const getInputDefinitionsForAlias = useCallback((alias) => {
     const ds = pageDataSources.find((s) => s.alias === alias);
     if (!ds) return [];
     if (ds.type === "query" && ds.queryID) {
-      const q = dataQueries.find((q) => String(q.dataQueryID) === String(ds.queryID));
+      const q = resolvedQueries.find((q) => String(q.dataQueryID) === String(ds.queryID));
       return q?.dataQueryOptions?.inputDefinitions || [];
     }
     if (ds.type === "workflow" && ds.workflowID) {
-      const wf = workflows.find((w) => String(w.workflowID) === String(ds.workflowID));
+      const wf = resolvedWorkflows.find((w) => String(w.workflowID) === String(ds.workflowID));
       return wf?.workflowOptions?.inputDefinitions || [];
     }
     return [];
-  }, [pageDataSources, dataQueries, workflows]);
+  }, [pageDataSources, resolvedQueries, resolvedWorkflows]);
+
+  const getInputDefinitionsForDirectAction = useCallback((actionType, config) => {
+    if (actionType === "TRIGGER_QUERY" && config?.queryID) {
+      const q = resolvedQueries.find((q) => String(q.dataQueryID) === String(config.queryID));
+      return q?.dataQueryOptions?.inputDefinitions || [];
+    }
+    if (actionType === "TRIGGER_WORKFLOW" && config?.workflowID) {
+      const wf = resolvedWorkflows.find((w) => String(w.workflowID) === String(config.workflowID));
+      return wf?.workflowOptions?.inputDefinitions || [];
+    }
+    return [];
+  }, [resolvedQueries, resolvedWorkflows]);
 
   const placedIDs = useMemo(() => {
     const placedKeys = appPageEditorForm?.values?.appPageConfig?.widgets || [];
@@ -118,7 +197,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
     return widgetQueries.map((q) => q.data).filter(Boolean);
   }, [widgetQueries]);
 
-  const events = widgetEditorForm.values.widgetConfig?.events || {};
+
   const [expandedActionPath, setExpandedActionPath] = useState(null);
 
   const widgetType = widgetEditorForm.values.widgetType;
@@ -178,6 +257,10 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
         defaultConfig = { targetWidgetID: "", methodName: "", args: [] };
       } else if (actionTypeValue === "SHOW_TOAST") {
         defaultConfig = { message: "", variant: "success" };
+      } else if (actionTypeValue === "TRIGGER_QUERY") {
+        defaultConfig = { queryID: "", inputValues: {} };
+      } else if (actionTypeValue === "TRIGGER_WORKFLOW") {
+        defaultConfig = { workflowID: "", inputValues: {} };
       }
       widgetEditorForm.setFieldValue(
         `widgetConfig.events.${eventType}[${actionIndex}].config`,
@@ -216,6 +299,14 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
     }
     if (actionType === "SHOW_TOAST") {
       return `Toast: "${config.message || "..."}"`;
+    }
+    if (actionType === "TRIGGER_QUERY") {
+      const q = resolvedQueries.find(q => String(q.dataQueryID) === String(config.queryID));
+      return `Trigger Query: ${q ? q.dataQueryTitle : config.queryID || "..."}`;
+    }
+    if (actionType === "TRIGGER_WORKFLOW") {
+      const wf = resolvedWorkflows.find(w => String(w.workflowID) === String(config.workflowID));
+      return `Trigger Workflow: ${wf ? wf.title : config.workflowID || "..."}`;
     }
     return "Not configured";
   };
@@ -425,28 +516,19 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                               <div className="space-y-1">
                                 <Label className="text-[10px] text-muted-foreground font-semibold">Data Source</Label>
                                 {pageDataSources.length > 0 ? (
-                                  <Select
+                                  <SearchSelect
                                     value={action.config?.alias || ""}
-                                    onValueChange={(val) => {
+                                    onChange={(val) => {
                                       handleActionConfigChange(eventType, actionIndex, "alias", val);
                                       handleActionConfigChange(eventType, actionIndex, "inputValues", {});
                                     }}
-                                  >
-                                    <SelectTrigger className="text-xs bg-background">
-                                      <SelectValue placeholder="Select a page data source…" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {pageDataSources.filter((ds) => ds.alias).map((ds) => (
-                                        <SelectItem key={ds.alias} value={ds.alias}>
-                                          <span className="flex items-center gap-2">
-                                            <Database className="h-3 w-3 text-muted-foreground" />
-                                            <span className="font-mono">{ds.alias}</span>
-                                            <span className="text-muted-foreground text-[9px] ml-1">({ds.type})</span>
-                                          </span>
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                    options={pageDataSources.filter((ds) => ds.alias).map((ds) => ({
+                                      value: ds.alias,
+                                      label: `${ds.alias} (${ds.type})`
+                                    }))}
+                                    placeholder="Select a page data source…"
+                                    className="text-xs bg-background"
+                                  />
                                 ) : (
                                   <div className="rounded-md border border-dashed border-border p-2.5 text-center">
                                     <p className="text-[10px] text-muted-foreground">No page-level data sources defined. Add them in the Data tab of the page editor.</p>
@@ -464,6 +546,126 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                       <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
                                     </div>
                                     <p className="text-[9px] text-muted-foreground">Override argument values when this data source is executed by this event action.</p>
+                                    {inputDefinitions.map((inputDef) => {
+                                      const inputKey = inputDef.key || inputDef.name;
+                                      return (
+                                        <div key={inputKey} className="space-y-0.5">
+                                          <Label className="text-[10px] font-medium text-muted-foreground">
+                                            {inputKey}
+                                            {inputDef.type && <span className="ml-1 text-muted-foreground/50">({inputDef.type})</span>}
+                                          </Label>
+                                          <TemplateAutocompleteInput
+                                            value={action.config?.inputValues?.[inputKey] ?? ""}
+                                            onChange={(val) => {
+                                              const updated = { ...(action.config?.inputValues || {}), [inputKey]: val };
+                                              handleActionConfigChange(eventType, actionIndex, "inputValues", updated);
+                                            }}
+                                            placeholder={inputDef.defaultValue || `e.g. {{ state.variables.${inputKey} }}`}
+                                            liveStateTree={localStateTree}
+                                          />
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          )}
+
+                          {action.actionType === "TRIGGER_QUERY" && (
+                            <div className="space-y-2">
+                              <div className="space-y-1">
+                                <Label className="text-[10px] text-muted-foreground font-semibold">Data Query</Label>
+                                <SearchSelect
+                                  value={action.config?.queryID || ""}
+                                  onChange={(val) => {
+                                    handleActionConfigChange(eventType, actionIndex, "queryID", val);
+                                    handleActionConfigChange(eventType, actionIndex, "inputValues", {});
+                                  }}
+                                  options={dataQueries.map((q) => ({
+                                    value: String(q.dataQueryID),
+                                    label: q.dataQueryTitle,
+                                  }))}
+                                  placeholder="Select a query…"
+                                  className="text-xs bg-background"
+                                  onSearchChange={setQuerySearch}
+                                  onLoadMore={fetchNextQueriesPage}
+                                  hasNextPage={hasNextQueriesPage}
+                                  isFetchingNextPage={isFetchingNextQueriesPage}
+                                  isLoading={isLoadingDataQueries}
+                                />
+                              </div>
+                              {/* Input Values */}
+                              {action.config?.queryID && (() => {
+                                const inputDefinitions = getInputDefinitionsForDirectAction(action.actionType, action.config);
+                                if (inputDefinitions.length === 0) return null;
+                                return (
+                                  <div className="rounded-md border border-border bg-muted/30 p-2 space-y-2">
+                                    <div className="flex items-center gap-1.5">
+                                      <Info className="h-3 w-3 text-muted-foreground" />
+                                      <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
+                                    </div>
+                                    <p className="text-[9px] text-muted-foreground">Override argument values when this query is executed.</p>
+                                    {inputDefinitions.map((inputDef) => {
+                                      const inputKey = inputDef.key || inputDef.name;
+                                      return (
+                                        <div key={inputKey} className="space-y-0.5">
+                                          <Label className="text-[10px] font-medium text-muted-foreground">
+                                            {inputKey}
+                                            {inputDef.type && <span className="ml-1 text-muted-foreground/50">({inputDef.type})</span>}
+                                          </Label>
+                                          <TemplateAutocompleteInput
+                                            value={action.config?.inputValues?.[inputKey] ?? ""}
+                                            onChange={(val) => {
+                                              const updated = { ...(action.config?.inputValues || {}), [inputKey]: val };
+                                              handleActionConfigChange(eventType, actionIndex, "inputValues", updated);
+                                            }}
+                                            placeholder={inputDef.defaultValue || `e.g. {{ state.variables.${inputKey} }}`}
+                                            liveStateTree={localStateTree}
+                                          />
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          )}
+
+                          {action.actionType === "TRIGGER_WORKFLOW" && (
+                            <div className="space-y-2">
+                              <div className="space-y-1">
+                                <Label className="text-[10px] text-muted-foreground font-semibold">Workflow</Label>
+                                <SearchSelect
+                                  value={action.config?.workflowID || ""}
+                                  onChange={(val) => {
+                                    handleActionConfigChange(eventType, actionIndex, "workflowID", val);
+                                    handleActionConfigChange(eventType, actionIndex, "inputValues", {});
+                                  }}
+                                  options={workflows.map((w) => ({
+                                    value: String(w.workflowID),
+                                    label: w.title,
+                                  }))}
+                                  placeholder="Select a workflow…"
+                                  className="text-xs bg-background"
+                                  onSearchChange={setWorkflowSearch}
+                                  onLoadMore={fetchNextWorkflowsPage}
+                                  hasNextPage={hasNextWorkflowsPage}
+                                  isFetchingNextPage={isFetchingNextWorkflowsPage}
+                                  isLoading={isLoadingWorkflows}
+                                />
+                              </div>
+                              {/* Input Values */}
+                              {action.config?.workflowID && (() => {
+                                const inputDefinitions = getInputDefinitionsForDirectAction(action.actionType, action.config);
+                                if (inputDefinitions.length === 0) return null;
+                                return (
+                                  <div className="rounded-md border border-border bg-muted/30 p-2 space-y-2">
+                                    <div className="flex items-center gap-1.5">
+                                      <Info className="h-3 w-3 text-muted-foreground" />
+                                      <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
+                                    </div>
+                                    <p className="text-[9px] text-muted-foreground">Override argument values when this workflow is executed.</p>
                                     {inputDefinitions.map((inputDef) => {
                                       const inputKey = inputDef.key || inputDef.name;
                                       return (

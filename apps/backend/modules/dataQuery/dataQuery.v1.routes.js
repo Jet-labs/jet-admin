@@ -3,20 +3,22 @@ const router = express.Router({ mergeParams: true });
 const { dataQueryController } = require("./dataQuery.controller");
 const { authMiddleware } = require("../auth/auth.middleware");
 const { validate, validateAll } = require("../../utils/validation.utils");
+const { dataQueryMiddleware } = require("./dataQuery.middleware");
 const {
   createDataQuerySchema,
   updateDataQuerySchema,
   testDataQuerySchema,
   runDataQueryByIDSchema,
-  aiGenerateSchema,
   dataQueryIdParamSchema,
+  listDataQueriesQuerySchema,
 } = require("./dataQuery.validator");
 
 // Database query routes
 
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:query:list"]),
+  validate(listDataQueriesQuerySchema, "query"),
+  authMiddleware.authorize("dataquery", "list"),
   dataQueryController.getAllDataQueries
 );
 
@@ -24,35 +26,49 @@ router.post(
   "/",
   validate(createDataQuerySchema, "body"),
   authMiddleware.authProvider,
-  authMiddleware.checkUserPermissions(["tenant:query:create"]),
+  authMiddleware.authorize([
+    {
+      resource: "dataquery",
+      action: "create",
+    },
+    {
+      resource: "datasource",
+      action: "read",
+      bodyKey: "datasourceID",
+    }
+  ]),
   dataQueryController.createDataQuery
-);
-
-router.post(
-  "/bulk",
-  authMiddleware.authProvider,
-  authMiddleware.checkUserPermissions(["tenant:query:bulk:create"]),
-  dataQueryController.createBulkDataQuery
 );
 
 router.post(
   "/:dataQueryID/clone",
   validate(dataQueryIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:query:clone"]),
+  dataQueryMiddleware.resolveDatasourceIDFromDB,
+  authMiddleware.authorize([
+    { resource: "dataquery", action: "create" },
+    { resource: "dataquery", action: "read", paramKey: "dataQueryID" },
+    { resource: "datasource", action: "read", reqKey: "datasourceID", skipIfMissing: true }
+  ]),
   dataQueryController.cloneDataQueryByID
 );
+
 
 router.patch(
   "/queryTest",
   validate(testDataQuerySchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:query:test"]),
+  authMiddleware.authorize([
+    { resource: "dataquery", action: "test" },
+    { resource: "datasource", action: "read", bodyKey: "datasourceID" }
+  ]),
   dataQueryController.runDataQueryByData
 );
 
 router.get(
   "/:dataQueryID",
   validate(dataQueryIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:query:read"]),
+  authMiddleware.authorize("dataquery", "read", {
+    paramKey: "dataQueryID",
+  }),
   dataQueryController.getDataQueryByID
 );
 
@@ -62,7 +78,9 @@ router.post(
     params: dataQueryIdParamSchema,
     body: runDataQueryByIDSchema,
   }),
-  authMiddleware.checkUserPermissions(["tenant:query:test"]),
+  authMiddleware.authorize("dataquery", "test", {
+    paramKey: "dataQueryID",
+  }),
   dataQueryController.runDataQueryByID
 );
 
@@ -72,7 +90,9 @@ router.post(
     params: dataQueryIdParamSchema,
     body: runDataQueryByIDSchema,
   }),
-  authMiddleware.checkUserPermissions(["tenant:query:read"]),
+  authMiddleware.authorize("dataquery", "execute", {
+    paramKey: "dataQueryID",
+  }),
   dataQueryController.runDataQueryByID
 );
 
@@ -82,14 +102,28 @@ router.patch(
     params: dataQueryIdParamSchema,
     body: updateDataQuerySchema,
   }),
-  authMiddleware.checkUserPermissions(["tenant:query:update"]),
+  authMiddleware.authorize([
+    {
+      resource: "dataquery",
+      action: "update",
+      paramKey: "dataQueryID",
+    },
+    {
+      resource: "datasource",
+      action: "read",
+      bodyKey: "datasourceID",
+      skipIfMissing: true,
+    }
+  ]),
   dataQueryController.updateDataQueryByID
 );
 
 router.delete(
   "/:dataQueryID",
   validate(dataQueryIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:query:delete"]),
+  authMiddleware.authorize("dataquery", "delete", {
+    paramKey: "dataQueryID",
+  }),
   dataQueryController.deleteDataQueryByID
 );
 

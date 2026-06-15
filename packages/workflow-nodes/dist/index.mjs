@@ -39,8 +39,10 @@ var WorkflowNodesContext = createContext(null);
 var WorkflowNodesProvider = ({
   children,
   dataQueries,
+  datasources,
   strings = {},
   onRefreshDataQueries,
+  onRefreshDatasources,
   workflowNodes = [],
   workflowEdges = [],
   // Edges for DAG traversal
@@ -52,20 +54,47 @@ var WorkflowNodesProvider = ({
   // The actual execution context (ctx)
   tenantID = null,
   // Tenant ID for API calls
-  onQueryTest = null
+  onQueryTest = null,
   // Callback for testing queries: (dataQueryID, inputValues) => Promise<result>
+  // Infinite Scroll props for UI
+  querySearch,
+  setQuerySearch,
+  fetchNextQueriesPage,
+  hasNextQueriesPage,
+  isFetchingNextQueriesPage,
+  isLoadingDataQueries,
+  datasourceSearch,
+  setDatasourceSearch,
+  fetchNextDatasourcesPage,
+  hasNextDatasourcesPage,
+  isFetchingNextDatasourcesPage,
+  isLoadingDatasources
 }) => {
   return /* @__PURE__ */ React.createElement(WorkflowNodesContext.Provider, { value: {
     dataQueries,
+    datasources,
     strings,
     onRefreshDataQueries,
+    onRefreshDatasources,
     workflowNodes,
     workflowEdges,
     workflowInputDefinitions,
     nodeExecutionStatus,
     workflowContext,
     tenantID,
-    onQueryTest
+    onQueryTest,
+    querySearch,
+    setQuerySearch,
+    fetchNextQueriesPage,
+    hasNextQueriesPage,
+    isFetchingNextQueriesPage,
+    isLoadingDataQueries,
+    datasourceSearch,
+    setDatasourceSearch,
+    fetchNextDatasourcesPage,
+    hasNextDatasourcesPage,
+    isFetchingNextDatasourcesPage,
+    isLoadingDatasources
   } }, children);
 };
 var useWorkflowNodes = () => {
@@ -567,7 +596,7 @@ import {
 
 // src/nodes/dataQueryNode.jsx
 import { Zap, RefreshCw, Ban as Ban2, Play } from "lucide-react";
-import { Button as Button2 } from "@jet-admin/ui";
+import { Button as Button2, Label } from "@jet-admin/ui";
 var ERROR_HANDLING_OPTIONS2 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
@@ -575,7 +604,21 @@ var ERROR_HANDLING_OPTIONS2 = {
   RETRY_THEN_FAIL: "retry_then_fail"
 };
 var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, workflowEdges, workflowInputDefinitions, onQueryTest } = useWorkflowNodes();
+  const {
+    dataQueries,
+    strings,
+    onRefreshDataQueries,
+    workflowNodes,
+    workflowEdges,
+    workflowInputDefinitions,
+    onQueryTest,
+    querySearch,
+    setQuerySearch,
+    fetchNextQueriesPage,
+    hasNextQueriesPage,
+    isFetchingNextQueriesPage,
+    isLoadingDataQueries
+  } = useWorkflowNodes();
   const [formData, setFormData] = useState2({
     title: data?.title || "",
     description: data?.description || "",
@@ -608,13 +651,12 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     return dataQueries?.find((q) => q.dataQueryID == formData.dataQueryID) || null;
   }, [dataQueries, formData.dataQueryID]);
   const schema = useMemo2(() => {
-    const queryEnums = dataQueries?.map((q) => String(q.dataQueryID)) || [""];
     return {
       type: "object",
       properties: {
+        dataQueryID: { type: "string", title: "Data Query" },
         title: { type: "string", title: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL || "Node Title" },
         description: { type: "string", title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || "Description" },
-        dataQueryID: { type: "string", title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL || "Data Query", enum: queryEnums.length > 0 ? queryEnums : [""] },
         inputValues: { type: "object", title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || "Inputs" },
         outputVariable: { type: "string", title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || "Output Variable Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$" },
         timeoutSeconds: { type: "integer", title: strings.WORKFLOW_EDITOR_TIMEOUT_LABEL || "Timeout (seconds)", minimum: 1, maximum: 3600, default: 300 },
@@ -625,7 +667,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       },
       required: ["dataQueryID"]
     };
-  }, [dataQueries, strings]);
+  }, [strings]);
   const upstreamStateTree = useMemo2(() => {
     const tree = { ctx: { input: {} } };
     if (workflowInputDefinitions && workflowInputDefinitions.length > 0) {
@@ -667,13 +709,17 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         type: "Control",
         scope: "#/properties/dataQueryID",
         options: {
-          placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SELECT_LABEL || "Select a query",
-          enumLabels: dataQueries?.reduce((acc, q) => {
-            acc[String(q.dataQueryID)] = q.dataQueryTitle;
-            return acc;
-          }, {}) || {},
-          showRefreshButton: !!onRefreshDataQueries,
-          onRefresh: onRefreshDataQueries
+          isSearchSelect: true,
+          placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_PLACEHOLDER || "Select a data query\u2026",
+          options: (dataQueries || []).map((q) => ({
+            value: String(q.dataQueryID),
+            label: q.dataQueryTitle
+          })),
+          onSearchChange: setQuerySearch,
+          onLoadMore: fetchNextQueriesPage,
+          hasNextPage: hasNextQueriesPage,
+          isFetchingNextPage: isFetchingNextQueriesPage,
+          isLoading: isLoadingDataQueries
         }
       }
     ];
@@ -715,7 +761,12 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     };
   }, [dataQueries, strings, selectedQuery, upstreamStateTree, onRefreshDataQueries]);
   const handleFormChange = useCallback2(({ data: newData }) => {
-    setFormData(newData);
+    setFormData((prev) => {
+      if (prev.dataQueryID !== newData.dataQueryID) {
+        return { ...newData, inputValues: {} };
+      }
+      return newData;
+    });
   }, []);
   const handleSave = useCallback2(() => {
     onChange(formData);
@@ -2267,7 +2318,7 @@ import {
   SelectTrigger as SelectTrigger2,
   SelectValue as SelectValue2,
   Checkbox,
-  Label,
+  Label as Label2,
   Textarea as Textarea2
 } from "@jet-admin/ui";
 var FIELD_TYPES = [
@@ -2350,7 +2401,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       expiryMinutes: Number(expiryMinutes) || 60
     });
   }, [title, description, collectionType, fields, outputVariable, expiryMinutes, onChange]);
-  return /* @__PURE__ */ React10.createElement("div", { className: "w-full p-2 space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Modal title"), /* @__PURE__ */ React10.createElement(
+  return /* @__PURE__ */ React10.createElement("div", { className: "w-full p-2 space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label2, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Modal title"), /* @__PURE__ */ React10.createElement(
     Input3,
     {
       value: title,
@@ -2358,7 +2409,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       placeholder: "Input required",
       className: "h-8 text-sm"
     }
-  )), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Instructions"), /* @__PURE__ */ React10.createElement(
+  )), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label2, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Instructions"), /* @__PURE__ */ React10.createElement(
     Textarea2,
     {
       value: description,
@@ -2367,7 +2418,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       placeholder: "Tell the user what to fill in...",
       className: "w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-brand-dark transition-colors"
     }
-  )), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Collection method"), /* @__PURE__ */ React10.createElement(Select2, { value: collectionType, onValueChange: setCollectionType }, /* @__PURE__ */ React10.createElement(SelectTrigger2, { className: "h-8 text-xs" }, /* @__PURE__ */ React10.createElement(SelectValue2, null)), /* @__PURE__ */ React10.createElement(SelectContent2, null, COLLECTION_TYPES.map((t) => /* @__PURE__ */ React10.createElement(SelectItem2, { key: t.value, value: t.value, disabled: t.disabled, className: "text-xs" }, t.label))))), collectionType === "form" && /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Form fields"), /* @__PURE__ */ React10.createElement(
+  )), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label2, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Collection method"), /* @__PURE__ */ React10.createElement(Select2, { value: collectionType, onValueChange: setCollectionType }, /* @__PURE__ */ React10.createElement(SelectTrigger2, { className: "h-8 text-xs" }, /* @__PURE__ */ React10.createElement(SelectValue2, null)), /* @__PURE__ */ React10.createElement(SelectContent2, null, COLLECTION_TYPES.map((t) => /* @__PURE__ */ React10.createElement(SelectItem2, { key: t.value, value: t.value, disabled: t.disabled, className: "text-xs" }, t.label))))), collectionType === "form" && /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label2, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Form fields"), /* @__PURE__ */ React10.createElement(
     Button8,
     {
       type: "button",
@@ -2384,7 +2435,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       key: field.id,
       className: "rounded-md border border-border p-3 bg-muted/20 space-y-2"
     },
-    /* @__PURE__ */ React10.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label, null, "Key"), /* @__PURE__ */ React10.createElement(
+    /* @__PURE__ */ React10.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label2, null, "Key"), /* @__PURE__ */ React10.createElement(
       Input3,
       {
         value: field.key,
@@ -2392,7 +2443,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
         placeholder: "field_name",
         className: "h-7 text-xs font-mono"
       }
-    )), /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label, null, "Label"), /* @__PURE__ */ React10.createElement(
+    )), /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label2, null, "Label"), /* @__PURE__ */ React10.createElement(
       Input3,
       {
         value: field.label,
@@ -2413,7 +2464,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       },
       /* @__PURE__ */ React10.createElement(Trash23, { className: "w-2.5 h-2.5" })
     )),
-    /* @__PURE__ */ React10.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label, null, "Type"), /* @__PURE__ */ React10.createElement(
+    /* @__PURE__ */ React10.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label2, null, "Type"), /* @__PURE__ */ React10.createElement(
       Select2,
       {
         value: field.fieldType,
@@ -2421,7 +2472,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       },
       /* @__PURE__ */ React10.createElement(SelectTrigger2, { className: "h-7 text-xs" }, /* @__PURE__ */ React10.createElement(SelectValue2, null)),
       /* @__PURE__ */ React10.createElement(SelectContent2, null, FIELD_TYPES.map((t) => /* @__PURE__ */ React10.createElement(SelectItem2, { key: t.value, value: t.value, className: "text-xs" }, t.label)))
-    )), /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label, null, "Placeholder"), /* @__PURE__ */ React10.createElement(
+    )), /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label2, null, "Placeholder"), /* @__PURE__ */ React10.createElement(
       Input3,
       {
         value: field.placeholder,
@@ -2429,14 +2480,14 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
         placeholder: "Optional hint",
         className: "h-7 text-xs"
       }
-    )), /* @__PURE__ */ React10.createElement(Label, { className: "flex items-center gap-1" }, /* @__PURE__ */ React10.createElement(
+    )), /* @__PURE__ */ React10.createElement(Label2, { className: "flex items-center gap-1" }, /* @__PURE__ */ React10.createElement(
       Checkbox,
       {
         checked: field.required,
         onCheckedChange: (v) => updateField(field.id, { required: v })
       }
     ), "Req.")),
-    field.fieldType === "select" && /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement(Label, null, "Options ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground/50" }, "(comma-separated)")), /* @__PURE__ */ React10.createElement(
+    field.fieldType === "select" && /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement(Label2, null, "Options ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground/50" }, "(comma-separated)")), /* @__PURE__ */ React10.createElement(
       Input3,
       {
         value: field.options,
@@ -2445,7 +2496,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
         className: "h-7 text-xs"
       }
     ))
-  ))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Output variable"), /* @__PURE__ */ React10.createElement(
+  ))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label2, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Output variable"), /* @__PURE__ */ React10.createElement(
     Input3,
     {
       value: outputVariable,
@@ -2453,7 +2504,7 @@ var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
       placeholder: "collectedData",
       className: "h-8 text-xs font-mono"
     }
-  ), /* @__PURE__ */ React10.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Access via", " ", /* @__PURE__ */ React10.createElement("code", { className: "bg-muted px-1 rounded-sm font-mono" }, `{{ctx.${outputVariable || "collectedData"}}}`))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Expiry (minutes) \u2014 0 = never"), /* @__PURE__ */ React10.createElement(
+  ), /* @__PURE__ */ React10.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Access via", " ", /* @__PURE__ */ React10.createElement("code", { className: "bg-muted px-1 rounded-sm font-mono" }, `{{ctx.${outputVariable || "collectedData"}}}`))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label2, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Expiry (minutes) \u2014 0 = never"), /* @__PURE__ */ React10.createElement(
     Input3,
     {
       type: "number",

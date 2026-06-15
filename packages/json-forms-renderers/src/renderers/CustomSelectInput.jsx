@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { RefreshCw } from 'lucide-react';
-import { Button, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@jet-admin/ui';
+import { Button, Label, SearchSelect } from '@jet-admin/ui';
 
 export const CustomSelectInput = (props) => {
   const {
@@ -56,6 +56,11 @@ export const CustomSelectInput = (props) => {
 
   const hasErrors = errors && errors.length > 0;
 
+  const selectOptions = options.map((optionValue) => ({
+    value: optionValue,
+    label: getDisplayName(optionValue),
+  }));
+
   return (
     <div className="">
       <Label
@@ -65,22 +70,14 @@ export const CustomSelectInput = (props) => {
         {label || description}
       </Label>
       <div className="flex items-center gap-2">
-        <Select value={data || ""} onValueChange={(val) => handleChange(path, val)} disabled={isDisabled}>
-          <SelectTrigger
-            id={path}
-            size="sm"
-            className={`${hasErrors ? "border-red-500" : ""}`}
-          >
-            <SelectValue placeholder={uischema?.options?.placeholder || "Select an option"} />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((optionValue) => (
-              <SelectItem key={optionValue} value={optionValue}>
-                {getDisplayName(optionValue)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchSelect
+          value={data || ""}
+          onChange={(val) => handleChange(path, val)}
+          options={selectOptions}
+          disabled={isDisabled}
+          placeholder={uischema?.options?.placeholder || "Select an option"}
+          className={`${hasErrors ? "border-red-500" : ""}`}
+        />
         {showRefreshButton && onRefresh && (
           <Button
             type="button"

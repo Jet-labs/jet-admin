@@ -23,7 +23,6 @@ const SECONDARY_SHELVES = ['row', 'column', 'shape', 'opacity', 'detail', 'text'
  */
 export const ShelfBuilder = ({
   widgetEditorForm,
-  workflows,
   queryResults,
   stateTree,
   liveStateTree,
@@ -59,13 +58,6 @@ export const ShelfBuilder = ({
 
   const [showSecondary, setShowSecondary] = useState(false);
   const [showStyle, setShowStyle] = useState(false);
-
-  // Selected workflow
-  const selectedWorkflow = useMemo(() => {
-    const wID = widgetEditorForm.values.workflowID;
-    if (!wID || !workflows) return null;
-    return workflows.find(w => String(w.workflowID) === String(wID));
-  }, [widgetEditorForm.values.workflowID, workflows]);
 
   // Resolved mark type for display
   const resolvedMark = useMemo(() => {
@@ -153,9 +145,7 @@ export const ShelfBuilder = ({
   }, [shelfSpec]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Quick fallback if no data source available
-  const hasDataSources = true; // Always true now since it's an input
-  const isWorkflowSelected = !!selectedWorkflow;
-  const hasAnyData = isWorkflowSelected || hasDataSources;
+  const hasAnyData = true; // Always true now since it's an input
 
   // Active encoding count
   const activeCount = [...PRIMARY_SHELVES, ...SECONDARY_SHELVES].filter(ch => shelfSpec.encoding[ch]?.field).length;
@@ -218,7 +208,6 @@ export const ShelfBuilder = ({
                   dataSource={shelfSpec.dataSource}
                   onDataSourceChange={handleDataSourceChange}
                   onFieldClick={handleFieldQuickAdd}
-                  workflow={selectedWorkflow}
                   compact
                 />
               </div>
@@ -364,7 +353,6 @@ export const ShelfBuilder = ({
 
 ShelfBuilder.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
-  workflows: PropTypes.array,
   queryResults: PropTypes.object,
   stateTree: PropTypes.object,
   liveStateTree: PropTypes.object,

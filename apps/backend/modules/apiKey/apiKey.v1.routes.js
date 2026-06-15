@@ -12,45 +12,54 @@ const {
 // Database APIKey routes
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:apikey:list"]),
+  authMiddleware.authorize("apikey", "list"),
   apiKeyController.getAllAPIKeys
 );
 
 router.post(
   "/",
-    validate(createApiKeySchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:apikey:create"]),
+  validate(createApiKeySchema, "body"),
+  authMiddleware.authorize("apikey", "create"),
   apiKeyController.createAPIKey
 );
 
 router.get(
   "/:apiKeyID",
-    validate(apiKeyIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:apikey:read"]),
+  validate(apiKeyIdParamSchema, "params"),
+  authMiddleware.authorize("apikey", "read", {
+    paramKey: "apiKeyID",
+  }),
   apiKeyController.getAPIKeyByID
 );
 
 router.patch(
   "/:apiKeyID",
-    validateAll({
-        params: apiKeyIdParamSchema,
-        body: updateApiKeySchema,
-    }),
-  authMiddleware.checkUserPermissions(["tenant:apikey:update"]),
+  validateAll({
+      params: apiKeyIdParamSchema,
+      body: updateApiKeySchema,
+  }),
+  authMiddleware.authorize("apikey", "update", {
+    paramKey: "apiKeyID",
+  }),
   apiKeyController.updateAPIKeyByID
 );
 
 router.delete(
   "/:apiKeyID",
-    validate(apiKeyIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:apikey:delete"]),
+  validate(apiKeyIdParamSchema, "params"),
+  authMiddleware.authorize("apikey", "delete", {
+    paramKey: "apiKeyID",
+  }),
   apiKeyController.deleteAPIKeyByID
 );
 
 router.post(
   "/:apiKeyID/clone",
   validate(apiKeyIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:apikey:create"]),
+  authMiddleware.authorize([
+    { resource: "apikey", action: "create" },
+    { resource: "apikey", action: "read", paramKey: "apiKeyID" }
+  ]),
   apiKeyController.cloneAPIKey
 );
 

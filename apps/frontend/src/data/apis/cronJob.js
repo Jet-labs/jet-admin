@@ -5,7 +5,7 @@ import { firebaseAuth } from "../../config/firebase";
 import { CronJob } from "../models/cronJob";
 import { CronJobHistory } from "../models/cronJobHistory";
 
-export const getAllCronJobsAPI = async ({ tenantID }) => {
+export const getAllCronJobsAPI = async ({ tenantID, search, page, pageSize }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -13,12 +13,27 @@ export const getAllCronJobsAPI = async ({ tenantID }) => {
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.get(url, {
+        params: {
+          search,
+          page,
+          pageSize,
+        },
         headers: {
           authorization: `Bearer ${bearerToken}`,
         },
       });
       if (response.data && response.data.success === true) {
-        return CronJob.toList(response.data.cronJobs);
+        const cronJobsList = response.data.cronJobs ? CronJob.toList(response.data.cronJobs) : [];
+        if (response.data.totalCount !== undefined) {
+          return {
+            cronJobs: cronJobsList,
+            totalCount: response.data.totalCount,
+            totalPages: response.data.totalPages,
+            page: response.data.page,
+            pageSize: response.data.pageSize,
+          };
+        }
+        return cronJobsList;
       } else if (response.data.error) {
         throw response.data.error;
       } else {

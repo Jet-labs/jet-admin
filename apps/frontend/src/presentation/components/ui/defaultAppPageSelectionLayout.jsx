@@ -16,7 +16,7 @@ import { AppPageWidgetSlot } from "../appPageComponents/appPageWidgetSlot";
 import { AppPageRuntimeProvider } from "../../../logic/appPageRuntime/AppPageRuntimeProvider";
 import { AppPageDataSourceBootstrapper } from "../appPageComponents/appPageDataSourceBootstrapper";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import { Button, Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Button, Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SearchSelect } from "@jet-admin/ui";
 import { migrateV1ToV2, LayoutRenderer } from "../appPageComponents/layout/index.js";
 
 export const DefaultAppPageSelectionLayout = ({
@@ -38,7 +38,7 @@ export const DefaultAppPageSelectionLayout = ({
 
   const {
     isLoading: isLoadingAppPages,
-    data: appPages,
+    data: appPagesData,
     error: loadAppPagesError,
     isFetching: isFetchingAppPages,
     isRefetching: isRefetchingAppPages,
@@ -48,6 +48,10 @@ export const DefaultAppPageSelectionLayout = ({
     queryFn: () => getAllAppPagesAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
+
+  const appPages = Array.isArray(appPagesData)
+    ? appPagesData
+    : appPagesData?.appPages || [];
 
   const {
     isLoading: isLoadingAppPage,
@@ -115,21 +119,16 @@ export const DefaultAppPageSelectionLayout = ({
                 <Spinner size={16} className="text-primary" />
               ) : (
                 <>
-                  <Select value={pinnedAppPageID ? String(pinnedAppPageID) : undefined} onValueChange={(val) => _handleSetDefaultAppPage(val)}>
-                    <SelectTrigger className="text-xs">
-                      <SelectValue placeholder="Select an app page" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {appPages?.map((page) => (
-                        <SelectItem
-                          key={page.appPageID}
-                          value={String(page.appPageID)}
-                        >
-                          {page.appPageTitle}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchSelect
+                    value={pinnedAppPageID ? String(pinnedAppPageID) : ""}
+                    onChange={(val) => _handleSetDefaultAppPage(val)}
+                    options={(appPages || []).map((page) => ({
+                      value: String(page.appPageID),
+                      label: page.appPageTitle,
+                    }))}
+                    placeholder="Select an app page"
+                    className="text-xs"
+                  />
                   <Button
                     onClick={() => _handleSetDefaultAppPage(null)}
                     variant="primary-ghost" className="w-fit text-nowrap"
@@ -211,21 +210,16 @@ export const DefaultAppPageSelectionLayout = ({
                 {isUpdatingUserConfig ? (
                   <Spinner size={16} className="text-primary" />
                 ) : (
-                  <Select value={pinnedAppPageID ? String(pinnedAppPageID) : undefined} onValueChange={(val) => _handleSetDefaultAppPage(val)}>
-                    <SelectTrigger className="text-xs">
-                      <SelectValue placeholder="Select an app page" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {appPages?.map((page) => (
-                        <SelectItem
-                          key={page.appPageID}
-                          value={String(page.appPageID)}
-                        >
-                          {page.appPageTitle}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchSelect
+                    value={pinnedAppPageID ? String(pinnedAppPageID) : ""}
+                    onChange={(val) => _handleSetDefaultAppPage(val)}
+                    options={(appPages || []).map((page) => ({
+                      value: String(page.appPageID),
+                      label: page.appPageTitle,
+                    }))}
+                    placeholder="Select an app page"
+                    className="text-xs"
+                  />
                 )}
               </div>
             </div>

@@ -499,66 +499,96 @@ const systemUser = {
 async function main() {
   await prisma.$transaction(
     async (tx) => {
-      // 1. Create permissions
-      const createdPermissions = await tx.tblPermissions.createMany({
-        data: permissions,
-        skipDuplicates: true, // optional safety
-      });
-      console.log("Permissions created:", createdPermissions.count);
+      // 1. Fetch existing permissions
+      const existingPermissions = await tx.tblPermissions.findMany();
+      const existingPermissionTitles = new Set(
+        existingPermissions.map((p) => p.permissionTitle.toLowerCase())
+      );
 
-      // Fetch all permissions to map title -> ID
+      // Filter to only new permissions
+      const newPermissions = permissions.filter(
+        (p) => !existingPermissionTitles.has(p.permissionTitle.toLowerCase())
+      );
+
+      if (newPermissions.length > 0) {
+        const createdPermissions = await tx.tblPermissions.createMany({
+          data: newPermissions,
+        });
+        console.log("New permissions created:", createdPermissions.count);
+      } else {
+        console.log("No new permissions to create.");
+      }
+
+      // Fetch all permissions again to map title -> ID
       const allPermissions = await tx.tblPermissions.findMany();
       const permissionTitleToId = {};
       allPermissions.forEach((p) => {
-        permissionTitleToId[p.permissionTitle] = p.permissionID;
+        permissionTitleToId[p.permissionTitle.toLowerCase()] = p.permissionID;
       });
 
-      // 2. Create roles
-      const createdRoles = await tx.tblRoles.createMany({
-        data: roles,
-        skipDuplicates: true,
-      });
-      console.log("Roles created:", createdRoles.count);
+      // 2. Fetch existing roles
+      const existingRoles = await tx.tblRoles.findMany();
+      const existingRoleTitles = new Set(
+        existingRoles.map((r) => r.roleTitle.toLowerCase())
+      );
+
+      // Filter to only new roles
+      const newRoles = roles.filter(
+        (r) => !existingRoleTitles.has(r.roleTitle.toLowerCase())
+      );
+
+      if (newRoles.length > 0) {
+        const createdRoles = await tx.tblRoles.createMany({
+          data: newRoles,
+        });
+        console.log("New roles created:", createdRoles.count);
+      } else {
+        console.log("No new roles to create.");
+      }
 
       const allRoles = await tx.tblRoles.findMany();
       const roleTitleToId = {};
       allRoles.forEach((r) => {
-        roleTitleToId[r.roleTitle] = r.roleID;
+        roleTitleToId[r.roleTitle.toLowerCase()] = r.roleID;
       });
 
-      // 3. Prepare role-permission mappings
+      // 3. Fetch existing mappings to avoid duplicates
+      const existingMappings = await tx.tblRolePermissionMappings.findMany();
+      const existingMappingKeys = new Set(
+        existingMappings.map((m) => `${m.roleID}:${m.permissionID}`)
+      );
+
+      // Prepare role-permission mappings
       const rolePermissionData = [];
       for (const [roleTitle, permTitles] of Object.entries(
         rolePermissionsMap
       )) {
-        const roleId = roleTitleToId[roleTitle];
+        const roleId = roleTitleToId[roleTitle.toLowerCase()];
         if (!roleId) {
           console.warn(`Role ${roleTitle} not found`);
           continue;
         }
         for (const permTitle of permTitles) {
-          const permId = permissionTitleToId[permTitle];
+          const permId = permissionTitleToId[permTitle.toLowerCase()];
           if (!permId) {
             console.warn(`Permission ${permTitle} not found`);
             continue;
           }
-          rolePermissionData.push({ roleID: roleId, permissionID: permId });
+          const key = `${roleId}:${permId}`;
+          if (!existingMappingKeys.has(key)) {
+            rolePermissionData.push({ roleID: roleId, permissionID: permId });
+          }
         }
       }
 
-      await tx.tblRolePermissionMappings.createMany({
-        data: rolePermissionData,
-        skipDuplicates: true,
-      });
-      console.log(
-        "Role-permission mappings created:",
-        rolePermissionData.length
-      );
-
-      console.log(
-        "Role-permission mappings created:",
-        rolePermissionData.length
-      );
+      if (rolePermissionData.length > 0) {
+        const createdMappings = await tx.tblRolePermissionMappings.createMany({
+          data: rolePermissionData,
+        });
+        console.log("Role-permission mappings created:", createdMappings.count);
+      } else {
+        console.log("No new role-permission mappings to create.");
+      }
 
       // 4. Create System User
       const existingUser = await tx.tblUsers.findFirst({

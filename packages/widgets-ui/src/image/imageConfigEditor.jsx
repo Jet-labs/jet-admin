@@ -1,26 +1,76 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useContext, useState, useRef } from "react";
 import PropTypes from "prop-types";
-import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Button } from "@jet-admin/ui";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
+import { Upload, Loader2 } from "lucide-react";
+import { WidgetEditorContext } from "../context/WidgetEditorContext";
 
 export const ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = useMemo(() => ({ state: stateTree }), [stateTree]);
+  const { fileUpload } = useContext(WidgetEditorContext);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const res = await fileUpload.uploadFile(file);
+      if (res && res.url) {
+        widgetEditorForm.setFieldValue("widgetConfig.src", res.url);
+      }
+    } catch (err) {
+      console.error("Upload failed", err);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   return (
     <div className="space-y-2">
       {/* Image Source */}
-      <div className="space-y-1">
-        <Label className="text-xs font-medium text-foreground">Image URL / Source</Label>
-        <TemplateAutocompleteInput
-          value={config.src || ""}
-          onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.src", val)}
-          placeholder="e.g. {{state.queries.user.data.avatar_url}}"
-          liveStateTree={liveStateTree}
-        />
-        <p className="text-[10px] text-muted-foreground">
-          Supports template expressions for dynamic content.
-        </p>
+      <div className="space-y-3">
+        <div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept="image/*"
+            onChange={handleFileUpload}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full h-9 text-xs flex items-center justify-center"
+            disabled={isUploading}
+            onClick={(e) => {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }}
+          >
+            {isUploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+            Upload Image
+          </Button>
+        </div>
+
+        <div className="space-y-1 w-full min-w-0 overflow-hidden">
+          <Label className="text-xs font-medium text-foreground">Image URL / Source</Label>
+          <div className="w-full min-w-0">
+            <TemplateAutocompleteInput
+              value={config.src || ""}
+              onChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.src", val)}
+              placeholder="e.g. {{state.queries.user.data.avatar_url}}"
+              liveStateTree={liveStateTree}
+            />
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Supports template expressions for dynamic content.
+          </p>
+        </div>
       </div>
 
       {/* Alternative Text */}

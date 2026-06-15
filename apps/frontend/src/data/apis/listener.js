@@ -10,15 +10,32 @@ const _getHeaders = async () => {
   return { Authorization: `Bearer ${bearerToken}` };
 };
 
-export const getAllListenersAPI = async ({ tenantID }) => {
+export const getAllListenersAPI = async ({ tenantID, search, page, pageSize }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
       CONSTANTS.APIS.LISTENER.getAllListenersAPI(tenantID);
     const headers = await _getHeaders();
-    const response = await axios.get(url, { headers });
+    const response = await axios.get(url, {
+      headers,
+      params: {
+        search,
+        page,
+        pageSize,
+      },
+    });
     if (response.data && response.data.success === true) {
-      return Listener.toList(response.data.listeners);
+      const listenersList = response.data.listeners ? Listener.toList(response.data.listeners) : [];
+      if (response.data.totalCount !== undefined) {
+        return {
+          listeners: listenersList,
+          totalCount: response.data.totalCount,
+          totalPages: response.data.totalPages,
+          page: response.data.page,
+          pageSize: response.data.pageSize,
+        };
+      }
+      return listenersList;
     } else if (response.data.error) {
       throw response.data.error;
     } else {

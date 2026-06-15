@@ -9,6 +9,8 @@ const { prisma } = require("../../../config/prisma.config");
 const { workflowService } = require("../../workflow/workflow.service");
 const constants = require("../../../constants");
 const { resolveInputs, extractWorkflowDefinitions } = require("../../../utils/input.util");
+const { createSystemContext, ORIGIN_TYPES } = require("../../../utils/executionContext");
+const { authorizedExecuteWorkflow } = require("../../../utils/authorizedProxy");
 
 class CronJobEngine {
   constructor() {
@@ -35,10 +37,11 @@ class CronJobEngine {
         throw new Error(`Cron job input validation failed: ${JSON.stringify(errors)}`);
       }
 
-      const workflowRunResult = await workflowService.executeWorkflow({
+      const workflowRunResult = await authorizedExecuteWorkflow({
         workflowID: cronJob.workflowID,
         tenantID: cronJob.tenantID,
         inputValues: resolved,
+        executionCtx: createSystemContext(ORIGIN_TYPES.CRON, cronJob.cronJobID, cronJob.tenantID),
       });
 
       await prisma.tblCronJobHistory.create({

@@ -21,8 +21,6 @@ const VEGA_STRINGS = {
 export const VegaConfigEditor = ({
   widgetEditorForm,
   workflowContext,
-  workflows,
-  selectedWorkflow,
   queryResults,
   stateTree,
 }) => {
@@ -34,10 +32,6 @@ export const VegaConfigEditor = ({
   const [showParseWarning, setShowParseWarning] = useState(false);
   const [parseWarningsList, setParseWarningsList] = useState([]);
   const [showSettings, setShowSettings] = useState(false);
-
-  const resolvedSelectedWorkflow = selectedWorkflow || (workflows && widgetEditorForm.values.workflowID
-    ? workflows.find(w => String(w.workflowID) === String(widgetEditorForm.values.workflowID))
-    : null);
 
   // Handle mode switch
   const handleModeSwitch = (newMode) => {
@@ -90,7 +84,6 @@ export const VegaConfigEditor = ({
           {currentMode === 'visual' && !showParseWarning && (
             <ShelfBuilder
               widgetEditorForm={widgetEditorForm}
-              workflows={workflows}
               queryResults={queryResults}
               stateTree={stateTree}
               liveStateTree={liveStateTree}
@@ -129,7 +122,6 @@ export const VegaConfigEditor = ({
           value={widgetEditorForm.values.widgetConfig?.vegaSpec}
           onChange={(spec) => widgetEditorForm.setFieldValue('widgetConfig.vegaSpec', spec)}
           workflowContext={workflowContext}
-          workflow={resolvedSelectedWorkflow}
         />
       )}
 
@@ -150,7 +142,5 @@ export const VegaConfigEditor = ({
 VegaConfigEditor.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
   workflowContext: PropTypes.object,
-  workflows: PropTypes.array,
-  selectedWorkflow: PropTypes.object,
   queryResults: PropTypes.object,
 };

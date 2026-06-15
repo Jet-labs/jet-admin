@@ -4,7 +4,7 @@ import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import { Workflow } from "../models/workflow";
 
-export const getAllWorkflowsAPI = async ({ tenantID }) => {
+export const getAllWorkflowsAPI = async ({ tenantID, search, page, pageSize }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -12,12 +12,27 @@ export const getAllWorkflowsAPI = async ({ tenantID }) => {
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.get(url, {
+        params: {
+          search,
+          page,
+          pageSize,
+        },
         headers: {
           authorization: `Bearer ${bearerToken}`,
         },
       });
       if (response.data && response.data.success === true) {
-        return Workflow.toList(response.data.workflows);
+        const workflowsList = response.data.workflows ? Workflow.toList(response.data.workflows) : [];
+        if (response.data.totalCount !== undefined) {
+          return {
+            workflows: workflowsList,
+            totalCount: response.data.totalCount,
+            totalPages: response.data.totalPages,
+            page: response.data.page,
+            pageSize: response.data.pageSize,
+          };
+        }
+        return workflowsList;
       } else if (response.data.error) {
         throw response.data.error;
       } else {

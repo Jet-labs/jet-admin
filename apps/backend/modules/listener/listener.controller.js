@@ -14,22 +14,32 @@ const listenerController = {
     try {
       const { user } = req;
       const { tenantID } = req.params;
+      const { search, page, pageSize } = req.query;
       const authContext = getServiceAuthContext(req);
 
       Logger.log("info", {
         message: "listenerController:getAllListeners:params",
-        params: { userID: user.userID, tenantID, authContext },
+        params: { userID: user.userID, tenantID, search, page, pageSize, authContext },
       });
 
-      const listeners = await listenerService.getAllListeners({ tenantID });
+      const result = await listenerService.getAllListeners({
+        tenantID,
+        search,
+        page,
+        pageSize,
+      });
 
       Logger.log("success", {
         message: "listenerController:getAllListeners:success",
-        params: { listenersCount: listeners.length },
+        params: { listenersCount: result.listeners.length },
       });
 
       return expressUtils.sendResponse(res, true, {
-        listeners,
+        listeners: result.listeners,
+        totalCount: result.totalCount,
+        totalPages: result.totalPages,
+        page: result.page,
+        pageSize: result.pageSize,
         message: "Listeners fetched successfully.",
       });
     } catch (error) {
@@ -86,7 +96,7 @@ const listenerController = {
         params: { userID: user.userID, tenantID, authContext, data },
       });
 
-      const listener = await listenerService.createListener({ tenantID, data });
+      const listener = await listenerService.createListener({ tenantID, userID: user.userID, data, authContext });
 
       Logger.log("success", {
         message: "listenerController:createListener:success",
@@ -177,12 +187,13 @@ const listenerController = {
       const { user } = req;
       const { tenantID, listenerID } = req.params;
 
+      const authContext = getServiceAuthContext(req);
       Logger.log("info", {
         message: "listenerController:cloneListener:params",
-        params: { userID: user.userID, tenantID, listenerID },
+        params: { userID: user.userID, tenantID, listenerID, authContext },
       });
 
-      const listener = await listenerService.cloneListener({ tenantID, listenerID });
+      const listener = await listenerService.cloneListener({ tenantID, listenerID, userID: user.userID, authContext });
 
       Logger.log("success", {
         message: "listenerController:cloneListener:success",

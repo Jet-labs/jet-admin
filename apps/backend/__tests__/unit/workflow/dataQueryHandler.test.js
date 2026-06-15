@@ -36,7 +36,7 @@ jest.mock('../../../utils/input.util', () => ({
   }),
 }));
 
-const { createQueryEngine } = require('../../../modules/dataQuery/dataQuery.service');
+const { authorizedExecuteDataQuery } = require('../../../utils/authorizedProxy');
 const { resolveTemplate } = require("@jet-admin/expression-engine");
 
 const WORKFLOW_TEMPLATE_OPTIONS = {
@@ -44,10 +44,13 @@ const WORKFLOW_TEMPLATE_OPTIONS = {
 };
 const dataQueryHandler = require('../../../modules/workflow/workers/handlers/dataQueryHandler');
 
+jest.mock('../../../utils/authorizedProxy', () => ({
+  authorizedExecuteDataQuery: jest.fn()
+}));
+
 describe('workflow dataQueryHandler', () => {
   it('recursively resolves nested inputValues before executing the query engine', async () => {
-    const executeQuery = jest.fn().mockResolvedValue([{ id: 1 }]);
-    createQueryEngine.mockReturnValue({ executeQuery });
+    authorizedExecuteDataQuery.mockResolvedValue([{ id: 1 }]);
 
     const context = {
       input: {
@@ -78,22 +81,24 @@ describe('workflow dataQueryHandler', () => {
       }
     );
 
-    expect(executeQuery).toHaveBeenCalledWith('query-1', {
-      customerID: 42,
-      filters: {
-        status: 'active',
-        tags: ['vip'],
-        profile: { tier: 'gold' },
-      },
-      labels: ['customer_42', ['vip']],
-    });
+    expect(authorizedExecuteDataQuery).toHaveBeenCalledWith(expect.objectContaining({
+      dataQueryID: 'query-1',
+      executionInputs: {
+        customerID: 42,
+        filters: {
+          status: 'active',
+          tags: ['vip'],
+          profile: { tier: 'gold' },
+        },
+        labels: ['customer_42', ['vip']],
+      }
+    }));
     expect(result.output.queryResult).toEqual([{ id: 1 }]);
     expect(result.output.success).toBe(true);
   });
 
   it('does not resolve raw ctx paths when mustache syntax is bypassed', async () => {
-    const executeQuery = jest.fn().mockResolvedValue([{ id: 1 }]);
-    createQueryEngine.mockReturnValue({ executeQuery });
+    authorizedExecuteDataQuery.mockResolvedValue([{ id: 1 }]);
 
     await dataQueryHandler.execute(
       {
@@ -108,8 +113,11 @@ describe('workflow dataQueryHandler', () => {
       }
     );
 
-    expect(executeQuery).toHaveBeenCalledWith('query-2', {
-      customerID: 'ctx.input.customerID',
-    });
+    expect(authorizedExecuteDataQuery).toHaveBeenCalledWith(expect.objectContaining({
+      dataQueryID: 'query-2',
+      executionInputs: {
+        customerID: 'ctx.input.customerID',
+      }
+    }));
   });
 });

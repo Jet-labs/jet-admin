@@ -319,7 +319,6 @@ export const VegaSpecEditor = ({
   onChange,
   onError,
   workflowContext = null,
-  workflow = null,
   disabled = false,
 }) => {
   const [showTemplates, setShowTemplates] = useState(false);
@@ -503,7 +502,6 @@ VegaSpecEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
   onError: PropTypes.func,
   workflowContext: PropTypes.object,
-  workflow: PropTypes.object,
   placeholder: PropTypes.string,
   disabled: PropTypes.bool,
   theme: PropTypes.oneOf(["light", "dark"]),

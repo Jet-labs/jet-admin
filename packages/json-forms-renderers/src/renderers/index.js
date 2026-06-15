@@ -25,6 +25,7 @@ import { CustomTabRenderer } from './CustomTabRenderer.jsx';
 import { CustomHorizontalLayout } from './CustomHorizontalLayout.jsx';
 import { CustomFileUploadInput } from './CustomFileUploadInput.jsx';
 import { CustomGoogleOAuthButtonControl } from './CustomGoogleOAuthButtonControl.jsx';
+import { CustomSearchSelectInput } from './CustomSearchSelectInput.jsx';
 
 // Export raw renderers
 export {
@@ -48,6 +49,7 @@ export {
   CustomHorizontalLayout,
   CustomFileUploadInput,
   CustomGoogleOAuthButtonControl,
+  CustomSearchSelectInput,
 };
 
 // Export HOC wrapped components with Jet prefix for uniformity
@@ -70,6 +72,7 @@ export const JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);
 export const JetTabLayout = withJsonFormsLayoutProps(CustomTabRenderer);
 export const JetHorizontalLayout = withJsonFormsLayoutProps(CustomHorizontalLayout);
 export const JetFileUploadControl = withJsonFormsControlProps(CustomFileUploadInput);
+export const JetSearchSelectControl = withJsonFormsControlProps(CustomSearchSelectInput);
 
 // Note: CustomGoogleOAuthButtonControl is already wired to OAuthContext internally,
 // but we wrap it in withJsonFormsControlProps here to seamlessly integrate into

@@ -121,8 +121,10 @@ var WorkflowNodesContext = (0, import_react.createContext)(null);
 var WorkflowNodesProvider = ({
   children,
   dataQueries,
+  datasources,
   strings = {},
   onRefreshDataQueries,
+  onRefreshDatasources,
   workflowNodes = [],
   workflowEdges = [],
   // Edges for DAG traversal
@@ -134,20 +136,47 @@ var WorkflowNodesProvider = ({
   // The actual execution context (ctx)
   tenantID = null,
   // Tenant ID for API calls
-  onQueryTest = null
+  onQueryTest = null,
   // Callback for testing queries: (dataQueryID, inputValues) => Promise<result>
+  // Infinite Scroll props for UI
+  querySearch,
+  setQuerySearch,
+  fetchNextQueriesPage,
+  hasNextQueriesPage,
+  isFetchingNextQueriesPage,
+  isLoadingDataQueries,
+  datasourceSearch,
+  setDatasourceSearch,
+  fetchNextDatasourcesPage,
+  hasNextDatasourcesPage,
+  isFetchingNextDatasourcesPage,
+  isLoadingDatasources
 }) => {
   return /* @__PURE__ */ import_react.default.createElement(WorkflowNodesContext.Provider, { value: {
     dataQueries,
+    datasources,
     strings,
     onRefreshDataQueries,
+    onRefreshDatasources,
     workflowNodes,
     workflowEdges,
     workflowInputDefinitions,
     nodeExecutionStatus,
     workflowContext,
     tenantID,
-    onQueryTest
+    onQueryTest,
+    querySearch,
+    setQuerySearch,
+    fetchNextQueriesPage,
+    hasNextQueriesPage,
+    isFetchingNextQueriesPage,
+    isLoadingDataQueries,
+    datasourceSearch,
+    setDatasourceSearch,
+    fetchNextDatasourcesPage,
+    hasNextDatasourcesPage,
+    isFetchingNextDatasourcesPage,
+    isLoadingDatasources
   } }, children);
 };
 var useWorkflowNodes = () => {
@@ -623,7 +652,21 @@ var ERROR_HANDLING_OPTIONS2 = {
   RETRY_THEN_FAIL: "retry_then_fail"
 };
 var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, workflowEdges, workflowInputDefinitions, onQueryTest } = useWorkflowNodes();
+  const {
+    dataQueries,
+    strings,
+    onRefreshDataQueries,
+    workflowNodes,
+    workflowEdges,
+    workflowInputDefinitions,
+    onQueryTest,
+    querySearch,
+    setQuerySearch,
+    fetchNextQueriesPage,
+    hasNextQueriesPage,
+    isFetchingNextQueriesPage,
+    isLoadingDataQueries
+  } = useWorkflowNodes();
   const [formData, setFormData] = (0, import_react3.useState)({
     title: data?.title || "",
     description: data?.description || "",
@@ -656,13 +699,12 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     return dataQueries?.find((q) => q.dataQueryID == formData.dataQueryID) || null;
   }, [dataQueries, formData.dataQueryID]);
   const schema = (0, import_react3.useMemo)(() => {
-    const queryEnums = dataQueries?.map((q) => String(q.dataQueryID)) || [""];
     return {
       type: "object",
       properties: {
+        dataQueryID: { type: "string", title: "Data Query" },
         title: { type: "string", title: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL || "Node Title" },
         description: { type: "string", title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || "Description" },
-        dataQueryID: { type: "string", title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL || "Data Query", enum: queryEnums.length > 0 ? queryEnums : [""] },
         inputValues: { type: "object", title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || "Inputs" },
         outputVariable: { type: "string", title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || "Output Variable Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$" },
         timeoutSeconds: { type: "integer", title: strings.WORKFLOW_EDITOR_TIMEOUT_LABEL || "Timeout (seconds)", minimum: 1, maximum: 3600, default: 300 },
@@ -673,7 +715,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       },
       required: ["dataQueryID"]
     };
-  }, [dataQueries, strings]);
+  }, [strings]);
   const upstreamStateTree = (0, import_react3.useMemo)(() => {
     const tree = { ctx: { input: {} } };
     if (workflowInputDefinitions && workflowInputDefinitions.length > 0) {
@@ -715,13 +757,17 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         type: "Control",
         scope: "#/properties/dataQueryID",
         options: {
-          placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SELECT_LABEL || "Select a query",
-          enumLabels: dataQueries?.reduce((acc, q) => {
-            acc[String(q.dataQueryID)] = q.dataQueryTitle;
-            return acc;
-          }, {}) || {},
-          showRefreshButton: !!onRefreshDataQueries,
-          onRefresh: onRefreshDataQueries
+          isSearchSelect: true,
+          placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_PLACEHOLDER || "Select a data query\u2026",
+          options: (dataQueries || []).map((q) => ({
+            value: String(q.dataQueryID),
+            label: q.dataQueryTitle
+          })),
+          onSearchChange: setQuerySearch,
+          onLoadMore: fetchNextQueriesPage,
+          hasNextPage: hasNextQueriesPage,
+          isFetchingNextPage: isFetchingNextQueriesPage,
+          isLoading: isLoadingDataQueries
         }
       }
     ];
@@ -763,7 +809,12 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     };
   }, [dataQueries, strings, selectedQuery, upstreamStateTree, onRefreshDataQueries]);
   const handleFormChange = (0, import_react3.useCallback)(({ data: newData }) => {
-    setFormData(newData);
+    setFormData((prev) => {
+      if (prev.dataQueryID !== newData.dataQueryID) {
+        return { ...newData, inputValues: {} };
+      }
+      return newData;
+    });
   }, []);
   const handleSave = (0, import_react3.useCallback)(() => {
     onChange(formData);

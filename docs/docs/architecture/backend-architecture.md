@@ -242,10 +242,11 @@ graph TD
     end
     
     JS -->|Success| Action[pipelineWorker.js: _dispatchAction]
-    JS -->|Failure| DLQ[Insert tblEventDLQ]
+    JS -->|Failure| DLQ[Log / handle transformation failure]
     
     Action -->|trigger_workflow| RunWF[workflowService.executeWorkflow]
     Action -->|save_to_buffer| Buffer[Insert tblListenerEvents]
+    Action -->|push_to_app_page| Emit[Emit via Socket.IO]
 ```
 
 ### 1. Script Transformation Sandbox
@@ -259,9 +260,6 @@ Transformed event payloads trigger actions configured in the pipeline:
 *   **`trigger_workflow`**: Calls `workflowService.executeWorkflow` passing the transformed event payload as execution inputs.
 *   **`save_to_buffer`**: Appends the transformed record to the database buffer table `tblListenerEvents`.
 *   **`push_to_app_page`**: Emits real-time data overlays to active page views via Socket.IO.
-
-### 3. Failures & Retries (DLQ)
-Failed events are stored in `tblEventDLQ`. A background retry loop queries this table and attempts to process failed events up to a configured retry limit (default is 3).
 
 ---
 

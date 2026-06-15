@@ -95,14 +95,14 @@ router.get("/", tenantController.getAllUserTenants);
 router.get(
   "/:tenantID",
     validate(tenantIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:read"]),
+  authMiddleware.authorize("tenant", "read"),
   tenantController.getUserTenantByID
 );
 
 router.delete(
   "/:tenantID",
     validate(tenantIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:delete"]),
+  authMiddleware.authorize("tenant", "delete"),
   tenantController.deleteUserTenantByID
 );
 
@@ -121,7 +121,7 @@ router.patch(
         params: tenantIdParamSchema,
         body: updateTenantSchema,
     }),
-  authMiddleware.checkUserPermissions(["tenant:update"]),
+  authMiddleware.authorize("tenant", "update"),
   tenantController.updateTenant
 );
 
@@ -134,7 +134,6 @@ if (isModuleEnabled(constants.MODULES.USERMANAGEMENT)) {
     "/:tenantID/users",
       validate(tenantIdParamSchema, "params"),
     auditLogMiddleware.audit,
-    authMiddleware.checkUserPermissions(["tenant:user"]),
     userManagementRouter
   );
 }
@@ -148,7 +147,6 @@ if (isModuleEnabled(constants.MODULES.ROLE)) {
     "/:tenantID/roles",
       validate(tenantIdParamSchema, "params"),
     auditLogMiddleware.audit,
-    authMiddleware.checkUserPermissions(["tenant:role"]),
     tenantRoleRouter
   );
 }
@@ -162,7 +160,6 @@ if (isModuleEnabled(constants.MODULES.APIKEY)) {
     "/:tenantID/apikeys",
       validate(tenantIdParamSchema, "params"),
     auditLogMiddleware.audit,
-    authMiddleware.checkUserPermissions(["tenant:apikey"]),
     tenantAPIKeyRouter
   );
 }
@@ -176,7 +173,6 @@ if (isModuleEnabled(constants.MODULES.CRONJOB)) {
     "/:tenantID/cronjobs",
       validate(tenantIdParamSchema, "params"),
     auditLogMiddleware.audit,
-    authMiddleware.checkUserPermissions(["tenant:cronjobs"]),
     cronjobRouter
   );
 }
@@ -190,7 +186,6 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
     "/:tenantID/datasources",
       validate(tenantIdParamSchema, "params"),
     auditLogMiddleware.audit,
-    authMiddleware.checkUserPermissions(["tenant:datasource"]),
     datasourceRouter
   );
 }
@@ -200,7 +195,6 @@ router.use(
   "/:tenantID/listeners",
   validate(tenantIdParamSchema, "params"),
   auditLogMiddleware.audit,
-  authMiddleware.checkUserPermissions(["tenant:datasource"]),
   require("../listener/listener.v1.routes")
 );
 
@@ -213,7 +207,6 @@ if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
     "/:tenantID/queries",
       validate(tenantIdParamSchema, "params"),
     auditLogMiddleware.audit,
-    authMiddleware.checkUserPermissions(["tenant:query"]),
     dataQueryRouter
   );
 }
@@ -227,7 +220,6 @@ if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
     "/:tenantID/workflows",
       validate(tenantIdParamSchema, "params"),
     auditLogMiddleware.audit,
-    authMiddleware.checkUserPermissions(["tenant:workflow"]),
     workflowRouter
   );
 }
@@ -241,7 +233,6 @@ if (isModuleEnabled(constants.MODULES.WIDGET)) {
     "/:tenantID/widgets",
       validate(tenantIdParamSchema, "params"),
     auditLogMiddleware.audit,
-    authMiddleware.checkUserPermissions(["tenant:widget"]),
     widgetRouter
   );
 }
@@ -255,7 +246,6 @@ if (isModuleEnabled(constants.MODULES.APP_PAGE)) {
     "/:tenantID/app-pages",
       validate(tenantIdParamSchema, "params"),
     auditLogMiddleware.audit,
-    authMiddleware.checkUserPermissions(["tenant:appPage"]),
     appPageRouter
   );
 }
@@ -264,7 +254,6 @@ if (isModuleEnabled(constants.MODULES.APP_PAGE)) {
 router.use(
   "/:tenantID/audit",
     validate(tenantIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:audit"]),
   auditLogRouter
 );
 

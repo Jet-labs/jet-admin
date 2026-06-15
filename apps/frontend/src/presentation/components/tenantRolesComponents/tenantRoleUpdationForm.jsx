@@ -2,7 +2,7 @@ import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import {
   getTenantRoleByIDAPI,
   updateTenantRoleByIDAPI,
@@ -10,6 +10,7 @@ import {
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantRoleDeletionForm } from "./tenantRoleDeletionForm";
 import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput";
+import { TenantAssetPermissionsInput } from "./tenantAssetPermissionsInput";
 import { formValidations } from "../../../utils/formValidation";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { Button, Spinner, Input, Label, PageHeader, Section } from "@jet-admin/ui";
@@ -23,6 +24,7 @@ const initialValues = {
   roleTitle: "",
   roleDescription: "",
   permissionIDs: [],
+  assetPermissions: [],
 };
 
 export const TenantRoleUpdationForm = () => {
@@ -44,13 +46,38 @@ export const TenantRoleUpdationForm = () => {
     refetchOnWindowFocus: false,
   });
 
+  const parsedPermissions = useMemo(() => {
+    const permissionIDs = [];
+    const assetPermissions = [];
+
+    tenantRole?.tblRolePermissionMappings?.forEach((mapping) => {
+      const perm = mapping.tblPermissions;
+      if (!perm) return;
+
+      if (perm.permissionTitle.startsWith("tenant:asset:")) {
+        const parts = perm.permissionTitle.split(":");
+        if (parts.length === 5) {
+          assetPermissions.push({
+            resourceType: parts[2],
+            resourceID: parts[3],
+            action: parts[4],
+          });
+        }
+      } else {
+        permissionIDs.push(perm.permissionID);
+      }
+    });
+
+    return { permissionIDs, assetPermissions };
+  }, [tenantRole]);
+
   const { isPending: isUpdatingTenantRoleByID, mutate: updateTenantRoleByID } =
     useMutation({
-      mutationFn: ({ roleTitle, roleDescription, permissionIDs }) =>
+      mutationFn: ({ roleTitle, roleDescription, permissionIDs, assetPermissions }) =>
         updateTenantRoleByIDAPI({
           tenantID,
           tenantRoleID,
-          data: { roleTitle, roleDescription, permissionIDs },
+          data: { roleTitle, roleDescription, permissionIDs, assetPermissions },
         }),
       retry: false,
       onSuccess: () => {
@@ -69,19 +96,15 @@ export const TenantRoleUpdationForm = () => {
     initialValues: tenantRole ? {
       roleTitle: tenantRole.roleTitle || "",
       roleDescription: tenantRole.roleDescription || "",
-      permissionIDs:
-        tenantRole.tblRolePermissionMappings?.map(
-          (mapping) => mapping.permissionID
-        ) || [],
+      permissionIDs: parsedPermissions.permissionIDs,
+      assetPermissions: parsedPermissions.assetPermissions,
     } : initialValues,
     enableReinitialize: true,
     validationSchema: formValidations.updateTenantRoleFormValidationSchema,
-    onSubmit: ({ roleTitle, roleDescription, permissionIDs }) => {
-      updateTenantRoleByID({ roleTitle, roleDescription, permissionIDs });
+    onSubmit: ({ roleTitle, roleDescription, permissionIDs, assetPermissions }) => {
+      updateTenantRoleByID({ roleTitle, roleDescription, permissionIDs, assetPermissions });
     },
   });
-
-
 
   const _handleOnRolePermissionsSelectionChange = useCallback(
     (event) => {
@@ -125,7 +148,7 @@ export const TenantRoleUpdationForm = () => {
               <section className="mx-auto max-w-2xl w-full">
                 <form
                   id="update-role-form"
-                  className="space-y-4"
+                className="space-y-2"
                   onSubmit={updateTenantRoleByIDForm.handleSubmit}
                   noValidate
                 >
@@ -176,7 +199,7 @@ export const TenantRoleUpdationForm = () => {
                     </div>
                   </Section>
 
-                  <Section title="Permissions" description="Access controls granted by this role.">
+                <Section title="General Permissions" description="Access controls granted by this role globally.">
                     <TenantPermissionSelectionInput
                       label={
                         CONSTANTS.STRINGS
@@ -191,6 +214,23 @@ export const TenantRoleUpdationForm = () => {
                       }
                     />
                   </Section>
+
+                <Section title="Asset Permissions" description="Restrict access to specific resources (pages, queries, workflows, etc.).">
+                  <TenantAssetPermissionsInput
+                    value={updateTenantRoleByIDForm.values.assetPermissions}
+                    onChange={(event) => {
+                      updateTenantRoleByIDForm.setFieldValue(
+                        "assetPermissions",
+                        event.target.value
+                      );
+                    }}
+                    error={
+                      updateTenantRoleByIDForm.touched.assetPermissions
+                        ? updateTenantRoleByIDForm.errors.assetPermissions
+                        : undefined
+                    }
+                  />
+                </Section>
                 </form>
               </section>
             </div>

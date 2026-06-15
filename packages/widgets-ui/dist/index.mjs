@@ -1183,9 +1183,9 @@ var init_dateRangePickerConfigEditor = __esm({
 });
 
 // src/button/buttonWidget.jsx
-import React21, { useState as useState8 } from "react";
+import React21, { useState as useState9 } from "react";
 import PropTypes20 from "prop-types";
-import { Button as Button7, Spinner } from "@jet-admin/ui";
+import { Button as Button8, Spinner } from "@jet-admin/ui";
 var ButtonWidget;
 var init_buttonWidget = __esm({
   "src/button/buttonWidget.jsx"() {
@@ -1201,7 +1201,7 @@ var init_buttonWidget = __esm({
       isLoadingWorkflows
       // Loading state of the workflow
     }) => {
-      const [loading, setLoading] = useState8(false);
+      const [loading, setLoading] = useState9(false);
       const text = widgetConfig?.text || "Click Me";
       const variant = widgetConfig?.variant || "default";
       const size = widgetConfig?.size || "default";
@@ -1217,7 +1217,7 @@ var init_buttonWidget = __esm({
         }
       };
       return /* @__PURE__ */ React21.createElement(
-        Button7,
+        Button8,
         {
           variant,
           size,
@@ -1497,10 +1497,10 @@ var init_stat = __esm({
 });
 
 // src/alert/alertWidget.jsx
-import React24, { useState as useState9 } from "react";
+import React24, { useState as useState10 } from "react";
 import PropTypes23 from "prop-types";
 import { AlertCircle, CheckCircle, Info, X as X3, AlertTriangle as AlertTriangle2 } from "lucide-react";
-import { Button as Button8 } from "@jet-admin/ui";
+import { Button as Button9 } from "@jet-admin/ui";
 var AlertWidget;
 var init_alertWidget = __esm({
   "src/alert/alertWidget.jsx"() {
@@ -1508,7 +1508,7 @@ var init_alertWidget = __esm({
       widgetConfig,
       fireWidgetEvent
     }) => {
-      const [dismissed, setDismissed] = useState9(false);
+      const [dismissed, setDismissed] = useState10(false);
       const message = widgetConfig?.message || "Something requires your attention.";
       const title = widgetConfig?.title || "";
       const variant = widgetConfig?.variant || "info";
@@ -1543,7 +1543,7 @@ var init_alertWidget = __esm({
         /* @__PURE__ */ React24.createElement(Icon, { className: "h-5 w-5 shrink-0 mt-0.5" }),
         /* @__PURE__ */ React24.createElement("div", { className: "flex-1 min-w-0" }, title && /* @__PURE__ */ React24.createElement("h5", { className: "text-sm font-semibold mb-1 leading-none text-current" }, title), /* @__PURE__ */ React24.createElement("p", { className: "text-xs leading-relaxed text-current/80" }, message)),
         dismissible && /* @__PURE__ */ React24.createElement(
-          Button8,
+          Button9,
           {
             variant: "ghost",
             size: "icon",
@@ -1574,9 +1574,9 @@ var init_alert = __esm({
 });
 
 // src/form/formWidget.jsx
-import React25, { useState as useState10, useEffect as useEffect6 } from "react";
+import React25, { useState as useState11, useEffect as useEffect6 } from "react";
 import PropTypes24 from "prop-types";
-import { Button as Button9, Input as Input14, Label as Label14, Select as Select10, SelectContent as SelectContent10, SelectItem as SelectItem10, SelectTrigger as SelectTrigger10, SelectValue as SelectValue10, Checkbox as Checkbox8 } from "@jet-admin/ui";
+import { Button as Button10, Input as Input14, Label as Label14, Select as Select10, SelectContent as SelectContent10, SelectItem as SelectItem10, SelectTrigger as SelectTrigger10, SelectValue as SelectValue10, Checkbox as Checkbox8 } from "@jet-admin/ui";
 var FormWidget;
 var init_formWidget = __esm({
   "src/form/formWidget.jsx"() {
@@ -1588,7 +1588,7 @@ var init_formWidget = __esm({
       const submitLabel = widgetConfig?.submitLabel || "Submit";
       const size = widgetConfig?.size || "default";
       const showReset = widgetConfig?.showReset ?? false;
-      const [formData, setFormData] = useState10({});
+      const [formData, setFormData] = useState11({});
       useEffect6(() => {
         const defaults = {};
         fields.forEach((field) => {
@@ -1677,7 +1677,7 @@ var init_formWidget = __esm({
           ));
         })),
         /* @__PURE__ */ React25.createElement("div", { className: "flex items-center justify-end gap-2 pt-4 border-t border-border/40 mt-4" }, showReset && /* @__PURE__ */ React25.createElement(
-          Button9,
+          Button10,
           {
             type: "button",
             variant: "outline",
@@ -1686,7 +1686,7 @@ var init_formWidget = __esm({
           },
           "Reset"
         ), /* @__PURE__ */ React25.createElement(
-          Button9,
+          Button10,
           {
             type: "submit",
             className: "h-8 text-xs font-semibold px-4 bg-primary text-primary-foreground hover:bg-primary/95"
@@ -2017,13 +2017,13 @@ var init_timeInput = __esm({
 });
 
 // src/date-picker/datePickerWidget.jsx
-import React30, { useState as useState11, useEffect as useEffect7, useMemo as useMemo19 } from "react";
+import React30, { useState as useState12, useEffect as useEffect7, useMemo as useMemo19 } from "react";
 import PropTypes27 from "prop-types";
 import { Popover, PopoverContent, PopoverTrigger, Label as Label15, Input as Input16 } from "@jet-admin/ui";
 import { Calendar as CalendarIcon, X as X4 } from "lucide-react";
 import { setMonth, setHours, setMinutes, setSeconds } from "date-fns";
 function DatePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}, setWidgetState }) {
-  const [currentDate, setCurrentDate] = useState11(/* @__PURE__ */ new Date());
+  const [currentDate, setCurrentDate] = useState12(/* @__PURE__ */ new Date());
   const parsedValue = useMemo19(() => parseISOSafe(widgetState?.value), [widgetState?.value]);
   useEffect7(() => {
     if (!widgetState?.value && widgetConfig.defaultValue) {
@@ -2159,14 +2159,14 @@ var init_date_picker = __esm({
 });
 
 // src/date-range-picker/dateRangePickerWidget.jsx
-import React31, { useState as useState12, useEffect as useEffect8, useMemo as useMemo20 } from "react";
+import React31, { useState as useState13, useEffect as useEffect8, useMemo as useMemo20 } from "react";
 import PropTypes28 from "prop-types";
-import { Popover as Popover2, PopoverContent as PopoverContent2, PopoverTrigger as PopoverTrigger2, Label as Label16, Input as Input17, Button as Button10 } from "@jet-admin/ui";
+import { Popover as Popover2, PopoverContent as PopoverContent2, PopoverTrigger as PopoverTrigger2, Label as Label16, Input as Input17, Button as Button11 } from "@jet-admin/ui";
 import { CalendarRange, ArrowRight, X as X5 } from "lucide-react";
 import { setMonth as setMonth2, setHours as setHours2, setMinutes as setMinutes2, setSeconds as setSeconds2, addDays, startOfMonth as startOfMonth2, endOfMonth as endOfMonth2, startOfYear, endOfYear } from "date-fns";
 function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState = {}, setWidgetState }) {
-  const [currentDate, setCurrentDate] = useState12(/* @__PURE__ */ new Date());
-  const [hoverDate, setHoverDate] = useState12(null);
+  const [currentDate, setCurrentDate] = useState13(/* @__PURE__ */ new Date());
+  const [hoverDate, setHoverDate] = useState13(null);
   const parsedStart = useMemo20(() => parseISOSafe(widgetState?.start), [widgetState?.start]);
   const parsedEnd = useMemo20(() => parseISOSafe(widgetState?.end), [widgetState?.end]);
   useEffect8(() => {
@@ -2353,7 +2353,7 @@ function DateRangePickerWidget({ widgetConfig = {}, fireWidgetEvent, widgetState
       seconds: parsedEnd.getSeconds(),
       onChange: (time) => handleTimeChange("end", time)
     }
-  ))), widgetConfig.presets && widgetConfig.presets.length > 0 && /* @__PURE__ */ React31.createElement("div", { className: "border-t border-border p-3 flex flex-wrap gap-2 bg-muted/30" }, widgetConfig.presets.map((preset, i) => /* @__PURE__ */ React31.createElement(Button10, { key: i, variant: "outline", size: "sm", onClick: () => handlePresetClick(preset) }, preset.label))))));
+  ))), widgetConfig.presets && widgetConfig.presets.length > 0 && /* @__PURE__ */ React31.createElement("div", { className: "border-t border-border p-3 flex flex-wrap gap-2 bg-muted/30" }, widgetConfig.presets.map((preset, i) => /* @__PURE__ */ React31.createElement(Button11, { key: i, variant: "outline", size: "sm", onClick: () => handlePresetClick(preset) }, preset.label))))));
 }
 var init_dateRangePickerWidget = __esm({
   "src/date-range-picker/dateRangePickerWidget.jsx"() {
@@ -2383,7 +2383,7 @@ var init_date_range_picker = __esm({
 });
 
 // src/html/htmlWidget.jsx
-import React32, { useRef as useRef6, useEffect as useEffect9, useMemo as useMemo21 } from "react";
+import React32, { useRef as useRef7, useEffect as useEffect9, useMemo as useMemo21 } from "react";
 import PropTypes29 from "prop-types";
 var HtmlWidget;
 var init_htmlWidget = __esm({
@@ -2394,7 +2394,7 @@ var init_htmlWidget = __esm({
       onWidgetInit,
       fireWidgetEvent
     }) => {
-      const iframeRef = useRef6(null);
+      const iframeRef = useRef7(null);
       const html = widgetConfig?.html || "";
       const css = widgetConfig?.css || "";
       const allowScripts = widgetConfig?.allowScripts === true || widgetConfig?.allowScripts === "true";
@@ -2992,7 +2992,6 @@ var VegaSpecEditor = ({
   onChange,
   onError,
   workflowContext = null,
-  workflow = null,
   disabled = false
 }) => {
   const [showTemplates, setShowTemplates] = useState2(false);
@@ -3162,7 +3161,6 @@ VegaSpecEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
   onError: PropTypes.func,
   workflowContext: PropTypes.object,
-  workflow: PropTypes.object,
   placeholder: PropTypes.string,
   disabled: PropTypes.bool,
   theme: PropTypes.oneOf(["light", "dark"])
@@ -3968,7 +3966,6 @@ var PRIMARY_SHELVES = ["x", "y", "color", "size"];
 var SECONDARY_SHELVES = ["row", "column", "shape", "opacity", "detail", "text"];
 var ShelfBuilder = ({
   widgetEditorForm,
-  workflows,
   queryResults,
   stateTree,
   liveStateTree
@@ -4001,11 +3998,6 @@ var ShelfBuilder = ({
   }, [widgetEditorForm.values.widgetConfig?.shelfSpec]);
   const [showSecondary, setShowSecondary] = useState5(false);
   const [showStyle, setShowStyle] = useState5(false);
-  const selectedWorkflow = useMemo4(() => {
-    const wID = widgetEditorForm.values.workflowID;
-    if (!wID || !workflows) return null;
-    return workflows.find((w) => String(w.workflowID) === String(wID));
-  }, [widgetEditorForm.values.workflowID, workflows]);
   const resolvedMark = useMemo4(() => {
     if (shelfSpec.mark === "auto" || !shelfSpec.mark) {
       return inferMarkType(shelfSpec.encoding);
@@ -4070,9 +4062,7 @@ var ShelfBuilder = ({
     }, 200);
     return () => clearTimeout(timer);
   }, [shelfSpec]);
-  const hasDataSources = true;
-  const isWorkflowSelected = !!selectedWorkflow;
-  const hasAnyData = isWorkflowSelected || hasDataSources;
+  const hasAnyData = true;
   const activeCount = [...PRIMARY_SHELVES, ...SECONDARY_SHELVES].filter((ch) => shelfSpec.encoding[ch]?.field).length;
   return /* @__PURE__ */ React7.createElement("div", { className: "w-full" }, /* @__PURE__ */ React7.createElement(
     "button",
@@ -4105,7 +4095,6 @@ var ShelfBuilder = ({
       dataSource: shelfSpec.dataSource,
       onDataSourceChange: handleDataSourceChange,
       onFieldClick: handleFieldQuickAdd,
-      workflow: selectedWorkflow,
       compact: true
     }
   )), /* @__PURE__ */ React7.createElement("div", { className: "border-b border-border/50" }, /* @__PURE__ */ React7.createElement("div", { className: "px-2.5 py-1.5 bg-muted/20 flex items-center gap-1.5" }, /* @__PURE__ */ React7.createElement(Layers, { className: "w-3 h-3 text-muted-foreground" }), /* @__PURE__ */ React7.createElement("span", { className: "font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Encodings")), /* @__PURE__ */ React7.createElement("div", { className: "p-2 flex flex-col gap-1.5" }, PRIMARY_SHELVES.map((ch) => /* @__PURE__ */ React7.createElement(
@@ -4167,7 +4156,6 @@ var ShelfBuilder = ({
 };
 ShelfBuilder.propTypes = {
   widgetEditorForm: PropTypes6.object.isRequired,
-  workflows: PropTypes6.array,
   queryResults: PropTypes6.object,
   stateTree: PropTypes6.object,
   liveStateTree: PropTypes6.object
@@ -4179,8 +4167,6 @@ import { TemplateAutocompleteInput as TemplateAutocompleteInput2 } from "@jet-ad
 var VegaConfigEditor = ({
   widgetEditorForm,
   workflowContext,
-  workflows,
-  selectedWorkflow,
   queryResults,
   stateTree
 }) => {
@@ -4190,7 +4176,6 @@ var VegaConfigEditor = ({
   const [showParseWarning, setShowParseWarning] = useState6(false);
   const [parseWarningsList, setParseWarningsList] = useState6([]);
   const [showSettings, setShowSettings] = useState6(false);
-  const resolvedSelectedWorkflow = selectedWorkflow || (workflows && widgetEditorForm.values.workflowID ? workflows.find((w) => String(w.workflowID) === String(widgetEditorForm.values.workflowID)) : null);
   const handleModeSwitch = (newMode) => {
     if (newMode === currentMode) return;
     if (newMode === "visual") {
@@ -4223,7 +4208,6 @@ var VegaConfigEditor = ({
     ShelfBuilder,
     {
       widgetEditorForm,
-      workflows,
       queryResults,
       stateTree,
       liveStateTree
@@ -4233,8 +4217,7 @@ var VegaConfigEditor = ({
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,
       onChange: (spec) => widgetEditorForm.setFieldValue("widgetConfig.vegaSpec", spec),
-      workflowContext,
-      workflow: resolvedSelectedWorkflow
+      workflowContext
     }
   ), /* @__PURE__ */ React8.createElement("div", { className: "space-y-1 mt-2" }, /* @__PURE__ */ React8.createElement(Label2, { className: "text-xs font-medium text-foreground" }, "Is Loading Template ", /* @__PURE__ */ React8.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), /* @__PURE__ */ React8.createElement(
     TemplateAutocompleteInput2,
@@ -4249,8 +4232,6 @@ var VegaConfigEditor = ({
 VegaConfigEditor.propTypes = {
   widgetEditorForm: PropTypes7.object.isRequired,
   workflowContext: PropTypes7.object,
-  workflows: PropTypes7.array,
-  selectedWorkflow: PropTypes7.object,
   queryResults: PropTypes7.object
 };
 
@@ -4705,14 +4686,75 @@ FormConfigEditor.propTypes = {
 };
 
 // src/image/imageConfigEditor.jsx
-import React16, { useMemo as useMemo12 } from "react";
+import React16, { useMemo as useMemo12, useContext, useState as useState8, useRef as useRef6 } from "react";
 import PropTypes15 from "prop-types";
-import { Input as Input10, Label as Label9, Select as Select9, SelectContent as SelectContent9, SelectItem as SelectItem9, SelectTrigger as SelectTrigger9, SelectValue as SelectValue9 } from "@jet-admin/ui";
+import { Input as Input10, Label as Label9, Select as Select9, SelectContent as SelectContent9, SelectItem as SelectItem9, SelectTrigger as SelectTrigger9, SelectValue as SelectValue9, Button as Button7 } from "@jet-admin/ui";
 import { TemplateAutocompleteInput as TemplateAutocompleteInput8 } from "@jet-admin/ui";
+import { Upload, Loader2 } from "lucide-react";
+
+// src/context/WidgetEditorContext.js
+import { createContext } from "react";
+var WidgetEditorContext = createContext({
+  tenantID: null,
+  fileUpload: {
+    uploadFile: async (file) => {
+      throw new Error("uploadFile is not implemented");
+    }
+  },
+  apiProxy: {
+    post: async (action, params) => {
+      throw new Error("apiProxy.post is not implemented");
+    }
+  }
+});
+
+// src/image/imageConfigEditor.jsx
 var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const config = widgetEditorForm.values.widgetConfig || {};
   const liveStateTree = useMemo12(() => ({ state: stateTree }), [stateTree]);
-  return /* @__PURE__ */ React16.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ React16.createElement(
+  const { fileUpload } = useContext(WidgetEditorContext);
+  const [isUploading, setIsUploading] = useState8(false);
+  const fileInputRef = useRef6(null);
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsUploading(true);
+      const res = await fileUpload.uploadFile(file);
+      if (res && res.url) {
+        widgetEditorForm.setFieldValue("widgetConfig.src", res.url);
+      }
+    } catch (err) {
+      console.error("Upload failed", err);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+  return /* @__PURE__ */ React16.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React16.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React16.createElement("div", null, /* @__PURE__ */ React16.createElement(
+    "input",
+    {
+      type: "file",
+      ref: fileInputRef,
+      className: "hidden",
+      accept: "image/*",
+      onChange: handleFileUpload
+    }
+  ), /* @__PURE__ */ React16.createElement(
+    Button7,
+    {
+      variant: "outline",
+      size: "sm",
+      className: "w-full h-9 text-xs flex items-center justify-center",
+      disabled: isUploading,
+      onClick: (e) => {
+        e.preventDefault();
+        fileInputRef.current?.click();
+      }
+    },
+    isUploading ? /* @__PURE__ */ React16.createElement(Loader2, { className: "h-4 w-4 mr-2 animate-spin" }) : /* @__PURE__ */ React16.createElement(Upload, { className: "h-4 w-4 mr-2" }),
+    "Upload Image"
+  )), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1 w-full min-w-0 overflow-hidden" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Image URL / Source"), /* @__PURE__ */ React16.createElement("div", { className: "w-full min-w-0" }, /* @__PURE__ */ React16.createElement(
     TemplateAutocompleteInput8,
     {
       value: config.src || "",
@@ -4720,7 +4762,7 @@ var ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
       placeholder: "e.g. {{state.queries.user.data.avatar_url}}",
       liveStateTree
     }
-  ), /* @__PURE__ */ React16.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content.")), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ React16.createElement(
+  )), /* @__PURE__ */ React16.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Supports template expressions for dynamic content."))), /* @__PURE__ */ React16.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React16.createElement(Label9, { className: "text-xs font-medium text-foreground" }, "Alt Text (Accessibility)"), /* @__PURE__ */ React16.createElement(
     Input10,
     {
       type: "text",
@@ -5264,6 +5306,7 @@ export {
   VegaConfigEditor,
   VegaWidget,
   WIDGETS_MAP,
+  WidgetEditorContext,
   getDemoData,
   registerWidgets
 };

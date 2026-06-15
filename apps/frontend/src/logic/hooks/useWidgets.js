@@ -2,7 +2,8 @@ import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../constants";
 import { getAllWidgetsAPI } from "../../data/apis/widget";
 
-export const useWidgets = (tenantID) => {
+export const useWidgets = (tenantID, options = {}) => {
+  const { search, page, pageSize } = options;
   const {
     isLoading: isLoadingWidgets,
     data,
@@ -11,14 +12,17 @@ export const useWidgets = (tenantID) => {
     isRefetching: isRefetchingWidgets,
     refetch: refetchWidgets,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID)],
-    queryFn: () => getAllWidgetsAPI({ tenantID }),
+    queryKey: [
+      CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
+      { search, page, pageSize },
+    ],
+    queryFn: () => getAllWidgetsAPI({ tenantID, search, page, pageSize }),
     refetchOnWindowFocus: false,
     enabled: Boolean(tenantID),
   });
 
   return {
-    widgets: data?.widgets || data,
+    widgets: Array.isArray(data) ? data : data?.widgets || [],
     isLoadingWidgets,
     isFetchingWidgets,
     loadWidgetsError,
@@ -27,7 +31,8 @@ export const useWidgets = (tenantID) => {
   };
 };
 
-export const useInfiniteWidgets = (tenantID, searchQuery = "") => {
+export const useInfiniteWidgets = (tenantID, searchQuery = "", options = {}) => {
+  const { enabled = true } = options;
   const {
     data,
     fetchNextPage,
@@ -52,7 +57,7 @@ export const useInfiniteWidgets = (tenantID, searchQuery = "") => {
       }
       return undefined;
     },
-    enabled: Boolean(tenantID),
+    enabled: Boolean(tenantID) && enabled,
     refetchOnWindowFocus: false,
   });
 

@@ -8,8 +8,10 @@ const WorkflowNodesContext = createContext(null);
 export const WorkflowNodesProvider = ({
   children,
   dataQueries,
+  datasources,
   strings = {},
   onRefreshDataQueries,
+  onRefreshDatasources,
   workflowNodes = [],
   workflowEdges = [],       // Edges for DAG traversal
   workflowInputDefinitions = [],   // Declared workflow input parameters [{key, type, ...}]
@@ -17,12 +19,29 @@ export const WorkflowNodesProvider = ({
   workflowContext = {},      // The actual execution context (ctx)
   tenantID = null,           // Tenant ID for API calls
   onQueryTest = null,        // Callback for testing queries: (dataQueryID, inputValues) => Promise<result>
+  
+  // Infinite Scroll props for UI
+  querySearch,
+  setQuerySearch,
+  fetchNextQueriesPage,
+  hasNextQueriesPage,
+  isFetchingNextQueriesPage,
+  isLoadingDataQueries,
+  
+  datasourceSearch,
+  setDatasourceSearch,
+  fetchNextDatasourcesPage,
+  hasNextDatasourcesPage,
+  isFetchingNextDatasourcesPage,
+  isLoadingDatasources,
 }) => {
   return (
     <WorkflowNodesContext.Provider value={{
       dataQueries,
+      datasources,
       strings,
       onRefreshDataQueries,
+      onRefreshDatasources,
       workflowNodes,
       workflowEdges,
       workflowInputDefinitions,
@@ -30,6 +49,20 @@ export const WorkflowNodesProvider = ({
       workflowContext,
       tenantID,
       onQueryTest,
+      
+      querySearch,
+      setQuerySearch,
+      fetchNextQueriesPage,
+      hasNextQueriesPage,
+      isFetchingNextQueriesPage,
+      isLoadingDataQueries,
+
+      datasourceSearch,
+      setDatasourceSearch,
+      fetchNextDatasourcesPage,
+      hasNextDatasourcesPage,
+      isFetchingNextDatasourcesPage,
+      isLoadingDatasources,
     }}>
       {children}
     </WorkflowNodesContext.Provider>

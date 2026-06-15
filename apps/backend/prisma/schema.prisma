@@ -32,9 +32,12 @@ model tblAPIKeys {
   tblUsers                                            tblUsers?               @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblAPIKeysCreatorID")
   tblTenants                                          tblTenants              @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAPIKeysTenantID")
   tblAppPages                                         tblAppPages[]
+  tblCronJobs                                         tblCronJobs[]
   tblDataQueries                                      tblDataQueries[]
   tblDatasources                                      tblDatasources[]
+  tblListeners                                        tblListeners[]
   tblTenants_tblTenants_createdByApiKeyIDTotblAPIKeys tblTenants[]            @relation("tblTenants_createdByApiKeyIDTotblAPIKeys")
+  tblVaultCredentials                                 tblVaultCredentials[]
   tblWidgets                                          tblWidgets[]
   tblWorkflows                                        tblWorkflows[]
 
@@ -64,6 +67,7 @@ model tblCronJobHistory {
   result           String?
   triggerType      String?     @default("SCHEDULED") @db.VarChar(50)
   createdAt        DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime    @default(now()) @db.Timestamptz(6)
   tblCronJobs      tblCronJobs @relation(fields: [cronJobID], references: [cronJobID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobHistoryCronjobID")
 }
 
@@ -82,9 +86,15 @@ model tblCronJobs {
   tenantID           String              @db.Uuid
   workflowID         String?             @db.Uuid
   workflowConfig     Json?
+  creatorID          String?             @db.Uuid
+  createdByApiKeyID  String?             @db.Uuid
   tblCronJobHistory  tblCronJobHistory[]
+  tblAPIKeys         tblAPIKeys?         @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblCronJobsCreatedByApiKeyID")
+  tblUsers           tblUsers?           @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblCronJobsCreatorID")
   tblTenants         tblTenants          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
   tblWorkflows       tblWorkflows?       @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsWorkflowID")
+
+  @@index([createdByApiKeyID], map: "idx_tblCronJobs_createdByApiKeyID")
 }
 
 model tblDataQueries {
@@ -109,14 +119,6 @@ model tblDataQueries {
   tblTenants            tblTenants      @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
 
   @@index([createdByApiKeyID], map: "idx_tblDataQueries_createdByApiKeyID")
-}
-
-model tblDatabaseNotifications {
-  databaseNotificationID    String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt                 DateTime   @default(now()) @db.Timestamptz(6)
-  databaseNotificationTitle String     @db.VarChar
-  tenantID                  String     @db.Uuid
-  tblTenants                tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseNotificationsTenantID")
 }
 
 model tblDatasources {
@@ -170,13 +172,6 @@ model tblRoles {
   tblUserTenantRoleMappings tblUserTenantRoleMappings[]
 }
 
-model tblRuntimeConfig {
-  key       String   @id
-  value     Json
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @db.Timestamptz(6)
-}
-
 model tblTenants {
   tenantID                                            String                        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   creatorID                                           String?                       @db.Uuid
@@ -192,7 +187,6 @@ model tblTenants {
   tblAppPages                                         tblAppPages[]
   tblCronJobs                                         tblCronJobs[]
   tblDataQueries                                      tblDataQueries[]
-  tblDatabaseNotifications                            tblDatabaseNotifications[]
   tblDatasources                                      tblDatasources[]
   tblListeners                                        tblListeners[]
   tblRoles                                            tblRoles[]
@@ -219,6 +213,7 @@ model tblUserNotifications {
   action         String?     @db.VarChar
   actionText     String?     @db.VarChar
   notifierID     String      @db.VarChar
+  createdAt      DateTime    @default(now()) @db.Timestamptz(6)
   tblTenants     tblTenants? @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblUserNotificationsTenantID")
   tblUsers       tblUsers    @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblUserNotificationsUserIDUserID")
 }
@@ -260,12 +255,15 @@ model tblUsers {
   lastSeen                    DateTime?                     @db.Timestamptz(6)
   tblAPIKeys                  tblAPIKeys[]
   tblAppPages                 tblAppPages[]
+  tblCronJobs                 tblCronJobs[]
   tblDataQueries              tblDataQueries[]
   tblDatasources              tblDatasources[]
+  tblListeners                tblListeners[]
   tblTenants                  tblTenants[]
   tblUserNotifications        tblUserNotifications[]
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]
+  tblVaultCredentials         tblVaultCredentials[]
   tblWidgets                  tblWidgets[]
   tblWorkflows                tblWorkflows[]
 }
@@ -365,7 +363,7 @@ model tblWorkflowNodes {
 }
 
 model tblWorkflows {
-  workflowID           String                 @id(map: "tblWorflows_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workflowID           String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title                String                 @db.VarChar
   tenantID             String                 @db.Uuid
   creatorID            String?                @db.Uuid
@@ -387,9 +385,9 @@ model tblWorkflows {
 }
 
 model tblWorkflowInstanceLogs {
-  logID                BigInt               @id @default(autoincrement())
+  logID                String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   instanceID           String               @db.Uuid
-  nodeID               String?              @db.VarChar
+  nodeID               String?              @db.Uuid
   eventType            String               @db.VarChar
   nodeStatus           String?              @db.VarChar
   outputVariable       String?              @db.VarChar
@@ -406,7 +404,7 @@ model tblWorkflowInstanceLogs {
 model tblWorkflowDataCollectionRequests {
   collectionRequestID  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   instanceID           String               @db.Uuid
-  nodeID               String               @db.VarChar
+  nodeID               String               @db.Uuid
   nodeAttempt          Int?
   status               String               @default("PENDING") @db.VarChar(50)
   collectionType       String               @default("form") @db.VarChar(50)
@@ -419,23 +417,6 @@ model tblWorkflowDataCollectionRequests {
 
   @@index([instanceID, status], map: "idx_tblWfDataCollection_instance_status")
   @@index([status, expiresAt], map: "idx_tblWfDataCollection_status_expiry")
-}
-
-model tblEventDLQ {
-  dlqId        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  eventId      String?   @db.VarChar(128)
-  tenantID     String?   @db.Uuid
-  datasourceID String?   @db.Uuid
-  rawPayload   Bytes?
-  headers      Json?
-  errorMessage String?
-  retryCount   Int?      @default(0)
-  maxRetries   Int?      @default(3)
-  nextRetryAt  DateTime? @db.Timestamptz(6)
-  resolvedAt   DateTime? @db.Timestamptz(6)
-  createdAt    DateTime? @default(now()) @db.Timestamptz(6)
-
-  @@index([tenantID], map: "idx_tblEventDLQ_tenantID")
 }
 
 model tblListenerActions {
@@ -464,6 +445,7 @@ model tblListenerEvents {
 
   @@index([listenerID, bufferName, seqNo(sort: Desc)], map: "idx_tblListenerEvents_buffer_seq")
   @@index([receivedAt], map: "idx_tblListenerEvents_receivedAt")
+  @@index([tenantID], map: "idx_tblListenerEvents_tenantID")
 }
 
 model tblListeners {
@@ -481,8 +463,12 @@ model tblListeners {
   endpointPath        String?              @db.VarChar(255)
   createdAt           DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime             @default(now()) @db.Timestamptz(6)
+  creatorID           String?              @db.Uuid
+  createdByApiKeyID   String?              @db.Uuid
   tblListenerActions  tblListenerActions[]
   tblListenerEvents   tblListenerEvents[]
+  tblAPIKeys          tblAPIKeys?          @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblListenersCreatedByApiKeyID")
+  tblUsers            tblUsers?            @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblListenersCreatorID")
   tblDatasources      tblDatasources       @relation(fields: [datasourceID], references: [datasourceID], onDelete: Cascade, onUpdate: NoAction)
   tblTenants          tblTenants           @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction)
 
@@ -490,6 +476,7 @@ model tblListeners {
   @@index([datasourceID], map: "idx_tblListeners_datasourceID")
   @@index([status], map: "idx_tblListeners_status")
   @@index([tenantID], map: "idx_tblListeners_tenantID")
+  @@index([createdByApiKeyID], map: "idx_tblListeners_createdByApiKeyID")
 }
 
 model tblAppPages {
@@ -510,12 +497,18 @@ model tblAppPages {
 }
 
 model tblVaultCredentials {
-  vaultCredentialID String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenantID          String     @db.Uuid
-  name              String     @db.VarChar
-  provider          String     @db.VarChar
+  vaultCredentialID String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantID          String      @db.Uuid
+  name              String      @db.VarChar
+  provider          String      @db.VarChar
   encryptedData     Json
-  createdAt         DateTime   @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime   @default(now()) @db.Timestamptz(6)
-  tblTenants        tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction, map: "fkTblVaultCredentialsTenantID")
+  createdAt         DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime    @default(now()) @db.Timestamptz(6)
+  creatorID         String?     @db.Uuid
+  createdByApiKeyID String?     @db.Uuid
+  tblAPIKeys        tblAPIKeys? @relation(fields: [createdByApiKeyID], references: [apiKeyID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblVaultCredentialsCreatedByApiKeyID")
+  tblUsers          tblUsers?   @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblVaultCredentialsCreatorID")
+  tblTenants        tblTenants  @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction, map: "fkTblVaultCredentialsTenantID")
+
+  @@index([createdByApiKeyID], map: "idx_tblVaultCredentials_createdByApiKeyID")
 }

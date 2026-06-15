@@ -14,19 +14,26 @@ dataQueryController.getAllDataQueries = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const { search, page, pageSize } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "dataQueryController:getAllDataQueries:params",
       params: {
         userID: user.userID,
         tenantID,
+        search,
+        page,
+        pageSize,
         authContext,
       },
     });
 
-    const dataQueries = await dataQueryService.getAllDataQueries({
+    const result = await dataQueryService.getAllDataQueries({
       userID: user.userID,
       tenantID,
+      search,
+      page,
+      pageSize,
       authContext,
     });
 
@@ -35,13 +42,17 @@ dataQueryController.getAllDataQueries = async (req, res) => {
       params: {
         userID: user.userID,
         tenantID,
-        dataQueriesLength: dataQueries.length,
+        dataQueriesLength: result.dataQueries.length,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      dataQueries,
-      message: "Query created successfully.",
+      dataQueries: result.dataQueries,
+      totalCount: result.totalCount,
+      totalPages: result.totalPages,
+      page: result.page,
+      pageSize: result.pageSize,
+      message: "Queries fetched successfully.",
     });
   } catch (error) {
     Logger.log("error", {
@@ -131,6 +142,7 @@ dataQueryController.createBulkDataQuery = async (req, res) => {
     const { user } = req;
     const { tenantID } = req.params;
     const { dataQueriesData } = req.body;
+    const authContext = getServiceAuthContext(req);
 
     Logger.log("info", {
       message: "dataQueryController:createBulkDataQuery:params",
@@ -138,6 +150,7 @@ dataQueryController.createBulkDataQuery = async (req, res) => {
         userID: user.userID,
         tenantID,
         dataQueriesData,
+        authContext,
       },
     });
 
@@ -145,6 +158,7 @@ dataQueryController.createBulkDataQuery = async (req, res) => {
       userID: user.userID,
       tenantID,
       dataQueriesData,
+      authContext,
     });
 
     Logger.log("success", {
@@ -190,6 +204,7 @@ dataQueryController.runDataQueryByID = async (req, res) => {
       tenantID,
       dataQueryID,
       inputValues,
+      executionCtx: req.executionCtx,
     });
 
     Logger.log("success", {
@@ -231,6 +246,7 @@ dataQueryController.runDataQueryByData = async (req, res) => {
       tenantID,
       dataQuery,
       inputValues,
+      executionCtx: req.executionCtx,
     });
 
     Logger.log("success", {
@@ -307,12 +323,14 @@ dataQueryController.cloneDataQueryByID = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, dataQueryID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "dataQueryController:cloneDataQueryByID:params",
       params: {
         userID: user.userID,
         tenantID,
         dataQueryID,
+        authContext,
       },
     });
 
@@ -320,6 +338,7 @@ dataQueryController.cloneDataQueryByID = async (req, res) => {
       userID: user.userID,
       tenantID,
       dataQueryID,
+      authContext,
     });
 
     Logger.log("success", {

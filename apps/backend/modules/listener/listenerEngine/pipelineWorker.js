@@ -15,6 +15,7 @@ const { resolveTemplate: sharedResolveTemplate } = require("@jet-admin/expressio
 const { socketIO } = require('../../../config/socket.io');
 const { prisma } = require('../../../config/prisma.config');
 const Logger = require('../../../utils/logger');
+const { createSystemContext, ORIGIN_TYPES } = require('../../../utils/executionContext');
 
 const TEMPLATE_OPTIONS = {
   preserveSingleExpressionType: true,
@@ -22,15 +23,7 @@ const TEMPLATE_OPTIONS = {
 
 // ─── Lazy service getters (avoids circular-dependency risk + hot-path require) ─
 
-let _workflowService;
-function getWorkflowService() {
-  return (_workflowService ??= require('../../workflow/workflow.service').workflowService);
-}
-
-let _executeDataQuery;
-function getExecuteDataQuery() {
-  return (_executeDataQuery ??= require('../../dataQuery/dataQuery.service').executeDataQuery);
-}
+const { authorizedExecuteWorkflow, authorizedExecuteDataQuery } = require('../../../utils/authorizedProxy');
 
 // ─── Startup ──────────────────────────────────────────────────────────────────
 
@@ -135,6 +128,8 @@ async function _processEvent(job) {
 
 async function _dispatchAction(tenantID, listenerID, action, event) {
   const { actionType, actionConfig } = action;
+  // Create a system execution context for this listener
+  const executionCtx = createSystemContext(ORIGIN_TYPES.LISTENER, listenerID, tenantID);
 
   switch (actionType) {
     case 'trigger_workflow': {
@@ -143,10 +138,11 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
           module: 'listener', listenerID,
         })
         : { event };
-      await getWorkflowService().executeWorkflow({
+      await authorizedExecuteWorkflow({
         workflowID: actionConfig.workflowID,
         tenantID,
         inputValues,
+        executionCtx,
       });
       break;
     }
@@ -157,9 +153,10 @@ async function _dispatchAction(tenantID, listenerID, action, event) {
           module: 'listener', listenerID,
         })
         : {};
-      await getExecuteDataQuery()({
+      await authorizedExecuteDataQuery({
         dataQueryID: actionConfig.dataQueryID,
         inputValues,
+        executionCtx,
       });
       break;
     }

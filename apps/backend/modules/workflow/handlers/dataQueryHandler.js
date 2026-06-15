@@ -1,10 +1,16 @@
 /**
  * Data Query Node Handler
- * Executes database queries using the QueryEngine
+ * Executes database queries using the QueryEngine.
+ *
+ * When running inside a workflow, the query is executed as a delegated call
+ * with the workflow as the originating resource. This allows users who have
+ * workflow:execute permission to run queries referenced by the workflow,
+ * even if they lack direct dataquery:execute permission.
  */
-const { createQueryEngine } = require("../../dataQuery/dataQuery.service");
+const { authorizedExecuteDataQuery } = require("../../../utils/authorizedProxy");
 const { resolveInputs } = require("../../../utils/input.util");
 const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
+const { deriveChildContext, createSystemContext, ORIGIN_TYPES } = require('../../../utils/executionContext');
 
 async function execute(nodeConfig, context, helpers) {
   const { 
@@ -31,10 +37,26 @@ async function execute(nodeConfig, context, helpers) {
     throw new Error(`Data query input validation failed: ${JSON.stringify(errors)}`);
   }
   
+  // Build execution context: this query is being run as part of a workflow
+  const workflowID = helpers?.workflowID;
+  const instanceID = helpers?.instanceID;
+  let executionCtx;
+
+  if (context?.__executionCtx) {
+    // If the workflow engine already attached an execution context, derive from it
+    executionCtx = deriveChildContext(context.__executionCtx, ORIGIN_TYPES.WORKFLOW, workflowID);
+  } else if (workflowID) {
+    // Fallback: create a system context for the workflow
+    executionCtx = createSystemContext(ORIGIN_TYPES.WORKFLOW, workflowID, context?.__tenantID);
+  }
+
   try {
-    // Execute query using QueryEngine
-    const engine = createQueryEngine();
-    const result = await engine.executeQuery(dataQueryID, resolved);
+    // Execute query using the authorized proxy
+    const result = await authorizedExecuteDataQuery({
+      dataQueryID,
+      executionInputs: resolved,
+      executionCtx,
+    });
     
     return {
       output: {
@@ -62,3 +84,4 @@ async function execute(nodeConfig, context, helpers) {
 }
 
 module.exports = { execute };
+

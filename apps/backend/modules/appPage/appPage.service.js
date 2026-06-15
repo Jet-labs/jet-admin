@@ -1,6 +1,7 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
+const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const appPageService = {};
 
 /**
@@ -10,29 +11,73 @@ const appPageService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-appPageService.getAllAppPages = async ({ userID, tenantID }) => {
+appPageService.getAllAppPages = async ({ userID, tenantID, search, page, pageSize }) => {
   Logger.log("info", {
     message: "appPageService:getAllAppPages:params",
     params: {
       userID,
       tenantID,
+      search,
+      page,
+      pageSize,
     },
   });
 
   try {
-    const appPages = await prisma.tblAppPages.findMany({
-      where: {
-        tenantID: tenantID,
+    const where = {
+      tenantID: tenantID,
+    };
+
+    if (search) {
+      where.OR = [
+        {
+          appPageTitle: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          appPageDescription: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+    }
+
+    const findManyOptions = {
+      where,
+      orderBy: {
+        createdAt: "desc",
       },
-    });
+    };
+
+    if (page && pageSize) {
+      findManyOptions.skip = (page - 1) * pageSize;
+      findManyOptions.take = pageSize;
+    }
+
+    const [appPages, totalCount] = await Promise.all([
+      prisma.tblAppPages.findMany(findManyOptions),
+      prisma.tblAppPages.count({ where }),
+    ]);
+
     Logger.log("success", {
       message: "appPageService:getAllAppPages:success",
       params: {
         userID,
-        appPages,
+        appPagesLength: appPages.length,
+        totalCount,
       },
     });
-    return appPages;
+
+    return {
+      appPages,
+      totalCount,
+      page: page || 1,
+      pageSize: pageSize || appPages.length,
+      totalPages: pageSize ? Math.ceil(totalCount / pageSize) : 1,
+    };
   } catch (error) {
     Logger.log("error", {
       message: "appPageService:getAllAppPages:failure",
@@ -76,8 +121,11 @@ appPageService.createAppPage = async ({
 
   try {
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
-    await prisma.$transaction(async (tx) => {
-      const appPage = await tx.tblAppPages.create({
+    if (!creatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
+    const appPage = await prisma.$transaction(async (tx) => {
+      const page = await tx.tblAppPages.create({
         data: {
           tenantID: tenantID,
           appPageTitle,
@@ -87,7 +135,10 @@ appPageService.createAppPage = async ({
           createdByApiKeyID,
         },
       });
+      return page;
     });
+
+    await grantCreatorAccess(tenantID, "appPage", appPage.appPageID, authContext, userID);
 
     Logger.log("success", {
       message: "appPageService:createAppPage:success",
@@ -173,6 +224,7 @@ appPageService.cloneAppPageByID = async ({
   userID,
   tenantID,
   appPageID,
+  authContext,
 }) => {
   Logger.log("info", {
     message: "appPageService:cloneAppPageByID:params",
@@ -180,6 +232,7 @@ appPageService.cloneAppPageByID = async ({
       userID,
       tenantID,
       appPageID,
+      authContext,
     },
   });
 
@@ -193,17 +246,27 @@ appPageService.cloneAppPageByID = async ({
     if (!appPage) {
       throw new Error("App page not found");
     }
-    await prisma.$transaction(async (tx) => {
-      const newAppPage = await tx.tblAppPages.create({
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    const finalCreatorID = creatorID || userID;
+    if (!finalCreatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
+    const newAppPage = await prisma.$transaction(async (tx) => {
+      const page = await tx.tblAppPages.create({
         data: {
           tenantID: tenantID,
           appPageTitle: appPage.appPageTitle + " (Copy)",
           appPageDescription: appPage.appPageDescription,
           appPageConfig: appPage.appPageConfig,
-          creatorID: userID,
+          creatorID: finalCreatorID,
+          createdByApiKeyID,
         },
       });
+      return page;
     });
+
+    await grantCreatorAccess(tenantID, "appPage", newAppPage.appPageID, authContext, finalCreatorID);
+
     Logger.log("success", {
       message: "appPageService:cloneAppPageByID:success",
       params: {
@@ -337,6 +400,8 @@ appPageService.deleteAppPageByID = async ({
         tenantID: tenantID,
       },
     });
+
+    await removePoliciesForResource(tenantID, `appPage:${appPageID}`);
 
     Logger.log("success", {
       message: "appPageService:deleteAppPageByID:success",

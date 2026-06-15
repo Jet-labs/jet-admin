@@ -154,6 +154,12 @@ const instanceIdParamSchema = z.object({
   instanceID: schemas.uuidSchema,
 }).passthrough();
 
+const listWorkflowsQuerySchema = z.object({
+  search: z.string().optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+}).passthrough();
+
 // ============================================================
 // Exports
 // ============================================================
@@ -165,4 +171,5 @@ module.exports = {
   testWorkflowSchema,
   workflowIdParamSchema,
   instanceIdParamSchema,
+  listWorkflowsQuerySchema,
 };

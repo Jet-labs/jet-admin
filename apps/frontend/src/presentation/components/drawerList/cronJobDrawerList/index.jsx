@@ -1,42 +1,79 @@
-import React from "react";
-import { CalendarClock, Plus } from 'lucide-react';
+import React, { useState } from "react";
+import { CalendarClock, Plus, Search } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useCronJobs } from "../../../../logic/hooks/useCronJobs";
+import { useInfiniteCronJobs } from "../../../../logic/hooks/useCronJobs";
 import { NoEntityUI } from "../../ui/noEntityUI";
+import { Button, Input } from "@jet-admin/ui";
+import { useDebounce } from "@uidotdev/usehooks";
 
-import { Button } from "@jet-admin/ui";
 export const CronJobDrawerList = () => {
   const { tenantID } = useParams();
   const navigate = useNavigate();
   const routeParam = useParams();
-  const { isLoadingCronJobs, cronJobs, isFetchingCronJobs } = useCronJobs(tenantID);
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  const {
+    cronJobs,
+    isLoadingCronJobs,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteCronJobs(tenantID, debouncedSearchQuery);
 
   const _navigateToAddNotification = () => {
     navigate(CONSTANTS.ROUTES.ADD_CRON_JOB.path(tenantID));
+  };
+
+  const _handleScroll = (e) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop - clientHeight < 30) {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }
   };
 
   return (
     <div className="bg-background flex h-full w-full flex-col gap-2 overflow-hidden">
       <div className="p-2 pb-0">
         <Button
-        onClick={_navigateToAddNotification}
-        variant="secondary"
-        className="w-full justify-start"
-      >
-        <Plus className="mr-2 h-4 w-4" />
-        {CONSTANTS.STRINGS.ADD_CRON_JOB_BUTTON_TEXT}
-      </Button>
+          onClick={_navigateToAddNotification}
+          variant="secondary"
+          className="w-full justify-start"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          {CONSTANTS.STRINGS.ADD_CRON_JOB_BUTTON_TEXT}
+        </Button>
       </div>
 
-      {isLoadingCronJobs || isFetchingCronJobs ? (
+      {/* Search Input - Small Size (size="sm") per Section 29 */}
+      <div className="px-2 py-0">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" />
+          <Input
+            type="text"
+            size="sm"
+            placeholder="Search cron jobs..."
+            className="pl-8 w-full border-border/50 focus:border-primary/30"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {isLoadingCronJobs ? (
         <div role="status" className="animate-pulse w-full space-y-2 p-2">
           <div className="h-9 rounded-md bg-muted" />
           <div className="h-9 rounded-md bg-muted" />
           <div className="h-9 rounded-md bg-muted" />
         </div>
       ) : cronJobs && cronJobs.length > 0 ? (
-          <div className="flex-1 w-full overflow-y-auto p-2 pb-10 space-y-1">
+        <div 
+          onScroll={_handleScroll}
+          className="flex-1 w-full overflow-y-auto p-2 pb-10 space-y-1"
+        >
           {cronJobs.map((cronJob) => {
             const key = `cronJob_${cronJob.cronJobID}`;
             const isActive = routeParam?.cronJobID == cronJob.cronJobID;
@@ -70,11 +107,20 @@ export const CronJobDrawerList = () => {
               </Link>
             );
           })}
+          {isFetchingNextPage && (
+            <div className="flex justify-center p-2 text-xs text-muted-foreground animate-pulse">
+              Loading more...
+            </div>
+          )}
         </div>
       ) : (
-            <div className="flex flex-1 items-center justify-center p-4 text-muted-foreground">
+        <div className="flex flex-1 items-center justify-center p-4 text-muted-foreground">
           <NoEntityUI
-            message={CONSTANTS.STRINGS.CRON_JOB_DRAWER_LIST_NO_CRON_JOB_FOUND}
+            message={
+              searchQuery
+                ? "No matching cron jobs found"
+                : CONSTANTS.STRINGS.CRON_JOB_DRAWER_LIST_NO_CRON_JOB_FOUND
+            }
           />
         </div>
       )}

@@ -32,6 +32,8 @@ describe("VaultService", () => {
   });
 
   describe("storeCredential", () => {
+    const creatorID = "user-123";
+
     it("should successfully encrypt and store the credential", async () => {
       const mockResult = {
         vaultCredentialID,
@@ -49,6 +51,7 @@ describe("VaultService", () => {
         provider,
         name,
         data,
+        creatorID,
       });
 
       expect(prisma.tblVaultCredentials.create).toHaveBeenCalledTimes(1);
@@ -56,6 +59,7 @@ describe("VaultService", () => {
       expect(createArg.tenantID).toBe(tenantID);
       expect(createArg.provider).toBe(provider);
       expect(createArg.name).toBe(name);
+      expect(createArg.creatorID).toBe(creatorID);
       expect(createArg.encryptedData).toBeDefined();
       expect(createArg.encryptedData.iv).toBeDefined();
       expect(createArg.encryptedData.data).toBeDefined();
@@ -69,6 +73,17 @@ describe("VaultService", () => {
         createdAt: mockResult.createdAt,
         updatedAt: mockResult.updatedAt,
       });
+    });
+
+    it("should throw an error if both creatorID and createdByApiKeyID are missing", async () => {
+      await expect(
+        vaultService.storeCredential({
+          tenantID,
+          provider,
+          name,
+          data,
+        })
+      ).rejects.toThrow("Creator ID or Created By API Key ID is required");
     });
   });
 

@@ -19,6 +19,7 @@ import {
   JetHorizontalLayout,
   JetFileUploadControl,
   JetGoogleOAuthControl,
+  JetSearchSelectControl,
 } from './renderers/index.js';
 
 import {
@@ -42,6 +43,7 @@ import {
   horizontalLayoutTester,
   fileUploadTester,
   googleOAuthTester,
+  searchSelectTester,
 } from './testers.js';
 
 /**
@@ -52,6 +54,7 @@ export const jetFormsBaseRenderers = [
   { tester: tabRendererTester, renderer: JetTabLayout },
   { tester: numberInputTester, renderer: JetNumberControl },
   { tester: textInputTester, renderer: JetTextControl },
+  { tester: searchSelectTester, renderer: JetSearchSelectControl },
   { tester: selectInputTester, renderer: JetSelectControl },
   { tester: radioInputTester, renderer: JetRadioControl },
   { tester: checkboxTester, renderer: JetCheckboxControl },

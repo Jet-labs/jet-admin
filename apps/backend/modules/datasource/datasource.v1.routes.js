@@ -6,6 +6,7 @@ const { validate, validateAll } = require("../../utils/validation.utils");
 const {
     updateDatasourceSchema,
     datasourceIdParamSchema,
+    listDatasourcesQuerySchema,
 } = require("./datasource.validator");
 
 const multer = require("multer");
@@ -19,65 +20,77 @@ const upload = multer({
 // Datasource routes
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:datasource:list"]),
+  validate(listDatasourcesQuerySchema, "query"),
+  authMiddleware.authorize("datasource", "list"),
   datasourceController.getAllDatasources
 );
 
 router.post(
   "/test",
-  authMiddleware.checkUserPermissions(["tenant:datasource:test"]),
+  authMiddleware.authorize("datasource", "test"),
   datasourceController.testDatasourceConnection
 );
 
 router.post(
   "/upload",
-  authMiddleware.checkUserPermissions(["tenant:datasource:create"]),
+  authMiddleware.authorize("datasource", "create"),
   upload.single("file"),
   datasourceController.uploadFile
 );
 
 router.get(
   "/:datasourceID",
-    validate(datasourceIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:datasource:read"]),
+  validate(datasourceIdParamSchema, "params"),
+  authMiddleware.authorize("datasource", "read", {
+    paramKey: "datasourceID",
+  }),
   datasourceController.getDatasourceByID
 );
 
 router.post(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:datasource:create"]),
+  authMiddleware.authorize("datasource", "create"),
   datasourceController.createDatasource
 );
 
 router.patch(
   "/:datasourceID",
-    validateAll({
-        params: datasourceIdParamSchema,
-        body: updateDatasourceSchema,
-    }),
-  authMiddleware.checkUserPermissions(["tenant:datasource:update"]),
+  validateAll({
+      params: datasourceIdParamSchema,
+      body: updateDatasourceSchema,
+  }),
+  authMiddleware.authorize("datasource", "update", {
+    paramKey: "datasourceID",
+  }),
   datasourceController.updateDatasourceByID
 );
 
 router.post(
   "/:datasourceID/clone",
-    validate(datasourceIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:datasource:clone"]),
+  validate(datasourceIdParamSchema, "params"),
+  authMiddleware.authorize([
+    { resource: "datasource", action: "create" },
+    { resource: "datasource", action: "read", paramKey: "datasourceID" }
+  ]),
   datasourceController.cloneDatasourceByID
 );
 
 router.delete(
   "/:datasourceID",
-    validate(datasourceIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:datasource:delete"]),
+  validate(datasourceIdParamSchema, "params"),
+  authMiddleware.authorize("datasource", "delete", {
+    paramKey: "datasourceID",
+  }),
   datasourceController.deleteDatasourceByID
 );
 
 // Datasource proxy — dedicated editors call DS-specific helper methods through backend
 router.post(
   "/:datasourceID/proxy",
-    validate(datasourceIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:datasource:read"]),
+  validate(datasourceIdParamSchema, "params"),
+  authMiddleware.authorize("datasource", "read", {
+    paramKey: "datasourceID",
+  }),
   datasourceController.proxyDatasourceAction
 );
 

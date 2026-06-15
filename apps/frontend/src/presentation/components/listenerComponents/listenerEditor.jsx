@@ -3,7 +3,7 @@ import {
   materialRenderers,
 } from "@jsonforms/material-renderers";
 import { JsonForms } from "@jsonforms/react";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_TYPES, getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
@@ -20,9 +20,13 @@ import {
   SelectValue,
   Spinner,
   Textarea,
-  Section
+  Section,
+  SearchSelect,
 } from "@jet-admin/ui";
-import { useDatasources } from "../../../logic/hooks/useDatasources";
+import { useInfiniteDatasources } from "../../../logic/hooks/useDatasources";
+import { getDatasourceByIDAPI } from "../../../data/apis/datasource";
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@uidotdev/usehooks";
 
 // Get only datasource types that support listeners
 const getListenerCapableDatasources = () => {
@@ -37,7 +41,25 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
     tenantID: PropTypes.string.isRequired,
   };
 
-  const { datasources, isLoadingDatasources, loadDatasourcesError } = useDatasources(tenantID);
+  const [datasourceSearch, setDatasourceSearch] = useState("");
+  const debouncedDatasourceSearch = useDebounce(datasourceSearch, 300);
+
+  const {
+    datasources,
+    isLoadingDatasources,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    loadDatasourcesError,
+  } = useInfiniteDatasources(tenantID, debouncedDatasourceSearch);
+
+  const selectedDatasourceID = listenerEditorForm.values.datasourceID;
+  const { data: selectedDatasourceDetail } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID), "detail", selectedDatasourceID],
+    queryFn: () => getDatasourceByIDAPI({ tenantID, datasourceID: selectedDatasourceID }),
+    enabled: Boolean(tenantID) && Boolean(selectedDatasourceID),
+    refetchOnWindowFocus: false,
+  });
 
   // Track JsonForms init to prevent spurious onChange during mount
   const isJsonFormsInitialized = useRef(false);
@@ -71,9 +93,11 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
   }
 
   // Get the selected datasource's type config
-  const selectedDatasource = datasources?.find(
-    (ds) => ds.datasourceID === listenerEditorForm.values.datasourceID
-  );
+  const selectedDatasource = useMemo(() => {
+    return selectedDatasourceDetail || datasources?.find(
+      (ds) => ds.datasourceID === listenerEditorForm.values.datasourceID
+    );
+  }, [selectedDatasourceDetail, datasources, listenerEditorForm.values.datasourceID]);
 
   // Fallback to listenerType if datasource not found or still loading
   const effectiveDatasourceType =
@@ -85,16 +109,18 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
     : null;
 
   // Filter datasources to only those whose type supports listeners
-  const listenerCapableTypes = getListenerCapableDatasources().map(
+  const listenerCapableTypes = useMemo(() => getListenerCapableDatasources().map(
     (ds) => ds.value
-  );
-  const filteredDatasources = datasources?.filter((ds) =>
-    listenerCapableTypes.includes(ds.datasourceType) ||
-    ds.datasourceID === listenerEditorForm.values.datasourceID
-  );
+  ), []);
+
+  const filteredDatasources = useMemo(() => {
+    return datasources?.filter((ds) =>
+      listenerCapableTypes.includes(ds.datasourceType) ||
+      ds.datasourceID === listenerEditorForm.values.datasourceID
+    ) || [];
+  }, [datasources, listenerCapableTypes, listenerEditorForm.values.datasourceID]);
 
   return (
-    <ReactQueryLoadingErrorWrapper isLoading={isLoadingDatasources} error={loadDatasourcesError}>
     <div className="space-y-4">
       {/* Identity section */}
       <Section title="Identity">
@@ -170,9 +196,9 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
         description="Select a datasource that supports real-time subscriptions"
       >
         <div className="space-y-1.5">
-          <Select
+          <SearchSelect
             value={listenerEditorForm.values.datasourceID || ""}
-            onValueChange={(val) => {
+            onChange={(val) => {
               listenerEditorForm.setFieldValue("datasourceID", val);
               // Auto-set the listener type from the datasource type
               const ds = datasources?.find((d) => d.datasourceID === val);
@@ -188,40 +214,17 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
                 }
               }
             }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={isLoadingDatasources ? "Loading..." : "Select a data source"} />
-            </SelectTrigger>
-            <SelectContent>
-              {isLoadingDatasources && (
-                <div className="flex items-center justify-center p-4">
-                  <Spinner size={16} />
-                </div>
-              )}
-              {filteredDatasources?.length === 0 && !isLoadingDatasources && (
-                <div className="p-2 text-xs text-muted-foreground text-center italic">
-                  No compatible data sources found
-                </div>
-              )}
-              {filteredDatasources?.map((ds) => {
-                const typeConfig = getDatasourceTypeByValue(ds.datasourceType);
-                return (
-                  <SelectItem key={ds.datasourceID} value={ds.datasourceID}>
-                    <span className="flex items-center gap-2">
-                      {typeConfig && (
-                        <DatasourceIcon
-                          icon={typeConfig.icon}
-                          iconColor={typeConfig.iconColor}
-                          size={14}
-                        />
-                      )}
-                      {ds.datasourceTitle}
-                    </span>
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+            options={filteredDatasources.map((ds) => ({
+              value: ds.datasourceID,
+              label: ds.datasourceTitle,
+            }))}
+            onSearchChange={setDatasourceSearch}
+            onLoadMore={fetchNextPage}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            isLoading={isLoadingDatasources}
+            placeholder="Select a data source"
+          />
         </div>
 
         {/* Show selected datasource badge */}
@@ -265,6 +268,5 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
 
 
     </div>
-    </ReactQueryLoadingErrorWrapper>
   );
 };

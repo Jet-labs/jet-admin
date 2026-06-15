@@ -200,3 +200,41 @@ export const deleteWidgetByIDAPI = async ({ tenantID, widgetID }) => {
     throw error;
   }
 };
+
+export const uploadWidgetFileAPI = async ({ tenantID, file }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.uploadWidgetFileAPI(tenantID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post(url, formData, {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data && response.data.success === true) {
+        return {
+          url: response.data.url,
+          filePath: response.data.filePath,
+          fileName: response.data.fileName,
+          fileSize: response.data.fileSize,
+          fileType: response.data.fileType,
+        };
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

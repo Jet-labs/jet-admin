@@ -88,6 +88,17 @@ export const selectInputTester = (uischema, rootSchema) => {
 };
 
 // ============================================================================
+// Search Select Input Tester
+// ============================================================================
+export const searchSelectTester = rankWith(
+  150,
+  and(
+    isControl,
+    (uischema) => uischema.options && uischema.options.isSearchSelect === true
+  )
+);
+
+// ============================================================================
 // Checkbox Tester
 // ============================================================================
 export const checkboxTester = (uischema, schema) => {

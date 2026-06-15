@@ -19,31 +19,44 @@ datasourceController.getAllDatasources = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const { search, page, pageSize } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "datasourceController:getAllDatasources:params",
       params: {
         userID: user.userID,
         tenantID,
+        search,
+        page,
+        pageSize,
         authContext,
       },
     });
 
-    const datasources = await datasourceService.getAllDatasources({
+    const result = await datasourceService.getAllDatasources({
       userID: user.userID,
       tenantID,
+      search,
+      page,
+      pageSize,
       authContext,
     });
 
     Logger.log("success", {
       message: "datasourceController:getAllDatasources:success",
       params: {
-        // datasources,
+        userID: user.userID,
+        tenantID,
+        datasourcesLength: result.datasources.length,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      datasources,
+      datasources: result.datasources,
+      totalCount: result.totalCount,
+      totalPages: result.totalPages,
+      page: result.page,
+      pageSize: result.pageSize,
       message: "Datasources fetched successfully.",
     });
   } catch (error) {
@@ -341,6 +354,7 @@ datasourceController.cloneDatasourceByID = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, datasourceID } = req.params;
+    const authContext = getServiceAuthContext(req);
 
     Logger.log("info", {
       message: "datasourceController:cloneDatasourceByID:params",
@@ -348,6 +362,7 @@ datasourceController.cloneDatasourceByID = async (req, res) => {
         userID: user.userID,
         tenantID,
         datasourceID,
+        authContext,
       },
     });
 
@@ -355,6 +370,7 @@ datasourceController.cloneDatasourceByID = async (req, res) => {
       userID: user.userID,
       tenantID,
       datasourceID,
+      authContext,
     });
 
     Logger.log("success", {

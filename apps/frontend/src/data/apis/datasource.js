@@ -5,7 +5,7 @@ import axios from "axios";
 import { Datasource } from "../models/datasource";
 import { firebaseAuth } from "../../config/firebase";
 
-export const getAllDatasourcesAPI = async ({ tenantID }) => {
+export const getAllDatasourcesAPI = async ({ tenantID, search, page, pageSize }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -13,12 +13,27 @@ export const getAllDatasourcesAPI = async ({ tenantID }) => {
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.get(url, {
+        params: {
+          search,
+          page,
+          pageSize,
+        },
         headers: {
           Authorization: `Bearer ${bearerToken}`,
         },
       });
       if (response.data && response.data.success === true) {
-        return Datasource.toList(response.data.datasources);
+        const datasourcesList = response.data.datasources ? Datasource.toList(response.data.datasources) : [];
+        if (response.data.totalCount !== undefined) {
+          return {
+            datasources: datasourcesList,
+            totalCount: response.data.totalCount,
+            totalPages: response.data.totalPages,
+            page: response.data.page,
+            pageSize: response.data.pageSize,
+          };
+        }
+        return datasourcesList;
       } else if (response.data.error) {
         throw response.data.error;
       } else {

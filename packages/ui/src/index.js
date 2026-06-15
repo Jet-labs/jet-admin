@@ -36,3 +36,6 @@ export { GoogleOAuthButton } from './components/google-oauth-button';
 export { Callout } from './components/callout';
 export { EmptyState } from './components/empty-state';
 export { LogicChip } from './components/logic-chip';
+export { SearchSelect } from './components/search-select';
+export { MultiSearchSelect } from './components/multi-search-select';
+

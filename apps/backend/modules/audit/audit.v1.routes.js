@@ -9,7 +9,7 @@ const { auditController } = require("./audit.controller");
 
 router.get(
   "/",
-  authMiddleware.authProvider,
+  authMiddleware.authorize("audit", "list"),
   auditController.getAuditLogsByTenantID
 );
 

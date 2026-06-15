@@ -26,8 +26,14 @@ const emailSchema = z.string().email("Must be a valid email address");
  * Pagination query parameters schema
  */
 const paginationSchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  page: z.preprocess(
+    (val) => (val === undefined || val === null || val === "" || val === "undefined" || val === "null") ? undefined : val,
+    z.coerce.number().int().min(1).default(1)
+  ),
+  pageSize: z.preprocess(
+    (val) => (val === undefined || val === null || val === "" || val === "undefined" || val === "null") ? undefined : val,
+    z.coerce.number().int().min(1).max(100).default(20)
+  ),
 });
 
 /**

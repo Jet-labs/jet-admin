@@ -95,6 +95,5 @@ erDiagram
 *   **`tblListeners`**: Connection metadata for background datasource events (e.g., PostgreSQL CDC listener endpoint path and active status).
 *   **`tblListenerActions`**: Action mapping routines triggering specific steps (like workflows) on data events.
 *   **`tblListenerEvents`**: Ring buffer storing transformed event records (`eventData` JSON).
-*   **`tblEventDLQ`**: Dead-letter queue tracking event dispatching errors, metadata, and retry counts.
 *   **`tblCronJobs`**: Stores cron scheduler parameters (`cronJobSchedule`) executing target workflows.
 *   **`tblCronJobHistory`**: Traces execution runs, durations, and output statuses from the cron daemon.

@@ -173,14 +173,9 @@ export default class RabbitMQDataSource extends DataSource {
       if (consumeMode === "preview") {
         // Put message back in queue
         channel.nack(msg, false, true);
-      } else if (consumeMode === "consume" || consumeMode === "consumeAndStore") {
+      } else if (consumeMode === "consume") {
         // Acknowledge and remove from queue
         channel.ack(msg);
-        
-        // If storing, execute the store destination data query
-        if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-          await context.executeDataQuery(storeDestination.dataQueryId, { message: content });
-        }
       }
     }
 

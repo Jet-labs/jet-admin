@@ -118,6 +118,55 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
       }
     }
 
+    case "TRIGGER_QUERY": {
+      const queryID = config.queryID;
+      if (!queryID) {
+        console.warn("[AppPageEvents] TRIGGER_QUERY missing queryID");
+        return null;
+      }
+      try {
+        const eventInputValues = stateTree.event?.inputValues || {};
+        const mergedInputValues = { ...config.inputValues, ...eventInputValues };
+
+        const result = await runDataQueryByIDAPI({
+          tenantID: meta.tenantID,
+          dataQueryID: queryID,
+          inputValues: mergedInputValues,
+        });
+        return result;
+      } catch (error) {
+        console.error(`[AppPageEvents] TRIGGER_QUERY "${queryID}" failed:`, error);
+        throw error;
+      }
+    }
+
+    case "TRIGGER_WORKFLOW": {
+      const workflowID = config.workflowID;
+      if (!workflowID) {
+        console.warn("[AppPageEvents] TRIGGER_WORKFLOW missing workflowID");
+        return null;
+      }
+      try {
+        const eventInputValues = stateTree.event?.inputValues || {};
+        const mergedInputValues = { ...config.inputValues, ...eventInputValues };
+
+        const temporaryAlias = `direct_workflow_${workflowID}_${Date.now()}`;
+        const { disconnect } = executeWorkflowWithStreaming({
+          tenantID: meta.tenantID,
+          workflowID: workflowID,
+          inputValues: mergedInputValues,
+          alias: temporaryAlias,
+          dispatch,
+        });
+        
+        activeWorkflowDisconnectors[temporaryAlias] = disconnect;
+        return null;
+      } catch (error) {
+        console.error(`[AppPageEvents] TRIGGER_WORKFLOW "${workflowID}" failed:`, error);
+        throw error;
+      }
+    }
+
     case "CALL_WIDGET_METHOD": {
       let rawTargetWidgetID = rawConfig?.targetWidgetID || "";
       let targetWidgetID = rawTargetWidgetID;

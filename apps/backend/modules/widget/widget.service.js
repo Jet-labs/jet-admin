@@ -1,6 +1,7 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
+const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const widgetService = {};
 /**
  *
@@ -127,6 +128,9 @@ widgetService.createWidget = async ({
 
   try {
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    if (!creatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
     const widget = await prisma.tblWidgets.create({
       data: {
         tenantID: tenantID,
@@ -138,6 +142,8 @@ widgetService.createWidget = async ({
         createdByApiKeyID,
       },
     });
+
+    await grantCreatorAccess(tenantID, "widget", widget.widgetID, authContext, creatorID);
 
     Logger.log("success", {
       message: "widgetService:createWidget:success",
@@ -243,6 +249,9 @@ widgetService.cloneWidgetByID = async ({ authContext, tenantID, widgetID, }) => 
       throw new Error("Database widget not found");
     }
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
+    if (!creatorID && !createdByApiKeyID) {
+      throw new Error("Creator ID or Created By API Key ID is required");
+    }
     const newWidget = await prisma.tblWidgets.create({
       data: {
         tenantID: tenantID,
@@ -254,6 +263,9 @@ widgetService.cloneWidgetByID = async ({ authContext, tenantID, widgetID, }) => 
         createdByApiKeyID: createdByApiKeyID,
       },
     });
+
+    await grantCreatorAccess(tenantID, "widget", newWidget.widgetID, authContext, creatorID);
+
     Logger.log("success", {
       message: "widgetService:cloneWidgetByID:success",
       params: {
@@ -395,6 +407,8 @@ widgetService.deleteWidgetByID = async ({ authContext, tenantID, widgetID }) => 
         tenantID: tenantID, // Ensure tenantID matches for security
       },
     });
+
+    await removePoliciesForResource(tenantID, `widget:${widgetID}`);
 
     Logger.log("success", {
       message: "widgetService:deleteWidgetByID:success",

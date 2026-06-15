@@ -7,9 +7,12 @@ const Logger = require("../../utils/logger");
 const { authService } = require("./auth.service");
 const { AUTH_TYPES } = require("../../types/auth.types");
 const { verifyAPIKeyHash } = require("../../utils/crypto.util");
+const { enforce: casbinEnforce } = require("../../config/casbin.config");
+const { fromRequest } = require("../../utils/executionContext");
 
 //auth middlewares
 const authMiddleware = {};
+
 
 authMiddleware.authProviderSocket = async function (socket, next) {
   if (socket && socket.handshake && socket.handshake.auth) {
@@ -208,130 +211,139 @@ authMiddleware.authProviderTest = async function (req, res, next) {
   }
 };
 
+
 /**
- * Middleware factory to check if a user has the required permissions.
+ * Casbin-based resource-level authorization middleware.
  *
- * @param {string[]} requiredPermissions - An array of permission names to check, e.g., ["create_table", "manage_tables"].
- * @param {Object} options - Optional configuration for the middleware.
- * @param {boolean} [options.requireAll=true] - Whether the user must have all permissions (`true`) or any of the permissions (`false`).
- * @returns {function(import("express").Request, import("express").Response, import("express").NextFunction): Promise<void>} - Express middleware function.
+ * Checks whether the current user/API key is allowed to perform
+ * a specific action on a specific resource within the tenant.
+ *
+ * Usage in routes:
+ *   authMiddleware.authorize("dataquery", "run")
+ *   authMiddleware.authorize("workflow", "execute")
+ *   authMiddleware.authorize("appPage", "read")
+ *
+ * The resource ID is resolved from req.params using the convention:
+ *   resourceType "dataquery" → req.params.dataQueryID
+ *   resourceType "workflow"  → req.params.workflowID
+ *   resourceType "appPage"   → req.params.appPageID
+ *
+ * If no specific resource ID is found (e.g., list endpoints),
+ * the resource selector becomes "dataquery:*" which requires
+ * a wildcard policy.
+ *
+ * Also attaches req.executionCtx for downstream service calls.
+ *
+ * @param {string|Array<object>} resourceType - Resource type or array of checks (e.g. [{ resource: "appPage", action: "create" }])
+ * @param {string} [action]       - Action if using single resource type
+ * @param {object} [options]
+ * @param {string} [options.paramKey] - Override the param key used to extract the resource ID
+ * @param {string} [options.bodyKey] - Key to extract the resource ID from req.body (useful for bindings)
+ * @param {boolean} [options.skipIfMissing] - If true and bodyKey is not in req.body, skip authorization (useful for PATCH)
  */
-authMiddleware.checkUserPermissions = (
-  requiredPermissions,
-  { requireAll = true } = {}
-) => {
+authMiddleware.authorize = (resourceTypeOrArray, action, options = {}) => {
+  const checks = Array.isArray(resourceTypeOrArray)
+    ? resourceTypeOrArray
+    : [{ resource: resourceTypeOrArray, action, ...options }];
+
   return async (req, res, next) => {
     try {
       const { user, authContext } = req;
       const { tenantID } = req.params;
-      const userID = user?.userID;
       const authType = authContext?.authType || AUTH_TYPES.USER;
-      const apiKeyID = authContext?.apiKey?.apiKeyID;
 
-      Logger.log("info", {
-        message: "authMiddleware:checkUserPermissions:params",
-        params: { userID, tenantID, requiredPermissions, requireAll, authType, apiKeyID },
-      });
+      // Determine the subject (user ID or API key ID)
+      let subjectID;
+      if (authType === AUTH_TYPES.API_KEY && authContext?.apiKey?.apiKeyID) {
+        subjectID = authContext.apiKey.apiKeyID;
+      } else {
+        subjectID = user?.userID;
+      }
 
-      if (!tenantID) {
-        Logger.log("error", {
-          message: "authMiddleware:checkUserPermissions:missing-tenant",
-          params: { tenantID, error: "Tenant information missing" },
-        });
+      if (!subjectID || !tenantID) {
         return expressUtils.sendResponse(
           res,
           false,
           {},
-          "Tenant information missing"
+          "Authorization failed: Missing subject or tenant"
         );
       }
 
-      let permissionCheck;
+      for (const check of checks) {
+        const { resource: resourceType, action: checkAction, paramKey: checkParamKey, bodyKey, reqKey, skipIfMissing } = check;
 
-      if (authType === AUTH_TYPES.API_KEY && apiKeyID) {
-        Logger.log("info", {
-          message: "authMiddleware:checkUserPermissions:api-key-auth",
-          params: { apiKeyID, tenantID, requiredPermissions },
-        });
+        // Resolve resource ID from req, route params, or body
+        let resourceIDs;
+        if (reqKey) {
+          const getNestedValue = (obj, path) => path.split('.').reduce((acc, part) => acc && acc[part], obj);
+          resourceIDs = getNestedValue(req, reqKey);
+        } else {
+          const paramKeyToUse = checkParamKey || `${resourceType}ID`;
+          resourceIDs = req.params[paramKeyToUse];
+          
+          if (resourceIDs === undefined && bodyKey) {
+            const getNestedValue = (obj, path) => path.split('.').reduce((acc, part) => acc && acc[part], obj);
+            const bodyValue = getNestedValue(req.body, bodyKey);
 
-        permissionCheck = await authService.checkAPIKeyPermissions({
-          apiKeyID,
-          tenantID,
-          requiredPermissions,
-          requireAll,
-        });
-      } else {
-        if (!userID) {
-          Logger.log("error", {
-            message: "authMiddleware:checkUserPermissions:missing-user",
-            params: { userID, error: "User information missing" },
-          });
-          return expressUtils.sendResponse(
-            res,
-            false,
-            {},
-            "User information missing"
-          );
+            if (bodyValue === undefined && skipIfMissing) {
+              // For PATCH requests where the binding ID is optional and omitted
+              continue;
+            }
+            resourceIDs = bodyValue;
+          }
+        }
+        
+        // Normalize to array for iterative evaluation
+        if (resourceIDs === undefined || resourceIDs === null) {
+          resourceIDs = ["*"];
+        } else if (!Array.isArray(resourceIDs)) {
+          resourceIDs = [resourceIDs];
         }
 
-        permissionCheck = await authService.checkUserPermissions({
-          userID,
-          tenantID,
-          requiredPermissions,
-          requireAll,
-        });
+        for (const id of resourceIDs) {
+          const resourceSelector = `${resourceType}:${id}`;
+
+          Logger.log("info", {
+            message: "authMiddleware:authorize:check",
+            params: { subjectID, tenantID, resourceSelector, action: checkAction, authType },
+          });
+
+          // Run Casbin enforcement
+          const allowed = await casbinEnforce(
+            subjectID,
+            tenantID,
+            resourceSelector,
+            checkAction
+          );
+
+          if (!allowed) {
+            Logger.log("error", {
+              message: "authMiddleware:authorize:denied",
+              params: { subjectID, tenantID, resourceSelector, action: checkAction },
+            });
+
+            return expressUtils.sendResponse(
+              res,
+              false,
+              {},
+              constants.ERROR_CODES.PERMISSION_DENIED
+            );
+          }
+        }
       }
 
-      Logger.log("info", {
-        message: "authMiddleware:checkUserPermissions:permissionCheck",
-        params: {
-          userID,
-          apiKeyID,
-          authType,
-          tenantID,
-          requiredPermissions,
-          requireAll,
-          permissionCheck,
-        },
+      Logger.log("success", {
+        message: "authMiddleware:authorize:allowedAll",
+        params: { subjectID, tenantID, checksCount: checks.length },
       });
 
-      if (permissionCheck.permission) {
-        Logger.log("success", {
-          message: "authMiddleware:checkUserPermissions:success",
-          params: {
-            userID,
-            apiKeyID,
-            authType,
-            tenantID,
-            requiredPermissions,
-            requireAll,
-          },
-        });
-        return next();
-      } else {
-        Logger.log("error", {
-          message: "authMiddleware:checkUserPermissions:permission-denied",
-          params: {
-            userID,
-            apiKeyID,
-            authType,
-            tenantID,
-            requiredPermissions,
-            requireAll,
-            reason: permissionCheck.reason,
-          },
-        });
-        return expressUtils.sendResponse(
-          res,
-          false,
-          {},
-          constants.ERROR_CODES.PERMISSION_DENIED
-        );
-      }
+      // Attach execution context for downstream services
+      req.executionCtx = fromRequest(req);
+      return next();
     } catch (error) {
       Logger.log("error", {
-        message: "authMiddleware:checkUserPermissions:catch-1",
-        params: { errorMessage: error.message },
+        message: "authMiddleware:authorize:error",
+        params: { error: error.message },
       });
       return expressUtils.sendResponse(
         res,
@@ -343,5 +355,5 @@ authMiddleware.checkUserPermissions = (
   };
 };
 
-
 module.exports = { authMiddleware };
+

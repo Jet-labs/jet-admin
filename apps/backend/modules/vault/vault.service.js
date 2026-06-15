@@ -14,11 +14,15 @@ const vaultService = {};
  * @param {object|string} param0.data - The plain-text credential data (object or string).
  * @returns {Promise<object>} - The stored credential metadata (without decrypted sensitive data).
  */
-vaultService.storeCredential = async ({ tenantID, provider, name, data }) => {
+vaultService.storeCredential = async ({ tenantID, provider, name, data, creatorID, createdByApiKeyID }) => {
   Logger.log("info", {
     message: "vaultService:storeCredential:params",
-    params: { tenantID, provider, name },
+    params: { tenantID, provider, name, creatorID, createdByApiKeyID },
   });
+
+  if (!creatorID && !createdByApiKeyID) {
+    throw new Error("Creator ID or Created By API Key ID is required");
+  }
 
   try {
     const stringifiedData = typeof data === "string" ? data : JSON.stringify(data);
@@ -30,6 +34,8 @@ vaultService.storeCredential = async ({ tenantID, provider, name, data }) => {
         provider: provider,
         name: name,
         encryptedData: encrypted,
+        creatorID: creatorID || null,
+        createdByApiKeyID: createdByApiKeyID || null,
       },
     });
 

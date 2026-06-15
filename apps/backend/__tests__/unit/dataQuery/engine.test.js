@@ -32,7 +32,7 @@ describe('QueryEngine', () => {
 
   describe('resolveTemplate', () => {
     it('should resolve string template with simple variables', async () => {
-      const template = 'SELECT * FROM users WHERE id = {{args.userId}}';
+      const template = 'SELECT * FROM users WHERE id = {{inputs.userId}}';
       const runtimeInputs = { userId: 123 };
 
       const result = await queryEngine.resolveTemplate(template, runtimeInputs, 'test-query');
@@ -41,7 +41,7 @@ describe('QueryEngine', () => {
     });
 
     it('should resolve string template with multiple variables', async () => {
-      const template = 'SELECT * FROM {{args.tableName}} WHERE id = {{args.userId}}';
+      const template = 'SELECT * FROM {{inputs.tableName}} WHERE id = {{inputs.userId}}';
       const runtimeInputs = { tableName: 'customers', userId: 456 };
 
       const result = await queryEngine.resolveTemplate(template, runtimeInputs, 'test-query');
@@ -52,9 +52,9 @@ describe('QueryEngine', () => {
     it('should resolve object template recursively', async () => {
       const template = {
         query: 'SELECT * FROM users',
-        limit: '{{args.pageSize}}',
+        limit: '{{inputs.pageSize}}',
         filters: {
-          name: '{{args.userName}}'
+          name: '{{inputs.userName}}'
         }
       };
       const runtimeInputs = { pageSize: 10, userName: 'John' };
@@ -95,7 +95,7 @@ describe('QueryEngine', () => {
     });
 
     it('should handle nested object access in template', async () => {
-      const template = 'SELECT * FROM users WHERE id = {{args.user.id}}';
+      const template = 'SELECT * FROM users WHERE id = {{inputs.user.id}}';
       const runtimeInputs = { user: { id: 789 } };
 
       const result = await queryEngine.resolveTemplate(template, runtimeInputs, 'test-query');
@@ -103,17 +103,17 @@ describe('QueryEngine', () => {
       expect(result).toBe('SELECT * FROM users WHERE id = 789');
     });
 
-    it('should preserve legacy args-prefixed template paths', async () => {
+    it('should ignore legacy args-prefixed template paths if not in allowedRoots', async () => {
       const template = 'SELECT * FROM users WHERE id = {{args.user.id}}';
       const runtimeInputs = { user: { id: 654 } };
 
       const result = await queryEngine.resolveTemplate(template, runtimeInputs, 'test-query');
 
-      expect(result).toBe('SELECT * FROM users WHERE id = 654');
+      expect(result).toBe('SELECT * FROM users WHERE id = ');
     });
 
     it('should resolve bracket notation and array indexes safely', async () => {
-      const template = 'SELECT * FROM {{args.filters[0].table}} WHERE user_id = {{args["user-id"]}}';
+      const template = 'SELECT * FROM {{inputs.filters[0].table}} WHERE user_id = {{inputs["user-id"]}}';
       const runtimeInputs = {
         filters: [{ table: 'customers' }],
         'user-id': 321,

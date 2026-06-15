@@ -137,17 +137,13 @@ export default class RedisDataSource extends DataSource {
       case "lpop": {
         const result = await redis.lpop(key);
         const parsed = parseValue(result);
-        if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-          await context.executeDataQuery(storeDestination.dataQueryId, { message: parsed });
-        }
+
         return { key, value: parsed };
       }
       case "rpop": {
         const result = await redis.rpop(key);
         const parsed = parseValue(result);
-        if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-          await context.executeDataQuery(storeDestination.dataQueryId, { message: parsed });
-        }
+
         return { key, value: parsed };
       }
       case "lrange": {
@@ -209,11 +205,7 @@ export default class RedisDataSource extends DataSource {
           return { id, data };
         });
 
-        if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
-          for (const msg of messages) {
-            await context.executeDataQuery(storeDestination.dataQueryId, { message: msg });
-          }
-        }
+
 
         return { key, messages, count: messages.length };
       }

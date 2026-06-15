@@ -44,10 +44,6 @@ if (isModuleEnabled(constants.MODULES.TENANT)) {
     "/api/v1/tenants",
     require("./modules/tenant/tenant.v1.routes")
   );
-  expressApp.use(
-    "/api/v1/tenants",
-    require("./modules/tenant/tenant.v1.routes")
-  );
 }
 
 // OAuth integration routes

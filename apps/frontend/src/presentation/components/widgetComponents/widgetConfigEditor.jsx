@@ -4,11 +4,10 @@ import { CONSTANTS } from "../../../constants";
 
 import PropTypes from "prop-types";
 
-import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
+import { WIDGETS_MAP, WidgetEditorContext } from "@jet-admin/widgets-ui";
 import { WIDGET_PROCESSORS_MAP } from "@jet-admin/widgets-logic";
+import { uploadWidgetFileAPI } from "../../../data/apis/widget";
 import { WidgetAdvancedOptions } from "./widgetAdvancedOptions";
-import { useWorkflows } from "../../../logic/hooks/useWorkflows";
-import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import {
   Checkbox,
   Input,
@@ -49,9 +48,6 @@ export const WidgetConfigEditor = ({
   const builder = WIDGET_PROCESSORS_MAP?.[widgetType];
   const dataManifest = builder?.constructor?.dataManifest;
 
-  // Fetch workflows list so chart editors can resolve workflow metadata
-  const { workflows, isLoadingWorkflows, loadWorkflowsError } = useWorkflows(tenantID);
-
   // Extract all referenced page-level data sources from the widget config
   const referencedDataSources = React.useMemo(() => {
     const config = widgetEditorForm.values.widgetConfig;
@@ -77,11 +73,26 @@ export const WidgetConfigEditor = ({
 
   const previewStateTree = dataSourceResults;
 
+  const handleUploadFile = React.useCallback(async (file) => {
+    return await uploadWidgetFileAPI({ tenantID, file });
+  }, [tenantID]);
+
+  const widgetEditorContextValue = React.useMemo(
+    () => ({
+      tenantID,
+      fileUpload: {
+        uploadFile: handleUploadFile,
+      },
+      apiProxy: {
+        post: async (action, params) => {
+          throw new Error("apiProxy is not fully supported for widgets yet");
+        },
+      },
+    }),
+    [tenantID, handleUploadFile]
+  );
+
   return (
-    <ReactQueryLoadingErrorWrapper
-      isLoading={isLoadingWorkflows}
-      error={loadWorkflowsError}
-    >
       <div className="flex w-full flex-col gap-2">
       {/* Widget Name */}
         <div className="space-y-1">
@@ -180,16 +191,17 @@ export const WidgetConfigEditor = ({
         </TabsContent>
 
           <TabsContent value="properties" className="mt-2">
-          {/* Type-Specific Config Editor (chart options, table columns, etc.) */}
-          {ConfigEditorComponent && (
-            <ConfigEditorComponent
-              widgetEditorForm={widgetEditorForm}
-              stateTree={previewStateTree}
-              workflowContext={previewStateTree}
-              queryResults={previewStateTree}
-              workflows={workflows}
-            />
-          )}
+            <WidgetEditorContext.Provider value={widgetEditorContextValue}>
+              {/* Type-Specific Config Editor (chart options, table columns, etc.) */}
+              {ConfigEditorComponent && (
+                <ConfigEditorComponent
+                  widgetEditorForm={widgetEditorForm}
+                  stateTree={previewStateTree}
+                  workflowContext={previewStateTree}
+                  queryResults={previewStateTree}
+                />
+              )}
+            </WidgetEditorContext.Provider>
 
           {/* Widget Advanced Options Generic Form */}
           <WidgetAdvancedOptions
@@ -210,6 +222,5 @@ export const WidgetConfigEditor = ({
         </TabsContent>
       </Tabs>
     </div>
-    </ReactQueryLoadingErrorWrapper>
   );
 };

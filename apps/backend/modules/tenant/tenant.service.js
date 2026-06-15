@@ -190,11 +190,6 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
           tenantID: tenantIdToDelete,
         },
       }),
-      prisma.tblDatabaseNotifications.deleteMany({
-        where: {
-          tenantID: tenantIdToDelete,
-        },
-      }),
       prisma.tblDataQueries.deleteMany({
         where: {
           tenantID: tenantIdToDelete,
