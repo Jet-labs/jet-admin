@@ -1,25 +1,42 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import { Upload } from "lucide-react";
 import PropTypes from "prop-types";
+import { uploadTenantLogoAPI } from "../../../data/apis/tenant";
+import { displayError, displaySuccess } from "../../../utils/notification";
 
 import { Spinner, Input } from "@jet-admin/ui";
-export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
+export const LogoUpload = ({ onLogoUpload }) => {
   LogoUpload.propTypes = {
-    isUploadingLogo: PropTypes.bool.isRequired,
-    uploadError: PropTypes.bool.isRequired,
     onLogoUpload: PropTypes.func.isRequired,
   };
+  
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
   const fileInputRef = useRef(null);
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event) => {
-    onLogoUpload(event);
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingLogo(true);
+      setUploadError(null);
+      const result = await uploadTenantLogoAPI({ file });
+      displaySuccess(CONSTANTS.STRINGS.TENANT_EDITOR_LOGO_UPLOAD_SUCCESS_TOAST);
+      onLogoUpload(result.url);
+    } catch (error) {
+      console.error("Upload error:", error);
+      setUploadError(error);
+      displayError(CONSTANTS.STRINGS.TENANT_EDITOR_LOGO_UPLOAD_ERROR_TOAST);
+    } finally {
+      setIsUploadingLogo(false);
+    }
   };
-  console.log({ uploadError: uploadError });
 
   return (
     <div className="space-y-2">

@@ -1,6 +1,5 @@
 import { CONSTANTS } from "../../../constants";
-import { displayError, displaySuccess } from "../../../utils/notification";
-import useSupabaseUpload from "../../../logic/hooks/useSupabseUpload";
+
 import { LogoUpload } from "../ui/logoUploadInput";
 import { TenantLogo } from "./tenantLogo";
 
@@ -21,37 +20,8 @@ export const TenantEditor = ({ tenantEditorForm }) => {
   };
 
 
-  const {
-    uploadFile,
-    isUploading: isUploadingLogo,
-    uploadError: uploadLogoError,
-  } = useSupabaseUpload({
-    bucket: CONSTANTS.SUPABASE.TENANT_ASSET_DIRECTORY,
-    directory: CONSTANTS.SUPABASE.TENANT_LOGO_DIRECTORY,
-    allowedTypes: ["image/jpeg", "image/png", "image/gif"],
-    maxSizeMB: 2,
-    onSuccess: () => {
-      displaySuccess(CONSTANTS.STRINGS.TENANT_EDITOR_LOGO_UPLOAD_SUCCESS_TOAST);
-    },
-    onError: (error) => {
-      displayError(JSON.stringify(error));
-      console.error("Upload failed:", error);
-    },
-    generateUniqueName: true,
-    upsert: true,
-  });
-
-  const _handleLogoUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    try {
-      const result = await uploadFile(file);
-      console.log("Upload result:", result);
-      tenantEditorForm.setFieldValue("tenantLogoURL", result.url);
-    } catch (error) {
-      console.error("Upload error:", error);
-    }
+  const _handleLogoUpload = (url) => {
+    tenantEditorForm.setFieldValue("tenantLogoURL", url);
   };
 
   return (
@@ -67,8 +37,6 @@ export const TenantEditor = ({ tenantEditorForm }) => {
             />
           )}
           <LogoUpload
-            isUploadingLogo={isUploadingLogo}
-            uploadError={uploadLogoError}
             onLogoUpload={_handleLogoUpload}
           />
         </div>

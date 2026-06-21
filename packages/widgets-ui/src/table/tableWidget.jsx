@@ -547,7 +547,7 @@ export const TableWidget = ({
       <div className="absolute bottom-12 left-0 right-0 px-4 flex flex-col gap-2 pointer-events-none z-30">
         {/* Multi-select action bar */}
         {multiSelectConfig.enabled && selectedCount > 0 && (
-          <div className="flex items-center justify-between bg-card border border-border shadow-md rounded-lg p-3 pointer-events-auto">
+          <div className="flex items-center justify-between bg-card border border-border shadow-md rounded-md p-3 pointer-events-auto">
             <span className="text-xs font-medium text-foreground px-2">
               <span className="text-primary font-medium">{selectedCount}</span> row{selectedCount !== 1 ? "s" : ""} selected
             </span>
@@ -564,7 +564,7 @@ export const TableWidget = ({
 
         {/* Bulk edit save bar */}
         {bulkEditConfig.enabled && pendingEditCount > 0 && (
-          <div className="flex items-center justify-between bg-card border border-primary/30 shadow-md rounded-lg p-3 pointer-events-auto">
+          <div className="flex items-center justify-between bg-card border border-primary/30 shadow-md rounded-md p-3 pointer-events-auto">
             <span className="text-xs font-medium text-foreground px-2">
               <span className="text-primary font-medium">{pendingEditCount}</span> unsaved change{pendingEditCount !== 1 ? "s" : ""}
             </span>

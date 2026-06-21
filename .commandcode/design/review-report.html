@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Review — Jet Admin</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #0f0f0f;
+    color: #e4e4e7;
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.75rem; font-weight: 700; color: #fafafa; margin-bottom: 0.25rem; letter-spacing: -0.02em; }
+  .subtitle { font-size: 0.875rem; color: #898989; margin-bottom: 2rem; border-bottom: 1px solid #2e2e2e; padding-bottom: 1rem; }
+  h2 { font-size: 1.25rem; font-weight: 600; color: #fafafa; margin-top: 2rem; margin-bottom: 0.75rem; }
+  h3 { font-size: 1rem; font-weight: 600; color: #d4d4d8; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+  p { margin-bottom: 0.75rem; color: #d4d4d8; }
+  .score-block { margin: 1.5rem 0; }
+  .score-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  .score-table th { text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #898989; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2e2e2e; font-weight: 600; }
+  .score-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #1f1f1f; font-size: 0.9rem; }
+  .score-table td:last-child { text-align: right; }
+  .score-table tr:last-child td { border-bottom: 2px solid #7582ff; font-weight: 600; color: #fafafa; }
+  .score-value { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .score-dots { display: inline-flex; gap: 3px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #2e2e2e; }
+  .dot.filled { background: #7582ff; }
+  .dot.half { background: linear-gradient(90deg, #7582ff 50%, #2e2e2e 50%); }
+  .finding { background: #1a1a1a; border-left: 3px solid #7582ff; padding: 1rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+  .finding.warning { border-left-color: #f59e0b; }
+  .finding.critical { border-left-color: #ef4444; }
+  .finding strong { color: #fafafa; }
+  ul, ol { margin: 0.5rem 0 1rem 1.5rem; color: #d4d4d8; }
+  li { margin-bottom: 0.35rem; }
+  .smell-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  .smell-table th { text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #898989; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2e2e2e; font-weight: 600; }
+  .smell-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #1f1f1f; font-size: 0.875rem; }
+  .tag { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 3px; }
+  .tag.yes { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+  .tag.partial { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+  .tag.no { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+  .tag.minimal { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+  .rec { background: #1a1a1a; border: 1px solid #2e2e2e; padding: 1rem; margin: 0.75rem 0; border-radius: 6px; }
+  .rec h4 { color: #fafafa; font-size: 0.95rem; margin-bottom: 0.35rem; }
+  .rec .meta { font-size: 0.8rem; color: #7582ff; font-weight: 500; }
+  .rec p { font-size: 0.875rem; margin-bottom: 0; }
+  .total { font-size: 2.5rem; font-weight: 700; color: #fafafa; }
+  .total-label { font-size: 0.8rem; color: #898989; text-transform: uppercase; letter-spacing: 0.08em; }
+  .total-wrap { display: flex; align-items: baseline; gap: 0.75rem; margin: 1rem 0; }
+  code { font-family: "SF Mono", "Fira Code", monospace; font-size: 0.8rem; background: #1f1f1f; padding: 0.15rem 0.35rem; border-radius: 3px; color: #a1a1aa; }
+  .meta-line { font-size: 0.85rem; color: #898989; }
+</style>
+</head>
+<body>
+
+<h1>Design Review: Jet Admin</h1>
+<p class="subtitle">
+  <span class="meta-line">Product &mdash; App UI / Admin Internal-Tool Builder</span><br>
+  <span class="meta-line">Surface: Sign-in, sign-up, protected layout, app page builder</span><br>
+  <span class="meta-line">2026-06-20</span>
+</p>
+
+<h2>First Impression</h2>
+<p>The dark indigo theme signals "developer tool" immediately — and correctly. The three-panel builder (editor sidebar | canvas | console) looks like the right tool for the job. Resizable panels and a custom drag-and-drop layout engine say the team has invested in the hard problems.</p>
+<p>But the product's visual personality stops at "competent dark theme." The sign-in page is interchangeable with any SaaS product. The nav bar has a 2px purple bottom border that draws the eye but carries no meaning. The builder works well but doesn't leave a memorable impression.</p>
+
+<div class="score-block">
+  <div class="total-wrap">
+    <span class="total">33</span>
+    <span class="total-label">/ 50</span>
+  </div>
+</div>
+
+<h2>Design Lenses</h2>
+
+<table class="score-table">
+  <tr>
+    <th>Lens</th>
+    <th>Score</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td>First impression</td>
+    <td>
+      <span class="score-value">7/10
+        <span class="score-dots">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+      </span>
+    </td>
+    <td>Competent dark tool, lacks personality</td>
+  </tr>
+  <tr>
+    <td>Hierarchy</td>
+    <td>
+      <span class="score-value">7/10
+        <span class="score-dots">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+      </span>
+    </td>
+    <td>Strong layout hierarchy, weak typographic hierarchy</td>
+  </tr>
+  <tr>
+    <td>Color voice</td>
+    <td>
+      <span class="score-value">6/10
+        <span class="score-dots">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+      </span>
+    </td>
+    <td>Confused semantics, missing green, naming mismatch</td>
+  </tr>
+  <tr>
+    <td>Type voice</td>
+    <td>
+      <span class="score-value">6/10
+        <span class="score-dots">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+      </span>
+    </td>
+    <td>No type system, flat weight, aspirational font</td>
+  </tr>
+  <tr>
+    <td>Interaction feel</td>
+    <td>
+      <span class="score-value">7/10
+        <span class="score-dots">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+      </span>
+    </td>
+    <td>Great DnD + undo, focus/disabled states need work</td>
+  </tr>
+  <tr>
+    <td><strong>Total</strong></td>
+    <td><strong>33/50</strong></td>
+    <td>Solid foundation with clear interventions that would lift it</td>
+  </tr>
+</table>
+
+<h2>Hierarchy — Walkthrough</h2>
+
+<h3>Entry (Sign-in)</h3>
+<p>Centered card layout — logo row at top, form below. <code>Section</code> card component provides a visual container. Label placement above inputs follows convention well. Clear focus hierarchy: logo → form → submit → Google button → sign-up link.</p>
+
+<h3>Protected Layout</h3>
+<p>Three-tier nesting is sound architecture. Top nav has logo (left), breadcrumbs (center), user avatar (right). Sidebar uses resizable panels with Radix accordion. Active state highlighting uses <code>bg-primary/5</code> — visible but subtle.</p>
+
+<h3>Builder Surface</h3>
+<p>Three-zone layout (editor 20% | canvas 80% | console 25%) creates clear operational hierarchy. Canvas is the dominant surface. Floating <code>LayoutNodeToolbar</code> on selection is a good space-saver.</p>
+
+<div class="finding">
+  <strong>Typographic hierarchy is flat.</strong> All headings use <code>font-weight: 400</code>. Only <code>line-height</code> distinguishes h1 from h2 from h3. Sidebar nav items use <code>font-semibold</code>, creating a mismatch where nav labels feel heavier than page headings.
+</div>
+
+<h2>Color Voice</h2>
+<p>The palette commits to one hue: <code>#7582ff</code> (indigo-purple) — primary, accent, link, focus, success, and active indicator simultaneously. The brand's entire semantics run on a single hue plus gray neutrals.</p>
+
+<p><strong>What works:</strong> The dark theme is cohesive. <code>--brand-dark</code> (<code>#171717</code>) and <code>--brand-dark-card</code> (<code>#1F1F1F</code>) create subtle surface distinction. Border steps show depth thinking.</p>
+
+<div class="finding critical">
+  <strong>Success = Primary.</strong> The MUI theme maps <code>success.main</code> to <code>#7582ff</code> — the same purple as primary. There is no green. "Success" and "primary action" are visually identical.
+</div>
+
+<div class="finding warning">
+  <strong>Naming confusion.</strong> <code>.link-lime</code> styles links in <em>blue</em> (<code>#3e71cf</code>). <code>.link-purple</code> styles links in <em>white</em> (<code>#fafafa</code>). Names describe neither the color nor the function.
+</div>
+
+<div class="finding warning">
+  <strong>Google SSO button</strong> hardcodes <code>bg-[#4285F4]</code> inline — breaks the design system. No warning color exists (only destructive red). Darkest surfaces are pure neutral — a whisper of indigo chroma would feel authored.
+</div>
+
+<h2>Type Voice</h2>
+<p>The font stack targets "Circular" — a paid Lineto typeface. If licensed, distinctive. If not, the fallback (Helvetica Neue, Arial) is generic system text.</p>
+
+<div class="finding critical">
+  <strong>No type system.</strong> No defined scale. No <code>clamp()</code>, no fluid type, no leading trim. All headings at <code>font-weight: 400</code> — on a dark background, light headings recede instead of commanding attention.
+</div>
+
+<div class="finding">
+  <strong>h1 line-height: 1.00</strong> — descenders on letters like "g" and "j" will collide with the line above. Most h1 elements in the app are page titles that should breathe.
+</div>
+
+<p>Only one defined label style (<code>.label-caps</code> at 12px uppercase monospace). No secondary, tertiary, or caption size. On dark backgrounds, <code>font-weight: 400</code> body text at 16px is readable but not comfortable for longer content.</p>
+
+<h2>Interaction Feel</h2>
+
+<p><strong>Strengths:</strong></p>
+<ul>
+  <li>Drag-and-drop has thorough visual feedback: glow indicators, hover resize handles, row border highlights, dashed empty zones</li>
+  <li>Undo system with "N unsaved changes" badge is a UX win</li>
+  <li>Floating toolbar appears contextually on selection</li>
+  <li><code>ReactQueryLoadingErrorWrapper</code> provides consistent loading/error/empty states</li>
+  <li>Toast system is visually consistent with dark theme</li>
+</ul>
+
+<div class="finding warning">
+  <strong><code>outline: none !important</code> on buttons</strong> removes the native focus indicator. The custom <code>box-shadow</code> fallback works on supported elements but <code>!important</code> blocks any override.
+</div>
+
+<div class="finding warning">
+  <strong>Sign-in error copy</strong> is generic: "Sign in error! Please check your credentials and try again!" tells the user nothing actionable. The <strong>sign-up form</strong> serializes the raw error object (<code>JSON.stringify(error)</code>) — technical noise for end users.
+</div>
+
+<h2>Smell Check</h2>
+
+<table class="smell-table">
+  <tr>
+    <th>Smell</th>
+    <th>Status</th>
+    <th>Evidence</th>
+  </tr>
+  <tr>
+    <td>Generic tech palette (blue-purple CTA, blue-to-cyan gradient)</td>
+    <td><span class="tag partial">Partial</span></td>
+    <td>Indigo is better than the usual gradient, but success=same-purple makes it read as one-note</td>
+  </tr>
+  <tr>
+    <td>Centered hero, repeated cards, pill buttons</td>
+    <td><span class="tag no">No</span></td>
+    <td>Builder avoids this pattern; sign-in card is appropriate for auth</td>
+  </tr>
+  <tr>
+    <td>Inter/Plus Jakarta/Roboto system font default</td>
+    <td><span class="tag no">No</span></td>
+    <td>Circular is an actual design decision, albeit expensive</td>
+  </tr>
+  <tr>
+    <td>"AI made this" category reflex</td>
+    <td><span class="tag no">No</span></td>
+    <td>Custom layout engine and resizable panels are specific decisions</td>
+  </tr>
+  <tr>
+    <td>No states beyond idle</td>
+    <td><span class="tag minimal">Minimal</span></td>
+    <td>Loading/error/empty exist. Disabled and overflow unverified</td>
+  </tr>
+  <tr>
+    <td>Flat hero, no depth or texture</td>
+    <td><span class="tag yes">Yes</span></td>
+    <td>Sign-in/up are flat cards on solid background — no shadow, texture, atmosphere</td>
+  </tr>
+  <tr>
+    <td>Color as decoration rather than information</td>
+    <td><span class="tag yes">Yes</span></td>
+    <td>Purple used for everything — when a color means everything, it means nothing</td>
+  </tr>
+</table>
+
+<h2>Top Recommendations</h2>
+
+<div class="rec">
+  <h4>1. Redesign color semantics</h4>
+  <div class="meta">Mode: recolor</div>
+  <p>Add a green for success states (distinct from primary). Add amber for warnings. Keep purple as primary only. This fixes the most confusing visual bug in the system.</p>
+</div>
+
+<div class="rec">
+  <h4>2. Build a type system</h4>
+  <div class="meta">Mode: typeset</div>
+  <p>Define a 5-step type scale (h1, h2, h3, body, caption) with distinct weights: h1/h2 at 600-700, body 400, caption 500. Add <code>clamp()</code> for fluid sizing.</p>
+</div>
+
+<div class="rec">
+  <h4>3. Fix heading weight on dark</h4>
+  <div class="meta">Mode: refine</div>
+  <p>Increase h1/h2 to <code>font-weight: 600-700</code>. Relax h1 <code>line-height</code> from 1.00 to 1.15 minimum. Headings on dark need weight to command attention.</p>
+</div>
+
+<div class="rec">
+  <h4>4. Add interaction state audit</h4>
+  <div class="meta">Mode: interaction</div>
+  <p>Audit disabled states (gray-on-gray is common). Remove <code>outline: none !important</code>. Restore visible focus rings.</p>
+</div>
+
+<div class="rec">
+  <h4>5. Add brand atmosphere to auth pages</h4>
+  <div class="meta">Mode: refine / surface</div>
+  <p>The sign-in/up cards sit on a flat dark background with no texture or depth. A subtle gradient or atmospheric element would make the entry feel authored.</p>
+</div>
+
+<div class="rec">
+  <h4>6. Rename <code>.link-lime</code> and <code>.link-purple</code></h4>
+  <div class="meta">Mode: refine</div>
+  <p>Name them by function: <code>link-brand</code>, <code>link-muted</code>. Current names describe neither color nor function.</p>
+</div>
+
+<div class="rec">
+  <h4>7. Improve error messages</h4>
+  <div class="meta">Mode: writing</div>
+  <p>Replace "Sign in error! Please check your credentials" with the actual reason. Replace <code>JSON.stringify(error)</code> on sign-up with formatted message.</p>
+</div>
+
+</body>
+</html>

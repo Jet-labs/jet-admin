@@ -171,7 +171,7 @@ export const TenantStats = ({ tenants }) => {
 
       {/* Grid or List View */}
       {sorted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 border border-border rounded-lg bg-muted/30">
+        <div className="flex flex-col items-center justify-center p-12 border border-border rounded-md bg-muted/30">
           <p className="text-muted-foreground text-sm">No projects found</p>
         </div>
       ) : viewMode === "grid" ? (

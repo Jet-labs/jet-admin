@@ -388,6 +388,7 @@ dataQueryService.runDataQueryByID = async ({
  * @param {string} param0.tenantID
  * @param {number} param0.dataQueryID
  * @param {object} param0.inputValues
+ * @param {object} param0.executionCtx
  * @returns {Promise<object>}
  */
 dataQueryService.runDataQueryByData = async ({
@@ -395,6 +396,7 @@ dataQueryService.runDataQueryByData = async ({
   tenantID,
   dataQuery,
   inputValues,
+  executionCtx,
 }) => {
   const tempQueryID = uuid();
   Logger.log("info", {
@@ -439,7 +441,7 @@ dataQueryService.runDataQueryByData = async ({
     const results = await authorizedExecuteDataQuery({
       engine: queryRunner,
       dataQueryID: tempQueryID,
-      executionInputs: resolved,
+      executionInputs: inputValues,
       executionCtx,
     });
 

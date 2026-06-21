@@ -77,14 +77,14 @@ const ResizablePanel = React.forwardRef((
   forwardedRef
 ) => {
   const context = React.useContext(ResizableContext);
+  const reactId = React.useId();
 
   // Stable panel id — used both as the `id` prop on <Panel> and as the
   // registry key. Because we pass it as `id`, the library's useUniqueId()
   // uses it verbatim, so data-panel-id on the DOM matches our key exactly.
   const panelId = React.useMemo(
-    () => id ?? `panel-${Math.random().toString(36).slice(2, 11)}`,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [id]
+    () => id ?? `panel-${reactId.replace(/:/g, "")}`,
+    [id, reactId]
   );
 
   // localRef receives ImperativePanelHandle from forwardRef on <Panel>
@@ -148,12 +148,12 @@ ResizablePanel.propTypes = {
 const ResizableHandle = ({ withHandle = true, className, id: idProp, ...props }) => {
   const context = React.useContext(ResizableContext);
   const direction = context?.direction ?? "horizontal";
+  const reactId = React.useId();
 
   // Stable ID for the handle element — used to find it in the DOM
   const handleId = React.useMemo(
-    () => idProp ?? `handle-${Math.random().toString(36).slice(2, 11)}`,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [idProp]
+    () => idProp ?? `handle-${reactId.replace(/:/g, "")}`,
+    [idProp, reactId]
   );
 
   const [targetPanelId, setTargetPanelId] = React.useState(null);

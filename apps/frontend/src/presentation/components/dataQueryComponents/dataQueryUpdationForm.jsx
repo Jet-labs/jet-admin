@@ -157,11 +157,11 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
         <ResizablePanelGroup
           direction="vertical"
           autoSaveId={
-            CONSTANTS.RESIZABLE_PANEL_KEYS.QUERY_ADDITION_FORM_RESULT_SEPARATION
+            CONSTANTS.RESIZABLE_PANEL_KEYS.QUERY_UPDATION_FORM_RESULT_SEPARATION
           }
           className={"!w-full !h-full"}
         >
-          <ResizablePanel defaultSize={20} className="!overflow-y-auto h-full p-8">
+          <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.DATA_QUERY_EDITOR_PANEL} defaultSize={20} className="!overflow-y-auto h-full p-8">
             <div className="mx-auto w-full max-w-2xl">
               <form
                 id="dataquery-update-form"
@@ -174,12 +174,13 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
                   dataQueryEditorForm={queryUpdationForm}
                   tenantID={tenantID}
                   dataQueryID={dataQueryID}
+                  dataQueryTestResult={dataQueryTestResult}
                 />
               </form>
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80}>
+          <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.DATA_QUERY_RESULT_PANEL} defaultSize={80}>
             <div className="flex h-full w-full flex-col overflow-hidden bg-background">
               <div className="flex items-center justify-between border-b border-border bg-background px-4 py-2 flex-shrink-0">
                 <span className="text-xs font-semibold text-foreground">

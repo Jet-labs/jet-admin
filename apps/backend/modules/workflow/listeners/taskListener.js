@@ -53,6 +53,7 @@ async function _processJob(jobData) {
     nodeConfig,
     context,
     workflowID,
+    tenantID,
     attempts = 0,
     maxAttempts = 3,
     nodeAttempt = 1,
@@ -95,6 +96,7 @@ async function _processJob(jobData) {
         instanceID,
         nodeID,
         workflowID,
+        tenantID,
         nodeAttempt,
         resolveTemplate: (template, meta = {}) =>
           sharedResolveTemplate(template, currentContext, WORKFLOW_TEMPLATE_OPTIONS, {

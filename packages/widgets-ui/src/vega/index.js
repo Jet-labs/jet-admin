@@ -142,7 +142,7 @@ export const VegaWidget = ({
 
       {error && !isLoadingWorkflows && (
         <div className="absolute inset-0 z-20 flex items-center justify-center p-4 text-center pointer-events-none">
-          <div className="flex items-center gap-1.5 rounded-lg  bg-muted/30 px-4 py-2 text-xs font-medium text-foreground shadow-sm">
+          <div className="flex items-center gap-1.5 rounded-md  bg-muted/30 px-4 py-2 text-xs font-medium text-foreground shadow-sm">
             <span className="text-muted-foreground">⚠</span>
             <span className="text-muted-foreground">{error}</span>
           </div>

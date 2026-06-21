@@ -140,7 +140,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
           }
           className={"!w-full !h-full"}
         >
-          <ResizablePanel defaultSize={35} className="!overflow-y-auto !pb-10">
+          <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WIDGET_EDITOR_SIDEBAR} defaultSize={35} className="!overflow-y-auto !pb-10">
             <form
               className="flex w-full flex-col items-stretch gap-2 bg-background p-4"
               onSubmit={updateWidgetForm.handleSubmit}
@@ -156,7 +156,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={65} className="relative flex flex-col min-h-0">
+          <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WIDGET_PREVIEW_PANEL} defaultSize={65} className="relative flex flex-col min-h-0">
             <div className="flex-1 min-h-0 w-full relative">
               <WidgetPreview
                 key={`{widgetPreview_${widgetID}}`}

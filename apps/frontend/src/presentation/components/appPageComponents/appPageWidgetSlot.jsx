@@ -88,6 +88,7 @@ export const AppPageWidgetSlot = ({
   handleDelete,
   editable = false,
   sizing,
+  scopedStateTree = null,
 }) => {
   AppPageWidgetSlot.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -97,6 +98,7 @@ export const AppPageWidgetSlot = ({
     handleDelete: PropTypes.func,
     editable: PropTypes.bool,
     sizing: PropTypes.string,
+    scopedStateTree: PropTypes.object,
   };
 
   // Extract widgetID from the key format "widget_<uuid>"
@@ -118,7 +120,10 @@ export const AppPageWidgetSlot = ({
   });
 
   // ── AppPage Runtime Integration ──
-  const stateTree = useAppPageStateTree();
+  const globalStateTree = useAppPageStateTree();
+  // Use scoped state tree (from repeat/iteration rendering) when available,
+  // otherwise fall back to the global page state tree.
+  const stateTree = scopedStateTree || globalStateTree;
   const { widgetState, setWidgetState } = useWidgetState(widgetID);
   const { registerWidgetMethods } = useWidgetMethodRegistry(widgetID);
   const { fireWidgetEvent } = useWidgetEventHandlers(

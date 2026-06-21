@@ -38,8 +38,26 @@ export const createContainerNode = (span = 12, sizing = "auto") => {
   };
 };
 
+/**
+ * Creates a z-stack node — children are stacked on top of each other
+ * via absolute positioning (z-axis, not flexbox flow).
+ * @param {number} span - Column span (1-12)
+ * @param {string} sizing - 'auto' | 'fill' | 'fixed'
+ * @param {Array} children - Initial child nodes (widget | container)
+ */
+export const createZStackNode = (span = 12, sizing = "fill", children = []) => {
+  return {
+    id: generateNodeId("zstack"),
+    type: "z-stack",
+    span,
+    sizing,
+    children,
+  };
+};
+
 export const createDefaultLayout = () => {
   return createColumnNode([
     createRowNode([])
   ]);
 };
+

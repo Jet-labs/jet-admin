@@ -1,8 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, lazy, Suspense } from "react";
 import PropTypes from "prop-types";
 import { migrateV1ToV2, LayoutEditorCanvas } from "./layout/index.js";
 import { AppPageWidgetSlot } from "./appPageWidgetSlot";
 import { WidgetIdeModal } from "./WidgetIdeModal";
+
+// Feature flag: set VITE_USE_CRAFT_EDITOR=true in .env to opt into the Craft.js editor
+const USE_CRAFT_EDITOR = import.meta.env.VITE_USE_CRAFT_EDITOR === "true";
+// Lazy-load so it doesn't inflate the bundle when the flag is off
+const CraftLayoutEditorCanvas = USE_CRAFT_EDITOR
+  ? lazy(() => import("./layout/CraftLayoutEditorCanvas.jsx"))
+  : null;
+
 
 export const AppPageDropzone = ({
   tenantID,
@@ -66,18 +74,26 @@ export const AppPageDropzone = ({
     [tenantID]
   );
 
+  const editorProps = {
+    layout: migratedConfig.layout,
+    onChangeLayout: handleLayoutChange,
+    renderWidget,
+    tenantID,
+    widgets,
+    setWidgets,
+    onEditWidget: handleEditWidget,
+  };
+
   return (
     <div className="h-full min-h-full w-full overflow-hidden bg-transparent p-0">
       {migratedConfig.layout && (
-        <LayoutEditorCanvas
-          layout={migratedConfig.layout}
-          onChangeLayout={handleLayoutChange}
-          renderWidget={renderWidget}
-          tenantID={tenantID}
-          widgets={widgets}
-          setWidgets={setWidgets}
-          onEditWidget={handleEditWidget}
-        />
+        USE_CRAFT_EDITOR && CraftLayoutEditorCanvas ? (
+          <Suspense fallback={<div className="flex items-center justify-center h-full text-muted-foreground text-sm">Loading editor…</div>}>
+            <CraftLayoutEditorCanvas {...editorProps} />
+          </Suspense>
+        ) : (
+          <LayoutEditorCanvas {...editorProps} />
+        )
       )}
 
       <WidgetIdeModal
@@ -89,3 +105,4 @@ export const AppPageDropzone = ({
     </div>
   );
 };
+

@@ -151,7 +151,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
           >
             <AppPageDataSourceBootstrapper />
             <ResizablePanelGroup direction="vertical" className="!h-full !w-full">
-              <ResizablePanel defaultSize={75} className="flex min-h-0 min-w-0">
+              <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_ADD_TOP_PANEL} defaultSize={75} className="flex min-h-0 min-w-0">
                 <ResizablePanelGroup
                   direction="horizontal"
                   autoSaveId={
@@ -160,7 +160,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
                   }
                   className="!h-full !w-full"
                 >
-                  <ResizablePanel defaultSize={20} className="overflow-hidden bg-background">
+                  <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_ADD_EDITOR_PANEL} defaultSize={20} className="overflow-hidden bg-background">
                     <AppPageEditor
                       appPageEditorForm={appPageAdditionForm}
                       tenantID={tenantID}
@@ -168,7 +168,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
                     />
                   </ResizablePanel>
                   <ResizableHandle withHandle={true} />
-                  <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+                  <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_ADD_DROPZONE_PANEL} defaultSize={80} className="overflow-hidden bg-background">
                     <AppPageDropzone
                       tenantID={tenantID}
                       pageConfig={appPageAdditionForm.values.appPageConfig}
@@ -197,7 +197,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
                 </ResizablePanelGroup>
               </ResizablePanel>
               <ResizableHandle withHandle={true} />
-              <ResizablePanel defaultSize={25} className="overflow-hidden min-h-[40px] flex flex-col">
+              <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_ADD_CONSOLE_PANEL} defaultSize={25} className="overflow-hidden min-h-[40px] flex flex-col">
                 <AppPageConsole />
               </ResizablePanel>
             </ResizablePanelGroup>

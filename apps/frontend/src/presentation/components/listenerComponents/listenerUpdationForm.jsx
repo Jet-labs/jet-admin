@@ -115,7 +115,7 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
       >
         <ResizablePanelGroup
           direction="vertical"
-          autoSaveId="listener-updation-panel-layout"
+          autoSaveId={CONSTANTS.RESIZABLE_PANEL_KEYS.LISTENER_UPDATION_PANEL_LAYOUT}
           className="!w-full !h-full"
         >
           <ResizablePanel defaultSize={60} className="!overflow-y-auto h-full p-8"

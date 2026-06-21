@@ -59,7 +59,7 @@ class QueryEngine {
     });
 
     const datasource = await this.getDataSource(query, dataQueryID);
-    const result = await datasource.execute(
+    let result = await datasource.execute(
       resolvedTemplate,
       {},
       {

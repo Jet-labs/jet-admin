@@ -162,7 +162,7 @@ export const CustomFileUploadInput = (props) => {
               </div>
             ) : (
               <>
-                <div className="p-3 bg-primary/10 text-primary rounded-lg">
+                <div className="p-3 bg-primary/10 text-primary rounded-md">
                   <CloudUpload className="h-6 w-6" />
                 </div>
                 <div className="text-center">

@@ -5,6 +5,7 @@ import {
   createWidgetNode,
   createContainerNode,
   createColumnNode,
+  createZStackNode,
 } from "./layoutDefaults.js";
 
 /**
@@ -286,7 +287,23 @@ export const wrapInContainer = (root, nodeIds) => {
   const newRoot = cloneDeep(root);
   const firstId = nodeIds[0];
   const parentInfo = findParentOf(newRoot, firstId);
-  if (!parentInfo || parentInfo.parent.type !== "row") return root;
+  if (!parentInfo) return root;
+
+  // ── Z-Stack parent: replace the layer node with a container wrapping it ──
+  if (parentInfo.parent.type === "z-stack") {
+    const zStack = parentInfo.parent;
+    // Only single-node wrapping makes sense in a z-stack layer
+    const nodeToWrap = zStack.children[parentInfo.index];
+    if (!nodeToWrap) return root;
+
+    const container = createContainerNode(12, "fill");
+    container.children = createColumnNode([createRowNode([nodeToWrap])]);
+    zStack.children[parentInfo.index] = container;
+    return newRoot;
+  }
+
+  // ── Row parent (original behaviour) ──
+  if (parentInfo.parent.type !== "row") return root;
 
   const { parent: row } = parentInfo;
 
@@ -326,15 +343,81 @@ export const wrapInContainer = (root, nodeIds) => {
 };
 
 /**
+ * Wraps one or more widgets/containers from the same row into a z-stack node.
+ * Children will be overlaid on top of each other via absolute positioning.
+ *
+ * @param {object} root - Layout tree root
+ * @param {string[]} nodeIds - IDs of nodes to wrap (must be in the same row)
+ * @returns {object} Updated layout tree
+ */
+export const wrapInZStack = (root, nodeIds) => {
+  if (!Array.isArray(nodeIds) || nodeIds.length === 0) return root;
+
+  const newRoot = cloneDeep(root);
+  const firstId = nodeIds[0];
+  const parentInfo = findParentOf(newRoot, firstId);
+  if (!parentInfo || parentInfo.parent.type !== "row") return root;
+
+  const { parent: row } = parentInfo;
+
+  const indices = nodeIds
+    .map((id) => row.children.findIndex((c) => c.id === id))
+    .filter((idx) => idx !== -1)
+    .sort((a, b) => a - b);
+
+  if (indices.length === 0) return root;
+
+  const firstIndex = indices[0];
+  let totalSpan = 0;
+  const nodesToWrap = [];
+
+  indices.forEach((idx) => {
+    const child = row.children[idx];
+    if (child) {
+      totalSpan += child.span || 6;
+      nodesToWrap.push(child);
+    }
+  });
+
+  const zStack = createZStackNode(Math.min(12, totalSpan), "fill", nodesToWrap);
+
+  const childrenLeft = row.children.filter((child) => !nodeIds.includes(child.id));
+  childrenLeft.splice(firstIndex, 0, zStack);
+  row.children = childrenLeft;
+
+  return newRoot;
+};
+
+/**
+ * Adds a widget node into an existing z-stack, stacking it on top.
+ *
+ * @param {object} root - Layout tree root
+ * @param {string} zStackId - Target z-stack node ID
+ * @param {string} widgetKey - Widget key to add
+ * @returns {object} Updated layout tree
+ */
+export const addWidgetToZStack = (root, zStackId, widgetKey) => {
+  const newRoot = cloneDeep(root);
+  const zStack = findNodeById(newRoot, zStackId);
+  if (!zStack || zStack.type !== "z-stack") return root;
+
+  const widget = createWidgetNode(widgetKey, zStack.span || 12, "fill");
+  if (!Array.isArray(zStack.children)) zStack.children = [];
+  zStack.children.push(widget);
+
+  return newRoot;
+};
+
+/**
  * Unwraps a container, putting its inner nodes back into its parent row.
  */
 export const unwrapContainer = (root, containerId) => {
   const newRoot = cloneDeep(root);
   const parentInfo = findParentOf(newRoot, containerId);
-  if (!parentInfo || parentInfo.parent.type !== "row") return root;
+  if (!parentInfo) return root;
 
-  const { parent: parentRow, index: containerIndex } = parentInfo;
-  const container = parentRow.children[containerIndex];
+  const { parent: parentNode, index: containerIndex } = parentInfo;
+  const container = parentNode.children[containerIndex];
 
   if (container.type !== "container" || !container.children) return root;
 
@@ -346,10 +429,17 @@ export const unwrapContainer = (root, containerId) => {
     }
   });
 
-  // Remove container and replace with its inner nodes
-  parentRow.children.splice(containerIndex, 1, ...innerNodes);
+  if (parentNode.type === "row") {
+    // Remove container and replace with its inner nodes in the parent row
+    parentNode.children.splice(containerIndex, 1, ...innerNodes);
+    return removeEmptyRows(newRoot);
+  } else if (parentNode.type === "z-stack") {
+    // Remove container and replace with its inner nodes in the z-stack children list
+    parentNode.children.splice(containerIndex, 1, ...innerNodes);
+    return newRoot;
+  }
 
-  return removeEmptyRows(newRoot);
+  return root;
 };
 
 /**
@@ -363,6 +453,54 @@ export const setNodeStyle = (root, nodeId, style) => {
       ...(node.style || {}),
       ...style,
     };
+  }
+  return newRoot;
+};
+
+/**
+ * Sets or clears a condition expression on a layout node.
+ * When the expression evaluates to falsy at runtime, the node is hidden.
+ *
+ * @param {object} root - Layout tree root
+ * @param {string} nodeId - Target node ID
+ * @param {string|null} condition - Mustache expression string, or null/empty to clear
+ * @returns {object} Updated layout tree
+ */
+export const setNodeCondition = (root, nodeId, condition) => {
+  const newRoot = cloneDeep(root);
+  const node = findNodeById(newRoot, nodeId);
+  if (node) {
+    if (condition && condition.trim()) {
+      node.condition = condition.trim();
+    } else {
+      delete node.condition;
+    }
+  }
+  return newRoot;
+};
+
+/**
+ * Sets or clears repeat (iteration) configuration on a layout node.
+ * When set, the node is rendered once per item in the collection array.
+ *
+ * @param {object} root - Layout tree root
+ * @param {string} nodeId - Target node ID
+ * @param {{ collection: string, itemAlias: string, indexAlias?: string }|null} repeat - Repeat config, or null to clear
+ * @returns {object} Updated layout tree
+ */
+export const setNodeRepeat = (root, nodeId, repeat) => {
+  const newRoot = cloneDeep(root);
+  const node = findNodeById(newRoot, nodeId);
+  if (node) {
+    if (repeat && repeat.collection && repeat.collection.trim() && repeat.itemAlias && repeat.itemAlias.trim()) {
+      node.repeat = {
+        collection: repeat.collection.trim(),
+        itemAlias: repeat.itemAlias.trim(),
+        ...(repeat.indexAlias && repeat.indexAlias.trim() ? { indexAlias: repeat.indexAlias.trim() } : {}),
+      };
+    } else {
+      delete node.repeat;
+    }
   }
   return newRoot;
 };

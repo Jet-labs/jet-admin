@@ -451,6 +451,7 @@ async function _dispatchNextNodes({ nextNodes, instance, isTestRun, contextData,
         nodeConfig: nextNode.nodeConfig,
         context: contextData,
         workflowID: instance.workflowID,
+        tenantID: instance.tenantID,
         isTestRun,
         isJoinNode: nextNode._isJoinNode ?? false,
         nodeAttempt: nextNode._nodeAttempt,
@@ -544,6 +545,7 @@ async function startWorkflow({ workflowID, tenantID, inputValues = {} }) {
     nodeConfig: startNode.nodeConfig,
     context: initialContext,
     workflowID,
+    tenantID,
     isJoinNode: false,
   });
 
@@ -596,6 +598,7 @@ async function startTestWorkflow({ nodes, edges, tenantID, inputValues = {} }) {
     nodeConfig: startNode.data ?? {},
     context: firstJobContext,
     workflowID: testWorkflowID,
+    tenantID,
     isTestRun: true,
     isJoinNode: false,
   });

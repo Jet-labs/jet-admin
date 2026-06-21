@@ -109,6 +109,9 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
     validateOnChange: false,
     validationSchema: formValidations.updateAppPageFormValidationSchema,
     onSubmit: async (values) => {
+      // Force any pending layout edits in Craft.js to sync to Formik state immediately
+      window.dispatchEvent(new CustomEvent("flush-editor-sync"));
+
       const confirmed = await showConfirmation({
         title: CONSTANTS.STRINGS.UPDATE_APP_PAGE_FORM_UPDATE_DIALOG_TITLE,
         message: CONSTANTS.STRINGS.UPDATE_APP_PAGE_FORM_UPDATE_DIALOG_MESSAGE,
@@ -117,7 +120,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
         confirmButtonClass: "",
       });
       if (!confirmed) return;
-      updateAppPage(values);
+      updateAppPage(appPageUpdationForm.values);
     },
   });
 
@@ -217,7 +220,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
           >
             <AppPageDataSourceBootstrapper />
             <ResizablePanelGroup direction="vertical" className="!h-full !w-full">
-              <ResizablePanel defaultSize={75} className="flex min-h-0 min-w-0">
+              <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_TOP_PANEL} defaultSize={75} className="flex min-h-0 min-w-0">
                 <ResizablePanelGroup
                   direction="horizontal"
                   autoSaveId={
@@ -226,7 +229,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
                   }
                   className="!h-full !w-full"
                 >
-                  <ResizablePanel defaultSize={20} className="overflow-hidden bg-background">
+                  <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_EDITOR_PANEL} defaultSize={20} className="overflow-hidden bg-background">
                     <AppPageEditor
                       appPageEditorForm={appPageUpdationForm}
                       tenantID={tenantID}
@@ -234,7 +237,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
                     />
                   </ResizablePanel>
                   <ResizableHandle withHandle={true} />
-                  <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+                  <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_DROPZONE_PANEL} defaultSize={80} className="overflow-hidden bg-background">
                     <AppPageDropzone
                       tenantID={tenantID}
                       pageID={appPageID}
@@ -264,7 +267,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
                 </ResizablePanelGroup>
               </ResizablePanel>
               <ResizableHandle withHandle={true} />
-              <ResizablePanel defaultSize={25} className="overflow-hidden min-h-[40px] flex flex-col">
+              <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_CONSOLE_PANEL} defaultSize={25} className="overflow-hidden min-h-[40px] flex flex-col">
                 <AppPageConsole />
               </ResizablePanel>
             </ResizablePanelGroup>

@@ -185,4 +185,58 @@ tenantController.updateTenant = async (req, res) => {
   }
 };
 
+/**
+ * Uploads a tenant logo file to Supabase storage.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+tenantController.uploadLogo = async (req, res) => {
+  try {
+    const file = req.file;
+
+    if (!file) {
+      throw new Error("No file uploaded.");
+    }
+
+    Logger.log("info", {
+      message: "tenantController:uploadLogo:params",
+      params: {
+        fileName: file.originalname,
+        fileSize: file.size,
+        fileType: file.mimetype,
+      },
+    });
+
+    // Create unique filename and upload path
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    const filePath = `${constants.STORAGE.FOLDERS.LOGOS}/${uniqueName}`;
+
+    const fileStorageUtil = require("../../utils/fileStorage.util");
+    // Upload to default bucket and get the public URL
+    const publicUrl = await fileStorageUtil.uploadFile(file.buffer, file.mimetype, filePath, constants.STORAGE.BUCKETS.TENANT_ASSETS);
+
+    Logger.log("success", {
+      message: "tenantController:uploadLogo:success",
+      params: {
+        url: publicUrl,
+        filePath,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      url: publicUrl,
+      filePath,
+      fileName: file.originalname,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tenantController:uploadLogo:error",
+      params: {
+        error: error.message || error,
+      },
+    });
+    return expressUtils.sendResponse(res, false, {}, error.message || error);
+  }
+};
+
 module.exports = { tenantController };

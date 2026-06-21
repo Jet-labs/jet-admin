@@ -7,9 +7,9 @@ import PropTypes from "prop-types";
  * links, images, lists (ordered/unordered), blockquotes, hr, paragraphs.
  */
 const parseMarkdown = (md) => {
-  if (!md) return "";
-
-  let html = md;
+  if (md === null || md === undefined) return "";
+  let html = typeof md === "string" ? md : String(md);
+  if (!html) return "";
 
   // Fenced code blocks (```lang\n...\n```)
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
@@ -134,20 +134,22 @@ export const TextWidget = ({
   widgetConfig,
   data,
 }) => {
-  const content = widgetConfig?.content || "";
+  const content = widgetConfig?.content;
   const format = widgetConfig?.format || "markdown";
   const textAlign = widgetConfig?.textAlign || "left";
   const fontSize = widgetConfig?.fontSize || "sm";
 
   const renderedHTML = useMemo(() => {
+    if (content === null || content === undefined) return "";
+    const stringContent = typeof content === "string" ? content : String(content);
     if (format === "plain") {
-      return content
+      return stringContent
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/\n/g, "<br />");
     }
-    return parseMarkdown(content);
+    return parseMarkdown(stringContent);
   }, [content, format]);
 
   const fontSizeClass = {

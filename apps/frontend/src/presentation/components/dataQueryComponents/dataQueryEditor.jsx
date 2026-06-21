@@ -20,6 +20,7 @@ import {
   Label,
   SearchSelect,
   Section,
+  CodeEditor,
 } from "@jet-admin/ui";
 
 
@@ -133,7 +134,12 @@ function buildQueryEditorForm(formikForm) {
 
     // Controlled mutation methods
     setQueryOptions: (options) => {
-      formikForm.setFieldValue("dataQueryOptions", options);
+      // Preserve transformer script which is managed outside the dedicated editors
+      const transformerScript = formikForm.values.dataQueryOptions?.transformerScript;
+      formikForm.setFieldValue("dataQueryOptions", {
+        ...options,
+        ...(transformerScript !== undefined ? { transformerScript } : {}),
+      });
     },
     patchQueryOptions: (patch) => {
       formikForm.setFieldValue("dataQueryOptions", {
@@ -144,15 +150,19 @@ function buildQueryEditorForm(formikForm) {
   };
 }
 
+
+
 export const DataQueryEditor = ({
   dataQueryEditorForm,
   tenantID,
   dataQueryID,
+  dataQueryTestResult,
 }) => {
   DataQueryEditor.propTypes = {
     dataQueryEditorForm: PropTypes.object.isRequired,
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     dataQueryID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    dataQueryTestResult: PropTypes.object,
   };
   const uniqueKey = dataQueryID
     ? `dataQueryEditor_${tenantID}_${dataQueryID}`
@@ -251,8 +261,10 @@ export const DataQueryEditor = ({
     currentDatasourceType?.hasDedicatedQueryEditor &&
     DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType]?.dedicatedQueryEditor;
 
+
+
   return (
-    <div className="w-full">
+    <div className="w-full space-y-4">
       <Section title="Query Configuration">
           <div className="space-y-2">
           <div className="space-y-1.5">

@@ -369,7 +369,7 @@ widgetController.uploadFile = async (req, res) => {
 
     // Create unique filename and upload path
     const uniqueName = `${Date.now()}-${file.originalname}`;
-    const filePath = `widget-files/${tenantID}/${uniqueName}`;
+    const filePath = `${constants.STORAGE.FOLDERS.WIDGET_FILES}/${tenantID}/${uniqueName}`;
 
     // Upload to default bucket and get the public URL
     const publicUrl = await fileStorageUtil.uploadFile(file.buffer, file.mimetype, filePath);
@@ -412,7 +412,7 @@ widgetController.serveFile = async (req, res) => {
       return res.status(400).send("Path is required");
     }
 
-    const bucketName = environmentVariables.SUPABASE_S3_BUCKET || "jet-admin-datasource-file-uploads";
+    const bucketName = environmentVariables.SUPABASE_S3_BUCKET || constants.STORAGE.BUCKETS.DATASOURCE_FILE_UPLOADS;
     const s3 = fileStorageUtil.getS3Client();
 
     const command = new GetObjectCommand({ Bucket: bucketName, Key: filePath });

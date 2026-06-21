@@ -1,5 +1,5 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
-import { ExternalLink, GripVertical, Plus, Edit2, Search } from 'lucide-react';
+import { ExternalLink, GripVertical, Plus, Edit2, Search, Grid2X2, Box, Rows, Layers } from 'lucide-react';
 import PropTypes from "prop-types";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
@@ -70,6 +70,21 @@ export const AppPageWidgetList = ({
         document.body.removeChild(clone);
       }, 0);
     }
+  };
+
+  const _handleLayoutDragStart = (e, type) => {
+    e.dataTransfer.setData("layout-type", type);
+    
+    const clone = document.createElement("div");
+    clone.className = "flex items-center gap-2 rounded-md border border-border bg-card p-2 shadow-sm text-xs font-semibold px-4 py-2 font-mono uppercase text-primary";
+    clone.innerText = `${type.toUpperCase()} LAYOUT`;
+    clone.style.transform = "translateX(-9999px)";
+    clone.style.position = "absolute";
+    document.body.appendChild(clone);
+    e.dataTransfer.setDragImage(clone, 0, 0);
+    setTimeout(() => {
+      document.body.removeChild(clone);
+    }, 0);
   };
 
   const _renderWidgetIcon = (widgetType) => {
@@ -165,6 +180,53 @@ export const AppPageWidgetList = ({
         onScroll={_handleScroll}
         className="flex w-full flex-1 flex-col gap-2 min-h-0 overflow-y-auto p-2"
       >
+        {/* Layout Elements Section */}
+        {(() => {
+          const layoutItems = [
+            { type: "row", label: "Grid Row", desc: "12-column grid row", icon: <Grid2X2 className="h-4 w-4 text-sky-500" /> },
+            { type: "container", label: "Container", desc: "Styled grouping card", icon: <Box className="h-4 w-4 text-emerald-500" /> },
+            { type: "stack", label: "Flex Stack", desc: "Align components vertically/horizontally", icon: <Rows className="h-4 w-4 text-amber-500" /> },
+            { type: "z-stack", label: "Z-Stack Layer", desc: "Overlap elements on top of each other", icon: <Layers className="h-4 w-4 text-indigo-500" /> }
+          ];
+
+          const filtered = layoutItems.filter(item => 
+            item.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            item.desc.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+
+          if (filtered.length === 0) return null;
+
+          return (
+            <div className="flex flex-col gap-1.5 pb-2 mb-2 border-b border-border/30">
+              <span className="font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 px-1">
+                Layout Elements
+              </span>
+              <div className="grid grid-cols-2 gap-1.5 p-1">
+                {filtered.map((layoutItem) => (
+                  <div
+                    key={layoutItem.type}
+                    draggable
+                    onDragStart={(e) => _handleLayoutDragStart(e, layoutItem.type)}
+                    className="flex items-center gap-2 rounded-md border border-border/60 bg-card/65 p-2 shadow-xs hover:border-primary/50 cursor-grab active:cursor-grabbing hover:bg-muted/10 transition-all select-none"
+                  >
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-muted/50 border border-border/30">
+                      {layoutItem.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="truncate text-[11px] font-semibold text-foreground block">
+                        {layoutItem.label}
+                      </span>
+                      <span className="text-[8px] text-muted-foreground truncate block">
+                        {layoutItem.desc}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         <ReactQueryLoadingErrorWrapper
           isLoading={isLoadingWidgets}
           error={loadWidgetsError}

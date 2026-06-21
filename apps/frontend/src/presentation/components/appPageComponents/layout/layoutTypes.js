@@ -1,7 +1,9 @@
 /**
  * @typedef {Object} LayoutNodeBase
  * @property {string} id - Unique identifier for the layout node
- * @property {'column' | 'row' | 'widget' | 'container' | 'stack'} type - Node type
+ * @property {'column' | 'row' | 'widget' | 'container' | 'stack' | 'z-stack'} type - Node type
+ * @property {string} [condition] - Mustache expression (e.g. {{ state.variables.showFilters }}). Node renders only when expression evaluates to truthy.
+ * @property {{ collection: string, itemAlias: string, indexAlias?: string }} [repeat] - Iteration config. `collection` is a mustache expression resolving to an array. Node is rendered once per item with item/index injected into state tree under the given aliases.
  */
 
 /**
@@ -25,5 +27,11 @@
  */
 
 /**
- * @typedef {ColumnNode | RowNode | WidgetNode | ContainerNode | StackNode} LayoutNode
+ * @typedef {LayoutNodeBase & { type: 'z-stack', span: number, sizing: 'auto' | 'fill' | 'fixed', children: (WidgetNode | ContainerNode)[], style?: Object }} ZStackNode
+ * Children are rendered on top of one another using absolute positioning.
+ * The active/top layer can be controlled at runtime via a tab index or condition on each child.
+ */
+
+/**
+ * @typedef {ColumnNode | RowNode | WidgetNode | ContainerNode | StackNode | ZStackNode} LayoutNode
  */

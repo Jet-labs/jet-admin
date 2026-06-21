@@ -429,7 +429,7 @@ datasourceController.uploadFile = async (req, res) => {
 
     // Create unique filename and upload path
     const uniqueName = `${Date.now()}-${file.originalname}`;
-    const filePath = `excel-csv-datasources/${tenantID}/${uniqueName}`;
+    const filePath = `${constants.STORAGE.FOLDERS.EXCEL_CSV_DATASOURCES}/${tenantID}/${uniqueName}`;
 
     const publicUrl = await fileStorageUtil.uploadFile(file.buffer, file.mimetype, filePath);
 

@@ -87,7 +87,7 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
         }
         className={"!w-full !h-full"}
       >
-        <ResizablePanel defaultSize={20} className="!overflow-y-auto h-full p-8">
+        <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.DATA_QUERY_EDITOR_PANEL} defaultSize={20} className="!overflow-y-auto h-full p-8">
           <div className="mx-auto w-full max-w-2xl">
             <form
               className="space-y-2 w-full"
@@ -96,14 +96,14 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
             >
 
 
-              <DataQueryEditor dataQueryEditorForm={queryAdditionForm} tenantID={tenantID} />
+              <DataQueryEditor dataQueryEditorForm={queryAdditionForm} tenantID={tenantID} dataQueryTestResult={dataQueryTestResult} />
 
 
             </form>
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
-        <ResizablePanel defaultSize={80}>
+        <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.DATA_QUERY_RESULT_PANEL} defaultSize={80}>
           <div className="flex h-full w-full flex-col overflow-hidden bg-background">
             <div className="flex items-center justify-between border-b border-border bg-background px-4 py-2 flex-shrink-0">
               <span className="text-xs font-semibold text-foreground">

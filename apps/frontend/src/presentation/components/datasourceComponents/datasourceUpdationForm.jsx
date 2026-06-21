@@ -137,11 +137,12 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
         <ResizablePanelGroup
           direction="vertical"
           autoSaveId={
-            CONSTANTS.RESIZABLE_PANEL_KEYS.QUERY_ADDITION_FORM_RESULT_SEPARATION
+            CONSTANTS.RESIZABLE_PANEL_KEYS.DATASOURCE_UPDATION_FORM_RESULT_SEPARATION
           }
           className={"!w-full !h-full"}
         >
           <ResizablePanel
+            id={CONSTANTS.RESIZABLE_PANEL_IDS.DATASOURCE_EDITOR_PANEL}
             defaultSize={20}
             className="!overflow-y-auto h-full p-8"
           >
@@ -157,7 +158,7 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel ref={testResultPanelRef} defaultSize={80} collapsible={true} minSize={5}>
+          <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.DATASOURCE_RESULT_PANEL} ref={testResultPanelRef} defaultSize={80} collapsible={true} minSize={5}>
             <div className="flex h-full w-full flex-col overflow-hidden bg-background">
               <div className="flex items-center justify-between border-b border-border bg-background px-4 py-2 flex-shrink-0">
                 <span className="text-xs font-semibold text-foreground">

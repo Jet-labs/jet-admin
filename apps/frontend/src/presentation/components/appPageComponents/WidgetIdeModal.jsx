@@ -170,7 +170,7 @@ export const WidgetIdeModal = ({
             <ResizablePanelGroup
               direction="horizontal"
               autoSaveId={
-                CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_ADDITION_FORM_RESULT_SEPARATION
+                CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_IDE_MODAL_SEPARATION
               }
               className="w-full h-full"
             >

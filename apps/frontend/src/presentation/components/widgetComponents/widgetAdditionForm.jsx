@@ -93,7 +93,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
         }
         className={"!w-full !h-full"}
       >
-        <ResizablePanel defaultSize={55}>
+        <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WIDGET_ADDITION_SIDEBAR} defaultSize={55}>
           <form
             id="widget-addition-form"
             className="flex h-full w-full flex-col items-stretch gap-2 overflow-y-auto bg-background p-4 pb-10"
@@ -110,7 +110,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
           </form>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
-        <ResizablePanel defaultSize={45} className="relative flex flex-col min-h-0">
+        <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WIDGET_ADDITION_PREVIEW} defaultSize={45} className="relative flex flex-col min-h-0">
           <div className="flex-1 min-h-0 w-full relative">
             <WidgetPreview
               widgetTitle={addWidgetForm.values.widgetTitle}

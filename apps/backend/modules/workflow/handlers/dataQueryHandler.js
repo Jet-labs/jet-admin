@@ -40,14 +40,15 @@ async function execute(nodeConfig, context, helpers) {
   // Build execution context: this query is being run as part of a workflow
   const workflowID = helpers?.workflowID;
   const instanceID = helpers?.instanceID;
+  const tenantID = helpers?.tenantID;
   let executionCtx;
 
   if (context?.__executionCtx) {
     // If the workflow engine already attached an execution context, derive from it
     executionCtx = deriveChildContext(context.__executionCtx, ORIGIN_TYPES.WORKFLOW, workflowID);
-  } else if (workflowID) {
-    // Fallback: create a system context for the workflow
-    executionCtx = createSystemContext(ORIGIN_TYPES.WORKFLOW, workflowID, context?.__tenantID);
+  } else if (workflowID || tenantID) {
+    // Create a system context for the workflow (workflowID may be null for test runs)
+    executionCtx = createSystemContext(ORIGIN_TYPES.WORKFLOW, workflowID || instanceID, tenantID);
   }
 
   try {

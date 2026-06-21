@@ -459,7 +459,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         className="!w-full !h-full relative"
                     >
                         {/* Sidebar Controls */}
-                        <ResizablePanel defaultSize={20} className="flex flex-col h-full overflow-hidden">
+                        <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WORKFLOW_SIDEBAR_PANEL} defaultSize={20} className="flex flex-col h-full overflow-hidden">
 
                                 <div className="flex-1 overflow-y-auto space-y-2 p-2 flex flex-col justify-start items-stretch bg-background">
                                 <div>
@@ -654,14 +654,14 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         <ResizableHandle withHandle />
 
                         {/* Canvas Area */}
-                        <ResizablePanel defaultSize={80}>
+                        <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WORKFLOW_MAIN_PANEL} defaultSize={80}>
                             <ResizablePanelGroup
                                 direction="vertical"
-                                autoSaveId="workflow-editor-canvas-terminal-split"
+                                autoSaveId={CONSTANTS.RESIZABLE_PANEL_KEYS.WORKFLOW_EDITOR_CANVAS_TERMINAL_SPLIT}
                                 className="!h-full"
                             >
                                 {/* ReactFlow Canvas */}
-                                <ResizablePanel defaultSize={showConsole || showContextPanel ? 70 : 100} minSize={30}>
+                                <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WORKFLOW_CANVAS_PANEL} defaultSize={showConsole || showContextPanel ? 70 : 100} minSize={30}>
                                     <div className="h-full w-full relative bg-muted/30">
                                         <ReactFlow
                                             nodes={values.nodes}
@@ -724,15 +724,15 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                 {(showConsole || showContextPanel) && (
                                     <>
                                         <ResizableHandle withHandle />
-                                        <ResizablePanel defaultSize={30} minSize={15} maxSize={60}>
+                                        <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WORKFLOW_BOTTOM_PANEL} defaultSize={30} minSize={15} maxSize={60}>
                                             <ResizablePanelGroup
                                                 direction="horizontal"
-                                                autoSaveId="workflow-editor-console-context-split"
+                                                autoSaveId={CONSTANTS.RESIZABLE_PANEL_KEYS.WORKFLOW_EDITOR_CONSOLE_CONTEXT_SPLIT}
                                                 className="!h-full"
                                             >
                                                 {/* Console Panel */}
                                                 {showConsole && (
-                                                    <ResizablePanel defaultSize={showContextPanel ? 50 : 100} minSize={25}>
+                                                    <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WORKFLOW_CONSOLE_PANEL} defaultSize={showContextPanel ? 50 : 100} minSize={25}>
                                                         <WorkflowConsole
                                                             logs={consoleLogs}
                                                             isRunning={isTestRunning}
@@ -749,7 +749,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
                                                 {/* Context Panel */}
                                                 {showContextPanel && (
-                                                    <ResizablePanel defaultSize={showConsole ? 50 : 100} minSize={25}>
+                                                    <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WORKFLOW_CONTEXT_PANEL} defaultSize={showConsole ? 50 : 100} minSize={25}>
                                                         <WorkflowContextPanel
                                                             context={workflowContext}
                                                             isRunning={isTestRunning}

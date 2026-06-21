@@ -10,6 +10,15 @@ const {
     tenantIdParamSchema,
 } = require("./tenant.validator");
 
+const multer = require("multer");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+});
+
+
 let 
   datasourceRouter,
   dataQueryRouter,
@@ -91,6 +100,12 @@ router.use(authMiddleware.authProvider);
 router.use(auditLogMiddleware.audit);
 
 router.get("/", tenantController.getAllUserTenants);
+
+router.post(
+  "/upload-logo",
+  upload.single("file"),
+  tenantController.uploadLogo
+);
 
 router.get(
   "/:tenantID",

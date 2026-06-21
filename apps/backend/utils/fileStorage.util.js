@@ -9,6 +9,7 @@
 const environmentVariables = require("../environment");
 const axios = require("axios");
 const { S3Client, GetObjectCommand, HeadObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
+const constants = require("../constants");
 
 const SUPABASE_STORAGE_MARKER = "/storage/v1/object/public/";
 
@@ -200,8 +201,8 @@ class FileStorageUtil {
    */
   async uploadFile(fileBuffer, mimetype, filePath, customBucket = null) {
     const bucketName = customBucket || (this.useS3
-      ? (environmentVariables.SUPABASE_S3_BUCKET || "jet-admin-datasource-file-uploads")
-      : "tenant-assets");
+      ? (environmentVariables.SUPABASE_S3_BUCKET || constants.STORAGE.BUCKETS.DATASOURCE_FILE_UPLOADS)
+      : constants.STORAGE.BUCKETS.TENANT_ASSETS);
 
     if (this.useS3) {
       const s3 = this.getS3Client();

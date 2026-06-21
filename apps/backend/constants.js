@@ -189,6 +189,18 @@ const constants = {
     // loser checks this on retry to avoid re-dispatch
     SYSTEM_SET: 'SYSTEM_SET',      // orchestrator metadata — nodeID null
     NODE_SUSPENDED: 'NODE_SUSPENDED', // node is suspended — carries payload
+  },
+
+  STORAGE: {
+    BUCKETS: {
+      TENANT_ASSETS: "tenant-assets",
+      DATASOURCE_FILE_UPLOADS: "jet-admin-datasource-file-uploads",
+    },
+    FOLDERS: {
+      LOGOS: "logos",
+      WIDGET_FILES: "widget-files",
+      EXCEL_CSV_DATASOURCES: "excel-csv-datasources",
+    },
   }
 };
 

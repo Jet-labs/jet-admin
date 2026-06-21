@@ -167,3 +167,38 @@ export const deleteUserTenantByIDAPI = async ({ tenantID }) => {
     throw error;
   }
 };
+
+export const uploadTenantLogoAPI = async ({ file }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST + CONSTANTS.APIS.TENANT.uploadTenantLogoAPI();
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post(url, formData, {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data && response.data.success === true) {
+        return {
+          url: response.data.url,
+          filePath: response.data.filePath,
+          fileName: response.data.fileName,
+        };
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

@@ -21,6 +21,52 @@ import { AppPageDataSourceBootstrapper } from "./appPageDataSourceBootstrapper";
 import { AppPageWidgetSlot } from "./appPageWidgetSlot";
 import { AppPagePrintForm } from "./appPagePrintForm";
 import { migrateV1ToV2, LayoutRenderer } from "./layout/index.js";
+import { useAppPageStateTree } from "../../../logic/appPageRuntime";
+import { resolveValue } from "../../../logic/evaluationEngine";
+
+/**
+ * Inner component rendered inside AppPageRuntimeProvider.
+ * Accesses the state tree via hooks and threads it to the layout renderer
+ * for conditional/iteration-based rendering.
+ */
+const AppPageViewerContent = ({ tenantID, appPageID, migratedPageConfig }) => {
+  const stateTree = useAppPageStateTree();
+
+  const renderWidget = React.useCallback(
+    (widgetKey, sizing, scopedStateTree) => (
+      <AppPageWidgetSlot
+        tenantID={tenantID}
+        widgetKey={widgetKey}
+        editable={false}
+        sizing={sizing}
+        scopedStateTree={scopedStateTree}
+      />
+    ),
+    [tenantID]
+  );
+
+  return (
+    <>
+      {/* Bootstrap data sources — fires auto/reactive/polling fetches */}
+      <AppPageDataSourceBootstrapper />
+
+      <div
+        className="w-full overflow-y-auto bg-muted p-6"
+        id={`printable-area-app-page-${appPageID}`}
+      >
+        {migratedPageConfig.layout && (
+          <LayoutRenderer
+            node={migratedPageConfig.layout}
+            renderWidget={renderWidget}
+            mode="view"
+            stateTree={stateTree}
+            resolveValue={resolveValue}
+          />
+        )}
+      </div>
+    </>
+  );
+};
 
 export const AppPageViewer = ({ tenantID, appPageID }) => {
   AppPageViewer.propTypes = {
@@ -56,18 +102,6 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
     return migrateV1ToV2(appPage.appPageConfig);
   }, [appPage]);
 
-  const renderWidget = React.useCallback(
-    (widgetKey, sizing) => (
-      <AppPageWidgetSlot
-        tenantID={tenantID}
-        widgetKey={widgetKey}
-        editable={false}
-        sizing={sizing}
-      />
-    ),
-    [tenantID]
-  );
-
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
       <div className="flex flex-row justify-between items-center w-full px-3 py-2 border-b border-border">
@@ -100,21 +134,11 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
             tenantID={tenantID}
             pageConfig={migratedPageConfig}
           >
-            {/* Bootstrap data sources — fires auto/reactive/polling fetches */}
-            <AppPageDataSourceBootstrapper />
-
-            <div
-              className="w-full overflow-y-auto bg-muted p-6"
-              id={`printable-area-app-page-${appPageID}`}
-            >
-              {migratedPageConfig.layout && (
-                <LayoutRenderer
-                  node={migratedPageConfig.layout}
-                  renderWidget={renderWidget}
-                  mode="view"
-                />
-              )}
-            </div>
+            <AppPageViewerContent
+              tenantID={tenantID}
+              appPageID={appPageID}
+              migratedPageConfig={migratedPageConfig}
+            />
           </AppPageRuntimeProvider>
         )}
       </ReactQueryLoadingErrorWrapper>
