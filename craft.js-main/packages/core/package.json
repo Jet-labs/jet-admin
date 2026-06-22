@@ -1,0 +1,56 @@
+{
+  "name": "@craftjs/core",
+  "version": "0.2.12",
+  "description": "A React Framework for building extensible drag and drop page editors",
+  "keywords": [
+    "react",
+    "drag-and-drop",
+    "page-editor",
+    "web-builder",
+    "html-builder",
+    "builder",
+    "editor",
+    "draft-js",
+    "framework",
+    "wysiwyg",
+    "html"
+  ],
+  "author": "Prev Wong <prevwong@gmail.com>",
+  "homepage": "https://github.com/prevwong/craft.js/",
+  "license": "MIT",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "dist",
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/prevwong/craft.js/"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=development ../../scripts/build.sh",
+    "build": "cross-env NODE_ENV=production ../../scripts/build.sh",
+    "dev:yalc": "../../scripts/yalc.sh",
+    "clean": "rimraf lib dist"
+  },
+  "bugs": {
+    "url": "https://github.com/prevwong/craft.js/issues"
+  },
+  "dependencies": {
+    "@craftjs/utils": "^0.2.5",
+    "debounce": "^1.2.0",
+    "lodash": "^4.17.21",
+    "tiny-invariant": "^1.0.6"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.195",
+    "@types/react": "19.0.8",
+    "@types/react-dom": "19.0.3",
+    "react": "19.0.0"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17 || ^18 || ^19"
+  }
+}

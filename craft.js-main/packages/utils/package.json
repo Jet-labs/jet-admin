@@ -1,0 +1,37 @@
+{
+  "name": "@craftjs/utils",
+  "description": "Utilities used internally across the craft.js monorepo",
+  "version": "0.2.5",
+  "author": "Prev Wong <prevwong@gmail.com>",
+  "license": "MIT",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "dist",
+    "lib"
+  ],
+  "scripts": {
+    "start": "cross-env NODE_ENV=development ../../scripts/build.sh",
+    "build": "cross-env NODE_ENV=production ../../scripts/build.sh",
+    "dev:yalc": "../../scripts/yalc.sh",
+    "clean": "rimraf lib dist"
+  },
+  "dependencies": {
+    "immer": "^9.0.6",
+    "lodash": "^4.17.21",
+    "nanoid": "^3.1.23",
+    "shallowequal": "^1.1.0",
+    "tiny-invariant": "^1.0.6"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.8"
+  },
+  "nohoist": [
+    "immer",
+    "immer/**"
+  ],
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17 || ^18 || ^19"
+  }
+}

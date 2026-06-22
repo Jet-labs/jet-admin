@@ -1,0 +1,342 @@
+/* CSS Grid & Flexbox system for the Craft.js layout editor and runtime renderer */
+/* All spacing standardized to 8px (p-2/gap-2 equivalent) per UI guidelines */
+
+/* ─── Runtime Layout System ───────────────────────────────────────────────── */
+
+.layout-column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.layout-row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  width: 100%;
+  gap: 8px;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+.layout-row.sizing-auto,
+.craft-node-row.sizing-auto {
+  height: auto;
+}
+
+.layout-row.sizing-fill,
+.craft-node-row.sizing-fill {
+  align-self: stretch;
+  height: 100%;
+}
+
+.layout-row.sizing-fixed,
+.craft-node-row.sizing-fixed {
+  height: var(--fixed-height, 200px);
+}
+
+/* Grid Column Spans (1 to 12) */
+.col-span-1  { grid-column: span 1 / span 1; }
+.col-span-2  { grid-column: span 2 / span 2; }
+.col-span-3  { grid-column: span 3 / span 3; }
+.col-span-4  { grid-column: span 4 / span 4; }
+.col-span-5  { grid-column: span 5 / span 5; }
+.col-span-6  { grid-column: span 6 / span 6; }
+.col-span-7  { grid-column: span 7 / span 7; }
+.col-span-8  { grid-column: span 8 / span 8; }
+.col-span-9  { grid-column: span 9 / span 9; }
+.col-span-10 { grid-column: span 10 / span 10; }
+.col-span-11 { grid-column: span 11 / span 11; }
+.col-span-12 { grid-column: span 12 / span 12; }
+
+/* Responsive adjustments for Mobile */
+@media (max-width: 768px) {
+  .layout-row {
+    grid-template-columns: 1fr !important;
+  }
+  .layout-row > * {
+    grid-column: span 1 / span 1 !important;
+  }
+}
+
+/* Sizing Modes */
+.layout-widget-slot {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.layout-widget-slot.sizing-auto,
+.craft-node-widget.sizing-auto {
+  align-self: stretch;
+  height: auto;
+  min-height: 0;
+}
+
+.layout-widget-slot.sizing-fill,
+.craft-node-widget.sizing-fill {
+  align-self: stretch;
+  height: 100%;
+  min-height: 0;
+}
+
+.layout-widget-slot.sizing-fixed,
+.craft-node-widget.sizing-fixed {
+  height: var(--fixed-height, 200px);
+  min-height: 0;
+}
+
+.layout-widget-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Containers */
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  padding: 8px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.layout-container.sizing-auto,
+.craft-node-container.sizing-auto {
+  height: auto;
+}
+
+.layout-container.sizing-fill,
+.craft-node-container.sizing-fill {
+  align-self: stretch;
+  height: 100%;
+}
+
+.layout-container.sizing-fixed,
+.craft-node-container.sizing-fixed {
+  height: var(--fixed-height, 200px);
+}
+
+/* Stacks */
+.layout-stack {
+  display: flex;
+  box-sizing: border-box;
+}
+
+.layout-stack.sizing-auto,
+.craft-node-stack.sizing-auto {
+  height: auto;
+}
+
+.layout-stack.sizing-fill,
+.craft-node-stack.sizing-fill {
+  align-self: stretch;
+  height: 100%;
+}
+
+.layout-stack.sizing-fixed,
+.craft-node-stack.sizing-fixed {
+  height: var(--fixed-height, 200px);
+}
+
+/* ─── Z-Stack (overlay / layer stacking) ─────────────────────────────────── */
+
+.layout-z-stack {
+  position: relative;
+  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: 100%;
+  grid-template-rows: 100%;
+}
+
+.layout-z-stack.sizing-auto {
+  height: auto;
+  min-height: 80px;
+}
+
+.layout-z-stack.sizing-fill {
+  align-self: stretch;
+  height: 100%;
+}
+
+.layout-z-stack.sizing-fixed {
+  height: var(--fixed-height, 200px);
+}
+
+.layout-z-stack > .layout-z-stack-layer {
+  grid-area: 1 / 1 / 2 / 2;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.layout-z-stack:not(.layout-z-stack-edit) {
+  overflow: hidden;
+}
+
+.layout-z-stack-layer-badge {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  z-index: 60;
+  font-family: var(--font-mono, monospace);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: hsl(var(--primary) / 0.6);
+  background: hsl(var(--background) / 0.85);
+  border: 1px solid hsl(var(--primary) / 0.2);
+  border-radius: 3px;
+  padding: 0 3px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ─── Resize Handles ──────────────────────────────────────────────────────── */
+
+.layout-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 50;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+  border-radius: 3px;
+}
+
+.layout-resize-handle:hover,
+.layout-resize-handle.active {
+  background-color: hsl(var(--primary) / 0.5);
+  box-shadow: 0 0 4px hsl(var(--primary) / 0.3);
+}
+
+/* ─── Craft.js Editor Shell ───────────────────────────────────────────────── */
+
+.craft-editor-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: hsl(var(--background));
+}
+
+/* Split Workspace layout */
+.craft-editor-workspace {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.craft-canvas-area {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  background-color: hsl(var(--muted) / 0.15);
+  padding: 8px;
+  position: relative;
+}
+
+/* Node visual highlight overlays in editor */
+.craft-node {
+  position: relative;
+  transition: outline 0.1s ease, outline-offset 0.1s ease;
+}
+
+.craft-node:hover:not(.craft-node-selected) {
+  outline: 1px dashed hsl(var(--primary) / 0.5);
+  outline-offset: 1px;
+  cursor: pointer;
+}
+
+.craft-node:hover:not(.craft-node-selected)::after {
+  content: attr(data-node-type);
+  position: absolute;
+  top: -14px;
+  left: 4px;
+  background-color: hsl(var(--primary) / 0.85);
+  color: hsl(var(--background));
+  font-size: 8px;
+  font-family: var(--font-mono, monospace);
+  padding: 1px 4px;
+  border-radius: 2px;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.craft-node:has(.craft-node:hover):not(.craft-node-selected) {
+  outline: none;
+}
+
+.craft-node:has(.craft-node:hover):not(.craft-node-selected)::after {
+  display: none;
+}
+
+.craft-node-selected {
+  outline: 2px solid hsl(var(--primary)) !important;
+  outline-offset: 1px;
+}
+
+.craft-node-selected::after {
+  content: attr(data-node-type);
+  position: absolute;
+  top: -15px;
+  left: 1px;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--background));
+  font-size: 9px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 2px 2px 0 0;
+  z-index: 50;
+  pointer-events: none;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Disable dragging while resizing (used by WidgetResizeHandles) */
+.craft-node-resizing {
+  pointer-events: auto !important;
+}
+
+.craft-node-resizing[draggable] {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+}
+
+/* Craft.js drop zone styling */
+.craft-drop-zone {
+  border-radius: 6px;
+  min-height: 48px;
+  transition: all 0.15s ease;
+  cursor: default;
+  border: 1px dashed hsl(var(--border) / 0.8);
+  background-color: hsl(var(--muted) / 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.craft-drop-zone[data-is-over="true"],
+.craft-drop-zone:has(> [data-is-over="true"]) {
+  border-color: hsl(var(--primary)) !important;
+  background-color: hsl(var(--primary) / 0.05) !important;
+  color: hsl(var(--primary)) !important;
+}
