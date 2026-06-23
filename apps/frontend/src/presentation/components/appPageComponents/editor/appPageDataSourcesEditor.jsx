@@ -370,7 +370,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     <div className="flex flex-col h-full min-h-0 bg-background">
       {editingIndex !== null && selectedSource ? (
         <div className="flex-1 overflow-y-auto">
-          <div className="flex items-center justify-between border-b border-border">
+          <div className="flex items-center justify-between p-3 border-b border-border">
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -390,7 +390,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 p-2">
+          <div className="flex flex-col gap-4 p-3">
             <div className="flex flex-col gap-2">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Alias / Reference Name
@@ -407,7 +407,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               />
               <p className="text-[10px] text-muted-foreground">
                 Accessible via expression engine, e.g.{" "}
-                <code className="bg-background p-2 rounded border border-border font-mono text-xs">{`{{ state.${selectedSource.type === "workflow" ? "workflows" : "queries"}.${selectedSource.alias || "alias"}.data }}`}</code>
+                <code className="bg-background px-1.5 py-0.5 rounded border border-border font-mono text-xs">{`{{ state.${selectedSource.type === "workflow" ? "workflows" : "queries"}.${selectedSource.alias || "alias"}.data }}`}</code>
               </p>
             </div>
 
@@ -610,7 +610,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         </div>
       ) : (
         <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex items-center justify-between p-2 border-b border-border">
+            <div className="flex items-center justify-between p-3 border-b border-border">
             <div>
               <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Page Data Sources
@@ -623,7 +623,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
           <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
             {dataSources.length === 0 ? (
-              <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-center flex flex-col items-center justify-center p-2">
+                <div className="rounded-md border border-dashed border-border bg-muted/30 p-6 text-center flex flex-col items-center justify-center">
                 <Layers className="h-8 w-8 text-muted-foreground/50 mb-2" />
                 <p className="text-xs font-medium text-foreground">No Page Data Sources</p>
                 <p className="text-[10px] text-muted-foreground/70 max-w-[200px]">
@@ -645,7 +645,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                   return (
                     <div
                       key={index}
-                      className="rounded-md border border-border bg-card p-2 flex flex-col hover:shadow-sm transition-shadow group"
+                      className="rounded-md border border-border bg-card p-2 flex flex-col gap-2 hover:shadow-sm transition-shadow group"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
@@ -656,18 +656,18 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                             <span className="text-xs font-mono font-medium truncate text-foreground block">
                               {source.alias || `source_${index + 1}`}
                             </span>
-                            <p className="text-[10px] text-muted-foreground truncate font-mono">
+                            <p className="text-[10px] text-muted-foreground truncate font-mono mt-0.5">
                               {source.type} : {isQuery ? source.queryID : isWorkflow ? source.workflowID : source.listenerID}
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between border-t border-border gap-2">
+                      <div className="flex items-center justify-between border-t border-border pt-2.5 gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="flex items-center gap-2 shrink-0">
                             <span className="text-[9px] font-mono text-muted-foreground/70 uppercase tracking-wider">Trigger:</span>
-                            <span className="text-[9px] font-medium p-2 rounded bg-primary/10 text-primary border border-primary/30">
+                            <span className="text-[9px] font-medium px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/30">
                               {source.triggerMode || "auto"}
                             </span>
                           </div>

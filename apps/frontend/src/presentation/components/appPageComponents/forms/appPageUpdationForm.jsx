@@ -261,6 +261,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
                           newConfig
                         );
                       }}
+                      appPageEditorForm={appPageUpdationForm}
                     />
                   </ResizablePanel>
                 </ResizablePanelGroup>

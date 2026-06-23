@@ -116,38 +116,54 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
   const events = widgetEditorForm.values.widgetConfig?.events || {};
 
   // Collect all queryIDs and workflowIDs needed for input definitions
-  const neededQueryIDs = useMemo(() => {
+  const neededQueryIDsStr = useMemo(() => {
     const ids = new Set();
     pageDataSources.forEach(ds => { if (ds.type === "query" && ds.queryID) ids.add(String(ds.queryID)); });
     Object.values(events).flat().forEach(action => {
       if (action.actionType === "TRIGGER_QUERY" && action.config?.queryID) ids.add(String(action.config.queryID));
     });
-    return Array.from(ids);
+    return Array.from(ids).sort().join(",");
   }, [pageDataSources, events]);
 
-  const neededWorkflowIDs = useMemo(() => {
+  const neededQueryIDs = useMemo(() => {
+    return neededQueryIDsStr ? neededQueryIDsStr.split(",") : [];
+  }, [neededQueryIDsStr]);
+
+  const neededWorkflowIDsStr = useMemo(() => {
     const ids = new Set();
     pageDataSources.forEach(ds => { if (ds.type === "workflow" && ds.workflowID) ids.add(String(ds.workflowID)); });
     Object.values(events).flat().forEach(action => {
       if (action.actionType === "TRIGGER_WORKFLOW" && action.config?.workflowID) ids.add(String(action.config.workflowID));
     });
-    return Array.from(ids);
+    return Array.from(ids).sort().join(",");
   }, [pageDataSources, events]);
 
-  const queryDetails = useQueries({
-    queries: neededQueryIDs.map((id) => ({
+  const neededWorkflowIDs = useMemo(() => {
+    return neededWorkflowIDsStr ? neededWorkflowIDsStr.split(",") : [];
+  }, [neededWorkflowIDsStr]);
+
+  const queryOptions = useMemo(() => {
+    return neededQueryIDs.map((id) => ({
       queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), "detail", id],
       queryFn: () => getDataQueryByIDAPI({ tenantID, dataQueryID: id }),
       staleTime: Infinity,
-    }))
+    }));
+  }, [neededQueryIDs, tenantID]);
+
+  const queryDetails = useQueries({
+    queries: queryOptions
   });
 
-  const workflowDetails = useQueries({
-    queries: neededWorkflowIDs.map((id) => ({
+  const workflowOptions = useMemo(() => {
+    return neededWorkflowIDs.map((id) => ({
       queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "detail", id],
       queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID: id }),
       staleTime: Infinity,
-    }))
+    }));
+  }, [neededWorkflowIDs, tenantID]);
+
+  const workflowDetails = useQueries({
+    queries: workflowOptions
   });
 
   const resolvedQueries = useMemo(() => queryDetails.map(q => q.data).filter(Boolean), [queryDetails]);
@@ -185,12 +201,16 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
     return Array.from(new Set(placedKeys.map((k) => String(k).split("_")[1])));
   }, [appPageEditorForm?.values?.appPageConfig?.widgets]);
 
-  const widgetQueries = useQueries({
-    queries: placedIDs.map((id) => ({
+  const widgetQueryOptions = useMemo(() => {
+    return placedIDs.map((id) => ({
       queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), id],
       queryFn: () => getWidgetByIDAPI({ tenantID, widgetID: id }),
       staleTime: Infinity,
-    })),
+    }));
+  }, [placedIDs, tenantID]);
+
+  const widgetQueries = useQueries({
+    queries: widgetQueryOptions,
   });
 
   const pageWidgets = useMemo(() => {
@@ -557,8 +577,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                           <TemplateAutocompleteInput
                                             value={action.config?.inputValues?.[inputKey] ?? ""}
                                             onChange={(val) => {
-                                              const updated = { ...(action.config?.inputValues || {}), [inputKey]: val };
-                                              handleActionConfigChange(eventType, actionIndex, "inputValues", updated);
+                                              handleActionConfigChange(eventType, actionIndex, `inputValues.${inputKey}`, val);
                                             }}
                                             placeholder={inputDef.defaultValue || `e.g. {{ state.variables.${inputKey} }}`}
                                             liveStateTree={localStateTree}
@@ -617,8 +636,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                           <TemplateAutocompleteInput
                                             value={action.config?.inputValues?.[inputKey] ?? ""}
                                             onChange={(val) => {
-                                              const updated = { ...(action.config?.inputValues || {}), [inputKey]: val };
-                                              handleActionConfigChange(eventType, actionIndex, "inputValues", updated);
+                                              handleActionConfigChange(eventType, actionIndex, `inputValues.${inputKey}`, val);
                                             }}
                                             placeholder={inputDef.defaultValue || `e.g. {{ state.variables.${inputKey} }}`}
                                             liveStateTree={localStateTree}
@@ -677,8 +695,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                           <TemplateAutocompleteInput
                                             value={action.config?.inputValues?.[inputKey] ?? ""}
                                             onChange={(val) => {
-                                              const updated = { ...(action.config?.inputValues || {}), [inputKey]: val };
-                                              handleActionConfigChange(eventType, actionIndex, "inputValues", updated);
+                                              handleActionConfigChange(eventType, actionIndex, `inputValues.${inputKey}`, val);
                                             }}
                                             placeholder={inputDef.defaultValue || `e.g. {{ state.variables.${inputKey} }}`}
                                             liveStateTree={localStateTree}

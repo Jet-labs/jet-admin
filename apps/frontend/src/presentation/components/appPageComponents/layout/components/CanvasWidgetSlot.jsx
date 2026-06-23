@@ -12,6 +12,7 @@
  *    width when pixel width is explicitly set (free placement mode).
  */
 import React from "react";
+import { Lock } from "lucide-react";
 import { useNode, useEditor } from "@craftjs/core";
 import { useCraftEditorContext } from "./CraftEditorContext.js";
 import { LogicBadges } from "./LogicBadges.jsx";
@@ -132,23 +133,29 @@ export function CanvasWidgetSlot({
 
   return (
     <div
-      ref={(ref) => !previewMode && connect(drag(ref))}
+      ref={(ref) => !previewMode && connect(locked ? ref : drag(ref))}
       className={`flex flex-col relative min-w-0 self-stretch min-h-0 box-border craft-node craft-node-widget ${sizingClass} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
-      }`}
+      } ${!previewMode ? "layout-widget-slot-edit" : ""} ${locked ? "layout-widget-locked" : ""}`}
       style={slotStyle}
       id={id}
       data-node-type="Widget"
     >
-      {!previewMode && (condition || repeat) && (
-        <div className="absolute left-2 top-2 z-50 pointer-events-none">
+      {!previewMode && (condition || repeat || locked) && (
+        <div className="absolute left-2 top-2 z-50 pointer-events-none flex gap-1 items-center">
+          {locked && (
+            <div className="flex items-center gap-1.5 rounded bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 shadow-sm leading-none uppercase tracking-wider">
+              <Lock className="h-2.5 w-2.5" />
+              <span>Locked</span>
+            </div>
+          )}
           <LogicBadges condition={condition} repeat={repeat} />
         </div>
       )}
 
       <div
         className={`flex flex-col flex-1 min-h-0 w-full box-border overflow-hidden ${
-          previewMode ? "pointer-events-auto" : "pointer-events-none"
+          (previewMode || locked) ? "pointer-events-auto" : "pointer-events-none"
         }`}
         style={{
           borderRadius: style?.borderRadius,
@@ -161,7 +168,7 @@ export function CanvasWidgetSlot({
       {!previewMode && isSelected && (
         <>
           {/* Span-based width resize when in a grid row (snaps to 12-col grid) */}
-          {isInRow && !hasPixelWidth && (
+          {isInRow && !hasPixelWidth && !locked && (
             <LayoutResizeHandle
               node={{ id, span: span || 6 }}
               onResize={handleSpanResize}
@@ -170,13 +177,15 @@ export function CanvasWidgetSlot({
 
           {/* Pixel-based resize handles — height only when in a row,
               full 8-handle when in free placement (pixel width) mode */}
-          <WidgetResizeHandles
-            nodeId={id}
-            width={width}
-            height={height}
-            onResize={handlePixelResize}
-            heightOnly={isInRow && !hasPixelWidth}
-          />
+          {!locked && (
+            <WidgetResizeHandles
+              nodeId={id}
+              width={width}
+              height={height}
+              onResize={handlePixelResize}
+              heightOnly={isInRow && !hasPixelWidth}
+            />
+          )}
 
           <SelectParentButton />
         </>

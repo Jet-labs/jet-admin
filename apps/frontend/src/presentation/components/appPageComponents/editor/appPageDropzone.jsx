@@ -13,6 +13,7 @@ export const AppPageDropzone = ({
   layouts,
   setLayouts,
   onChangePageConfig,
+  appPageEditorForm,
 }) => {
   AppPageDropzone.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -24,6 +25,7 @@ export const AppPageDropzone = ({
     layouts: PropTypes.object,
     setLayouts: PropTypes.func,
     onChangePageConfig: PropTypes.func,
+    appPageEditorForm: PropTypes.object,
   };
 
   const migratedConfig = useMemo(() => {
@@ -83,6 +85,7 @@ export const AppPageDropzone = ({
         onClose={() => setIsIdeOpen(false)}
         tenantID={tenantID}
         widgetID={selectedWidgetID}
+        appPageEditorForm={appPageEditorForm}
       />
     </div>
   );

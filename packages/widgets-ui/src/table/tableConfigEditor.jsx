@@ -572,6 +572,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
           </div>
           <p className="text-[9.5px] text-muted-foreground leading-tight">
             Adds an Edit button to each row. Fires <code className="bg-background px-1 border rounded">onRowSave</code>.
+            <br/><span className="text-amber-600 font-medium">Note: Make sure to check 'Editable Column' for at least one column above.</span>
           </p>
         </div>
 
@@ -588,6 +589,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
           </div>
           <p className="text-[9.5px] text-muted-foreground leading-tight">
             Double-click cells to edit. Fires <code className="bg-background px-1 border rounded">onBulkEdit</code> on save.
+            <br/><span className="text-amber-600 font-medium">Note: Make sure to check 'Editable Column' for at least one column above.</span>
           </p>
           {bulkEdit.enabled && (
             <div className="space-y-1 bg-muted/30 p-2 rounded border mt-2">

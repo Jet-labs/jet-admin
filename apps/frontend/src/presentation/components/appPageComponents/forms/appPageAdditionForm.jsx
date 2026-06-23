@@ -192,6 +192,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
                           newConfig
                         );
                       }}
+                      appPageEditorForm={appPageAdditionForm}
                     />
                   </ResizablePanel>
                 </ResizablePanelGroup>

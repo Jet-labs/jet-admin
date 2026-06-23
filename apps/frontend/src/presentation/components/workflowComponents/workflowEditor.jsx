@@ -152,23 +152,31 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     } = useInfiniteDatasources(tenantID, datasourceSearch);
 
     // Collect Data Query IDs from Nodes to fetch specific details
-    const neededQueryIDs = useMemo(() => {
+    const neededQueryIDsStr = useMemo(() => {
         const ids = new Set();
         values.nodes?.forEach((node) => {
             if (node.type === "dataQuery" && node.data?.dataQueryID) {
                 ids.add(String(node.data.dataQueryID));
             }
         });
-        return Array.from(ids);
+        return Array.from(ids).sort().join(",");
     }, [values.nodes]);
 
-    // Fetch details for specific node references
-    const queryDetails = useQueries({
-        queries: neededQueryIDs.map((id) => ({
+    const neededQueryIDs = useMemo(() => {
+        return neededQueryIDsStr ? neededQueryIDsStr.split(",") : [];
+    }, [neededQueryIDsStr]);
+
+    const queryOptions = useMemo(() => {
+        return neededQueryIDs.map((id) => ({
             queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), "detail", id],
             queryFn: () => getDataQueryByIDAPI({ tenantID, dataQueryID: id }),
             staleTime: Infinity,
-        }))
+        }));
+    }, [neededQueryIDs, tenantID]);
+
+    // Fetch details for specific node references
+    const queryDetails = useQueries({
+        queries: queryOptions
     });
 
     // Create a union of infinite paginated list and specifically resolved node references

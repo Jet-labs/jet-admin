@@ -145,7 +145,7 @@ export const AppPageWidgetList = ({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 bg-background overflow-hidden">
-      <div className="flex items-center justify-between p-2">
+      <div className="flex items-center justify-between p-2 pb-0">
         <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           {CONSTANTS.STRINGS.APP_PAGE_WIDGET_LIST_WIDGETS_TITLE}
         </span>
@@ -164,7 +164,7 @@ export const AppPageWidgetList = ({
         </Button>
       </div>
 
-      <div className="p-2">
+      <div className="px-2">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" />
           <Input
@@ -199,10 +199,10 @@ export const AppPageWidgetList = ({
 
           return (
             <div className="flex flex-col gap-2 pb-2 border-b border-border/30">
-              <span className="font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 p-2">
+              <span className="font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60 p-0">
                 Layout Elements
               </span>
-              <div className="grid grid-cols-2 gap-2 p-2">
+              <div className="grid grid-cols-2 gap-2">
                 {filtered.map((layoutItem) => (
                   <div
                     key={layoutItem.type}

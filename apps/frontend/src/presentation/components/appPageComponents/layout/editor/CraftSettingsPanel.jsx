@@ -27,6 +27,8 @@ import {
   Rows,
   Columns,
   Plus,
+  Lock,
+  Unlock,
 } from "lucide-react";
 import { Label, TemplateAutocompleteInput } from "@jet-admin/ui";
 import { CanvasContainer } from "../components/CanvasContainer.jsx";
@@ -547,6 +549,27 @@ export default function CraftSettingsPanel({
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                {displayName === "CanvasWidgetSlot" && (
+                  <button
+                    onClick={() => {
+                      actions.setProp(selectedNodeId, (props) => {
+                        props.locked = !props.locked;
+                      });
+                    }}
+                    className={`p-2 rounded transition-colors ${
+                      nodeProps.locked
+                        ? "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
+                    title={nodeProps.locked ? "Unlock Widget" : "Lock Widget"}
+                  >
+                    {nodeProps.locked ? (
+                      <Lock className="h-3.5 w-3.5" />
+                    ) : (
+                      <Unlock className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                )}
                 <button
                   onClick={() => handleMoveNode("up")}
                   className="p-2 hover:bg-muted rounded text-muted-foreground"
@@ -876,6 +899,35 @@ export default function CraftSettingsPanel({
                     </div>
                   </div>
                 </div>
+
+                <div className="flex items-center justify-between p-2 bg-muted/20 border border-border/50 rounded-md">
+                  <div className="flex items-center gap-2">
+                    {nodeProps.locked ? (
+                      <Lock className="h-3.5 w-3.5 text-amber-500" />
+                    ) : (
+                      <Unlock className="h-3.5 w-3.5 text-muted-foreground" />
+                    )}
+                    <span className="text-[11px] font-medium text-foreground">
+                      {nodeProps.locked ? "Widget is Locked" : "Widget is Unlocked"}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      actions.setProp(selectedNodeId, (props) => {
+                        props.locked = !props.locked;
+                      });
+                    }}
+                    className={`text-[10px] px-2 py-1 rounded border transition-colors ${
+                      nodeProps.locked
+                        ? "border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+                        : "border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {nodeProps.locked ? "Unlock" : "Lock"}
+                  </button>
+                </div>
+
                 <button
                   onClick={() => onEditWidget?.(nodeProps.widgetKey?.replace(/^widget_/, "").split("_")[0])}
                   className="w-full p-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary rounded text-[11px] font-medium flex items-center justify-center gap-2"

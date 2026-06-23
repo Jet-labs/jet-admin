@@ -138,7 +138,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
     <div className="flex flex-col h-full min-h-0 bg-background">
       {editingIndex !== null && selectedVariable ? (
         <div className="flex-1 overflow-y-auto">
-          <div className="flex items-center justify-between border-b border-border">
+          <div className="flex items-center justify-between p-3 border-b border-border">
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -158,7 +158,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 p-2">
+          <div className="flex flex-col gap-4 p-3">
             <div className="flex flex-col gap-2">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Variable Key / Name
@@ -175,7 +175,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
               />
               <p className="text-[10px] text-muted-foreground">
                 Accessible via expression engine, e.g.{" "}
-                <code className="bg-background p-2 rounded border border-border font-mono text-xs">{`{{variables.${selectedVariable.key || "key"}}}`}</code>
+                <code className="bg-background px-1.5 py-0.5 rounded border border-border font-mono text-xs">{`{{variables.${selectedVariable.key || "key"}}}`}</code>
               </p>
             </div>
 
@@ -223,7 +223,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
         </div>
       ) : (
         <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex items-center justify-between p-2 border-b border-border">
+            <div className="flex items-center justify-between p-3 border-b border-border">
             <div>
               <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Page Variables
@@ -236,7 +236,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
 
           <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
             {variables.length === 0 ? (
-              <div className="rounded-md border border-dashed border-border bg-muted/30 p-2 text-center flex flex-col items-center justify-center p-2">
+                <div className="rounded-md border border-dashed border-border bg-muted/30 p-6 text-center flex flex-col items-center justify-center">
                 <Key className="h-8 w-8 text-muted-foreground/50 mb-2" />
                 <p className="text-xs font-medium text-foreground">No Page Variables</p>
                 <p className="text-[10px] text-muted-foreground/70 max-w-[200px]">
@@ -249,9 +249,9 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
                   return (
                     <div
                       key={index}
-                      className="rounded-md border border-border bg-card p-2 flex flex-col hover:shadow-sm transition-shadow group"
+                      className="rounded-md border border-border bg-card p-2 flex flex-col gap-2 hover:shadow-sm transition-shadow group"
                     >
-                      <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex items-center gap-2.5 min-w-0">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted/50 border border-border">
                           <Key className="h-4 w-4 text-primary" />
                         </div>
@@ -260,24 +260,24 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
                             {variable.key || `variable_${index + 1}`}
                           </span>
                           {variable.defaultValue !== undefined && variable.defaultValue !== "" && (
-                            <p className="text-[10px] text-muted-foreground/75 truncate">
-                              Default: <code className="text-[10px] font-mono font-semibold bg-muted p-2 rounded border border-border/50">{typeof variable.defaultValue === "object"
+                            <p className="text-[10px] text-muted-foreground/75 truncate mt-1">
+                              Default: <code className="text-[10px] font-mono font-semibold bg-muted px-1.5 py-0.5 rounded border border-border/50">{typeof variable.defaultValue === "object"
                                 ? JSON.stringify(variable.defaultValue)
                                 : String(variable.defaultValue)}</code>
                             </p>
                           )}
                           {variable.description && (
-                            <p className="text-[10px] text-muted-foreground/50 truncate">
+                            <p className="text-[10px] text-muted-foreground/50 truncate mt-0.5">
                               {variable.description}
                             </p>
                           )}
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between border-t border-border gap-2">
+                      <div className="flex items-center justify-between border-t border-border pt-2.5 gap-2">
                         <div className="flex items-center gap-2">
                           <span className="text-[9px] font-mono text-muted-foreground/70 uppercase tracking-wider">Type:</span>
-                          <span className="text-[9px] font-medium p-2 rounded bg-primary/10 text-primary border border-primary/30">
+                          <span className="text-[9px] font-medium px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/30">
                             {variable.type || "string"}
                           </span>
                         </div>

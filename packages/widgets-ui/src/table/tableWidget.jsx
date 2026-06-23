@@ -111,11 +111,28 @@ export const TableWidget = ({
 
   // ── Resolve column definitions ──
   const configColumns = useMemo(() => {
-    const cols = tableData.columns?.length ? tableData.columns
+    const rawCols = tableData.columns?.length ? tableData.columns
       : widgetConfig?.columns?.length ? widgetConfig.columns : [];
-    if (cols.length > 0) return cols;
+    
+    // Merge user configurations (like editable, custom label) from widgetConfig.columns
+    const mergedCols = rawCols.map(col => {
+      const colKey = col.key || col.id;
+      const userCol = widgetConfig?.columns?.find(c => {
+        const uKey = c.key || c.id;
+        return uKey && colKey && String(uKey).toLowerCase() === String(colKey).toLowerCase();
+      });
+      return userCol ? { key: colKey, id: colKey, ...col, ...userCol } : { key: colKey, id: colKey, ...col };
+    });
+
+    if (mergedCols.length > 0) return mergedCols;
     if (rows.length > 0 && typeof rows[0] === "object" && rows[0] !== null) {
-      return Object.keys(rows[0]).map(k => ({ key: k, label: k }));
+      return Object.keys(rows[0]).map(k => {
+        const userCol = widgetConfig?.columns?.find(c => {
+          const uKey = c.key || c.id;
+          return uKey && String(uKey).toLowerCase() === String(k).toLowerCase();
+        });
+        return { key: k, id: k, label: k, ...userCol };
+      });
     }
     return [];
   }, [tableData.columns, widgetConfig?.columns, rows]);
@@ -214,13 +231,14 @@ export const TableWidget = ({
         cell: ({ getValue, row, column, table }) => {
           const rowIdx = row.index;
           const colId = column.id;
+          const { editingRowId, rowDraft, setRowDraft, pendingEdits, editingCell } = table.options.meta;
           const isRowEditing = editingConfig.enabled && editingRowId === rowIdx;
           const isCellEditing = bulkEditConfig.enabled && editingCell?.rowIdx === rowIdx && editingCell?.colId === colId;
           const pendingVal = pendingEdits[rowIdx]?.[colId];
           const hasPending = pendingVal !== undefined;
 
           // Inline row editing mode
-          if (isRowEditing && col.editable) {
+          if (isRowEditing && (col.editable === true || col.editable === "true")) {
             return (
               <Input
                 value={rowDraft[colId] ?? ""}
@@ -253,14 +271,15 @@ export const TableWidget = ({
       defs.push({
         id: "_actions",
         header: () => null,
-        cell: ({ row }) => {
+        cell: ({ row, table }) => {
           const rowIdx = row.index;
+          const { editingRowId, setEditingRowId, setRowDraft, saveRow } = table.options.meta;
           const isEditing = editingRowId === rowIdx;
           if (isEditing) {
             return (
               <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
                 <Button size="icon" variant="ghost" className="h-6 w-6 text-primary hover:bg-primary/10"
-                  onClick={() => handleSaveRow(rowIdx, row.original)}>
+                  onClick={() => saveRow(rowIdx, row.original)}>
                   <Check className="h-3.5 w-3.5" />
                 </Button>
                 <Button size="icon" variant="ghost" className="h-6 w-6 text-muted-foreground hover:text-foreground"
@@ -286,7 +305,7 @@ export const TableWidget = ({
     }
 
     return defs;
-  }, [configColumns, multiSelectConfig, editingConfig, bulkEditConfig, editingRowId, rowDraft, editingCell, pendingEdits]);
+  }, [configColumns, multiSelectConfig, editingConfig, bulkEditConfig]);
 
   // ── TanStack Table instance ──
   const table = useReactTable({
@@ -312,6 +331,13 @@ export const TableWidget = ({
         }));
         setEditingCell(null);
       },
+      editingRowId,
+      setEditingRowId,
+      rowDraft,
+      setRowDraft,
+      editingCell,
+      pendingEdits,
+      saveRow: (idx, originalRow) => handleSaveRow(idx, originalRow),
     },
   });
 

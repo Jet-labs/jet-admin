@@ -267,10 +267,24 @@ var init_tableWidget = __esm({
         return !!isLoadingWorkflows;
       }, [tableData.isLoading, widgetConfig?.isLoading, isLoadingWorkflows]);
       const configColumns = useMemo6(() => {
-        const cols = tableData.columns?.length ? tableData.columns : widgetConfig?.columns?.length ? widgetConfig.columns : [];
-        if (cols.length > 0) return cols;
+        const rawCols = tableData.columns?.length ? tableData.columns : widgetConfig?.columns?.length ? widgetConfig.columns : [];
+        const mergedCols = rawCols.map((col) => {
+          const colKey = col.key || col.id;
+          const userCol = widgetConfig?.columns?.find((c) => {
+            const uKey = c.key || c.id;
+            return uKey && colKey && String(uKey).toLowerCase() === String(colKey).toLowerCase();
+          });
+          return userCol ? { key: colKey, id: colKey, ...col, ...userCol } : { key: colKey, id: colKey, ...col };
+        });
+        if (mergedCols.length > 0) return mergedCols;
         if (rows.length > 0 && typeof rows[0] === "object" && rows[0] !== null) {
-          return Object.keys(rows[0]).map((k) => ({ key: k, label: k }));
+          return Object.keys(rows[0]).map((k) => {
+            const userCol = widgetConfig?.columns?.find((c) => {
+              const uKey = c.key || c.id;
+              return uKey && String(uKey).toLowerCase() === String(k).toLowerCase();
+            });
+            return { key: k, id: k, label: k, ...userCol };
+          });
         }
         return [];
       }, [tableData.columns, widgetConfig?.columns, rows]);
@@ -348,16 +362,17 @@ var init_tableWidget = __esm({
             cell: ({ getValue, row, column, table: table2 }) => {
               const rowIdx = row.index;
               const colId = column.id;
-              const isRowEditing = editingConfig.enabled && editingRowId === rowIdx;
-              const isCellEditing = bulkEditConfig.enabled && editingCell?.rowIdx === rowIdx && editingCell?.colId === colId;
-              const pendingVal = pendingEdits[rowIdx]?.[colId];
+              const { editingRowId: editingRowId2, rowDraft: rowDraft2, setRowDraft: setRowDraft2, pendingEdits: pendingEdits2, editingCell: editingCell2 } = table2.options.meta;
+              const isRowEditing = editingConfig.enabled && editingRowId2 === rowIdx;
+              const isCellEditing = bulkEditConfig.enabled && editingCell2?.rowIdx === rowIdx && editingCell2?.colId === colId;
+              const pendingVal = pendingEdits2[rowIdx]?.[colId];
               const hasPending = pendingVal !== void 0;
-              if (isRowEditing && col.editable) {
+              if (isRowEditing && (col.editable === true || col.editable === "true")) {
                 return /* @__PURE__ */ React9.createElement(
                   Input4,
                   {
-                    value: rowDraft[colId] ?? "",
-                    onChange: (e) => setRowDraft((prev) => ({ ...prev, [colId]: e.target.value })),
+                    value: rowDraft2[colId] ?? "",
+                    onChange: (e) => setRowDraft2((prev) => ({ ...prev, [colId]: e.target.value })),
                     className: "h-7 text-xs bg-background border-primary/30 focus-visible:ring-primary/50 rounded",
                     onClick: (e) => e.stopPropagation()
                   }
@@ -376,9 +391,10 @@ var init_tableWidget = __esm({
           defs.push({
             id: "_actions",
             header: () => null,
-            cell: ({ row }) => {
+            cell: ({ row, table: table2 }) => {
               const rowIdx = row.index;
-              const isEditing = editingRowId === rowIdx;
+              const { editingRowId: editingRowId2, setEditingRowId: setEditingRowId2, setRowDraft: setRowDraft2, saveRow } = table2.options.meta;
+              const isEditing = editingRowId2 === rowIdx;
               if (isEditing) {
                 return /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-end gap-1", onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React9.createElement(
                   Button4,
@@ -386,7 +402,7 @@ var init_tableWidget = __esm({
                     size: "icon",
                     variant: "ghost",
                     className: "h-6 w-6 text-primary hover:bg-primary/10",
-                    onClick: () => handleSaveRow(rowIdx, row.original)
+                    onClick: () => saveRow(rowIdx, row.original)
                   },
                   /* @__PURE__ */ React9.createElement(Check, { className: "h-3.5 w-3.5" })
                 ), /* @__PURE__ */ React9.createElement(
@@ -395,7 +411,7 @@ var init_tableWidget = __esm({
                     size: "icon",
                     variant: "ghost",
                     className: "h-6 w-6 text-muted-foreground hover:text-foreground",
-                    onClick: () => setEditingRowId(null)
+                    onClick: () => setEditingRowId2(null)
                   },
                   /* @__PURE__ */ React9.createElement(X2, { className: "h-3.5 w-3.5" })
                 ));
@@ -407,8 +423,8 @@ var init_tableWidget = __esm({
                   variant: "ghost",
                   className: "h-6 w-6 text-muted-foreground/50 hover:text-foreground",
                   onClick: () => {
-                    setEditingRowId(rowIdx);
-                    setRowDraft({ ...row.original });
+                    setEditingRowId2(rowIdx);
+                    setRowDraft2({ ...row.original });
                   }
                 },
                 /* @__PURE__ */ React9.createElement(Pencil, { className: "h-3.5 w-3.5" })
@@ -420,7 +436,7 @@ var init_tableWidget = __esm({
           });
         }
         return defs;
-      }, [configColumns, multiSelectConfig, editingConfig, bulkEditConfig, editingRowId, rowDraft, editingCell, pendingEdits]);
+      }, [configColumns, multiSelectConfig, editingConfig, bulkEditConfig]);
       const table = useReactTable({
         data: rows,
         columns: columnDefs,
@@ -443,7 +459,14 @@ var init_tableWidget = __esm({
               [rowIdx]: { ...prev[rowIdx] || {}, [colId]: value }
             }));
             setEditingCell(null);
-          }
+          },
+          editingRowId,
+          setEditingRowId,
+          rowDraft,
+          setRowDraft,
+          editingCell,
+          pendingEdits,
+          saveRow: (idx, originalRow) => handleSaveRow(idx, originalRow)
         }
       });
       const [serverPage, setServerPage] = useState7(1);
@@ -966,7 +989,7 @@ var init_tableConfigEditor = __esm({
             if (v && bulkEdit.enabled) handleConfigChange("bulkEdit", { ...bulkEdit, enabled: false });
           }
         }
-      )), /* @__PURE__ */ React10.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Adds an Edit button to each row. Fires ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 border rounded" }, "onRowSave"), ".")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Excel-Style Bulk Edit"), /* @__PURE__ */ React10.createElement(
+      )), /* @__PURE__ */ React10.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Adds an Edit button to each row. Fires ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 border rounded" }, "onRowSave"), ".", /* @__PURE__ */ React10.createElement("br", null), /* @__PURE__ */ React10.createElement("span", { className: "text-amber-600 font-medium" }, "Note: Make sure to check 'Editable Column' for at least one column above."))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-xs font-medium text-foreground" }, "Excel-Style Bulk Edit"), /* @__PURE__ */ React10.createElement(
         Switch2,
         {
           checked: bulkEdit.enabled,
@@ -975,7 +998,7 @@ var init_tableConfigEditor = __esm({
             if (v && editing.enabled) handleConfigChange("editing", { ...editing, enabled: false });
           }
         }
-      )), /* @__PURE__ */ React10.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Double-click cells to edit. Fires ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 border rounded" }, "onBulkEdit"), " on save."), bulkEdit.enabled && /* @__PURE__ */ React10.createElement("div", { className: "space-y-1 bg-muted/30 p-2 rounded border mt-2" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-[10px]" }, "Save Button Label"), /* @__PURE__ */ React10.createElement(
+      )), /* @__PURE__ */ React10.createElement("p", { className: "text-[9.5px] text-muted-foreground leading-tight" }, "Double-click cells to edit. Fires ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 border rounded" }, "onBulkEdit"), " on save.", /* @__PURE__ */ React10.createElement("br", null), /* @__PURE__ */ React10.createElement("span", { className: "text-amber-600 font-medium" }, "Note: Make sure to check 'Editable Column' for at least one column above.")), bulkEdit.enabled && /* @__PURE__ */ React10.createElement("div", { className: "space-y-1 bg-muted/30 p-2 rounded border mt-2" }, /* @__PURE__ */ React10.createElement(Label3, { className: "text-[10px]" }, "Save Button Label"), /* @__PURE__ */ React10.createElement(
         Input5,
         {
           value: bulkEdit.saveLabel || "Save All Changes",
