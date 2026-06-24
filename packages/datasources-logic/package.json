@@ -50,7 +50,7 @@
     "@supabase/supabase-js": "^2.47.10",
     "airtable": "^0.12.2",
     "amqplib": "^0.10.5",
-    "axios": "^1.6.2",
+    "axios": "^1.18.1",
     "better-sqlite3": "^11.6.0",
     "eventsource": "^4.1.0",
     "exceljs": "^4.4.0",

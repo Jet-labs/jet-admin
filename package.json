@@ -40,7 +40,7 @@
     "@prisma/client": "^7.2.0",
     "@tanstack/react-table": "^8.21.3",
     "acorn": "^8.14.1",
-    "axios": "^1.13.2",
+    "axios": "^1.18.1",
     "dotenv": "^17.2.3",
     "estree-walker": "^3.0.3",
     "handlebars": "^4.7.8",
