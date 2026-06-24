@@ -7,7 +7,7 @@
 ### Open Source Analytics Platform & Internal Tools Builder
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=nodedotjs&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=nodedotjs&logoColor=white"/>
   <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white"/>
   <img src="https://img.shields.io/badge/PostgreSQL-14+-4169E1?style=flat-square&logo=postgresql&logoColor=white"/>
   <img src="https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma&logoColor=white"/>
@@ -54,16 +54,16 @@ Unlike traditional BI tools, Jet Admin is designed around a **workflow execution
 
 ### 🔌 Data Source Integration
 
-Jet Admin supports 25+ datasource connectors through its package-driven plugin system.
+Jet Admin supports 35+ datasource connectors through its package-driven plugin system.
 
 **Databases**
-- PostgreSQL · MySQL · MongoDB · SQLite · SQL Server · Redis · Neo4j
+- PostgreSQL · MySQL · MongoDB · SQLite · SQL Server · Redis · Neo4j · Oracle · CockroachDB
 
 **Cloud & SaaS**
-- BigQuery · Supabase · Firestore · Elasticsearch · AWS S3
+- BigQuery · Supabase · Firestore · Elasticsearch · AWS S3 · Airtable · Notion · Jira
 
-**APIs & Services**
-- REST · GraphQL · Slack · Stripe · Twilio · SendGrid
+**APIs, Events & Services**
+- REST · GraphQL · Slack · Stripe · Twilio · SendGrid · Kafka · RabbitMQ · NATS · MQTT · Webhooks
 
 ---
 
@@ -86,21 +86,31 @@ Start → Query → Transform → Condition → Loop → Notify → End
 
 ---
 
+### 📱 App Page Builder (Canvas)
+
+A visual drag-and-drop page builder based on Craft.js, allowing you to compose complex UIs and multi-page apps.
+
+**Features:** Z-Stack layout · Component tree · Custom styling · Data binding · Responsive layouts
+
+---
+
 ### 📊 Dashboard & Widget System
 
-**Charts:** Bar · Line · Pie · Radar · Scatter · Bubble
+**Charts:** Vega-based custom charts · Bar · Line · Pie
 
-**Data Widgets:** Tables · Text · Markdown · HTML · Custom widgets
+**Data Widgets:** Advanced Tables · Text · Custom widgets
 
-**Features:** Real-time updates · Export support · Responsive layouts · Drag-and-drop builder
+**Features:** Real-time updates · Export support
 
 ---
 
 ### 🏢 Enterprise Features
 
-**Security:** Multi-tenancy · RBAC · API authentication · Audit logs
+**Security:** Multi-tenancy · RBAC (Role-Based Access Control) · API authentication · Audit logs · Vault for secrets
 
-**User Management:** Team invites · Permissions · Activity tracking
+**User Management:** Team invites · Custom roles (TenantRole) · Permissions · Activity tracking
+
+**System & Ops:** Cron Jobs · System monitoring · Notifications (Slack, Email, Webhooks)
 
 ---
 
@@ -144,7 +154,14 @@ jet-admin/
 ├── packages/
 │   ├── datasource-types/      # Shared connector contracts
 │   ├── datasources-logic/     # Connector implementations
-│   ├── widgets/               # Widget definitions
+│   ├── datasources-ui/        # Connector UI components
+│   ├── expression-engine/     # Template resolution & evaluation
+│   ├── json-forms-renderers/  # Custom form renderers
+│   ├── ui/                    # Shared UI library
+│   ├── widget-types/          # Widget definitions
+│   ├── widgets-logic/         # Widget business logic
+│   ├── widgets-ui/            # Widget UI components
+│   ├── workflow-edges/        # Workflow edge connections
 │   └── workflow-nodes/        # Node type definitions
 │
 └── docker-compose.cloud.yml
@@ -165,14 +182,12 @@ modules/
 │   └── validation.js
 ├── workflow/
 │   ├── controller.js
-│   ├── service.js
 │   ├── engine.js          ← Workflow execution
-│   ├── workers/           ← Node workers
-│   └── repository.js
-└── dataQuery/
-    ├── controller.js
-    ├── service.js
-    └── repository.js
+│   └── workers/           ← Node workers
+├── auth/                  ← Authentication & authorization
+├── appPage/               ← App builder pages
+├── tenant/                ← Multi-tenancy isolation
+└── ... (13+ other isolated modules like audit, cronJob, vault, system, widget, notification)
 ```
 
 **Design principles enforced:**
@@ -311,18 +326,20 @@ Extensibility is achieved through **package-driven plugins**. The core system ne
 
 ```
 packages/
-├── datasources-logic/
+├── datasources-logic/src/data-sources/
 │   ├── postgres/
 │   ├── mysql/
-│   ├── mongodb/
-│   └── ...
-├── workflow-nodes/
-│   ├── queryNode/
-│   ├── transformNode/
-│   └── conditionNode/
-└── widgets/
-    ├── barChart/
+│   ├── restapi/
+│   ├── graphql/
+│   └── ... (35+ datasources)
+├── workflow-nodes/src/nodes/
+│   ├── dataQueryNode/
+│   ├── loopNode/
+│   ├── javascriptNode/
+│   └── ... (8+ nodes)
+└── widgets-logic/src/
     ├── table/
+    ├── vega/
     └── ...
 ```
 
@@ -548,7 +565,7 @@ Future:    Distributed workflow runners + execution snapshots
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - PostgreSQL 14+
 - Docker (recommended)
 - Firebase project (for auth)
@@ -566,20 +583,18 @@ Access: `http://localhost:3000`
 
 ### Manual Setup
 
-**Backend:**
+**Backend Setup:**
 ```bash
 cd apps/backend
-npm install
 cp .env.example .env
 npx prisma migrate dev
-npm run dev
 ```
 
-**Frontend:**
+**Run full stack from root:**
 ```bash
-cd apps/frontend
+cd ../..
 npm install
-npm run dev
+npm run dev:all
 ```
 
 ### Environment Variables
