@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="docs/static/img/logo.png" alt="Jet Admin Logo" width="120"/>
+<img width="112" height="112" alt="logo" src="https://github.com/user-attachments/assets/21741a12-1315-4de9-b993-7a004050c50e" />
 
-# ⚡ Jet Admin
+# Jet Admin
 
 ### Open Source Analytics Platform & Internal Tools Builder
 
