@@ -1,0 +1,5 @@
+[36minfo[39m: dev_node_1: 30-06-2026 21:08:36: [36mcasbin:getEnforcer:initializing[39m
+[32msuccess[39m: dev_node_1: 30-06-2026 21:08:37: [32mcasbin:getEnforcer:ready[39m
+[36minfo[39m: dev_node_1: 30-06-2026 21:14:13: [36mcasbin:getEnforcer:initializing[39m
+[32msuccess[39m: dev_node_1: 30-06-2026 21:14:15: [32mcasbin:getEnforcer:ready[39m
+[36minfo[39m: dev_node_1: 30-06-2026 21:14:37: [36mcasbin:shutdown:done[39m

@@ -47,6 +47,8 @@ const environmentVariables = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   BACKEND_URL: process.env.BACKEND_URL,
+  NVIDIA_API_KEY: process.env.NVIDIA_API_KEY,
+  JET_ADMIN_INTERNAL_API_KEY: process.env.JET_ADMIN_INTERNAL_API_KEY,
 };
 console.log("environment variables set-----------------------------");
 const safeEnv = { ...environmentVariables };

@@ -12,10 +12,15 @@ import { Breadcrumbs } from "../ui/breadCrumbs";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { UserAvatar } from "../ui/userAvatar";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
+import { Sparkles } from "lucide-react";
+import { AIChatPanel } from "../aiComponents/AIChatPanel";
+import { useAIStore } from "../../../logic/stores/useAIStore";
+
 export const ProtectedLayout = () => {
   const { firebaseUserState } = useAuthState();
   const { tenantID } = useParams();
   const { getUserConfig } = useAuthActions();
+  const { isOpen, togglePanel } = useAIStore();
 
   const navigate = useNavigate();
 
@@ -24,6 +29,7 @@ export const ProtectedLayout = () => {
       getUserConfig({ tenantID });
     }
   }, [tenantID, getUserConfig, firebaseUserState]);
+
   useEffect(() => {
     if (
       firebaseUserState &&
@@ -33,6 +39,18 @@ export const ProtectedLayout = () => {
       navigate(CONSTANTS.ROUTES.SIGN_IN.path());
     }
   }, [firebaseUserState]);
+
+  // Keyboard shortcut: Ctrl+K or Cmd+K toggles the AI panel
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        togglePanel();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [togglePanel]);
 
   return (
     <ReactQueryLoadingErrorWrapper
@@ -48,16 +66,31 @@ export const ProtectedLayout = () => {
                 <Link to="/">
                   <div className="flex flex-row items-end">
                     <img src={logo} className="w-8 h-8" />
-                    {/* <span className="ml-3 text-lg leading-none font-bold whitespace-nowrap text-primary aldrich-logo">
-                      {CONSTANTS.APP_NAME}
-                    </span> */}
                   </div>
                 </Link>
               </div>
               <Breadcrumbs />
 
-
               <div className="flex flex-row justify-end items-center gap-2">
+                {/* AI Agent toggle button */}
+                {tenantID && (
+                  <button
+                    id="ai-panel-toggle"
+                    onClick={togglePanel}
+                    title="AI Agent (Ctrl+K)"
+                    className={`
+                      flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[12px] font-medium
+                      transition-all duration-150
+                      ${isOpen
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
+                      }
+                    `}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>AI</span>
+                  </button>
+                )}
 
                 <UserAvatar />
               </div>
@@ -82,6 +115,9 @@ export const ProtectedLayout = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
+
+      {/* AI Chat Panel — fixed position, doesn't affect layout */}
+      <AIChatPanel />
     </ReactQueryLoadingErrorWrapper>
   );
 };

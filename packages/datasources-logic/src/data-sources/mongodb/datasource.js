@@ -294,4 +294,129 @@ export default class MongoDBDataSource extends DataSource {
       });
     }
   }
+
+  async getSchema(params, context) {
+    const datasourceOptions = this.config.datasourceOptions || {};
+    let connectionString;
+    let dbName;
+
+    if (datasourceOptions.connectionString) {
+      connectionString = datasourceOptions.connectionString;
+      const urlMatch = connectionString.match(/\/([^/?]+)(\?|$)/);
+      dbName = urlMatch ? urlMatch[1] : "test";
+    } else {
+      const details = datasourceOptions.connectionDetails || datasourceOptions;
+      const { host, port, database, username, password, authSource, ssl, replicaSet } = details;
+      
+      dbName = database || datasourceOptions.database;
+      let authPart = "";
+      if (username && password) {
+        authPart = `${encodeURIComponent(username)}:${encodeURIComponent(password)}@`;
+      }
+      const params = new URLSearchParams();
+      if (authSource) params.append("authSource", authSource);
+      if (ssl) params.append("ssl", "true");
+      if (replicaSet) params.append("replicaSet", replicaSet);
+      const queryString = params.toString() ? `?${params.toString()}` : "";
+      connectionString = `mongodb://${authPart}${host || "localhost"}:${port || 27017}/${dbName}${queryString}`;
+    }
+
+    let client;
+    try {
+      client = new MongoClient(connectionString);
+      await client.connect();
+      const db = client.db(dbName);
+      const collections = await db.listCollections().toArray();
+      
+      const tables = [];
+      for (const colInfo of collections) {
+        if (colInfo.name.startsWith("system.")) continue;
+        const col = db.collection(colInfo.name);
+        const sampleDoc = await col.findOne({});
+        const columns = [];
+        if (sampleDoc) {
+          for (const key of Object.keys(sampleDoc)) {
+            const val = sampleDoc[key];
+            let type = typeof val;
+            if (val instanceof ObjectId) type = "ObjectId";
+            else if (val instanceof Date) type = "Date";
+            else if (Array.isArray(val)) type = "Array";
+            
+            columns.push({
+              columnName: key,
+              dataType: type,
+              isNullable: true,
+              isPrimaryKey: key === "_id",
+            });
+          }
+        }
+        tables.push({
+          tableName: colInfo.name,
+          columns: columns,
+        });
+      }
+      return { tables };
+    } catch (error) {
+      Logger.log("error", {
+        message: "mongodb:MongoDBDataSource:getSchema:catch",
+        params: error.message || error,
+      });
+      throw error;
+    } finally {
+      if (client) {
+        await client.close();
+      }
+    }
+  }
+
+  async getSampleData(params, context) {
+    const { table, limit = 5 } = params;
+    if (!table || typeof table !== 'string') {
+      throw new Error("Invalid collection name");
+    }
+    const datasourceOptions = this.config.datasourceOptions || {};
+    let connectionString;
+    let dbName;
+
+    if (datasourceOptions.connectionString) {
+      connectionString = datasourceOptions.connectionString;
+      const urlMatch = connectionString.match(/\/([^/?]+)(\?|$)/);
+      dbName = urlMatch ? urlMatch[1] : "test";
+    } else {
+      const details = datasourceOptions.connectionDetails || datasourceOptions;
+      const { host, port, database, username, password, authSource, ssl, replicaSet } = details;
+      
+      dbName = database || datasourceOptions.database;
+      let authPart = "";
+      if (username && password) {
+        authPart = `${encodeURIComponent(username)}:${encodeURIComponent(password)}@`;
+      }
+      const params = new URLSearchParams();
+      if (authSource) params.append("authSource", authSource);
+      if (ssl) params.append("ssl", "true");
+      if (replicaSet) params.append("replicaSet", replicaSet);
+      const queryString = params.toString() ? `?${params.toString()}` : "";
+      connectionString = `mongodb://${authPart}${host || "localhost"}:${port || 27017}/${dbName}${queryString}`;
+    }
+
+    let client;
+    try {
+      client = new MongoClient(connectionString);
+      await client.connect();
+      const db = client.db(dbName);
+      const col = db.collection(table);
+      const rows = await col.find({}).limit(parseInt(limit, 10)).toArray();
+      return rows;
+    } catch (error) {
+      Logger.log("error", {
+        message: "mongodb:MongoDBDataSource:getSampleData:catch",
+        params: error.message || error,
+      });
+      throw error;
+    } finally {
+      if (client) {
+        await client.close();
+      }
+    }
+  }
 }

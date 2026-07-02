@@ -418,14 +418,23 @@ tenantRoleService.deleteTenantRoleByID = async ({ tenantID, roleID }) => {
 
 const PERMISSION_MAP = {
   // Data queries
-  "tenant:query:list": { resource: "dataquery", action: "list" },
-  "tenant:query:create": { resource: "dataquery", action: "create" },
-  "tenant:query:read": { resource: "dataquery", action: "read" },
-  "tenant:query:update": { resource: "dataquery", action: "update" },
-  "tenant:query:delete": { resource: "dataquery", action: "delete" },
-  "tenant:query:test": { resource: "dataquery", action: "test" },
-  "tenant:query:clone": { resource: "dataquery", action: "clone" },
+  "tenant:dataquery:list": { resource: "dataquery", action: "list" },
+  "tenant:dataquery:create": { resource: "dataquery", action: "create" },
+  "tenant:dataquery:read": { resource: "dataquery", action: "read" },
+  "tenant:dataquery:update": { resource: "dataquery", action: "update" },
+  "tenant:dataquery:delete": { resource: "dataquery", action: "delete" },
+  "tenant:dataquery:test": { resource: "dataquery", action: "test" },
+  "tenant:dataquery:execute": { resource: "dataquery", action: "execute" },
+  
+  // Legacy/Alternative data query permissions in DB
+  "tenant:database:query:list": { resource: "dataquery", action: "list" },
+  "tenant:database:query:create": { resource: "dataquery", action: "create" },
+  "tenant:database:query:read": { resource: "dataquery", action: "read" },
+  "tenant:database:query:update": { resource: "dataquery", action: "update" },
+  "tenant:database:query:delete": { resource: "dataquery", action: "delete" },
+  "tenant:database:query:test": { resource: "dataquery", action: "test" },
   "tenant:query:bulk:create": { resource: "dataquery", action: "create" },
+  "tenant:query:clone": { resource: "dataquery", action: "clone" },
 
   // Workflows
   "tenant:workflow:list": { resource: "workflow", action: "list" },
@@ -540,6 +549,57 @@ tenantRoleService.syncRolePolicies = async (roleID, tenantID) => {
 
   // 4. Reload the enforcer rules cache
   await reloadPolicies();
+};
+
+/**
+ * Re-syncs all Casbin policies for every role across all tenants.
+ * Call this on startup to recover from stale rules in the casbin_rule table.
+ */
+tenantRoleService.syncAllRolePolicies = async () => {
+  Logger.log("info", { message: "tenantRoleService:syncAllRolePolicies:start" });
+
+  try {
+    const allRoles = await prisma.tblRoles.findMany({
+      select: { roleID: true, tenantID: true },
+    });
+
+    // For global roles (tenantID=null), we need all tenantIDs to sync against
+    let allTenantIDs = null;
+
+    for (const role of allRoles) {
+      try {
+        if (role.tenantID) {
+          // Tenant-scoped role: sync only for its tenant
+          await tenantRoleService.syncRolePolicies(role.roleID, role.tenantID);
+        } else {
+          // Global role (tenantID=null): sync for every tenant, same as the seed script
+          if (!allTenantIDs) {
+            const tenants = await prisma.tblTenants.findMany({ select: { tenantID: true } });
+            allTenantIDs = tenants.map((t) => t.tenantID);
+          }
+          for (const tenantID of allTenantIDs) {
+            await tenantRoleService.syncRolePolicies(role.roleID, tenantID);
+          }
+        }
+      } catch (err) {
+        Logger.log("warning", {
+          message: "tenantRoleService:syncAllRolePolicies:roleSkipped",
+          params: { roleID: role.roleID, error: err.message },
+        });
+      }
+    }
+
+    Logger.log("success", {
+      message: "tenantRoleService:syncAllRolePolicies:done",
+      params: { rolesCount: allRoles.length },
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tenantRoleService:syncAllRolePolicies:error",
+      params: { error: error.message },
+    });
+    throw error;
+  }
 };
 
 module.exports = { tenantRoleService };

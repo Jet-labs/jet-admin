@@ -146,9 +146,12 @@ Base unit: **8px**. All component internal spacing must use these increments.
 | `xxl` | 32px | `p-8` / `gap-8` |
 | `huge` | 64px | `p-16` / `gap-16` |
 
-- **Feature / pricing cards:** internal padding `p-8` (32px).
+- **Feature / pricing cards:** internal padding should preferably be `p-2` (8px), using `gap-2` or `space-y-2`/`space-x-2` for layout.
 - **Marketing section bands:** vertical padding `py-16` to `py-24` (64–96px).
-- **Configurator panels:** internal padding `p-3` to `p-4`.
+- **Configurator panels:** internal padding should preferably be `p-2` (and use `gap-2` or `space-y-2`/`space-x-2` for layout).
+
+### Rules
+- **Prefer Dense & Compact Spacing:** Across all UI elements (cards, containers, forms, navigations, and panels), **preferably use `p-2` (8px padding), spacing-2 (`space-x-2` / `space-y-2`), and `gap-2`** wherever possible. Avoid larger paddings (`p-3`, `p-4`, `p-8`) or spacing values (`gap-3`, `space-y-4` etc.) unless strictly necessary for top-level marketing layout sections.
 
 ---
 
@@ -237,21 +240,21 @@ className="bg-primary text-white"
 
 #### Feature Card (light)
 ```jsx
-<div className="rounded-xl border border-border bg-card p-8 space-y-4">
+<div className="rounded-xl border border-border bg-card p-2 space-y-2">
   {/* content */}
 </div>
 ```
 
 #### Feature Card (dark / code-heavy)
 ```jsx
-<div className="rounded-xl border border-border bg-foreground text-background p-8 space-y-4">
+<div className="rounded-xl border border-border bg-foreground text-background p-2 space-y-2">
   {/* content */}
 </div>
 ```
 
 #### Pricing Card (standard)
 ```jsx
-<div className="rounded-xl border border-border bg-card p-8 flex flex-col gap-4">
+<div className="rounded-xl border border-border bg-card p-2 flex flex-col gap-2">
   <p className="text-2xl font-medium tracking-tight text-foreground">Plan Name</p>
   <p className="text-3xl font-medium text-foreground">$X<span className="text-sm text-muted-foreground">/mo</span></p>
   {/* feature list */}
@@ -261,7 +264,7 @@ className="bg-primary text-white"
 
 #### Pricing Card (featured / dark inverted)
 ```jsx
-<div className="rounded-xl border border-border bg-foreground text-background p-8 flex flex-col gap-4">
+<div className="rounded-xl border border-border bg-foreground text-background p-2 flex flex-col gap-2">
   {/* same structure, text-background overrides */}
 </div>
 ```
@@ -271,7 +274,7 @@ className="bg-primary text-white"
 
 ### 8.3 Code Blocks
 ```jsx
-<div className="rounded-md bg-foreground text-background p-4 font-mono text-sm leading-relaxed">
+<div className="rounded-md bg-foreground text-background p-2 font-mono text-sm leading-relaxed">
   <code>{snippet}</code>
 </div>
 ```
@@ -322,7 +325,7 @@ Inline code inside callouts:
 <nav className="bg-background border-b border-border px-6 py-4 flex items-center justify-between">
   <Logo />
   <NavLinks />
-  <div className="flex items-center gap-3">
+  <div className="flex items-center gap-2">
     <Button variant="ghost" size="sm">Sign In</Button>
     <Button size="sm">Get Started</Button>
   </div>
@@ -444,7 +447,7 @@ Every configurator closes with a single full-width save button using `Button var
 ### Help Callout Containers
 
 ```jsx
-<div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
+<div className="rounded-md border border-border bg-muted/30 p-2 text-[10px] text-muted-foreground space-y-2">
   <div className="font-semibold text-xs text-foreground">📘 Title</div>
   {/* body */}
 </div>
@@ -602,11 +605,11 @@ import { Label } from "@jet-admin/ui";
 ```jsx
 /* ✅ Correct */
 <div className="rounded-md border border-border bg-card overflow-hidden shadow-sm">
-  <div className="flex items-center justify-between px-3 py-2 bg-muted/50 border-b border-border">
+  <div className="flex items-center justify-between p-2 bg-muted/50 border-b border-border">
 
 /* ❌ Wrong */
 <div className="border border-slate-200 rounded bg-white overflow-hidden shadow-sm">
-  <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-b border-slate-200">
+  <div className="flex items-center justify-between p-2 bg-slate-50 border-b border-slate-200">
 ```
 
 ### vegaSpecEditor.jsx — Inline `S` Style Object (Allowed Exception)
@@ -635,6 +638,9 @@ bg-[#646cff]      → bg-primary
 text-white (on primary button) → text-foreground
 rounded-full (on buttons) → rounded-md
 font-weight 600+  → font-medium (500) on display headings
+p-3 / p-4 / p-8   → p-2 (preferably, except for section vertical padding)
+gap-3 / gap-4     → gap-2 (preferably)
+space-y-4         → space-y-2 (preferably)
 ```
 
 ---
@@ -644,10 +650,10 @@ font-weight 600+  → font-medium (500) on display headings
 Run after every design change:
 
 ```bash
-npx @google/design.md lint DESIGN.md
+npx @google/design.md lint UI_GUIDELINES_V3.md
 ```
 
-Default body references must use `body-md` / `text-base`. Code surfaces must use `code` / `font-mono`. Keep emerald scarce — one `bg-primary` filled element per viewport section is the target.
+Default body references must use `body-md` / `text-base`. Code surfaces must use `code` / `font-mono`. Spacing must preferably use `p-2`, `space-x-2`/`space-y-2`, and `gap-2` wherever possible. Keep emerald scarce — one `bg-primary` filled element per viewport section is the target.
 
 ---
 

@@ -20,12 +20,13 @@ model tblAPIKeyRoleMappings {
 model tblAPIKeys {
   apiKeyID                                            String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantID                                            String                  @db.Uuid
-  apiKey                                              String                  @db.VarChar
+  apiKeyHash                                          String                  @db.VarChar
   apiKeyTitle                                         String                  @db.VarChar
   createdAt                                           DateTime                @default(now()) @db.Timestamptz(6)
   isDisabled                                          Boolean
   creatorID                                           String?                 @db.Uuid
   createdByApiKeyID                                   String?                 @db.Uuid
+  apiKeyPrefix                                        String?                 @db.VarChar(8)
   tblAPIKeyRoleMappings                               tblAPIKeyRoleMappings[]
   tblAPIKeys                                          tblAPIKeys?             @relation("tblAPIKeysTotblAPIKeys", fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblAPIKeysCreatedByApiKeyID")
   other_tblAPIKeys                                    tblAPIKeys[]            @relation("tblAPIKeysTotblAPIKeys")
@@ -42,6 +43,7 @@ model tblAPIKeys {
   tblWorkflows                                        tblWorkflows[]
 
   @@index([createdByApiKeyID], map: "idx_tblAPIKeys_createdByApiKeyID")
+  @@index([apiKeyPrefix], map: "idx_tblAPIKeys_apiKeyPrefix")
 }
 
 model tblAuditLogs {
@@ -344,20 +346,22 @@ model tblWorkflowInstances {
   tblWorkflows                      tblWorkflows?                       @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([tenantID, status], map: "idx_tblWorkflowInstances_tenantID_status")
+  @@index([workflowID], map: "idx_tblWorkflowInstances_workflowID")
 }
 
 model tblWorkflowNodes {
-  nodeID                                                             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workflowID                                                         String            @db.Uuid
-  nodeType                                                           String            @db.VarChar
-  timeoutSeconds                                                     Int?              @default(300)
-  retryLimit                                                         Int?              @default(3)
-  createdAt                                                          DateTime          @default(now()) @db.Timestamptz(6)
-  updatedAt                                                          DateTime          @default(now()) @db.Timestamptz(6)
+  nodeID                                                             String                              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workflowID                                                         String                              @db.Uuid
+  nodeType                                                           String                              @db.VarChar
+  timeoutSeconds                                                     Int?                                @default(300)
+  retryLimit                                                         Int?                                @default(3)
+  createdAt                                                          DateTime                            @default(now()) @db.Timestamptz(6)
+  updatedAt                                                          DateTime                            @default(now()) @db.Timestamptz(6)
   nodeConfig                                                         Json?
-  tblWorkflowEdge_tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes tblWorkflowEdge[] @relation("tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes")
-  tblWorkflowEdge_tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes   tblWorkflowEdge[] @relation("tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes")
-  tblWorkflows                                                       tblWorkflows      @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction)
+  tblWorkflowDataCollectionRequests                                  tblWorkflowDataCollectionRequests[]
+  tblWorkflowEdge_tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes tblWorkflowEdge[]                   @relation("tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes")
+  tblWorkflowEdge_tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes   tblWorkflowEdge[]                   @relation("tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes")
+  tblWorkflows                                                       tblWorkflows                        @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([workflowID], map: "idx_tblWorkflowNodes_workflowID")
 }
@@ -413,6 +417,7 @@ model tblWorkflowDataCollectionRequests {
   expiresAt            DateTime?            @db.Timestamptz(6)
   createdAt            DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt            DateTime             @default(now()) @db.Timestamptz(6)
+  tblWorkflowNodes     tblWorkflowNodes     @relation(fields: [nodeID], references: [nodeID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWorkflowDataCollectionRequests_nodeID")
   tblWorkflowInstances tblWorkflowInstances @relation(fields: [instanceID], references: [instanceID], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([instanceID, status], map: "idx_tblWfDataCollection_instance_status")
@@ -511,4 +516,15 @@ model tblVaultCredentials {
   tblTenants        tblTenants  @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction, map: "fkTblVaultCredentialsTenantID")
 
   @@index([createdByApiKeyID], map: "idx_tblVaultCredentials_createdByApiKeyID")
+}
+
+model casbin_rule {
+  id    Int     @id @default(autoincrement())
+  ptype String  @db.VarChar(255)
+  v0    String? @db.VarChar(255)
+  v1    String? @db.VarChar(255)
+  v2    String? @db.VarChar(255)
+  v3    String? @db.VarChar(255)
+  v4    String? @db.VarChar(255)
+  v5    String? @db.VarChar(255)
 }

@@ -1,0 +1,23 @@
+{
+  "name": "@jet-admin/mcp-server",
+  "version": "1.0.0",
+  "description": "Jet Admin MCP Server — exposes Jet Admin platform tools via the Model Context Protocol (stdio transport)",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "jet-admin-mcp": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "axios": "^1.18.1",
+    "dotenv": "^16.0.0",
+    "zod": "^3.25.67"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -53,4 +53,12 @@ router.delete(
   tenantRoleController.deleteTenantRoleByID
 );
 
+// Re-sync all Casbin policies from DB for all roles in this tenant.
+// Use after PERMISSION_MAP changes or if casbin_rule table gets stale.
+router.post(
+  "/sync-policies",
+  authMiddleware.authorize("role", "update"),
+  tenantRoleController.syncPolicies
+);
+
 module.exports = router;

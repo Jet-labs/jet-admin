@@ -1096,6 +1096,11 @@ export const CONSTANTS = {
       updateDatabaseNotificationByID: (tenantID, databaseNotificationID) =>
         `/api/v1/tenants/${tenantID}/database/notifications/${databaseNotificationID}`,
     },
+    AI: {
+      chat: (tenantID) => `/api/v1/tenants/${tenantID}/ai/chat`,
+      chatStream: (tenantID) => `/api/v1/tenants/${tenantID}/ai/chat/stream`,
+      session: (tenantID) => `/api/v1/tenants/${tenantID}/ai/session`,
+    },
   },
 
   ERROR_CODES: {

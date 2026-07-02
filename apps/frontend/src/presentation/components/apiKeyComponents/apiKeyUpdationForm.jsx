@@ -15,7 +15,6 @@ import { APIKeyCloneForm } from "./apiKeyCloneForm";
 import { APIKeyEditor } from "./apiKeyEditor";
 import { formValidations } from "../../../utils/formValidation";
 import { APIKeyRoleSelectionDialog } from "./apiKeyRoleSelectionDialog";
-import { CodeBlock } from "../ui/codeblock";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
@@ -125,7 +124,6 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
             className="space-y-4"
             onSubmit={apiKeyUpdationForm.handleSubmit}
           >
-            {apiKey && <CodeBlock code={`${apiKey.apiKey}`} className="w-full" />}
             <APIKeyEditor
               tenantID={tenantID}
               apiKeyEditorForm={apiKeyUpdationForm}

@@ -2,6 +2,7 @@ const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const { generateAPIKey, hashAPIKey } = require("../../utils/crypto.util");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
+const { addRoleForUser, removeRoleForUser, getRolesForUser, reloadPolicies } = require("../../config/casbin.config");
 
 const apiKeyService = {};
 
@@ -93,6 +94,12 @@ apiKeyService.createAPIKey = async ({
       message: "apiKeyService:createAPIKey:success",
       params: { userID, apiKeyID: createdAPIKey?.apiKeyID, apiKeyTitle },
     });
+
+    if (roleIDs && roleIDs.length > 0) {
+      for (const roleID of roleIDs) {
+        await addRoleForUser(createdAPIKey.apiKeyID, `role:${roleID}`, tenantID);
+      }
+    }
 
     return { apiKey: rawKey };
   } catch (error) {
@@ -233,6 +240,18 @@ apiKeyService.updateAPIKeyByID = async ({
       },
     });
 
+    if (roleIDs !== undefined) {
+      const existingRoles = await getRolesForUser(apiKeyID, tenantID);
+      for (const role of existingRoles) {
+        await removeRoleForUser(apiKeyID, role, tenantID);
+      }
+      if (roleIDs.length > 0) {
+        for (const roleID of roleIDs) {
+          await addRoleForUser(apiKeyID, `role:${roleID}`, tenantID);
+        }
+      }
+    }
+
     return true;
   } catch (error) {
     Logger.log("error", {
@@ -262,6 +281,8 @@ apiKeyService.deleteAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
   });
 
   try {
+    const existingRoles = await getRolesForUser(apiKeyID, tenantID);
+
     await prisma.$transaction(async (tx) => {
       const existingAPIKey = await tx.tblAPIKeys.findUnique({
         where: { apiKeyID },
@@ -286,6 +307,10 @@ apiKeyService.deleteAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
 
       return true;
     });
+
+    for (const role of existingRoles) {
+      await removeRoleForUser(apiKeyID, role, tenantID);
+    }
 
     Logger.log("success", {
       message: "apiKeyService:deleteAPIKeyByID:success",
@@ -367,11 +392,63 @@ apiKeyService.cloneAPIKey = async ({ userID, tenantID, apiKeyID, authContext }) 
       params: { userID, apiKeyID: clonedAPIKey?.apiKeyID, cloneOfApiKeyID: apiKeyID },
     });
 
+    const existingMappings = existing.tblAPIKeyRoleMappings;
+    if (existingMappings && existingMappings.length > 0) {
+      for (const mapping of existingMappings) {
+        await addRoleForUser(clonedAPIKey.apiKeyID, `role:${mapping.roleID}`, tenantID);
+      }
+    }
+
     return { apiKey: rawKey };
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:cloneAPIKey:failure",
       params: { userID, errorMessage: error.message },
+    });
+    throw error;
+  }
+};
+
+/**
+ * Re-syncs all Casbin g (group) rules for every API key from tblAPIKeyRoleMappings.
+ * Call this on startup alongside syncAllRolePolicies() to recover g-rules lost
+ * after a casbin_rule table wipe, DB migration, or server restart.
+ */
+apiKeyService.syncAllApiKeyRolePolicies = async () => {
+  Logger.log("info", { message: "apiKeyService:syncAllApiKeyRolePolicies:start" });
+
+  try {
+    const allMappings = await prisma.tblAPIKeyRoleMappings.findMany({
+      include: {
+        tblAPIKeys: {
+          select: { apiKeyID: true, tenantID: true },
+        },
+      },
+    });
+
+    for (const mapping of allMappings) {
+      const { apiKeyID, tenantID } = mapping.tblAPIKeys;
+      const roleID = mapping.roleID;
+      try {
+        await addRoleForUser(apiKeyID, `role:${roleID}`, tenantID);
+      } catch (err) {
+        Logger.log("warning", {
+          message: "apiKeyService:syncAllApiKeyRolePolicies:rowSkipped",
+          params: { apiKeyID, roleID, error: err.message },
+        });
+      }
+    }
+
+    await reloadPolicies();
+
+    Logger.log("success", {
+      message: "apiKeyService:syncAllApiKeyRolePolicies:done",
+      params: { mappingsCount: allMappings.length },
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "apiKeyService:syncAllApiKeyRolePolicies:error",
+      params: { error: error.message },
     });
     throw error;
   }

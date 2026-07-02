@@ -2,6 +2,7 @@ const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const constants = require("../../constants");
 const { notificationService } = require("../notification/notification.service");
+const { addRoleForUser, removeRoleForUser, getRolesForUser, addPolicy, removePolicy } = require("../../config/casbin.config");
 
 const userManagementService = {};
 
@@ -379,17 +380,39 @@ userManagementService.updateTenantUserRolesByID = async ({
       userTenantRelationship == MEMBER_ROLE
     ) {
       await userManagementService.demoteUserToMember(tenantUserID, tenantID);
+      await removePolicy(tenantUserID, tenantID, "*", "*", "allow");
+      if (roleIDs && roleIDs.length > 0) {
+        for (const roleID of roleIDs) {
+          await addRoleForUser(tenantUserID, `role:${roleID}`, tenantID);
+        }
+      }
     } else if (
       currentRole == MEMBER_ROLE &&
       userTenantRelationship == ADMIN_ROLE
     ) {
       await userManagementService.promoteUserToAdmin(tenantUserID, tenantID);
+      await addPolicy(tenantUserID, tenantID, "*", "*", "allow");
+      const existingRoles = await getRolesForUser(tenantUserID, tenantID);
+      for (const role of existingRoles) {
+        await removeRoleForUser(tenantUserID, role, tenantID);
+      }
     } else {
       await userManagementService.updateTenantUserRoles(
         tenantUserID,
         tenantID,
         roleIDs
       );
+      if (currentRole == MEMBER_ROLE) {
+        const existingRoles = await getRolesForUser(tenantUserID, tenantID);
+        for (const role of existingRoles) {
+          await removeRoleForUser(tenantUserID, role, tenantID);
+        }
+        if (roleIDs && roleIDs.length > 0) {
+          for (const roleID of roleIDs) {
+            await addRoleForUser(tenantUserID, `role:${roleID}`, tenantID);
+          }
+        }
+      }
     }
 
     Logger.log("success", {
@@ -488,6 +511,15 @@ userManagementService.removeTenantUserFromTenantByID = async ({
         where: { userID: tenantUserID, tenantID },
       });
     });
+
+    if (existingUserTenantRelationship.role === constants.ROLES.PRIMARY.ADMIN.value) {
+      await removePolicy(tenantUserID, tenantID, "*", "*", "allow");
+    } else {
+      const existingRoles = await getRolesForUser(tenantUserID, tenantID);
+      for (const role of existingRoles) {
+        await removeRoleForUser(tenantUserID, role, tenantID);
+      }
+    }
 
     Logger.log("success", {
       message: "userManagementService:removeTenantUserFromTenantByID:success",

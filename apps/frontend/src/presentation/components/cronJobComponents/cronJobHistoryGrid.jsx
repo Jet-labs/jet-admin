@@ -21,7 +21,7 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
   };
 
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(50);
 
   const {
     isLoading: isLoadingCronJobHistory,

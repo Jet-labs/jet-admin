@@ -234,4 +234,35 @@ tenantRoleController.deleteTenantRoleByID = async (req, res) => {
   }
 };
 
+/**
+ * Re-sync all Casbin policies for all roles.
+ * Useful after PERMISSION_MAP changes or if the casbin_rule table gets stale.
+ *
+ * POST /api/v1/tenants/:tenantID/roles/sync-policies
+ */
+tenantRoleController.syncPolicies = async (req, res) => {
+  try {
+    const { tenantID } = req.params;
+    Logger.log("info", {
+      message: "tenantRoleController:syncPolicies:params",
+      params: { tenantID },
+    });
+
+    await tenantRoleService.syncAllRolePolicies();
+
+    Logger.log("success", {
+      message: "tenantRoleController:syncPolicies:success",
+      params: { tenantID },
+    });
+
+    return expressUtils.sendResponse(res, true, { message: "Casbin policies re-synced successfully." });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tenantRoleController:syncPolicies:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
 module.exports = {tenantRoleController}

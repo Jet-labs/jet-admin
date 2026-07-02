@@ -16,7 +16,7 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
     tenantID: PropTypes.number.isRequired,
   };
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(50);
   const datagridRef = useRef();
   const datagridAPIRef = useRef();
 

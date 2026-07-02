@@ -52,7 +52,7 @@ export const useInfiniteCronJobs = (tenantID, searchQuery = "", options = {}) =>
         tenantID,
         search: searchQuery,
         page: pageParam,
-        pageSize: 10,
+        pageSize: 50,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

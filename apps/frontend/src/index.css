@@ -366,4 +366,11 @@ button {
 
 .Toastify__progress-bar--error {
   background: hsl(var(--destructive));
+}
+
+.lab-bg::before {
+  overflow: hidden;
+  max-width: 100vw;
+  max-height: 100vh;
+  box-sizing: border-box;
 }

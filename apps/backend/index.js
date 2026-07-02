@@ -46,6 +46,12 @@ if (isModuleEnabled(constants.MODULES.TENANT)) {
   );
 }
 
+// AI Agent routes (tenant-scoped)
+expressApp.use(
+  "/api/v1/tenants/:tenantID/ai",
+  require("./modules/ai/ai.v1.routes")
+);
+
 // OAuth integration routes
 expressApp.use("/api/v1/oauth", require("./modules/oauth/oauth.v1.routes"));
 
@@ -217,6 +223,7 @@ httpServer.listen(port, async () => {
   } catch (error) {
     Logger.log("warning", { message: "listeners not started", params: { error: error.message } });
   }
+
 });
 
 // Graceful shutdown

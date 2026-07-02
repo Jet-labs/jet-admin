@@ -50,7 +50,7 @@ export const APIKeyRoleSelectionDialog = ({
         open={isAPIKeyRoleSelectDialogOpen}
         onOpenChange={setIsAPIKeyRoleSelectDialogOpen}
       >
-        <DialogContent className="max-w-lg gap-0 overflow-hidden p-0">
+        <DialogContent className="max-w-lg gap-0 p-0">
           <DialogHeader className="border-b border-border px-4 py-3">
             <DialogTitle className="text-base font-semibold text-foreground">
               {CONSTANTS.STRINGS.API_KEY_ROLE_SELECTION_TITLE}

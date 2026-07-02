@@ -75,7 +75,7 @@ export const createAPIKeyAPI = async ({ tenantID, apiKeyData }) => {
         }
       );
       if (response.data && response.data.success === true) {
-        return true;
+        return response.data.apiKey;
       } else if (response.data.error) {
         throw response.data.error;
       } else {
@@ -168,7 +168,7 @@ export const cloneAPIKeyAPI = async ({ tenantID, apiKeyID }) => {
         }
       );
       if (response.data && response.data.success === true) {
-        return true;
+        return response.data.apiKey;
       } else if (response.data.error) {
         throw response.data.error;
       } else {

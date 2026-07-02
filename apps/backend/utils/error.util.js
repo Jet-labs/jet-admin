@@ -41,7 +41,7 @@ errorUtils.extractError = (error) => {
       };
     }
     // Handle PostgreSQL-specific errors using predefined codes
-    else if (error.code && constants.POSTGRES_ERROR_CODES[error.code]) {
+    else if (error.code && constants.POSTGRES_ERROR_CODES && constants.POSTGRES_ERROR_CODES[error.code]) {
       errorResponse = {
         code: "DB_ERROR",
         message: constants.POSTGRES_ERROR_CODES[error.code],
@@ -83,7 +83,10 @@ errorUtils.extractError = (error) => {
   } catch (handlingError) {
     Logger.log("error", {
       message: "Error handling failed:",
-      params: handlingError,
+      params: {
+        message: handlingError?.message || String(handlingError),
+        stack: handlingError?.stack,
+      },
     });
     return constants.ERROR_CODES.SERVER_ERROR;
   }

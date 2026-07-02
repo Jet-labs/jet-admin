@@ -277,7 +277,7 @@ async function enforce(sub, dom, obj, act) {
  */
 async function addRoleForUser(sub, role, dom) {
   const enforcer = await getEnforcer();
-  await enforcer.addRoleForUserInDomain(sub, role, dom);
+  await enforcer.addRoleForUser(sub, role, dom);
 }
 
 /**
@@ -285,7 +285,7 @@ async function addRoleForUser(sub, role, dom) {
  */
 async function removeRoleForUser(sub, role, dom) {
   const enforcer = await getEnforcer();
-  await enforcer.deleteRoleForUserInDomain(sub, role, dom);
+  await enforcer.deleteRoleForUser(sub, role, dom);
 }
 
 /**

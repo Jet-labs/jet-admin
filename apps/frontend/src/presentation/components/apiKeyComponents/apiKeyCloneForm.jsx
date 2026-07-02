@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Copy } from 'lucide-react';
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { cloneAPIKeyAPI } from "../../../data/apis/apiKey";
 import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import { APIKeyDisplayDialog } from "./apiKeyDisplayDialog";
 
 import { Button, Spinner } from "@jet-admin/ui";
 
@@ -20,6 +21,10 @@ export const APIKeyCloneForm = ({ tenantID, apiKeyID }) => {
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
   const queryClient = useQueryClient();
+
+  const [clonedKey, setClonedKey] = useState(null);
+  const [isDisplayDialogOpen, setIsDisplayDialogOpen] = useState(false);
+
   const { isPending: isCloningAPIKey, mutate: cloneAPIKey } = useMutation({
     mutationFn: () => {
       return cloneAPIKeyAPI({
@@ -28,13 +33,14 @@ export const APIKeyCloneForm = ({ tenantID, apiKeyID }) => {
       });
     },
     retry: false,
-    onSuccess: () => {
+    onSuccess: (data) => {
       displaySuccess(CONSTANTS.STRINGS.CLONE_API_KEY_CLONING_SUCCESS);
       queryClient.invalidateQueries({
         queryKey:
-        [CONSTANTS.REACT_QUERY_KEYS.API_KEYS(tenantID)],
+        [CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID)],
       });
-      navigate(-1);
+      setClonedKey(data);
+      setIsDisplayDialogOpen(true);
     },
     onError: (error) => {
       displayError(error);
@@ -51,6 +57,11 @@ export const APIKeyCloneForm = ({ tenantID, apiKeyID }) => {
     });
     if (!confirmed) return;
     cloneAPIKey();
+  };
+
+  const handleCloseDisplayDialog = () => {
+    setIsDisplayDialogOpen(false);
+    navigate(-1);
   };
 
   return (
@@ -71,6 +82,12 @@ export const APIKeyCloneForm = ({ tenantID, apiKeyID }) => {
           <Copy className="h-3 w-3" />
         )}
       </Button>
+
+      <APIKeyDisplayDialog
+        open={isDisplayDialogOpen}
+        onClose={handleCloseDisplayDialog}
+        apiKey={clonedKey}
+      />
     </>
   );
 };
