@@ -6,6 +6,7 @@ const dataQueryService = {};
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 const { authorizedExecuteDataQuery, createQueryEngine, defaultDatasourceFetcher } = require("../../utils/authorizedProxy");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
+const { extractQueryDefinitions } = require("../../utils/input.util");
 
 dataQueryService.getDataQueriesWithDatasource = async ({
   userID,
@@ -29,15 +30,22 @@ dataQueryService.getDataQueriesWithDatasource = async ({
       },
     });
 
+    const sanitizedQueries = dataQueries.map((query) => {
+      if (query.tblDatasources) {
+        query.tblDatasources.datasourceOptions = undefined;
+      }
+      return query;
+    });
+
     Logger.log("success", {
       message: "dataQueryService:getDataQueriesWithDatasource:success",
       params: {
         userID,
-        dataQueriesLength: dataQueries?.length,
+        dataQueriesLength: sanitizedQueries?.length,
       },
     });
 
-    return dataQueries;
+    return sanitizedQueries;
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryService:getDataQueriesWithDatasource:failure",
@@ -441,7 +449,8 @@ dataQueryService.runDataQueryByData = async ({
     const results = await authorizedExecuteDataQuery({
       engine: queryRunner,
       dataQueryID: tempQueryID,
-      executionInputs: inputValues,
+      inputDefinitions: extractQueryDefinitions(dataQuery),
+      inputValues: inputValues || {},
       executionCtx,
     });
 
@@ -511,6 +520,10 @@ dataQueryService.getDataQueryByID = async ({
       ...dataQuery,
       _count: undefined, // Remove the _count property
     };
+
+    if (transformedQuery.tblDatasources) {
+      transformedQuery.tblDatasources.datasourceOptions = undefined;
+    }
 
     Logger.log("success", {
       message: "dataQueryService:getDataQueryByID:success",

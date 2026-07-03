@@ -35,7 +35,7 @@ errorUtils.extractError = (error) => {
         message: error.message,
         details: {
           name: error.name,
-          stack: error.stack,
+          ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
           ...error.details,
         },
       };

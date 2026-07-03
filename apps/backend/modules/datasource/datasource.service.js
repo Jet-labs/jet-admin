@@ -5,6 +5,51 @@ const fileStorageUtil = require("../../utils/fileStorage.util");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 const { vaultService } = require("../vault/vault.service");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
+const { encrypt, decrypt } = require("../../utils/encryption.util");
+
+function encryptOptions(options) {
+  if (!options) return options;
+  if (options.__encrypted) return options; // Already encrypted
+  const encrypted = encrypt(JSON.stringify(options));
+  return {
+    __encrypted: true,
+    ...encrypted,
+  };
+}
+
+function decryptOptions(options) {
+  if (!options) return options;
+  if (!options.__encrypted) return options; // Not encrypted (backwards compatibility)
+  try {
+    const decryptedStr = decrypt({
+      iv: options.iv,
+      data: options.data,
+      authTag: options.authTag,
+    });
+    return JSON.parse(decryptedStr);
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceService:decryptOptions:error",
+      params: { error: error.message },
+    });
+    return options; // Fallback to raw options if decryption fails
+  }
+}
+
+function mergeAndDecryptIncomingOptions(incomingOptions, existingDecryptedOptions) {
+  if (!incomingOptions) return incomingOptions;
+  const merged = { ...incomingOptions };
+  const sensitiveKeys = ["password", "secret", "token", "private_key", "apiKey", "key", "passphrase"];
+  
+  for (const k of Object.keys(merged)) {
+    if (merged[k] === "●●●●●●●●" && existingDecryptedOptions && existingDecryptedOptions[k] !== undefined) {
+      merged[k] = existingDecryptedOptions[k];
+    } else if (typeof merged[k] === "object" && merged[k] !== null && existingDecryptedOptions && typeof existingDecryptedOptions[k] === "object") {
+      merged[k] = mergeAndDecryptIncomingOptions(merged[k], existingDecryptedOptions[k]);
+    }
+  }
+  return merged;
+}
 
 const datasourceService = {};
 
@@ -65,20 +110,25 @@ datasourceService.getAllDatasources = async ({ userID, tenantID, search, page, p
       prisma.tblDatasources.count({ where }),
     ]);
 
+    const decryptedDatasources = datasources.map((d) => ({
+      ...d,
+      datasourceOptions: decryptOptions(d.datasourceOptions),
+    }));
+
     Logger.log("success", {
       message: "datasourceService:getAllDatasources:success",
       params: {
         userID,
-        datasourcesLength: datasources?.length,
+        datasourcesLength: decryptedDatasources?.length,
         totalCount,
       },
     });
 
     return {
-      datasources,
+      datasources: decryptedDatasources,
       totalCount,
       page: page || 1,
-      pageSize: pageSize || datasources.length,
+      pageSize: pageSize || decryptedDatasources.length,
       totalPages: pageSize ? Math.ceil(totalCount / pageSize) : 1,
     };
   } catch (error) {
@@ -107,6 +157,7 @@ datasourceService.testDatasourceConnection = async ({
   tenantID,
   datasourceType,
   datasourceOptions,
+  datasourceID,
 }) => {
   Logger.log("info", {
     message: "datasourceService:testDatasourceConnection:params",
@@ -115,13 +166,24 @@ datasourceService.testDatasourceConnection = async ({
       tenantID,
       datasourceType,
       datasourceOptions,
+      datasourceID,
     },
   });
   try {
+    let finalOptions = datasourceOptions;
+    const targetDSID = datasourceID || datasourceOptions?.datasourceID;
+    if (targetDSID) {
+      const existing = await prisma.tblDatasources.findFirst({
+        where: { datasourceID: targetDSID, tenantID },
+      });
+      const existingDecrypted = existing ? decryptOptions(existing.datasourceOptions) : null;
+      finalOptions = mergeAndDecryptIncomingOptions(datasourceOptions, existingDecrypted);
+    }
+
     const connectionResult = await DATASOURCE_LOGIC_COMPONENTS[
       datasourceType
     ].testConnection({
-      datasourceOptions,
+      datasourceOptions: finalOptions,
       helpers: {
         fileStorage: fileStorageUtil,
         getCredential: async (vaultCredentialID) => {
@@ -203,12 +265,13 @@ datasourceService.createDatasource = async ({
     if (!finalCreatorID && !createdByApiKeyID) {
       throw new Error("Creator ID or Created By API Key ID is required");
     }
+    const encryptedOptions = encryptOptions(datasourceOptions);
     const newDatasource = await prisma.tblDatasources.create({
       data: {
         tenantID: tenantID,
         datasourceTitle,
         datasourceType,
-        datasourceOptions,
+        datasourceOptions: encryptedOptions,
         creatorID,
         createdByApiKeyID,
         datasourceTags,
@@ -216,6 +279,8 @@ datasourceService.createDatasource = async ({
     });
 
     await grantCreatorAccess(tenantID, "datasource", newDatasource.datasourceID, authContext, finalCreatorID);
+
+    newDatasource.datasourceOptions = decryptOptions(newDatasource.datasourceOptions);
 
     Logger.log("success", {
       message: "datasourceService:createDatasource:success",
@@ -262,12 +327,15 @@ datasourceService.deleteDatasourceByID = async ({
   });
   try {
     // Prisma will cascade delete database tables based on the schema relation (onDelete: Cascade)
-    await prisma.tblDatasources.delete({
+    const deleted = await prisma.tblDatasources.deleteMany({
       where: {
         datasourceID: datasourceID,
         tenantID: tenantID,
       },
     });
+    if (deleted.count === 0) {
+      throw new Error("Datasource not found");
+    }
 
     await removePoliciesForResource(tenantID, `datasource:${datasourceID}`);
 
@@ -313,12 +381,15 @@ datasourceService.getDatasourceByID = async ({
     },
   });
   try {
-    const datasource = await prisma.tblDatasources.findUnique({
+    const datasource = await prisma.tblDatasources.findFirst({
       where: {
         datasourceID: datasourceID,
         tenantID: tenantID,
       },
     });
+    if (datasource) {
+      datasource.datasourceOptions = decryptOptions(datasource.datasourceOptions);
+    }
     Logger.log("success", {
       message: "datasourceService:getDatasourceByID:success",
       params: {
@@ -373,7 +444,16 @@ datasourceService.updateDatasourceByID = async ({
     },
   });
   try {
-    await prisma.tblDatasources.update({
+    let finalOptions = datasourceOptions;
+    if (datasourceOptions !== undefined) {
+      const existing = await prisma.tblDatasources.findFirst({
+        where: { datasourceID, tenantID },
+      });
+      const existingDecrypted = existing ? decryptOptions(existing.datasourceOptions) : null;
+      finalOptions = encryptOptions(mergeAndDecryptIncomingOptions(datasourceOptions, existingDecrypted));
+    }
+
+    const updated = await prisma.tblDatasources.updateMany({
       where: {
         datasourceID: datasourceID,
         tenantID: tenantID,
@@ -381,11 +461,14 @@ datasourceService.updateDatasourceByID = async ({
       data: {
         ...(datasourceTitle != undefined && { datasourceTitle }),
         ...(datasourceType != undefined && { datasourceType }),
-        ...(datasourceOptions != undefined && { datasourceOptions }),
+        ...(finalOptions != undefined && { datasourceOptions: finalOptions }),
         ...(datasourceTags != undefined && { datasourceTags }),
         updatedAt: new Date(),
       },
     });
+    if (updated.count === 0) {
+      throw new Error("Datasource not found");
+    }
     Logger.log("success", {
       message: "datasourceService:updateDatasourceByID:success",
       params: {
@@ -430,7 +513,7 @@ datasourceService.cloneDatasourceByID = async ({
     },
   });
   try {
-    const datasource = await prisma.tblDatasources.findUnique({
+    const datasource = await prisma.tblDatasources.findFirst({
       where: {
         datasourceID: datasourceID,
         tenantID: tenantID,
@@ -505,7 +588,7 @@ datasourceService.proxyDatasourceAction = async ({
 
   try {
     // 1. Load the datasource from DB
-    const datasource = await prisma.tblDatasources.findUnique({
+    const datasource = await prisma.tblDatasources.findFirst({
       where: {
         datasourceID: datasourceID,
         tenantID: tenantID,
@@ -515,6 +598,8 @@ datasourceService.proxyDatasourceAction = async ({
     if (!datasource) {
       throw new Error(`Datasource ${datasourceID} not found.`);
     }
+
+    const decryptedOptions = decryptOptions(datasource.datasourceOptions);
 
     // 2. Instantiate the DataSource class via registry
     const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
@@ -537,7 +622,7 @@ datasourceService.proxyDatasourceAction = async ({
       {
         datasourceID: datasource.datasourceID,
         datasourceType: datasource.datasourceType,
-        datasourceOptions: datasource.datasourceOptions,
+        datasourceOptions: decryptedOptions,
       },
       helpers
     );

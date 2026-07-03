@@ -43,6 +43,7 @@ router.post(
 
 router.get(
   "/files",
+  authMiddleware.authorize("widget", "read"),
   widgetController.serveFile
 );
 

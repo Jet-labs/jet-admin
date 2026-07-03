@@ -136,8 +136,8 @@ workflowService.getAllWorkflows = async ({ userID, tenantID, search, page, pageS
  * Get workflow by ID with nodes and edges.
  */
 workflowService.getWorkflowByID = async ({ workflowID, tenantID }) => {
-  const workflow = await prisma.tblWorkflows.findUnique({
-    where: { workflowID },
+  const workflow = await prisma.tblWorkflows.findFirst({
+    where: { workflowID, tenantID },
     include: {
       tblWorkflowNodes: true,
       tblWorkflowEdge: true,
@@ -260,14 +260,20 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
   try {
     const workflowUpdateTransaction = await prisma.$transaction(async (tx) => {
       // Update workflow title and options
-      const workflow = await tx.tblWorkflows.update({
-        where: { workflowID: workflowID },
+      const updated = await tx.tblWorkflows.updateMany({
+        where: { workflowID, tenantID },
         data: {
           title,
           workflowOptions: workflowOptions || {},
           updatedAt: new Date(),
         },
       });
+
+      if (updated.count === 0) {
+        throw new Error("Workflow not found or unauthorized");
+      }
+
+      const workflow = { workflowID, tenantID, title, workflowOptions };
 
       // Delete existing nodes and edges
       await tx.tblWorkflowNodes.deleteMany({
@@ -360,9 +366,12 @@ workflowService.deleteWorkflow = async ({ userID, tenantID, workflowID, authCont
         where: { workflowID: workflowID },
       });
       // Delete the workflow
-      await tx.tblWorkflows.delete({
-        where: { workflowID: workflowID },
+      const deleted = await tx.tblWorkflows.deleteMany({
+        where: { workflowID: workflowID, tenantID: tenantID },
       });
+      if (deleted.count === 0) {
+        throw new Error("Workflow not found or unauthorized");
+      }
     });
 
     await removePoliciesForResource(tenantID, `workflow:${workflowID}`);
@@ -406,8 +415,8 @@ workflowService.cloneWorkflow = async ({ userID, tenantID, workflowID, authConte
   });
 
   try {
-    const existing = await prisma.tblWorkflows.findUnique({
-      where: { workflowID },
+    const existing = await prisma.tblWorkflows.findFirst({
+      where: { workflowID, tenantID },
       include: {
         tblWorkflowNodes: true,
         tblWorkflowEdge: true,

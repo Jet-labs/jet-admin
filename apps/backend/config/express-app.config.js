@@ -41,5 +41,4 @@ expressApp.use(
     extended: false,
   })
 );
-expressApp.use(express.json({ extended: false }));
 module.exports = { expressApp };

@@ -9,7 +9,7 @@ const { z, schemas } = require("../../utils/validation.utils");
 // ============================================================
 
 const addUserToTenantSchema = z.object({
-  userEmail: schemas.emailSchema,
+  tenantUserEmail: schemas.emailSchema,
   roleIDs: z.array(schemas.uuidSchema).optional(),
 }).passthrough();
 

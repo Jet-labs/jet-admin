@@ -25,6 +25,7 @@ const OpenAI = require("openai");
 const { prisma } = require("../../config/prisma.config");
 const Logger = require("../../utils/logger");
 const environment = require("../../environment");
+const { BoundedCache } = require("../../utils/cache.util");
 
 // ─── Import MCP tool handlers ────────────────────────────────────────────────
 // We require them at runtime to avoid issues with the CJS/ESM boundary.
@@ -71,7 +72,7 @@ const MODEL = "meta/llama-3.1-8b-instruct";
 // It is refreshed on every new message (see chat() below) so we always
 // have the freshest token even across hour-long sessions.
 
-const sessionStore = new Map();
+const sessionStore = new BoundedCache(500);
 
 function getSessionKey(userID, tenantID) {
   return `${userID}:${tenantID}`;

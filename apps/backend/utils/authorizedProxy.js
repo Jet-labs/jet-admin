@@ -45,9 +45,28 @@ async function defaultDatasourceFetcher(datasourceID) {
   if (!datasourceID || !isUUID(datasourceID)) {
     return null;
   }
-  return prisma.tblDatasources.findFirst({
+  const datasource = await prisma.tblDatasources.findFirst({
     where: { datasourceID },
   });
+  if (datasource && datasource.datasourceOptions) {
+    const { decrypt } = require("./encryption.util");
+    if (datasource.datasourceOptions.__encrypted) {
+      try {
+        const decryptedStr = decrypt({
+          iv: datasource.datasourceOptions.iv,
+          data: datasource.datasourceOptions.data,
+          authTag: datasource.datasourceOptions.authTag,
+        });
+        datasource.datasourceOptions = JSON.parse(decryptedStr);
+      } catch (error) {
+        Logger.log("error", {
+          message: "defaultDatasourceFetcher:decryptionFailed",
+          params: { datasourceID, error: error.message },
+        });
+      }
+    }
+  }
+  return datasource;
 }
 
 function createQueryEngine({

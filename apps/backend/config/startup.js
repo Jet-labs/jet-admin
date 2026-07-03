@@ -21,8 +21,11 @@ async function startAllListeners() {
     await startTaskListener();
 
     // 3. Workflow results listener (orchestrator — consumes results, advances DAG)
-    const { startResultsConsumer } = require('../modules/workflow/workflowEngine/engine');
+    const { startResultsConsumer, recoverStuckWorkflows } = require('../modules/workflow/workflowEngine/engine');
     await startResultsConsumer();
+    await recoverStuckWorkflows().catch(err => {
+      Logger.log('warning', { message: 'Failed to recover stuck workflows', params: { error: err.message } });
+    });
 
     // 4. Listener pipeline worker (processes listener events from queue)
     const { startPipelineWorker } = require('../modules/listener/listenerEngine/pipelineWorker');
@@ -31,6 +34,10 @@ async function startAllListeners() {
     // 5. Listener engine (bootstraps all active listeners)
     const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
     await listenerEngine.startAll();
+
+    // 6. Audit log flusher (buffers and batch-saves audit logs)
+    const { auditService } = require('../modules/audit/audit.service');
+    auditService.startFlusher();
 
     Logger.log('success', { message: 'startup:startAllListeners:done' });
   } catch (error) {
@@ -48,6 +55,11 @@ async function stopAllListeners() {
   try {
     const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
     await listenerEngine.stopAll();
+  } catch (e) { /* ignore */ }
+
+  try {
+    const { auditService } = require('../modules/audit/audit.service');
+    await auditService.stopFlusher();
   } catch (e) { /* ignore */ }
 
   await closeQueue();

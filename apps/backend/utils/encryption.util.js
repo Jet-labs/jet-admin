@@ -1,9 +1,10 @@
 const crypto = require("crypto");
+const environment = require("../environment");
 
 const ALGORITHM = "aes-256-gcm";
 
 const getKey = () => {
-  const keyHex = process.env.VAULT_ENCRYPTION_KEY;
+  const keyHex = environment.VAULT_ENCRYPTION_KEY;
   if (!keyHex) {
     throw new Error("VAULT_ENCRYPTION_KEY environment variable is not defined");
   }

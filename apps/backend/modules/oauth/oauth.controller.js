@@ -43,7 +43,7 @@ oauthController.getGoogleAuthUrl = async (req, res) => {
         creatorID: req.user?.userID || null,
         createdByApiKeyID: req.authContext?.apiKey?.apiKeyID || null
       },
-      process.env.VAULT_ENCRYPTION_KEY,
+      environment.OAUTH_STATE_SECRET,
       { expiresIn: "10m" }
     );
 
@@ -93,7 +93,7 @@ oauthController.handleGoogleCallback = async (req, res) => {
       <html>
         <body>
           <script>
-            window.opener.postMessage({ type: 'OAUTH_FAILURE', error: '${error}' }, '*');
+            window.opener.postMessage({ type: 'OAUTH_FAILURE', error: ${JSON.stringify(error)} }, '*');
             window.close();
           </script>
         </body>
@@ -109,7 +109,7 @@ oauthController.handleGoogleCallback = async (req, res) => {
     // Verify state token and extract tenantID
     let decoded;
     try {
-      decoded = jwt.verify(state, process.env.VAULT_ENCRYPTION_KEY);
+      decoded = jwt.verify(state, environment.OAUTH_STATE_SECRET);
     } catch (err) {
       throw new Error("Invalid or expired state token");
     }
@@ -177,7 +177,7 @@ oauthController.handleGoogleCallback = async (req, res) => {
       <html>
         <body>
           <script>
-            window.opener.postMessage({ type: 'OAUTH_SUCCESS', vaultCredentialID: '${stored.vaultCredentialID}' }, '*');
+            window.opener.postMessage({ type: 'OAUTH_SUCCESS', vaultCredentialID: ${JSON.stringify(stored.vaultCredentialID)} }, '*');
             window.close();
           </script>
         </body>
@@ -192,7 +192,7 @@ oauthController.handleGoogleCallback = async (req, res) => {
       <html>
         <body>
           <script>
-            window.opener.postMessage({ type: 'OAUTH_FAILURE', error: '${err.message}' }, '*');
+            window.opener.postMessage({ type: 'OAUTH_FAILURE', error: ${JSON.stringify(err.message)} }, '*');
             window.close();
           </script>
         </body>

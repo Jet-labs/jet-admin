@@ -82,7 +82,9 @@ class Logger {
           }
         }
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error("Logger.log encountered an error:", error);
+    }
   };
 }
 

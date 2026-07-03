@@ -18,7 +18,13 @@ const listenerController = require('./listener.controller');
 const { authMiddleware } = require('../auth/auth.middleware');
 const { listenerMiddleware } = require('./listener.middleware');
 const { validate } = require("../../utils/validation.utils");
-const { listListenersQuerySchema } = require("./listener.validator");
+const {
+  createListenerSchema,
+  updateListenerSchema,
+  addListenerActionSchema,
+  updateListenerActionSchema,
+  listListenersQuerySchema,
+} = require("./listener.validator");
 
 const router = express.Router({ mergeParams: true });
 
@@ -29,6 +35,7 @@ router.get('/status/connections', authMiddleware.authorize('listener', 'read'), 
 router.get('/', validate(listListenersQuerySchema, 'query'), authMiddleware.authorize('listener', 'list'), listenerController.getAllListeners);
 
 router.post('/',
+  validate(createListenerSchema, 'body'),
   listenerMiddleware.extractListenerPipelinePermissions,
   authMiddleware.authorize([
     { resource: 'listener', action: 'create' },
@@ -42,6 +49,7 @@ router.post('/',
 router.get('/:listenerID', authMiddleware.authorize('listener', 'read', { paramKey: 'listenerID' }), listenerController.getListenerByID);
 
 router.put('/:listenerID',
+  validate(updateListenerSchema, 'body'),
   listenerMiddleware.extractListenerPipelinePermissions,
   authMiddleware.authorize([
     { resource: 'listener', action: 'update', paramKey: 'listenerID' },
@@ -73,6 +81,7 @@ router.post('/:listenerID/deactivate', authMiddleware.authorize('listener', 'upd
 
 // Actions
 router.post('/:listenerID/actions',
+  validate(addListenerActionSchema, 'body'),
   listenerMiddleware.extractListenerPipelinePermissions,
   authMiddleware.authorize([
     { resource: 'listener', action: 'update', paramKey: 'listenerID' },
@@ -83,6 +92,7 @@ router.post('/:listenerID/actions',
 );
 
 router.put('/:listenerID/actions/:actionID',
+  validate(updateListenerActionSchema, 'body'),
   listenerMiddleware.extractListenerPipelinePermissions,
   authMiddleware.authorize([
     { resource: 'listener', action: 'update', paramKey: 'listenerID' },

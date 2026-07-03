@@ -12,6 +12,7 @@ const { widgetWorkflowBridge } = require('./widgetWorkflowBridge');
 const { workflowService } = require('../workflow/workflow.service');
 const { stateManager } = require('../workflow/workflowEngine/stateManager');
 const orchestrator = require('../workflow/workflowEngine/engine');
+const constants = require("../../constants");
 
 /**
  * Widget Socket Controller
@@ -77,10 +78,21 @@ const widgetSocketController = {
             throw new Error('workflowID is required for execute mode');
           }
 
-          const result = await orchestrator.startWorkflow({
+          const { authService } = require("../auth/auth.service");
+          const user = await authService.getUserFromFirebaseID({ firebaseID });
+          if (!user) {
+            throw new Error("User not found.");
+          }
+
+          const { createUserContext } = require("../../utils/executionContext");
+          const { authorizedExecuteWorkflow } = require("../../utils/authorizedProxy");
+          const executionCtx = createUserContext(user, tenantID);
+
+          const result = await authorizedExecuteWorkflow({
             workflowID,
             tenantID,
             inputValues,
+            executionCtx,
           });
 
           responseInstanceID = result.instanceID;
@@ -255,11 +267,13 @@ const widgetSocketController = {
         },
       };
 
-      await stateManager.updateContext(
-        targetInstanceID,
-        widgetInputUpdate,
-        instance.version
-      );
+      await stateManager.logEvent({
+        instanceID: targetInstanceID,
+        nodeID: null,
+        eventType: constants.WORKFLOW_LOG_EVENT_TYPES.SYSTEM_SET,
+        outputVariable: '__widgetInput',
+        payload: widgetInputUpdate,
+      });
 
       // Acknowledge input received
       socket.emit('widget_input_received', {

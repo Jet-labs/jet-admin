@@ -1,6 +1,7 @@
 const { auditService } = require("./audit.service");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
+const constants = require("../../constants");
 
 const auditController = {};
 

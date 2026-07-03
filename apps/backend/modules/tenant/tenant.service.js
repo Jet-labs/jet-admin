@@ -137,72 +137,72 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
       prisma.tblWidgetQueryMappings.deleteMany({
         where: {
           OR: [
-            { tblDataQueries: { tenantID: tenantIdToDelete } },
-            { tblWidgets: { tenantID: tenantIdToDelete } },
+            { tblDataQueries: { tenantID } },
+            { tblWidgets: { tenantID } },
           ],
         },
       }),
       prisma.tblAPIKeyRoleMappings.deleteMany({
         where: {
           OR: [
-            { tblAPIKeys: { tenantID: tenantIdToDelete } },
-            { tblRoles: { tenantID: tenantIdToDelete } },
+            { tblAPIKeys: { tenantID } },
+            { tblRoles: { tenantID } },
           ],
         },
       }),
       prisma.tblRolePermissionMappings.deleteMany({
         where: {
-          tblRoles: { tenantID: tenantIdToDelete },
+          tblRoles: { tenantID },
         },
       }),
       prisma.tblUserTenantRoleMappings.deleteMany({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
       prisma.tblUserNotifications.deleteMany({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
       prisma.tblUserTenantConfigMap.deleteMany({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
       prisma.tblUsersTenantsRelationship.deleteMany({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
       prisma.tblAPIKeys.deleteMany({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
       prisma.tblWidgets.deleteMany({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
       prisma.tblAppPages.deleteMany({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
       prisma.tblDataQueries.deleteMany({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
       prisma.tblRoles.deleteMany({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
       prisma.tblTenants.delete({
         where: {
-          tenantID: tenantIdToDelete,
+          tenantID,
         },
       }),
     ]);

@@ -335,9 +335,8 @@ userManagementService.updateTenantUserRolesByID = async ({
   });
 
   try {
-    // Validate inputs
     if (!tenantID || !tenantUserID || !userTenantRelationship) {
-      throw new Error(constants.ERROR_CODES.INVALID_INPUT);
+      throw new Error(constants.ERROR_CODES.INVALID_REQUEST.message);
     }
 
     const existingUserTenantRelationship =
@@ -348,7 +347,7 @@ userManagementService.updateTenantUserRolesByID = async ({
       });
 
     if (!existingUserTenantRelationship) {
-      throw new Error(constants.ERROR_CODES.USER_NOT_FOUND_IN_TENANT);
+      throw new Error(constants.ERROR_CODES.USER_NOT_MEMBER_OF_TENANT.message);
     }
 
     const { role: currentRole } = existingUserTenantRelationship;
@@ -374,7 +373,7 @@ userManagementService.updateTenantUserRolesByID = async ({
           "userManagementService:updateTenantUserRolesByID:user-already-admin",
         params: { userID, tenantUserID, tenantID },
       });
-      throw new Error(constants.ERROR_CODES.USER_ALREADY_ADMIN_OF_TENANT);
+      throw new Error(constants.ERROR_CODES.USER_ALREADY_ADMIN_OF_TENANT.message);
     } else if (
       currentRole == ADMIN_ROLE &&
       userTenantRelationship == MEMBER_ROLE

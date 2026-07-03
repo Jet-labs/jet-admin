@@ -3,6 +3,7 @@ const { prisma } = require("../../config/prisma.config"); // Adjust path as need
 const constants = require("../../constants");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
+const { cronJobEngine } = require("./cronJobEngine/engine");
 
 const cronJobService = {};
 
@@ -255,10 +256,10 @@ cronJobService.getCronJobByID = async ({ userID, tenantID, cronJobID }) => {
   });
 
   try {
-    const cronJob = await prisma.tblCronJobs.findUnique({
+    const cronJob = await prisma.tblCronJobs.findFirst({
       where: {
-        cronJobID: cronJobID, // Ensure cronJobID is an integer
-        tenantID: tenantID, // Ensure tenantID matches for security
+        cronJobID: cronJobID,
+        tenantID: tenantID,
       },
     });
 
@@ -306,12 +307,21 @@ cronJobService.updateCronJobByID = async ({
   });
 
   try {
-    const updatedCronJob = await prisma.tblCronJobs.update({
+    const updated = await prisma.tblCronJobs.updateMany({
       where: {
         cronJobID: cronJobID,
         tenantID: tenantID,
       },
       data: updateData,
+    });
+    if (updated.count === 0) {
+      throw new Error("Cron job not found");
+    }
+    const updatedCronJob = await prisma.tblCronJobs.findFirst({
+      where: {
+        cronJobID: cronJobID,
+        tenantID: tenantID,
+      },
       include: {
         tblWorkflows: true,
       },
@@ -349,18 +359,27 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
   try {
     // Delete history first, then the job inside a transaction
     const deletedCronJob = await prisma.$transaction(async (tx) => {
-      await tx.tblCronJobHistory.deleteMany({
-        where: {
-          cronJobID: cronJobID,
-        },
-      });
-      const deleted = await tx.tblCronJobs.delete({
+      const existing = await tx.tblCronJobs.findFirst({
         where: {
           cronJobID: cronJobID,
           tenantID: tenantID,
         },
       });
-      return deleted;
+      if (!existing) {
+        throw new Error("Cron job not found");
+      }
+      await tx.tblCronJobHistory.deleteMany({
+        where: {
+          cronJobID: cronJobID,
+        },
+      });
+      await tx.tblCronJobs.deleteMany({
+        where: {
+          cronJobID: cronJobID,
+          tenantID: tenantID,
+        },
+      });
+      return existing;
     });
     Logger.log("info", {
       message: "cronJobService:deleteCronJobByID:deleted",
@@ -399,7 +418,7 @@ cronJobService.cloneCronJob = async ({ userID, tenantID, cronJobID, authContext 
   });
 
   try {
-    const existing = await prisma.tblCronJobs.findUnique({
+    const existing = await prisma.tblCronJobs.findFirst({
       where: {
         cronJobID: cronJobID,
         tenantID: tenantID,
@@ -454,7 +473,7 @@ cronJobService.cloneCronJob = async ({ userID, tenantID, cronJobID, authContext 
   }
 };
 
-const { cronJobEngine } = require("./cronJobEngine/engine");
+
 
 /**
  * Runs a Cron Job immediately — delegates to engine.

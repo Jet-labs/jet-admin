@@ -1,11 +1,11 @@
 require("ignore-styles");
-// Trigger nodemon restart
 
 // Patch BigInt JSON serialization globally
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
+const path = require('path');
 const environment = require("./environment");
 const cookieParser = require("cookie-parser");
 const constants = require("./constants");
@@ -16,16 +16,21 @@ const { cronJobService } = require("./modules/cronJob/cronJob.service");
 const { socketIO } = require("./config/socket.io");
 const { isModuleEnabled } = require("./config/module.config");
 const { widgetSocketController } = require("./modules/widget/widget.socket.controller");
+const { authMiddleware } = require("./modules/auth/auth.middleware");
+const { errorUtils } = require("./utils/error.util");
+const { workflowSocketController } = require("./modules/workflow/workflow.socket.controller");
+const { startAllListeners, stopAllListeners } = require("./config/startup");
+
+// Routes imports
+const authRoutes = require("./modules/auth/auth.v1.routes");
+const tenantRoutes = require("./modules/tenant/tenant.v1.routes");
+const aiRoutes = require("./modules/ai/ai.v1.routes");
+const oauthRoutes = require("./modules/oauth/oauth.v1.routes");
+
 // Middleware setup
 expressApp.use(cookieParser());
-const path = require('path');
 
 Logger.log("success", { message: "public folder path", params: { path: path.join(__dirname, 'public') } });
-
-// Monitor UI Route
-expressApp.get('/monitor', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'monitor.html'));
-});
 
 // Health Check Route
 expressApp.get('/health', (req, res) => {
@@ -35,35 +40,25 @@ expressApp.get('/health', (req, res) => {
 // API routes
 if (isModuleEnabled(constants.MODULES.AUTH)) {
   Logger.log("success", { message: "auth module enabled" });
-  expressApp.use("/api/v1/auth", require("./modules/auth/auth.v1.routes"));
+  expressApp.use("/api/v1/auth", authRoutes);
 }
 
 if (isModuleEnabled(constants.MODULES.TENANT)) {
   Logger.log("success", { message: "tenant module enabled" });
   expressApp.use(
     "/api/v1/tenants",
-    require("./modules/tenant/tenant.v1.routes")
+    tenantRoutes
   );
 }
 
 // AI Agent routes (tenant-scoped)
 expressApp.use(
   "/api/v1/tenants/:tenantID/ai",
-  require("./modules/ai/ai.v1.routes")
+  aiRoutes
 );
 
 // OAuth integration routes
-expressApp.use("/api/v1/oauth", require("./modules/oauth/oauth.v1.routes"));
-
-
-
-// if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
-//   Logger.log("success", { message: "workflow module enabled" });
-//   expressApp.use(
-//     "/api/v1/workflows",
-//     require("./modules/workflow/routes/workflow.routes")
-//   );
-// }
+expressApp.use("/api/v1/oauth", oauthRoutes);
 
 // Global error-handling middleware
 expressApp.use((err, req, res, next) => {
@@ -71,8 +66,26 @@ expressApp.use((err, req, res, next) => {
     message: "unhandled error",
     params: { error: err.message, stack: err.stack },
   });
-  res.status(500).json({
-    error: constants.ERROR_CODES.INVALID_REQUEST,
+
+  const errorObj = errorUtils.extractError(err);
+  
+  let statusCode = err.statusCode || err.status || 500;
+  if (errorObj.code === "PERMISSION_DENIED") {
+    statusCode = 403;
+  } else if (
+    errorObj.code === "INVALID_API_KEY" ||
+    errorObj.code === "USER_AUTH_TOKEN_EXPIRED" ||
+    errorObj.code === "USER_AUTH_TOKEN_NOT_FOUND" ||
+    errorObj.code === "INVALID_LOGIN"
+  ) {
+    statusCode = 401;
+  } else if (errorObj.code === "VALIDATION_ERROR" || errorObj.code === "INVALID_REQUEST") {
+    statusCode = 400;
+  }
+
+  res.status(statusCode).json({
+    success: false,
+    error: errorObj,
   });
 });
 
@@ -98,7 +111,6 @@ socketIO.on("connection", async (socket) => {
   socket.on(
     constants.SOCKET_RECEIVE_EVENTS.WORKFLOW_RUN_JOIN,
     async (data) => {
-      const { workflowSocketController } = require("./modules/workflow/workflow.socket.controller");
       await workflowSocketController.onWorkflowRunJoin({
         socket,
         runId: data.runId,
@@ -208,17 +220,8 @@ httpServer.listen(port, async () => {
   });
   cronJobService.scheduleAllCronJobs();
 
-  // Initialize Monitor Socket
-  try {
-    const { initializeMonitorSocket } = require('./modules/monitor/monitor.socket');
-    initializeMonitorSocket();
-  } catch (err) {
-    Logger.log('error', { message: 'Failed to init monitor socket', params: { error: err.message } });
-  }
-
   // Start all listeners (workflow queue, subscription consumers, etc.)
   try {
-    const { startAllListeners } = require("./config/startup");
     await startAllListeners();
   } catch (error) {
     Logger.log("warning", { message: "listeners not started", params: { error: error.message } });
@@ -232,7 +235,6 @@ process.on("SIGINT", async () => {
 
   // Stop all listeners
   try {
-    const { stopAllListeners } = require("./config/startup");
     await stopAllListeners();
   } catch (error) {
     // Ignore cleanup errors
@@ -242,5 +244,3 @@ process.on("SIGINT", async () => {
     process.exit(0);
   });
 });
-
-

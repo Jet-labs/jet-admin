@@ -1,10 +1,11 @@
 const admin = require("firebase-admin");
 const Logger = require("../utils/logger");
+const environmentVariables = require("../environment");
 
 let serviceAccount = null;
 
 try {
-  serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS);
+  serviceAccount = JSON.parse(environmentVariables.FIREBASE_CREDENTIALS);
 } catch (e) {
   Logger.log("error", { message: "Failed to parse FIREBASE_CREDENTIALS env variable" });
 }

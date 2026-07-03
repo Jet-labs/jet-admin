@@ -191,11 +191,19 @@ async function _processJob(jobData) {
  * @returns {Promise<T>}
  */
 function _withTimeout(promise, ms, message = `Operation timed out after ${ms}ms`) {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), ms);
+  });
   return Promise.race([
-    promise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error(message)), ms)
-    ),
+    promise.then((res) => {
+      clearTimeout(timeoutId);
+      return res;
+    }).catch((err) => {
+      clearTimeout(timeoutId);
+      throw err;
+    }),
+    timeoutPromise
   ]);
 }
 

@@ -19,6 +19,7 @@ router.get(
   "/config/:tenantID",
   validate(tenantIdParamSchema, "params"),
   authMiddleware.authProvider,
+  authMiddleware.checkTenantMembership,
   authController.getUserConfig
 );
 
@@ -29,6 +30,7 @@ router.post(
     body: updateConfigSchema,
   }),
   authMiddleware.authProvider,
+  authMiddleware.checkTenantMembership,
   auditLogMiddleware.audit,
   authController.updateUserConfig
 );

@@ -157,6 +157,13 @@ const constants = {
     },
   },
 
+  POSTGRES_ERROR_CODES: {
+    "23505": "A record with this unique identifier already exists.",
+    "23503": "A foreign key constraint was violated.",
+    "23502": "A required field was not provided.",
+    "22001": "Provided string value exceeds length limits.",
+  },
+
   TABLE_FILTERS: {
     "=": (a, b) => `${a} = ${b}`,
     "!=": (a, b) => `${a} != ${b}`,

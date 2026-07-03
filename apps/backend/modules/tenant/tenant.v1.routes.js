@@ -148,7 +148,6 @@ if (isModuleEnabled(constants.MODULES.USERMANAGEMENT)) {
   router.use(
     "/:tenantID/users",
       validate(tenantIdParamSchema, "params"),
-    auditLogMiddleware.audit,
     userManagementRouter
   );
 }
@@ -161,7 +160,6 @@ if (isModuleEnabled(constants.MODULES.ROLE)) {
   router.use(
     "/:tenantID/roles",
       validate(tenantIdParamSchema, "params"),
-    auditLogMiddleware.audit,
     tenantRoleRouter
   );
 }
@@ -174,7 +172,6 @@ if (isModuleEnabled(constants.MODULES.APIKEY)) {
   router.use(
     "/:tenantID/apikeys",
       validate(tenantIdParamSchema, "params"),
-    auditLogMiddleware.audit,
     tenantAPIKeyRouter
   );
 }
@@ -187,7 +184,6 @@ if (isModuleEnabled(constants.MODULES.CRONJOB)) {
   router.use(
     "/:tenantID/cronjobs",
       validate(tenantIdParamSchema, "params"),
-    auditLogMiddleware.audit,
     cronjobRouter
   );
 }
@@ -200,7 +196,6 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
   router.use(
     "/:tenantID/datasources",
       validate(tenantIdParamSchema, "params"),
-    auditLogMiddleware.audit,
     datasourceRouter
   );
 }
@@ -209,7 +204,6 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
 router.use(
   "/:tenantID/listeners",
   validate(tenantIdParamSchema, "params"),
-  auditLogMiddleware.audit,
   require("../listener/listener.v1.routes")
 );
 
@@ -221,7 +215,6 @@ if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
   router.use(
     "/:tenantID/queries",
       validate(tenantIdParamSchema, "params"),
-    auditLogMiddleware.audit,
     dataQueryRouter
   );
 }
@@ -234,7 +227,6 @@ if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
   router.use(
     "/:tenantID/workflows",
       validate(tenantIdParamSchema, "params"),
-    auditLogMiddleware.audit,
     workflowRouter
   );
 }
@@ -247,7 +239,6 @@ if (isModuleEnabled(constants.MODULES.WIDGET)) {
   router.use(
     "/:tenantID/widgets",
       validate(tenantIdParamSchema, "params"),
-    auditLogMiddleware.audit,
     widgetRouter
   );
 }
@@ -260,7 +251,6 @@ if (isModuleEnabled(constants.MODULES.APP_PAGE)) {
   router.use(
     "/:tenantID/app-pages",
       validate(tenantIdParamSchema, "params"),
-    auditLogMiddleware.audit,
     appPageRouter
   );
 }

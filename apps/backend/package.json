@@ -73,7 +73,6 @@
     "morgan": "^1.10.0",
     "multer": "^2.1.1",
     "node-cron": "^3.0.3",
-    "nodmeon": "^0.0.1-security",
     "openai": "^6.45.0",
     "pg": "^8.21.0",
     "pg-boss": "^12.14.0",

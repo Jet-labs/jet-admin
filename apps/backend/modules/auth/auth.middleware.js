@@ -18,6 +18,9 @@ authMiddleware.authProviderSocket = async function (socket, next) {
   if (socket && socket.handshake && socket.handshake.auth) {
     try {
       let { token } = socket.handshake.auth;
+      if (!firebaseApp) {
+        throw new Error("Firebase Admin SDK is not initialized.");
+      }
       const decodedIdToken = await firebaseApp.auth().verifyIdToken(token);
       Logger.log("info", {
         message: "authMiddleware:authProviderSocket:params",
@@ -65,6 +68,9 @@ authMiddleware.authProvider = async function (req, res, next) {
   ) {
     try {
       let idToken = req.headers.authorization.split("Bearer ")[1];
+      if (!firebaseApp) {
+        throw new Error("Firebase Admin SDK is not initialized.");
+      }
       const decodedIdToken = await firebaseApp.auth().verifyIdToken(idToken);
       Logger.log("info", {
         message: "authMiddleware:authProvider:params",
@@ -92,6 +98,12 @@ authMiddleware.authProvider = async function (req, res, next) {
             message: "authMiddleware:authProvider:catch-3",
             params: { errorMessage: error.message },
           });
+          return expressUtils.sendResponse(
+            res,
+            false,
+            {},
+            constants.ERROR_CODES.INVALID_USER
+          );
         }
         return next();
       }
@@ -192,6 +204,9 @@ authMiddleware.authProvider = async function (req, res, next) {
  * @returns
  */
 authMiddleware.authProviderTest = async function (req, res, next) {
+  if (process.env.NODE_ENV !== "test") {
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.PERMISSION_DENIED);
+  }
   try {
     req.user = await authService.getUserFromEmailID({
       email: "test@test.com",
@@ -353,6 +368,40 @@ authMiddleware.authorize = (resourceTypeOrArray, action, options = {}) => {
       );
     }
   };
+};
+
+authMiddleware.checkTenantMembership = async function (req, res, next) {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+
+    if (!user || !tenantID) {
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.INVALID_REQUEST);
+    }
+
+    const membership = await prisma.tblUsersTenantsRelationship.findFirst({
+      where: {
+        tenantID,
+        userID: user.userID,
+      },
+    });
+
+    if (!membership) {
+      Logger.log("warning", {
+        message: "authMiddleware:checkTenantMembership:denied",
+        params: { userID: user.userID, tenantID },
+      });
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.PERMISSION_DENIED);
+    }
+
+    return next();
+  } catch (error) {
+    Logger.log("error", {
+      message: "authMiddleware:checkTenantMembership:error",
+      params: { error: error.message },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
 };
 
 module.exports = { authMiddleware };

@@ -128,12 +128,7 @@ async function addListenerEvent(eventJob) {
  * Helper to safely publish to monitor bus (replaces AMQP exchange)
  */
 function publishToMonitor(routingKey, content) {
-  try {
-    monitorBus.emit('log', { routingKey, content, timestamp: Date.now() });
-  } catch (error) {
-    // Monitor failures should not block main flow
-    console.error('Failed to publish to monitor bus', error);
-  }
+  // No-op: monitor module removed
 }
 
 /**

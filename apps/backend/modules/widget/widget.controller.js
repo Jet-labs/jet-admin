@@ -412,6 +412,16 @@ widgetController.serveFile = async (req, res) => {
       return res.status(400).send("Path is required");
     }
 
+    const tenantID = req.params.tenantID;
+    if (!tenantID) {
+      return res.status(400).send("Tenant ID is required");
+    }
+
+    const expectedPrefix = `${constants.STORAGE.FOLDERS.WIDGET_FILES}/${tenantID}/`;
+    if (!filePath.startsWith(expectedPrefix)) {
+      return res.status(403).send("Forbidden: Invalid file path for this tenant");
+    }
+
     const bucketName = environmentVariables.SUPABASE_S3_BUCKET || constants.STORAGE.BUCKETS.DATASOURCE_FILE_UPLOADS;
     const s3 = fileStorageUtil.getS3Client();
 

@@ -5,6 +5,7 @@ const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
 const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
 const fileStorageUtil = require("../../../utils/fileStorage.util");
 const { vaultService } = require("../../vault/vault.service");
+const { BoundedCache } = require("../../../utils/cache.util");
 
 const QUERY_TEMPLATE_OPTIONS = {
   allowedRoots: ["inputs"],
@@ -15,8 +16,8 @@ class QueryEngine {
   constructor(queryFetcher, datasourceFetcher) {
     this.queryFetcher = queryFetcher;
     this.datasourceFetcher = datasourceFetcher;
-    this.cache = new Map();
-    this.dataSourceCache = new Map();
+    this.cache = new BoundedCache(1000);
+    this.dataSourceCache = new BoundedCache(100);
   }
 
   async executeQuery(dataQueryID, runtimeInputs) {

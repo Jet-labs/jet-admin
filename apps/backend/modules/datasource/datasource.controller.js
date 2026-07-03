@@ -8,6 +8,20 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const environmentVariables = require("../../environment");
 const fileStorageUtil = require("../../utils/fileStorage.util");
 
+const maskSensitiveOptions = (options) => {
+  if (!options) return options;
+  const masked = { ...options };
+  const sensitiveKeys = ["password", "secret", "token", "private_key", "apiKey", "key", "passphrase"];
+  for (const k of Object.keys(masked)) {
+    if (sensitiveKeys.some(sk => k.toLowerCase().includes(sk))) {
+      masked[k] = "●●●●●●●●";
+    } else if (typeof masked[k] === "object" && masked[k] !== null) {
+      masked[k] = maskSensitiveOptions(masked[k]);
+    }
+  }
+  return masked;
+};
+
 const datasourceController = {};
 
 /**
@@ -51,8 +65,13 @@ datasourceController.getAllDatasources = async (req, res) => {
       },
     });
 
+    const sanitizedDatasources = result.datasources.map((d) => ({
+      ...d,
+      datasourceOptions: maskSensitiveOptions(d.datasourceOptions),
+    }));
+
     return expressUtils.sendResponse(res, true, {
-      datasources: result.datasources,
+      datasources: sanitizedDatasources,
       totalCount: result.totalCount,
       totalPages: result.totalPages,
       page: result.page,
@@ -151,8 +170,13 @@ datasourceController.getDatasourceByID = async (req, res) => {
       },
     });
 
+    const sanitizedDatasource = datasource ? {
+      ...datasource,
+      datasourceOptions: maskSensitiveOptions(datasource.datasourceOptions),
+    } : null;
+
     return expressUtils.sendResponse(res, true, {
-      datasource,
+      datasource: sanitizedDatasource,
       message: "Datasource fetched successfully.",
     });
   } catch (error) {
@@ -217,8 +241,13 @@ datasourceController.createDatasource = async (req, res) => {
       },
     });
 
+    const sanitizedDatasource = datasource ? {
+      ...datasource,
+      datasourceOptions: maskSensitiveOptions(datasource.datasourceOptions),
+    } : null;
+
     return expressUtils.sendResponse(res, true, {
-      datasource,
+      datasource: sanitizedDatasource,
       message: "Datasource created successfully.",
     });
   } catch (error) {

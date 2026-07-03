@@ -49,6 +49,9 @@ const environmentVariables = {
   BACKEND_URL: process.env.BACKEND_URL,
   NVIDIA_API_KEY: process.env.NVIDIA_API_KEY,
   JET_ADMIN_INTERNAL_API_KEY: process.env.JET_ADMIN_INTERNAL_API_KEY,
+  VAULT_ENCRYPTION_KEY: process.env.VAULT_ENCRYPTION_KEY,
+  OAUTH_STATE_SECRET: process.env.OAUTH_STATE_SECRET || process.env.VAULT_ENCRYPTION_KEY,
+  FIREBASE_CREDENTIALS: process.env.FIREBASE_CREDENTIALS,
 };
 console.log("environment variables set-----------------------------");
 const safeEnv = { ...environmentVariables };

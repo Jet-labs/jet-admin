@@ -4,7 +4,10 @@ const { datasourceController } = require("./datasource.controller");
 const { authMiddleware } = require("../auth/auth.middleware");
 const { validate, validateAll } = require("../../utils/validation.utils");
 const {
+    createDatasourceSchema,
     updateDatasourceSchema,
+    testConnectionSchema,
+    proxyActionSchema,
     datasourceIdParamSchema,
     listDatasourcesQuerySchema,
 } = require("./datasource.validator");
@@ -27,6 +30,7 @@ router.get(
 
 router.post(
   "/test",
+  validate(testConnectionSchema, "body"),
   authMiddleware.authorize("datasource", "test"),
   datasourceController.testDatasourceConnection
 );
@@ -49,6 +53,7 @@ router.get(
 
 router.post(
   "/",
+  validate(createDatasourceSchema, "body"),
   authMiddleware.authorize("datasource", "create"),
   datasourceController.createDatasource
 );
@@ -87,7 +92,10 @@ router.delete(
 // Datasource proxy — dedicated editors call DS-specific helper methods through backend
 router.post(
   "/:datasourceID/proxy",
-  validate(datasourceIdParamSchema, "params"),
+  validateAll({
+    params: datasourceIdParamSchema,
+    body: proxyActionSchema,
+  }),
   authMiddleware.authorize("datasource", "read", {
     paramKey: "datasourceID",
   }),

@@ -25,6 +25,11 @@ const testConnectionSchema = z.object({
   datasourceOptions: z.object({}).passthrough(),
 }).passthrough();
 
+const proxyActionSchema = z.object({
+  action: z.string().min(1, "action is required"),
+  params: z.object({}).passthrough().optional(),
+}).passthrough();
+
 // ============================================================
 // URL Param Schemas
 // ============================================================
@@ -47,6 +52,7 @@ module.exports = {
   createDatasourceSchema,
   updateDatasourceSchema,
   testConnectionSchema,
+  proxyActionSchema,
   datasourceIdParamSchema,
   listDatasourcesQuerySchema,
 };

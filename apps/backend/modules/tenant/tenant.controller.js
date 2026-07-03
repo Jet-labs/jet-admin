@@ -57,7 +57,6 @@ tenantController.deleteUserTenantByID = async (req, res) => {
     await tenantService.deleteUserTenantByID({
       userID: user.userID,
       tenantID: tenantID,
-      tenantID: tenantID,
     });
     Logger.log("success", {
       message: "tenantController:deleteUserTenantByID:success",
