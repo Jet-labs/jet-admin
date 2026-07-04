@@ -6,6 +6,10 @@ const { getCreationContextFromAuthContext } = require("../../utils/auth.context.
 const { vaultService } = require("../vault/vault.service");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { encrypt, decrypt } = require("../../utils/encryption.util");
+// MASK_PLACEHOLDER is the sentinel written by mask() in sensitive.js.
+// Importing it here ensures the producer (controller) and consumer (service)
+// always agree on the same value — no magic strings duplicated.
+const { MASK_PLACEHOLDER, mask } = require("../../utils/sensitive");
 
 function encryptOptions(options) {
   if (!options) return options;
@@ -36,20 +40,46 @@ function decryptOptions(options) {
   }
 }
 
-function mergeAndDecryptIncomingOptions(incomingOptions, existingDecryptedOptions) {
+/**
+ * Merge incoming (potentially partially-masked) options with the previously
+ * decrypted values stored in the database.
+ *
+ * Any field whose value equals MASK_PLACEHOLDER was deliberately hidden from
+ * the caller by mask() in the API response — they sent it back unchanged,
+ * meaning "keep the existing secret". We restore the real value from the DB.
+ *
+ * This approach is key-name agnostic: it works for any credential field
+ * regardless of naming convention, without maintaining a separate list.
+ *
+ * @param {object} incomingOptions       - Options as received from the API caller
+ * @param {object} existingDecryptedOptions - Decrypted options currently in the DB
+ * @returns {object} Merged options ready for re-encryption and storage
+ */
+function mergeAndRestoreMaskedOptions(incomingOptions, existingDecryptedOptions) {
   if (!incomingOptions) return incomingOptions;
+
   const merged = { ...incomingOptions };
-  const sensitiveKeys = ["password", "secret", "token", "private_key", "apiKey", "key", "passphrase"];
-  
+
   for (const k of Object.keys(merged)) {
-    if (merged[k] === "●●●●●●●●" && existingDecryptedOptions && existingDecryptedOptions[k] !== undefined) {
-      merged[k] = existingDecryptedOptions[k];
-    } else if (typeof merged[k] === "object" && merged[k] !== null && existingDecryptedOptions && typeof existingDecryptedOptions[k] === "object") {
-      merged[k] = mergeAndDecryptIncomingOptions(merged[k], existingDecryptedOptions[k]);
+    if (merged[k] === MASK_PLACEHOLDER) {
+      // Caller sent back the placeholder — restore the real value from DB
+      if (existingDecryptedOptions && existingDecryptedOptions[k] !== undefined) {
+        merged[k] = existingDecryptedOptions[k];
+      }
+    } else if (
+      typeof merged[k] === "object" &&
+      merged[k] !== null &&
+      existingDecryptedOptions &&
+      typeof existingDecryptedOptions[k] === "object"
+    ) {
+      // Recurse into nested objects (e.g. OAuth credential sub-objects)
+      merged[k] = mergeAndRestoreMaskedOptions(merged[k], existingDecryptedOptions[k]);
     }
   }
+
   return merged;
 }
+
 
 const datasourceService = {};
 
@@ -165,7 +195,7 @@ datasourceService.testDatasourceConnection = async ({
       userID,
       tenantID,
       datasourceType,
-      datasourceOptions,
+      datasourceOptions: mask(datasourceOptions),
       datasourceID,
     },
   });
@@ -177,7 +207,7 @@ datasourceService.testDatasourceConnection = async ({
         where: { datasourceID: targetDSID, tenantID },
       });
       const existingDecrypted = existing ? decryptOptions(existing.datasourceOptions) : null;
-      finalOptions = mergeAndDecryptIncomingOptions(datasourceOptions, existingDecrypted);
+      finalOptions = mergeAndRestoreMaskedOptions(datasourceOptions, existingDecrypted);
     }
 
     const connectionResult = await DATASOURCE_LOGIC_COMPONENTS[
@@ -254,7 +284,7 @@ datasourceService.createDatasource = async ({
       tenantID,
       datasourceTitle,
       datasourceType,
-      datasourceOptions,
+      datasourceOptions: mask(datasourceOptions),
       datasourceTags,
       authContext,
     },
@@ -287,7 +317,7 @@ datasourceService.createDatasource = async ({
       params: {
         tenantID,
         userID,
-        newDatasource,
+        newDatasourceID: newDatasource.datasourceID,
       },
     });
     return newDatasource;
@@ -394,7 +424,7 @@ datasourceService.getDatasourceByID = async ({
       message: "datasourceService:getDatasourceByID:success",
       params: {
         userID,
-        datasource,
+        datasourceID: datasource?.datasourceID,
       },
     });
     return datasource;
@@ -439,7 +469,7 @@ datasourceService.updateDatasourceByID = async ({
       datasourceID,
       datasourceTitle,
       datasourceType,
-      datasourceOptions,
+      datasourceOptions: mask(datasourceOptions),
       datasourceTags,
     },
   });
@@ -450,7 +480,7 @@ datasourceService.updateDatasourceByID = async ({
         where: { datasourceID, tenantID },
       });
       const existingDecrypted = existing ? decryptOptions(existing.datasourceOptions) : null;
-      finalOptions = encryptOptions(mergeAndDecryptIncomingOptions(datasourceOptions, existingDecrypted));
+      finalOptions = encryptOptions(mergeAndRestoreMaskedOptions(datasourceOptions, existingDecrypted));
     }
 
     const updated = await prisma.tblDatasources.updateMany({
@@ -627,10 +657,19 @@ datasourceService.proxyDatasourceAction = async ({
       helpers
     );
 
-    // 3. Validate the action method exists
-    if (typeof dsInstance[action] !== "function") {
+    // 3. Validate the action method against allowlist
+    const ALLOWED_ACTIONS = {
+      postgres: ["runQuery", "getSchema", "testConnection"],
+      mysql: ["runQuery", "getSchema", "testConnection"],
+      google_sheets: ["listSpreadsheets", "listSheets", "previewData", "readSheet", "testConnection"],
+      excel_csv: ["previewData", "getColumns", "testConnection"],
+      rest_api: ["testConnection", "execute"],
+    };
+
+    const allowedForType = ALLOWED_ACTIONS[datasource.datasourceType] || [];
+    if (!allowedForType.includes(action) || typeof dsInstance[action] !== "function") {
       throw new Error(
-        `Action '${action}' is not supported by datasource type '${datasource.datasourceType}'.`
+        `Action '${action}' is not supported or allowed for datasource type '${datasource.datasourceType}'.`
       );
     }
 

@@ -10,11 +10,12 @@ const {
   appPageIdParamSchema,
   listAppPagesQuerySchema,
 } = require("./appPage.validator");
+const { P } = require("../../config/permissions");
 
 router.get(
   "/",
   validate(listAppPagesQuerySchema, "query"),
-  authMiddleware.authorize("appPage", "list"),
+  authMiddleware.authorize(P.appPage.list),
   appPageController.getAllAppPages
 );
 
@@ -23,14 +24,11 @@ router.post(
   validate(createAppPageSchema, "body"),
   appPageMiddleware.extractAppPageConfigAssetIDs,
   authMiddleware.authorize([
-    {
-      resource: "appPage",
-      action: "create",
-    },
-    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true },
-    { resource: "workflow", action: "execute", reqKey: "workflowIDs", skipIfMissing: true },
-    { resource: "listener", action: "execute", reqKey: "listenerIDs", skipIfMissing: true },
-    { resource: "widget", action: "execute", reqKey: "widgetIDs", skipIfMissing: true }
+    P.appPage.create,
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true },
+    { ...P.workflow.execute, reqKey: "workflowIDs", skipIfMissing: true },
+    { ...P.listener.execute, reqKey: "listenerIDs", skipIfMissing: true },
+    { ...P.widget.execute, reqKey: "widgetIDs", skipIfMissing: true }
   ]),
   appPageController.createAppPage
 );
@@ -38,7 +36,7 @@ router.post(
 router.get(
   "/:appPageID",
   validate(appPageIdParamSchema, "params"),
-  authMiddleware.authorize("appPage", "read", { paramKey: "appPageID" }),
+  authMiddleware.authorize({ ...P.appPage.read, paramKey: "appPageID" }),
   appPageController.getAppPageByID
 );
 
@@ -47,12 +45,12 @@ router.post(
   validate(appPageIdParamSchema, "params"),
   appPageMiddleware.resolveAppPageCloneAssetIDsFromDB,
   authMiddleware.authorize([
-    { resource: "appPage", action: "create" },
-    { resource: "appPage", action: "read", paramKey: "appPageID" },
-    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true },
-    { resource: "workflow", action: "execute", reqKey: "workflowIDs", skipIfMissing: true },
-    { resource: "listener", action: "execute", reqKey: "listenerIDs", skipIfMissing: true },
-    { resource: "widget", action: "execute", reqKey: "widgetIDs", skipIfMissing: true }
+    P.appPage.create,
+    { ...P.appPage.read, paramKey: "appPageID" },
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true },
+    { ...P.workflow.execute, reqKey: "workflowIDs", skipIfMissing: true },
+    { ...P.listener.execute, reqKey: "listenerIDs", skipIfMissing: true },
+    { ...P.widget.execute, reqKey: "widgetIDs", skipIfMissing: true }
   ]),
   appPageController.cloneAppPageByID
 );
@@ -65,15 +63,11 @@ router.patch(
   }),
   appPageMiddleware.extractAppPageConfigAssetIDs,
   authMiddleware.authorize([
-    {
-      resource: "appPage",
-      action: "update",
-      paramKey: "appPageID",
-    },
-    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true },
-    { resource: "workflow", action: "execute", reqKey: "workflowIDs", skipIfMissing: true },
-    { resource: "listener", action: "execute", reqKey: "listenerIDs", skipIfMissing: true },
-    { resource: "widget", action: "execute", reqKey: "widgetIDs", skipIfMissing: true }
+    { ...P.appPage.update, paramKey: "appPageID" },
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true },
+    { ...P.workflow.execute, reqKey: "workflowIDs", skipIfMissing: true },
+    { ...P.listener.execute, reqKey: "listenerIDs", skipIfMissing: true },
+    { ...P.widget.execute, reqKey: "widgetIDs", skipIfMissing: true }
   ]),
   appPageController.updateAppPageByID
 );
@@ -81,7 +75,7 @@ router.patch(
 router.delete(
   "/:appPageID",
   validate(appPageIdParamSchema, "params"),
-  authMiddleware.authorize("appPage", "delete", { paramKey: "appPageID" }),
+  authMiddleware.authorize({ ...P.appPage.delete, paramKey: "appPageID" }),
   appPageController.deleteAppPageByID
 );
 

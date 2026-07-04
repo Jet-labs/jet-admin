@@ -11,8 +11,6 @@ const constants = {
     ROLE: "role",
     APIKEY: "apiKey",
     CRONJOB: "cronJob",
-    NOTIFICATION: "notification",
-    PERMISSION: "permission",
     WORKFLOW: "workflow",
     LISTENER: "listener",
   },
@@ -24,25 +22,6 @@ const constants = {
 
   ROW_PAGE_SIZE: 100,
 
-  SUPPORTED_DATASOURCES: {
-    postgresql: {
-      name: "PostgreSQL",
-      value: "postgresql",
-    },
-    mysql: {
-      name: "MySQL",
-      value: "mysql",
-    },
-    mssql: {
-      name: "MSSQL",
-      value: "mssql",
-    },
-    restapi: {
-      name: "REST API",
-      value: "restapi",
-    },
-  },
-
   SOCKET_EMIT_EVENTS: {
     WORKFLOW_DATA_COLLECTION_REQUEST: 'workflow_data_collection_request',
     WORKFLOW_NODE_UPDATE: "workflow_node_update",
@@ -51,9 +30,6 @@ const constants = {
     WIDGET_WORKFLOW_CONNECTED: "widget_workflow_connected",
     WIDGET_CONTEXT_UPDATE: "widget_context_update",
     WIDGET_WORKFLOW_STATUS: "widget_workflow_status",
-    WIDGET_WORKFLOW_ERROR: "widget_workflow_error",
-    WIDGET_WORKFLOW_DISCONNECTED: "widget_workflow_disconnected",
-    WIDGET_INPUT_RECEIVED: "widget_input_received",
   },
 
   SOCKET_RECEIVE_EVENTS: {
@@ -139,10 +115,6 @@ const constants = {
       code: "INVALID_USER",
       message: "User not found",
     },
-    USERNAME_TAKEN: {
-      code: "USERNAME_TAKEN",
-      message: "Please use different username",
-    },
     INVALID_LOGIN: {
       code: "INVALID_LOGIN",
       message: "User login invalid",
@@ -151,9 +123,21 @@ const constants = {
       code: "INVALID_REQUEST",
       message: "Invalid request",
     },
-    NOT_A_DML_DQL_QUERY: {
-      code: "NOT_A_DML_DQL_QUERY",
-      message: "Only data manupulation and data fetching queries are allowed",
+    VALIDATION_ERROR: {
+      code: "VALIDATION_ERROR",
+      message: "Validation failed",
+    },
+    DB_ERROR: {
+      code: "DB_ERROR",
+      message: "Database error",
+    },
+    INTERNAL_ERROR: {
+      code: "INTERNAL_ERROR",
+      message: "Internal error",
+    },
+    UNKNOWN_ERROR: {
+      code: "UNKNOWN_ERROR",
+      message: "Unknown error",
     },
   },
 
@@ -162,24 +146,6 @@ const constants = {
     "23503": "A foreign key constraint was violated.",
     "23502": "A required field was not provided.",
     "22001": "Provided string value exceeds length limits.",
-  },
-
-  TABLE_FILTERS: {
-    "=": (a, b) => `${a} = ${b}`,
-    "!=": (a, b) => `${a} != ${b}`,
-    "<": (a, b) => `${a} < ${b}`,
-    "<=": (a, b) => `${a} <= ${b}`,
-    ">": (a, b) => `${a} > ${b}`,
-    ">=": (a, b) => `${a} >= ${b}`,
-    LIKE: (a, b) => `${a} LIKE '%${b}%'`,
-    ILIKE: (a, b) => `${a} ILIKE '%${b}%'`,
-  },
-
-  WIDGET_TYPES: {
-    TEXT_WIDGET: {
-      name: "Text widget",
-      value: "text",
-    },
   },
 
   CRON_JOB_STATUS: {
@@ -208,7 +174,65 @@ const constants = {
       WIDGET_FILES: "widget-files",
       EXCEL_CSV_DATASOURCES: "excel-csv-datasources",
     },
-  }
+  },
+
+  AUTH_PREFIXES: {
+    BEARER: "Bearer ",
+    API_KEY: "api_key ",
+  },
+
+  WORKFLOW_STATUS: {
+    PENDING: "PENDING",
+    RUNNING: "RUNNING",
+    COMPLETED: "COMPLETED",
+    FAILED: "FAILED",
+    CANCELLED: "CANCELLED",
+    SUCCESS: "success",
+    ERROR: "error",
+    SUSPENDED: "suspended",
+  },
+
+  WORKFLOW_NODE_TYPES: {
+    START: "start",
+    DATA_QUERY: "dataQuery",
+    JAVASCRIPT: "javascript",
+    CONDITION: "condition",
+    LOOP: "loop",
+    DELAY: "delay",
+    END: "end",
+    DATA_COLLECTION: "dataCollection",
+  },
+
+  HTTP_STATUS: {
+    OK: 200,
+    CREATED: 201,
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    INTERNAL_SERVER_ERROR: 500,
+  },
+
+  ENVIRONMENTS: {
+    DEVELOPMENT: "development",
+    PRODUCTION: "production",
+    TEST: "test",
+  },
+
+  DEFAULTS: {
+    API_KEY_PREFIX_LENGTH: 8,
+    TEST_USER_EMAIL: "test@test.com",
+    QUERY_TIMEOUT_SECONDS: 60,
+  },
+
+  AI: {
+    DEFAULT_BASE_URL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+    DEFAULT_MODEL: "gemma-4-31b-it",
+  },
 };
 
 module.exports = constants;
+
+// Trigger nodemon restart
+
+// Trigger nodemon restart 2

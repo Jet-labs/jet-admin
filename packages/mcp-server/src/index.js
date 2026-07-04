@@ -27,7 +27,7 @@
  *         "command": "node",
  *         "args": ["/absolute/path/to/packages/mcp-server/src/index.js"],
  *         "env": {
- *           "JET_ADMIN_BASE_URL": "http://localhost:5000",
+ *           "JET_ADMIN_MCP_BASE_URL": "http://localhost:5000",
  *           "JET_ADMIN_API_KEY": "your_api_key",
  *           "JET_ADMIN_TENANT_ID": "your_tenant_id"
  *         }

@@ -9,25 +9,26 @@ const {
     updateUserRolesSchema,
     tenantUserIdParamSchema,
 } = require("./userManagement.validator");
+const { P } = require("../../config/permissions");
 
 // User management routes
 router.get(
   "/",
-  authMiddleware.authorize("user", "list"),
+  authMiddleware.authorize(P.user.list),
   userManagementController.getAllTenantUsers
 );
 
 router.get(
   "/:tenantUserID",
     validate(tenantUserIdParamSchema, "params"),
-  authMiddleware.authorize("user", "read", { paramKey: "tenantUserID" }),
+  authMiddleware.authorize({ ...P.user.read, paramKey: "tenantUserID" }),
   userManagementController.getTenantUserByID
 );
 
 router.delete(
   "/:tenantUserID",
     validate(tenantUserIdParamSchema, "params"),
-  authMiddleware.authorize("user", "delete", { paramKey: "tenantUserID" }),
+  authMiddleware.authorize({ ...P.user.delete, paramKey: "tenantUserID" }),
   userManagementController.removeTenantUserFromTenantByID
 );
 
@@ -37,14 +38,14 @@ router.patch(
         params: tenantUserIdParamSchema,
         body: updateUserRolesSchema,
     }),
-  authMiddleware.authorize("user", "update", { paramKey: "tenantUserID" }),
+  authMiddleware.authorize({ ...P.user.update, paramKey: "tenantUserID" }),
   userManagementController.updateTenantUserRolesByID
 );
 
 router.post(
   "/",
     validate(addUserToTenantSchema, "body"),
-  authMiddleware.authorize("user", "create"),
+  authMiddleware.authorize(P.user.create),
   userManagementMiddleware.checkTenantUserAdditionLimit,
   userManagementController.addUserToTenant
 );

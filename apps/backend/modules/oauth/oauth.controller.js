@@ -89,11 +89,12 @@ oauthController.handleGoogleCallback = async (req, res) => {
   });
 
   if (error) {
+    const safeError = JSON.stringify(error).replace(/</g, "\\u003c");
     return res.send(`
       <html>
         <body>
           <script>
-            window.opener.postMessage({ type: 'OAUTH_FAILURE', error: ${JSON.stringify(error)} }, '*');
+            window.opener.postMessage({ type: 'OAUTH_FAILURE', error: ${safeError} }, '*');
             window.close();
           </script>
         </body>
@@ -173,11 +174,12 @@ oauthController.handleGoogleCallback = async (req, res) => {
       createdByApiKeyID,
     });
 
+    const safeVaultCredentialID = JSON.stringify(stored.vaultCredentialID).replace(/</g, "\\u003c");
     return res.send(`
       <html>
         <body>
           <script>
-            window.opener.postMessage({ type: 'OAUTH_SUCCESS', vaultCredentialID: ${JSON.stringify(stored.vaultCredentialID)} }, '*');
+            window.opener.postMessage({ type: 'OAUTH_SUCCESS', vaultCredentialID: ${safeVaultCredentialID} }, '*');
             window.close();
           </script>
         </body>
@@ -188,11 +190,12 @@ oauthController.handleGoogleCallback = async (req, res) => {
       message: "oauthController:handleGoogleCallback:failure",
       params: { errorMessage: err.message },
     });
+    const safeErrMsg = JSON.stringify(err.message).replace(/</g, "\\u003c");
     return res.send(`
       <html>
         <body>
           <script>
-            window.opener.postMessage({ type: 'OAUTH_FAILURE', error: ${JSON.stringify(err.message)} }, '*');
+            window.opener.postMessage({ type: 'OAUTH_FAILURE', error: ${safeErrMsg} }, '*');
             window.close();
           </script>
         </body>

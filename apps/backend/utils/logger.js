@@ -1,4 +1,5 @@
 const { winstonLogger } = require("../config/winston.config");
+const { redact } = require("./sensitive");
 
 const logLevels = Object.freeze({
   info: "info",
@@ -6,34 +7,6 @@ const logLevels = Object.freeze({
   success: "success",
   warning: "warning",
 });
-
-const SENSITIVE_KEYS = [
-  "apiKey", "api_key", "apikeyhash",
-  "token", "bearertoken", "accesstoken", "refreshtoken",
-  "password", "secret", "authorization",
-];
-
-const redactSensitive = (obj, depth = 0) => {
-  if (obj === null || obj === undefined) return obj;
-  if (typeof obj !== "object") return obj;
-  if (depth > 10) return "[REDACTED: max depth]";
-
-  if (Array.isArray(obj)) {
-    return obj.map((item) => redactSensitive(item, depth + 1));
-  }
-
-  const redacted = {};
-  for (const [key, value] of Object.entries(obj)) {
-    if (SENSITIVE_KEYS.includes(key.toLowerCase())) {
-      redacted[key] = "[REDACTED]";
-    } else if (typeof value === "object" && value !== null) {
-      redacted[key] = redactSensitive(value, depth + 1);
-    } else {
-      redacted[key] = value;
-    }
-  }
-  return redacted;
-};
 
 class Logger {
   static pageLogger = (page, obj) => {
@@ -49,7 +22,7 @@ class Logger {
    */
   static log = (status = "info", { message, params }) => {
     try {
-      const safeParams = redactSensitive(params);
+      const safeParams = redact(params);
       const statusArray = String(status).split(":");
 
       statusArray.forEach((s) => {

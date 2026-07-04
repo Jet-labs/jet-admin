@@ -8,15 +8,17 @@ import { safeArray, trimId } from "../utils.js";
 import { config } from "../config.js";
 
 /**
- * Derives the frontend base URL from the backend base URL.
- * Handles cases where the backend URL may or may not contain /api paths.
+ * Resolves the frontend base URL for preview links.
+ * Prefers the explicit JET_ADMIN_FRONTEND_URL env var (for split-domain deployments).
+ * Falls back to deriving it from the backend URL (for same-origin setups).
  *
  * Examples:
- *   http://localhost:5000        → http://localhost:5000
- *   http://localhost:5000/api/v1 → http://localhost:5000
- *   https://api.myapp.com        → https://api.myapp.com
+ *   JET_ADMIN_FRONTEND_URL=http://localhost:3000 → http://localhost:3000
+ *   (fallback) http://localhost:5000        → http://localhost:5000
+ *   (fallback) http://localhost:5000/api/v1 → http://localhost:5000
  */
 function getFrontendBaseUrl() {
+  if (config.frontendUrl) return config.frontendUrl;
   // Strip any /api... path suffix to get the root origin
   return config.baseUrl.replace(/\/api(\/.*)?$/, "");
 }
@@ -66,7 +68,8 @@ export const appPageTools = [
     },
     handler: async ({ appPageID }, context) => {
       const { appPageAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      const p = await appPageAPI.getById(trimId(appPageID, "appPageID"));
+      const res = await appPageAPI.getById(trimId(appPageID, "appPageID"));
+      const p = res?.appPage || res;
       if (!p) throw new Error(`App Page not found: ${appPageID}`);
       return {
         appPageID: p.appPageID,

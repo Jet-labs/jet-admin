@@ -4,6 +4,7 @@
  * scheduling; this handler only validates and describes the wait.
  */
 const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
+const Logger = require('../../../utils/logger');
 
 const MAX_DELAY_MS = 24 * 60 * 60 * 1000; // 24 hours: compatible with setTimeout and UI limits
 
@@ -28,6 +29,8 @@ function normalizeDelayMs(value) {
 
 async function execute(nodeConfig, context, helpers) {
   const { resolveTemplate } = helpers;
+  const nodeID = helpers?.nodeID || 'delay';
+  const instanceID = helpers?.instanceID;
   const { 
     delayType = 'fixed', 
     delayMinutes = 0, 
@@ -38,7 +41,12 @@ async function execute(nodeConfig, context, helpers) {
     errorHandling = ERROR_HANDLING.CONTINUE,
     isDisabled = false,
   } = nodeConfig || {};
-  
+
+  Logger.log('info', {
+    message: 'delayHandler:execute:params',
+    params: { nodeID, instanceID, delayType, isDisabled },
+  });
+
   try {
     if (isDisabled) {
       return {
@@ -92,6 +100,10 @@ async function execute(nodeConfig, context, helpers) {
       queueDelay: totalDelayMs,
     };
   } catch (error) {
+    Logger.log('error', {
+      message: 'delayHandler:execute:error',
+      params: { nodeID: helpers?.nodeID, instanceID: helpers?.instanceID, error: error.message },
+    });
     // If errorHandling is FAIL_WORKFLOW, throw to stop the workflow
     if (errorHandling === ERROR_HANDLING.FAIL_WORKFLOW) {
       throw error;

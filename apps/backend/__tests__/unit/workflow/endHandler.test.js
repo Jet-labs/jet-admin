@@ -4,7 +4,7 @@ const WORKFLOW_TEMPLATE_OPTIONS = {
   allowedRoots: ['ctx'],
   preserveSingleExpressionType: true,
 };
-const endHandler = require('../../../modules/workflow/workers/handlers/endHandler');
+const endHandler = require('../../../modules/workflow/handlers/endHandler');
 
 describe('workflow endHandler', () => {
   it('resolves mustache-based output parameters through the shared resolver', async () => {

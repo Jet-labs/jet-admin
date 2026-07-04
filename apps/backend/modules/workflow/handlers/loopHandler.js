@@ -6,6 +6,7 @@
  * follows the completed handle.
  */
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
+const Logger = require('../../../utils/logger');
 
 const DEFAULT_MAX_ITERATIONS = 1000;
 const MAX_MAX_ITERATIONS = 100000;
@@ -47,6 +48,11 @@ async function execute(nodeConfig, context, helpers) {
     isDisabled = false,
   } = nodeConfig || {};
   
+  Logger.log('info', {
+    message: 'loopHandler:execute:params',
+    params: { nodeID, instanceID: helpers?.instanceID, sourceVariable, maxIterations, isDisabled },
+  });
+
   try {
     if (isDisabled) {
       return {
@@ -165,6 +171,10 @@ async function execute(nodeConfig, context, helpers) {
       queueDelay: currentIndex > 0 ? itemDelayMs : 0,
     };
   } catch (error) {
+    Logger.log('error', {
+      message: 'loopHandler:execute:error',
+      params: { nodeID, instanceID: helpers?.instanceID, error: error.message },
+    });
     // If errorHandling is FAIL_WORKFLOW, throw to stop the workflow
     if (errorHandling === ERROR_HANDLING.FAIL_WORKFLOW) {
       throw error;

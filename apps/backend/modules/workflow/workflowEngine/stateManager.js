@@ -34,14 +34,8 @@ const { prisma } = require("../../../config/prisma.config");
 const constants = require("../../../constants");
 const Logger = require("../../../utils/logger");
 
-// ─── Event type constants ─────────────────────────────────────────────────────
-
-
-
 const stateManager = {};
 stateManager.WORKFLOW_LOG_EVENT_TYPES = constants.WORKFLOW_LOG_EVENT_TYPES;
-
-
 
 // ─── Unified log write ────────────────────────────────────────────────────────
 
@@ -134,7 +128,7 @@ stateManager.createInstance = async ({ workflowID, tenantID, inputValues = {}, i
     data: {
       workflowID: isTest ? null : workflowID,
       tenantID,
-      status: 'RUNNING',
+      status: constants.WORKFLOW_STATUS.RUNNING,
       startedAt: new Date(),
       isTest,
     },
@@ -347,7 +341,7 @@ stateManager.createDataCollectionRequest = async ({
       instanceID,
       nodeID: String(nodeID),
       nodeAttempt: nodeAttempt ?? null,
-      status: 'PENDING',
+      status: constants.WORKFLOW_STATUS.PENDING,
       collectionType: collectionType || 'form',
       collectionConfig: collectionConfig ?? {},
       expiresAt: expiresAt ?? null,
@@ -364,7 +358,7 @@ stateManager.createDataCollectionRequest = async ({
  */
 stateManager.getPendingRequestForNode = async (instanceID, nodeID) => {
   return prisma.tblWorkflowDataCollectionRequests.findFirst({
-    where: { instanceID, nodeID: String(nodeID), status: 'PENDING' },
+    where: { instanceID, nodeID: String(nodeID), status: constants.WORKFLOW_STATUS.PENDING },
     orderBy: { createdAt: 'desc' },
   });
 };
@@ -397,7 +391,7 @@ stateManager.completeDataCollectionRequest = async (collectionRequestID, submitt
   return prisma.tblWorkflowDataCollectionRequests.update({
     where: { collectionRequestID },
     data: {
-      status: 'COMPLETED',
+      status: constants.WORKFLOW_STATUS.COMPLETED,
       submittedData: submittedData ?? {},
       updatedAt: new Date(),
     },
@@ -413,7 +407,7 @@ stateManager.completeDataCollectionRequest = async (collectionRequestID, submitt
  */
 stateManager.getPendingDataCollectionRequests = async (instanceID) => {
   return prisma.tblWorkflowDataCollectionRequests.findMany({
-    where: { instanceID, status: 'PENDING' },
+    where: { instanceID, status: constants.WORKFLOW_STATUS.PENDING },
     orderBy: { createdAt: 'asc' },
   });
 };
@@ -452,7 +446,7 @@ stateManager.getStaleRunningInstances = async ({ staleAfterMs = 5 * 60 * 1000, t
 
   return prisma.tblWorkflowInstances.findMany({
     where: {
-      status: 'RUNNING',
+      status: constants.WORKFLOW_STATUS.RUNNING,
       updatedAt: { lt: staleThreshold },
       isTest: false,
       ...(tenantID ? { tenantID } : {}),
@@ -476,8 +470,8 @@ stateManager.markInstancesAsRecovered = async (instanceIDs) => {
   });
 
   await prisma.tblWorkflowInstances.updateMany({
-    where: { instanceID: { in: instanceIDs }, status: 'RUNNING' },
-    data: { status: 'FAILED', completedAt: new Date(), updatedAt: new Date() },
+    where: { instanceID: { in: instanceIDs }, status: constants.WORKFLOW_STATUS.RUNNING },
+    data: { status: constants.WORKFLOW_STATUS.FAILED, completedAt: new Date(), updatedAt: new Date() },
   });
 
   await stateManager.logEventBulk(

@@ -18,6 +18,7 @@ const { resolveTemplate: sharedResolveTemplate } = require("@jet-admin/expressio
 const { stateManager } = require('../workflowEngine/stateManager');
 const Logger = require("../../../utils/logger");
 const { serializeError } = require('../handlers/constants');
+const constants = require('../../../constants');
 
 const WORKFLOW_TEMPLATE_OPTIONS = {
   allowedRoots: ['ctx'],
@@ -120,7 +121,7 @@ async function _processJob(jobData) {
         nodeID,
         nodeType,
         outputVariable: nodeConfig?.outputVariable,
-        status: 'suspended',
+        status: constants.WORKFLOW_STATUS.SUSPENDED,
         output: result.output,   // contains the full collectionConfig
         nextHandle: result.nextHandle ?? 'output',
         queueDelay: 0,
@@ -132,7 +133,7 @@ async function _processJob(jobData) {
         nodeID,
         nodeType,
         outputVariable: nodeConfig?.outputVariable,
-        status: 'success',
+        status: constants.WORKFLOW_STATUS.SUCCESS,
         output: result.output,
         nextHandle: result.nextHandle ?? 'output',
         queueDelay: result.queueDelay ?? 0,
@@ -166,7 +167,7 @@ async function _processJob(jobData) {
         instanceID,
         nodeID,
         nodeType,
-        status: 'error',
+        status: constants.WORKFLOW_STATUS.ERROR,
         output: null,
         nextHandle: 'error',
         taskError: (() => {

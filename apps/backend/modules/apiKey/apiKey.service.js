@@ -25,12 +25,14 @@ apiKeyService.getAllAPIKeys = async ({ userID, tenantID }) => {
       },
     });
 
+    const sanitizedApiKeys = apiKeys.map(({ apiKeyHash, ...rest }) => rest);
+
     Logger.log("success", {
       message: "apiKeyService:getAllAPIKeys:success",
-      params: { userID, count: apiKeys.length },
+      params: { userID, count: sanitizedApiKeys.length },
     });
 
-    return apiKeys;
+    return sanitizedApiKeys;
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:getAllAPIKeys:failure",
@@ -139,12 +141,14 @@ apiKeyService.getAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
       throw new Error("APIKey not found");
     }
 
+    const { apiKeyHash, ...sanitizedAPIKey } = apiKey;
+
     Logger.log("success", {
       message: "apiKeyService:getAPIKeyByID:success",
       params: { userID, apiKeyID },
     });
 
-    return apiKey;
+    return sanitizedAPIKey;
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:getAPIKeyByID:failure",
@@ -187,16 +191,11 @@ apiKeyService.updateAPIKeyByID = async ({
 
   try {
     const updatedAPIKey = await prisma.$transaction(async (tx) => {
-      const existingAPIKey = await tx.tblAPIKeys.findUnique({
-        where: { apiKeyID },
+      const existingAPIKey = await tx.tblAPIKeys.findFirst({
+        where: { apiKeyID, tenantID },
       });
       if (!existingAPIKey) {
-        throw new Error(`API Key with ID ${apiKeyID} not found`);
-      }
-      if (existingAPIKey.tenantID !== tenantID) {
-        throw new Error(
-          `API Key with ID ${apiKeyID} does not belong to tenant with ID ${tenantID}`
-        );
+        throw new Error(`API Key with ID ${apiKeyID} not found in this tenant`);
       }
 
       const apiKeyUpdateData = {
@@ -242,13 +241,13 @@ apiKeyService.updateAPIKeyByID = async ({
 
     if (roleIDs !== undefined) {
       const existingRoles = await getRolesForUser(apiKeyID, tenantID);
-      for (const role of existingRoles) {
-        await removeRoleForUser(apiKeyID, role, tenantID);
-      }
+      await Promise.allSettled(
+        existingRoles.map((role) => removeRoleForUser(apiKeyID, role, tenantID))
+      );
       if (roleIDs.length > 0) {
-        for (const roleID of roleIDs) {
-          await addRoleForUser(apiKeyID, `role:${roleID}`, tenantID);
-        }
+        await Promise.allSettled(
+          roleIDs.map((roleID) => addRoleForUser(apiKeyID, `role:${roleID}`, tenantID))
+        );
       }
     }
 
@@ -284,16 +283,11 @@ apiKeyService.deleteAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
     const existingRoles = await getRolesForUser(apiKeyID, tenantID);
 
     await prisma.$transaction(async (tx) => {
-      const existingAPIKey = await tx.tblAPIKeys.findUnique({
-        where: { apiKeyID },
+      const existingAPIKey = await tx.tblAPIKeys.findFirst({
+        where: { apiKeyID, tenantID },
       });
       if (!existingAPIKey) {
-        throw new Error(`API key with ID ${apiKeyID} not found`);
-      }
-      if (existingAPIKey.tenantID !== tenantID) {
-        throw new Error(
-          `API key with ID ${apiKeyID} does not belong to tenant with ID ${tenantID}`
-        );
+        throw new Error(`API key with ID ${apiKeyID} not found in this tenant`);
       }
       await tx.tblAPIKeyRoleMappings.deleteMany({
         where: { apiKeyID },
@@ -308,9 +302,9 @@ apiKeyService.deleteAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
       return true;
     });
 
-    for (const role of existingRoles) {
-      await removeRoleForUser(apiKeyID, role, tenantID);
-    }
+    await Promise.allSettled(
+      existingRoles.map((role) => removeRoleForUser(apiKeyID, role, tenantID))
+    );
 
     Logger.log("success", {
       message: "apiKeyService:deleteAPIKeyByID:success",
@@ -341,19 +335,15 @@ apiKeyService.cloneAPIKey = async ({ userID, tenantID, apiKeyID, authContext }) 
   });
 
   try {
-    const existing = await prisma.tblAPIKeys.findUnique({
-      where: { apiKeyID },
+    const existing = await prisma.tblAPIKeys.findFirst({
+      where: { apiKeyID, tenantID },
       include: {
         tblAPIKeyRoleMappings: true,
       },
     });
 
     if (!existing) {
-      throw new Error("API Key not found");
-    }
-
-    if (existing.tenantID !== tenantID) {
-      throw new Error("API Key does not belong to this tenant");
+      throw new Error("API Key not found in this tenant");
     }
 
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
@@ -394,9 +384,11 @@ apiKeyService.cloneAPIKey = async ({ userID, tenantID, apiKeyID, authContext }) 
 
     const existingMappings = existing.tblAPIKeyRoleMappings;
     if (existingMappings && existingMappings.length > 0) {
-      for (const mapping of existingMappings) {
-        await addRoleForUser(clonedAPIKey.apiKeyID, `role:${mapping.roleID}`, tenantID);
-      }
+      await Promise.allSettled(
+        existingMappings.map((mapping) =>
+          addRoleForUser(clonedAPIKey.apiKeyID, `role:${mapping.roleID}`, tenantID)
+        )
+      );
     }
 
     return { apiKey: rawKey };

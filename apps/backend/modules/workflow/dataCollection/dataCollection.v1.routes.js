@@ -5,6 +5,7 @@ const { authMiddleware } = require('../../auth/auth.middleware');
 const { workflowMiddleware } = require('../workflow.middleware');
 const { validate } = require("../../../utils/validation.utils");
 const { z } = require("../../../utils/validation.utils");
+const { P } = require("../../../config/permissions");
 
 const requestIdParamSchema = z.object({ collectionRequestID: z.string().uuid() }).passthrough();
 
@@ -13,7 +14,7 @@ router.post(
     '/:collectionRequestID/submit',
     validate(requestIdParamSchema, 'params'),
     workflowMiddleware.resolveWorkflowIDFromCollectionRequest,
-    authMiddleware.authorize("workflow", "execute", { reqKey: "workflowID" }),
+    authMiddleware.authorize({ ...P.workflow.execute, reqKey: "workflowID" }),
     dataCollectionController.submitData
 );
 
@@ -22,7 +23,7 @@ router.get(
     '/:collectionRequestID',
     validate(requestIdParamSchema, 'params'),
     workflowMiddleware.resolveWorkflowIDFromCollectionRequest,
-    authMiddleware.authorize("workflow", "read", { reqKey: "workflowID" }),
+    authMiddleware.authorize({ ...P.workflow.read, reqKey: "workflowID" }),
     dataCollectionController.getRequest
 );
 

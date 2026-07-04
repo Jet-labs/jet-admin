@@ -6,6 +6,7 @@ const { workflowService } = require("./workflow.service");
 const { authorizedExecuteWorkflow } = require("../../utils/authorizedProxy");
 
 const Logger = require("../../utils/logger");
+const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
@@ -34,16 +35,22 @@ workflowController.getAllWorkflows = async (req, res) => {
     });
     
     Logger.log("success", { message: "WorkflowController:getAllWorkflows:success", params: { workflowLength: result.workflows.length } });
-    expressUtils.sendResponse(res, true, {
-      workflows: result.workflows,
-      totalCount: result.totalCount,
-      totalPages: result.totalPages,
-      page: result.page,
-      pageSize: result.pageSize,
-    });
+    expressUtils.sendResponse(
+      res,
+      true,
+      {
+        workflows: result.workflows,
+        totalCount: result.totalCount,
+        totalPages: result.totalPages,
+        page: result.page,
+        pageSize: result.pageSize,
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:getAllWorkflows:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -60,10 +67,10 @@ workflowController.getWorkflowByID = async (req, res) => {
     Logger.log("info", { message: "WorkflowController:getWorkflowByID:params", params: { userID: user.userID, tenantID, workflowID, authContext } });
     const workflow = await workflowService.getWorkflowByID({ userID: user.userID, tenantID, workflowID, authContext });
     Logger.log("success", { message: "WorkflowController:getWorkflowByID:success", params: { workflow } });
-    expressUtils.sendResponse(res, true, { workflow });
+    expressUtils.sendResponse(res, true, { workflow }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:getWorkflowByID:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -81,10 +88,10 @@ workflowController.createWorkflow = async (req, res) => {
     Logger.log("info", { message: "WorkflowController:createWorkflow:params", params: { userID: user.userID, tenantID, title, nodes, edges, workflowOptions, authContext } });
     const workflow = await workflowService.createWorkflow({ userID: user.userID, tenantID, title, nodes, edges, workflowOptions, authContext });
     Logger.log("success", { message: "WorkflowController:createWorkflow:success", params: { workflow } });
-    expressUtils.sendResponse(res, true, { workflow });
+    expressUtils.sendResponse(res, true, { workflow }, null, constants.HTTP_STATUS.CREATED);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:createWorkflow:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -102,10 +109,10 @@ workflowController.updateWorkflow = async (req, res) => {
     Logger.log("info", { message: "WorkflowController:updateWorkflow:params", params: { userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions, authContext } });
     const workflow = await workflowService.updateWorkflow({ userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions, authContext });
     Logger.log("success", { message: "WorkflowController:updateWorkflow:success", params: { workflow } });
-    expressUtils.sendResponse(res, true, { workflow });
+    expressUtils.sendResponse(res, true, { workflow }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:updateWorkflow:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -122,10 +129,10 @@ workflowController.deleteWorkflow = async (req, res) => {
     Logger.log("info", { message: "WorkflowController:deleteWorkflow:params", params: { userID: user.userID, tenantID, workflowID, authContext } });
     await workflowService.deleteWorkflow({ userID: user.userID, tenantID, workflowID, authContext });
     Logger.log("success", { message: "WorkflowController:deleteWorkflow:success", params: { workflowID } });
-    expressUtils.sendResponse(res, true, { message: "Workflow deleted successfully." });
+    expressUtils.sendResponse(res, true, { message: "Workflow deleted successfully." }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:deleteWorkflow:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -142,10 +149,10 @@ workflowController.cloneWorkflow = async (req, res) => {
     Logger.log("info", { message: "WorkflowController:cloneWorkflow:params", params: { userID: user.userID, tenantID, workflowID, authContext } });
     const workflow = await workflowService.cloneWorkflow({ userID: user.userID, tenantID, workflowID, authContext });
     Logger.log("success", { message: "WorkflowController:cloneWorkflow:success", params: { workflow } });
-    expressUtils.sendResponse(res, true, { workflow });
+    expressUtils.sendResponse(res, true, { workflow }, null, constants.HTTP_STATUS.CREATED);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:cloneWorkflow:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -171,10 +178,10 @@ workflowController.executeWorkflow = async (req, res) => {
     });
 
     Logger.log("success", { message: "WorkflowController:executeWorkflow:success", params: { instanceID: result.instanceID } });
-    expressUtils.sendResponse(res, true, result);
+    expressUtils.sendResponse(res, true, result, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:executeWorkflow:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -193,13 +200,13 @@ workflowController.getRunStatus = async (req, res) => {
 
     if (!status) {
       Logger.log("error", { message: "WorkflowController:getRunStatus:notFound", params: { instanceID } });
-      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" });
+      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" }, constants.HTTP_STATUS.NOT_FOUND);
     }
 
-    expressUtils.sendResponse(res, true, status);
+    expressUtils.sendResponse(res, true, status, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:getRunStatus:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -215,7 +222,7 @@ workflowController.testWorkflow = async (req, res) => {
     const authContext = getServiceAuthContext(req);
 
     if (!Array.isArray(nodes) || !Array.isArray(edges)) {
-      return expressUtils.sendResponse(res, false, {}, { message: "nodes and edges are required" });
+      return expressUtils.sendResponse(res, false, {}, { message: "nodes and edges are required" }, constants.HTTP_STATUS.BAD_REQUEST);
     }
 
     Logger.log("info", { message: "WorkflowController:testWorkflow:params", params: { tenantID, nodeCount: nodes.length, authContext } });
@@ -223,10 +230,10 @@ workflowController.testWorkflow = async (req, res) => {
     const result = await workflowService.testWorkflow({ tenantID, nodes, edges, inputValues, authContext });
 
     Logger.log("success", { message: "WorkflowController:testWorkflow:success", params: { instanceID: result.instanceID } });
-    expressUtils.sendResponse(res, true, result);
+    expressUtils.sendResponse(res, true, result, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:testWorkflow:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -245,10 +252,10 @@ workflowController.stopTestWorkflow = async (req, res) => {
     const result = await workflowService.stopTestWorkflow({ instanceID });
 
     Logger.log("success", { message: "WorkflowController:stopTestWorkflow:success", params: { instanceID } });
-    expressUtils.sendResponse(res, true, result);
+    expressUtils.sendResponse(res, true, result, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:stopTestWorkflow:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -277,17 +284,17 @@ workflowController.getRunStatusForWidget = async (req, res) => {
 
     if (!status) {
       Logger.log("error", { message: "WorkflowController:getRunStatusForWidget:notFound", params: { instanceID } });
-      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" });
+      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" }, constants.HTTP_STATUS.NOT_FOUND);
     }
 
     Logger.log("success", {
       message: "WorkflowController:getRunStatusForWidget:success",
       params: { instanceID, status: status.status, hasData: !!status.data }
     });
-    expressUtils.sendResponse(res, true, status);
+    expressUtils.sendResponse(res, true, status, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:getRunStatusForWidget:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error);
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

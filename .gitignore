@@ -11,6 +11,9 @@ apps/backend/logs
 apps/frontend/node_modules
 apps/frontend/.env
 
+apps/mcp-server/node_modules
+apps/mcp-server/.env
+
 docker-compose.yml
 node_modules
 

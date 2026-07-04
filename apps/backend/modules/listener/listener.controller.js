@@ -4,6 +4,7 @@
  */
 const { listenerService } = require('./listener.service');
 const Logger = require('../../utils/logger');
+const constants = require("../../constants");
 const { expressUtils } = require('../../utils/express.utils');
 const { getServiceAuthContext } = require('../../utils/auth.context.utils');
 
@@ -106,7 +107,7 @@ const listenerController = {
       return expressUtils.sendResponse(res, true, {
         listener,
         message: "Listener created successfully.",
-      });
+      }, null, constants.HTTP_STATUS.CREATED);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:createListener:error",

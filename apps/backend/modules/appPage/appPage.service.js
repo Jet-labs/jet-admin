@@ -147,10 +147,9 @@ appPageService.createAppPage = async ({
         tenantID: tenantID,
         appPageTitle,
         appPageDescription,
-        appPageConfig,
       },
     });
-    return true;
+    return appPage;
   } catch (error) {
     Logger.log("error", {
       message: "appPageService:createAppPage:failure",
@@ -271,10 +270,9 @@ appPageService.cloneAppPageByID = async ({
       message: "appPageService:cloneAppPageByID:success",
       params: {
         userID,
-        appPageID,
       },
     });
-    return true;
+    return newAppPage;
   } catch (error) {
     Logger.log("error", {
       message: "appPageService:cloneAppPageByID:failure",

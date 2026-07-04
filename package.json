@@ -12,7 +12,8 @@
   "scripts": {
     "start:f": "cd apps/frontend && npm run dev",
     "start:b": "cd apps/backend && npm run dev-w",
-    "start:all": "concurrently \"npm run start:f\" \"npm run start:b\"",
+    "start:mcp": "cd apps/mcp-server && node index.js",
+    "start:all": "concurrently \"npm run start:f\" \"npm run start:b\" \"npm run start:mcp\"",
     "dev:expression-engine": "cd packages/expression-engine && npm run dev",
     "dev:widgets-logic": "cd packages/widgets-logic && npm run dev",
     "dev:widgets-ui": "cd packages/widgets-ui && npm run dev",

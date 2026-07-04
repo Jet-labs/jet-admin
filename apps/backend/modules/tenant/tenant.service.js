@@ -7,6 +7,9 @@ const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { cronJobService } = require("../cronJob/cronJob.service");
 const { apiKeyService } = require("../apiKey/apiKey.service");
 const { widgetService } = require("../widget/widget.service");
+const { datasourceService } = require("../datasource/datasource.service");
+const { workflowService } = require("../workflow/workflow.service");
+const { listenerService } = require("../listener/listener.service");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 const tenantService = {};
@@ -54,34 +57,33 @@ tenantService.getUserTenantByID = async ({ userID, tenantID }) => {
       tenantDataQueries = null,
       tenantWidgets = null,
       tenantCronJobs = null,
-      tenantAPIKeys = null;
+      tenantAPIKeys = null,
+      tenantDatasources = null,
+      tenantWorkflows = null,
+      tenantListeners = null;
 
     try {
-      tenantRoles = await tenantRoleService.getAllTenantRoles({
-        userID: userID,
-        tenantID: tenantID,
-      });
-
-      tenantAppPages = await appPageService.getAllAppPages({
-        userID: userID,
-        tenantID: tenantID,
-      });
-      tenantDataQueries = await dataQueryService.getAllDataQueries({
-        userID: userID,
-        tenantID: tenantID,
-      });
-      tenantWidgets = await widgetService.getAllWidgets({
-        userID: userID,
-        tenantID: tenantID,
-      });
-      tenantCronJobs = await cronJobService.getAllCronJobs({
-        userID: userID,
-        tenantID: tenantID,
-      });
-      tenantAPIKeys = await apiKeyService.getAllAPIKeys({
-        userID: userID,
-        tenantID: tenantID,
-      });
+      [
+        tenantRoles,
+        tenantAppPages,
+        tenantDataQueries,
+        tenantWidgets,
+        tenantCronJobs,
+        tenantAPIKeys,
+        tenantDatasources,
+        tenantWorkflows,
+        tenantListeners,
+      ] = await Promise.all([
+        tenantRoleService.getAllTenantRoles({ userID, tenantID }).catch(() => null),
+        appPageService.getAllAppPages({ userID, tenantID }).catch(() => null),
+        dataQueryService.getAllDataQueries({ userID, tenantID }).catch(() => null),
+        widgetService.getAllWidgets({ userID, tenantID }).catch(() => null),
+        cronJobService.getAllCronJobs({ userID, tenantID }).catch(() => null),
+        apiKeyService.getAllAPIKeys({ userID, tenantID }).catch(() => null),
+        datasourceService.getAllDatasources({ userID, tenantID }).catch(() => null),
+        workflowService.getAllWorkflows({ userID, tenantID }).catch(() => null),
+        listenerService.getAllListeners({ tenantID }).catch(() => null),
+      ]);
     } catch (error) {
       Logger.log("error", {
         message: "tenantService:getUserTenantByID:catch-1",
@@ -89,21 +91,31 @@ tenantService.getUserTenantByID = async ({ userID, tenantID }) => {
       });
     }
 
+    const getCount = (res) => {
+      if (!res) return 0;
+      if (typeof res.totalCount === "number") return res.totalCount;
+      if (Array.isArray(res)) return res.length;
+      return 0;
+    };
+
     const tenant = {
       ...userTenantRelationships.tblTenants,
       roles: userTenantRelationships,
       relationships: allRelationshipsOfTenant,
-      tenantRolesCount: tenantRoles?.length || 0,
+      tenantRolesCount: getCount(tenantRoles),
       tenantDatabaseSchemasCount: tenantDatabaseMetadata?.metadata?.length || 0,
       tenantDatabaseTablesCount:
         tenantDatabaseMetadata?.metadata
           ?.map((schema) => (schema.tables ? schema.tables.length : 0))
           .reduce((acc, curr) => acc + curr, 0) || 0,
-      tenantAppPageCount: tenantAppPages?.length || 0,
-      tenantDataQueryCount: tenantDataQueries?.length || 0,
-      tenantCronJobCount: tenantCronJobs?.length || 0,
-      tenantAPIKeyCount: tenantAPIKeys?.length || 0,
-      tenantWidgetCount: tenantWidgets?.length || 0,
+      tenantAppPageCount: getCount(tenantAppPages),
+      tenantDataQueryCount: getCount(tenantDataQueries),
+      tenantCronJobCount: getCount(tenantCronJobs),
+      tenantAPIKeyCount: getCount(tenantAPIKeys),
+      tenantWidgetCount: getCount(tenantWidgets),
+      tenantDatasourceCount: getCount(tenantDatasources),
+      tenantWorkflowCount: getCount(tenantWorkflows),
+      tenantListenerCount: getCount(tenantListeners),
     };
     Logger.log("success", {
       message: "tenantService:getUserTenantByID:tenant",

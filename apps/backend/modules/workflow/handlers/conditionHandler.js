@@ -27,6 +27,7 @@
 
 const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
 const { createWorkflowVm } = require('./workflowVm');
+const Logger = require('../../../utils/logger');
 
 // ─── Template resolution ───────────────────────────────────────────────────────
 
@@ -216,6 +217,13 @@ async function execute(nodeConfig, context, helpers) {
   } = nodeConfig ?? {};
 
   const { resolveTemplate } = helpers ?? {};
+  const nodeID = helpers?.nodeID || 'condition';
+  const instanceID = helpers?.instanceID;
+
+  Logger.log('info', {
+    message: 'conditionHandler:execute:params',
+    params: { nodeID, instanceID, branchCount: branches.length },
+  });
 
   try {
     // VM is only needed for the "JS Expression" operator and legacy branches.
@@ -246,6 +254,10 @@ async function execute(nodeConfig, context, helpers) {
     };
 
   } catch (err) {
+    Logger.log('error', {
+      message: 'conditionHandler:execute:error',
+      params: { nodeID: helpers?.nodeID, instanceID: helpers?.instanceID, error: err.message },
+    });
     if (errorHandling === ERROR_HANDLING.FAIL_WORKFLOW) throw err;
 
     return {

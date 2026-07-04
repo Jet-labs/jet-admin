@@ -54,7 +54,8 @@ export const queryTools = [
     },
     handler: async ({ dataQueryID }, context) => {
       const { queryAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      const q = await queryAPI.getById(trimId(dataQueryID, "dataQueryID"));
+      const res = await queryAPI.getById(trimId(dataQueryID, "dataQueryID"));
+      const q = res?.dataQuery || res;
       if (!q) throw new Error(`Query not found: ${dataQueryID}`);
       return {
         dataQueryID: q.dataQueryID,
@@ -123,13 +124,7 @@ export const queryTools = [
         dataQueryOptions,
         runOnLoad,
       });
-      return {
-        success: true,
-        dataQueryID: result?.dataQueryID,
-        dataQueryTitle: result?.dataQueryTitle ?? dataQueryTitle,
-        datasourceID: result?.datasourceID ?? datasourceID,
-        datasourceType: result?.datasourceType ?? datasourceType,
-      };
+      return result;
     },
   },
 

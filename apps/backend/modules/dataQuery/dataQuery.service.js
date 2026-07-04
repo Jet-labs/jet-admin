@@ -223,7 +223,7 @@ dataQueryService.createDataQuery = async ({
         runOnLoad,
       },
     });
-    return true;
+    return createdQuery;
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryService:createDataQuery:failure",

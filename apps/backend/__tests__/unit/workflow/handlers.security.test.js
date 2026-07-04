@@ -1,6 +1,6 @@
-const { NEXT_HANDLE } = require('../../../modules/workflow/workers/handlers/constants');
-const conditionHandler = require('../../../modules/workflow/workers/handlers/conditionHandler');
-const javascriptHandler = require('../../../modules/workflow/workers/handlers/javascriptHandler');
+const { NEXT_HANDLE } = require('../../../modules/workflow/handlers/constants');
+const conditionHandler = require('../../../modules/workflow/handlers/conditionHandler');
+const javascriptHandler = require('../../../modules/workflow/handlers/javascriptHandler');
 
 describe('workflow handler sandboxing', () => {
   it('condition handler selects the first matching branch', async () => {

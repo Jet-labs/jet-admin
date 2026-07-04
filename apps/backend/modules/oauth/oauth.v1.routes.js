@@ -2,12 +2,15 @@ const express = require("express");
 const router = express.Router();
 const { oauthController } = require("./oauth.controller");
 const { authMiddleware } = require("../auth/auth.middleware");
+const { validate, schemas } = require("../../utils/validation.utils");
+const { P } = require("../../config/permissions");
 
 // Get Google OAuth Authorization URL (authenticated) - matching frontend useOAuthPopup
 router.get(
   "/google/auth/:tenantID",
   authMiddleware.authProvider,
-  authMiddleware.authorize("datasource", "update"),
+  validate(schemas.tenantIdParamSchema, "params"),
+  authMiddleware.authorize(P.datasource.update),
   oauthController.getGoogleAuthUrl
 );
 
@@ -15,7 +18,8 @@ router.get(
 router.get(
   "/:tenantID/google/url",
   authMiddleware.authProvider,
-  authMiddleware.authorize("datasource", "update"),
+  validate(schemas.tenantIdParamSchema, "params"),
+  authMiddleware.authorize(P.datasource.update),
   oauthController.getGoogleAuthUrl
 );
 

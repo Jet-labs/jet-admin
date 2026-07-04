@@ -110,8 +110,9 @@ appPageController.createAppPage = async (req, res) => {
     });
 
     return expressUtils.sendResponse(res, true, {
+      appPage: result,
       message: "App page created successfully.",
-    });
+    }, null, constants.HTTP_STATUS.CREATED);
   } catch (error) {
     Logger.log("error", {
       message: "appPageController:createAppPage:catch-1",

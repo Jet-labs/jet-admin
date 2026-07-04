@@ -1,32 +1,40 @@
-const express = require("express");
+const express = require('express');
+const { aiController } = require('./ai.controller');
+const { authMiddleware } = require('../auth/auth.middleware');
+const { validate } = require('../../utils/validation.utils');
+const { streamChatBodySchema } = require('./ai.validator');
+const { schemas } = require('../../utils/validation.utils');
+const { P } = require('../../config/permissions');
+
 const router = express.Router({ mergeParams: true });
-const { aiController } = require("./ai.controller");
-const { authMiddleware } = require("../auth/auth.middleware");
-
-// All AI routes require Firebase authentication and tenant membership verification.
-
-/**
- * POST /api/v1/tenants/:tenantID/ai/chat
- * Send a message to the AI agent and get a response with optional tool call trace.
- */
-router.post("/chat", authMiddleware.authProvider, authMiddleware.checkTenantMembership, aiController.chat);
 
 /**
  * POST /api/v1/tenants/:tenantID/ai/chat/stream
- * SSE stream — emits thinking/text/tool_start/tool_end/done events in real time.
+ *
+ * Streams an AI SDK data stream response to the useChat frontend hook.
+ * Body: { messages: UIMessage[] } — full conversation history from useChat.
  */
-router.post("/chat/stream", authMiddleware.authProvider, authMiddleware.checkTenantMembership, aiController.streamChat);
-
-/**
- * GET /api/v1/tenants/:tenantID/ai/session
- * Get current session message history.
- */
-router.get("/session", authMiddleware.authProvider, authMiddleware.checkTenantMembership, aiController.getSession);
+router.post(
+  '/chat/stream',
+  authMiddleware.authProvider,
+  validate(schemas.tenantIdParamSchema, 'params'),
+  validate(streamChatBodySchema, 'body'),
+  authMiddleware.checkTenantMembership,
+  authMiddleware.authorize(P.ai.chat),
+  aiController.streamChat
+);
 
 /**
  * DELETE /api/v1/tenants/:tenantID/ai/session
- * Clear the current session history (start fresh).
+ * No-op in the stateless model — exists for frontend compatibility.
  */
-router.delete("/session", authMiddleware.authProvider, authMiddleware.checkTenantMembership, aiController.clearSession);
+router.delete(
+  '/session',
+  authMiddleware.authProvider,
+  validate(schemas.tenantIdParamSchema, 'params'),
+  authMiddleware.checkTenantMembership,
+  authMiddleware.authorize(P.ai.delete),
+  aiController.clearSession
+);
 
 module.exports = router;

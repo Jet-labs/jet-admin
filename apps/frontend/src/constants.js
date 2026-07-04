@@ -1100,6 +1100,7 @@ export const CONSTANTS = {
       chat: (tenantID) => `/api/v1/tenants/${tenantID}/ai/chat`,
       chatStream: (tenantID) => `/api/v1/tenants/${tenantID}/ai/chat/stream`,
       session: (tenantID) => `/api/v1/tenants/${tenantID}/ai/session`,
+      action: (tenantID) => `/api/v1/tenants/${tenantID}/ai/action`,
     },
   },
 

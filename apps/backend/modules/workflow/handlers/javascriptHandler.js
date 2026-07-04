@@ -8,6 +8,7 @@
 
 const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
 const { runInSandbox } = require('./workflowVm');
+const Logger = require('../../../utils/logger');
 
 /**
  * @param {object} nodeConfig
@@ -26,6 +27,11 @@ async function execute(nodeConfig, context) {
     errorHandling = ERROR_HANDLING.CONTINUE,
   } = nodeConfig ?? {};
 
+  Logger.log('info', {
+    message: 'javascriptHandler:execute:params',
+    params: { outputVariable, timeoutSeconds, hasCode: !!code },
+  });
+
   if (!code) {
     throw new Error('JavaScript node requires a non-empty `code` field');
   }
@@ -43,6 +49,10 @@ async function execute(nodeConfig, context) {
       nextHandle: NEXT_HANDLE.SUCCESS,
     };
   } catch (err) {
+    Logger.log('error', {
+      message: 'javascriptHandler:execute:error',
+      params: { outputVariable, error: err.message },
+    });
     if (errorHandling === ERROR_HANDLING.FAIL_WORKFLOW) throw err;
 
     return {

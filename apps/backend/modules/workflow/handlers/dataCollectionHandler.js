@@ -12,6 +12,7 @@
  */
 
 const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
+const Logger = require('../../../utils/logger');
 
 /**
  * @param {object} nodeConfig
@@ -39,6 +40,13 @@ async function execute(nodeConfig, context, helpers) {
     } = nodeConfig ?? {};
 
     const { resolveTemplate } = helpers;
+    const nodeID = helpers?.nodeID || 'dataCollection';
+    const instanceID = helpers?.instanceID;
+
+    Logger.log('info', {
+      message: 'dataCollectionHandler:execute:params',
+      params: { nodeID, instanceID, collectionType, outputVariable, expiryMinutes },
+    });
 
     try {
         // Resolve any mustache templates that the author put into title/description
@@ -66,6 +74,10 @@ async function execute(nodeConfig, context, helpers) {
         };
 
     } catch (err) {
+        Logger.log('error', {
+          message: 'dataCollectionHandler:execute:error',
+          params: { nodeID: helpers?.nodeID, instanceID: helpers?.instanceID, error: err.message },
+        });
         if (errorHandling === ERROR_HANDLING.FAIL_WORKFLOW) throw err;
         return {
             output: { [outputVariable]: null, success: false, error: serializeError(err) },

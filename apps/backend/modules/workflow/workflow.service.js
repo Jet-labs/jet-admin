@@ -355,7 +355,7 @@ workflowService.deleteWorkflow = async ({ userID, tenantID, workflowID, authCont
         where: { workflowID: workflowID },
       });
       // Delete workflow instances and logs if any
-      await tx.tblNodeExecutionLogs.deleteMany({
+      await tx.tblWorkflowInstanceLogs.deleteMany({
         where: {
           tblWorkflowInstances: {
             workflowID: workflowID,

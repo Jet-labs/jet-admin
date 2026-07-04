@@ -11,6 +11,7 @@ const { authorizedExecuteDataQuery } = require("../../../utils/authorizedProxy")
 const { resolveInputs } = require("../../../utils/input.util");
 const { ERROR_HANDLING, NEXT_HANDLE, serializeError } = require('./constants');
 const { deriveChildContext, createSystemContext, ORIGIN_TYPES } = require('../../../utils/executionContext');
+const Logger = require('../../../utils/logger');
 
 async function execute(nodeConfig, context, helpers) {
   const { 
@@ -19,7 +20,17 @@ async function execute(nodeConfig, context, helpers) {
     outputVariable = 'queryResult',
     errorHandling = ERROR_HANDLING.CONTINUE,
   } = nodeConfig || {};
-  
+
+  const nodeID = helpers?.nodeID || 'dataQuery';
+  const instanceID = helpers?.instanceID;
+  const workflowID = helpers?.workflowID;
+  const tenantID = helpers?.tenantID;
+
+  Logger.log('info', {
+    message: 'dataQueryHandler:execute:params',
+    params: { nodeID, instanceID, dataQueryID, outputVariable },
+  });
+
   if (!dataQueryID) {
     throw new Error('Data Query node requires dataQueryID');
   }
@@ -38,9 +49,6 @@ async function execute(nodeConfig, context, helpers) {
   }
   
   // Build execution context: this query is being run as part of a workflow
-  const workflowID = helpers?.workflowID;
-  const instanceID = helpers?.instanceID;
-  const tenantID = helpers?.tenantID;
   let executionCtx;
 
   if (context?.__executionCtx) {
@@ -67,6 +75,10 @@ async function execute(nodeConfig, context, helpers) {
       nextHandle: NEXT_HANDLE.SUCCESS,
     };
   } catch (error) {
+    Logger.log('error', {
+      message: 'dataQueryHandler:execute:error',
+      params: { nodeID: helpers?.nodeID, instanceID: helpers?.instanceID, dataQueryID, error: error.message },
+    });
     // If errorHandling is FAIL_WORKFLOW, throw to stop the workflow
     if (errorHandling === ERROR_HANDLING.FAIL_WORKFLOW) {
       throw error;

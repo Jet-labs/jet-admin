@@ -1,96 +1,57 @@
 /**
  * ai.service.js
  *
- * Core agentic AI service for Jet Admin.
+ * Agentic AI service powered by the Vercel AI SDK (streamText / generateText).
  *
- * Uses NVIDIA NIM (OpenAI-compatible) with DeepSeek V4 Pro.
- * On each user message:
- *   1. Appends message to per-user-per-tenant session history
- *   2. Calls the LLM with all 46 MCP tools as OpenAI function definitions
- *   3. If the LLM returns tool_calls: executes each tool handler, feeds results back, loops
- *   4. Returns final assistant reply + full tool call trace
+ * Architecture:
+ *   streamText() → @ai-sdk/mcp HTTP client → apps/mcp-server (Streamable HTTP)
+ *               → Firebase token verified → tool.handler() → Jet Admin REST API
  *
- * Session isolation:
- *   sessionStore is keyed by "${userID}:${tenantID}" — no cross-user/cross-tenant leakage.
+ * Auth: the user's Firebase Bearer token is forwarded through the MCP client's
+ *   HTTP Authorization header into every tool call. Each tool runs under the
+ *   calling user's own Casbin permissions — no shared service account.
  *
- * Auth propagation for tool calls:
- *   The user's Firebase Bearer token (from the original HTTP request) is stored in the session
- *   and passed as `context.bearerToken` into every MCP tool handler. Each tool call therefore
- *   runs under the calling user's own Casbin permissions — no shared service account needed.
- *   When the Bearer token expires (Firebase tokens last 1 hour), the user will need to re-open
- *   the app (which refreshes the token automatically) and start a new chat session.
+ * Session: the client (useChat) manages message history and sends the full
+ *   conversation on each request. The backend is stateless — no BoundedCache.
+ *
+ * Stream format: AI SDK data stream (text/plain; X-Vercel-AI-Data-Stream: v1).
+ *   The frontend's useChat hook parses this natively, giving us tool invocation
+ *   state tracking for free.
+ *
+ * ESM/CJS boundary: ai, @ai-sdk/openai, @ai-sdk/mcp are ESM-only packages.
+ *   We load them via Promise.all(await import(...)) on first call (lazy singleton).
  */
 
-const OpenAI = require("openai");
-const { prisma } = require("../../config/prisma.config");
-const Logger = require("../../utils/logger");
-const environment = require("../../environment");
-const { BoundedCache } = require("../../utils/cache.util");
+const Logger = require('../../utils/logger');
+const environment = require('../../environment');
+const constants = require('../../constants');
 
-// ─── Import MCP tool handlers ────────────────────────────────────────────────
-// We require them at runtime to avoid issues with the CJS/ESM boundary.
-// The tools package uses ESM, so we use a dynamic import wrapper.
+// ─── Lazy SDK loader (ESM → CJS bridge) ──────────────────────────────────────
 
-let _toolsLoaded = false;
-let _allTools = [];
-let _toolMap = new Map();
+let _sdkLoaded = false;
+let _streamText, _createOpenAI, _createGoogle, _createMCPClient, _convertToCoreMessages;
 
-async function loadTools() {
-  if (_toolsLoaded) return;
-  try {
-    const mod = await import("../../../../packages/mcp-server/src/tools/index.js");
-    _allTools = mod.allTools;
-    _toolMap = mod.toolMap;
-    _toolsLoaded = true;
-    Logger.log("success", {
-      message: "ai.service:tools:loaded",
-      params: { count: _allTools.length },
-    });
-  } catch (err) {
-    Logger.log("error", {
-      message: "ai.service:tools:loadFailed",
-      params: { error: err.message },
-    });
-    throw err;
-  }
-}
+async function loadSDK() {
+  if (_sdkLoaded) return;
 
-// ─── NVIDIA NIM client ────────────────────────────────────────────────────────
+  const [aiMod, openaiMod, googleMod, mcpMod] = await Promise.all([
+    import('ai'),
+    import('@ai-sdk/openai'),
+    import('@ai-sdk/google'),
+    import('@ai-sdk/mcp'),
+  ]);
 
-const nimClient = new OpenAI({
-  baseURL: "https://integrate.api.nvidia.com/v1",
-  apiKey: environment.NVIDIA_API_KEY,
-});
+  _streamText = aiMod.streamText;
+  _createOpenAI = openaiMod.createOpenAI;
+  _createGoogle = googleMod.createGoogle;
+  _createMCPClient = mcpMod.createMCPClient;
+  _convertToCoreMessages = aiMod.convertToCoreMessages;
+  _sdkLoaded = true;
 
-const MODEL = "meta/llama-3.1-8b-instruct";
-
-// ─── Session store ────────────────────────────────────────────────────────────
-// In-memory; keyed by `${userID}:${tenantID}`
-// Value: { messages: Message[], bearerToken: string }
-//
-// bearerToken: the user's Firebase JWT from the original HTTP request.
-// It is refreshed on every new message (see chat() below) so we always
-// have the freshest token even across hour-long sessions.
-
-const sessionStore = new BoundedCache(500);
-
-function getSessionKey(userID, tenantID) {
-  return `${userID}:${tenantID}`;
-}
-
-/**
- * Converts the MCP allTools array to the OpenAI function calling format.
- * The inputSchema is already JSON Schema — OpenAI accepts it directly.
- */
-function buildOpenAITools(allTools) {
-  return allTools.map((tool) => ({
-    type: "function",
-    function: {
-      name: tool.name,
-      description: tool.description,
-      parameters: tool.inputSchema || { type: "object", properties: {} },
-    },
-  }));
+  Logger.log('success', {
+    message: 'ai.service:sdk:loaded',
+    params: { model: environment.AI_MODEL || constants.AI.DEFAULT_MODEL },
+  });
 }
 
 // ─── System prompt ────────────────────────────────────────────────────────────
@@ -99,7 +60,7 @@ const SYSTEM_PROMPT = `You are an expert AI assistant embedded inside Jet Admin,
 
 You have access to tools that let you manage this tenant's resources:
 - Datasources (database connections)
-- Data Queries (SQL and REST queries)  
+- Data Queries (SQL and REST queries)
 - Listeners (real-time WebSocket/webhook/SSE event streams)
 - Workflows (multi-step automated pipelines)
 - Widgets (visual UI building blocks: tables, charts, stats, forms)
@@ -112,401 +73,262 @@ ALWAYS follow this workflow when asked to build something:
 3. When creating multiple resources, do them in dependency order: datasource → query → widget → page
 4. After creating or modifying something, confirm what was done
 
-Be concise. Show your reasoning briefly before calling tools. After executing tools, summarize what you did and what the user can do next.
+A2UI (Agent-to-User Interface) Readymade Component Catalog:
+You have rich interactive UI generation capabilities. Whenever asking the user for input, options, confirmation, parameters, or showing visual query outputs, enclose a valid JSON block inside \`\`\`a2ui ... \`\`\`.
 
-If a tool fails with a permissions error, explain that the tenant's API key needs the relevant permission enabled.`;
+Supported A2UI Component Schemas:
 
-// ─── Main service ─────────────────────────────────────────────────────────────
+1. Human-in-the-Loop Confirmation ("type": "confirm"):
+Use before running destructive/sensitive tool operations (e.g. deleting datasources/workflows or running mutation SQL):
+{
+  "type": "confirm",
+  "title": "Approval Required: Action Name",
+  "description": "Warning details...",
+  "toolName": "delete_datasource",
+  "params": { "datasourceID": "123" }
+}
+
+2. Form / Parameter Collector ("type": "form"):
+{
+  "type": "form",
+  "title": "Configure Resource",
+  "description": "Please enter missing settings",
+  "fields": [
+    { "name": "dbName", "label": "Database Name", "type": "text" | "number" | "select" | "boolean" | "secret" | "textarea", "defaultValue": "my_db", "options": ["pg", "mysql"] }
+  ],
+  "actions": [
+    { "label": "Save & Proceed", "action": "SUBMIT_CONFIG", "variant": "primary" }
+  ]
+}
+
+3. Multi-Choice Decision Selector ("type": "choice"):
+{
+  "type": "choice",
+  "title": "Select Approach",
+  "description": "Choose how you'd like to proceed",
+  "choices": [
+    { "label": "Option Title", "description": "Details...", "badge": "Recommended", "action": "CHOOSE_PLAN", "params": { "plan": "fast" } }
+  ]
+}
+
+4. Code / SQL Snippet Preview ("type": "code"):
+{
+  "type": "code",
+  "title": "Generated SQL Query",
+  "language": "sql" | "javascript" | "json",
+  "code": "SELECT * FROM users LIMIT 10;",
+  "actions": [
+    { "label": "Run Query Now", "action": "RUN_SQL", "params": { "sql": "SELECT * FROM users LIMIT 10;" } }
+  ]
+}
+
+5. Visual Data Chart ("type": "chart"):
+{
+  "type": "chart",
+  "title": "User Registrations",
+  "chartType": "bar" | "line" | "pie",
+  "data": [
+    { "label": "Jan", "value": 120 },
+    { "label": "Feb", "value": 240 }
+  ]
+}
+
+6. Multi-Step Progress Tracker ("type": "steps"):
+{
+  "type": "steps",
+  "title": "Setup Progress",
+  "steps": [
+    { "title": "Create Datasource", "status": "completed" },
+    { "title": "Build Query", "status": "in_progress" },
+    { "title": "Generate Widget", "status": "pending" }
+  ]
+}
+
+7. Metric KPI Card ("type": "stat"):
+{ "type": "stat", "title": "Total Records", "value": "12,450", "trend": "up", "change": "+14%" }
+
+8. Data Table Grid ("type": "table"):
+{ "type": "table", "title": "Results", "columns": ["id", "name"], "rows": [{ "id": 1, "name": "Alice" }] }
+
+Be concise. Show your reasoning briefly before calling tools. After executing tools, summarize what you did and present next steps using an appropriate A2UI card.
+
+Suggested Next Actions:
+Whenever you finish a response, optionally append suggested follow-up options at the END using this format:
+
+\`\`\`suggested_actions
+[
+  { "label": "Short action label", "message": "The full message to send when clicked" },
+  { "label": "Another option", "message": "Another message" }
+]
+\`\`\`
+IMPORTANT: Do NOT list these suggested actions as text bullet points in your markdown response body when generating the \`\`\`suggested_actions\`\`\` block. The UI renders them as interactive buttons automatically at the bottom of the chat bubble.
+
+Rules for suggested actions:
+- Include 2-4 short, actionable options
+- Only suggest genuinely relevant next steps
+- Do NOT include this block when asking for confirmation or showing a form`;
+
+// ─── Service ──────────────────────────────────────────────────────────────────
 
 const aiService = {};
 
 /**
- * Send a message and run the agentic loop until a final response is ready.
+ * Stream a chat response using the Vercel AI SDK data stream format.
+ *
+ * Accepts the full message history from the client (useChat pattern).
+ * Uses @ai-sdk/mcp to call tools on the standalone MCP server, which
+ * validates the Bearer token and enforces Casbin permissions on each call.
  *
  * @param {object} param0
- * @param {string} param0.userID - Firebase UID of the current user
- * @param {string} param0.tenantID - Current tenant UUID
- * @param {string} param0.message - User's chat message
- * @returns {Promise<{ reply: string, toolCallSteps: Array, messages: Array }>}
+ * @param {Array}  param0.messages     - Full conversation history (AI SDK UIMessage[])
+ * @param {string} param0.tenantID     - Current tenant UUID
+ * @param {string} param0.bearerToken  - Firebase JWT for this user
+ * @param {object} param0.res          - Express ServerResponse
  */
-aiService.chat = async ({ userID, tenantID, message, bearerToken }) => {
-  await loadTools();
+aiService.streamChat = async ({ messages, tenantID, bearerToken, res }) => {
+  try {
+    await loadSDK();
+  } catch (err) {
+    Logger.log('error', { message: 'ai.service:streamChat:sdkLoadFailed', params: { error: err.message } });
+    res.status(500).json({ error: 'AI SDK failed to load' });
+    return;
+  }
 
-  const sessionKey = getSessionKey(userID, tenantID);
+  const rawModel = environment.AI_MODEL || constants.AI.DEFAULT_MODEL;
 
-  // Get or init session
-  if (!sessionStore.has(sessionKey)) {
-    sessionStore.set(sessionKey, {
-      messages: [{ role: "system", content: SYSTEM_PROMPT }],
-      bearerToken: null,
+  // Use native @ai-sdk/google if GEMINI_API_KEY is present, else fall back to OpenAI-compatible provider
+  let modelInstance;
+  if (environment.GEMINI_API_KEY) {
+    const googleProvider = _createGoogle({
+      apiKey: environment.GEMINI_API_KEY,
     });
-  }
-
-  const session = sessionStore.get(sessionKey);
-
-  // Always refresh the bearer token — Firebase tokens expire after 1 hour.
-  // The frontend sends a fresh token with every message, so we update it here
-  // so that long sessions don't break mid-conversation.
-  if (bearerToken) {
-    session.bearerToken = bearerToken;
-  }
-
-  if (!session.bearerToken) {
-    return {
-      reply:
-        "Authentication token not found. Please refresh the page and try again.",
-      toolCallSteps: [],
-      messageCount: session.messages.length,
-    };
-  }
-
-  // Build the tool context using the user's own identity
-  const toolContext = {
-    tenantId: tenantID,
-    apiKey: null,             // not used — bearerToken takes priority in createApiClient
-    bearerToken: session.bearerToken,
-  };
-
-  // Append user message
-  session.messages.push({ role: "user", content: message });
-
-  const openAITools = buildOpenAITools(_allTools);
-  const toolCallSteps = [];
-
-  Logger.log("info", {
-    message: "ai.service:chat:start",
-    params: { userID, tenantID, messageCount: session.messages.length },
-  });
-
-  // ── Agentic loop ────────────────────────────────────────────────────────────
-  let iterations = 0;
-  const MAX_ITERATIONS = 10;
-
-  while (iterations < MAX_ITERATIONS) {
-    iterations++;
-
-    const response = await nimClient.chat.completions.create({
-      model: MODEL,
-      messages: session.messages,
-      tools: openAITools,
-      tool_choice: "auto",
-      temperature: 0.7,
-      top_p: 0.95,
-      max_tokens: 4096,
+    // Map gemini or gemma model string to native Google provider
+    const isGoogleModel = rawModel.includes('gemini') || rawModel.includes('gemma');
+    modelInstance = googleProvider(isGoogleModel ? rawModel : constants.AI.DEFAULT_MODEL);
+  } else {
+    const openaiProvider = _createOpenAI({
+      baseURL: environment.AI_BASE_URL || constants.AI.DEFAULT_BASE_URL,
+      apiKey: environment.NVIDIA_API_KEY || environment.OPENAI_API_KEY,
+      compatibility: 'compatible',
     });
-
-    const choice = response.choices[0];
-    const assistantMsg = choice.message;
-
-    // Append assistant message to history
-    session.messages.push(assistantMsg);
-
-    Logger.log("info", {
-      message: "ai.service:chat:llmResponse",
-      params: {
-        userID,
-        tenantID,
-        finishReason: choice.finish_reason,
-        toolCallCount: assistantMsg.tool_calls?.length || 0,
-        iteration: iterations,
-      },
-    });
-
-    // If no tool calls, we're done
-    if (!assistantMsg.tool_calls || assistantMsg.tool_calls.length === 0) {
-      const reply = assistantMsg.content || "";
-      Logger.log("success", {
-        message: "ai.service:chat:done",
-        params: { userID, tenantID, iterations, toolCallSteps: toolCallSteps.length },
-      });
-      return {
-        reply,
-        toolCallSteps,
-        messageCount: session.messages.length,
-      };
-    }
-
-    // Execute all tool calls in this turn
-    for (const toolCall of assistantMsg.tool_calls) {
-      const toolName = toolCall.function.name;
-      const toolArgs = JSON.parse(toolCall.function.arguments || "{}");
-
-      Logger.log("info", {
-        message: "ai.service:chat:toolCall",
-        params: { userID, tenantID, toolName, toolCallId: toolCall.id },
-      });
-
-      let toolResult;
-      let toolError = null;
-
-      const handler = _toolMap.get(toolName);
-
-      if (!handler) {
-        toolError = `Tool "${toolName}" not found.`;
-        toolResult = { error: toolError };
-      } else {
-        try {
-          toolResult = await handler.handler(toolArgs, toolContext);
-        } catch (err) {
-          toolError = err.message;
-          toolResult = { error: err.message };
-          Logger.log("error", {
-            message: "ai.service:chat:toolError",
-            params: { userID, tenantID, toolName, error: err.message },
-          });
-        }
-      }
-
-      const resultStr = JSON.stringify(toolResult, null, 2);
-
-      // Record step for UI display
-      toolCallSteps.push({
-        toolCallId: toolCall.id,
-        toolName,
-        args: toolArgs,
-        result: toolResult,
-        error: toolError,
-      });
-
-      // Append tool result message
-      session.messages.push({
-        role: "tool",
-        tool_call_id: toolCall.id,
-        content: resultStr,
-      });
-    }
-    // Continue loop — LLM will process tool results
+    modelInstance = openaiProvider.chat(rawModel);
   }
 
-  // Safety fallback if too many iterations
-  const fallback =
-    "I've been working on your request but reached the maximum number of steps. Please try a simpler request or break it into smaller parts.";
-  session.messages.push({ role: "assistant", content: fallback });
-
-  return {
-    reply: fallback,
-    toolCallSteps,
-    messageCount: session.messages.length,
-  };
-};
-
-/**
- * Stream a message through the agentic loop using Server-Sent Events.
- *
- * SSE event types:
- *   thinking   — DeepSeek reasoning token (delta.reasoning_content)
- *   text       — Assistant text token (delta.content)
- *   tool_start — { toolName, args }
- *   tool_end   — { toolName, result, error }
- *   done       — { messageCount }
- *   error      — { message }
- */
-aiService.streamChat = async ({ userID, tenantID, message, bearerToken, res }) => {
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache, no-transform");
-  res.setHeader("Connection", "keep-alive");
-  res.setHeader("X-Accel-Buffering", "no");
-
-  function emit(event, data) {
-    res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-  }
-  function emitError(msg) {
-    emit("error", { message: msg });
-    res.end();
-  }
+  // Create an MCP client pointed at our standalone MCP server.
+  // The Bearer token is forwarded so tool calls run under this user's identity.
+  const mcpServerUrl = `http://localhost:${environment.MCP_SERVER_PORT}/tenants/${tenantID}/mcp`;
+  let mcpClient;
 
   try {
-    await loadTools();
+    mcpClient = await _createMCPClient({
+      transport: {
+        type: 'http',
+        url: mcpServerUrl,
+        headers: { Authorization: `Bearer ${bearerToken}` },
+      },
+    });
   } catch (err) {
-    return emitError(`Failed to load AI tools: ${err.message}`);
+    Logger.log('error', {
+      message: 'ai.service:streamChat:mcpClientFailed',
+      params: { tenantID, error: err.message },
+    });
+    res.status(503).json({ error: 'Failed to connect to MCP server' });
+    return;
   }
 
-  const sessionKey = getSessionKey(userID, tenantID);
-  if (!sessionStore.has(sessionKey)) {
-    sessionStore.set(sessionKey, {
-      messages: [{ role: "system", content: SYSTEM_PROMPT }],
-      bearerToken: null,
+  // Discover available tools from the MCP server
+  const tools = await mcpClient.tools();
+
+  // Sanitize UI messages from useChat to strictly conform to CoreMessage[] format
+  console.log('RAW MESSAGES RECEIVED:', JSON.stringify(messages, null, 2));
+
+  let coreMessages;
+  try {
+    if (typeof _convertToCoreMessages === 'function') {
+      coreMessages = _convertToCoreMessages(messages);
+    }
+  } catch (err) {
+    Logger.log('warning', { message: 'ai.service:streamChat:convertToCoreMessagesFailed', params: { error: err.message } });
+  }
+
+  if (!coreMessages || !coreMessages.length) {
+    coreMessages = messages.map((m) => {
+      let textContent = '';
+      if (typeof m.content === 'string') {
+        textContent = m.content;
+      } else if (Array.isArray(m.content)) {
+        textContent = m.content
+          .map((p) => (typeof p === 'string' ? p : p?.text || ''))
+          .filter(Boolean)
+          .join('\n');
+      }
+      
+      if (!textContent && Array.isArray(m.parts)) {
+        textContent = m.parts
+          .map((p) => (p?.type === 'text' ? p.text : ''))
+          .filter(Boolean)
+          .join('\n');
+      }
+
+      return {
+        role: m.role === 'system' ? 'system' : m.role === 'assistant' ? 'assistant' : 'user',
+        content: textContent.trim() || ' ',
+      };
     });
   }
-  const session = sessionStore.get(sessionKey);
-  if (bearerToken) session.bearerToken = bearerToken;
 
-  if (!session.bearerToken) {
-    return emitError("Authentication token not found. Please refresh the page.");
-  }
-
-  const toolContext = {
-    tenantId: tenantID,
-    apiKey: null,
-    bearerToken: session.bearerToken,
-  };
-
-  session.messages.push({ role: "user", content: message });
-  const openAITools = buildOpenAITools(_allTools);
-
-  Logger.log("info", {
-    message: "ai.service:streamChat:start",
-    params: { userID, tenantID, messageCount: session.messages.length },
+  Logger.log('info', {
+    message: 'ai.service:streamChat:start',
+    params: { tenantID, messageCount: coreMessages.length, model: rawModel },
   });
 
-  let iterations = 0;
-  const MAX_ITERATIONS = 10;
-
-  while (iterations < MAX_ITERATIONS) {
-    iterations++;
-
-    const stream = await nimClient.chat.completions.create({
-      model: MODEL,
-      messages: session.messages,
-      tools: openAITools,
-      tool_choice: "auto",
-      temperature: 0.7,
-      top_p: 0.95,
-      max_tokens: 4096,
-      stream: true,
-    });
-
-    let accText = "";
-    let accThinking = "";
-    let finishReason = null;
-    // Tool call args arrive fragmented — accumulate by index
-    const pendingToolCalls = new Map();
-
-    for await (const chunk of stream) {
-      const delta = chunk.choices[0]?.delta;
-      if (!delta) continue;
-      finishReason = chunk.choices[0]?.finish_reason || finishReason;
-
-      // Thinking tokens (DeepSeek reasoning_content field)
-      if (delta.reasoning_content) {
-        accThinking += delta.reasoning_content;
-        emit("thinking", { content: delta.reasoning_content });
-      }
-
-      // Text tokens
-      if (delta.content) {
-        accText += delta.content;
-        emit("text", { content: delta.content });
-      }
-
-      // Tool call fragments — stitch into pendingToolCalls map
-      if (delta.tool_calls) {
-        for (const tc of delta.tool_calls) {
-          const idx = tc.index ?? 0;
-          if (!pendingToolCalls.has(idx)) {
-            pendingToolCalls.set(idx, { id: "", name: "", argsBuffer: "" });
-          }
-          const p = pendingToolCalls.get(idx);
-          if (tc.id) p.id = tc.id;
-          if (tc.function?.name) p.name += tc.function.name;
-          if (tc.function?.arguments) p.argsBuffer += tc.function.arguments;
-        }
-      }
-    }
-
-    // Persist assistant message
-    const hasCalls = pendingToolCalls.size > 0;
-    session.messages.push({
-      role: "assistant",
-      content: accText || null,
-      ...(accThinking ? { reasoning_content: accThinking } : {}),
-      ...(hasCalls
-        ? {
-            tool_calls: Array.from(pendingToolCalls.values()).map((tc) => ({
-              id: tc.id,
-              type: "function",
-              function: { name: tc.name, arguments: tc.argsBuffer },
-            })),
-          }
-        : {}),
-    });
-
-    Logger.log("info", {
-      message: "ai.service:streamChat:turnDone",
-      params: { userID, tenantID, iteration: iterations, finishReason, toolCalls: pendingToolCalls.size },
-    });
-
-    // No tool calls — done
-    if (!hasCalls) {
-      emit("done", { messageCount: session.messages.length });
-      res.end();
-      return;
-    }
-
-    // Execute each tool call and stream events
-    for (const [, tc] of pendingToolCalls) {
-      const toolName = tc.name;
-      let toolArgs = {};
-      try { toolArgs = JSON.parse(tc.argsBuffer || "{}"); } catch (_) {}
-
-      emit("tool_start", { toolName, args: toolArgs });
-      Logger.log("info", {
-        message: "ai.service:streamChat:toolCall",
-        params: { userID, tenantID, toolName },
+  const result = await _streamText({
+    model: modelInstance,
+    system: SYSTEM_PROMPT,
+    messages: coreMessages,
+    tools,
+    maxSteps: 10,
+    stopWhen: (step) => step.finishReason === 'stop' || step.finishReason === 'length',
+    onFinish: async ({ finishReason, usage }) => {
+      Logger.log('success', {
+        message: 'ai.service:streamChat:done',
+        params: { tenantID, finishReason, totalTokens: usage?.totalTokens },
       });
-
-      let toolResult;
-      let toolError = null;
-      const handler = _toolMap.get(toolName);
-
-      if (!handler) {
-        toolError = `Tool "${toolName}" not found.`;
-        toolResult = { error: toolError };
-      } else {
+      if (finishReason !== 'tool-calls') {
         try {
-          toolResult = await handler.handler(toolArgs, toolContext);
-        } catch (err) {
-          toolError = err.message;
-          toolResult = { error: err.message };
-          Logger.log("error", {
-            message: "ai.service:streamChat:toolError",
-            params: { userID, tenantID, toolName, error: err.message },
-          });
+          await mcpClient.close();
+        } catch (_) {
+          // Ignore cleanup errors
         }
       }
-
-      emit("tool_end", { toolName, result: toolResult, error: toolError });
-      session.messages.push({
-        role: "tool",
-        tool_call_id: tc.id,
-        content: JSON.stringify(toolResult, null, 2),
-      });
-    }
-    // Loop: feed tool results back to LLM
-  }
-
-  const fallback = "I've reached the maximum number of reasoning steps. Please try a simpler request.";
-  session.messages.push({ role: "assistant", content: fallback });
-  emit("text", { content: fallback });
-  emit("done", { messageCount: session.messages.length });
-  res.end();
-};
-
-/**
- * Get the current session message history (excluding system prompt).
- */
-aiService.getSession = ({ userID, tenantID }) => {
-  const sessionKey = getSessionKey(userID, tenantID);
-  const session = sessionStore.get(sessionKey);
-  if (!session) return { messages: [], messageCount: 0 };
-
-  // Return all messages except system prompt
-  const messages = session.messages.filter((m) => m.role !== "system");
-  return { messages, messageCount: messages.length };
-};
-
-/**
- * Clear the session for a user+tenant.
- */
-aiService.clearSession = ({ userID, tenantID }) => {
-  const sessionKey = getSessionKey(userID, tenantID);
-  sessionStore.delete(sessionKey);
-  Logger.log("info", {
-    message: "ai.service:clearSession",
-    params: { userID, tenantID },
+    },
   });
-  return { cleared: true };
+
+  // Pipe the AI SDK UI message stream to the Express response.
+  // AI SDK 5 / @ai-sdk/react uses pipeUIMessageStreamToResponse.
+  if (typeof result.pipeUIMessageStreamToResponse === 'function') {
+    result.pipeUIMessageStreamToResponse(res);
+  } else if (typeof result.toUIMessageStreamResponse === 'function') {
+    const webResponse = result.toUIMessageStreamResponse();
+    res.status(webResponse.status);
+    webResponse.headers.forEach((val, key) => res.setHeader(key, val));
+    
+    const reader = webResponse.body.getReader();
+    const pump = async () => {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(value);
+      }
+      res.end();
+    };
+    pump().catch((err) => {
+      console.error(err);
+      res.end();
+    });
+  } else {
+    throw new Error('No compatible piping method found on streamText result.');
+  }
 };
 
 module.exports = { aiService };
-// force nodemon restart 2

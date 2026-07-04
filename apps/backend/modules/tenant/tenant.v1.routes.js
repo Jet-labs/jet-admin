@@ -30,17 +30,26 @@ let
   cronjobRouter,
   auditLogRouter,
   aiRouter,
-  workflowRouter;
+  workflowRouter,
+  listenerRouter;
 const { isModuleEnabled } = require("../../config/module.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { auditLogMiddleware } = require("../audit/audit.middleware");
+const { P } = require("../../config/permissions");
 
 if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
   Logger.log("success", {
     message: `${constants.MODULES.DATASOURCE} module imported`,
   });
   datasourceRouter = require("../datasource/datasource.v1.routes");
+}
+
+if (isModuleEnabled(constants.MODULES.LISTENER)) {
+  Logger.log("success", {
+    message: `${constants.MODULES.LISTENER} module imported`,
+  });
+  listenerRouter = require("../listener/listener.v1.routes");
 }
 
 if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
@@ -71,13 +80,13 @@ if (isModuleEnabled(constants.MODULES.USERMANAGEMENT)) {
   Logger.log("success", {
     message: `${constants.MODULES.USERMANAGEMENT} module imported`,
   });
-  userManagementRouter = require("../userManagement/userManagement.v1.route");
+  userManagementRouter = require("../userManagement/userManagement.v1.routes");
 }
 if (isModuleEnabled(constants.MODULES.ROLE)) {
   Logger.log("success", {
     message: `${constants.MODULES.ROLE} module imported`,
   });
-  tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
+  tenantRoleRouter = require("../tenantRole/tenantRole.v1.routes");
 }
 if (isModuleEnabled(constants.MODULES.APIKEY)) {
   Logger.log("success", {
@@ -110,14 +119,14 @@ router.post(
 router.get(
   "/:tenantID",
     validate(tenantIdParamSchema, "params"),
-  authMiddleware.authorize("tenant", "read"),
+  authMiddleware.authorize(P.tenant.read),
   tenantController.getUserTenantByID
 );
 
 router.delete(
   "/:tenantID",
     validate(tenantIdParamSchema, "params"),
-  authMiddleware.authorize("tenant", "delete"),
+  authMiddleware.authorize(P.tenant.delete),
   tenantController.deleteUserTenantByID
 );
 
@@ -136,7 +145,7 @@ router.patch(
         params: tenantIdParamSchema,
         body: updateTenantSchema,
     }),
-  authMiddleware.authorize("tenant", "update"),
+  authMiddleware.authorize(P.tenant.update),
   tenantController.updateTenant
 );
 
@@ -201,11 +210,16 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
 }
 
 // Nested listener routes (unified listener system)
-router.use(
-  "/:tenantID/listeners",
-  validate(tenantIdParamSchema, "params"),
-  require("../listener/listener.v1.routes")
-);
+if (isModuleEnabled(constants.MODULES.LISTENER)) {
+  Logger.log("success", {
+    message: `${constants.MODULES.LISTENER} module enabled`,
+  });
+  router.use(
+    "/:tenantID/listeners",
+    validate(tenantIdParamSchema, "params"),
+    listenerRouter
+  );
+}
 
 // Nested dataQuery routes
 if (isModuleEnabled(constants.MODULES.DATAQUERY)) {

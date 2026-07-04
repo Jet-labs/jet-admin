@@ -111,11 +111,15 @@ socketIO.on("connection", async (socket) => {
   socket.on(
     constants.SOCKET_RECEIVE_EVENTS.WORKFLOW_RUN_JOIN,
     async (data) => {
-      await workflowSocketController.onWorkflowRunJoin({
-        socket,
-        runId: data.runId,
-        firebaseID: firebase_id,
-      });
+      try {
+        await workflowSocketController.onWorkflowRunJoin({
+          socket,
+          runId: data.runId,
+          firebaseID: firebase_id,
+        });
+      } catch (error) {
+        Logger.log("error", { message: "socket:workflow_run_join:error", params: { error: error.message } });
+      }
     }
   );
 
@@ -123,72 +127,95 @@ socketIO.on("connection", async (socket) => {
   socket.on(
     constants.SOCKET_RECEIVE_EVENTS.WIDGET_WORKFLOW_CONNECT,
     async (data) => {
-      Logger.log('warning', {
-        message: 'socket:widget_workflow_connect:received',
-        params: { widgetID: data.widgetID, workflowID: data.workflowID, mode: data.mode, instanceID: data.instanceID },
-      });
-      await widgetSocketController.onWidgetWorkflowConnect({
-        socket,
-        widgetID: data.widgetID,
-        workflowID: data.workflowID,
-        mode: data.mode || 'execute',
-        inputParams: data.inputParams || {},
-        instanceID: data.instanceID,
-        tenantID: data.tenantID,
-        firebaseID: firebase_id,
-        // Generic widget configuration (opaque — only widgets-logic knows internals)
-        widgetType: data.widgetType,
-        widgetConfig: data.widgetConfig,
-        workflowConfig: data.workflowConfig,
-      });
+      try {
+        Logger.log('warning', {
+          message: 'socket:widget_workflow_connect:received',
+          params: { widgetID: data.widgetID, workflowID: data.workflowID, mode: data.mode, instanceID: data.instanceID },
+        });
+        await widgetSocketController.onWidgetWorkflowConnect({
+          socket,
+          widgetID: data.widgetID,
+          workflowID: data.workflowID,
+          mode: data.mode || 'execute',
+          inputParams: data.inputParams || {},
+          instanceID: data.instanceID,
+          tenantID: data.tenantID,
+          firebaseID: firebase_id,
+          widgetType: data.widgetType,
+          widgetConfig: data.widgetConfig,
+          workflowConfig: data.workflowConfig,
+        });
+      } catch (error) {
+        Logger.log("error", { message: "socket:widget_workflow_connect:error", params: { error: error.message } });
+      }
     }
   );
 
   socket.on(
     constants.SOCKET_RECEIVE_EVENTS.WIDGET_SEND_INPUT,
     async (data) => {
-      await widgetSocketController.onWidgetSendInput({
-        socket,
-        widgetID: data.widgetID,
-        instanceID: data.instanceID,
-        inputType: data.inputType,
-        data: data.data,
-      });
+      try {
+        await widgetSocketController.onWidgetSendInput({
+          socket,
+          widgetID: data.widgetID,
+          instanceID: data.instanceID,
+          inputType: data.inputType,
+          data: data.data,
+        });
+      } catch (error) {
+        Logger.log("error", { message: "socket:widget_send_input:error", params: { error: error.message } });
+      }
     }
   );
 
   socket.on(
     constants.SOCKET_RECEIVE_EVENTS.WIDGET_REFRESH,
     async (data) => {
-      await widgetSocketController.onWidgetRefresh({
-        socket,
-        widgetID: data.widgetID,
-        inputParams: data.inputParams,
-        tenantID: data.tenantID,
-      });
+      try {
+        await widgetSocketController.onWidgetRefresh({
+          socket,
+          widgetID: data.widgetID,
+          inputParams: data.inputParams,
+          tenantID: data.tenantID,
+        });
+      } catch (error) {
+        Logger.log("error", { message: "socket:widget_refresh:error", params: { error: error.message } });
+      }
     }
   );
 
   socket.on(
     constants.SOCKET_RECEIVE_EVENTS.WIDGET_WORKFLOW_DISCONNECT,
     async (data) => {
-      await widgetSocketController.onWidgetWorkflowDisconnect({
-        socket,
-        widgetID: data.widgetID,
-      });
+      try {
+        await widgetSocketController.onWidgetWorkflowDisconnect({
+          socket,
+          widgetID: data.widgetID,
+        });
+      } catch (error) {
+        Logger.log("error", { message: "socket:widget_workflow_disconnect:error", params: { error: error.message } });
+      }
     }
   );
 
   // === Room Management (for listener test streaming, etc.) ===
   socket.on('join_room', (room) => {
-    if (typeof room === 'string' && (room.startsWith('listener_test:') || room.startsWith('tenant:') || room.startsWith('listener:'))) {
-      socket.join(room);
+    try {
+      if (typeof room === 'string' && (room.startsWith('listener_test:') || room.startsWith('tenant:') || room.startsWith('listener:'))) {
+        socket.join(room);
+      }
+    } catch (error) {
+      Logger.log("error", { message: "socket:join_room:error", params: { error: error.message } });
     }
   });
 
   socket.on('leave_room', (room) => {
-    if (typeof room === 'string' && room.startsWith('listener_test:')) {
-      socket.leave(room);
+    try {
+      if (typeof room === 'string' && room.startsWith('listener_test:')) {
+        socket.leave(room);
+      }
+    } catch (error) {
+      Logger.log("error", { message: "socket:leave_room:error", params: { error: error.message } });
     }
   });
 
@@ -198,11 +225,14 @@ socketIO.on("connection", async (socket) => {
   });
 
   socket.on("disconnect", () => {
-    // Clean up widget connections on disconnect
-    widgetSocketController.onSocketDisconnect({
-      socket,
-      firebaseID: firebase_id,
-    });
+    try {
+      widgetSocketController.onSocketDisconnect({
+        socket,
+        firebaseID: firebase_id,
+      });
+    } catch (error) {
+      Logger.log("error", { message: "socket:disconnect:error", params: { error: error.message } });
+    }
 
     Logger.log("info", {
       message: "socket connection disconnected",

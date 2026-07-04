@@ -1,0 +1,95 @@
+{
+  "ai": {
+    "chat": { "title": "tenant:ai:chat", "description": "Permission to chat with the AI agent" },
+    "read": { "title": "tenant:ai:read", "description": "Permission to read AI session history" },
+    "delete": { "title": "tenant:ai:delete", "description": "Permission to clear AI session history" }
+  },
+  "apikey": {
+    "list": { "title": "tenant:apikey:list", "description": "Permission to list all API keys" },
+    "create": { "title": "tenant:apikey:create", "description": "Permission to create a new API key" },
+    "read": { "title": "tenant:apikey:read", "description": "Permission to read a specific API key" },
+    "update": { "title": "tenant:apikey:update", "description": "Permission to update an API key" },
+    "delete": { "title": "tenant:apikey:delete", "description": "Permission to delete an API key" }
+  },
+  "appPage": {
+    "list": { "title": "tenant:apppage:list", "description": "Permission to list all app pages" },
+    "create": { "title": "tenant:apppage:create", "description": "Permission to create a new app page" },
+    "read": { "title": "tenant:apppage:read", "description": "Permission to read a specific app page" },
+    "update": { "title": "tenant:apppage:update", "description": "Permission to update an app page" },
+    "delete": { "title": "tenant:apppage:delete", "description": "Permission to delete an app page" }
+  },
+  "audit": {
+    "list": { "title": "tenant:audit:list", "description": "Permission to list audit logs" }
+  },
+  "cronjob": {
+    "list": { "title": "tenant:cronjob:list", "description": "Permission to list all cron jobs" },
+    "create": { "title": "tenant:cronjob:create", "description": "Permission to create a new cron job" },
+    "read": { "title": "tenant:cronjob:read", "description": "Permission to read a specific cron job" },
+    "update": { "title": "tenant:cronjob:update", "description": "Permission to update a cron job" },
+    "delete": { "title": "tenant:cronjob:delete", "description": "Permission to delete a cron job" }
+  },
+  "dataquery": {
+    "list": { "title": "tenant:dataquery:list", "description": "Permission to list all data queries" },
+    "create": { "title": "tenant:dataquery:create", "description": "Permission to create a new data query" },
+    "read": { "title": "tenant:dataquery:read", "description": "Permission to read a specific data query" },
+    "update": { "title": "tenant:dataquery:update", "description": "Permission to update a data query" },
+    "delete": { "title": "tenant:dataquery:delete", "description": "Permission to delete a data query" },
+    "test": { "title": "tenant:dataquery:test", "description": "Permission to test a data query" },
+    "execute": { "title": "tenant:dataquery:execute", "description": "Permission to execute a data query" }
+  },
+  "datasource": {
+    "list": { "title": "tenant:datasource:list", "description": "Permission to list all datasources" },
+    "create": { "title": "tenant:datasource:create", "description": "Permission to create a new datasource" },
+    "read": { "title": "tenant:datasource:read", "description": "Permission to read a specific datasource" },
+    "update": { "title": "tenant:datasource:update", "description": "Permission to update a datasource" },
+    "delete": { "title": "tenant:datasource:delete", "description": "Permission to delete a datasource" },
+    "test": { "title": "tenant:datasource:test", "description": "Permission to test a datasource connection" }
+  },
+  "listener": {
+    "list": { "title": "tenant:listener:list", "description": "Permission to list all listeners" },
+    "create": { "title": "tenant:listener:create", "description": "Permission to create a new listener" },
+    "read": { "title": "tenant:listener:read", "description": "Permission to read a specific listener" },
+    "update": { "title": "tenant:listener:update", "description": "Permission to update a listener" },
+    "delete": { "title": "tenant:listener:delete", "description": "Permission to delete a listener" },
+    "execute": { "title": "tenant:listener:execute", "description": "Permission to execute a listener (cross-resource binding)" }
+  },
+  "permission": {
+    "list": { "title": "tenant:permissions:list", "description": "Permission to list all permissions" }
+  },
+  "role": {
+    "list": { "title": "tenant:role:list", "description": "Permission to list all roles" },
+    "create": { "title": "tenant:role:create", "description": "Permission to create a new role" },
+    "read": { "title": "tenant:role:read", "description": "Permission to read a specific role" },
+    "update": { "title": "tenant:role:update", "description": "Permission to update a role" },
+    "delete": { "title": "tenant:role:delete", "description": "Permission to delete a role" }
+  },
+  "tenant": {
+    "read": { "title": "tenant:read", "description": "Permission to read tenant details" },
+    "update": { "title": "tenant:update", "description": "Permission to update tenant details" },
+    "delete": { "title": "tenant:delete", "description": "Permission to delete a tenant" }
+  },
+  "user": {
+    "list": { "title": "tenant:user:list", "description": "Permission to list all users in a tenant" },
+    "create": { "title": "tenant:user:create", "description": "Permission to add a user to a tenant" },
+    "read": { "title": "tenant:user:read", "description": "Permission to read a specific user in a tenant" },
+    "update": { "title": "tenant:user:update", "description": "Permission to update a user's roles in a tenant" },
+    "delete": { "title": "tenant:user:delete", "description": "Permission to remove a user from a tenant" }
+  },
+  "widget": {
+    "list": { "title": "tenant:widget:list", "description": "Permission to list all widgets" },
+    "create": { "title": "tenant:widget:create", "description": "Permission to create a new widget" },
+    "read": { "title": "tenant:widget:read", "description": "Permission to read a specific widget" },
+    "update": { "title": "tenant:widget:update", "description": "Permission to update a widget" },
+    "delete": { "title": "tenant:widget:delete", "description": "Permission to delete a widget" },
+    "execute": { "title": "tenant:widget:execute", "description": "Permission to execute a widget (cross-resource binding)" }
+  },
+  "workflow": {
+    "list": { "title": "tenant:workflow:list", "description": "Permission to list all workflows" },
+    "create": { "title": "tenant:workflow:create", "description": "Permission to create a new workflow" },
+    "read": { "title": "tenant:workflow:read", "description": "Permission to read a specific workflow" },
+    "update": { "title": "tenant:workflow:update", "description": "Permission to update a workflow" },
+    "delete": { "title": "tenant:workflow:delete", "description": "Permission to delete a workflow" },
+    "execute": { "title": "tenant:workflow:execute", "description": "Permission to execute a workflow" },
+    "test": { "title": "tenant:workflow:test", "description": "Permission to test-run a workflow" }
+  }
+}

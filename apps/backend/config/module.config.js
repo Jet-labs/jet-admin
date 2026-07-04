@@ -32,6 +32,7 @@ const moduleDependencies = {
     constants.MODULES.DATASOURCE,
   ],
   datasource: [constants.MODULES.AUTH, constants.MODULES.TENANT],
+  listener: [constants.MODULES.AUTH, constants.MODULES.TENANT],
   notification: [constants.MODULES.AUTH, constants.MODULES.TENANT],
   tenant: [constants.MODULES.AUTH],
   tenantRole: [constants.MODULES.AUTH, constants.MODULES.TENANT],

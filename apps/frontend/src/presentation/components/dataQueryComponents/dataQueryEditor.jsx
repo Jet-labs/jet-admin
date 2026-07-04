@@ -344,6 +344,28 @@ export const DataQueryEditor = ({
 
             ) : null
           )}
+
+          {/* Global Query Options */}
+          <div className="space-y-1.5 pt-4 border-t">
+            <Label htmlFor="timeoutSeconds">Timeout (Seconds)</Label>
+            <Input
+              name="timeoutSeconds"
+              id="timeoutSeconds"
+              type="number"
+              placeholder="60"
+              onChange={(e) => {
+                const val = e.target.value === "" ? undefined : Number(e.target.value);
+                dataQueryEditorForm.setFieldValue("dataQueryOptions", {
+                  ...dataQueryEditorForm.values.dataQueryOptions,
+                  timeoutSeconds: val,
+                });
+              }}
+              value={dataQueryEditorForm.values.dataQueryOptions?.timeoutSeconds ?? ""}
+            />
+            <p className="text-xs text-muted-foreground">
+              Maximum time the query is allowed to run before being aborted. Defaults to 60s.
+            </p>
+          </div>
         </div>
       </Section>
     </div>

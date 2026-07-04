@@ -1,4 +1,5 @@
 const constants = require("../constants");
+const environmentVariables = require("../environment");
 const Logger = require("./logger");
 
 const errorUtils = {};
@@ -20,7 +21,7 @@ errorUtils.extractError = (error) => {
 
     if (Array.isArray(error)) {
       errorResponse = {
-        code: "VALIDATION_ERROR",
+        code: constants.ERROR_CODES.VALIDATION_ERROR.code,
         message: error.map(formatValidationIssue).join("; "),
         details: {
           issues: error,
@@ -31,11 +32,11 @@ errorUtils.extractError = (error) => {
     // Handle JavaScript errors (TypeError, ReferenceError, etc.)
     else if (error instanceof Error) {
       errorResponse = {
-        code: error.code || "INTERNAL_ERROR",
+        code: error.code || constants.ERROR_CODES.INTERNAL_ERROR.code,
         message: error.message,
         details: {
           name: error.name,
-          ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
+          ...(environmentVariables.NODE_ENV === constants.ENVIRONMENTS.DEVELOPMENT && { stack: error.stack }),
           ...error.details,
         },
       };
@@ -43,7 +44,7 @@ errorUtils.extractError = (error) => {
     // Handle PostgreSQL-specific errors using predefined codes
     else if (error.code && constants.POSTGRES_ERROR_CODES && constants.POSTGRES_ERROR_CODES[error.code]) {
       errorResponse = {
-        code: "DB_ERROR",
+        code: constants.ERROR_CODES.DB_ERROR.code,
         message: constants.POSTGRES_ERROR_CODES[error.code],
         details: {
           postgres_code: error.code,
@@ -76,7 +77,7 @@ errorUtils.extractError = (error) => {
     // Handle primitive error values (strings, numbers)
     else {
       errorResponse = {
-        code: "UNKNOWN_ERROR",
+        code: constants.ERROR_CODES.UNKNOWN_ERROR.code,
         message: error.toString(),
       };
     }
@@ -92,7 +93,7 @@ errorUtils.extractError = (error) => {
   }
 
   // Log unhandled server errors for debugging
-  if (errorResponse.code === "SERVER_ERROR") {
+  if (errorResponse.code === constants.ERROR_CODES.SERVER_ERROR.code) {
     Logger.log("error", { message: "Unhandled error:", params: error });
   }
 

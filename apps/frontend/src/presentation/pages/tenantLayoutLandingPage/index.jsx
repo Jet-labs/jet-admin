@@ -8,7 +8,6 @@ import { TenantLogo } from "../../components/tenantComponents/tenantLogo";
 import { NoEntityUI } from "../../components/ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../../components/ui/reactQueryLoadingErrorWrapper";
 
-
 import {
   Clock,
   Database,
@@ -47,7 +46,7 @@ const TenantLayoutLandingPage = () => {
     {
       title: "Data Sources",
       icon: <Database className="w-3.5 h-3.5" />,
-      count: 0,
+      count: tenant?.tenantDatasourceCount || 0,
       description: "External data source connections",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID)),
     },
@@ -61,14 +60,14 @@ const TenantLayoutLandingPage = () => {
     {
       title: "Data Listeners",
       icon: <Radio className="w-3.5 h-3.5" />,
-      count: 0,
+      count: tenant?.tenantListenerCount || 0,
       description: "Real-time data event listeners",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_LISTENERS.path(tenantID)),
     },
     {
       title: "Workflows",
       icon: <GitBranch className="w-3.5 h-3.5" />,
-      count: 0,
+      count: tenant?.tenantWorkflowCount || 0,
       description: "Visual automation and pipelines",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_WORKFLOWS.path(tenantID)),
     },
@@ -82,7 +81,7 @@ const TenantLayoutLandingPage = () => {
     {
       title: "App Pages",
       icon: <LayoutDashboard className="w-3.5 h-3.5" />,
-      count: tenant?.tenantDashboardCount || 0,
+      count: tenant?.tenantAppPageCount || tenant?.tenantDashboardCount || 0,
       description: "Composed widget layouts and views",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_APP_PAGES.path(tenantID)),
     },

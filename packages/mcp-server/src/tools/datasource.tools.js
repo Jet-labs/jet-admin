@@ -249,11 +249,7 @@ export const datasourceTools = [
         datasourceTags: datasourceTags || [],
       });
       if (!result) throw new Error("Datasource creation returned no data.");
-      return {
-        datasourceID: result.datasourceID,
-        title: result.datasourceTitle,
-        type: result.datasourceType,
-      };
+      return result;
     },
   },
 

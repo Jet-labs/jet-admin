@@ -11,6 +11,7 @@ const {
     datasourceIdParamSchema,
     listDatasourcesQuerySchema,
 } = require("./datasource.validator");
+const { P } = require("../../config/permissions");
 
 const multer = require("multer");
 const upload = multer({
@@ -24,20 +25,20 @@ const upload = multer({
 router.get(
   "/",
   validate(listDatasourcesQuerySchema, "query"),
-  authMiddleware.authorize("datasource", "list"),
+  authMiddleware.authorize(P.datasource.list),
   datasourceController.getAllDatasources
 );
 
 router.post(
   "/test",
   validate(testConnectionSchema, "body"),
-  authMiddleware.authorize("datasource", "test"),
+  authMiddleware.authorize(P.datasource.test),
   datasourceController.testDatasourceConnection
 );
 
 router.post(
   "/upload",
-  authMiddleware.authorize("datasource", "create"),
+  authMiddleware.authorize(P.datasource.create),
   upload.single("file"),
   datasourceController.uploadFile
 );
@@ -45,7 +46,8 @@ router.post(
 router.get(
   "/:datasourceID",
   validate(datasourceIdParamSchema, "params"),
-  authMiddleware.authorize("datasource", "read", {
+  authMiddleware.authorize({
+    ...P.datasource.read,
     paramKey: "datasourceID",
   }),
   datasourceController.getDatasourceByID
@@ -54,7 +56,7 @@ router.get(
 router.post(
   "/",
   validate(createDatasourceSchema, "body"),
-  authMiddleware.authorize("datasource", "create"),
+  authMiddleware.authorize(P.datasource.create),
   datasourceController.createDatasource
 );
 
@@ -64,7 +66,8 @@ router.patch(
       params: datasourceIdParamSchema,
       body: updateDatasourceSchema,
   }),
-  authMiddleware.authorize("datasource", "update", {
+  authMiddleware.authorize({
+    ...P.datasource.update,
     paramKey: "datasourceID",
   }),
   datasourceController.updateDatasourceByID
@@ -74,8 +77,8 @@ router.post(
   "/:datasourceID/clone",
   validate(datasourceIdParamSchema, "params"),
   authMiddleware.authorize([
-    { resource: "datasource", action: "create" },
-    { resource: "datasource", action: "read", paramKey: "datasourceID" }
+    P.datasource.create,
+    { ...P.datasource.read, paramKey: "datasourceID" }
   ]),
   datasourceController.cloneDatasourceByID
 );
@@ -83,7 +86,8 @@ router.post(
 router.delete(
   "/:datasourceID",
   validate(datasourceIdParamSchema, "params"),
-  authMiddleware.authorize("datasource", "delete", {
+  authMiddleware.authorize({
+    ...P.datasource.delete,
     paramKey: "datasourceID",
   }),
   datasourceController.deleteDatasourceByID
@@ -96,7 +100,8 @@ router.post(
     params: datasourceIdParamSchema,
     body: proxyActionSchema,
   }),
-  authMiddleware.authorize("datasource", "read", {
+  authMiddleware.authorize({
+    ...P.datasource.read,
     paramKey: "datasourceID",
   }),
   datasourceController.proxyDatasourceAction

@@ -123,7 +123,7 @@ widgetController.createWidget = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       widget: result,
       message: "Widget created successfully.",
-    });
+    }, null, constants.HTTP_STATUS.CREATED);
   } catch (error) {
     Logger.log("error", {
       message: "widgetController:createWidget:catch-1",
@@ -409,17 +409,29 @@ widgetController.serveFile = async (req, res) => {
   try {
     const filePath = req.query.path;
     if (!filePath) {
-      return res.status(400).send("Path is required");
+      Logger.log("error", {
+        message: "widgetController:serveFile:missingPath",
+        params: { tenantID: req.params.tenantID },
+      });
+      return expressUtils.sendResponse(res, false, {}, { code: "INVALID_REQUEST", message: "Path is required" });
     }
 
     const tenantID = req.params.tenantID;
     if (!tenantID) {
-      return res.status(400).send("Tenant ID is required");
+      Logger.log("error", {
+        message: "widgetController:serveFile:missingTenant",
+        params: {},
+      });
+      return expressUtils.sendResponse(res, false, {}, { code: "INVALID_REQUEST", message: "Tenant ID is required" });
     }
 
     const expectedPrefix = `${constants.STORAGE.FOLDERS.WIDGET_FILES}/${tenantID}/`;
     if (!filePath.startsWith(expectedPrefix)) {
-      return res.status(403).send("Forbidden: Invalid file path for this tenant");
+      Logger.log("error", {
+        message: "widgetController:serveFile:invalidPath",
+        params: { tenantID, filePath },
+      });
+      return expressUtils.sendResponse(res, false, {}, { code: "PERMISSION_DENIED", message: "Forbidden: Invalid file path for this tenant" });
     }
 
     const bucketName = environmentVariables.SUPABASE_S3_BUCKET || constants.STORAGE.BUCKETS.DATASOURCE_FILE_UPLOADS;
@@ -436,7 +448,7 @@ widgetController.serveFile = async (req, res) => {
       message: "widgetController:serveFile:error",
       params: { error: error.message || error },
     });
-    res.status(404).send("File not found");
+    return expressUtils.sendResponse(res, false, {}, error);
   }
 };
 

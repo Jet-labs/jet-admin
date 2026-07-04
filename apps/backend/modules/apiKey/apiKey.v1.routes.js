@@ -8,25 +8,27 @@ const {
     updateApiKeySchema,
     apiKeyIdParamSchema,
 } = require("./apiKey.validator");
+const { P } = require("../../config/permissions");
 
 // Database APIKey routes
 router.get(
   "/",
-  authMiddleware.authorize("apikey", "list"),
+  authMiddleware.authorize(P.apikey.list),
   apiKeyController.getAllAPIKeys
 );
 
 router.post(
   "/",
   validate(createApiKeySchema, "body"),
-  authMiddleware.authorize("apikey", "create"),
+  authMiddleware.authorize(P.apikey.create),
   apiKeyController.createAPIKey
 );
 
 router.get(
   "/:apiKeyID",
   validate(apiKeyIdParamSchema, "params"),
-  authMiddleware.authorize("apikey", "read", {
+  authMiddleware.authorize({
+    ...P.apikey.read,
     paramKey: "apiKeyID",
   }),
   apiKeyController.getAPIKeyByID
@@ -38,7 +40,8 @@ router.patch(
       params: apiKeyIdParamSchema,
       body: updateApiKeySchema,
   }),
-  authMiddleware.authorize("apikey", "update", {
+  authMiddleware.authorize({
+    ...P.apikey.update,
     paramKey: "apiKeyID",
   }),
   apiKeyController.updateAPIKeyByID
@@ -47,7 +50,8 @@ router.patch(
 router.delete(
   "/:apiKeyID",
   validate(apiKeyIdParamSchema, "params"),
-  authMiddleware.authorize("apikey", "delete", {
+  authMiddleware.authorize({
+    ...P.apikey.delete,
     paramKey: "apiKeyID",
   }),
   apiKeyController.deleteAPIKeyByID
@@ -57,8 +61,8 @@ router.post(
   "/:apiKeyID/clone",
   validate(apiKeyIdParamSchema, "params"),
   authMiddleware.authorize([
-    { resource: "apikey", action: "create" },
-    { resource: "apikey", action: "read", paramKey: "apiKeyID" }
+    P.apikey.create,
+    { ...P.apikey.read, paramKey: "apiKeyID" }
   ]),
   apiKeyController.cloneAPIKey
 );

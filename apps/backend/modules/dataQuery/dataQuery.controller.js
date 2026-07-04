@@ -1,3 +1,4 @@
+const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { dataQueryService } = require("./dataQuery.service");
@@ -121,8 +122,9 @@ dataQueryController.createDataQuery = async (req, res) => {
     });
 
     return expressUtils.sendResponse(res, true, {
+      dataQuery: result,
       message: "Query created successfully.",
-    });
+    }, null, constants.HTTP_STATUS.CREATED);
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryController:createDataQuery:catch-1",
@@ -174,7 +176,7 @@ dataQueryController.createBulkDataQuery = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       dataQueries,
       message: "Queries created successfully.",
-    });
+    }, null, constants.HTTP_STATUS.CREATED);
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryController:createBulkDataQuery:catch-1",

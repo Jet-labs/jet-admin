@@ -66,19 +66,19 @@ async function handleTaskResult(result) {
 
   // ── Step 1: write the execution log row — exactly once ────────────────────
   try {
-    if (status === 'success') {
+    if (status === constants.WORKFLOW_STATUS.SUCCESS) {
       const payload = _buildLogPayload({ nodeID, nodeType, outputVariable, output, status });
       await stateManager.logEvent({
         instanceID,
         nodeID,
         eventType: constants.WORKFLOW_LOG_EVENT_TYPES.NODE_COMPLETED,
-        nodeStatus: 'success',
+        nodeStatus: constants.WORKFLOW_STATUS.SUCCESS,
         outputVariable: outputVariable || null,
         payload,
         nodeAttempt,
       });
 
-    } else if (status === 'suspended') {
+    } else if (status === constants.WORKFLOW_STATUS.SUSPENDED) {
       // ── Suspended: workflow is waiting for human input ──────────────────
       // Check first whether a PENDING request already exists (idempotency on
       // pg-boss at-least-once re-delivery; avoids duplicate DB records).
@@ -121,7 +121,7 @@ async function handleTaskResult(result) {
         instanceID,
         nodeID,
         eventType: constants.WORKFLOW_LOG_EVENT_TYPES.NODE_SUSPENDED,
-        nodeStatus: 'suspended',
+        nodeStatus: constants.WORKFLOW_STATUS.SUSPENDED,
         payload: { collectionRequestID: request.collectionRequestID },
         nodeAttempt,
       });
@@ -151,7 +151,7 @@ async function handleTaskResult(result) {
         instanceID,
         nodeID,
         eventType: constants.WORKFLOW_LOG_EVENT_TYPES.NODE_FAILED,
-        nodeStatus: 'error',
+        nodeStatus: constants.WORKFLOW_STATUS.ERROR,
         payload: {},
         errorMessage: taskError || 'Unknown error',
         nodeAttempt,

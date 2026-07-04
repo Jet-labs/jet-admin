@@ -42,7 +42,7 @@ const { resolveTemplate } = require("@jet-admin/expression-engine");
 const WORKFLOW_TEMPLATE_OPTIONS = {
   preserveSingleExpressionType: true,
 };
-const dataQueryHandler = require('../../../modules/workflow/workers/handlers/dataQueryHandler');
+const dataQueryHandler = require('../../../modules/workflow/handlers/dataQueryHandler');
 
 jest.mock('../../../utils/authorizedProxy', () => ({
   authorizedExecuteDataQuery: jest.fn()

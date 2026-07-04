@@ -19,20 +19,30 @@ const require = createRequire(import.meta.url);
 const dotenv = require("dotenv");
 dotenv.config({ path: resolve(__dirname, "../.env") });
 
-function requireEnv(name) {
-  const value = process.env[name];
+function requireEnv(name, fallbackName) {
+  const value = process.env[name] || (fallbackName ? process.env[fallbackName] : undefined);
   if (!value || value.trim() === "") {
+    const fallbackMsg = fallbackName ? ` or ${fallbackName}` : "";
     throw new Error(
-      `[jet-admin-mcp] Missing required environment variable: ${name}\n` +
-        `  Copy .env.example to .env and fill in your values.`
+      `[jet-admin-mcp] Missing required environment variable: ${name}${fallbackMsg}\n` +
+        `  Copy .env.example to .env and fill in your values, or pass it via MCP server client configuration.`
     );
   }
   return value.trim();
 }
 
+function optionalEnv(name, fallbackName) {
+  const value = process.env[name] || (fallbackName ? process.env[fallbackName] : undefined);
+  if (!value || value.trim() === "") return null;
+  return value.trim();
+}
+
 export const config = {
   /** Base URL of the Jet Admin backend (e.g. http://localhost:5000) */
-  baseUrl: requireEnv("JET_ADMIN_MCP_BASE_URL").trim().replace(/\/+$/, ""),
+  baseUrl: requireEnv("JET_ADMIN_MCP_BASE_URL", "JET_ADMIN_BASE_URL").replace(/\/+$/, ""),
+
+  /** Optional: explicit frontend URL for preview links (e.g. http://localhost:3000) */
+  frontendUrl: optionalEnv("JET_ADMIN_FRONTEND_URL")?.replace(/\/+$/, "") ?? null,
 
   /** HTTP request timeout in milliseconds */
   timeout: (() => {

@@ -19,7 +19,7 @@
  *   src/modules/workflow/orchestrator/orchestrator.js
  *   src/modules/workflow/orchestrator/stateManager.js
  *   src/modules/workflow/orchestrator/dagScheduler.js
- *   src/modules/workflow/workers/handlers/index.js
+ *   src/modules/workflow/handlers/index.js
  *   src/config/prisma.config.js
  *   src/config/queue.config.js
  *   src/config/socket.io.js
@@ -74,7 +74,7 @@ jest.mock('../../utils/logger', () => ({
 
 // ─── Register test-only handlers BEFORE importing orchestrator ────────────────
 
-const { handlers } = require('../../modules/workflow/workers/handlers');
+const { handlers } = require('../../modules/workflow/handlers');
 
 // __echo: returns echoOutput via echoHandle, supports joinMode in nodeConfig
 handlers['__echo'] = {

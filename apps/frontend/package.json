@@ -11,6 +11,7 @@
     "deploy": "npm run build && firebase deploy --only hosting"
   },
   "dependencies": {
+    "@ai-sdk/react": "^4.0.16",
     "@babel/standalone": "^7.28.1",
     "@codemirror/autocomplete": "^6.20.0",
     "@codemirror/commands": "^6.10.2",
@@ -66,6 +67,7 @@
     "@uiw/codemirror-theme-github": "^4.23.7",
     "@uiw/codemirror-theme-vscode": "^4.23.7",
     "@uiw/react-codemirror": "^4.23.7",
+    "ai": "^7.0.15",
     "axios": "^1.18.1",
     "chartjs-plugin-autocolors": "^0.3.1",
     "class-variance-authority": "^0.7.1",

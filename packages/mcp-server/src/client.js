@@ -181,8 +181,11 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
     test: (dataQueryID, body = {}) =>
       call(() => http.post(`${T}/queries/${dataQueryID}/queryTest`, body)),
 
-    testByData: (body) =>
-      call(() => http.patch(`${T}/queries/queryTest`, body)),
+    testByData: ({ datasourceID, datasourceType, dataQueryOptions, inputValues }) =>
+      call(() => http.patch(`${T}/queries/queryTest`, {
+        dataQuery: { datasourceID, datasourceType, dataQueryOptions },
+        inputValues,
+      })),
   };
 
   // ─── Listener API ────────────────────────────────────────────────────────

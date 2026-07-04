@@ -25,68 +25,69 @@ const {
   updateListenerActionSchema,
   listListenersQuerySchema,
 } = require("./listener.validator");
+const { P } = require("../../config/permissions");
 
 const router = express.Router({ mergeParams: true });
 
 // Connection status (must be before :listenerID param route)
-router.get('/status/connections', authMiddleware.authorize('listener', 'read'), listenerController.getConnectionStatus);
+router.get('/status/connections', authMiddleware.authorize(P.listener.read), listenerController.getConnectionStatus);
 
 // Listener CRUD
-router.get('/', validate(listListenersQuerySchema, 'query'), authMiddleware.authorize('listener', 'list'), listenerController.getAllListeners);
+router.get('/', validate(listListenersQuerySchema, 'query'), authMiddleware.authorize(P.listener.list), listenerController.getAllListeners);
 
 router.post('/',
   validate(createListenerSchema, 'body'),
   listenerMiddleware.extractListenerPipelinePermissions,
   authMiddleware.authorize([
-    { resource: 'listener', action: 'create' },
-    { resource: 'datasource', action: 'read', bodyKey: 'datasourceID' },
-    { resource: 'workflow', action: 'execute', reqKey: 'workflowIDs', skipIfMissing: true },
-    { resource: 'dataquery', action: 'execute', reqKey: 'dataQueryIDs', skipIfMissing: true }
+    P.listener.create,
+    { ...P.datasource.read, bodyKey: 'datasourceID' },
+    { ...P.workflow.execute, reqKey: 'workflowIDs', skipIfMissing: true },
+    { ...P.dataquery.execute, reqKey: 'dataQueryIDs', skipIfMissing: true }
   ]),
   listenerController.createListener
 );
 
-router.get('/:listenerID', authMiddleware.authorize('listener', 'read', { paramKey: 'listenerID' }), listenerController.getListenerByID);
+router.get('/:listenerID', authMiddleware.authorize({ ...P.listener.read, paramKey: 'listenerID' }), listenerController.getListenerByID);
 
 router.put('/:listenerID',
   validate(updateListenerSchema, 'body'),
   listenerMiddleware.extractListenerPipelinePermissions,
   authMiddleware.authorize([
-    { resource: 'listener', action: 'update', paramKey: 'listenerID' },
-    { resource: 'datasource', action: 'read', bodyKey: 'datasourceID', skipIfMissing: true },
-    { resource: 'workflow', action: 'execute', reqKey: 'workflowIDs', skipIfMissing: true },
-    { resource: 'dataquery', action: 'execute', reqKey: 'dataQueryIDs', skipIfMissing: true }
+    { ...P.listener.update, paramKey: 'listenerID' },
+    { ...P.datasource.read, bodyKey: 'datasourceID', skipIfMissing: true },
+    { ...P.workflow.execute, reqKey: 'workflowIDs', skipIfMissing: true },
+    { ...P.dataquery.execute, reqKey: 'dataQueryIDs', skipIfMissing: true }
   ]),
   listenerController.updateListener
 );
 
-router.delete('/:listenerID', authMiddleware.authorize('listener', 'delete', { paramKey: 'listenerID' }), listenerController.deleteListener);
+router.delete('/:listenerID', authMiddleware.authorize({ ...P.listener.delete, paramKey: 'listenerID' }), listenerController.deleteListener);
 
 router.post('/:listenerID/clone',
   listenerMiddleware.resolveListenerClonePermissionsFromDB,
   authMiddleware.authorize([
-    { resource: 'listener', action: 'create' },
-    { resource: 'listener', action: 'read', paramKey: 'listenerID' },
-    { resource: 'datasource', action: 'read', reqKey: 'datasourceID', skipIfMissing: true },
-    { resource: 'workflow', action: 'execute', reqKey: 'workflowIDs', skipIfMissing: true },
-    { resource: 'dataquery', action: 'execute', reqKey: 'dataQueryIDs', skipIfMissing: true }
+    P.listener.create,
+    { ...P.listener.read, paramKey: 'listenerID' },
+    { ...P.datasource.read, reqKey: 'datasourceID', skipIfMissing: true },
+    { ...P.workflow.execute, reqKey: 'workflowIDs', skipIfMissing: true },
+    { ...P.dataquery.execute, reqKey: 'dataQueryIDs', skipIfMissing: true }
   ]),
   listenerController.cloneListener
 );
 
 
 // Lifecycle
-router.post('/:listenerID/activate', authMiddleware.authorize('listener', 'update', { paramKey: 'listenerID' }), listenerController.activateListener);
-router.post('/:listenerID/deactivate', authMiddleware.authorize('listener', 'update', { paramKey: 'listenerID' }), listenerController.deactivateListener);
+router.post('/:listenerID/activate', authMiddleware.authorize({ ...P.listener.update, paramKey: 'listenerID' }), listenerController.activateListener);
+router.post('/:listenerID/deactivate', authMiddleware.authorize({ ...P.listener.update, paramKey: 'listenerID' }), listenerController.deactivateListener);
 
 // Actions
 router.post('/:listenerID/actions',
   validate(addListenerActionSchema, 'body'),
   listenerMiddleware.extractListenerPipelinePermissions,
   authMiddleware.authorize([
-    { resource: 'listener', action: 'update', paramKey: 'listenerID' },
-    { resource: 'workflow', action: 'execute', reqKey: 'workflowIDs', skipIfMissing: true },
-    { resource: 'dataquery', action: 'execute', reqKey: 'dataQueryIDs', skipIfMissing: true }
+    { ...P.listener.update, paramKey: 'listenerID' },
+    { ...P.workflow.execute, reqKey: 'workflowIDs', skipIfMissing: true },
+    { ...P.dataquery.execute, reqKey: 'dataQueryIDs', skipIfMissing: true }
   ]),
   listenerController.addAction
 );
@@ -95,14 +96,14 @@ router.put('/:listenerID/actions/:actionID',
   validate(updateListenerActionSchema, 'body'),
   listenerMiddleware.extractListenerPipelinePermissions,
   authMiddleware.authorize([
-    { resource: 'listener', action: 'update', paramKey: 'listenerID' },
-    { resource: 'workflow', action: 'execute', reqKey: 'workflowIDs', skipIfMissing: true },
-    { resource: 'dataquery', action: 'execute', reqKey: 'dataQueryIDs', skipIfMissing: true }
+    { ...P.listener.update, paramKey: 'listenerID' },
+    { ...P.workflow.execute, reqKey: 'workflowIDs', skipIfMissing: true },
+    { ...P.dataquery.execute, reqKey: 'dataQueryIDs', skipIfMissing: true }
   ]),
   listenerController.updateAction
 );
 
-router.delete('/:listenerID/actions/:actionID', authMiddleware.authorize('listener', 'update', { paramKey: 'listenerID' }), listenerController.deleteAction);
+router.delete('/:listenerID/actions/:actionID', authMiddleware.authorize({ ...P.listener.update, paramKey: 'listenerID' }), listenerController.deleteAction);
 
 
 module.exports = router;

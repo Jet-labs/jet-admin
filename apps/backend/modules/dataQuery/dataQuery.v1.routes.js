@@ -12,13 +12,14 @@ const {
   dataQueryIdParamSchema,
   listDataQueriesQuerySchema,
 } = require("./dataQuery.validator");
+const { P } = require("../../config/permissions");
 
 // Database query routes
 
 router.get(
   "/",
   validate(listDataQueriesQuerySchema, "query"),
-  authMiddleware.authorize("dataquery", "list"),
+  authMiddleware.authorize(P.dataquery.list),
   dataQueryController.getAllDataQueries
 );
 
@@ -27,13 +28,9 @@ router.post(
   validate(createDataQuerySchema, "body"),
   authMiddleware.authProvider,
   authMiddleware.authorize([
+    P.dataquery.create,
     {
-      resource: "dataquery",
-      action: "create",
-    },
-    {
-      resource: "datasource",
-      action: "read",
+      ...P.datasource.read,
       bodyKey: "datasourceID",
     }
   ]),
@@ -45,9 +42,9 @@ router.post(
   validate(dataQueryIdParamSchema, "params"),
   dataQueryMiddleware.resolveDatasourceIDFromDB,
   authMiddleware.authorize([
-    { resource: "dataquery", action: "create" },
-    { resource: "dataquery", action: "read", paramKey: "dataQueryID" },
-    { resource: "datasource", action: "read", reqKey: "datasourceID", skipIfMissing: true }
+    P.dataquery.create,
+    { ...P.dataquery.read, paramKey: "dataQueryID" },
+    { ...P.datasource.read, reqKey: "datasourceID", skipIfMissing: true }
   ]),
   dataQueryController.cloneDataQueryByID
 );
@@ -57,8 +54,8 @@ router.patch(
   "/queryTest",
   validate(testDataQuerySchema, "body"),
   authMiddleware.authorize([
-    { resource: "dataquery", action: "test" },
-    { resource: "datasource", action: "read", bodyKey: "datasourceID" }
+    P.dataquery.test,
+    { ...P.datasource.read, bodyKey: "dataQuery.datasourceID" }
   ]),
   dataQueryController.runDataQueryByData
 );
@@ -66,7 +63,8 @@ router.patch(
 router.get(
   "/:dataQueryID",
   validate(dataQueryIdParamSchema, "params"),
-  authMiddleware.authorize("dataquery", "read", {
+  authMiddleware.authorize({
+    ...P.dataquery.read,
     paramKey: "dataQueryID",
   }),
   dataQueryController.getDataQueryByID
@@ -78,7 +76,8 @@ router.post(
     params: dataQueryIdParamSchema,
     body: runDataQueryByIDSchema,
   }),
-  authMiddleware.authorize("dataquery", "test", {
+  authMiddleware.authorize({
+    ...P.dataquery.test,
     paramKey: "dataQueryID",
   }),
   dataQueryController.runDataQueryByID
@@ -90,7 +89,8 @@ router.post(
     params: dataQueryIdParamSchema,
     body: runDataQueryByIDSchema,
   }),
-  authMiddleware.authorize("dataquery", "execute", {
+  authMiddleware.authorize({
+    ...P.dataquery.execute,
     paramKey: "dataQueryID",
   }),
   dataQueryController.runDataQueryByID
@@ -104,13 +104,11 @@ router.patch(
   }),
   authMiddleware.authorize([
     {
-      resource: "dataquery",
-      action: "update",
+      ...P.dataquery.update,
       paramKey: "dataQueryID",
     },
     {
-      resource: "datasource",
-      action: "read",
+      ...P.datasource.read,
       bodyKey: "datasourceID",
       skipIfMissing: true,
     }
@@ -121,7 +119,8 @@ router.patch(
 router.delete(
   "/:dataQueryID",
   validate(dataQueryIdParamSchema, "params"),
-  authMiddleware.authorize("dataquery", "delete", {
+  authMiddleware.authorize({
+    ...P.dataquery.delete,
     paramKey: "dataQueryID",
   }),
   dataQueryController.deleteDataQueryByID

@@ -16,13 +16,14 @@ const {
   instanceIdParamSchema,
   listWorkflowsQuerySchema,
 } = require("./workflow.validator");
-const dataCollectionRoutes = require("./dataCollection/dataController.route");
+const { P } = require("../../config/permissions");
+const dataCollectionRoutes = require("./dataCollection/dataCollection.v1.routes");
 
 // List all workflows
 router.get(
   "/",
   validate(listWorkflowsQuerySchema, "query"),
-  authMiddleware.authorize("workflow", "list"),
+  authMiddleware.authorize(P.workflow.list),
   workflowController.getAllWorkflows
 );
 
@@ -32,8 +33,8 @@ router.post(
   validate(createWorkflowSchema, "body"),
   workflowMiddleware.extractWorkflowDataQueryIDs,
   authMiddleware.authorize([
-    { resource: "workflow", action: "create" },
-    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true }
+    P.workflow.create,
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true }
   ]),
   workflowController.createWorkflow
 );
@@ -42,7 +43,7 @@ router.post(
 router.get(
   "/:workflowID",
   validate(workflowIdParamSchema, "params"),
-  authMiddleware.authorize("workflow", "read", { paramKey: "workflowID" }),
+  authMiddleware.authorize({ ...P.workflow.read, paramKey: "workflowID" }),
   workflowController.getWorkflowByID
 );
 
@@ -55,8 +56,8 @@ router.patch(
   }),
   workflowMiddleware.extractWorkflowDataQueryIDs,
   authMiddleware.authorize([
-    { resource: "workflow", action: "update", paramKey: "workflowID" },
-    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true }
+    { ...P.workflow.update, paramKey: "workflowID" },
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true }
   ]),
   workflowController.updateWorkflow
 );
@@ -65,7 +66,7 @@ router.patch(
 router.delete(
   "/:workflowID",
   validate(workflowIdParamSchema, "params"),
-  authMiddleware.authorize("workflow", "delete", { paramKey: "workflowID" }),
+  authMiddleware.authorize({ ...P.workflow.delete, paramKey: "workflowID" }),
   workflowController.deleteWorkflow
 );
 
@@ -75,9 +76,9 @@ router.post(
   validate(workflowIdParamSchema, "params"),
   workflowMiddleware.resolveWorkflowDataQueryIDsFromDB,
   authMiddleware.authorize([
-    { resource: "workflow", action: "create" },
-    { resource: "workflow", action: "read", paramKey: "workflowID" },
-    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true }
+    P.workflow.create,
+    { ...P.workflow.read, paramKey: "workflowID" },
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true }
   ]),
   workflowController.cloneWorkflow
 );
@@ -90,7 +91,7 @@ router.post(
     params: workflowIdParamSchema,
     body: executeWorkflowSchema,
   }),
-  authMiddleware.authorize("workflow", "execute", { paramKey: "workflowID" }),
+  authMiddleware.authorize({ ...P.workflow.execute, paramKey: "workflowID" }),
   workflowController.executeWorkflow
 );
 
@@ -99,7 +100,7 @@ router.get(
   "/instances/:instanceID",
   validate(instanceIdParamSchema, "params"),
   workflowMiddleware.resolveWorkflowIDFromInstance,
-  authMiddleware.authorize("workflow", "read", { reqKey: "workflowID" }),
+  authMiddleware.authorize({ ...P.workflow.read, reqKey: "workflowID" }),
   workflowController.getRunStatus
 );
 
@@ -109,8 +110,8 @@ router.post(
   validate(testWorkflowSchema, "body"),
   workflowMiddleware.extractWorkflowDataQueryIDs,
   authMiddleware.authorize([
-    { resource: "workflow", action: "test" },
-    { resource: "dataquery", action: "execute", reqKey: "dataQueryIDs", skipIfMissing: true }
+    P.workflow.test,
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true }
   ]),
   workflowController.testWorkflow
 );
@@ -120,7 +121,7 @@ router.delete(
   "/instances/:instanceID/stop",
   validate(instanceIdParamSchema, "params"),
   workflowMiddleware.resolveWorkflowIDFromInstance,
-  authMiddleware.authorize("workflow", "execute", { reqKey: "workflowID" }),
+  authMiddleware.authorize({ ...P.workflow.execute, reqKey: "workflowID" }),
   workflowController.stopTestWorkflow
 );
 
@@ -129,7 +130,7 @@ router.post(
   "/instances/:instanceID/widget",
   validate(instanceIdParamSchema, "params"),
   workflowMiddleware.resolveWorkflowIDFromInstance,
-  authMiddleware.authorize("workflow", "read", { reqKey: "workflowID" }),
+  authMiddleware.authorize({ ...P.workflow.read, reqKey: "workflowID" }),
   workflowController.getRunStatusForWidget
 );
 

@@ -94,6 +94,10 @@ const PERMISSION_MAP = {
   "tenant:widget": { resource: "widget", action: "*" },
   "tenant:apppage": { resource: "appPage", action: "*" },
   "tenant:audit": { resource: "audit", action: "*" },
+  "tenant:ai": { resource: "ai", action: "*" },
+  "tenant:ai:chat": { resource: "ai", action: "chat" },
+  "tenant:ai:read": { resource: "ai", action: "read" },
+  "tenant:ai:delete": { resource: "ai", action: "delete" },
 };
 
 async function main() {

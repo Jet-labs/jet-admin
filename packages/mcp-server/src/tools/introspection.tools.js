@@ -235,4 +235,63 @@ export const introspectionTools = [
       return { query, totalMatches: matches.length, results: matches };
     },
   },
+  {
+    name: "get_asset_schemas",
+    description:
+      "Get the JSON schema configurations expected for Jet Admin resources (e.g. widgetConfig, appPageConfig, dataQueryOptions, listenerConfig). " +
+      "Use this to understand what properties must be provided when creating or updating these assets.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        assetType: {
+          type: "string",
+          enum: ["widget", "appPage", "dataQuery", "listener"],
+          description: "The type of asset to get the schema for."
+        }
+      },
+      required: ["assetType"]
+    },
+    handler: async ({ assetType }) => {
+      const schemas = {
+        widget: {
+          description: "widgetConfig defines the visual and behavior properties of a widget. It varies heavily by widgetType.",
+          commonProperties: {
+            properties: "Object containing visual configuration (e.g. { layout: { w, h, x, y } }).",
+            events: "Object containing event handlers (e.g. { onClick: { action: 'runQuery', queryId: '...' } })."
+          },
+          examples: {
+            table: { properties: { columns: [{ field: "id", title: "ID" }] } },
+            chart: { properties: { chartType: "bar", xAxis: "date", yAxis: "count" } }
+          }
+        },
+        appPage: {
+          description: "appPageConfig defines the layout and bindings of a dashboard page.",
+          schema: {
+            layout: { type: "string", description: "'grid' or 'flex'" },
+            widgets: { type: "array", description: "Array of widget layout configurations [{ widgetID, layout: { x, y, w, h } }]" },
+            dataSources: { type: "array", description: "Array of query/listener bindings for the page" }
+          }
+        },
+        dataQuery: {
+          description: "dataQueryOptions defines the query execution parameters. Varies by datasource type.",
+          examples: {
+            postgresql: { sql: "SELECT * FROM users WHERE status = {{status}}" },
+            restapi: { method: "GET", path: "/users", headers: { "Authorization": "Bearer {{token}}" } }
+          }
+        },
+        listener: {
+          description: "listenerConfig defines the connection parameters for real-time streaming.",
+          examples: {
+            websocket: { url: "wss://example.com/stream" },
+            kafka: { topic: "events", groupId: "jet-admin" }
+          }
+        }
+      };
+
+      if (!schemas[assetType]) {
+        throw new Error(`Schema not found for assetType: ${assetType}`);
+      }
+      return schemas[assetType];
+    }
+  }
 ];

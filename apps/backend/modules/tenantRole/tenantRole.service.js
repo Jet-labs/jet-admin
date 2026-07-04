@@ -2,6 +2,7 @@ const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const constants = require("../../constants");
 const { addPolicy, removePoliciesForRole, reloadPolicies } = require("../../config/casbin.config");
+const { PERMISSION_MAP } = require("../../config/permissions");
 
 const tenantRoleService = {};
 
@@ -414,98 +415,6 @@ tenantRoleService.deleteTenantRoleByID = async ({ tenantID, roleID }) => {
     });
     throw error;
   }
-};
-
-const PERMISSION_MAP = {
-  // Data queries
-  "tenant:dataquery:list": { resource: "dataquery", action: "list" },
-  "tenant:dataquery:create": { resource: "dataquery", action: "create" },
-  "tenant:dataquery:read": { resource: "dataquery", action: "read" },
-  "tenant:dataquery:update": { resource: "dataquery", action: "update" },
-  "tenant:dataquery:delete": { resource: "dataquery", action: "delete" },
-  "tenant:dataquery:test": { resource: "dataquery", action: "test" },
-  "tenant:dataquery:execute": { resource: "dataquery", action: "execute" },
-  
-  // Legacy/Alternative data query permissions in DB
-  "tenant:database:query:list": { resource: "dataquery", action: "list" },
-  "tenant:database:query:create": { resource: "dataquery", action: "create" },
-  "tenant:database:query:read": { resource: "dataquery", action: "read" },
-  "tenant:database:query:update": { resource: "dataquery", action: "update" },
-  "tenant:database:query:delete": { resource: "dataquery", action: "delete" },
-  "tenant:database:query:test": { resource: "dataquery", action: "test" },
-  "tenant:query:bulk:create": { resource: "dataquery", action: "create" },
-  "tenant:query:clone": { resource: "dataquery", action: "clone" },
-
-  // Workflows
-  "tenant:workflow:list": { resource: "workflow", action: "list" },
-  "tenant:workflow:create": { resource: "workflow", action: "create" },
-  "tenant:workflow:read": { resource: "workflow", action: "read" },
-  "tenant:workflow:update": { resource: "workflow", action: "update" },
-  "tenant:workflow:delete": { resource: "workflow", action: "delete" },
-  "tenant:workflow:execute": { resource: "workflow", action: "execute" },
-
-  // App pages
-  "tenant:apppage:list": { resource: "appPage", action: "list" },
-  "tenant:apppage:create": { resource: "appPage", action: "create" },
-  "tenant:apppage:read": { resource: "appPage", action: "read" },
-  "tenant:apppage:update": { resource: "appPage", action: "update" },
-  "tenant:apppage:delete": { resource: "appPage", action: "delete" },
-  "tenant:apppage:clone": { resource: "appPage", action: "clone" },
-
-  // Datasources
-  "tenant:datasource:list": { resource: "datasource", action: "list" },
-  "tenant:datasource:create": { resource: "datasource", action: "create" },
-  "tenant:datasource:read": { resource: "datasource", action: "read" },
-  "tenant:datasource:update": { resource: "datasource", action: "update" },
-  "tenant:datasource:delete": { resource: "datasource", action: "delete" },
-  "tenant:datasource:test": { resource: "datasource", action: "test" },
-
-  // Widgets
-  "tenant:widget:list": { resource: "widget", action: "list" },
-  "tenant:widget:create": { resource: "widget", action: "create" },
-  "tenant:widget:read": { resource: "widget", action: "read" },
-  "tenant:widget:update": { resource: "widget", action: "update" },
-  "tenant:widget:delete": { resource: "widget", action: "delete" },
-  "tenant:widget:clone": { resource: "widget", action: "clone" },
-
-  // Listeners
-  "tenant:listener:list": { resource: "listener", action: "list" },
-  "tenant:listener:create": { resource: "listener", action: "create" },
-  "tenant:listener:read": { resource: "listener", action: "read" },
-  "tenant:listener:update": { resource: "listener", action: "update" },
-  "tenant:listener:delete": { resource: "listener", action: "delete" },
-
-  // Users
-  "tenant:user:list": { resource: "user", action: "list" },
-  "tenant:user:create": { resource: "user", action: "create" },
-  "tenant:user:read": { resource: "user", action: "read" },
-  "tenant:user:update": { resource: "user", action: "update" },
-  "tenant:user:delete": { resource: "user", action: "delete" },
-
-  // Roles & Permissions
-  "tenant:role:list": { resource: "role", action: "list" },
-  "tenant:role:create": { resource: "role", action: "create" },
-  "tenant:role:read": { resource: "role", action: "read" },
-  "tenant:role:update": { resource: "role", action: "update" },
-  "tenant:role:delete": { resource: "role", action: "delete" },
-  "tenant:permissions:list": { resource: "permission", action: "list" },
-
-  // Tenant / general fallbacks
-  "tenant:read": { resource: "tenant", action: "read" },
-  "tenant:update": { resource: "tenant", action: "update" },
-  "tenant:delete": { resource: "tenant", action: "delete" },
-
-  // Legacy/Wildcard fallbacks
-  "tenant:user": { resource: "user", action: "*" },
-  "tenant:role": { resource: "role", action: "*" },
-  "tenant:apikey": { resource: "apikey", action: "*" },
-  "tenant:cronjobs": { resource: "cronjob", action: "*" },
-  "tenant:datasource": { resource: "datasource", action: "*" },
-  "tenant:query": { resource: "dataquery", action: "*" },
-  "tenant:workflow": { resource: "workflow", action: "*" },
-  "tenant:widget": { resource: "widget", action: "*" },
-  "tenant:apppage": { resource: "appPage", action: "*" },
-  "tenant:audit": { resource: "audit", action: "*" },
 };
 
 tenantRoleService.syncRolePolicies = async (roleID, tenantID) => {

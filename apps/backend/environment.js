@@ -2,8 +2,6 @@ const dotenv = require("dotenv");
 const path = require("path");
 const constants = require("./constants");
 const p = path.resolve(__dirname, `.env`);
-console.log("setting path for environment...", p);
-console.log("setting up environment variables...");
 dotenv.config({
   path: p,
 });
@@ -18,8 +16,6 @@ const environmentVariables = {
   DATABASE_URL: process.env.DATABASE_URL,
   UNPOOLED_DATABASE_URL: process.env.UNPOOLED_DATABASE_URL,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || process.env.OPEROUTER_API_KEY,
-  GROQ_API_KEY: process.env.GROQ_API_KEY || process.env.OPENROUTER_API_KEY,
   SYSLOG_HOST: process.env.SYSLOG_HOST || "127.0.0.1",
   SYSLOG_PORT: process.env.SYSLOG_PORT || 514,
   SYSLOG_PROTOCOL: process.env.SYSLOG_PROTOCOL || "udp4",
@@ -48,17 +44,14 @@ const environmentVariables = {
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   BACKEND_URL: process.env.BACKEND_URL,
   NVIDIA_API_KEY: process.env.NVIDIA_API_KEY,
+  AI_BASE_URL: process.env.AI_BASE_URL,
+  AI_MODEL: process.env.AI_MODEL,
+  /** Port the standalone apps/mcp-server listens on (default 5001) */
+  MCP_SERVER_PORT: parseInt(process.env.MCP_SERVER_PORT || '5001', 10),
   JET_ADMIN_INTERNAL_API_KEY: process.env.JET_ADMIN_INTERNAL_API_KEY,
   VAULT_ENCRYPTION_KEY: process.env.VAULT_ENCRYPTION_KEY,
-  OAUTH_STATE_SECRET: process.env.OAUTH_STATE_SECRET || process.env.VAULT_ENCRYPTION_KEY,
+  OAUTH_STATE_SECRET: process.env.OAUTH_STATE_SECRET,
   FIREBASE_CREDENTIALS: process.env.FIREBASE_CREDENTIALS,
 };
-console.log("environment variables set-----------------------------");
-const safeEnv = { ...environmentVariables };
-for (const key of Object.keys(safeEnv)) {
-  if (key.includes('KEY') || key.includes('SUPABASE_S3_ENDPOINT') || key.includes('SUPABASE_S3_BUCKET') || key.includes('SECRET') || key.includes('URL') || key.includes('TOKEN') || key.includes('PASSWORD')) {
-    safeEnv[key] = '***';
-  }
-}
-console.log(safeEnv);
+
 module.exports = environmentVariables;

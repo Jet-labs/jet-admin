@@ -11,6 +11,7 @@ const {
   cronJobHistoryQuerySchema,
   listCronJobsQuerySchema,
 } = require("./cronJob.validator");
+const { P } = require("../../config/permissions");
 
 // --- Cron Job Routes ---
 
@@ -18,14 +19,14 @@ const {
 router.get(
   "/",
   validate(listCronJobsQuerySchema, "query"),
-  authMiddleware.authorize("cronjob", "list"),
+  authMiddleware.authorize(P.cronjob.list),
   cronJobController.getAllCronJobs
 );
 
 // GET /status/connections - Get all connection statuses
 router.get(
   "/status/connections",
-  authMiddleware.authorize("cronjob", "list"),
+  authMiddleware.authorize(P.cronjob.list),
   cronJobController.getConnectionStatus
 );
 
@@ -34,13 +35,9 @@ router.post(
   "/",
   validate(createCronJobSchema, "body"),
   authMiddleware.authorize([
+    P.cronjob.create,
     {
-      resource: "cronjob",
-      action: "create",
-    },
-    {
-      resource: "workflow",
-      action: "execute",
+      ...P.workflow.execute,
       bodyKey: "workflowID",
     }
   ]),
@@ -51,7 +48,8 @@ router.post(
 router.get(
   "/:cronJobID",
   validate(cronJobIdParamSchema, "params"),
-  authMiddleware.authorize("cronjob", "read", {
+  authMiddleware.authorize({
+    ...P.cronjob.read,
     paramKey: "cronJobID",
   }),
   cronJobController.getCronJobByID
@@ -66,13 +64,11 @@ router.patch(
   }),
   authMiddleware.authorize([
     {
-      resource: "cronjob",
-      action: "update",
+      ...P.cronjob.update,
       paramKey: "cronJobID",
     },
     {
-      resource: "workflow",
-      action: "execute",
+      ...P.workflow.execute,
       bodyKey: "workflowID",
       skipIfMissing: true,
     }
@@ -84,7 +80,8 @@ router.patch(
 router.delete(
   "/:cronJobID",
   validate(cronJobIdParamSchema, "params"),
-  authMiddleware.authorize("cronjob", "delete", {
+  authMiddleware.authorize({
+    ...P.cronjob.delete,
     paramKey: "cronJobID",
   }),
   cronJobController.deleteCronJobByID
@@ -96,9 +93,9 @@ router.post(
   validate(cronJobIdParamSchema, "params"),
   cronJobMiddleware.resolveWorkflowIDFromDB,
   authMiddleware.authorize([
-    { resource: "cronjob", action: "create" },
-    { resource: "cronjob", action: "read", paramKey: "cronJobID" },
-    { resource: "workflow", action: "execute", reqKey: "workflowID", skipIfMissing: true }
+    P.cronjob.create,
+    { ...P.cronjob.read, paramKey: "cronJobID" },
+    { ...P.workflow.execute, reqKey: "workflowID", skipIfMissing: true }
   ]),
   cronJobController.cloneCronJob
 );
@@ -113,7 +110,8 @@ router.get(
     params: cronJobIdParamSchema,
     query: cronJobHistoryQuerySchema,
   }),
-  authMiddleware.authorize("cronjob", "read", {
+  authMiddleware.authorize({
+    ...P.cronjob.read,
     paramKey: "cronJobID",
   }),
   cronJobController.getCronJobHistoryByID

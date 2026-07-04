@@ -108,11 +108,7 @@ export const workflowTools = [
           inputParams: inputParams || [],
         },
       });
-      return {
-        workflowID: result?.workflowID,
-        title: result?.title ?? workflowTitle,
-        createdAt: result?.createdAt,
-      };
+      return result;
     },
   },
 

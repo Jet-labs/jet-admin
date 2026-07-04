@@ -1,127 +1,82 @@
-const { aiService } = require("./ai.service");
-const { expressUtils } = require("../../utils/express.utils");
-const Logger = require("../../utils/logger");
+const { aiService } = require('./ai.service');
+const { expressUtils } = require('../../utils/express.utils');
+const constants = require('../../constants');
+const Logger = require('../../utils/logger');
 
 const aiController = {};
 
 /**
  * POST /api/v1/tenants/:tenantID/ai/chat/stream
- * SSE stream — emits thinking, text, tool_start, tool_end, done events.
+ *
+ * Accepts the full message history from the useChat frontend hook and
+ * streams an AI SDK data stream response back. The AI SDK's streamText
+ * handles the multi-step agentic loop, MCP tool calls, and streaming.
+ *
+ * Response format: text/plain with X-Vercel-AI-Data-Stream: v1 header,
+ * parsed natively by useChat on the frontend.
  */
 aiController.streamChat = async (req, res) => {
   const { tenantID } = req.params;
-  const { message } = req.body;
+  const { messages } = req.body;
   const userID = req.user?.userID || req.firebaseUser?.uid;
+
   const bearerToken =
-    req.headers.authorization?.startsWith("Bearer ")
-      ? req.headers.authorization.split("Bearer ")[1]
+    req.headers.authorization?.startsWith(constants.AUTH_PREFIXES.BEARER)
+      ? req.headers.authorization.slice(constants.AUTH_PREFIXES.BEARER.length)
       : null;
 
-  Logger.log("info", {
-    message: "aiController:streamChat:params",
-    params: { userID, tenantID, messageLength: message?.length },
+  Logger.log('info', {
+    message: 'aiController:streamChat:params',
+    params: { userID, tenantID, messageCount: messages?.length },
   });
 
-  if (!message || typeof message !== "string" || message.trim() === "") {
-    res.status(400).json({ success: false, error: { message: "message is required" } });
-    return;
+  if (!bearerToken) {
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND,
+      constants.HTTP_STATUS.UNAUTHORIZED
+    );
   }
 
-  // Delegate to service — it owns the SSE lifecycle (headers + res.end)
   try {
-    await aiService.streamChat({
-      userID,
-      tenantID,
-      message: message.trim(),
-      bearerToken,
-      res,
-    });
+    await aiService.streamChat({ messages, tenantID, bearerToken, res });
   } catch (error) {
-    Logger.log("error", {
-      message: "aiController:streamChat:uncaught",
+    Logger.log('error', {
+      message: 'aiController:streamChat:catch-1',
       params: { userID, tenantID, error: error.message },
     });
-    // If headers weren't sent yet, send a normal error
     if (!res.headersSent) {
-      res.status(500).json({ success: false, error: { message: error.message } });
-    } else {
-      // Headers already sent (SSE started) — send error event and close
-      res.write(`event: error\ndata: ${JSON.stringify({ message: error.message })}\n\n`);
-      res.end();
+      return expressUtils.sendResponse(
+        res,
+        false,
+        {},
+        error,
+        constants.HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
     }
   }
 };
 
 /**
- * POST /api/v1/tenants/:tenantID/ai/chat
- * Body: { message: string }
- * Returns: { success, reply, toolCallSteps, messageCount }
- */
-aiController.chat = async (req, res) => {
-  const { tenantID } = req.params;
-  const { message } = req.body;
-  const userID = req.user?.userID || req.firebaseUser?.uid;
-
-  // Extract the raw Firebase JWT that was already verified by authProvider.
-  // We forward it into the AI service so tool calls run under this user's identity.
-  const bearerToken =
-    req.headers.authorization?.startsWith("Bearer ")
-      ? req.headers.authorization.split("Bearer ")[1]
-      : null;
-
-  Logger.log("info", {
-    message: "aiController:chat:params",
-    params: { userID, tenantID, messageLength: message?.length, hasBearerToken: !!bearerToken },
-  });
-
-  if (!message || typeof message !== "string" || message.trim() === "") {
-    return expressUtils.sendResponse(res, false, {}, { message: "message is required" });
-  }
-
-  try {
-    const result = await aiService.chat({
-      userID,
-      tenantID,
-      message: message.trim(),
-      bearerToken,
-    });
-
-    return expressUtils.sendResponse(res, true, {
-      reply: result.reply,
-      toolCallSteps: result.toolCallSteps,
-      messageCount: result.messageCount,
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "aiController:chat:error",
-      params: { userID, tenantID, error: error.message },
-    });
-    return expressUtils.sendResponse(res, false, {}, error);
-  }
-};
-
-/**
- * GET /api/v1/tenants/:tenantID/ai/session
- * Returns current session message history (excluding system prompt).
- */
-aiController.getSession = (req, res) => {
-  const { tenantID } = req.params;
-  const userID = req.user?.userID || req.firebaseUser?.uid;
-
-  const result = aiService.getSession({ userID, tenantID });
-  return expressUtils.sendResponse(res, true, result);
-};
-
-/**
  * DELETE /api/v1/tenants/:tenantID/ai/session
- * Clears the session for this user+tenant.
+ *
+ * No-op in the stateless AI SDK model — the client (useChat) owns
+ * the conversation history. This endpoint exists for compatibility so
+ * the frontend's "clear chat" button still works (it clears client-side
+ * state and optionally pings this endpoint).
  */
 aiController.clearSession = (req, res) => {
   const { tenantID } = req.params;
   const userID = req.user?.userID || req.firebaseUser?.uid;
 
-  const result = aiService.clearSession({ userID, tenantID });
-  return expressUtils.sendResponse(res, true, result);
+  Logger.log('info', {
+    message: 'aiController:clearSession:params',
+    params: { userID, tenantID },
+  });
+
+  return expressUtils.sendResponse(res, true, { cleared: true }, null, constants.HTTP_STATUS.OK);
 };
 
 module.exports = { aiController };

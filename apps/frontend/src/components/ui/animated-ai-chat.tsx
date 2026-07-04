@@ -79,13 +79,13 @@ interface AnimatedAIChatProps {
     docked?: boolean;
     value: string;
     onChange: (val: string) => void;
-    onSend: () => void;
+    onSend: (val: string) => void;
     busy: boolean;
 }
 
 export function AnimatedAIChat({
     docked = false,
-    value,
+    value = "",
     onChange,
     onSend,
     busy,
@@ -197,7 +197,7 @@ export function AnimatedAIChat({
         } else if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             if (value.trim()) {
-                onSend();
+                onSend(value);
                 setTimeout(() => adjustHeight(true), 50);
             }
         }
@@ -349,19 +349,18 @@ export function AnimatedAIChat({
                     </motion.button>
                 </div>
                 
-                <motion.button
+                <button
                     type="button"
                     onClick={() => {
-                        onSend();
+                        console.log("ON CLICK TRIGGERED", value);
+                        onSend(value);
                         setTimeout(() => adjustHeight(true), 50);
                     }}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
                     disabled={busy || !value.trim()}
                     className={cn(
                         "h-8 px-3 rounded-md text-xs font-medium transition-all flex items-center gap-1.5",
                         value.trim()
-                            ? "bg-primary text-foreground hover:bg-primary/90 shadow-sm"
+                            ? "bg-primary text-foreground hover:bg-primary/90 shadow-sm hover:scale-[1.01] active:scale-[0.98]"
                             : "bg-muted text-muted-foreground/40 cursor-not-allowed"
                     )}
                 >
@@ -371,7 +370,7 @@ export function AnimatedAIChat({
                         <SendIcon className="w-3.5 h-3.5" />
                     )}
                     <span>Send</span>
-                </motion.button>
+                </button>
             </div>
         </motion.div>
     );

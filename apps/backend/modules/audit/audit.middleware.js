@@ -1,36 +1,10 @@
 // audit.middleware.js
 
 const { auditService } = require("./audit.service");
+const { redact } = require("../../utils/sensitive");
+const Logger = require("../../utils/logger");
 
 /** @typedef {import('./audit.type').AuditLogEvent} AuditLogEvent */
-
-const SENSITIVE_PAYLOAD_KEYS = [
-  "apikey", "api_key", "apikeyhash",
-  "token", "bearertoken", "accesstoken", "refreshtoken",
-  "password", "secret", "authorization",
-];
-
-function redactPayload(payload, depth = 0) {
-  if (payload === undefined || payload === null) return payload;
-  if (typeof payload !== "object") return payload;
-  if (depth > 10) return "[REDACTED: max depth]";
-
-  if (Array.isArray(payload)) {
-    return payload.map((item) => redactPayload(item, depth + 1));
-  }
-
-  const redacted = {};
-  for (const [key, value] of Object.entries(payload)) {
-    if (SENSITIVE_PAYLOAD_KEYS.includes(key.toLowerCase())) {
-      redacted[key] = "[FILTERED]";
-    } else if (typeof value === "object" && value !== null) {
-      redacted[key] = redactPayload(value, depth + 1);
-    } else {
-      redacted[key] = value;
-    }
-  }
-  return redacted;
-}
 
 function safeGetPayload(payload) {
   if (payload === undefined || payload === null) {
@@ -47,7 +21,7 @@ function safeGetPayload(payload) {
       }
     }
 
-    const filteredPayload = redactPayload(processedPayload);
+    const filteredPayload = redact(processedPayload);
 
     const payloadString = typeof filteredPayload === "string"
       ? filteredPayload
@@ -63,7 +37,10 @@ function safeGetPayload(payload) {
 
     return filteredPayload;
   } catch (error) {
-    console.error("Error processing payload for logging:", error);
+    Logger.log("error", {
+      message: "auditMiddleware:safeGetPayload:error",
+      params: { error: error?.message || String(error) },
+    });
     return { _error: "Failed to process payload" };
   }
 }

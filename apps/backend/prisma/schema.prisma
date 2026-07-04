@@ -115,7 +115,7 @@ model tblDataQueries {
   datasourceID          String?         @db.Uuid
   datasourceType        String          @default("postgresql") @db.VarChar
   createdByApiKeyID     String?         @db.Uuid
-  tblDatasources        tblDatasources? @relation(fields: [datasourceID], references: [datasourceID], onDelete: NoAction, onUpdate: NoAction, map: "fkDatasourceIDDatasourceID")
+  tblDatasources        tblDatasources? @relation(fields: [datasourceID], references: [datasourceID], onDelete: Cascade, onUpdate: NoAction, map: "fkDatasourceIDDatasourceID")
   tblAPIKeys            tblAPIKeys?     @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblDataQueriesCreatedByApiKeyID")
   tblUsers              tblUsers?       @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDataQueriesCreatorID")
   tblTenants            tblTenants      @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
@@ -496,7 +496,7 @@ model tblAppPages {
   createdByApiKeyID  String?     @db.Uuid
   tblUsers           tblUsers?   @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAppPageCreatorID")
   tblAPIKeys         tblAPIKeys? @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblAppPagesCreatedByApiKeyID")
-  tblTenants         tblTenants  @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAppPagesTenantIDTenantID")
+  tblTenants         tblTenants  @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction, map: "fkTblAppPagesTenantIDTenantID")
 
   @@index([createdByApiKeyID], map: "idx_tblAppPages_createdByApiKeyID")
 }

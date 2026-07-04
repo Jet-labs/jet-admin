@@ -79,9 +79,12 @@ export const iamTools = [
         logoUrl: tenant.tenantLogoURL,
         memberCount,
         resourceCounts: {
-          appPages: tenant.tenantAppPageCount ?? 0,
+          datasources: tenant.tenantDatasourceCount ?? 0,
           dataQueries: tenant.tenantDataQueryCount ?? 0,
           widgets: tenant.tenantWidgetCount ?? 0,
+          appPages: tenant.tenantAppPageCount ?? 0,
+          workflows: tenant.tenantWorkflowCount ?? 0,
+          listeners: tenant.tenantListenerCount ?? 0,
           cronJobs: tenant.tenantCronJobCount ?? 0,
           apiKeys: tenant.tenantAPIKeyCount ?? 0,
         },

@@ -27,16 +27,22 @@ apiKeyController.getAllAPIKeys = async (req, res) => {
       authContext,
     });
 
-    return expressUtils.sendResponse(res, true, {
-      apiKeys,
-      message: "APIKeys fetched successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        apiKeys,
+        message: "APIKeys fetched successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:getAllAPIKeys:catch-1",
       params: { errorMessage: error.message },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -64,16 +70,22 @@ apiKeyController.createAPIKey = async (req, res) => {
       authContext,
     });
 
-    return expressUtils.sendResponse(res, true, {
-      apiKey,
-      message: "APIKey created successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        apiKey,
+        message: "APIKey created successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.CREATED
+    );
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:createAPIKey:catch-1",
       params: { errorMessage: error.message },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -97,16 +109,22 @@ apiKeyController.getAPIKeyByID = async (req, res) => {
       apiKeyID: apiKeyID,
     });
 
-    return expressUtils.sendResponse(res, true, {
-      apiKey,
-      message: "APIKey fetched successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        apiKey,
+        message: "APIKey fetched successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:getAPIKeyByID:catch-1",
       params: { errorMessage: error.message },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -152,15 +170,21 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, true, {
-      message: "APIKey updated successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        message: "APIKey updated successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:updateAPIKeyByID:catch-1",
       params: { errorMessage: error.message },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -184,15 +208,21 @@ apiKeyController.deleteAPIKeyByID = async (req, res) => {
       apiKeyID: apiKeyID,
     });
 
-    return expressUtils.sendResponse(res, true, {
-      message: "APIKey deleted successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        message: "APIKey deleted successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:deleteAPIKeyByID:catch-1",
       params: { errorMessage: error.message },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -218,16 +248,22 @@ apiKeyController.cloneAPIKey = async (req, res) => {
       authContext,
     });
 
-    return expressUtils.sendResponse(res, true, {
-      apiKey,
-      message: "APIKey cloned successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        apiKey,
+        message: "APIKey cloned successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.CREATED
+    );
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyController:cloneAPIKey:catch-1",
       params: { errorMessage: error.message },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

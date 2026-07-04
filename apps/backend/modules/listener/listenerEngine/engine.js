@@ -174,7 +174,10 @@ class ListenerEngine {
       await prisma.tblListeners.update({
         where: { listenerID },
         data: { status: 'active', lastError: null },
-      }).catch(() => {});
+      }).catch((dbErr) => Logger.log('warning', {
+        message: 'ListenerEngine:startOne:dbStatusUpdateFailed',
+        params: { listenerID, error: dbErr.message },
+      }));
 
       Logger.log('success', {
         message: 'ListenerEngine:startOne:success',
@@ -191,7 +194,10 @@ class ListenerEngine {
       await prisma.tblListeners.update({
         where: { listenerID },
         data: { status: 'error', lastError: error.message },
-      }).catch(() => {});
+      }).catch((dbErr) => Logger.log('warning', {
+        message: 'ListenerEngine:startOne:dbErrorStatusUpdateFailed',
+        params: { listenerID, error: dbErr.message },
+      }));
     }
   }
 

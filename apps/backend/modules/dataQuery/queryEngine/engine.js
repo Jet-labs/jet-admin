@@ -1,4 +1,5 @@
 // src/engine.js
+const constants = require("../../../constants");
 const Logger = require("../../../utils/logger");
 const { resolveTemplate } = require("@jet-admin/expression-engine");
 const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
@@ -60,22 +61,32 @@ class QueryEngine {
     });
 
     const datasource = await this.getDataSource(query, dataQueryID);
-    let result = await datasource.execute(
-      resolvedTemplate,
-      {},
-      {
-        fileStorage: fileStorageUtil,
-        getCredential: async (vaultCredentialID) => {
-          return await vaultService.getCredential({
-            tenantID: query.tenantID,
-            vaultCredentialID,
-          });
-        },
-        getGoogleClientConfig: () => {
-          return vaultService.getGoogleClientConfig();
-        },
-      }
-    );
+    const timeoutSeconds = query.dataQueryOptions?.timeoutSeconds || constants.DEFAULTS.QUERY_TIMEOUT_SECONDS;
+    const timeoutMs = timeoutSeconds * 1000;
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`Query execution timed out after ${timeoutSeconds}s`)), timeoutMs);
+    });
+
+    let result = await Promise.race([
+      datasource.execute(
+        resolvedTemplate,
+        {},
+        {
+          fileStorage: fileStorageUtil,
+          getCredential: async (vaultCredentialID) => {
+            return await vaultService.getCredential({
+              tenantID: query.tenantID,
+              vaultCredentialID,
+            });
+          },
+          getGoogleClientConfig: () => {
+            return vaultService.getGoogleClientConfig();
+          },
+        }
+      ),
+      timeoutPromise
+    ]);
 
     this.cache.set(cacheKey, result);
     Logger.log("info", {

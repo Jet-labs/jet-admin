@@ -2,6 +2,7 @@
 const { firebaseApp } = require("../../config/firebase.config");
 const { prisma } = require("../../config/prisma.config");
 const constants = require("../../constants");
+const environmentVariables = require("../../environment");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { authService } = require("./auth.service");
@@ -43,14 +44,20 @@ authMiddleware.authProviderSocket = async function (socket, next) {
         message: "authMiddleware:authProviderSocket:catch-2",
         params: { errorMessage: error.message },
       });
-      next(new Error(error.message));
+      // Preserve structured error code so Socket.IO error handlers and
+      // consumers that inspect error.code get the right value (e.g. USER_AUTH_TOKEN_EXPIRED)
+      const socketErr = new Error(error.message || String(error));
+      socketErr.code = error.code;
+      next(socketErr);
     }
   } else {
     Logger.log("error", {
       message: "authMiddleware:authProviderSocket:catch-1",
       params: { error: constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND },
     });
-    next(new Error(constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND.message));
+    const socketErr = new Error(constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND.message);
+    socketErr.code = constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND.code;
+    next(socketErr);
   }
 };
 
@@ -64,10 +71,10 @@ authMiddleware.authProviderSocket = async function (socket, next) {
 authMiddleware.authProvider = async function (req, res, next) {
   if (
     req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer ")
+    req.headers.authorization.startsWith(constants.AUTH_PREFIXES.BEARER)
   ) {
     try {
-      let idToken = req.headers.authorization.split("Bearer ")[1];
+      let idToken = req.headers.authorization.split(constants.AUTH_PREFIXES.BEARER)[1];
       if (!firebaseApp) {
         throw new Error("Firebase Admin SDK is not initialized.");
       }
@@ -102,7 +109,8 @@ authMiddleware.authProvider = async function (req, res, next) {
             res,
             false,
             {},
-            constants.ERROR_CODES.INVALID_USER
+            constants.ERROR_CODES.INVALID_USER,
+            constants.HTTP_STATUS.UNAUTHORIZED
           );
         }
         return next();
@@ -116,16 +124,17 @@ authMiddleware.authProvider = async function (req, res, next) {
         res,
         false,
         {},
-        error
+        error,
+        constants.HTTP_STATUS.UNAUTHORIZED
       );
     }
   } else if (
     req.headers.authorization &&
-    req.headers.authorization.startsWith("api_key ")
+    req.headers.authorization.startsWith(constants.AUTH_PREFIXES.API_KEY)
   ) {
     try {
-      let apiKey = req.headers.authorization.split("api_key ")[1];
-      const prefix = apiKey.substring(0, 8);
+      let apiKey = req.headers.authorization.split(constants.AUTH_PREFIXES.API_KEY)[1];
+      const prefix = apiKey.substring(0, constants.DEFAULTS.API_KEY_PREFIX_LENGTH);
       const candidateKeys = await prisma.tblAPIKeys.findMany({
         where: {
           apiKeyPrefix: prefix,
@@ -179,7 +188,8 @@ authMiddleware.authProvider = async function (req, res, next) {
         res,
         false,
         {},
-        error
+        error,
+        constants.HTTP_STATUS.UNAUTHORIZED
       );
     }
   } else {
@@ -191,7 +201,8 @@ authMiddleware.authProvider = async function (req, res, next) {
       res,
       false,
       {},
-      constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND
+      constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND,
+      constants.HTTP_STATUS.UNAUTHORIZED
     );
   }
 };
@@ -204,12 +215,12 @@ authMiddleware.authProvider = async function (req, res, next) {
  * @returns
  */
 authMiddleware.authProviderTest = async function (req, res, next) {
-  if (process.env.NODE_ENV !== "test") {
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.PERMISSION_DENIED);
+  if (environmentVariables.NODE_ENV !== constants.ENVIRONMENTS.TEST) {
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.PERMISSION_DENIED, constants.HTTP_STATUS.FORBIDDEN);
   }
   try {
     req.user = await authService.getUserFromEmailID({
-      email: "test@test.com",
+      email: constants.DEFAULTS.TEST_USER_EMAIL,
     });
     return next();
   } catch (error) {
@@ -221,8 +232,9 @@ authMiddleware.authProviderTest = async function (req, res, next) {
       res,
       false,
       {},
-      error
-    )
+      error,
+      constants.HTTP_STATUS.UNAUTHORIZED
+    );
   }
 };
 
@@ -234,9 +246,12 @@ authMiddleware.authProviderTest = async function (req, res, next) {
  * a specific action on a specific resource within the tenant.
  *
  * Usage in routes:
- *   authMiddleware.authorize("dataquery", "run")
- *   authMiddleware.authorize("workflow", "execute")
- *   authMiddleware.authorize("appPage", "read")
+ *   authMiddleware.authorize(P.dataquery.list)
+ *   authMiddleware.authorize({ ...P.workflow.execute, paramKey: "workflowID" })
+ *   authMiddleware.authorize([P.appPage.create, { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true }])
+ *
+ * Also accepts the legacy two-string form:
+ *   authMiddleware.authorize("dataquery", "list")
  *
  * The resource ID is resolved from req.params using the convention:
  *   resourceType "dataquery" → req.params.dataQueryID
@@ -249,17 +264,28 @@ authMiddleware.authProviderTest = async function (req, res, next) {
  *
  * Also attaches req.executionCtx for downstream service calls.
  *
- * @param {string|Array<object>} resourceType - Resource type or array of checks (e.g. [{ resource: "appPage", action: "create" }])
- * @param {string} [action]       - Action if using single resource type
+ * @param {string|object|Array<object>} resourceTypeOrArray - Resource type string, single descriptor
+ *   object ({resource, action, ...opts}), or array of descriptor objects
+ * @param {string} [action] - Action if using single resource type (legacy two-string form)
  * @param {object} [options]
  * @param {string} [options.paramKey] - Override the param key used to extract the resource ID
  * @param {string} [options.bodyKey] - Key to extract the resource ID from req.body (useful for bindings)
- * @param {boolean} [options.skipIfMissing] - If true and bodyKey is not in req.body, skip authorization (useful for PATCH)
+ * @param {string} [options.reqKey] - Dot-path into req object to extract the resource ID(s)
+ * @param {boolean} [options.skipIfMissing] - If true and bodyKey/reqKey value is missing, skip authorization (useful for PATCH)
  */
 authMiddleware.authorize = (resourceTypeOrArray, action, options = {}) => {
-  const checks = Array.isArray(resourceTypeOrArray)
-    ? resourceTypeOrArray
-    : [{ resource: resourceTypeOrArray, action, ...options }];
+  let checks;
+  if (Array.isArray(resourceTypeOrArray)) {
+    checks = resourceTypeOrArray;
+  } else if (
+    resourceTypeOrArray &&
+    typeof resourceTypeOrArray === "object" &&
+    "resource" in resourceTypeOrArray
+  ) {
+    checks = [resourceTypeOrArray];
+  } else {
+    checks = [{ resource: resourceTypeOrArray, action, ...options }];
+  }
 
   return async (req, res, next) => {
     try {
@@ -276,11 +302,16 @@ authMiddleware.authorize = (resourceTypeOrArray, action, options = {}) => {
       }
 
       if (!subjectID || !tenantID) {
+        Logger.log("error", {
+          message: "authMiddleware:authorize:missingContext",
+          params: { hasSubject: !!subjectID, hasTenant: !!tenantID },
+        });
         return expressUtils.sendResponse(
           res,
           false,
           {},
-          "Authorization failed: Missing subject or tenant"
+          constants.ERROR_CODES.INVALID_REQUEST,
+          constants.HTTP_STATUS.BAD_REQUEST
         );
       }
 
@@ -292,6 +323,9 @@ authMiddleware.authorize = (resourceTypeOrArray, action, options = {}) => {
         if (reqKey) {
           const getNestedValue = (obj, path) => path.split('.').reduce((acc, part) => acc && acc[part], obj);
           resourceIDs = getNestedValue(req, reqKey);
+          if (resourceIDs === undefined && skipIfMissing) {
+            continue;
+          }
         } else {
           const paramKeyToUse = checkParamKey || `${resourceType}ID`;
           resourceIDs = req.params[paramKeyToUse];
@@ -341,7 +375,8 @@ authMiddleware.authorize = (resourceTypeOrArray, action, options = {}) => {
               res,
               false,
               {},
-              constants.ERROR_CODES.PERMISSION_DENIED
+              constants.ERROR_CODES.PERMISSION_DENIED,
+              constants.HTTP_STATUS.FORBIDDEN
             );
           }
         }
@@ -364,7 +399,8 @@ authMiddleware.authorize = (resourceTypeOrArray, action, options = {}) => {
         res,
         false,
         {},
-        constants.ERROR_CODES.SERVER_ERROR
+        constants.ERROR_CODES.SERVER_ERROR,
+        constants.HTTP_STATUS.INTERNAL_SERVER_ERROR
       );
     }
   };
@@ -376,7 +412,7 @@ authMiddleware.checkTenantMembership = async function (req, res, next) {
     const { tenantID } = req.params;
 
     if (!user || !tenantID) {
-      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.INVALID_REQUEST);
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.INVALID_REQUEST, constants.HTTP_STATUS.BAD_REQUEST);
     }
 
     const membership = await prisma.tblUsersTenantsRelationship.findFirst({
@@ -391,7 +427,7 @@ authMiddleware.checkTenantMembership = async function (req, res, next) {
         message: "authMiddleware:checkTenantMembership:denied",
         params: { userID: user.userID, tenantID },
       });
-      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.PERMISSION_DENIED);
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.PERMISSION_DENIED, constants.HTTP_STATUS.FORBIDDEN);
     }
 
     return next();
@@ -400,7 +436,7 @@ authMiddleware.checkTenantMembership = async function (req, res, next) {
       message: "authMiddleware:checkTenantMembership:error",
       params: { error: error.message },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR);
   }
 };
 

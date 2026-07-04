@@ -50,7 +50,8 @@ export const widgetTools = [
     },
     handler: async ({ widgetID }, context) => {
       const { widgetAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      const w = await widgetAPI.getById(trimId(widgetID, "widgetID"));
+      const res = await widgetAPI.getById(trimId(widgetID, "widgetID"));
+      const w = res?.widget || res;
       if (!w) throw new Error(`Widget not found: ${widgetID}`);
       return {
         widgetID: w.widgetID,

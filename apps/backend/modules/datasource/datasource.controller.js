@@ -7,20 +7,9 @@ const { createClient } = require("@supabase/supabase-js");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const environmentVariables = require("../../environment");
 const fileStorageUtil = require("../../utils/fileStorage.util");
-
-const maskSensitiveOptions = (options) => {
-  if (!options) return options;
-  const masked = { ...options };
-  const sensitiveKeys = ["password", "secret", "token", "private_key", "apiKey", "key", "passphrase"];
-  for (const k of Object.keys(masked)) {
-    if (sensitiveKeys.some(sk => k.toLowerCase().includes(sk))) {
-      masked[k] = "●●●●●●●●";
-    } else if (typeof masked[k] === "object" && masked[k] !== null) {
-      masked[k] = maskSensitiveOptions(masked[k]);
-    }
-  }
-  return masked;
-};
+// mask() uses SENSITIVE_KEY_PATTERNS with substring matching — intentionally broader
+// than log redaction so all credential-like fields are hidden from API responses.
+const { mask } = require("../../utils/sensitive");
 
 const datasourceController = {};
 
@@ -67,17 +56,23 @@ datasourceController.getAllDatasources = async (req, res) => {
 
     const sanitizedDatasources = result.datasources.map((d) => ({
       ...d,
-      datasourceOptions: maskSensitiveOptions(d.datasourceOptions),
+      datasourceOptions: mask(d.datasourceOptions),
     }));
 
-    return expressUtils.sendResponse(res, true, {
-      datasources: sanitizedDatasources,
-      totalCount: result.totalCount,
-      totalPages: result.totalPages,
-      page: result.page,
-      pageSize: result.pageSize,
-      message: "Datasources fetched successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        datasources: sanitizedDatasources,
+        totalCount: result.totalCount,
+        totalPages: result.totalPages,
+        page: result.page,
+        pageSize: result.pageSize,
+        message: "Datasources fetched successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:getAllDatasources:error",
@@ -86,7 +81,7 @@ datasourceController.getAllDatasources = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -107,7 +102,7 @@ datasourceController.testDatasourceConnection = async (req, res) => {
         userID: user.userID,
         tenantID,
         datasourceType,
-        datasourceOptions,
+        datasourceOptions: mask(datasourceOptions),
       },
     });
 
@@ -124,10 +119,16 @@ datasourceController.testDatasourceConnection = async (req, res) => {
         connectionResult,
       },
     });
-    return expressUtils.sendResponse(res, true, {
-      connectionResult,
-      message: "Datasource connection tested successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        connectionResult,
+        message: "Datasource connection tested successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:testDatasourceConnection:error",
@@ -135,7 +136,7 @@ datasourceController.testDatasourceConnection = async (req, res) => {
         error,
       },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -166,19 +167,25 @@ datasourceController.getDatasourceByID = async (req, res) => {
     Logger.log("success", {
       message: "datasourceController:getDatasourceByID:success",
       params: {
-        datasource,
+        datasourceID: datasource?.datasourceID,
       },
     });
 
     const sanitizedDatasource = datasource ? {
       ...datasource,
-      datasourceOptions: maskSensitiveOptions(datasource.datasourceOptions),
+      datasourceOptions: mask(datasource.datasourceOptions),
     } : null;
 
-    return expressUtils.sendResponse(res, true, {
-      datasource: sanitizedDatasource,
-      message: "Datasource fetched successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        datasource: sanitizedDatasource,
+        message: "Datasource fetched successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:getDatasourceByID:error",
@@ -187,7 +194,7 @@ datasourceController.getDatasourceByID = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -217,7 +224,7 @@ datasourceController.createDatasource = async (req, res) => {
         datasourceTitle,
         datasourceDescription,
         datasourceType,
-        datasourceOptions,
+        datasourceOptions: mask(datasourceOptions),
         datasourceTags,
         authContext,
       },
@@ -237,19 +244,25 @@ datasourceController.createDatasource = async (req, res) => {
     Logger.log("success", {
       message: "datasourceController:createDatasource:success",
       params: {
-        datasource,
+        datasourceID: datasource?.datasourceID,
       },
     });
 
     const sanitizedDatasource = datasource ? {
       ...datasource,
-      datasourceOptions: maskSensitiveOptions(datasource.datasourceOptions),
+      datasourceOptions: mask(datasource.datasourceOptions),
     } : null;
 
-    return expressUtils.sendResponse(res, true, {
-      datasource: sanitizedDatasource,
-      message: "Datasource created successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        datasource: sanitizedDatasource,
+        message: "Datasource created successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.CREATED
+    );
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:createDatasource:error",
@@ -258,7 +271,7 @@ datasourceController.createDatasource = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -288,7 +301,7 @@ datasourceController.updateDatasourceByID = async (req, res) => {
         datasourceTitle,
         datasourceDescription,
         datasourceType,
-        datasourceOptions,
+        datasourceOptions: mask(datasourceOptions),
         datasourceTags,
       },
     });
@@ -307,14 +320,20 @@ datasourceController.updateDatasourceByID = async (req, res) => {
     Logger.log("success", {
       message: "datasourceController:updateDatasourceByID:success",
       params: {
-        datasource,
+        datasourceID,
       },
     });
 
-    return expressUtils.sendResponse(res, true, {
-      datasource,
-      message: "Datasource updated successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        datasource,
+        message: "Datasource updated successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:updateDatasourceByID:error",
@@ -323,7 +342,7 @@ datasourceController.updateDatasourceByID = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -360,9 +379,15 @@ datasourceController.deleteDatasourceByID = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, true, {
-      message: "Datasource deleted successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        message: "Datasource deleted successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:deleteDatasourceByID:error",
@@ -371,7 +396,7 @@ datasourceController.deleteDatasourceByID = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -411,9 +436,15 @@ datasourceController.cloneDatasourceByID = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, true, {
-      message: "Datasource cloned successfully.",
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        message: "Datasource cloned successfully.",
+      },
+      null,
+      constants.HTTP_STATUS.CREATED
+    );
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:cloneDatasourceByID:error",
@@ -422,7 +453,7 @@ datasourceController.cloneDatasourceByID = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -470,13 +501,19 @@ datasourceController.uploadFile = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, true, {
-      url: publicUrl,
-      filePath,
-      fileName: file.originalname,
-      fileSize: file.size,
-      fileType: file.mimetype,
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        url: publicUrl,
+        filePath,
+        fileName: file.originalname,
+        fileSize: file.size,
+        fileType: file.mimetype,
+      },
+      null,
+      constants.HTTP_STATUS.CREATED
+    );
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:uploadFile:error",
@@ -484,7 +521,7 @@ datasourceController.uploadFile = async (req, res) => {
         error: error.message || error,
       },
     });
-    return expressUtils.sendResponse(res, false, {}, error.message || error);
+    return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -535,10 +572,16 @@ datasourceController.proxyDatasourceAction = async (req, res) => {
       params: { action, datasourceID },
     });
 
-    return expressUtils.sendResponse(res, true, {
-      result,
-      message: `Proxy action '${action}' executed successfully.`,
-    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        result,
+        message: `Proxy action '${action}' executed successfully.`,
+      },
+      null,
+      constants.HTTP_STATUS.OK
+    );
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:proxyDatasourceAction:error",
@@ -546,7 +589,7 @@ datasourceController.proxyDatasourceAction = async (req, res) => {
         error: error.message || error,
       },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

@@ -4,485 +4,50 @@ const { prisma } = require("../config/prisma.config");
 // For simplicity, we'll let PostgreSQL generate UUIDs via `default(dbgenerated(...))`
 // So we OMIT the ID fields and let the DB handle it.
 
-const permissions = [
-  {
-    permissionTitle: "tenant:read",
-    permissionDescription: "Permission to read tenant details",
-  },
-  {
-    permissionTitle: "tenant:update",
-    permissionDescription: "Permission to update tenant details",
-  },
-  {
-    permissionTitle: "tenant:create",
-    permissionDescription: "Permission to create a new tenant",
-  },
-  {
-    permissionTitle: "tenant:role:create",
-    permissionDescription: "Permission to create a new role",
-  },
-  {
-    permissionTitle: "tenant:role:list",
-    permissionDescription: "Permission to list all roles",
-  },
-  {
-    permissionTitle: "tenant:role:read",
-    permissionDescription: "Permission to read a specific role",
-  },
-  {
-    permissionTitle: "tenant:role:update",
-    permissionDescription: "Permission to update a role",
-  },
-  {
-    permissionTitle: "tenant:role:delete",
-    permissionDescription: "Permission to delete a role",
-  },
-  {
-    permissionTitle: "tenant:user:list",
-    permissionDescription: "Permission to list all users in a tenant",
-  },
-  {
-    permissionTitle: "tenant:user:read",
-    permissionDescription: "Permission to read a specific user in a tenant",
-  },
-  {
-    permissionTitle: "tenant:user:update",
-    permissionDescription: "Permission to update a user's roles in a tenant",
-  },
-  {
-    permissionTitle: "tenant:user:create",
-    permissionDescription: "Permission to add a user to a tenant",
-  },
-  {
-    permissionTitle: "tenant:user:delete",
-    permissionDescription: "Permission to remove a user from a tenant",
-  },
-  {
-    permissionTitle: "tenant:database:metadata",
-    permissionDescription: "Permission to view database metadata",
-  },
-  {
-    permissionTitle: "tenant:database:schema:create",
-    permissionDescription: "Permission to create a new database schema",
-  },
-  {
-    permissionTitle: "tenant:database:query:list",
-    permissionDescription: "Permission to list all database queries",
-  },
-  {
-    permissionTitle: "tenant:database:query:create",
-    permissionDescription: "Permission to create a new database query",
-  },
-  {
-    permissionTitle: "tenant:database:query:test",
-    permissionDescription: "Permission to test a database query",
-  },
-  {
-    permissionTitle: "tenant:database:query:read",
-    permissionDescription: "Permission to read a specific database query",
-  },
-  {
-    permissionTitle: "tenant:database:query:update",
-    permissionDescription: "Permission to update a database query",
-  },
-  {
-    permissionTitle: "tenant:database:query:delete",
-    permissionDescription: "Permission to delete a database query",
-  },
-  {
-    permissionTitle: "tenant:database:table:list",
-    permissionDescription: "Permission to list all database tables",
-  },
-  {
-    permissionTitle: "tenant:database:table:create",
-    permissionDescription: "Permission to create a new database table",
-  },
-  {
-    permissionTitle: "tenant:database:table:read",
-    permissionDescription: "Permission to read a specific database table",
-  },
-  {
-    permissionTitle: "tenant:database:table:update",
-    permissionDescription: "Permission to update a database table",
-  },
-  {
-    permissionTitle: "tenant:database:table:row:read",
-    permissionDescription: "Permission to read rows from a database table",
-  },
-  {
-    permissionTitle: "tenant:database:table:row:create",
-    permissionDescription: "Permission to create rows in a database table",
-  },
-  {
-    permissionTitle: "tenant:database:table:row:update",
-    permissionDescription: "Permission to update rows in a database table",
-  },
-  {
-    permissionTitle: "tenant:database:table:stats",
-    permissionDescription: "Permission to view statistics of a database table",
-  },
-  {
-    permissionTitle: "tenant:database:trigger:list",
-    permissionDescription: "Permission to list all database triggers",
-  },
-  {
-    permissionTitle: "tenant:database:trigger:create",
-    permissionDescription: "Permission to create a new database trigger",
-  },
-  {
-    permissionTitle: "tenant:database:trigger:read",
-    permissionDescription: "Permission to read a specific database trigger",
-  },
-  {
-    permissionTitle: "tenant:database:trigger:delete",
-    permissionDescription: "Permission to delete a database trigger",
-  },
-  {
-    permissionTitle: "tenant:permissions:list",
-    permissionDescription: "Permission to read permissions",
-  },
-  {
-    permissionTitle: "tenant:database:chart:list",
-    permissionDescription: "Permission to list all tenant charts",
-  },
-  {
-    permissionTitle: "tenant:database:chart:create",
-    permissionDescription: "Permission to create tenant chart",
-  },
-  {
-    permissionTitle: "tenant:database:chart:delete",
-    permissionDescription: "Permission to delete tenant chart",
-  },
-  {
-    permissionTitle: "tenant:database:chart:update",
-    permissionDescription: "Permission to update tenant chart",
-  },
-  {
-    permissionTitle: "tenant:database:chart:read",
-    permissionDescription: "Permission to read tenant chart",
-  },
-  // --- CronJob Permissions ---
-  {
-    permissionTitle: "tenant:cronjob:history:read",
-    permissionDescription: "Permission to read cron job history",
-  },
-  // --- Dashboard Permissions ---
-  {
-    permissionTitle: "tenant:dashboard:clone",
-    permissionDescription: "Permission to clone a dashboard",
-  },
-  // --- DataQuery Permissions ---
-  {
-    permissionTitle: "tenant:query:bulk:create",
-    permissionDescription: "Permission to bulk create queries",
-  },
-  {
-    permissionTitle: "tenant:query:clone",
-    permissionDescription: "Permission to clone a query",
-  },
-  {
-    permissionTitle: "tenant:query:aigenerate",
-    permissionDescription: "Permission to generate query using AI",
-  },
-  // --- Database Permissions ---
-  {
-    permissionTitle: "tenant:database:raw-sql:execute",
-    permissionDescription: "Permission to execute raw SQL",
-  },
-  {
-    permissionTitle: "tenant:database:table:row:delete",
-    permissionDescription: "Permission to delete table rows",
-  },
-  {
-    permissionTitle: "tenant:database:table:row:export",
-    permissionDescription: "Permission to export table rows",
-  },
-  // --- Datasource Permissions ---
-  {
-    permissionTitle: "tenant:datasource:test",
-    permissionDescription: "Permission to test datasource connection",
-  },
-  {
-    permissionTitle: "tenant:datasource:clone",
-    permissionDescription: "Permission to clone a datasource",
-  },
-  // --- Widget Permissions (Replacements for Chart) ---
-  {
-    permissionTitle: "tenant:widget:list",
-    permissionDescription: "Permission to list widgets",
-  },
-  {
-    permissionTitle: "tenant:widget:create",
-    permissionDescription: "Permission to create a widget",
-  },
-  {
-    permissionTitle: "tenant:widget:read",
-    permissionDescription: "Permission to read a widget",
-  },
-  {
-    permissionTitle: "tenant:widget:update",
-    permissionDescription: "Permission to update a widget",
-  },
-  {
-    permissionTitle: "tenant:widget:delete",
-    permissionDescription: "Permission to delete a widget",
-  },
-  {
-    permissionTitle: "tenant:widget:test",
-    permissionDescription: "Permission to test a widget",
-  },
-  {
-    permissionTitle: "tenant:widget:clone",
-    permissionDescription: "Permission to clone a widget",
-  },
-  // --- Workflow Permissions ---
-  {
-    permissionTitle: "tenant:workflow:list",
-    permissionDescription: "Permission to list workflows",
-  },
-  {
-    permissionTitle: "tenant:workflow:create",
-    permissionDescription: "Permission to create a workflow",
-  },
-  {
-    permissionTitle: "tenant:workflow:read",
-    permissionDescription: "Permission to read a workflow",
-  },
-  {
-    permissionTitle: "tenant:workflow:update",
-    permissionDescription: "Permission to update a workflow",
-  },
-  {
-    permissionTitle: "tenant:workflow:delete",
-    permissionDescription: "Permission to delete a workflow",
-  },
-  {
-    permissionTitle: "tenant:workflow:execute",
-    permissionDescription: "Permission to execute a workflow",
-  },
-];
+const { P, PERMISSIONS_LIST } = require("../config/permissions");
 
 const roles = [
-  {
-    roleTitle: "TenantManager",
-    roleDescription: "Manages tenant creation, updates, and deletion",
-  },
-  {
-    roleTitle: "TenantViewer",
-    roleDescription: "Can view tenant details but cannot modify them",
-  },
-  {
-    roleTitle: "RoleManager",
-    roleDescription: "Manages role creation, updates, and deletion",
-  },
-  {
-    roleTitle: "RoleViewer",
-    roleDescription: "Can view roles but cannot modify them",
-  },
-  {
-    roleTitle: "UserManager",
-    roleDescription: "Manages tenant users and their roles",
-  },
-  {
-    roleTitle: "UserViewer",
-    roleDescription: "Can view tenant users but cannot modify them",
-  },
-  {
-    roleTitle: "DatabaseManager",
-    roleDescription: "Manages database schemas, queries, and tables",
-  },
-  {
-    roleTitle: "DatabaseViewer",
-    roleDescription: "Can view database metadata, schemas, and queries",
-  },
-  {
-    roleTitle: "QueryCreator",
-    roleDescription: "Can create and test database queries",
-  },
-  {
-    roleTitle: "QueryEditor",
-    roleDescription: "Can edit and delete database queries",
-  },
-  {
-    roleTitle: "QueryRunner",
-    roleDescription: "Can run and test database queries",
-  },
-  {
-    roleTitle: "TableManager",
-    roleDescription: "Manages database tables and rows",
-  },
-  {
-    roleTitle: "TableViewer",
-    roleDescription: "Can view database tables and rows",
-  },
-  { roleTitle: "TriggerManager", roleDescription: "Manages database triggers" },
-  { roleTitle: "TriggerViewer", roleDescription: "Can view database triggers" },
+  { roleTitle: "TenantManager", roleDescription: "Manages tenant creation, updates, and deletion" },
+  { roleTitle: "TenantViewer", roleDescription: "Can view tenant details but cannot modify them" },
+  { roleTitle: "RoleManager", roleDescription: "Manages role creation, updates, and deletion" },
+  { roleTitle: "RoleViewer", roleDescription: "Can view roles but cannot modify them" },
+  { roleTitle: "UserManager", roleDescription: "Manages tenant users and their roles" },
+  { roleTitle: "UserViewer", roleDescription: "Can view tenant users but cannot modify them" },
+  { roleTitle: "QueryCreator", roleDescription: "Can create and test database queries" },
+  { roleTitle: "QueryEditor", roleDescription: "Can edit and delete database queries" },
+  { roleTitle: "QueryRunner", roleDescription: "Can run and test database queries" },
   { roleTitle: "WorkflowManager", roleDescription: "Manages workflows" },
   { roleTitle: "WidgetManager", roleDescription: "Manages widgets" },
-  // Add an explicit ADMIN role if needed
+  { roleTitle: "DatasourceManager", roleDescription: "Manages datasources" },
+  { roleTitle: "AppPageManager", roleDescription: "Manages app pages" },
+  { roleTitle: "ListenerManager", roleDescription: "Manages listeners" },
+  { roleTitle: "CronJobManager", roleDescription: "Manages cron jobs" },
+  { roleTitle: "ApiKeyManager", roleDescription: "Manages API keys" },
+  { roleTitle: "AuditViewer", roleDescription: "Can view audit logs" },
+  { roleTitle: "AIManager", roleDescription: "Manages AI interactions" },
   { roleTitle: "ADMIN", roleDescription: "Full administrative access" },
 ];
 
-// We'll map role titles to permissions later
 const rolePermissionsMap = {
-  TenantManager: ["tenant:read", "tenant:update", "tenant:create"],
-  TenantViewer: ["tenant:read"],
-  RoleManager: [
-    "tenant:role:create",
-    "tenant:role:list",
-    "tenant:role:read",
-    "tenant:role:update",
-    "tenant:role:delete",
-  ],
-  RoleViewer: ["tenant:role:list", "tenant:role:read"],
-  UserManager: [
-    "tenant:user:list",
-    "tenant:user:read",
-    "tenant:user:update",
-    "tenant:user:create",
-    "tenant:user:delete",
-  ],
-  UserViewer: ["tenant:user:list", "tenant:user:read"],
-  DatabaseManager: [
-    "tenant:database:metadata",
-    "tenant:database:schema:create",
-    "tenant:database:query:list",
-    "tenant:database:query:create",
-    "tenant:database:query:test",
-    "tenant:database:query:read",
-    "tenant:database:query:update",
-    "tenant:database:query:delete",
-    "tenant:database:table:list",
-    "tenant:database:table:create",
-    "tenant:database:table:read",
-    "tenant:database:table:update",
-    "tenant:database:table:row:read",
-    "tenant:database:table:row:create",
-    "tenant:database:table:row:update",
-    "tenant:database:table:stats",
-    "tenant:database:trigger:list",
-    "tenant:database:trigger:create",
-    "tenant:database:trigger:read",
-    "tenant:database:trigger:delete",
-  ],
-  DatabaseViewer: [
-    "tenant:database:metadata",
-    "tenant:database:query:list",
-    "tenant:database:query:read",
-    "tenant:database:table:list",
-    "tenant:database:table:read",
-    "tenant:database:table:row:read",
-    "tenant:database:table:stats",
-    "tenant:database:trigger:list",
-    "tenant:database:trigger:read",
-  ],
-  QueryCreator: ["tenant:database:query:create", "tenant:database:query:test"],
-  QueryEditor: ["tenant:database:query:update", "tenant:database:query:delete"],
-  QueryRunner: ["tenant:database:query:test", "tenant:database:query:read"],
-  TableManager: [
-    "tenant:database:table:list",
-    "tenant:database:table:create",
-    "tenant:database:table:read",
-    "tenant:database:table:update",
-    "tenant:database:table:row:read",
-    "tenant:database:table:row:create",
-    "tenant:database:table:row:update",
-    "tenant:database:table:stats",
-  ],
-  TableViewer: [
-    "tenant:database:table:list",
-    "tenant:database:table:read",
-    "tenant:database:table:row:read",
-    "tenant:database:table:stats",
-  ],
-  TriggerManager: [
-    "tenant:database:trigger:list",
-    "tenant:database:trigger:create",
-    "tenant:database:trigger:read",
-    "tenant:database:trigger:delete",
-  ],
-
-  WorkflowManager: [
-    "tenant:workflow:list",
-    "tenant:workflow:create",
-    "tenant:workflow:read",
-    "tenant:workflow:update",
-    "tenant:workflow:delete",
-    "tenant:workflow:execute",
-  ],
-  WidgetManager: [
-    "tenant:widget:list",
-    "tenant:widget:create",
-    "tenant:widget:read",
-    "tenant:widget:update",
-    "tenant:widget:delete",
-    "tenant:widget:test",
-    "tenant:widget:clone",
-  ],
-  ADMIN: [
-    "tenant:read",
-    "tenant:update",
-    "tenant:create",
-    "tenant:role:create",
-    "tenant:role:list",
-    "tenant:role:read",
-    "tenant:role:update",
-    "tenant:role:delete",
-    "tenant:user:list",
-    "tenant:user:read",
-    "tenant:user:update",
-    "tenant:user:create",
-    "tenant:user:delete",
-    "tenant:database:metadata",
-    "tenant:database:schema:create",
-    "tenant:database:query:list",
-    "tenant:database:query:create",
-    "tenant:database:query:test",
-    "tenant:database:query:read",
-    "tenant:database:query:update",
-    "tenant:database:query:delete",
-    "tenant:database:table:list",
-    "tenant:database:table:create",
-    "tenant:database:table:read",
-    "tenant:database:table:update",
-    "tenant:database:table:row:read",
-    "tenant:database:table:row:create",
-    "tenant:database:table:row:update",
-    "tenant:database:table:stats",
-    "tenant:database:trigger:list",
-    "tenant:database:trigger:create",
-    "tenant:database:trigger:read",
-    "tenant:database:trigger:delete",
-
-    "tenant:permissions:list",
-    // Consolidated & New Permissions for ADMIN
-    "tenant:ai:create",
-    "tenant:cronjob:history:read",
-    "tenant:dashboard:clone",
-    "tenant:query:bulk:create",
-    "tenant:query:clone",
-    "tenant:query:aigenerate",
-    "tenant:database:raw-sql:execute",
-    "tenant:database:table:row:delete",
-    "tenant:database:table:row:export",
-    "tenant:datasource:test",
-    "tenant:datasource:clone",
-    // Widget
-    "tenant:widget:list",
-    "tenant:widget:create",
-    "tenant:widget:read",
-    "tenant:widget:update",
-    "tenant:widget:delete",
-    "tenant:widget:test",
-    "tenant:widget:clone",
-    // Workflow
-    "tenant:workflow:list",
-    "tenant:workflow:create",
-    "tenant:workflow:read",
-    "tenant:workflow:update",
-    "tenant:workflow:delete",
-    "tenant:workflow:execute",
-  ],
+  TenantManager: [P.tenant.read.title, P.tenant.update.title, P.tenant.delete.title],
+  TenantViewer: [P.tenant.read.title],
+  RoleManager: [P.role.create.title, P.role.list.title, P.role.read.title, P.role.update.title, P.role.delete.title],
+  RoleViewer: [P.role.list.title, P.role.read.title, P.permission.list.title],
+  UserManager: [P.user.list.title, P.user.read.title, P.user.update.title, P.user.create.title, P.user.delete.title],
+  UserViewer: [P.user.list.title, P.user.read.title],
+  QueryCreator: [P.dataquery.create.title, P.dataquery.test.title, P.dataquery.list.title, P.dataquery.read.title],
+  QueryEditor: [P.dataquery.update.title, P.dataquery.delete.title, P.dataquery.list.title, P.dataquery.read.title],
+  QueryRunner: [P.dataquery.execute.title, P.dataquery.list.title, P.dataquery.read.title],
+  WorkflowManager: [P.workflow.list.title, P.workflow.create.title, P.workflow.read.title, P.workflow.update.title, P.workflow.delete.title, P.workflow.execute.title, P.workflow.test.title],
+  WidgetManager: [P.widget.list.title, P.widget.create.title, P.widget.read.title, P.widget.update.title, P.widget.delete.title, P.widget.execute.title],
+  DatasourceManager: [P.datasource.list.title, P.datasource.create.title, P.datasource.read.title, P.datasource.update.title, P.datasource.delete.title, P.datasource.test.title],
+  AppPageManager: [P.appPage.list.title, P.appPage.create.title, P.appPage.read.title, P.appPage.update.title, P.appPage.delete.title],
+  ListenerManager: [P.listener.list.title, P.listener.create.title, P.listener.read.title, P.listener.update.title, P.listener.delete.title, P.listener.execute.title],
+  CronJobManager: [P.cronjob.list.title, P.cronjob.create.title, P.cronjob.read.title, P.cronjob.update.title, P.cronjob.delete.title],
+  ApiKeyManager: [P.apikey.list.title, P.apikey.create.title, P.apikey.read.title, P.apikey.update.title, P.apikey.delete.title],
+  AuditViewer: [P.audit.list.title],
+  AIManager: [P.ai.chat.title, P.ai.read.title, P.ai.delete.title],
+  ADMIN: PERMISSIONS_LIST.map(p => p.permissionTitle),
 };
 
 const systemUser = {
@@ -506,7 +71,7 @@ async function main() {
       );
 
       // Filter to only new permissions
-      const newPermissions = permissions.filter(
+      const newPermissions = PERMISSIONS_LIST.filter(
         (p) => !existingPermissionTitles.has(p.permissionTitle.toLowerCase())
       );
 
