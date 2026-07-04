@@ -13,11 +13,13 @@ cd /app/apps/backend
 echo "[1/3] Configuring backend..."
 
 export NODE_ENV=${NODE_ENV:-production}
+export NGINX_PORT=${PORT:-10000}
 
-# Generate .env file
+# Generate .env file for Node.js
+# We forcefully bind Node.js to 8090 so NGINX can take the Render PORT
 cat > .env <<EOL
 NODE_ENV=${NODE_ENV}
-PORT=${PORT:-8090}
+PORT=8090
 DATABASE_URL=${DATABASE_URL}
 SESSION_SECRET=${SESSION_SECRET:-supersecret}
 GEMINI_API_KEY=${GEMINI_API_KEY}
@@ -77,8 +79,12 @@ fi
 # Start Backend
 # ============================================
 echo "============================================"
-echo "Starting internal NGINX router on port 3000..."
+echo "Generating NGINX configuration for port $NGINX_PORT..."
+envsubst '${NGINX_PORT}' < /etc/nginx/nginx.backend.conf > /etc/nginx/nginx.conf
+
+echo "Starting internal NGINX router..."
 nginx -g 'daemon off;' &
+
 echo "Starting Node.js backend server on port 8090..."
 echo "============================================"
 

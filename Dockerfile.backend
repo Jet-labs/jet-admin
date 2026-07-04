@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
     wget \
     python3 \
-    make \
     g++ \
     nginx \
+    gettext-base \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -37,8 +37,8 @@ RUN npm install --legacy-peer-deps
 COPY apps/backend/ ./apps/backend/
 COPY packages/ ./packages/
 
-# Copy custom backend nginx config
-COPY nginx.backend.conf /etc/nginx/nginx.conf
+# Copy custom backend nginx config template
+COPY nginx.backend.conf /etc/nginx/nginx.backend.conf
 
 # Generate Prisma client
 WORKDIR /app/apps/backend
@@ -53,8 +53,8 @@ RUN mkdir -p /app/apps/backend/logs && chmod 755 /app/apps/backend/logs
 # Fix nginx permissions for non-root environments if necessary (optional)
 RUN chown -R www-data:www-data /app/apps/backend/logs
 
-# Expose port for NGINX
-EXPOSE 3000
+# Expose port for Node and Webhooks (NGINX will bind dynamically)
+EXPOSE 8090 8095
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
