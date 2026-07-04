@@ -63,7 +63,7 @@ services:
     environment:
       # Server Configuration
       - NODE_ENV=production
-      - PORT=8090
+      - PORT=3000
       
       # Database Configuration
       - DATABASE_URL=postgresql://postgres:your_strong_password@postgres:5432/jet_admin_db

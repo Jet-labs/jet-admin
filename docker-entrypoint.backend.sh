@@ -16,7 +16,7 @@ export NODE_ENV=${NODE_ENV:-production}
 export NGINX_PORT=${PORT:-10000}
 
 # Generate .env file for Node.js
-# We forcefully bind Node.js to 8090 so NGINX can take the Render PORT
+# We forcefully bind Node.js to 8090 internally
 cat > .env <<EOL
 NODE_ENV=${NODE_ENV}
 PORT=8090
