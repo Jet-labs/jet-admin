@@ -27,6 +27,7 @@ import { useInfiniteDatasources } from "../../../logic/hooks/useDatasources";
 import { getDatasourceByIDAPI } from "../../../data/apis/datasource";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
+import { RealtimeListenerGuidanceBox } from "./realtimeListenerGuidanceBox";
 
 // Get only datasource types that support listeners
 const getListenerCapableDatasources = () => {
@@ -264,9 +265,17 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
         </Section>
       )}
 
-
-
-
+      {/* Real-time Listener Guidance & Test Snippets Box */}
+      {effectiveDatasourceType && (
+        <RealtimeListenerGuidanceBox
+          tenantID={tenantID}
+          listenerID={listenerEditorForm.values.listenerID}
+          datasourceType={effectiveDatasourceType}
+          listenerConfig={listenerEditorForm.values.listenerConfig}
+          datasourceOptions={selectedDatasource?.datasourceOptions}
+          typeConfig={datasourceTypeConfig}
+        />
+      )}
     </div>
   );
 };

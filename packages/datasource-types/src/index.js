@@ -119,6 +119,20 @@ import natsFormConfig from "./nats/formConfig.json";
 import natsQueryConfigForm from "./nats/queryConfig.json";
 import natsListenerConfigForm from "./nats/listenerConfig.json";
 
+import postgresqlGuidance from "./postgresql/guidance";
+import firestoreGuidance from "./firestore/guidance";
+import mongodbGuidance from "./mongodb/guidance";
+import graphqlGuidance from "./graphql/guidance";
+import rabbitmqGuidance from "./rabbitmq/guidance";
+import kafkaGuidance from "./kafka/guidance";
+import redisGuidance from "./redis/guidance";
+import webhookGuidance from "./webhook/guidance";
+import mqttGuidance from "./mqtt/guidance";
+import websocketGuidance from "./websocket/guidance";
+import sseGuidance from "./sse/guidance";
+import syslogGuidance from "./syslog/guidance";
+import natsGuidance from "./nats/guidance";
+
 export const DATASOURCE_TYPES = {
   POSTGRESQL: {
     name: "PostgreSQL",
@@ -128,6 +142,7 @@ export const DATASOURCE_TYPES = {
     formConfig: postgresqlFormConfig,
     queryConfigForm: postgresqlQueryConfigForm,
     listenerConfigForm: postgresqlListenerConfigForm,
+    listenerGuidance: postgresqlGuidance,
     supportsListener: true,
   },
   RESTAPI: {
@@ -156,6 +171,7 @@ export const DATASOURCE_TYPES = {
     formConfig: firestoreFormConfig,
     queryConfigForm: firestoreQueryConfigForm,
     listenerConfigForm: firestoreListenerConfigForm,
+    listenerGuidance: firestoreGuidance,
     supportsListener: true,
   },
   MYSQL: {
@@ -174,6 +190,7 @@ export const DATASOURCE_TYPES = {
     formConfig: mongodbFormConfig,
     queryConfigForm: mongodbQueryConfigForm,
     listenerConfigForm: mongodbListenerConfigForm,
+    listenerGuidance: mongodbGuidance,
     supportsListener: true,
   },
   GOOGLESHEETS: {
@@ -194,6 +211,7 @@ export const DATASOURCE_TYPES = {
     formConfig: graphqlFormConfig,
     queryConfigForm: graphqlQueryConfigForm,
     listenerConfigForm: graphqlListenerConfigForm,
+    listenerGuidance: graphqlGuidance,
     supportsListener: true,
   },
   RABBITMQ: {
@@ -204,6 +222,7 @@ export const DATASOURCE_TYPES = {
     formConfig: rabbitmqFormConfig,
     queryConfigForm: rabbitmqQueryConfigForm,
     listenerConfigForm: rabbitmqListenerConfigForm,
+    listenerGuidance: rabbitmqGuidance,
     supportsListener: true,
   },
   KAFKA: {
@@ -214,6 +233,7 @@ export const DATASOURCE_TYPES = {
     formConfig: kafkaFormConfig,
     queryConfigForm: kafkaQueryConfigForm,
     listenerConfigForm: kafkaListenerConfigForm,
+    listenerGuidance: kafkaGuidance,
     supportsListener: true,
   },
   REDIS: {
@@ -224,6 +244,7 @@ export const DATASOURCE_TYPES = {
     formConfig: redisFormConfig,
     queryConfigForm: redisQueryConfigForm,
     listenerConfigForm: redisListenerConfigForm,
+    listenerGuidance: redisGuidance,
     supportsListener: true,
   },
   // Batch 1 datasources
@@ -373,6 +394,7 @@ export const DATASOURCE_TYPES = {
     formConfig: webhookFormConfig,
     queryConfigForm: webhookQueryConfigForm,
     listenerConfigForm: webhookListenerConfigForm,
+    listenerGuidance: webhookGuidance,
     supportsListener: true,
   },
   MQTT: {
@@ -383,6 +405,7 @@ export const DATASOURCE_TYPES = {
     formConfig: mqttFormConfig,
     queryConfigForm: mqttQueryConfigForm,
     listenerConfigForm: mqttListenerConfigForm,
+    listenerGuidance: mqttGuidance,
     supportsListener: true,
   },
   WEBSOCKET: {
@@ -393,6 +416,7 @@ export const DATASOURCE_TYPES = {
     formConfig: websocketFormConfig,
     queryConfigForm: websocketQueryConfigForm,
     listenerConfigForm: websocketListenerConfigForm,
+    listenerGuidance: websocketGuidance,
     supportsListener: true,
   },
   SSE: {
@@ -403,6 +427,7 @@ export const DATASOURCE_TYPES = {
     formConfig: sseFormConfig,
     queryConfigForm: sseQueryConfigForm,
     listenerConfigForm: sseListenerConfigForm,
+    listenerGuidance: sseGuidance,
     supportsListener: true,
   },
   SYSLOG: {
@@ -413,6 +438,7 @@ export const DATASOURCE_TYPES = {
     formConfig: syslogFormConfig,
     queryConfigForm: syslogQueryConfigForm,
     listenerConfigForm: syslogListenerConfigForm,
+    listenerGuidance: syslogGuidance,
     supportsListener: true,
   },
   NATS: {
@@ -423,6 +449,7 @@ export const DATASOURCE_TYPES = {
     formConfig: natsFormConfig,
     queryConfigForm: natsQueryConfigForm,
     listenerConfigForm: natsListenerConfigForm,
+    listenerGuidance: natsGuidance,
     supportsListener: true,
   },
   EXCELCSV: {

@@ -33,6 +33,11 @@ import GoogleAnalyticsDataSource from "./googleanalytics/datasource";
 
 // Listeners
 import SyslogDataSource from "./syslog/datasource";
+import WebhookDataSource from "./webhook/datasource";
+import WebSocketDataSource from "./websocket/datasource";
+import SSEDataSource from "./sse/datasource";
+import MQTTDataSource from "./mqtt/datasource";
+import NatsDataSource from "./nats/datasource";
 
 import ExcelCSVDataSource from "./excelcsv/datasource";
 
@@ -70,6 +75,11 @@ const dataSources = {
   
   // Listeners
   syslog: SyslogDataSource,
+  webhook: WebhookDataSource,
+  websocket: WebSocketDataSource,
+  sse: SSEDataSource,
+  mqtt: MQTTDataSource,
+  nats: NatsDataSource,
 
   excelcsv: ExcelCSVDataSource,
 };

@@ -31,7 +31,7 @@ async function startAllListeners() {
     const { startPipelineWorker } = require('../modules/listener/listenerEngine/pipelineWorker');
     await startPipelineWorker();
 
-    // 5. Listener engine (bootstraps all active listeners)
+    // 5. Listener engine (bootstraps all active listeners & shared webhook ingress server)
     const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
     await listenerEngine.startAll();
 

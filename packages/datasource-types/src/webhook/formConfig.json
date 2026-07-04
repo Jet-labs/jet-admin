@@ -15,17 +15,32 @@
       },
       "authType": {
         "type": "string",
-        "enum": ["none", "header", "query_param", "basic"],
+        "enum": ["none", "basic", "bearer", "header", "query_param"],
         "description": "Authentication method for incoming requests",
         "default": "none"
       },
+      "username": {
+        "type": "string",
+        "description": "Username for Basic Authentication"
+      },
+      "password": {
+        "type": "string",
+        "description": "Password for Basic Authentication",
+        "format": "password"
+      },
+      "bearerToken": {
+        "type": "string",
+        "description": "Bearer token secret",
+        "format": "password"
+      },
       "authHeaderName": {
         "type": "string",
-        "description": "Header name for authentication (e.g., X-Api-Key)"
+        "description": "Header or Query Param name for authentication (e.g., X-Api-Key)"
       },
       "authSecret": {
         "type": "string",
-        "description": "Secret value to validate against"
+        "description": "Secret value to validate against",
+        "format": "password"
       }
     },
     "required": ["connectionName"]
@@ -43,7 +58,36 @@
       },
       {
         "type": "Group",
-        "label": "Authentication",
+        "label": "Basic Authentication",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "const": "basic" }
+          }
+        },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/username", "label": "Username" },
+          { "type": "Control", "scope": "#/properties/password", "label": "Password", "options": { "format": "password" } }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Bearer Token Authentication",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "const": "bearer" }
+          }
+        },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/bearerToken", "label": "Bearer Token", "options": { "format": "password" } }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Custom Header / Query Param Authentication",
         "rule": {
           "effect": "SHOW",
           "condition": {
@@ -65,6 +109,9 @@
     "connectionName": "MyWebhook",
     "allowedMethods": "POST",
     "authType": "none",
+    "username": "",
+    "password": "",
+    "bearerToken": "",
     "authHeaderName": "",
     "authSecret": ""
   }

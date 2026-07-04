@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
+    nginx \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -36,6 +37,9 @@ RUN npm install --legacy-peer-deps
 COPY apps/backend/ ./apps/backend/
 COPY packages/ ./packages/
 
+# Copy custom backend nginx config
+COPY nginx.backend.conf /etc/nginx/nginx.conf
+
 # Generate Prisma client
 WORKDIR /app/apps/backend
 RUN npx prisma generate
@@ -46,9 +50,11 @@ RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 # Create log directory
 RUN mkdir -p /app/apps/backend/logs && chmod 755 /app/apps/backend/logs
+# Fix nginx permissions for non-root environments if necessary (optional)
+RUN chown -R www-data:www-data /app/apps/backend/logs
 
-# Expose port
-EXPOSE 8090
+# Expose port for NGINX
+EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \

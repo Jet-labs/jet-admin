@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-      - "8090:8090"
+      - "8090:3000"
     image: rasgsav/jet-admin:cloud
     container_name: jet-admin-cloud
     healthcheck:

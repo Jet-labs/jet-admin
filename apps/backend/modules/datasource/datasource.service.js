@@ -210,9 +210,12 @@ datasourceService.testDatasourceConnection = async ({
       finalOptions = mergeAndRestoreMaskedOptions(datasourceOptions, existingDecrypted);
     }
 
-    const connectionResult = await DATASOURCE_LOGIC_COMPONENTS[
-      datasourceType
-    ].testConnection({
+    const component = DATASOURCE_LOGIC_COMPONENTS[datasourceType];
+    if (!component || typeof component.testConnection !== "function") {
+      throw new Error(`Connection test for datasource type '${datasourceType}' is not supported.`);
+    }
+
+    const connectionResult = await component.testConnection({
       datasourceOptions: finalOptions,
       helpers: {
         fileStorage: fileStorageUtil,
@@ -228,7 +231,7 @@ datasourceService.testDatasourceConnection = async ({
       },
     });
 
-    if (!connectionResult.ok) {
+    if (!connectionResult || (!connectionResult.ok && !connectionResult.success)) {
       Logger.log("error", {
         message: "datasourceService:testDatasourceConnection:error",
         params: {
@@ -236,7 +239,7 @@ datasourceService.testDatasourceConnection = async ({
           connectionResult,
         },
       });
-      throw new Error(connectionResult.error || "Connection test failed");
+      throw new Error(connectionResult?.error || "Connection test failed");
     }
 
     Logger.log("success", {
@@ -252,7 +255,7 @@ datasourceService.testDatasourceConnection = async ({
       message: "datasourceService:testDatasourceConnection:error",
       params: {
         userID,
-        error,
+        error: error.message || error,
       },
     });
     throw error;
@@ -693,5 +696,5 @@ datasourceService.proxyDatasourceAction = async ({
 
 
 
-module.exports = {datasourceService};
+module.exports = { datasourceService, decryptOptions };
 

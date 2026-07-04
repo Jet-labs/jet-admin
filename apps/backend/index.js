@@ -260,8 +260,8 @@ httpServer.listen(port, async () => {
 });
 
 // Graceful shutdown
-process.on("SIGINT", async () => {
-  Logger.log("info", { message: "shutting down server" });
+const gracefulShutdown = async (signal) => {
+  Logger.log("info", { message: `shutting down server (${signal})` });
 
   // Stop all listeners
   try {
@@ -270,7 +270,19 @@ process.on("SIGINT", async () => {
     // Ignore cleanup errors
   }
 
-  httpServer.close(() => {
+  if (httpServer) {
+    httpServer.close(() => {
+      if (signal === "SIGUSR2") {
+        process.kill(process.pid, "SIGUSR2");
+      } else {
+        process.exit(0);
+      }
+    });
+  } else {
     process.exit(0);
-  });
-});
+  }
+};
+
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.once("SIGUSR2", () => gracefulShutdown("SIGUSR2"));

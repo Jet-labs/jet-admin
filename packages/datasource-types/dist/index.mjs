@@ -7536,17 +7536,32 @@ var formConfig_default30 = {
       },
       authType: {
         type: "string",
-        enum: ["none", "header", "query_param", "basic"],
+        enum: ["none", "basic", "bearer", "header", "query_param"],
         description: "Authentication method for incoming requests",
         default: "none"
       },
+      username: {
+        type: "string",
+        description: "Username for Basic Authentication"
+      },
+      password: {
+        type: "string",
+        description: "Password for Basic Authentication",
+        format: "password"
+      },
+      bearerToken: {
+        type: "string",
+        description: "Bearer token secret",
+        format: "password"
+      },
       authHeaderName: {
         type: "string",
-        description: "Header name for authentication (e.g., X-Api-Key)"
+        description: "Header or Query Param name for authentication (e.g., X-Api-Key)"
       },
       authSecret: {
         type: "string",
-        description: "Secret value to validate against"
+        description: "Secret value to validate against",
+        format: "password"
       }
     },
     required: ["connectionName"]
@@ -7564,7 +7579,36 @@ var formConfig_default30 = {
       },
       {
         type: "Group",
-        label: "Authentication",
+        label: "Basic Authentication",
+        rule: {
+          effect: "SHOW",
+          condition: {
+            scope: "#/properties/authType",
+            schema: { const: "basic" }
+          }
+        },
+        elements: [
+          { type: "Control", scope: "#/properties/username", label: "Username" },
+          { type: "Control", scope: "#/properties/password", label: "Password", options: { format: "password" } }
+        ]
+      },
+      {
+        type: "Group",
+        label: "Bearer Token Authentication",
+        rule: {
+          effect: "SHOW",
+          condition: {
+            scope: "#/properties/authType",
+            schema: { const: "bearer" }
+          }
+        },
+        elements: [
+          { type: "Control", scope: "#/properties/bearerToken", label: "Bearer Token", options: { format: "password" } }
+        ]
+      },
+      {
+        type: "Group",
+        label: "Custom Header / Query Param Authentication",
         rule: {
           effect: "SHOW",
           condition: {
@@ -7586,6 +7630,9 @@ var formConfig_default30 = {
     connectionName: "MyWebhook",
     allowedMethods: "POST",
     authType: "none",
+    username: "",
+    password: "",
+    bearerToken: "",
     authHeaderName: "",
     authSecret: ""
   }
@@ -8008,6 +8055,353 @@ var listenerConfig_default13 = {
   data: { subjects: "", queueGroup: "" }
 };
 
+// src/postgresql/guidance.js
+function getPostgresqlGuidance({ listenerConfig = {} }) {
+  const channels = listenerConfig.channels || "orders_channel";
+  const firstChannel = channels.split(",")[0].trim();
+  const snippet = `NOTIFY ${firstChannel}, '{"event": "order_created", "id": 1001}';`;
+  return {
+    title: "PostgreSQL LISTEN / NOTIFY Guidance",
+    summary: "Listens for real-time PostgreSQL database notification events.",
+    badges: [{ label: `Channels: ${channels}`, color: "purple" }],
+    snippets: [
+      {
+        label: "SQL NOTIFY Test Command",
+        language: "sql",
+        code: snippet
+      }
+    ],
+    instructions: "Execute NOTIFY in SQL or triggers to push live notifications to Jet Admin."
+  };
+}
+
+// src/firestore/guidance.js
+function getFirestoreGuidance({ listenerConfig = {} }) {
+  const collection = listenerConfig.collection || "orders";
+  const snippet = `// Trigger snapshot listener in Firebase SDK:
+await db.collection("${collection}").add({
+  status: "new",
+  timestamp: new Date()
+});`;
+  return {
+    title: "Firestore Real-time Listener Guidance",
+    summary: "Subscribes to Google Cloud Firestore real-time collection document changes.",
+    badges: [{ label: `Collection: ${collection}`, color: "amber" }],
+    snippets: [
+      {
+        label: "Firebase JS SDK Document Trigger",
+        language: "javascript",
+        code: snippet
+      }
+    ],
+    instructions: "Listens for document creates, updates, and deletes in the specified Firestore collection."
+  };
+}
+
+// src/mongodb/guidance.js
+function getMongodbGuidance({ listenerConfig = {} }) {
+  const collection = listenerConfig.collection || "transactions";
+  const snippet = `db.${collection}.insertOne({ type: "payment", amount: 100, createdAt: new Date() });`;
+  return {
+    title: "MongoDB Change Stream Guidance",
+    summary: "Subscribes to MongoDB Change Streams on target collections.",
+    badges: [{ label: `Collection: ${collection}`, color: "emerald" }],
+    snippets: [
+      {
+        label: "MongoDB Shell Insert Command",
+        language: "javascript",
+        code: snippet
+      }
+    ],
+    instructions: "Listens for document mutations (insert, update, replace, delete) on your MongoDB cluster."
+  };
+}
+
+// src/graphql/guidance.js
+function getGraphqlGuidance({ listenerConfig = {}, datasourceOptions = {} }) {
+  const wsEndpoint = datasourceOptions.wsEndpoint || "ws://localhost:4000/graphql";
+  const query = listenerConfig.subscriptionQuery || "subscription {\n  orderCreated {\n    id\n    amount\n  }\n}";
+  return {
+    title: "GraphQL Subscription Guidance",
+    summary: "Establishes a GraphQL WebSocket subscription using graphql-ws protocol.",
+    badges: [{ label: `WS Endpoint: ${wsEndpoint}`, color: "pink" }],
+    snippets: [
+      {
+        label: "GraphQL Subscription Query",
+        language: "graphql",
+        code: query
+      }
+    ],
+    instructions: "Receives real-time data pushes published by your GraphQL subscription endpoint."
+  };
+}
+
+// src/rabbitmq/guidance.js
+function getRabbitmqGuidance({ listenerConfig = {} }) {
+  const exchange = listenerConfig.exchange || "amq.topic";
+  const routingKey = listenerConfig.routingKey || "orders.created";
+  const queueName = listenerConfig.queueName || "jet-admin-queue";
+  const snippet = `rabbitmqadmin publish exchange="${exchange}" routing_key="${routingKey}" payload='{"orderId": 123, "status": "created"}'`;
+  return {
+    title: "RabbitMQ AMQP Guidance",
+    summary: "Asserts exchange, binds queue, and consumes real-time AMQP messages.",
+    badges: [
+      { label: `Exchange: ${exchange}`, color: "purple" },
+      { label: `Routing Key: ${routingKey}`, color: "blue" },
+      { label: `Queue: ${queueName || "auto-generated"}`, color: "emerald" }
+    ],
+    snippets: [
+      {
+        label: "RabbitMQ Admin Publish Command",
+        language: "bash",
+        code: snippet
+      }
+    ],
+    instructions: "Listens for messages matching the specified routing key pattern."
+  };
+}
+
+// src/kafka/guidance.js
+function getKafkaGuidance({ listenerConfig = {}, datasourceOptions = {} }) {
+  const brokers = datasourceOptions.brokers || "localhost:9092";
+  const topics = listenerConfig.topics || "user-events";
+  const groupId = listenerConfig.groupId || "jet-admin-consumer";
+  const snippet = `kafka-console-producer.sh --bootstrap-server ${brokers} --topic ${topics.split(",")[0].trim()}`;
+  return {
+    title: "Apache Kafka Listener Guidance",
+    summary: "Connects to a Kafka cluster as a consumer group to consume topic message streams.",
+    badges: [
+      { label: `Brokers: ${brokers}`, color: "blue" },
+      { label: `Topics: ${topics}`, color: "purple" },
+      { label: `Group: ${groupId}`, color: "emerald" }
+    ],
+    snippets: [
+      {
+        label: "Kafka Console Producer Command",
+        language: "bash",
+        code: snippet
+      }
+    ],
+    instructions: "Consumes messages as part of the specified consumer group. Supports partition rebalancing."
+  };
+}
+
+// src/redis/guidance.js
+function getRedisGuidance({ listenerConfig = {} }) {
+  const subType = listenerConfig.subType || "pubsub";
+  const channels = listenerConfig.channels || listenerConfig.pattern || "orders";
+  const firstChannel = channels.split(",")[0].trim();
+  const snippet = `redis-cli PUBLISH "${firstChannel}" '{"event": "user_signup", "id": 42}'`;
+  return {
+    title: "Redis Pub/Sub & Keyspace Guidance",
+    summary: "Subscribes to Redis Pub/Sub channels or Keyspace pattern notifications.",
+    badges: [
+      { label: `Type: ${subType}`, color: "red" },
+      { label: `Target: ${channels}`, color: "purple" }
+    ],
+    snippets: [
+      {
+        label: "redis-cli Publish Command",
+        language: "bash",
+        code: snippet
+      }
+    ],
+    instructions: "Captures messages published to Redis channels or keyspace expiration events."
+  };
+}
+
+// src/webhook/guidance.js
+function getWebhookGuidance({
+  tenantID,
+  listenerID,
+  listenerConfig = {},
+  datasourceOptions = {},
+  baseUrl = "http://localhost:8095"
+}) {
+  const options = { ...datasourceOptions, ...listenerConfig };
+  const pathSuffix = (listenerConfig.pathSuffix || "").replace(/^\//, "");
+  const effectiveSuffix = pathSuffix || "your-path-suffix";
+  const allowedMethod = (options.allowedMethods || "POST").toUpperCase();
+  const authType = options.authType || "none";
+  const pathSuffixUrl = `${baseUrl}/webhooks/v1/inbound/${tenantID}/${effectiveSuffix}`;
+  const listenerIdUrl = listenerID ? `${baseUrl}/webhooks/v1/inbound/${listenerID}` : `${baseUrl}/webhooks/v1/inbound/<listenerID>`;
+  let authHeaderSnippet = "";
+  let authQueryStr = "";
+  let authDescription = "Public (No Auth required)";
+  if (authType === "basic") {
+    const user = options.username || "username";
+    const pass = options.password || "password";
+    authHeaderSnippet = ` -u "${user}:${pass}" \\`;
+    authDescription = `Basic Auth (User: '${user}')`;
+  } else if (authType === "bearer") {
+    const token = options.bearerToken || "YOUR_BEARER_TOKEN";
+    authHeaderSnippet = ` -H "Authorization: Bearer ${token}" \\`;
+    authDescription = `Bearer Token ('${token}')`;
+  } else if (authType === "header") {
+    const headerName = options.authHeaderName || "x-api-key";
+    const secret = options.authSecret || "YOUR_SECRET_KEY";
+    authHeaderSnippet = ` -H "${headerName}: ${secret}" \\`;
+    authDescription = `Header '${headerName}'`;
+  } else if (authType === "query_param") {
+    const paramName = options.authHeaderName || "api_key";
+    const secret = options.authSecret || "YOUR_SECRET_KEY";
+    authQueryStr = `?${paramName}=${encodeURIComponent(secret)}`;
+    authDescription = `Query Param '?${paramName}=...'`;
+  }
+  const curlSnippet = `curl -X ${allowedMethod} "${pathSuffixUrl}${authQueryStr}" \\${authHeaderSnippet ? `
+ ${authHeaderSnippet}` : ""}
+  -H "Content-Type: application/json" \\
+  -d '{"event": "payment_success", "amount": 100}'`;
+  return {
+    title: "Webhook Ingestion Guidance",
+    summary: "Ingests HTTP POST, PUT, or GET requests sent to Jet Admin's dedicated Webhook Receiver service on port 8095.",
+    badges: [
+      { label: `Method: ${allowedMethod}`, color: "purple" },
+      { label: `Auth: ${authDescription}`, color: "blue" },
+      { label: "Port: 8095", color: "emerald" }
+    ],
+    urls: [
+      {
+        label: "Custom Path Suffix Endpoint URL",
+        url: pathSuffixUrl,
+        description: "Use this URL in third-party webhooks (Stripe, GitHub, Shopify)"
+      },
+      {
+        label: "Direct Listener ID Endpoint URL (Fallback)",
+        url: listenerIdUrl,
+        description: "Direct reference by unique listener UUID"
+      }
+    ],
+    snippets: [
+      {
+        label: "Real-time cURL Request Command",
+        language: "bash",
+        code: curlSnippet
+      }
+    ],
+    instructions: "Point third-party webhooks or HTTP clients to the copyable URL above."
+  };
+}
+
+// src/mqtt/guidance.js
+function getMqttGuidance({
+  listenerConfig = {},
+  datasourceOptions = {}
+}) {
+  const topics = listenerConfig.topics || "sensors/+/temperature, alerts/#";
+  const qos = listenerConfig.qos !== void 0 ? listenerConfig.qos : 0;
+  const host = datasourceOptions.host || datasourceOptions.brokerUrl || "broker.hivemq.com";
+  const port = datasourceOptions.port || 1883;
+  const firstTopic = topics.split(",")[0].trim().replace(/\+/g, "device1").replace(/#/g, "test");
+  const pubSnippet = `mosquitto_pub -h ${host} -p ${port} -t "${firstTopic}" -m '{"temperature": 24.5, "status": "ok"}'`;
+  return {
+    title: "MQTT Listener Guidance",
+    summary: "Subscribes to an MQTT broker for real-time IoT messages and telemetry streams.",
+    badges: [
+      { label: `Broker: ${host}:${port}`, color: "purple" },
+      { label: `QoS: ${qos}`, color: "blue" }
+    ],
+    snippets: [
+      {
+        label: "MQTT CLI Test Publisher Command",
+        language: "bash",
+        code: pubSnippet
+      }
+    ],
+    instructions: `Subscribed topics: '${topics}'. Wildcards '+' (single level) and '#' (multi level) are supported.`
+  };
+}
+
+// src/websocket/guidance.js
+function getWebsocketGuidance({ datasourceOptions = {} }) {
+  const endpoint = datasourceOptions.endpoint || "ws://localhost:8080/ws";
+  const snippet = `wscat -c "${endpoint}"`;
+  return {
+    title: "WebSocket Listener Guidance",
+    summary: "Connects as a client to a remote WebSocket server endpoint (ws:// or wss://).",
+    badges: [{ label: `Endpoint: ${endpoint}`, color: "blue" }],
+    snippets: [
+      {
+        label: "WebSocket Client Test Command (wscat)",
+        language: "bash",
+        code: snippet
+      }
+    ],
+    instructions: "Maintains a persistent socket connection. Incoming JSON/string frames are queued for pipeline execution."
+  };
+}
+
+// src/sse/guidance.js
+function getSseGuidance({ listenerConfig = {}, datasourceOptions = {} }) {
+  const endpoint = datasourceOptions.endpoint || "http://localhost:3000/events";
+  const eventNames = listenerConfig.eventNames || "all un-named events";
+  const snippet = `curl -N "${endpoint}"`;
+  return {
+    title: "Server-Sent Events (SSE) Guidance",
+    summary: "Opens an HTTP EventSource stream to receive real-time server events.",
+    badges: [
+      { label: `Endpoint: ${endpoint}`, color: "blue" },
+      { label: `Events: ${eventNames}`, color: "emerald" }
+    ],
+    snippets: [
+      {
+        label: "Curl EventSource Stream Test Command",
+        language: "bash",
+        code: snippet
+      }
+    ],
+    instructions: "Listens for HTTP stream events. Custom event names specified in configuration will trigger pipelines."
+  };
+}
+
+// src/syslog/guidance.js
+function getSyslogGuidance({ listenerConfig = {}, datasourceOptions = {} }) {
+  const syslogPort = listenerConfig.port || datasourceOptions.port || 5514;
+  const address = listenerConfig.address || datasourceOptions.address || "0.0.0.0";
+  const snippet = `logger -n 127.0.0.1 -P ${syslogPort} -u "Test syslog event from Jet Admin"`;
+  return {
+    title: "Syslog UDP Receiver Guidance",
+    summary: "Binds a local UDP Syslog receiver server socket to ingest system and router log streams.",
+    badges: [
+      { label: `Address: ${address}`, color: "purple" },
+      { label: `Port: ${syslogPort} (UDP)`, color: "emerald" }
+    ],
+    snippets: [
+      {
+        label: "Linux Logger Test Command",
+        language: "bash",
+        code: snippet
+      }
+    ],
+    instructions: `Configure rsyslog, syslog-ng, or firewall routers to forward UDP logs to port ${syslogPort}.`
+  };
+}
+
+// src/nats/guidance.js
+function getNatsGuidance({ listenerConfig = {}, datasourceOptions = {} }) {
+  const servers = datasourceOptions.servers || "nats://localhost:4222";
+  const subject = listenerConfig.subject || "orders.*";
+  const queue = listenerConfig.queue || "workers";
+  const snippet = `nats pub "${subject.replace(/\*/g, "created")}" '{"orderId": "1001", "status": "paid"}'`;
+  return {
+    title: "NATS Listener Guidance",
+    summary: "Subscribes to NATS server subjects for high-performance event messaging.",
+    badges: [
+      { label: `Servers: ${servers}`, color: "blue" },
+      { label: `Subject: ${subject}`, color: "purple" },
+      ...queue ? [{ label: `Queue: ${queue}`, color: "emerald" }] : []
+    ],
+    snippets: [
+      {
+        label: "NATS CLI Publish Command",
+        language: "bash",
+        code: snippet
+      }
+    ],
+    instructions: "Wildcards '*' (single token) and '>' (multi token) are supported for subject matching."
+  };
+}
+
 // src/index.js
 var DATASOURCE_TYPES = {
   POSTGRESQL: {
@@ -8018,6 +8412,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default,
     queryConfigForm: queryConfig_default,
     listenerConfigForm: listenerConfig_default,
+    listenerGuidance: getPostgresqlGuidance,
     supportsListener: true
   },
   RESTAPI: {
@@ -8046,6 +8441,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default4,
     queryConfigForm: queryConfig_default4,
     listenerConfigForm: listenerConfig_default2,
+    listenerGuidance: getFirestoreGuidance,
     supportsListener: true
   },
   MYSQL: {
@@ -8064,6 +8460,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default6,
     queryConfigForm: queryConfig_default6,
     listenerConfigForm: listenerConfig_default3,
+    listenerGuidance: getMongodbGuidance,
     supportsListener: true
   },
   GOOGLESHEETS: {
@@ -8084,6 +8481,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default8,
     queryConfigForm: queryConfig_default8,
     listenerConfigForm: listenerConfig_default4,
+    listenerGuidance: getGraphqlGuidance,
     supportsListener: true
   },
   RABBITMQ: {
@@ -8094,6 +8492,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default9,
     queryConfigForm: queryConfig_default9,
     listenerConfigForm: listenerConfig_default5,
+    listenerGuidance: getRabbitmqGuidance,
     supportsListener: true
   },
   KAFKA: {
@@ -8104,6 +8503,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default10,
     queryConfigForm: queryConfig_default10,
     listenerConfigForm: listenerConfig_default6,
+    listenerGuidance: getKafkaGuidance,
     supportsListener: true
   },
   REDIS: {
@@ -8114,6 +8514,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default11,
     queryConfigForm: queryConfig_default11,
     listenerConfigForm: listenerConfig_default7,
+    listenerGuidance: getRedisGuidance,
     supportsListener: true
   },
   // Batch 1 datasources
@@ -8263,6 +8664,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default30,
     queryConfigForm: queryConfig_default30,
     listenerConfigForm: listenerConfig_default8,
+    listenerGuidance: getWebhookGuidance,
     supportsListener: true
   },
   MQTT: {
@@ -8273,6 +8675,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default31,
     queryConfigForm: queryConfig_default31,
     listenerConfigForm: listenerConfig_default9,
+    listenerGuidance: getMqttGuidance,
     supportsListener: true
   },
   WEBSOCKET: {
@@ -8283,6 +8686,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default32,
     queryConfigForm: queryConfig_default32,
     listenerConfigForm: listenerConfig_default10,
+    listenerGuidance: getWebsocketGuidance,
     supportsListener: true
   },
   SSE: {
@@ -8293,6 +8697,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default33,
     queryConfigForm: queryConfig_default33,
     listenerConfigForm: listenerConfig_default11,
+    listenerGuidance: getSseGuidance,
     supportsListener: true
   },
   SYSLOG: {
@@ -8303,6 +8708,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default34,
     queryConfigForm: queryConfig_default34,
     listenerConfigForm: listenerConfig_default12,
+    listenerGuidance: getSyslogGuidance,
     supportsListener: true
   },
   NATS: {
@@ -8313,6 +8719,7 @@ var DATASOURCE_TYPES = {
     formConfig: formConfig_default35,
     queryConfigForm: queryConfig_default35,
     listenerConfigForm: listenerConfig_default13,
+    listenerGuidance: getNatsGuidance,
     supportsListener: true
   },
   EXCELCSV: {

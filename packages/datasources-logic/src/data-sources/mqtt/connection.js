@@ -1,3 +1,4 @@
 export const mqttTestConnection = async ({ datasourceOptions }) => {
-  return { success: true };
+  return { ok: true, success: true };
 };
+

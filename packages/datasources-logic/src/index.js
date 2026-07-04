@@ -38,6 +38,12 @@ import { googleanalyticsTestConnection } from "./data-sources/googleanalytics/co
 
 // Listeners
 import { syslogTestConnection } from "./data-sources/syslog/connection";
+import { webhookTestConnection } from "./data-sources/webhook/connection";
+import { webhookRouter } from "./data-sources/webhook/router.js";
+import { mqttTestConnection } from "./data-sources/mqtt/connection";
+import { websocketTestConnection } from "./data-sources/websocket/connection";
+import { sseTestConnection } from "./data-sources/sse/connection";
+import { natsTestConnection } from "./data-sources/nats/connection";
 
 import { excelcsvTestConnection } from "./data-sources/excelcsv/connection";
 
@@ -45,7 +51,7 @@ import { excelcsvTestConnection } from "./data-sources/excelcsv/connection";
 import { getManifestForType } from "./data-sources/manifests";
 
 
-export { dataSourceRegistry };
+export { dataSourceRegistry, webhookRouter };
 
 /**
  * Helper: creates a getDatasourceInfo function for any datasource type.
@@ -247,6 +253,36 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
       return await syslogTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("syslog"),
+  },
+  [DATASOURCE_TYPES.WEBHOOK.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await webhookTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("webhook"),
+  },
+  [DATASOURCE_TYPES.MQTT.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await mqttTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("mqtt"),
+  },
+  [DATASOURCE_TYPES.WEBSOCKET.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await websocketTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("websocket"),
+  },
+  [DATASOURCE_TYPES.SSE.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await sseTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("sse"),
+  },
+  [DATASOURCE_TYPES.NATS.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await natsTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("nats"),
   },
   [DATASOURCE_TYPES.EXCELCSV.value]: {
     testConnection: async ({ datasourceOptions, helpers }) => {

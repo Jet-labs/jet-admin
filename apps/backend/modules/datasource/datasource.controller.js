@@ -133,10 +133,10 @@ datasourceController.testDatasourceConnection = async (req, res) => {
     Logger.log("error", {
       message: "datasourceController:testDatasourceConnection:error",
       params: {
-        error,
+        error: error.message || error,
       },
     });
-    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+    return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

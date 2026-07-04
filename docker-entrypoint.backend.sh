@@ -77,7 +77,9 @@ fi
 # Start Backend
 # ============================================
 echo "============================================"
-echo "Starting backend server..."
+echo "Starting internal NGINX router on port 3000..."
+nginx -g 'daemon off;' &
+echo "Starting Node.js backend server on port 8090..."
 echo "============================================"
 
 exec "$@"

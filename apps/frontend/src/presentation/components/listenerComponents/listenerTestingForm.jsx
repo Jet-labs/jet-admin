@@ -51,7 +51,7 @@ export const ListenerTestingForm = ({
   }, [socket, listenerID]);
 
   useEffect(() => {
-    if (!socket || !isActive) return;
+    if (!socket || !listenerID) return;
 
     const handleTestEvent = (data) => {
       if (data.listenerID === listenerID) {
@@ -61,7 +61,7 @@ export const ListenerTestingForm = ({
 
     socket.on("listener_test_event", handleTestEvent);
     return () => socket.off("listener_test_event", handleTestEvent);
-  }, [socket, listenerID, isActive]);
+  }, [socket, listenerID]);
 
   useEffect(() => {
     if (scrollRef.current) {

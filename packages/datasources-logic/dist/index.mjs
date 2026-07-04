@@ -4152,6 +4152,485 @@ var SyslogDataSource = class extends DataSource {
   }
 };
 
+// src/data-sources/webhook/router.js
+import express from "express";
+var WebhookRouter = class {
+  constructor() {
+    this._handlers = /* @__PURE__ */ new Map();
+    this._app = express();
+    this._app.use(express.json({ limit: "10mb" }));
+    this._app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+    this._app.use(express.raw({ type: "*/*", limit: "10mb" }));
+    this._app.get("/health", (_req, res) => {
+      res.status(200).json({
+        status: "ok",
+        service: "webhook-receiver",
+        activeListeners: this._handlers.size,
+        timestamp: /* @__PURE__ */ new Date()
+      });
+    });
+    this._app.all("/webhooks/v1/inbound/:tenantID/:pathSuffix", (req, res) => {
+      const { tenantID, pathSuffix } = req.params;
+      const key = `tenant:${tenantID}:${pathSuffix.replace(/^\//, "")}`;
+      const handler = this._handlers.get(key);
+      if (handler) {
+        handler(req, res);
+      } else {
+        res.status(404).json({ success: false, error: "Webhook listener not found or inactive." });
+      }
+    });
+    this._app.all("/webhooks/v1/inbound/:listenerID", (req, res) => {
+      const { listenerID } = req.params;
+      const key = `id:${listenerID}`;
+      const handler = this._handlers.get(key);
+      if (handler) {
+        handler(req, res);
+      } else {
+        res.status(404).json({ success: false, error: "Webhook listener not found or inactive." });
+      }
+    });
+  }
+  /**
+   * Register a webhook listener's request handler.
+   * @param {string} routeKey  - Opaque key returned by WebhookDataSource.subscribe()
+   * @param {Function} handler - (req, res) => void
+   */
+  register(routeKey, handler) {
+    this._handlers.set(routeKey, handler);
+  }
+  /**
+   * Remove a webhook listener's request handler.
+   * @param {string} routeKey
+   */
+  deregister(routeKey) {
+    this._handlers.delete(routeKey);
+  }
+  /**
+   * The underlying Express application — passed to http.createServer() by the engine.
+   */
+  getApp() {
+    return this._app;
+  }
+  /**
+   * Number of currently registered listeners.
+   */
+  get size() {
+    return this._handlers.size;
+  }
+};
+var webhookRouter = new WebhookRouter();
+
+// src/data-sources/webhook/datasource.js
+var WebhookDataSource = class extends DataSource {
+  async execute(dataQueryOptions2, context) {
+    throw new Error("Webhook is a listener-only datasource.");
+  }
+  /**
+   * Register this listener's inbound route on the shared WebhookRouter.
+   *
+   * Route keys (in priority order):
+   *   tenant:<tenantID>:<pathSuffix>  — if listenerConfig.pathSuffix is set
+   *   id:<listenerID>                 — always registered as fallback
+   *
+   * @param {object} listenerConfig  - listener-level config (pathSuffix, allowedMethods, authType, …)
+   * @param {Function} onEvent       - callback(rawEvent) invoked by the engine
+   * @returns {{ routeKeys: string[] }} handle passed to unsubscribe()
+   */
+  async subscribe(listenerConfig, onEvent) {
+    const dsOptions = this.config?.datasourceOptions || {};
+    const mergedOptions = { ...dsOptions, ...listenerConfig };
+    const listenerID = listenerConfig?.listenerID || this.config?.datasourceID;
+    const tenantID = listenerConfig?.tenantID;
+    const pathSuffix = listenerConfig?.pathSuffix?.replace(/^\//, "");
+    const routeKeys = [];
+    const handler = (req, res) => this._handleRequest(req, res, mergedOptions, listenerID, onEvent);
+    if (tenantID && pathSuffix) {
+      const key = `tenant:${tenantID}:${pathSuffix}`;
+      webhookRouter.register(key, handler);
+      routeKeys.push(key);
+    }
+    if (listenerID) {
+      const key = `id:${listenerID}`;
+      webhookRouter.register(key, handler);
+      routeKeys.push(key);
+    }
+    Logger.log("info", {
+      message: "webhook:subscribe:registered",
+      params: { listenerID, routeKeys }
+    });
+    return { routeKeys };
+  }
+  /**
+   * Deregister this listener's routes from the shared WebhookRouter.
+   * @param {{ routeKeys: string[] }} handle
+   */
+  async unsubscribe(handle) {
+    if (!handle?.routeKeys) return;
+    for (const key of handle.routeKeys) {
+      webhookRouter.deregister(key);
+    }
+    Logger.log("info", {
+      message: "webhook:unsubscribe",
+      params: { datasourceID: this.config?.datasourceID, routeKeys: handle.routeKeys }
+    });
+  }
+  // ─── Internal request handler ────────────────────────────────────────────────
+  _handleRequest(req, res, options, listenerID, onEvent) {
+    const requestMethod = req.method.toUpperCase();
+    try {
+      const allowedMethods = (options.allowedMethods || "POST").toUpperCase();
+      if (allowedMethods !== "ANY" && requestMethod !== allowedMethods) {
+        Logger.log("warning", {
+          message: "webhook:methodNotAllowed",
+          params: { listenerID, requestMethod, allowedMethods }
+        });
+        return res.status(405).json({
+          success: false,
+          error: `Method '${requestMethod}' not allowed. Configured allowed method is '${allowedMethods}'.`
+        });
+      }
+      const authType = options.authType || "none";
+      if (authType === "basic") {
+        const authHeader = req.headers["authorization"] || "";
+        if (!authHeader.startsWith("Basic ")) {
+          res.setHeader("WWW-Authenticate", 'Basic realm="Webhook"');
+          return res.status(401).json({ success: false, error: "Missing Basic Authentication header." });
+        }
+        const [incomingUsername, incomingPassword] = Buffer.from(authHeader.split(" ")[1], "base64").toString("utf-8").split(":");
+        if (incomingUsername !== (options.username || "") || incomingPassword !== (options.password || "")) {
+          return res.status(401).json({ success: false, error: "Invalid Basic Auth username or password." });
+        }
+      } else if (authType === "bearer") {
+        const authHeader = req.headers["authorization"] || "";
+        if (!authHeader.startsWith("Bearer ")) {
+          return res.status(401).json({ success: false, error: "Missing Bearer Authentication token." });
+        }
+        if (authHeader.split(" ")[1] !== (options.bearerToken || "")) {
+          return res.status(401).json({ success: false, error: "Invalid Bearer token." });
+        }
+      } else if (authType === "header") {
+        const headerName = (options.authHeaderName || "x-api-key").toLowerCase();
+        if (!req.headers[headerName] || req.headers[headerName] !== (options.authSecret || "")) {
+          return res.status(401).json({ success: false, error: `Invalid or missing '${headerName}' header.` });
+        }
+      } else if (authType === "query_param") {
+        const paramName = options.authHeaderName || "api_key";
+        if (!req.query[paramName] || req.query[paramName] !== (options.authSecret || "")) {
+          return res.status(401).json({ success: false, error: `Invalid or missing '${paramName}' query parameter.` });
+        }
+      }
+      const rawEvent = {
+        method: req.method,
+        headers: req.headers,
+        query: req.query,
+        body: req.body,
+        url: req.originalUrl,
+        params: req.params,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      onEvent(rawEvent).catch((err) => {
+        Logger.log("error", {
+          message: "webhook:onEvent:error",
+          params: { listenerID, error: err.message }
+        });
+      });
+      const responseStatus = options.responseStatusCode || 200;
+      let responseBody = options.responseBody;
+      if (!responseBody) {
+        responseBody = { success: true, message: "Webhook event received successfully.", listenerID };
+      } else if (typeof responseBody === "string") {
+        try {
+          responseBody = JSON.parse(responseBody);
+        } catch {
+          res.setHeader("Content-Type", "text/plain");
+          return res.status(responseStatus).send(responseBody);
+        }
+      }
+      return res.status(responseStatus).json(responseBody);
+    } catch (error) {
+      Logger.log("error", {
+        message: "webhook:handleRequest:error",
+        params: { listenerID, error: error.message }
+      });
+      return res.status(500).json({ success: false, error: "Internal server error processing webhook." });
+    }
+  }
+};
+
+// src/data-sources/websocket/datasource.js
+import WebSocket2 from "ws";
+var WebSocketDataSource = class extends DataSource {
+  async execute(dataQueryOptions2, context) {
+    throw new Error("WebSocket is a listener-only datasource.");
+  }
+  async subscribe(config, onEvent) {
+    const { endpoint, headers, protocols } = this.config.datasourceOptions || {};
+    if (!endpoint) {
+      throw new Error("WebSocket endpoint is required");
+    }
+    Logger.log("info", {
+      message: "websocket:subscribe:start",
+      params: { endpoint, datasourceID: this.config.datasourceID }
+    });
+    const options = {};
+    if (headers && Array.isArray(headers)) {
+      options.headers = {};
+      headers.forEach((h) => {
+        if (h.key && h.value) options.headers[h.key] = h.value;
+      });
+    }
+    const ws = new WebSocket2(endpoint, protocols || [], options);
+    ws.on("message", (data) => {
+      let payload = data.toString();
+      try {
+        payload = JSON.parse(payload);
+      } catch (e) {
+      }
+      onEvent({ payload });
+    });
+    ws.on("error", (error) => {
+      Logger.log("error", {
+        message: "websocket:subscribe:error",
+        params: { error: error.message }
+      });
+    });
+    return { ws };
+  }
+  async unsubscribe(handle) {
+    if (!handle || !handle.ws) return;
+    Logger.log("info", {
+      message: "websocket:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      handle.ws.terminate();
+    } catch (e) {
+      Logger.log("error", {
+        message: "websocket:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
+};
+
+// src/data-sources/sse/datasource.js
+import EventSource from "eventsource";
+var SSEDataSource = class extends DataSource {
+  async execute(dataQueryOptions2, context) {
+    throw new Error("SSE is a listener-only datasource.");
+  }
+  async subscribe(config, onEvent) {
+    const datasourceOptions = this.config.datasourceOptions || {};
+    const { endpoint, headers } = datasourceOptions;
+    if (!endpoint) {
+      throw new Error("SSE endpoint is required");
+    }
+    const eventNames = (config.eventNames || "").split(",").map((e) => e.trim()).filter(Boolean);
+    Logger.log("info", {
+      message: "sse:subscribe:start",
+      params: { endpoint, eventNames, datasourceID: this.config.datasourceID }
+    });
+    const options = {};
+    if (headers && Array.isArray(headers)) {
+      options.headers = {};
+      headers.forEach((h) => {
+        if (h.key && h.value) options.headers[h.key] = h.value;
+      });
+    }
+    const es = new EventSource(endpoint, options);
+    es.onmessage = (event) => {
+      let payload = event.data;
+      try {
+        payload = JSON.parse(payload);
+      } catch (e) {
+      }
+      onEvent({ eventName: "message", payload });
+    };
+    for (const eventName of eventNames) {
+      if (eventName === "message") continue;
+      es.addEventListener(eventName, (event) => {
+        let payload = event.data;
+        try {
+          payload = JSON.parse(payload);
+        } catch (e) {
+        }
+        onEvent({ eventName, payload });
+      });
+    }
+    es.onerror = (err) => {
+      Logger.log("error", {
+        message: "sse:subscribe:error",
+        params: { error: err.message || "Unknown SSE error" }
+      });
+    };
+    return { es };
+  }
+  async unsubscribe(handle) {
+    if (!handle || !handle.es) return;
+    Logger.log("info", {
+      message: "sse:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      handle.es.close();
+    } catch (e) {
+      Logger.log("error", {
+        message: "sse:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
+};
+
+// src/data-sources/mqtt/datasource.js
+import mqtt from "mqtt";
+var MQTTDataSource = class extends DataSource {
+  async execute(dataQueryOptions2, context) {
+    throw new Error("MQTT is a listener-only datasource.");
+  }
+  async subscribe(config, onEvent) {
+    const datasourceOptions = this.config.datasourceOptions || {};
+    const details = datasourceOptions.connectionDetails || datasourceOptions;
+    let { host, port, protocol, username, password, clientId } = details;
+    protocol = protocol || "mqtt";
+    if (!host) {
+      throw new Error("MQTT host is required");
+    }
+    const brokerUrl = `${protocol}://${host}:${port || 1883}`;
+    const topics = (config.topics || "").split(",").map((t) => t.trim()).filter(Boolean);
+    const qos = config.qos || 0;
+    if (!topics.length) {
+      throw new Error("MQTT topics are required");
+    }
+    Logger.log("info", {
+      message: "mqtt:subscribe:start",
+      params: { brokerUrl, topics, datasourceID: this.config.datasourceID }
+    });
+    const options = {};
+    if (username) options.username = username;
+    if (password) options.password = password;
+    if (clientId) options.clientId = clientId;
+    const client = mqtt.connect(brokerUrl, options);
+    return new Promise((resolve, reject) => {
+      let isConnected = false;
+      client.on("connect", () => {
+        isConnected = true;
+        client.subscribe(topics, { qos }, (err) => {
+          if (err) {
+            Logger.log("error", { message: "mqtt:subscribe:subscribeError", params: { error: err.message } });
+            reject(err);
+          } else {
+            resolve({ client, topics });
+          }
+        });
+      });
+      client.on("error", (error) => {
+        Logger.log("error", {
+          message: "mqtt:subscribe:error",
+          params: { error: error.message }
+        });
+        if (!isConnected) {
+          reject(error);
+        }
+      });
+      client.on("message", (topic, message) => {
+        let payload = message.toString();
+        try {
+          payload = JSON.parse(payload);
+        } catch (e) {
+        }
+        onEvent({ topic, payload });
+      });
+    });
+  }
+  async unsubscribe(handle) {
+    if (!handle || !handle.client) return;
+    Logger.log("info", {
+      message: "mqtt:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      if (handle.topics) {
+        handle.client.unsubscribe(handle.topics);
+      }
+      handle.client.end();
+    } catch (e) {
+      Logger.log("error", {
+        message: "mqtt:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
+};
+
+// src/data-sources/nats/datasource.js
+import { connect, StringCodec } from "nats";
+var NatsDataSource = class extends DataSource {
+  async execute(dataQueryOptions2, context) {
+    throw new Error("NATS is a listener-only datasource.");
+  }
+  async subscribe(config, onEvent) {
+    const datasourceOptions = this.config.datasourceOptions || {};
+    const { servers, token, user, pass } = datasourceOptions;
+    if (!servers) {
+      throw new Error("NATS servers are required");
+    }
+    const subject = config.subject || ">";
+    const queue = config.queue;
+    Logger.log("info", {
+      message: "nats:subscribe:start",
+      params: { servers, subject, queue, datasourceID: this.config.datasourceID }
+    });
+    const options = { servers: servers.split(",") };
+    if (token) options.token = token;
+    if (user && pass) {
+      options.user = user;
+      options.pass = pass;
+    }
+    const nc = await connect(options);
+    const sc = StringCodec();
+    const subOptions = {};
+    if (queue) subOptions.queue = queue;
+    const sub = nc.subscribe(subject, subOptions);
+    (async () => {
+      for await (const msg of sub) {
+        let payload = sc.decode(msg.data);
+        try {
+          payload = JSON.parse(payload);
+        } catch (e) {
+        }
+        onEvent({ subject: msg.subject, payload });
+      }
+    })().catch((error) => {
+      Logger.log("error", {
+        message: "nats:subscribe:error",
+        params: { error: error.message }
+      });
+    });
+    return { nc, sub };
+  }
+  async unsubscribe(handle) {
+    if (!handle) return;
+    Logger.log("info", {
+      message: "nats:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      if (handle.sub) {
+        handle.sub.unsubscribe();
+      }
+      if (handle.nc) {
+        await handle.nc.close();
+      }
+    } catch (e) {
+      Logger.log("error", {
+        message: "nats:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
+};
+
 // src/data-sources/excelcsv/datasource.js
 import ExcelJS from "exceljs";
 var CACHE_TTL_MS = 5 * 60 * 1e3;
@@ -4455,6 +4934,11 @@ var dataSources = {
   googleanalytics: GoogleAnalyticsDataSource,
   // Listeners
   syslog: SyslogDataSource,
+  webhook: WebhookDataSource,
+  websocket: WebSocketDataSource,
+  sse: SSEDataSource,
+  mqtt: MQTTDataSource,
+  nats: NatsDataSource,
   excelcsv: ExcelCSVDataSource
 };
 var data_sources_default = {
@@ -5660,7 +6144,32 @@ var googleanalyticsTestConnection = async ({ datasourceOptions }) => {
 
 // src/data-sources/syslog/connection.js
 var syslogTestConnection = async ({ datasourceOptions }) => {
-  return { success: true };
+  return { ok: true, success: true };
+};
+
+// src/data-sources/webhook/connection.js
+var webhookTestConnection = async ({ datasourceOptions }) => {
+  return { ok: true, success: true };
+};
+
+// src/data-sources/mqtt/connection.js
+var mqttTestConnection = async ({ datasourceOptions }) => {
+  return { ok: true, success: true };
+};
+
+// src/data-sources/websocket/connection.js
+var websocketTestConnection = async ({ datasourceOptions }) => {
+  return { ok: true, success: true };
+};
+
+// src/data-sources/sse/connection.js
+var sseTestConnection = async ({ datasourceOptions }) => {
+  return { ok: true, success: true };
+};
+
+// src/data-sources/nats/connection.js
+var natsTestConnection = async ({ datasourceOptions }) => {
+  return { ok: true, success: true };
 };
 
 // src/data-sources/excelcsv/connection.js
@@ -6652,6 +7161,36 @@ var DATASOURCE_LOGIC_COMPONENTS = {
     },
     getDatasourceInfo: _buildGetDatasourceInfo("syslog")
   },
+  [DATASOURCE_TYPES.WEBHOOK.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await webhookTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("webhook")
+  },
+  [DATASOURCE_TYPES.MQTT.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await mqttTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("mqtt")
+  },
+  [DATASOURCE_TYPES.WEBSOCKET.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await websocketTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("websocket")
+  },
+  [DATASOURCE_TYPES.SSE.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await sseTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("sse")
+  },
+  [DATASOURCE_TYPES.NATS.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await natsTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("nats")
+  },
   [DATASOURCE_TYPES.EXCELCSV.value]: {
     testConnection: async ({ datasourceOptions, helpers }) => {
       return await excelcsvTestConnection({ datasourceOptions, helpers });
@@ -6661,6 +7200,7 @@ var DATASOURCE_LOGIC_COMPONENTS = {
 };
 export {
   DATASOURCE_LOGIC_COMPONENTS,
-  data_sources_default as dataSourceRegistry
+  data_sources_default as dataSourceRegistry,
+  webhookRouter
 };
 //# sourceMappingURL=index.mjs.map

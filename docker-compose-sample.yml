@@ -56,7 +56,7 @@ services:
       dockerfile: Dockerfile.backend
     container_name: jet-admin-backend
     ports:
-      - "8090:8090"  # API direct access (optional, for debugging)
+      - "8090:3000"  # API and Webhook access via internal NGINX
     depends_on:
       postgres:
         condition: service_healthy

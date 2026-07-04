@@ -48,6 +48,8 @@ const environmentVariables = {
   AI_MODEL: process.env.AI_MODEL,
   /** Port the standalone apps/mcp-server listens on (default 5001) */
   MCP_SERVER_PORT: parseInt(process.env.MCP_SERVER_PORT || '5001', 10),
+  /** Port the shared Webhook ingress HTTP server listens on (default 8095). Managed by ListenerEngine via WebhookRouter. */
+  WEBHOOK_PORT: parseInt(process.env.WEBHOOK_PORT || '8095', 10),
   JET_ADMIN_INTERNAL_API_KEY: process.env.JET_ADMIN_INTERNAL_API_KEY,
   VAULT_ENCRYPTION_KEY: process.env.VAULT_ENCRYPTION_KEY,
   OAUTH_STATE_SECRET: process.env.OAUTH_STATE_SECRET,

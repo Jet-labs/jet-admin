@@ -16,11 +16,13 @@
  * The engine uses the saved transform script from the pipeline actions
  * (no session-specific overrides).
  */
-const { dataSourceRegistry } = require('@jet-admin/datasources-logic');
+const http = require('http');
+const { dataSourceRegistry, webhookRouter } = require('@jet-admin/datasources-logic');
 const { addListenerEvent } = require('../../../config/queue.config');
 const { prisma } = require('../../../config/prisma.config');
 const Logger = require('../../../utils/logger');
 const { vaultService } = require('../../vault/vault.service');
+const environment = require('../../../environment');
 
 const MAX_RETRIES = 10;
 const BASE_RETRY_DELAY_MS = 1000;
@@ -31,6 +33,8 @@ class ListenerEngine {
   constructor() {
     this.active = new Map();  // listenerID → { handle, instance, listener, state, retryCount, retryTimer }
     this.healthCheckTimer = null;
+    /** @type {import('http').Server | null} */
+    this.webhookServer = null;
   }
 
   // ─── Boot ───────────────────────────────────────────────────────────────────
@@ -58,6 +62,9 @@ class ListenerEngine {
       for (const listener of listeners) {
         await this.startOne(listener);
       }
+
+      // Start the shared Webhook HTTP ingress server (backed by WebhookRouter from datasources-logic)
+      await this._startWebhookServer();
 
       // Start periodic health check
       this.healthCheckTimer = setInterval(() => this._healthCheck(), HEALTH_CHECK_INTERVAL_MS);
@@ -105,7 +112,7 @@ class ListenerEngine {
       });
 
       const handle = await instance.subscribe(
-        listener.listenerConfig,
+        { ...listener.listenerConfig, listenerID: listener.listenerID, tenantID: listener.tenantID },
         async (rawEvent) => {
           // Emit a test event to clients who joined the listener's test room
           try {
@@ -266,12 +273,68 @@ class ListenerEngine {
       this.healthCheckTimer = null;
     }
 
+    // Stop the webhook HTTP ingress server
+    await this._stopWebhookServer();
+
     const ids = [...this.active.keys()];
     for (const listenerID of ids) {
       await this.stopOne(listenerID);
     }
 
     Logger.log('success', { message: 'ListenerEngine:stopAll:done' });
+  }
+
+  // ─── Webhook HTTP server lifecycle ──────────────────────────────────────────
+
+  async _startWebhookServer(retryCount = 0) {
+    const port = environment.WEBHOOK_PORT || 8095;
+
+    return new Promise((resolve, reject) => {
+      const server = http.createServer(webhookRouter.getApp());
+
+      server.on('error', async (err) => {
+        if (err.code === 'EADDRINUSE' && retryCount < 3) {
+          Logger.log('warning', {
+            message: 'ListenerEngine:webhookServer:portInUseRetrying',
+            params: { port, retryAttempt: retryCount + 1 },
+          });
+          try { server.close(); } catch { /* ignore */ }
+          await new Promise((r) => setTimeout(r, 1000));
+          try {
+            await this._startWebhookServer(retryCount + 1);
+            resolve();
+          } catch (retryErr) {
+            reject(retryErr);
+          }
+        } else {
+          Logger.log('error', {
+            message: 'ListenerEngine:webhookServer:startError',
+            params: { error: err.message },
+          });
+          reject(err);
+        }
+      });
+
+      server.listen(port, () => {
+        this.webhookServer = server;
+        Logger.log('success', {
+          message: 'ListenerEngine:webhookServer:started',
+          params: { port },
+        });
+        resolve();
+      });
+    });
+  }
+
+  async _stopWebhookServer() {
+    if (!this.webhookServer) return;
+    return new Promise((resolve) => {
+      this.webhookServer.close(() => {
+        Logger.log('info', { message: 'ListenerEngine:webhookServer:stopped' });
+        this.webhookServer = null;
+        resolve();
+      });
+    });
   }
 
   // ─── Reconnection (fault tolerance) ─────────────────────────────────────────
