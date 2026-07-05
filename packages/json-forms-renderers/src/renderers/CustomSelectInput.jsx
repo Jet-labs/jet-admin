@@ -71,6 +71,7 @@ export const CustomSelectInput = (props) => {
       </Label>
       <div className="flex items-center gap-2">
         <SearchSelect
+          size="sm"
           value={data || ""}
           onChange={(val) => handleChange(path, val)}
           options={selectOptions}

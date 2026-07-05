@@ -1,8 +1,25 @@
 import * as React from "react";
 import { Check, ChevronDown, Search, Loader2 } from "lucide-react";
 import * as SelectPrimitive from "@radix-ui/react-select";
+import { cva } from "class-variance-authority";
 import { Input } from "./input";
 import { cn } from "../lib/utils";
+
+const searchSelectVariants = cva(
+  "flex w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
+  {
+    variants: {
+      size: {
+        default: "h-8 px-2.5 py-1.5 text-sm",
+        sm: "h-7 px-2 py-1 text-xs",
+        lg: "h-10 px-3 py-2 text-base",
+      },
+    },
+    defaultVariants: {
+      size: "default",
+    },
+  }
+);
 
 export const SearchSelect = React.forwardRef(
   (
@@ -18,6 +35,7 @@ export const SearchSelect = React.forwardRef(
       isFetchingNextPage = false,
       isLoading = false,
       className,
+      size = "default",
       disabled = false,
       selectedLabel,
     },
@@ -91,10 +109,7 @@ export const SearchSelect = React.forwardRef(
             ref={ref}
             type="button"
             disabled={disabled}
-            className={cn(
-              "flex h-8 w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom px-2.5 py-1.5 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
-              className
-            )}
+            className={cn(searchSelectVariants({ size }), className)}
           >
             <span className="truncate">
               {selectedOption ? selectedOption.label : (selectedLabel || placeholder)}

@@ -1,0 +1,41 @@
+# ============================================
+# Jet Admin - MCP Container
+# ============================================
+# Node.js MCP API server
+
+FROM node:20-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    wget \
+    python3 \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy root package files (for workspace resolution)
+COPY package*.json ./
+
+# Copy workspace package.json files
+COPY apps/mcp-server/package*.json ./apps/mcp-server/
+COPY packages/mcp-server/package*.json ./packages/mcp-server/
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
+
+# Copy source files
+COPY apps/mcp-server/ ./apps/mcp-server/
+COPY packages/mcp-server/ ./packages/mcp-server/
+
+WORKDIR /app/apps/mcp-server
+
+# Expose the default local dev port; Render overrides $PORT at runtime
+EXPOSE 5001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-5001}/health || exit 1
+
+CMD ["npm", "start"]

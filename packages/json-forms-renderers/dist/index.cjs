@@ -302,6 +302,7 @@ var CustomSelectInput = (props) => {
   ), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(
     import_ui3.SearchSelect,
     {
+      size: "sm",
       value: data || "",
       onChange: (val) => handleChange(path, val),
       options: selectOptions,
@@ -1479,7 +1480,7 @@ var CustomFileUploadInput = (props) => {
         htmlFor: `file-upload-${path}`,
         className: "flex flex-col items-center justify-center cursor-pointer space-y-3 w-full h-full"
       },
-      isUploading ? /* @__PURE__ */ import_react28.default.createElement("div", { className: "flex flex-col items-center space-y-2" }, /* @__PURE__ */ import_react28.default.createElement("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-primary" }), /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-sm font-medium text-muted-foreground" }, "Uploading file\u2026")) : /* @__PURE__ */ import_react28.default.createElement(import_react28.default.Fragment, null, /* @__PURE__ */ import_react28.default.createElement("div", { className: "p-3 bg-primary/10 text-primary rounded-lg" }, /* @__PURE__ */ import_react28.default.createElement(import_lucide_react8.CloudUpload, { className: "h-6 w-6" })), /* @__PURE__ */ import_react28.default.createElement("div", { className: "text-center" }, /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-sm font-medium text-foreground" }, "Click to upload or drag & drop"), /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-xs text-muted-foreground mt-1" }, "Excel (.xlsx, .xls) or CSV up to 10MB")))
+      isUploading ? /* @__PURE__ */ import_react28.default.createElement("div", { className: "flex flex-col items-center space-y-2" }, /* @__PURE__ */ import_react28.default.createElement("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-primary" }), /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-sm font-medium text-muted-foreground" }, "Uploading file\u2026")) : /* @__PURE__ */ import_react28.default.createElement(import_react28.default.Fragment, null, /* @__PURE__ */ import_react28.default.createElement("div", { className: "p-3 bg-primary/10 text-primary rounded-md" }, /* @__PURE__ */ import_react28.default.createElement(import_lucide_react8.CloudUpload, { className: "h-6 w-6" })), /* @__PURE__ */ import_react28.default.createElement("div", { className: "text-center" }, /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-sm font-medium text-foreground" }, "Click to upload or drag & drop"), /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-xs text-muted-foreground mt-1" }, "Excel (.xlsx, .xls) or CSV up to 10MB")))
     )
   ), (errors?.length > 0 || errorMsg) && /* @__PURE__ */ import_react28.default.createElement("p", { className: "text-xs text-destructive mt-1 flex items-center gap-1" }, /* @__PURE__ */ import_react28.default.createElement(import_lucide_react8.AlertCircle, { className: "h-3 w-3" }), errorMsg || errors));
 };
@@ -1575,6 +1576,7 @@ var CustomSearchSelectInput = (props) => {
   ), /* @__PURE__ */ import_react30.default.createElement(
     import_ui18.SearchSelect,
     {
+      size: "sm",
       value: data ? String(data) : "",
       onChange: (val) => handleChange(path, val),
       options: selectOptions,

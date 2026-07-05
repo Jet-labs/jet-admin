@@ -251,7 +251,7 @@ export function AnimatedAIChat({
                                 <motion.div
                                     key={suggestion.prefix}
                                     className={cn(
-                                        "flex items-center gap-2 px-2.5 py-1.5 text-xs transition-colors cursor-pointer rounded-md",
+                                        "flex items-center gap-2 px-2.5 py-2 text-xs transition-colors cursor-pointer rounded-md",
                                         activeSuggestion === index 
                                             ? "bg-primary/10 text-primary font-medium" 
                                             : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
@@ -289,14 +289,14 @@ export function AnimatedAIChat({
                     placeholder="Ask anything about your tenant…"
                     disabled={busy}
                     style={{ boxShadow: 'none' }}
-                    className="w-full px-2 py-1.5 resize-none bg-transparent border-none text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/40 leading-6 min-h-[52px]"
+                    className="w-full px-2 py-2 resize-none bg-transparent border-none text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/40 leading-6 min-h-[52px]"
                 />
             </div>
 
             <AnimatePresence>
                 {attachments.length > 0 && (
                     <motion.div 
-                        className="px-2 pb-2 flex gap-1.5 flex-wrap"
+                        className="px-2 flex gap-2 flex-wrap"
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
@@ -304,7 +304,7 @@ export function AnimatedAIChat({
                         {attachments.map((file, index) => (
                             <motion.div
                                 key={index}
-                                className="flex items-center gap-1.5 text-xs bg-muted/40 py-1 px-2.5 rounded-full text-muted-foreground border border-border/50"
+                                className="flex items-center gap-2 text-xs bg-muted/40 py-1 px-2.5 rounded-full text-muted-foreground border border-border/50"
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
@@ -323,12 +323,12 @@ export function AnimatedAIChat({
             </AnimatePresence>
 
             <div className="p-2 border-t border-border flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                     <motion.button
                         type="button"
                         onClick={handleAttachFile}
                         whileTap={{ scale: 0.95 }}
-                        className="p-1.5 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 transition-colors"
+                        className="p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 transition-colors"
                     >
                         <Paperclip className="w-4 h-4" />
                     </motion.button>
@@ -341,7 +341,7 @@ export function AnimatedAIChat({
                         }}
                         whileTap={{ scale: 0.95 }}
                         className={cn(
-                            "p-1.5 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 transition-colors",
+                            "p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 transition-colors",
                             showCommandPalette && "bg-muted text-foreground"
                         )}
                     >
@@ -358,7 +358,7 @@ export function AnimatedAIChat({
                     }}
                     disabled={busy || !value.trim()}
                     className={cn(
-                        "h-8 px-3 rounded-md text-xs font-medium transition-all flex items-center gap-1.5",
+                        "h-8 px-3 rounded-md text-xs font-medium transition-all flex items-center gap-2",
                         value.trim()
                             ? "bg-primary text-foreground hover:bg-primary/90 shadow-sm hover:scale-[1.01] active:scale-[0.98]"
                             : "bg-muted text-muted-foreground/40 cursor-not-allowed"
@@ -417,12 +417,12 @@ export function AnimatedAIChat({
 
                     {inputCard}
 
-                    <div className="flex flex-wrap items-center justify-center gap-1.5">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
                         {commandSuggestions.map((suggestion, index) => (
                             <motion.button
                                 key={suggestion.prefix}
                                 onClick={() => selectCommandSuggestion(index)}
-                                className="flex items-center gap-1.5 px-2 py-1 bg-muted/40 hover:bg-muted border border-border/80 rounded-md text-xs text-muted-foreground hover:text-foreground transition-all relative group"
+                                className="flex items-center gap-2 px-2 py-1 bg-muted/40 hover:bg-muted border border-border/80 rounded-md text-xs text-muted-foreground hover:text-foreground transition-all relative group"
                                 initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.05 }}

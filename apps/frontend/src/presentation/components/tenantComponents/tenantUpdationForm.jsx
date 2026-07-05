@@ -20,6 +20,7 @@ import { TenantUserAdditionForm } from "../tenantUsersComponents/tenantUserAddit
 import { TenantEditor } from "./tenantEditor";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { TenantDeletionForm } from "./tenantDeletionForm";
+import { TenantAIConfigEditor } from "./TenantAIConfigEditor";
 
 const initialValues = {
   tenantID: "",
@@ -153,6 +154,8 @@ export const TenantUpdationForm = ({ tenantID }) => {
                   </Section>
 
                   <TenantEditor tenantEditorForm={updateTenantForm} />
+
+                  <TenantAIConfigEditor tenantID={tenantID} />
 
                   <Section
                     title={CONSTANTS.STRINGS.UPDATE_TENANT_MEMBERS_TITLE}

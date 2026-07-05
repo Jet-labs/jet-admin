@@ -137,6 +137,19 @@ router.post(
   tenantController.createNewTenant
 );
 
+router.get(
+  "/:tenantID/ai-config",
+  validate(tenantIdParamSchema, "params"),
+  authMiddleware.authorize(P.tenant.read),
+  tenantController.getTenantAIConfig
+);
+
+router.post(
+  "/:tenantID/ai-config",
+  validate(tenantIdParamSchema, "params"),
+  authMiddleware.authorize(P.tenant.update),
+  tenantController.updateTenantAIConfig
+);
 
 
 router.patch(

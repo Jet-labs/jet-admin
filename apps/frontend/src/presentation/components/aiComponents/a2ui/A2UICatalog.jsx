@@ -64,7 +64,7 @@ export function A2UICard({ title, description, fields, actions, onAction, submit
       {Array.isArray(fields) && fields.length > 0 && (
         <div className="space-y-3 pt-1">
           {fields.map((field, idx) => (
-            <div key={idx} className="space-y-1.5 text-xs">
+            <div key={idx} className="space-y-2 text-xs">
               {field.label && (
                 <label className="font-medium text-foreground block">{field.label}</label>
               )}
@@ -130,7 +130,7 @@ export function A2UICard({ title, description, fields, actions, onAction, submit
                 disabled={submitting}
                 onClick={() => handleActionClick(act)}
                 className={cn(
-                  "h-8 px-3 text-xs font-medium rounded-lg flex items-center gap-1.5 transition-all disabled:opacity-50",
+                  "h-8 px-3 text-xs font-medium rounded-lg flex items-center gap-2 transition-all disabled:opacity-50",
                   isDanger
                     ? "bg-red-600 hover:bg-red-700 text-white shadow-sm"
                     : isOutline
@@ -211,7 +211,7 @@ export function A2UIConfirmCard({ title, description, toolName, params, onAction
           type="button"
           disabled={submitting}
           onClick={handleApprove}
-          className="h-8 px-3.5 text-xs font-semibold rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-sm flex items-center gap-1.5 disabled:opacity-50 transition-all"
+          className="h-8 px-3.5 text-xs font-semibold rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-sm flex items-center gap-2 disabled:opacity-50 transition-all"
         >
           {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
           <span>Approve Execution</span>
@@ -258,12 +258,12 @@ export function A2UIChoiceSelector({ title, description, choices = [], onAction,
             className="w-full text-left p-3 rounded-lg border border-border/70 bg-background hover:bg-muted/40 hover:border-primary/40 transition-all flex items-start justify-between group disabled:opacity-50"
           >
             <div className="space-y-0.5 min-w-0 pr-2">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                   {choice.label}
                 </span>
                 {choice.badge && (
-                  <span className="text-[10px] bg-primary/15 text-primary px-1.5 py-0.5 rounded font-medium">
+                  <span className="text-[10px] bg-primary/15 text-primary px-2 py-0.5 rounded font-medium">
                     {choice.badge}
                   </span>
                 )}
@@ -355,7 +355,7 @@ export function A2UIChart({ title, chartType = "bar", data = [] }) {
           )}
           <span className="text-xs font-semibold text-foreground">{title || "Data Visualization"}</span>
         </div>
-        <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground uppercase font-mono">
+        <span className="text-[10px] bg-muted px-2 py-0.5 rounded text-muted-foreground uppercase font-mono">
           {chartType}
         </span>
       </div>
@@ -482,7 +482,7 @@ export function A2UITable({ title, columns = [], rows = [] }) {
                   const key = typeof col === "object" ? col.field : col;
                   const val = typeof row === "object" ? row[key] : row;
                   return (
-                    <td key={cIdx} className="px-3 py-1.5 text-muted-foreground border-r border-border/40 last:border-0 truncate max-w-[150px]">
+                    <td key={cIdx} className="px-3 py-2 text-muted-foreground border-r border-border/40 last:border-0 truncate max-w-[150px]">
                       {val === null || val === undefined ? "-" : String(val)}
                     </td>
                   );

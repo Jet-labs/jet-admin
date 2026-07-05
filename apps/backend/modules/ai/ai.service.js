@@ -194,21 +194,37 @@ aiService.streamChat = async ({ messages, tenantID, bearerToken, res }) => {
     return;
   }
 
-  const rawModel = environment.AI_MODEL || constants.AI.DEFAULT_MODEL;
+  const { vaultService } = require('../vault/vault.service');
+  let tenantAiConfig = null;
+  try {
+    tenantAiConfig = await vaultService.getCredentialByProvider({ tenantID, provider: "ai_config" });
+  } catch (err) {
+    Logger.log('warning', { message: 'ai.service:streamChat:failedToFetchTenantConfig', params: { error: err.message } });
+  }
 
-  // Use native @ai-sdk/google if GEMINI_API_KEY is present, else fall back to OpenAI-compatible provider
+  const rawModel = tenantAiConfig?.model || environment.AI_MODEL || constants.AI.DEFAULT_MODEL;
+  const aiProvider = tenantAiConfig?.provider || 'openai';
+  const aiApiKey = tenantAiConfig?.apiKey;
+  const aiBaseUrl = tenantAiConfig?.baseURL;
+
+  if (!aiApiKey) {
+    Logger.log('warning', { message: 'ai.service:streamChat:missingTenantApiKey', params: { tenantID } });
+    res.status(403).json({ error: 'AI features are disabled. Please configure an API key in the Tenant Settings.' });
+    return;
+  }
+
   let modelInstance;
-  if (environment.GEMINI_API_KEY) {
+  if (aiProvider === 'google') {
     const googleProvider = _createGoogle({
-      apiKey: environment.GEMINI_API_KEY,
+      apiKey: aiApiKey,
     });
     // Map gemini or gemma model string to native Google provider
     const isGoogleModel = rawModel.includes('gemini') || rawModel.includes('gemma');
     modelInstance = googleProvider(isGoogleModel ? rawModel : constants.AI.DEFAULT_MODEL);
   } else {
     const openaiProvider = _createOpenAI({
-      baseURL: environment.AI_BASE_URL || constants.AI.DEFAULT_BASE_URL,
-      apiKey: environment.NVIDIA_API_KEY || environment.OPENAI_API_KEY,
+      baseURL: aiBaseUrl,
+      apiKey: aiApiKey,
       compatibility: 'compatible',
     });
     modelInstance = openaiProvider.chat(rawModel);

@@ -49,8 +49,8 @@ export default function getWebhookGuidance({
     title: "Webhook Ingestion Guidance",
     summary: "Ingests HTTP POST, PUT, or GET requests sent to Jet Admin's dedicated Webhook Receiver service on port 8095.",
     badges: [
-      { label: `Method: ${allowedMethod}`, color: "purple" },
-      { label: `Auth: ${authDescription}`, color: "blue" },
+      { label: `Method: ${allowedMethod}`, color: "neutral" },
+      { label: `Auth: ${authDescription}`, color: authType === "none" ? "neutral" : "emerald" },
       { label: "Port: 8095", color: "emerald" },
     ],
     urls: [

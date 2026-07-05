@@ -940,6 +940,8 @@ export const CONSTANTS = {
       getAllTenantUsersAPI: (tenantID) => `/api/v1/tenants/${tenantID}/users`,
       deleteUserTenantByIDAPI: (tenantID) => `/api/v1/tenants/${tenantID}`,
       uploadTenantLogoAPI: () => "/api/v1/tenants/upload-logo",
+      getTenantAIConfigAPI: (tenantID) => `/api/v1/tenants/${tenantID}/ai-config`,
+      updateTenantAIConfigAPI: (tenantID) => `/api/v1/tenants/${tenantID}/ai-config`,
     },
     TENANT_ROLE: {
       getAllTenantRolesAPI: (tenantID) => `/api/v1/tenants/${tenantID}/roles`,

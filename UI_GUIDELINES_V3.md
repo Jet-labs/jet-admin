@@ -12,7 +12,7 @@
 ## 1. Visual Identity Overview
 
 jet-admin's design language is built for **clarity and technical precision**. Marketing and
-product surfaces sit on a white canvas (`bg-background`) with near-black ink (`text-foreground`).
+product surfaces sit on a dark near-black canvas (`bg-background`) with near-white ink (`text-foreground`).
 The only consistent chromatic event across the entire system is the **emerald green primary** —
 used for filled CTAs, brand accents, and active-state indicators. Everything else is a calibrated
 greyscale hierarchy.
@@ -23,11 +23,11 @@ dominant decorative element — never photography, never atmospheric gradients.
 
 **Key commitments:**
 - Single emerald primary as the only chromatic event; all else is monochrome.
-- White canvas product track — no dark-canvas marketing, no full-bleed gradients.
+- Dark canvas product track — no light-canvas marketing, no full-bleed gradients.
 - Square-ish button radii (`rounded-sm` / 6px) — never pill-shaped.
 - Near-black text ON the emerald button (the "lit surface" idiom) — never white-on-green.
 - Composited product UI mockups as decoration; compositing always uses `rounded-md` containers.
-- Code blocks always in `bg-canvas-night` deep near-black with system mono.
+- Code blocks always in `bg-background` deep near-black with system mono.
 
 ---
 
@@ -41,20 +41,20 @@ translate it to the right-hand jet-admin class. Never hard-code the hex.
 | `primary` (emerald) | `#3ecf8e` | `bg-primary` / `text-primary` |
 | `primary-deep` (pressed) | `#24b47e` | `bg-primary/90` (hover/active modifier) |
 | `primary-soft` | `#4ade80` | `bg-primary/60` |
-| `canvas` (page bg) | `#ffffff` | `bg-background` |
-| `canvas-soft` | `#fafafa` | `bg-muted/50` |
-| `canvas-night` (dark surface) | `#1c1c1c` | `bg-foreground` (inverted) or `dark:bg-background` |
-| `canvas-night-soft` | `#202020` | `bg-foreground/90` |
-| `hairline` (default border) | `#dfdfdf` | `border-border` |
-| `hairline-strong` | `#c7c7c7` | `border-border/80` |
-| `hairline-cool` | `#ededed` | `border-border/50` |
-| `ink` (default text) | `#171717` | `text-foreground` |
-| `ink-secondary` | `#212121` | `text-foreground/90` |
-| `ink-mute` (secondary text) | `#707070` | `text-muted-foreground` |
-| `ink-mute-2` (tertiary text) | `#9a9a9a` | `text-muted-foreground/70` |
-| `ink-faint` (placeholder) | `#b2b2b2` | `text-muted-foreground/50` |
-| `on-primary` (text on green) | `#171717` | `text-foreground` (on primary bg) |
-| `on-dark` (text on night) | `#ffffff` | `text-background` |
+| `canvas` (page bg) | `#171717` | `bg-background` |
+| `canvas-soft` | `#1f1f1f` | `bg-card` or `bg-muted/50` |
+| `canvas-night` (dark surface) | `#171717` | `bg-background` or `bg-brand-black` |
+| `canvas-night-soft` | `#242424` | `bg-muted/30` or `bg-muted/50` |
+| `hairline` (default border) | `#2e2e2e` | `border-border` |
+| `hairline-strong` | `#363636` | `border-border/80` |
+| `hairline-cool` | `#242424` | `border-border/50` |
+| `ink` (default text) | `#fafafa` | `text-foreground` |
+| `ink-secondary` | `#b4b4b4` | `text-foreground/90` |
+| `ink-mute` (secondary text) | `#898989` | `text-muted-foreground` |
+| `ink-mute-2` (tertiary text) | `#4d4d4d` | `text-muted-foreground/70` |
+| `ink-faint` (placeholder) | `#363636` | `text-muted-foreground/50` |
+| `on-primary` (text on green) | `#0f0f0f` | `text-brand-black` or `text-primary-foreground` |
+| `on-dark` (text on night) | `#fafafa` | `text-foreground` |
 | Accent purple | `#6b01c2` | Chart/logo use only — no Tailwind token |
 | Accent yellow | `#ffdb13` | Status indicator only — no Tailwind token |
 
@@ -74,21 +74,21 @@ translate it to the right-hand jet-admin class. Never hard-code the hex.
 
 ### Surface Hierarchy
 ```
-bg-background     ← page root, card fills on white track
+bg-background     ← page root, card fills, default dark panels (code blocks)
 bg-muted/50       ← alternating section bands, table row stripes
 bg-muted/30       ← help callout containers, secondary panel fills
 bg-card           ← elevated card surfaces (rendered above page bg)
-bg-foreground     ← deep dark panels (code blocks, featured pricing tier)
+bg-brand-black    ← deep dark panels (code blocks alternative)
+bg-foreground     ← light featured panels (featured pricing tier / light inversion)
 ```
 
 ### Text Hierarchy
 ```
-text-foreground           ← default body, headings
+text-foreground           ← default body, headings (near-white)
 text-foreground/90        ← slightly muted emphasis
 text-muted-foreground     ← helper copy, section labels, captions
 text-muted-foreground/70  ← tertiary copy
 text-muted-foreground/50  ← placeholders, disabled
-text-background           ← text on dark (canvas-night) surfaces
 ```
 
 ### Border Hierarchy
@@ -238,16 +238,16 @@ className="bg-primary text-white"
 
 ### 8.2 Cards
 
-#### Feature Card (light)
+#### Feature Card (standard / default card)
 ```jsx
 <div className="rounded-xl border border-border bg-card p-2 space-y-2">
   {/* content */}
 </div>
 ```
 
-#### Feature Card (dark / code-heavy)
+#### Feature Card (deep dark / code-heavy)
 ```jsx
-<div className="rounded-xl border border-border bg-foreground text-background p-2 space-y-2">
+<div className="rounded-xl border border-border bg-brand-black text-foreground p-2 space-y-2">
   {/* content */}
 </div>
 ```
@@ -262,19 +262,19 @@ className="bg-primary text-white"
 </div>
 ```
 
-#### Pricing Card (featured / dark inverted)
+#### Pricing Card (featured / light inverted)
 ```jsx
 <div className="rounded-xl border border-border bg-foreground text-background p-2 flex flex-col gap-2">
   {/* same structure, text-background overrides */}
 </div>
 ```
-- The dark inversion is the featured-tier treatment. Do NOT use `bg-primary` as the featured tier background — green is reserved for buttons.
+- The light inversion is the featured-tier treatment. Do NOT use `bg-primary` as the featured tier background — green is reserved for buttons.
 
 ---
 
 ### 8.3 Code Blocks
 ```jsx
-<div className="rounded-md bg-foreground text-background p-2 font-mono text-sm leading-relaxed">
+<div className="rounded-md bg-background text-foreground p-2 font-mono text-sm leading-relaxed border border-border">
   <code>{snippet}</code>
 </div>
 ```

@@ -2079,8 +2079,10 @@ PageHeader.propTypes = {
 
 // src/components/section.jsx
 import * as React28 from "react";
+import { ChevronRight as ChevronRight2 } from "lucide-react";
 var Section = React28.forwardRef(
-  ({ className, title, description, children, ...props }, ref) => {
+  ({ className, title, description, children, collapsible = false, defaultOpen = true, ...props }, ref) => {
+    const [isOpen, setIsOpen] = React28.useState(defaultOpen);
     return /* @__PURE__ */ React28.createElement(
       "div",
       {
@@ -2091,8 +2093,27 @@ var Section = React28.forwardRef(
         ),
         ...props
       },
-      (title || description) && /* @__PURE__ */ React28.createElement("div", { className: "border-b border-border bg-muted/15 p-2" }, title && /* @__PURE__ */ React28.createElement("h3", { className: "text-xs font-semibold text-foreground" }, title), description && /* @__PURE__ */ React28.createElement("p", { className: "text-[11px] text-muted-foreground mt-0.5" }, description)),
-      /* @__PURE__ */ React28.createElement("div", { className: "p-2 space-y-2" }, children)
+      (title || description) && /* @__PURE__ */ React28.createElement(
+        "div",
+        {
+          className: cn(
+            "border-b border-border bg-muted/15 p-2",
+            collapsible && "cursor-pointer select-none hover:bg-muted/25 transition-colors",
+            !isOpen && "border-b-0"
+          ),
+          onClick: collapsible ? () => setIsOpen((prev) => !prev) : void 0
+        },
+        /* @__PURE__ */ React28.createElement("div", { className: "flex items-center gap-1.5" }, collapsible && /* @__PURE__ */ React28.createElement(
+          ChevronRight2,
+          {
+            className: cn(
+              "h-3.5 w-3.5 text-muted-foreground transition-transform duration-200",
+              isOpen && "rotate-90"
+            )
+          }
+        ), /* @__PURE__ */ React28.createElement("div", { className: "flex-1 min-w-0" }, title && /* @__PURE__ */ React28.createElement("h3", { className: "text-xs font-semibold text-foreground" }, title), description && /* @__PURE__ */ React28.createElement("p", { className: "text-[11px] text-muted-foreground mt-0.5" }, description)))
+      ),
+      (!collapsible || isOpen) && /* @__PURE__ */ React28.createElement("div", { className: "p-2 space-y-2" }, children)
     );
   }
 );
@@ -2271,6 +2292,22 @@ LogicChip.displayName = "LogicChip";
 import * as React34 from "react";
 import { Check as Check4, ChevronDown as ChevronDown3, Search, Loader2 as Loader22 } from "lucide-react";
 import * as SelectPrimitive2 from "@radix-ui/react-select";
+import { cva as cva5 } from "class-variance-authority";
+var searchSelectVariants = cva5(
+  "flex w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
+  {
+    variants: {
+      size: {
+        default: "h-8 px-2.5 py-1.5 text-sm",
+        sm: "h-7 px-2 py-1 text-xs",
+        lg: "h-10 px-3 py-2 text-base"
+      }
+    },
+    defaultVariants: {
+      size: "default"
+    }
+  }
+);
 var SearchSelect = React34.forwardRef(
   ({
     value,
@@ -2284,6 +2321,7 @@ var SearchSelect = React34.forwardRef(
     isFetchingNextPage = false,
     isLoading = false,
     className,
+    size = "default",
     disabled = false,
     selectedLabel
   }, ref) => {
@@ -2348,10 +2386,7 @@ var SearchSelect = React34.forwardRef(
           ref,
           type: "button",
           disabled,
-          className: cn(
-            "flex h-8 w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom px-2.5 py-1.5 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
-            className
-          )
+          className: cn(searchSelectVariants({ size }), className)
         },
         /* @__PURE__ */ React34.createElement("span", { className: "truncate" }, selectedOption ? selectedOption.label : selectedLabel || placeholder),
         /* @__PURE__ */ React34.createElement(ChevronDown3, { className: "h-4 w-4 opacity-50 shrink-0 ml-2" })

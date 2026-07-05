@@ -36,6 +36,7 @@ export const CustomSearchSelectInput = (props) => {
         {label || description} {required ? <span className="text-destructive">*</span> : null}
       </Label>
       <SearchSelect
+        size="sm"
         value={data ? String(data) : ""}
         onChange={(val) => handleChange(path, val)}
         options={selectOptions}

@@ -238,4 +238,92 @@ tenantController.uploadLogo = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves the AI configuration status for the tenant.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+tenantController.getTenantAIConfig = async (req, res) => {
+  try {
+    const { tenantID } = req.params;
+    Logger.log("info", {
+      message: "tenantController:getTenantAIConfig:params",
+      params: { tenantID },
+    });
+
+    const { vaultService } = require("../vault/vault.service");
+    const credential = await vaultService.getCredentialByProvider({
+      tenantID,
+      provider: "ai_config",
+    });
+
+    const aiConfig = {
+      isApiKeySet: !!(credential && credential.apiKey),
+      baseURL: credential?.baseURL || "",
+      provider: credential?.provider || "openai",
+      model: credential?.model || "",
+    };
+
+    Logger.log("success", {
+      message: "tenantController:getTenantAIConfig:success",
+      params: { tenantID, hasConfig: !!credential },
+    });
+    return expressUtils.sendResponse(res, true, { aiConfig });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tenantController:getTenantAIConfig:error",
+      params: { error: error.message || error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error.message || error);
+  }
+};
+
+/**
+ * Updates the AI configuration for the tenant securely in the vault.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+tenantController.updateTenantAIConfig = async (req, res) => {
+  try {
+    const { tenantID } = req.params;
+    const { apiKey, baseURL, provider, model } = req.body;
+    const { user, apiKey: systemApiKey } = req;
+    
+    Logger.log("info", {
+      message: "tenantController:updateTenantAIConfig:params",
+      params: { tenantID, baseURL, provider, model },
+    });
+
+    const { vaultService } = require("../vault/vault.service");
+    
+    // We only update apiKey if it's provided. If it's a placeholder "******", we keep the old one.
+    let finalApiKey = apiKey;
+    if (!apiKey || apiKey === "******") {
+      const existing = await vaultService.getCredentialByProvider({ tenantID, provider: "ai_config" });
+      finalApiKey = existing?.apiKey || "";
+    }
+
+    await vaultService.upsertCredentialByProvider({
+      tenantID,
+      provider: "ai_config",
+      name: "Tenant AI Configuration",
+      data: { apiKey: finalApiKey, baseURL, provider, model },
+      creatorID: user?.userID,
+      createdByApiKeyID: systemApiKey?.apiKeyID,
+    });
+
+    Logger.log("success", {
+      message: "tenantController:updateTenantAIConfig:success",
+      params: { tenantID },
+    });
+    return expressUtils.sendResponse(res, true, {});
+  } catch (error) {
+    Logger.log("error", {
+      message: "tenantController:updateTenantAIConfig:error",
+      params: { error: error.message || error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error.message || error);
+  }
+};
+
 module.exports = { tenantController };

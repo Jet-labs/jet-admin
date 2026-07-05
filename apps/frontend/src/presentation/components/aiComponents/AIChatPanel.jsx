@@ -43,11 +43,11 @@ function SimpleMarkdown({ text }) {
         remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ children }) => <h1 className="text-base font-bold tracking-tight text-foreground my-2">{children}</h1>,
-          h2: ({ children }) => <h2 className="text-sm font-semibold tracking-tight text-foreground my-1.5">{children}</h2>,
+          h2: ({ children }) => <h2 className="text-sm font-semibold tracking-tight text-foreground my-2">{children}</h2>,
           h3: ({ children }) => <h3 className="text-xs font-semibold tracking-tight text-foreground my-1">{children}</h3>,
           p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
-          ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 my-1.5">{children}</ul>,
-          ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 my-1.5">{children}</ol>,
+          ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 my-2">{children}</ul>,
+          ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 my-2">{children}</ol>,
           li: ({ children }) => <li className="leading-relaxed text-[14px]">{children}</li>,
           strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
           em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
@@ -68,8 +68,8 @@ function SimpleMarkdown({ text }) {
             </div>
           ),
           thead: ({ children }) => <thead className="bg-muted/60 border-b border-border">{children}</thead>,
-          th: ({ children }) => <th className="px-2.5 py-1.5 font-semibold text-foreground border-r border-border/60 last:border-r-0">{children}</th>,
-          td: ({ children }) => <td className="px-2.5 py-1.5 border-b border-r border-border/40 text-muted-foreground last:border-r-0">{children}</td>,
+          th: ({ children }) => <th className="px-2.5 py-2 font-semibold text-foreground border-r border-border/60 last:border-r-0">{children}</th>,
+          td: ({ children }) => <td className="px-2.5 py-2 border-b border-r border-border/40 text-muted-foreground last:border-r-0">{children}</td>,
           code: ({ className, children, ...props }) => {
             const isBlock = String(children).includes('\n') || (className && className.includes('language-'));
             if (isBlock) {
@@ -80,7 +80,7 @@ function SimpleMarkdown({ text }) {
               );
             }
             return (
-              <code className="bg-muted/80 px-1.5 py-0.5 rounded border border-border/60 text-[13px] font-mono text-foreground font-normal" {...props}>
+              <code className="bg-muted/80 px-2 py-0.5 rounded border border-border/60 text-[13px] font-mono text-foreground font-normal" {...props}>
                 {children}
               </code>
             );
@@ -113,7 +113,7 @@ function ThinkingBlock({ content, isStreaming }) {
         className="w-full flex items-center gap-2 px-2 py-2 text-left hover:bg-muted/30 transition-colors"
       >
         <Brain className={`w-3.5 h-3.5 shrink-0 drop-shadow-sm ${isStreaming ? 'text-primary animate-pulse' : 'text-primary/70'}`} />
-        <span className="flex-1 text-xs text-muted-foreground flex items-center gap-1.5 font-medium">
+        <span className="flex-1 text-xs text-muted-foreground flex items-center gap-2 font-medium">
           {isStreaming ? (
             <>
               <span className="text-primary font-mono text-[11px] uppercase tracking-wider font-semibold">Reasoning</span>
@@ -212,7 +212,7 @@ function QueryPreviewCard({ query, tenantID }) {
                 <thead>
                   <tr className="bg-muted/50 border-b border-border">
                     {Object.keys(results[0]).map((key) => (
-                      <th key={key} className="px-2 py-1.5 font-medium text-foreground border-r border-border last:border-0">{key}</th>
+                      <th key={key} className="px-2 py-2 font-medium text-foreground border-r border-border last:border-0">{key}</th>
                     ))}
                   </tr>
                 </thead>
@@ -220,7 +220,7 @@ function QueryPreviewCard({ query, tenantID }) {
                   {results.slice(0, 10).map((row, i) => (
                     <tr key={i} className="border-b border-border/60 last:border-0 bg-background hover:bg-muted/20">
                       {Object.values(row).map((val, j) => (
-                        <td key={j} className="px-2 py-1.5 text-muted-foreground border-r border-border/60 last:border-0 truncate max-w-[120px]" title={String(val)}>
+                        <td key={j} className="px-2 py-2 text-muted-foreground border-r border-border/60 last:border-0 truncate max-w-[120px]" title={String(val)}>
                           {val === null ? <span className="italic text-muted-foreground/50">null</span> : String(val)}
                         </td>
                       ))}
@@ -234,7 +234,7 @@ function QueryPreviewCard({ query, tenantID }) {
               </div>
             )}
             {Array.isArray(results) && results.length > 10 && (
-              <div className="p-1.5 bg-muted/30 text-center text-[11px] text-muted-foreground border-t border-border">
+              <div className="p-2 bg-muted/30 text-center text-[11px] text-muted-foreground border-t border-border">
                 Showing first 10 of {results.length} rows
               </div>
             )}
@@ -515,7 +515,7 @@ function ToolCallStep({ invocation }) {
 
       {/* Inline resource preview (shown without expanding) */}
       {hasResult && parsedResult && (
-        <div className="px-2 pb-2">
+        <div className="px-2">
           <ResourceRenderer toolName={invocation.toolName} result={parsedResult} tenantID={tenantID} />
         </div>
       )}
@@ -524,14 +524,14 @@ function ToolCallStep({ invocation }) {
         <div className="border-t border-border/40 px-2 py-2 space-y-2 bg-muted/10">
           {Object.keys(invocation.args || {}).length > 0 && (
             <div>
-              <p className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1.5">Arguments</p>
+              <p className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-2">Arguments</p>
               <pre className="text-[12px] text-foreground font-mono bg-background p-2 rounded-md border border-border/50 overflow-x-auto shadow-sm">
                 {JSON.stringify(invocation.args, null, 2)}
               </pre>
             </div>
           )}
           <div>
-            <p className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1.5">Raw result</p>
+            <p className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-2">Raw result</p>
             <pre className="text-[12px] font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded-md overflow-x-auto max-h-60 overflow-y-auto shadow-sm">
               {JSON.stringify(parsedResult, null, 2)}
             </pre>
@@ -554,13 +554,13 @@ function SuggestedActions({ content, onAppend }) {
   if (!actions.length) return null;
 
   return (
-    <div className="flex flex-wrap gap-1.5 pt-1">
+    <div className="flex flex-wrap gap-2 pt-1">
       {actions.map((action, i) => (
         <button
           key={i}
           type="button"
           onClick={() => onAppend({ role: 'user', content: action.message })}
-          className="flex items-center gap-1.5 text-[13px] px-2.5 py-1.5 rounded-md border border-border/60 bg-muted/10 hover:bg-primary/5 hover:border-primary/40 hover:text-primary text-foreground/80 transition-all duration-200 shadow-sm"
+          className="flex items-center gap-2 text-[13px] px-2.5 py-2 rounded-md border border-border/60 bg-muted/10 hover:bg-primary/5 hover:border-primary/40 hover:text-primary text-foreground/80 transition-all duration-200 shadow-sm"
         >
           <Sparkles className="w-3 h-3 shrink-0 opacity-60" />
           {action.label}
@@ -645,16 +645,17 @@ function getAgentActiveStatus(lastMessage, isLoading) {
 function AgentStatusBanner({ status }) {
   if (!status) return null;
   const Icon = status.icon || Loader2;
+  const isLoader = Icon === Loader2 || status.type === 'working';
 
   return (
     <div className="flex items-center gap-2 px-2.5 py-2 rounded-md bg-primary/10 border border-primary/30 text-xs text-foreground animate-in fade-in slide-in-from-bottom-1 duration-200 shadow-sm">
       <div className="w-5 h-5 rounded bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
-        <Icon className="w-3 h-3 text-primary animate-spin" />
+        <Icon className={`w-3 h-3 text-primary ${isLoader ? 'animate-spin' : 'animate-pulse'}`} />
       </div>
       <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
         <span className="font-medium text-foreground truncate">{status.label}</span>
         {status.toolName && (
-          <span className="px-1.5 py-0.5 rounded bg-primary/20 border border-primary/40 text-[10px] font-mono text-foreground font-semibold shrink-0">
+          <span className="px-2 py-0.5 rounded bg-primary/20 border border-primary/40 text-[10px] font-mono text-foreground font-semibold shrink-0">
             {status.toolName}
           </span>
         )}
@@ -831,8 +832,8 @@ export const AIChatPanel = () => {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground">AI Agent</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-1.5 min-w-0">
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${busy ? 'bg-primary animate-pulse' : 'bg-muted-foreground/40'}`} />
+            <p className="text-xs text-muted-foreground flex items-center gap-2 min-w-0">
+              <span className={`w-2 h-2 rounded-full shrink-0 ${busy ? 'bg-primary animate-pulse' : 'bg-muted-foreground/40'}`} />
               <span className="truncate font-medium">{activeStatus ? activeStatus.label : '46 tools available'}</span>
             </p>
           </div>
@@ -892,7 +893,7 @@ export const AIChatPanel = () => {
 
               {/* Error banner */}
               {error && (
-                <div className="text-xs text-red-600 bg-red-50 border border-red-200 px-2 py-1.5 rounded-md">
+                  <div className="text-xs text-red-600 bg-red-50 border border-red-200 px-2 py-2 rounded-md">
                   ⚠️ {error.message || 'An error occurred. Please try again.'}
                 </div>
               )}
@@ -911,7 +912,7 @@ export const AIChatPanel = () => {
               onSend={handleSend}
               busy={busy}
             />
-            <p className="text-[10px] text-muted-foreground/60 mt-1.5 text-center">
+            <p className="text-[10px] text-muted-foreground/60 mt-2 text-center">
               Enter to send · Shift+Enter for new line
             </p>
           </div>
