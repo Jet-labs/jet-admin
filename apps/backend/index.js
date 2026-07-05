@@ -26,6 +26,7 @@ const authRoutes = require("./modules/auth/auth.v1.routes");
 const tenantRoutes = require("./modules/tenant/tenant.v1.routes");
 const aiRoutes = require("./modules/ai/ai.v1.routes");
 const oauthRoutes = require("./modules/oauth/oauth.v1.routes");
+const { webhookRouter } = require("@jet-admin/datasources-logic");
 
 // Middleware setup
 expressApp.use(cookieParser());
@@ -59,6 +60,11 @@ expressApp.use(
 
 // OAuth integration routes
 expressApp.use("/api/v1/oauth", oauthRoutes);
+
+// Webhook ingress routes (served inline — no separate port or nginx routing needed)
+// These handle: /webhooks/v1/inbound/:tenantID/:pathSuffix
+//               /webhooks/v1/inbound/:listenerID
+expressApp.use("/webhooks", webhookRouter.getApp());
 
 // Global error-handling middleware
 expressApp.use((err, req, res, next) => {
