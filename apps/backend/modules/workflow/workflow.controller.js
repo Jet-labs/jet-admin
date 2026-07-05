@@ -44,9 +44,7 @@ workflowController.getAllWorkflows = async (req, res) => {
         totalPages: result.totalPages,
         page: result.page,
         pageSize: result.pageSize,
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:getAllWorkflows:error", params: { error: error.message } });
@@ -200,7 +198,7 @@ workflowController.getRunStatus = async (req, res) => {
 
     if (!status) {
       Logger.log("error", { message: "WorkflowController:getRunStatus:notFound", params: { instanceID } });
-      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" }, constants.HTTP_STATUS.NOT_FOUND);
+      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" }, constants.HTTP_STATUS.NOT_FOUND, constants.HTTP_STATUS.BAD_REQUEST);
     }
 
     expressUtils.sendResponse(res, true, status, null, constants.HTTP_STATUS.OK);
@@ -284,7 +282,7 @@ workflowController.getRunStatusForWidget = async (req, res) => {
 
     if (!status) {
       Logger.log("error", { message: "WorkflowController:getRunStatusForWidget:notFound", params: { instanceID } });
-      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" }, constants.HTTP_STATUS.NOT_FOUND);
+      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" }, constants.HTTP_STATUS.NOT_FOUND, constants.HTTP_STATUS.BAD_REQUEST);
     }
 
     Logger.log("success", {

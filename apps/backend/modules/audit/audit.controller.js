@@ -31,13 +31,13 @@ auditController.getAuditLogsByTenantID = async (req, res) => {
       nextPage:
         auditLogs?.length < take ? null : Math.floor((skip + take) / take) + 1,
       auditLogsCount,
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "auditController:getAuditLogsByTenantID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

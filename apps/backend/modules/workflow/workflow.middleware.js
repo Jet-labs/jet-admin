@@ -30,7 +30,7 @@ workflowMiddleware.resolveWorkflowIDFromInstance = async (req, res, next) => {
       message: "workflowMiddleware:resolveWorkflowIDFromInstance:error",
       params: { error: error.message }
     });
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -63,7 +63,7 @@ workflowMiddleware.resolveWorkflowIDFromCollectionRequest = async (req, res, nex
       message: "workflowMiddleware:resolveWorkflowIDFromCollectionRequest:error",
       params: { error: error.message }
     });
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -97,7 +97,7 @@ workflowMiddleware.extractWorkflowDataQueryIDs = async (req, res, next) => {
       message: "workflowMiddleware:extractWorkflowDataQueryIDs:error",
       params: { error: error.message }
     });
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -139,7 +139,7 @@ workflowMiddleware.resolveWorkflowDataQueryIDsFromDB = async (req, res, next) =>
       message: "workflowMiddleware:resolveWorkflowDataQueryIDsFromDB:error",
       params: { error: error.message }
     });
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

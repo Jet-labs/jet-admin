@@ -57,13 +57,13 @@ widgetController.getAllWidgets = async (req, res) => {
       page: result.page,
       pageSize: result.pageSize,
       message: "Widgets fetched successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "widgetController:getAllWidgets:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -129,7 +129,7 @@ widgetController.createWidget = async (req, res) => {
       message: "widgetController:createWidget:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -170,13 +170,13 @@ widgetController.getWidgetByID = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       widget,
       message: "Widget fetched successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "widgetController:getWidgetByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -218,13 +218,13 @@ widgetController.cloneWidgetByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "Widget cloned successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "widgetController:cloneWidgetByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -283,13 +283,13 @@ widgetController.updateWidgetByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "Widget updated successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "widgetController:updateWidgetByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -333,13 +333,13 @@ widgetController.deleteWidgetByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "Widget deleted successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "widgetController:deleteWidgetByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -388,7 +388,7 @@ widgetController.uploadFile = async (req, res) => {
       fileName: file.originalname,
       fileSize: file.size,
       fileType: file.mimetype,
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "widgetController:uploadFile:error",
@@ -396,7 +396,7 @@ widgetController.uploadFile = async (req, res) => {
         error: error.message || error,
       },
     });
-    return expressUtils.sendResponse(res, false, {}, error.message || error);
+    return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -413,7 +413,7 @@ widgetController.serveFile = async (req, res) => {
         message: "widgetController:serveFile:missingPath",
         params: { tenantID: req.params.tenantID },
       });
-      return expressUtils.sendResponse(res, false, {}, { code: "INVALID_REQUEST", message: "Path is required" });
+      return expressUtils.sendResponse(res, false, {}, { code: "INVALID_REQUEST", message: "Path is required" }, constants.HTTP_STATUS.BAD_REQUEST);
     }
 
     const tenantID = req.params.tenantID;
@@ -422,7 +422,7 @@ widgetController.serveFile = async (req, res) => {
         message: "widgetController:serveFile:missingTenant",
         params: {},
       });
-      return expressUtils.sendResponse(res, false, {}, { code: "INVALID_REQUEST", message: "Tenant ID is required" });
+      return expressUtils.sendResponse(res, false, {}, { code: "INVALID_REQUEST", message: "Tenant ID is required" }, constants.HTTP_STATUS.BAD_REQUEST);
     }
 
     const expectedPrefix = `${constants.STORAGE.FOLDERS.WIDGET_FILES}/${tenantID}/`;
@@ -431,7 +431,7 @@ widgetController.serveFile = async (req, res) => {
         message: "widgetController:serveFile:invalidPath",
         params: { tenantID, filePath },
       });
-      return expressUtils.sendResponse(res, false, {}, { code: "PERMISSION_DENIED", message: "Forbidden: Invalid file path for this tenant" });
+      return expressUtils.sendResponse(res, false, {}, { code: "PERMISSION_DENIED", message: "Forbidden: Invalid file path for this tenant" }, constants.HTTP_STATUS.BAD_REQUEST);
     }
 
     const bucketName = environmentVariables.SUPABASE_S3_BUCKET || constants.STORAGE.BUCKETS.DATASOURCE_FILE_UPLOADS;
@@ -448,7 +448,7 @@ widgetController.serveFile = async (req, res) => {
       message: "widgetController:serveFile:error",
       params: { error: error.message || error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

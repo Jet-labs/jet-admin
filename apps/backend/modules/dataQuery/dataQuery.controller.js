@@ -54,13 +54,13 @@ dataQueryController.getAllDataQueries = async (req, res) => {
       page: result.page,
       pageSize: result.pageSize,
       message: "Queries fetched successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryController:getAllDataQueries:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -130,7 +130,7 @@ dataQueryController.createDataQuery = async (req, res) => {
       message: "dataQueryController:createDataQuery:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -182,7 +182,7 @@ dataQueryController.createBulkDataQuery = async (req, res) => {
       message: "dataQueryController:createBulkDataQuery:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -218,13 +218,13 @@ dataQueryController.runDataQueryByID = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, true, { dataQueryResult });
+    return expressUtils.sendResponse(res, true, { dataQueryResult }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryController:runDataQueryByID:catch-1",
       params: { userID: req.user?.userID, error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -260,13 +260,13 @@ dataQueryController.runDataQueryByData = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, true, { dataQueryResult });
+    return expressUtils.sendResponse(res, true, { dataQueryResult }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryController:runDataQueryByData:catch-1",
       params: { userID: req.user?.userID, error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -307,13 +307,13 @@ dataQueryController.getDataQueryByID = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       dataQuery,
       message: "Query fetched successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryController:getDataQueryByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -354,13 +354,13 @@ dataQueryController.cloneDataQueryByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "Query cloned successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryController:cloneDataQueryByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -423,13 +423,13 @@ dataQueryController.updateDataQueryByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "Query updated successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryController:updateDataQueryByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -470,13 +470,13 @@ dataQueryController.deleteDataQueryByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "Query deleted successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryController:deleteDataQueryByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

@@ -83,19 +83,14 @@ cronJobController.createCronJob = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       cronJob: newCronJob,
       message: "Cron job created successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "cronJobController:createCronJob:catch-1",
       params: { userID: req.user?.userID, error },
     });
     // Pass the specific error message from the service
-    return expressUtils.sendResponse(
-      res,
-      false,
-      {},
-      error.message || "Failed to create cron job."
-    );
+    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to create cron job.", constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -140,18 +135,13 @@ cronJobController.getAllCronJobs = async (req, res) => {
       page: result.page,
       pageSize: result.pageSize,
       message: "Cron jobs fetched successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "cronJobController:getAllCronJobs:catch-1",
       params: { userID: req.user?.userID, error },
     });
-    return expressUtils.sendResponse(
-      res,
-      false,
-      {},
-      error.message || "Failed to fetch cron jobs."
-    );
+    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to fetch cron jobs.", constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -197,7 +187,7 @@ cronJobController.getCronJobByID = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       cronJob,
       message: "Cron job fetched successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "cronJobController:getCronJobByID:catch-1",
@@ -207,12 +197,7 @@ cronJobController.getCronJobByID = async (req, res) => {
         error,
       },
     });
-    return expressUtils.sendResponse(
-      res,
-      false,
-      {},
-      error.message || "Failed to fetch cron job."
-    );
+    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to fetch cron job.", constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -275,7 +260,7 @@ cronJobController.updateCronJobByID = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       cronJob: updatedCronJob,
       message: "Cron job updated successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "cronJobController:updateCronJobByID:catch-1",
@@ -287,17 +272,12 @@ cronJobController.updateCronJobByID = async (req, res) => {
     });
     // Check for specific errors from service
     if (error.message.includes("not found")) {
-      return expressUtils.sendResponse(res, false, {}, error.message, 404);
+      return expressUtils.sendResponse(res, false, {}, error.message, 404, constants.HTTP_STATUS.BAD_REQUEST);
     }
     if (error.message.includes("already exists")) {
-      return expressUtils.sendResponse(res, false, {}, error.message, 409); // Conflict
+      return expressUtils.sendResponse(res, false, {}, error.message, 409, constants.HTTP_STATUS.BAD_REQUEST); // Conflict
     }
-    return expressUtils.sendResponse(
-      res,
-      false,
-      {},
-      error.message || "Failed to update cron job."
-    );
+    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to update cron job.", constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -328,7 +308,7 @@ cronJobController.deleteCronJobByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "Cron job deleted successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "cronJobController:deleteCronJobByID:catch-1",
@@ -338,12 +318,7 @@ cronJobController.deleteCronJobByID = async (req, res) => {
         error,
       },
     });
-    return expressUtils.sendResponse(
-      res,
-      false,
-      {},
-      error.message || "Failed to delete cron job."
-    );
+    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to delete cron job.", constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -377,18 +352,13 @@ cronJobController.cloneCronJob = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       cronJob: clonedCronJob,
       message: "Cron job cloned successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "cronJobController:cloneCronJob:catch-1",
       params: { userID: req.user?.userID, cronJobID: req.params.cronJobID, error },
     });
-    return expressUtils.sendResponse(
-      res,
-      false,
-      {},
-      error.message || "Failed to clone cron job."
-    );
+    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to clone cron job.", constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -443,7 +413,7 @@ cronJobController.getCronJobHistoryByID = async (req, res) => {
         cronJobHistory?.length < take
           ? null
           : Math.floor((skip + take) / take) + 1,
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "cronJobController:getCronJobHistoryByID:catch-1",
@@ -453,12 +423,7 @@ cronJobController.getCronJobHistoryByID = async (req, res) => {
         error,
       },
     });
-    return expressUtils.sendResponse(
-      res,
-      false,
-      {},
-      error.message || "Failed to fetch cron job history."
-    );
+    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to fetch cron job history.", constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -481,13 +446,13 @@ cronJobController.getConnectionStatus = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       status,
       message: "Connection status fetched successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "cronJobController:getConnectionStatus:error",
       params: { error: error.message },
     });
-    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to fetch connection status.", 500);
+    return expressUtils.sendResponse(res, false, {}, error.message || "Failed to fetch connection status.", 500, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

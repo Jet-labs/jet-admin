@@ -11,14 +11,10 @@ var corsOptions = {
       [
         ...environmentVariables.CORS_WHITELIST,
         "chrome-extension://fhbjgbiflinjbdggehcddcbncdddomop",
-        // Allow requests with no origin (like mobile apps, Postman desktop app)
-        undefined,
-        "null",
       ].indexOf(origin) !== -1
     ) {
       callback(null, true);
     } else {
-      console.log(origin);
       callback(new Error(constants.ERROR_CODES.NOT_ALLOWED_BY_CORS.message));
     }
   },

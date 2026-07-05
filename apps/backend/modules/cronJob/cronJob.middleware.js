@@ -27,7 +27,7 @@ cronJobMiddleware.resolveWorkflowIDFromDB = async (req, res, next) => {
       message: "cronJobMiddleware:resolveWorkflowIDFromDB:error",
       params: { error: error.message }
     });
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR);
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

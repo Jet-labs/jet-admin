@@ -54,13 +54,13 @@ appPageController.getAllAppPages = async (req, res) => {
       page: result.page,
       pageSize: result.pageSize,
       message: "App pages fetched successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "appPageController:getAllAppPages:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -118,7 +118,7 @@ appPageController.createAppPage = async (req, res) => {
       message: "appPageController:createAppPage:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -159,13 +159,13 @@ appPageController.getAppPageByID = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       appPage,
       message: "App page fetched successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "appPageController:getAppPageByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -206,13 +206,13 @@ appPageController.cloneAppPageByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "App page cloned successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "appPageController:cloneAppPageByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -262,13 +262,13 @@ appPageController.updateAppPageByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "App page updated successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "appPageController:updateAppPageByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -309,13 +309,13 @@ appPageController.deleteAppPageByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "App page deleted successfully.",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "appPageController:deleteAppPageByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

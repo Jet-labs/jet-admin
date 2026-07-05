@@ -33,9 +33,7 @@ apiKeyController.getAllAPIKeys = async (req, res) => {
       {
         apiKeys,
         message: "APIKeys fetched successfully.",
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {
@@ -115,9 +113,7 @@ apiKeyController.getAPIKeyByID = async (req, res) => {
       {
         apiKey,
         message: "APIKey fetched successfully.",
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {
@@ -175,9 +171,7 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
       true,
       {
         message: "APIKey updated successfully.",
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {
@@ -213,9 +207,7 @@ apiKeyController.deleteAPIKeyByID = async (req, res) => {
       true,
       {
         message: "APIKey deleted successfully.",
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {

@@ -1,3 +1,4 @@
+const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { tenantRoleService } =require("./tenantRole.service");
@@ -34,13 +35,13 @@ tenantRoleController.createRole = async (req, res) => {
       params: { tenantID, tenantID, roleTitle, roleDescription, permissionIDs },
     });
 
-    return expressUtils.sendResponse(res, true, {});
+    return expressUtils.sendResponse(res, true, {}, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleController:createRole:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -71,13 +72,13 @@ tenantRoleController.getAllTenantRoles = async (req, res) => {
       params: { rolesLength: roles?.length },
     });
 
-    return expressUtils.sendResponse(res, true, { roles });
+    return expressUtils.sendResponse(res, true, { roles }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleController:getAllTenantRoles:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -106,13 +107,13 @@ tenantRoleController.getAllTenantPermissions = async (req, res) => {
       params: { permissionsLength: permissions?.length },
     });
 
-    return expressUtils.sendResponse(res, true, { permissions });
+    return expressUtils.sendResponse(res, true, { permissions }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleController:getAllTenantPermissions:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -135,7 +136,7 @@ tenantRoleController.getTenantRoleByID = async (req, res) => {
     const role = await tenantRoleService.getTenantRoleByID(roleID);
 
     if (!role) {
-      return expressUtils.sendResponse(res, false, {}, "Role not found");
+      return expressUtils.sendResponse(res, false, {}, "Role not found", constants.HTTP_STATUS.BAD_REQUEST);
     }
 
     Logger.log("success", {
@@ -143,13 +144,13 @@ tenantRoleController.getTenantRoleByID = async (req, res) => {
       params: { roleID },
     });
 
-    return expressUtils.sendResponse(res, true, { role });
+    return expressUtils.sendResponse(res, true, { role }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleController:getTenantRoleByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -184,13 +185,13 @@ tenantRoleController.updateTenantRoleByID = async (req, res) => {
       params: { tenantID, roleID },
     });
 
-    return expressUtils.sendResponse(res, true, {});
+    return expressUtils.sendResponse(res, true, {}, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleController:updateTenantRoleByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -216,7 +217,7 @@ tenantRoleController.deleteTenantRoleByID = async (req, res) => {
     });
 
     if (!deletedRole) {
-      return expressUtils.sendResponse(res, false, {}, "Role not found");
+      return expressUtils.sendResponse(res, false, {}, "Role not found", constants.HTTP_STATUS.BAD_REQUEST);
     }
 
     Logger.log("success", {
@@ -224,13 +225,13 @@ tenantRoleController.deleteTenantRoleByID = async (req, res) => {
       params: { roleID },
     });
 
-    return expressUtils.sendResponse(res, true, { role: deletedRole });
+    return expressUtils.sendResponse(res, true, { role: deletedRole }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleController:deleteTenantRoleByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -255,13 +256,13 @@ tenantRoleController.syncPolicies = async (req, res) => {
       params: { tenantID },
     });
 
-    return expressUtils.sendResponse(res, true, { message: "Casbin policies re-synced successfully." });
+    return expressUtils.sendResponse(res, true, { message: "Casbin policies re-synced successfully." }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleController:syncPolicies:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

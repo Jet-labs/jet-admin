@@ -1,3 +1,4 @@
+const constants = require("../../constants");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const Logger = require("../../utils/logger");
@@ -66,13 +67,13 @@ oauthController.getGoogleAuthUrl = async (req, res) => {
       `&prompt=consent` +
       `&state=${encodeURIComponent(stateToken)}`;
 
-    return expressUtils.sendResponse(res, true, { url: authUrl });
+    return expressUtils.sendResponse(res, true, { url: authUrl }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "oauthController:getGoogleAuthUrl:failure",
       params: { tenantID, errorMessage: error.message },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

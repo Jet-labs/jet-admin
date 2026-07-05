@@ -30,13 +30,13 @@ tenantController.getUserTenantByID = async (req, res) => {
       message: "tenantController:getUserTenantByID:tenant",
       params: { tenant: tenant.tenantID },
     });
-    return expressUtils.sendResponse(res, true, { tenant });
+    return expressUtils.sendResponse(res, true, { tenant }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantController:getUserTenantByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -62,13 +62,13 @@ tenantController.deleteUserTenantByID = async (req, res) => {
       message: "tenantController:deleteUserTenantByID:success",
       params: { userID: user.userID, tenantID },
     });
-    return expressUtils.sendResponse(res, true, {});
+    return expressUtils.sendResponse(res, true, {}, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantController:deleteUserTenantByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -92,13 +92,13 @@ tenantController.getAllUserTenants = async (req, res) => {
       message: "tenantController:getAllUserTenants:tenantsLength",
       params: { tenantsLength: tenants.length },
     });
-    return expressUtils.sendResponse(res, true, { tenants });
+    return expressUtils.sendResponse(res, true, { tenants }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantController:getAllUserTenants:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -132,13 +132,13 @@ tenantController.createNewTenant = async (req, res) => {
       message: "tenantController:createNewTenant:createdNewTenant",
       params: { newTenant },
     });
-    return expressUtils.sendResponse(res, true, { tenant: newTenant });
+    return expressUtils.sendResponse(res, true, { tenant: newTenant }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantController:createNewTenant:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -174,13 +174,13 @@ tenantController.updateTenant = async (req, res) => {
       message: "tenantController:updateTenant:updatedTenant",
       params: { updatedTenant },
     });
-    return expressUtils.sendResponse(res, true, { tenant: updatedTenant });
+    return expressUtils.sendResponse(res, true, { tenant: updatedTenant }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantController:updateTenant:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -226,7 +226,7 @@ tenantController.uploadLogo = async (req, res) => {
       url: publicUrl,
       filePath,
       fileName: file.originalname,
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantController:uploadLogo:error",
@@ -234,7 +234,7 @@ tenantController.uploadLogo = async (req, res) => {
         error: error.message || error,
       },
     });
-    return expressUtils.sendResponse(res, false, {}, error.message || error);
+    return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -268,13 +268,13 @@ tenantController.getTenantAIConfig = async (req, res) => {
       message: "tenantController:getTenantAIConfig:success",
       params: { tenantID, hasConfig: !!credential },
     });
-    return expressUtils.sendResponse(res, true, { aiConfig });
+    return expressUtils.sendResponse(res, true, { aiConfig }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantController:getTenantAIConfig:error",
       params: { error: error.message || error },
     });
-    return expressUtils.sendResponse(res, false, {}, error.message || error);
+    return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -316,13 +316,13 @@ tenantController.updateTenantAIConfig = async (req, res) => {
       message: "tenantController:updateTenantAIConfig:success",
       params: { tenantID },
     });
-    return expressUtils.sendResponse(res, true, {});
+    return expressUtils.sendResponse(res, true, {}, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantController:updateTenantAIConfig:error",
       params: { error: error.message || error },
     });
-    return expressUtils.sendResponse(res, false, {}, error.message || error);
+    return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

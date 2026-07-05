@@ -24,6 +24,15 @@ authService.getUserFromFirebaseID = async ({ firebaseID }) => {
         firebaseID,
       },
     });
+
+    if (!user) {
+      Logger.log("info", {
+        message: "authService:getUserFromFirebaseID:userNotFound",
+        params: { firebaseID },
+      });
+      return null;
+    }
+
     const notifications = await notificationService.getAllUserNotifications({
       userID: user.userID,
     });

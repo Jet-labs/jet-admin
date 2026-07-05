@@ -47,7 +47,7 @@ listenerMiddleware.extractListenerPipelinePermissions = (req, res, next) => {
       message: "listenerMiddleware:extractListenerPipelinePermissions:error",
       params: { error: error.message }
     });
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR);
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -98,7 +98,7 @@ listenerMiddleware.resolveListenerClonePermissionsFromDB = async (req, res, next
       message: "resolveListenerClonePermissionsFromDB:error",
       params: { error: error.message }
     });
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR);
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

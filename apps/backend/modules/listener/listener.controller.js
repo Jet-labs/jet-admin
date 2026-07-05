@@ -42,13 +42,13 @@ const listenerController = {
         page: result.page,
         pageSize: result.pageSize,
         message: "Listeners fetched successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:getAllListeners:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -64,7 +64,7 @@ const listenerController = {
 
       const listener = await listenerService.getListenerByID({ tenantID, listenerID });
       if (!listener) {
-        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found', constants.HTTP_STATUS.BAD_REQUEST));
       }
 
       Logger.log("success", {
@@ -75,13 +75,13 @@ const listenerController = {
       return expressUtils.sendResponse(res, true, {
         listener,
         message: "Listener fetched successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:getListenerByID:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -113,7 +113,7 @@ const listenerController = {
         message: "listenerController:createListener:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -130,7 +130,7 @@ const listenerController = {
 
       const listener = await listenerService.updateListener({ tenantID, listenerID, data });
       if (!listener) {
-        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found', constants.HTTP_STATUS.BAD_REQUEST));
       }
 
       Logger.log("success", {
@@ -141,13 +141,13 @@ const listenerController = {
       return expressUtils.sendResponse(res, true, {
         listener,
         message: "Listener updated successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:updateListener:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -163,7 +163,7 @@ const listenerController = {
 
       const result = await listenerService.deleteListener({ tenantID, listenerID });
       if (!result) {
-        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found', constants.HTTP_STATUS.BAD_REQUEST));
       }
 
       Logger.log("success", {
@@ -173,13 +173,13 @@ const listenerController = {
 
       return expressUtils.sendResponse(res, true, {
         message: "Listener deleted successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:deleteListener:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -204,13 +204,13 @@ const listenerController = {
       return expressUtils.sendResponse(res, true, {
         listener,
         message: "Listener cloned successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:cloneListener:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -228,7 +228,7 @@ const listenerController = {
 
       const listener = await listenerService.activateListener({ tenantID, listenerID });
       if (!listener) {
-        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found', constants.HTTP_STATUS.BAD_REQUEST));
       }
 
       Logger.log("success", {
@@ -239,13 +239,13 @@ const listenerController = {
       return expressUtils.sendResponse(res, true, {
         listener,
         message: "Listener activated successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:activateListener:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -261,7 +261,7 @@ const listenerController = {
 
       const listener = await listenerService.deactivateListener({ tenantID, listenerID });
       if (!listener) {
-        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found', constants.HTTP_STATUS.BAD_REQUEST));
       }
 
       Logger.log("success", {
@@ -272,13 +272,13 @@ const listenerController = {
       return expressUtils.sendResponse(res, true, {
         listener,
         message: "Listener deactivated successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:deactivateListener:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -297,7 +297,7 @@ const listenerController = {
 
       const action = await listenerService.addAction({ tenantID, listenerID, data });
       if (!action) {
-        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found', constants.HTTP_STATUS.BAD_REQUEST));
       }
 
       Logger.log("success", {
@@ -308,13 +308,13 @@ const listenerController = {
       return expressUtils.sendResponse(res, true, {
         action,
         message: "Listener action added successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:addAction:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -331,7 +331,7 @@ const listenerController = {
 
       const action = await listenerService.updateAction({ tenantID, listenerID, actionID, data });
       if (!action) {
-        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found', constants.HTTP_STATUS.BAD_REQUEST));
       }
 
       Logger.log("success", {
@@ -342,13 +342,13 @@ const listenerController = {
       return expressUtils.sendResponse(res, true, {
         action,
         message: "Listener action updated successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:updateAction:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -364,7 +364,7 @@ const listenerController = {
 
       const result = await listenerService.deleteAction({ tenantID, listenerID, actionID });
       if (!result) {
-        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found', constants.HTTP_STATUS.BAD_REQUEST));
       }
 
       Logger.log("success", {
@@ -374,13 +374,13 @@ const listenerController = {
 
       return expressUtils.sendResponse(res, true, {
         message: "Listener action deleted successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:deleteAction:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 
@@ -398,13 +398,13 @@ const listenerController = {
       return expressUtils.sendResponse(res, true, {
         status,
         message: "Connection status fetched successfully.",
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
       Logger.log("error", {
         message: "listenerController:getConnectionStatus:error",
         params: { error },
       });
-      return expressUtils.sendResponse(res, false, {}, error);
+      return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
 };

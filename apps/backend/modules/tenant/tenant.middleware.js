@@ -41,12 +41,7 @@ tenantMiddleware.checkIfUserIsAdmin = async (req, res, next) => {
           error: constants.ERROR_CODES.USER_NOT_ADMIN_OF_TENANT,
         },
       });
-      return expressUtils.sendResponse(
-        res,
-        false,
-        {},
-        constants.ERROR_CODES.USER_NOT_ADMIN_OF_TENANT
-      );
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.USER_NOT_ADMIN_OF_TENANT, constants.HTTP_STATUS.BAD_REQUEST);
     }
   } catch (error) {
     Logger.log("error", {
@@ -55,12 +50,7 @@ tenantMiddleware.checkIfUserIsAdmin = async (req, res, next) => {
         error,
       },
     });
-    return expressUtils.sendResponse(
-      res,
-      false,
-      {},
-      constants.ERROR_CODES.SERVER_ERROR
-    );
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -97,12 +87,7 @@ tenantMiddleware.checkTenantCreationLimit = async function (req, res, next) {
           error: constants.ERROR_CODES.TENANT_CREATION_LIMIT_EXCEED,
         },
       });
-      return expressUtils.sendResponse(
-        res,
-        false,
-        {},
-        constants.ERROR_CODES.TENANT_CREATION_LIMIT_EXCEED
-      );
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.TENANT_CREATION_LIMIT_EXCEED, constants.HTTP_STATUS.BAD_REQUEST);
     }
   } catch (error) {
     Logger.log("error", {
@@ -111,7 +96,7 @@ tenantMiddleware.checkTenantCreationLimit = async function (req, res, next) {
         error,
       },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -140,7 +125,7 @@ tenantMiddleware.poolProvider = async (req, res, next) => {
           error: constants.ERROR_CODES.INVALID_TENANT,
         },
       });
-      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.INVALID_TENANT)
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.INVALID_TENANT, constants.HTTP_STATUS.BAD_REQUEST)
     }
 
     Logger.log("success", {
@@ -153,7 +138,7 @@ tenantMiddleware.poolProvider = async (req, res, next) => {
       message: "tenantMiddleware:poolProvider:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error)
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST)
   }
 };
 

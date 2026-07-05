@@ -44,7 +44,7 @@ userManagementMiddleware.checkTenantUserAdditionLimit = async (
           error: constants.ERROR_CODES.MEMBER_ADDITION_LIMIT_EXCEED,
         },
       });
-      return expressUtils.sendResponse(res,false,{},constants.ERROR_CODES.MEMBER_ADDITION_LIMIT_EXCEED)
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.MEMBER_ADDITION_LIMIT_EXCEED, constants.HTTP_STATUS.BAD_REQUEST)
     }
   } catch (error) {
     Logger.log("error", {
@@ -53,7 +53,7 @@ userManagementMiddleware.checkTenantUserAdditionLimit = async (
         error,
       },
     });
-    return expressUtils.sendResponse(res,false,{},error)
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST)
   }
 };
 

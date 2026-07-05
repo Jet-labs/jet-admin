@@ -69,9 +69,7 @@ datasourceController.getAllDatasources = async (req, res) => {
         page: result.page,
         pageSize: result.pageSize,
         message: "Datasources fetched successfully.",
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {
@@ -125,9 +123,7 @@ datasourceController.testDatasourceConnection = async (req, res) => {
       {
         connectionResult,
         message: "Datasource connection tested successfully.",
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {
@@ -182,9 +178,7 @@ datasourceController.getDatasourceByID = async (req, res) => {
       {
         datasource: sanitizedDatasource,
         message: "Datasource fetched successfully.",
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {
@@ -330,9 +324,7 @@ datasourceController.updateDatasourceByID = async (req, res) => {
       {
         datasource,
         message: "Datasource updated successfully.",
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {
@@ -384,9 +376,7 @@ datasourceController.deleteDatasourceByID = async (req, res) => {
       true,
       {
         message: "Datasource deleted successfully.",
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {
@@ -578,9 +568,7 @@ datasourceController.proxyDatasourceAction = async (req, res) => {
       {
         result,
         message: `Proxy action '${action}' executed successfully.`,
-      },
-      null,
-      constants.HTTP_STATUS.OK
+      }, null, constants.HTTP_STATUS.OK
     );
   } catch (error) {
     Logger.log("error", {

@@ -183,7 +183,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
 
                     <div className="flex flex-wrap items-center gap-3">
                       <Badge
-                        variant={tenantUser.isTenantAdmin ? "outline" : "warning"}
+                        variant={tenantUser.isTenantAdmin ? "outline" : "secondary"}
                         className={
                           tenantUser.isTenantAdmin
                             ? "border-primary/30 bg-primary/5 text-primary"

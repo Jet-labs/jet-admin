@@ -81,13 +81,13 @@ userManagementController.getAllTenantUsers = async (req, res) => {
       users,
       nextPage:
         users?.length < take ? null : Math.floor((skip + take) / take) + 1,
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "userManagementController:getAllTenantUsers:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -121,13 +121,13 @@ userManagementController.getTenantUserByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       user: userDetails,
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "userManagementController:getTenantUserByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -149,6 +149,15 @@ userManagementController.addUserToTenant = async (req, res) => {
     const tenantUser = await authService.getUserFromEmailID({
       email: tenantUserEmail,
     });
+    
+    if (!tenantUser) {
+      Logger.log("warning", {
+        message: "userManagementController:addUserToTenant:userNotFound",
+        params: { tenantUserEmail, tenantID, userID: user.userID },
+      });
+      throw constants.ERROR_CODES.INVALID_USER;
+    }
+
     const newUserTenantRelationship =
       await userManagementService.addUserToTenant({
         userID: user.userID,
@@ -165,13 +174,13 @@ userManagementController.addUserToTenant = async (req, res) => {
         newUserTenantRelationship,
       },
     });
-    return expressUtils.sendResponse(res, true, {});
+    return expressUtils.sendResponse(res, true, {}, null, constants.HTTP_STATUS.CREATED);
   } catch (error) {
     Logger.log("error", {
       message: "userManagementController:addUserToTenant:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -219,13 +228,13 @@ userManagementController.updateTenantUserRolesByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "User roles and details updated successfully",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "userManagementController:updateTenantUserRolesByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -264,14 +273,14 @@ userManagementController.removeTenantUserFromTenantByID = async (req, res) => {
 
     return expressUtils.sendResponse(res, true, {
       message: "User roles and details updated successfully",
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message:
         "userManagementController:removeTenantUserFromTenantByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

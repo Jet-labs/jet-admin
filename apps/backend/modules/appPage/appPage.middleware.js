@@ -68,7 +68,7 @@ appPageMiddleware.extractAppPageConfigAssetIDs = (req, res, next) => {
       message: "appPageMiddleware:extractAppPageConfigAssetIDs:error",
       params: { error: error.message }
     });
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR);
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -128,7 +128,7 @@ appPageMiddleware.resolveAppPageCloneAssetIDsFromDB = async (req, res, next) => 
       message: "appPageMiddleware:resolveAppPageCloneAssetIDsFromDB:error",
       params: { error: error.message }
     });
-    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR);
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

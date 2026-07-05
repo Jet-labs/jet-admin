@@ -21,7 +21,7 @@ authController.getUserInfo = async (req, res) => {
       });
       return expressUtils.sendResponse(res, true, {
         user
-      });
+      }, null, constants.HTTP_STATUS.OK);
     } else {
       Logger.log("info", {
         message: "userController:getUserInfo:create",
@@ -37,14 +37,14 @@ authController.getUserInfo = async (req, res) => {
       });
       return expressUtils.sendResponse(res, true, {
         user:newUser
-      });
+      }, null, constants.HTTP_STATUS.OK);
     }
   } catch (error) {
     Logger.log("error", {
       message: "userController:getUserInfo:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -68,13 +68,13 @@ authController.getUserConfig = async (req, res) => {
     });
     return expressUtils.sendResponse(res, true, {
       userConfig,
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "userController:getUserConfig:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 
@@ -101,13 +101,13 @@ authController.updateUserConfig = async (req, res) => {
     return expressUtils.sendResponse(res, true, {
       message: "User config updated successfully.",
       tenantID
-    });
+    }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "userController:updateUserConfig:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error);
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
   }
 };
 

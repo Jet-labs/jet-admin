@@ -41,7 +41,7 @@ export const TenantUsersList = () => {
       flex: 1,
       renderCell: ({ value }) => (
         <Badge
-          variant={value ? "outline" : "warning"}
+          variant={value ? "outline" : "secondary"}
           className={value ? "border-primary/30 bg-primary/5 text-primary" : undefined}
         >
           {value ? "Admin" : "Member"}

@@ -1,3 +1,4 @@
+const constants = require("../../../constants");
 const { dataCollectionService } = require('./dataCollection.service');
 const Logger = require("../../../utils/logger");
 const { expressUtils } = require("../../../utils/express.utils");
@@ -15,9 +16,7 @@ dataCollectionController.submitData = async (req, res) => {
         });
 
         if (!submittedData || typeof submittedData !== 'object') {
-            return expressUtils.sendResponse(
-                res, false, {}, { message: 'submittedData must be a non-null object' }
-            );
+            return expressUtils.sendResponse(res, false, {}, { message: 'submittedData must be a non-null object' }, constants.HTTP_STATUS.BAD_REQUEST);
         }
 
         const result = await dataCollectionService.submitCollectionData({
@@ -29,14 +28,14 @@ dataCollectionController.submitData = async (req, res) => {
             message: 'dataCollectionController:submitData:success',
             params: { collectionRequestID },
         });
-        expressUtils.sendResponse(res, true, result);
+        expressUtils.sendResponse(res, true, result, null, constants.HTTP_STATUS.OK);
 
     } catch (error) {
         Logger.log('error', {
             message: 'dataCollectionController:submitData:error',
             params: { error: error.message },
         });
-        expressUtils.sendResponse(res, false, {}, error);
+        expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
 };
 
@@ -44,9 +43,9 @@ dataCollectionController.getRequest = async (req, res) => {
     try {
         const { collectionRequestID } = req.params;
         const request = await dataCollectionService.getCollectionRequest({ collectionRequestID });
-        expressUtils.sendResponse(res, true, { request });
+        expressUtils.sendResponse(res, true, { request }, null, constants.HTTP_STATUS.OK);
     } catch (error) {
-        expressUtils.sendResponse(res, false, {}, error);
+        expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
 };
 
