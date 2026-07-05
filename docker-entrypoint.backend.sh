@@ -12,18 +12,14 @@ cd /app/apps/backend
 # ============================================
 echo "[1/3] Configuring backend..."
 
+# All env vars (PORT, DATABASE_URL, FIREBASE_CREDENTIALS, VAULT_ENCRYPTION_KEY,
+# SUPABASE_*, GROQ_API_KEY, GOOGLE_CLIENT_*, BACKEND_URL, etc.) are injected
+# directly by Render's environment panel and are already present in process.env.
+#
+# Render sets PORT to its public-facing port (e.g. 10000).
+# Node.js reads it via environment.js: process.env.PORT || 8090
+# No .env file generation or port overrides needed.
 export NODE_ENV=${NODE_ENV:-production}
-
-# Capture Render's external port BEFORE we override PORT.
-# Render sets PORT to the single public-facing port (e.g. 10000).
-# We need nginx to bind to that port, while Node.js binds to 8090 internally.
-export NGINX_PORT=${PORT:-10000}
-
-# Force Node.js onto the internal port.
-# All other env vars (FIREBASE_CREDENTIALS, VAULT_ENCRYPTION_KEY, SUPABASE_*,
-# GROQ_API_KEY, GOOGLE_CLIENT_*, BACKEND_URL, etc.) are already present in
-# process.env — injected by Render's environment panel. No .env file needed.
-export PORT=8090
 
 # ============================================
 # Wait for Dependencies
@@ -63,13 +59,7 @@ fi
 # Start Backend
 # ============================================
 echo "============================================"
-echo "Generating NGINX configuration for port $NGINX_PORT..."
-envsubst '${NGINX_PORT}' < /etc/nginx/nginx.backend.conf > /etc/nginx/nginx.conf
-
-echo "Starting internal NGINX router..."
-nginx -g 'daemon off;' &
-
-echo "Starting Node.js backend server on port 8090..."
+echo "Starting Node.js backend server on port ${PORT:-8090}..."
 echo "============================================"
 
 exec "$@"

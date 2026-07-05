@@ -13,8 +13,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     python3 \
     g++ \
-    nginx \
-    gettext-base \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -37,8 +35,7 @@ RUN npm install --legacy-peer-deps
 COPY apps/backend/ ./apps/backend/
 COPY packages/ ./packages/
 
-# Copy custom backend nginx config template
-COPY nginx.backend.conf /etc/nginx/nginx.backend.conf
+# (nginx removed — Node.js binds directly to Render's $PORT)
 
 # Generate Prisma client
 WORKDIR /app/apps/backend
@@ -50,16 +47,15 @@ RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 # Create log directory
 RUN mkdir -p /app/apps/backend/logs && chmod 755 /app/apps/backend/logs
-# Fix nginx permissions for non-root environments if necessary (optional)
+# Ensure log directory is writable
 RUN chown -R www-data:www-data /app/apps/backend/logs
 
-# Expose internal Node.js port (NGINX binds to $PORT dynamically)
-# Port 8095 removed: webhook ingress is now served inline by the main Express app
+# Expose the default local dev port; Render overrides $PORT at runtime
 EXPOSE 8090
 
-# Health check
+# Health check — uses $PORT so it matches wherever Node is listening
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8090/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-8090}/health || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["npm", "run", "pm2"]
