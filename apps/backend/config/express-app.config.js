@@ -7,6 +7,7 @@ const constants = require("../constants");
 var corsOptions = {
   credentials: true,
   origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Allow server-to-server requests
     if (
       [
         ...environmentVariables.CORS_WHITELIST,
@@ -20,11 +21,24 @@ var corsOptions = {
   },
 };
 
+const strictCors = cors(corsOptions);
+const openCors = cors({ origin: true, credentials: true });
+
 const expressApp = express();
 expressApp.enable("trust proxy");
-expressApp.options('*', cors());
+
+// Dynamically apply CORS based on the route
+const dynamicCors = (req, res, next) => {
+  if (req.path.startsWith('/webhooks')) {
+    openCors(req, res, next);
+  } else {
+    strictCors(req, res, next);
+  }
+};
+
+expressApp.options('*', dynamicCors);
+expressApp.use(dynamicCors);
 expressApp.use(morganMiddleware);
-expressApp.use(cors(corsOptions));
 expressApp.use(
   express.json({
     limit: environmentVariables.EXPRESS_REQUEST_SIZE_LIMIT,
