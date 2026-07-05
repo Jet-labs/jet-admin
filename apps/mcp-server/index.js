@@ -33,7 +33,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { z } from 'zod';
 
 // ─── 3. Tools (dynamic import — after env is set) ─────────────────────────────
-const { allTools } = await import('../../packages/mcp-server/src/tools/index.js');
+const { allTools } = await import('@jet-admin/mcp-server');
 
 // ─── Firebase Admin ───────────────────────────────────────────────────────────
 
@@ -223,7 +223,7 @@ const server = app.listen(environment.PORT, () => {
   process.stderr.write(
     `[mcp-server] Ready\n` +
     `  Port  : ${environment.PORT}\n` +
-    `  Target: ${environment.JET_ADMIN_MCP_BASE_URL}\n` +
+    `  Target: ${environment.JET_ADMIN_BACKEND_URL}\n` +
     `  Tools : ${allTools.length}\n`
   );
 });

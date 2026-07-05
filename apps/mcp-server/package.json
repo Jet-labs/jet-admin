@@ -9,6 +9,7 @@
     "dev": "node --watch index.js"
   },
   "dependencies": {
+    "@jet-admin/mcp-server": "*",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "axios": "^1.18.1",
     "dotenv": "^16.6.1",

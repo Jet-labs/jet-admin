@@ -39,7 +39,7 @@ function optionalEnv(name, fallbackName) {
 
 export const config = {
   /** Base URL of the Jet Admin backend (e.g. http://localhost:5000) */
-  baseUrl: requireEnv("JET_ADMIN_MCP_BASE_URL", "JET_ADMIN_BASE_URL").replace(/\/+$/, ""),
+  baseUrl: requireEnv("JET_ADMIN_BACKEND_URL", "JET_ADMIN_BASE_URL").replace(/\/+$/, ""),
 
   /** Optional: explicit frontend URL for preview links (e.g. http://localhost:3000) */
   frontendUrl: optionalEnv("JET_ADMIN_FRONTEND_URL")?.replace(/\/+$/, "") ?? null,

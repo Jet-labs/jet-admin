@@ -232,7 +232,7 @@ aiService.streamChat = async ({ messages, tenantID, bearerToken, res }) => {
 
   // Create an MCP client pointed at our standalone MCP server.
   // The Bearer token is forwarded so tool calls run under this user's identity.
-  const mcpServerUrl = `http://localhost:${environment.MCP_SERVER_PORT}/tenants/${tenantID}/mcp`;
+  const mcpServerUrl = `${environment.MCP_SERVER_URL}/tenants/${tenantID}/mcp`;
   let mcpClient;
 
   try {

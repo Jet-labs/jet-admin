@@ -48,6 +48,8 @@ const environmentVariables = {
   AI_MODEL: process.env.AI_MODEL,
   /** Port the standalone apps/mcp-server listens on (default 5001) */
   MCP_SERVER_PORT: parseInt(process.env.MCP_SERVER_PORT || '5001', 10),
+  /** Base URL for the MCP server */
+  MCP_SERVER_URL: process.env.MCP_SERVER_URL || `http://localhost:${parseInt(process.env.MCP_SERVER_PORT || '5001', 10)}`,
   JET_ADMIN_INTERNAL_API_KEY: process.env.JET_ADMIN_INTERNAL_API_KEY,
   VAULT_ENCRYPTION_KEY: process.env.VAULT_ENCRYPTION_KEY,
   OAUTH_STATE_SECRET: process.env.OAUTH_STATE_SECRET,

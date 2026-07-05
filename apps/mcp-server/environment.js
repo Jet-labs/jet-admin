@@ -39,7 +39,7 @@ export const environment = {
   PORT: parseInt(process.env.PORT || '5001', 10),
 
   /** Base URL of the Jet Admin backend (for tool HTTP calls) */
-  JET_ADMIN_MCP_BASE_URL: requireEnv('JET_ADMIN_MCP_BASE_URL').replace(/\/+$/, ''),
+  JET_ADMIN_BACKEND_URL: requireEnv('JET_ADMIN_BACKEND_URL').replace(/\/+$/, ''),
 
   /** Firebase service account credentials JSON string */
   FIREBASE_CREDENTIALS: requireEnv('FIREBASE_CREDENTIALS'),

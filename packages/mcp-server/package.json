@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Jet Admin MCP Server — exposes Jet Admin platform tools via the Model Context Protocol (stdio transport)",
   "type": "module",
-  "main": "src/index.js",
+  "main": "src/tools/index.js",
   "bin": {
     "jet-admin-mcp": "src/index.js"
   },
