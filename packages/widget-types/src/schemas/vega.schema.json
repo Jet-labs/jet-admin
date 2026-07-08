@@ -1,0 +1,40 @@
+{
+  "widgetType": "vega",
+  "description": "Vega chart widget. widgetConfig.spec is the full Vega JSON specification.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "spec": {
+        "type": "object",
+        "description": "Vega JSON specification (https://vega.github.io/vega/docs/specification/)",
+        "properties": {
+          "$schema": { "type": "string" },
+          "width": { "type": "number" },
+          "height": { "type": "number" },
+          "signals": { "type": "array" },
+          "data": { "type": "array" },
+          "scales": { "type": "array" },
+          "axes": { "type": "array" },
+          "marks": { "type": "array" },
+          "legends": { "type": "array" },
+          "title": { "type": ["string", "object"] },
+          "config": { "type": "object" }
+        }
+      },
+      "showActions": {
+        "type": "boolean",
+        "title": "Show Actions",
+        "description": "Show Vega embed action buttons",
+        "default": false
+      },
+      "renderer": {
+        "type": "string",
+        "title": "Renderer",
+        "enum": ["svg", "canvas"],
+        "description": "Rendering engine for the chart",
+        "default": "svg"
+      }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

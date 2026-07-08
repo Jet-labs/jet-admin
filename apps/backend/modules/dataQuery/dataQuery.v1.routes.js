@@ -16,6 +16,13 @@ const { P } = require("../../config/permissions");
 
 // Database query routes
 
+// Schemas
+router.get(
+  "/schemas",
+  authMiddleware.authorize(P.dataquery.list),
+  dataQueryController.getDataQuerySchemas
+);
+
 router.get(
   "/",
   validate(listDataQueriesQuerySchema, "query"),

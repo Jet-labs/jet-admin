@@ -521,3 +521,26 @@ export const WORKFLOW_NODES_MAP = {
         },
     },
 };
+
+/**
+ * Aggregated workflow node schemas, keyed by node type value.
+ * Each entry has: nodeType, label, schema (JSON Schema), uischema (jsonforms UISchema), defaultValue.
+ * Derived directly from WORKFLOW_NODES_MAP — no separate authoring needed.
+ *
+ * @type {Record<string, { nodeType: string, label: string, schema: object, uischema: object, defaultValue: object }>}
+ */
+export const WORKFLOW_NODE_SCHEMAS = Object.fromEntries(
+  Object.values(WORKFLOW_NODES_MAP)
+    .filter((n) => n.schema)
+    .map((n) => [
+      n.value,
+      {
+        nodeType: n.value,
+        label: n.label,
+        schema: n.schema,
+        uischema: n.uischema,
+        defaultValue: n.defaultValue,
+      },
+    ])
+);
+

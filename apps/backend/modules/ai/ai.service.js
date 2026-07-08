@@ -30,6 +30,7 @@ const constants = require('../../constants');
 
 let _sdkLoaded = false;
 let _streamText, _createOpenAI, _createGoogle, _createMCPClient, _convertToCoreMessages;
+let _ToolLoopAgent, _createAgentUIStreamResponse;
 
 async function loadSDK() {
   if (_sdkLoaded) return;
@@ -46,6 +47,9 @@ async function loadSDK() {
   _createGoogle = googleMod.createGoogle;
   _createMCPClient = mcpMod.createMCPClient;
   _convertToCoreMessages = aiMod.convertToCoreMessages;
+  
+  _ToolLoopAgent = aiMod.ToolLoopAgent;
+  _createAgentUIStreamResponse = aiMod.createAgentUIStreamResponse;
   _sdkLoaded = true;
 
   Logger.log('success', {
@@ -54,121 +58,10 @@ async function loadSDK() {
   });
 }
 
-// ─── System prompt ────────────────────────────────────────────────────────────
-
-const SYSTEM_PROMPT = `You are an expert AI assistant embedded inside Jet Admin, a data platform for building internal tools.
-
-You have access to tools that let you manage this tenant's resources:
-- Datasources (database connections)
-- Data Queries (SQL and REST queries)
-- Listeners (real-time WebSocket/webhook/SSE event streams)
-- Workflows (multi-step automated pipelines)
-- Widgets (visual UI building blocks: tables, charts, stats, forms)
-- App Pages (full dashboard pages with layouts and widgets)
-- IAM (tenant members and roles — read-only)
-
-ALWAYS follow this workflow when asked to build something:
-1. Call get_tenant_resource_summary FIRST to see what already exists
-2. Reuse existing resources before creating new ones
-3. When creating multiple resources, do them in dependency order: datasource → query → widget → page
-4. After creating or modifying something, confirm what was done
-
-A2UI (Agent-to-User Interface) Readymade Component Catalog:
-You have rich interactive UI generation capabilities. Whenever asking the user for input, options, confirmation, parameters, or showing visual query outputs, enclose a valid JSON block inside \`\`\`a2ui ... \`\`\`.
-
-Supported A2UI Component Schemas:
-
-1. Human-in-the-Loop Confirmation ("type": "confirm"):
-Use before running destructive/sensitive tool operations (e.g. deleting datasources/workflows or running mutation SQL):
-{
-  "type": "confirm",
-  "title": "Approval Required: Action Name",
-  "description": "Warning details...",
-  "toolName": "delete_datasource",
-  "params": { "datasourceID": "123" }
-}
-
-2. Form / Parameter Collector ("type": "form"):
-{
-  "type": "form",
-  "title": "Configure Resource",
-  "description": "Please enter missing settings",
-  "fields": [
-    { "name": "dbName", "label": "Database Name", "type": "text" | "number" | "select" | "boolean" | "secret" | "textarea", "defaultValue": "my_db", "options": ["pg", "mysql"] }
-  ],
-  "actions": [
-    { "label": "Save & Proceed", "action": "SUBMIT_CONFIG", "variant": "primary" }
-  ]
-}
-
-3. Multi-Choice Decision Selector ("type": "choice"):
-{
-  "type": "choice",
-  "title": "Select Approach",
-  "description": "Choose how you'd like to proceed",
-  "choices": [
-    { "label": "Option Title", "description": "Details...", "badge": "Recommended", "action": "CHOOSE_PLAN", "params": { "plan": "fast" } }
-  ]
-}
-
-4. Code / SQL Snippet Preview ("type": "code"):
-{
-  "type": "code",
-  "title": "Generated SQL Query",
-  "language": "sql" | "javascript" | "json",
-  "code": "SELECT * FROM users LIMIT 10;",
-  "actions": [
-    { "label": "Run Query Now", "action": "RUN_SQL", "params": { "sql": "SELECT * FROM users LIMIT 10;" } }
-  ]
-}
-
-5. Visual Data Chart ("type": "chart"):
-{
-  "type": "chart",
-  "title": "User Registrations",
-  "chartType": "bar" | "line" | "pie",
-  "data": [
-    { "label": "Jan", "value": 120 },
-    { "label": "Feb", "value": 240 }
-  ]
-}
-
-6. Multi-Step Progress Tracker ("type": "steps"):
-{
-  "type": "steps",
-  "title": "Setup Progress",
-  "steps": [
-    { "title": "Create Datasource", "status": "completed" },
-    { "title": "Build Query", "status": "in_progress" },
-    { "title": "Generate Widget", "status": "pending" }
-  ]
-}
-
-7. Metric KPI Card ("type": "stat"):
-{ "type": "stat", "title": "Total Records", "value": "12,450", "trend": "up", "change": "+14%" }
-
-8. Data Table Grid ("type": "table"):
-{ "type": "table", "title": "Results", "columns": ["id", "name"], "rows": [{ "id": 1, "name": "Alice" }] }
-
-Be concise. Show your reasoning briefly before calling tools. After executing tools, summarize what you did and present next steps using an appropriate A2UI card.
-
-Suggested Next Actions:
-Whenever you finish a response, optionally append suggested follow-up options at the END using this format:
-
-\`\`\`suggested_actions
-[
-  { "label": "Short action label", "message": "The full message to send when clicked" },
-  { "label": "Another option", "message": "Another message" }
-]
-\`\`\`
-IMPORTANT: Do NOT list these suggested actions as text bullet points in your markdown response body when generating the \`\`\`suggested_actions\`\`\` block. The UI renders them as interactive buttons automatically at the bottom of the chat bubble.
-
-Rules for suggested actions:
-- Include 2-4 short, actionable options
-- Only suggest genuinely relevant next steps
-- Do NOT include this block when asking for confirmation or showing a form`;
-
 // ─── Service ──────────────────────────────────────────────────────────────────
+
+const { aiContextService } = require('./ai.context.service');
+const { aiSystemPrompt } = require('./ai.systemPrompt');
 
 const aiService = {};
 
@@ -183,9 +76,11 @@ const aiService = {};
  * @param {Array}  param0.messages     - Full conversation history (AI SDK UIMessage[])
  * @param {string} param0.tenantID     - Current tenant UUID
  * @param {string} param0.bearerToken  - Firebase JWT for this user
+ * @param {object} param0.clientContext- Client location (route, widgetID, appPageID)
+ * @param {string} param0.conversationID - Conversation ID for context caching
  * @param {object} param0.res          - Express ServerResponse
  */
-aiService.streamChat = async ({ messages, tenantID, bearerToken, res }) => {
+aiService.streamChat = async ({ messages, tenantID, bearerToken, clientContext, conversationID, res }) => {
   try {
     await loadSDK();
   } catch (err) {
@@ -255,96 +150,107 @@ aiService.streamChat = async ({ messages, tenantID, bearerToken, res }) => {
   // Discover available tools from the MCP server
   const tools = await mcpClient.tools();
 
-  // Sanitize UI messages from useChat to strictly conform to CoreMessage[] format
-  console.log('RAW MESSAGES RECEIVED:', JSON.stringify(messages, null, 2));
-
-  let coreMessages;
-  try {
-    if (typeof _convertToCoreMessages === 'function') {
-      coreMessages = _convertToCoreMessages(messages);
+  // Sanitize UI messages to strictly conform to AI SDK UIMessage validation.
+  // The frontend useChat sometimes passes internal part types (e.g. step-start, dynamic-tool)
+  // that the strict Zod validation in createAgentUIStreamResponse rejects.
+  const sanitizedMessages = messages.map((m) => {
+    const cleanMsg = { ...m };
+    
+    // 1. Extract tool invocations from custom parts if not already present
+    if (!cleanMsg.toolInvocations && Array.isArray(cleanMsg.parts)) {
+      const extractedTools = [];
+      cleanMsg.parts.forEach((p) => {
+        if (p.type === 'tool-invocation' && p.toolInvocation) {
+          extractedTools.push(p.toolInvocation);
+        } else if (p.toolCallId || p.type?.includes('tool')) {
+          extractedTools.push({
+            state: (p.state === 'output-available' || p.output !== undefined || p.result !== undefined) ? 'result' : 'call',
+            toolCallId: p.toolCallId || p.id,
+            toolName: p.toolName || p.name || 'tool',
+            args: p.input || p.args || {},
+            result: p.output !== undefined ? p.output : p.result,
+          });
+        }
+      });
+      if (extractedTools.length > 0) {
+        cleanMsg.toolInvocations = extractedTools;
+      }
     }
-  } catch (err) {
-    Logger.log('warning', { message: 'ai.service:streamChat:convertToCoreMessagesFailed', params: { error: err.message } });
-  }
 
-  if (!coreMessages || !coreMessages.length) {
-    coreMessages = messages.map((m) => {
-      let textContent = '';
-      if (typeof m.content === 'string') {
-        textContent = m.content;
-      } else if (Array.isArray(m.content)) {
-        textContent = m.content
-          .map((p) => (typeof p === 'string' ? p : p?.text || ''))
-          .filter(Boolean)
-          .join('\n');
+    // 2. Filter parts to only allow strictly valid AI SDK UIMessage parts
+    if (!Array.isArray(cleanMsg.parts)) {
+      cleanMsg.parts = [];
+      if (cleanMsg.content) {
+        cleanMsg.parts.push({ type: 'text', text: cleanMsg.content });
       }
-      
-      if (!textContent && Array.isArray(m.parts)) {
-        textContent = m.parts
-          .map((p) => (p?.type === 'text' ? p.text : ''))
-          .filter(Boolean)
-          .join('\n');
+    } else {
+      cleanMsg.parts = cleanMsg.parts.filter((p) => 
+        p.type === 'text' || 
+        p.type === 'reasoning' || 
+        p.type === 'tool-invocation' ||
+        p.type === 'dynamic-tool' ||
+        p.type === 'step-start' ||
+        p.type === 'file' ||
+        p.type === 'reasoning-file' ||
+        p.type === 'custom' ||
+        (typeof p.type === 'string' && (p.type.startsWith('tool-') || p.type.startsWith('data-')))
+      );
+      // If parts is empty after filtering, ensure it has at least the text content if available
+      if (cleanMsg.parts.length === 0 && cleanMsg.content) {
+        cleanMsg.parts.push({ type: 'text', text: cleanMsg.content });
       }
-
-      return {
-        role: m.role === 'system' ? 'system' : m.role === 'assistant' ? 'assistant' : 'user',
-        content: textContent.trim() || ' ',
-      };
-    });
-  }
+    }
+    
+    return cleanMsg;
+  });
 
   Logger.log('info', {
     message: 'ai.service:streamChat:start',
-    params: { tenantID, messageCount: coreMessages.length, model: rawModel },
+    params: { tenantID, messageCount: sanitizedMessages.length, model: rawModel },
   });
 
-  const result = await _streamText({
+  const localizedContextBlock = await aiContextService.buildSessionContext({ tenantID, conversationID, clientContext });
+  const dynamicSystemPrompt = aiSystemPrompt.build(localizedContextBlock);
+
+  const agent = new _ToolLoopAgent({
     model: modelInstance,
-    system: SYSTEM_PROMPT,
-    messages: coreMessages,
+    instructions: dynamicSystemPrompt,
     tools,
-    maxSteps: 10,
-    stopWhen: (step) => step.finishReason === 'stop' || step.finishReason === 'length',
-    onFinish: async ({ finishReason, usage }) => {
+    onEnd: async ({ usage, steps }) => {
       Logger.log('success', {
         message: 'ai.service:streamChat:done',
-        params: { tenantID, finishReason, totalTokens: usage?.totalTokens },
+        params: { tenantID, totalTokens: usage?.totalTokens, totalSteps: steps?.length },
       });
-      if (finishReason !== 'tool-calls') {
-        try {
-          await mcpClient.close();
-        } catch (_) {
-          // Ignore cleanup errors
-        }
+      try {
+        await mcpClient.close();
+      } catch (_) {
+        // Ignore cleanup errors
       }
     },
   });
 
-  // Pipe the AI SDK UI message stream to the Express response.
-  // AI SDK 5 / @ai-sdk/react uses pipeUIMessageStreamToResponse.
-  if (typeof result.pipeUIMessageStreamToResponse === 'function') {
-    result.pipeUIMessageStreamToResponse(res);
-  } else if (typeof result.toUIMessageStreamResponse === 'function') {
-    const webResponse = result.toUIMessageStreamResponse();
-    res.status(webResponse.status);
-    webResponse.headers.forEach((val, key) => res.setHeader(key, val));
-    
-    const reader = webResponse.body.getReader();
-    const pump = async () => {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(value);
-      }
-      res.end();
-    };
-    pump().catch((err) => {
-      console.error(err);
-      res.end();
-    });
-  } else {
-    throw new Error('No compatible piping method found on streamText result.');
-  }
+  const webResponse = await _createAgentUIStreamResponse({
+    agent,
+    uiMessages: sanitizedMessages,
+  });
+
+  res.status(webResponse.status);
+  webResponse.headers.forEach((val, key) => res.setHeader(key, val));
+  
+  const reader = webResponse.body.getReader();
+  const pump = async () => {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      res.write(value);
+    }
+    res.end();
+  };
+  
+  pump().catch((err) => {
+    Logger.log('error', { message: 'ai.service:streamChat:pumpError', params: { error: err.message } });
+    res.end();
+  });
 };
 
 module.exports = { aiService };

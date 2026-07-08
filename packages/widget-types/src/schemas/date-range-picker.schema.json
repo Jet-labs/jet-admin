@@ -1,0 +1,33 @@
+{
+  "widgetType": "date-range-picker",
+  "description": "Date Range Picker widget. Allows users to select a start and end date range.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string", "description": "Input label" },
+      "startPlaceholder": { "type": "string", "default": "Start date" },
+      "endPlaceholder": { "type": "string", "default": "End date" },
+      "defaultStart": { "type": "string", "description": "Default start ISO date" },
+      "defaultEnd": { "type": "string", "description": "Default end ISO date" },
+      "enableTime": { "type": "boolean", "default": false },
+      "dateFormat": { "type": "string", "default": "YYYY-MM-DD" },
+      "minDate": { "type": "string" },
+      "maxDate": { "type": "string" },
+      "presets": {
+        "type": "array",
+        "description": "Quick-select preset ranges",
+        "items": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string" },
+            "start": { "type": "string", "description": "ISO date or relative expression e.g. 'now-7d'" },
+            "end": { "type": "string" }
+          },
+          "required": ["label", "start", "end"]
+        }
+      },
+      "disabled": { "type": ["boolean", "string"], "default": false }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onChange", "onOpen", "onClose", "onClear"]
+}

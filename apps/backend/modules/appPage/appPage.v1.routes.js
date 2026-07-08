@@ -12,6 +12,13 @@ const {
 } = require("./appPage.validator");
 const { P } = require("../../config/permissions");
 
+// Schemas
+router.get(
+  "/schemas",
+  authMiddleware.authorize(P.appPage.list),
+  appPageController.getAppPageSchema
+);
+
 router.get(
   "/",
   validate(listAppPagesQuerySchema, "query"),

@@ -1,0 +1,53 @@
+{
+  "widgetType": "table",
+  "description": "Data table widget. Displays rows of data with configurable columns, pagination, sorting, filtering, and row actions.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "columns": {
+        "type": "array",
+        "description": "Column definitions for the table",
+        "items": {
+          "type": "object",
+          "properties": {
+            "field": { "type": "string", "description": "Data field key" },
+            "title": { "type": "string", "description": "Column header label" },
+            "type": { "type": "string", "enum": ["text", "number", "boolean", "date", "link", "image", "badge", "actions"], "description": "Column render type" },
+            "width": { "type": ["number", "string"], "description": "Column width in px or percent" },
+            "sortable": { "type": "boolean", "default": false },
+            "filterable": { "type": "boolean", "default": false },
+            "editable": { "type": "boolean", "default": false },
+            "hidden": { "type": "boolean", "default": false },
+            "format": { "type": "string", "description": "Display format string (e.g. date format)" }
+          },
+          "required": ["field"]
+        }
+      },
+      "pagination": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean", "default": true },
+          "pageSize": { "type": "number", "default": 20 },
+          "mode": { "type": "string", "enum": ["client", "server"], "default": "client" }
+        }
+      },
+      "searchable": { "type": "boolean", "default": false },
+      "exportable": { "type": "boolean", "default": false },
+      "selectable": { "type": "boolean", "default": false },
+      "bulkActions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "label": { "type": "string" },
+            "variant": { "type": "string", "enum": ["default", "danger", "success"] }
+          },
+          "required": ["key", "label"]
+        }
+      },
+      "emptyText": { "type": "string", "description": "Text to show when table has no data" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onRowSelect", "onPageChange", "onSearch", "onExport", "onRowSave", "onBulkDelete", "onBulkExport", "onBulkAction", "onBulkEdit"]
+}

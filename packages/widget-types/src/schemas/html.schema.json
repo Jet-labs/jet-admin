@@ -1,0 +1,15 @@
+{
+  "widgetType": "html",
+  "description": "HTML Widget. Renders arbitrary custom HTML/CSS/JS in an isolated sandbox. Communicates with the dashboard via window.postMessage.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "html": { "type": "string", "description": "Full HTML document content (or body fragment)" },
+      "css": { "type": "string", "description": "Additional CSS to inject" },
+      "js": { "type": "string", "description": "JavaScript to inject. Use window.parent.postMessage({ type: 'JET_MESSAGE', data: {...} }, '*') to emit the onMessage event." },
+      "height": { "type": ["number", "string"], "description": "Widget height in px", "default": 300 },
+      "scrollable": { "type": "boolean", "default": false }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onMessage"]
+}

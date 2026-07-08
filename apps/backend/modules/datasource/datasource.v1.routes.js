@@ -22,6 +22,14 @@ const upload = multer({
 });
 
 // Datasource routes
+
+// Schemas
+router.get(
+  "/schemas",
+  authMiddleware.authorize(P.datasource.list),
+  datasourceController.getDatasourceFormSchemas
+);
+
 router.get(
   "/",
   validate(listDatasourcesQuerySchema, "query"),

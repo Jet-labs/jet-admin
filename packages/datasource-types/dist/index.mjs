@@ -8736,7 +8736,19 @@ var DATASOURCE_TYPES = {
 var getDatasourceTypeByValue = (value) => {
   return Object.values(DATASOURCE_TYPES).find((type) => type.value === value);
 };
+var DATASOURCE_FORM_CONFIG_SCHEMAS = Object.fromEntries(
+  Object.values(DATASOURCE_TYPES).map((t) => [t.value, t.formConfig])
+);
+var DATASOURCE_QUERY_CONFIG_SCHEMAS = Object.fromEntries(
+  Object.values(DATASOURCE_TYPES).map((t) => [t.value, t.queryConfigForm])
+);
+var DATASOURCE_LISTENER_CONFIG_SCHEMAS = Object.fromEntries(
+  Object.values(DATASOURCE_TYPES).filter((t) => t.listenerConfigForm != null).map((t) => [t.value, t.listenerConfigForm])
+);
 export {
+  DATASOURCE_FORM_CONFIG_SCHEMAS,
+  DATASOURCE_LISTENER_CONFIG_SCHEMAS,
+  DATASOURCE_QUERY_CONFIG_SCHEMAS,
   DATASOURCE_TYPES,
   getDatasourceTypeByValue
 };

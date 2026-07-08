@@ -452,4 +452,41 @@ widgetController.serveFile = async (req, res) => {
   }
 };
 
+/**
+ * GET /widgets/schemas?widgetType=...
+ * Returns the widgetConfig JSON Schema for one or all widget types.
+ * tenantID is required (permissions check) but schemas are static config.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+widgetController.getWidgetSchemas = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+    const { widgetType } = req.query;
+
+    Logger.log('info', {
+      message: 'widgetController:getWidgetSchemas:params',
+      params: { userID: user.userID, tenantID, widgetType },
+    });
+
+    const schemas = await widgetService.getWidgetSchemas({ widgetType });
+
+    Logger.log('success', {
+      message: 'widgetController:getWidgetSchemas:success',
+      params: { userID: user.userID, tenantID, schemaCount: Object.keys(schemas).length },
+    });
+
+    return expressUtils.sendResponse(res, true, { schemas, message: 'Widget schemas fetched successfully.' }, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log('error', {
+      message: 'widgetController:getWidgetSchemas:catch-1',
+      params: { error },
+    });
+    const status = error.code === 'SCHEMA_NOT_FOUND' ? constants.HTTP_STATUS.NOT_FOUND : constants.HTTP_STATUS.BAD_REQUEST;
+    return expressUtils.sendResponse(res, false, {}, error, status);
+  }
+};
+
 module.exports = { widgetController };

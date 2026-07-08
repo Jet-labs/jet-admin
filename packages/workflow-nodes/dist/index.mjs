@@ -3094,6 +3094,18 @@ var WORKFLOW_NODES_MAP = {
     }
   }
 };
+var WORKFLOW_NODE_SCHEMAS = Object.fromEntries(
+  Object.values(WORKFLOW_NODES_MAP).filter((n) => n.schema).map((n) => [
+    n.value,
+    {
+      nodeType: n.value,
+      label: n.label,
+      schema: n.schema,
+      uischema: n.uischema,
+      defaultValue: n.defaultValue
+    }
+  ])
+);
 export {
   ConditionNode,
   ConditionNodeConfigurator,
@@ -3117,6 +3129,7 @@ export {
   StartNodeConfigurator,
   StatusIndicator,
   WORKFLOW_NODES_MAP,
+  WORKFLOW_NODE_SCHEMAS,
   WORKFLOW_NODE_TYPES,
   JetCheckboxControl as WorkflowCheckboxControl,
   JetCustomDynamicKeyValueInputRenderer as WorkflowDynamicArgsControl,

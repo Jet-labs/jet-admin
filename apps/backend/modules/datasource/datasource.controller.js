@@ -581,6 +581,42 @@ datasourceController.proxyDatasourceAction = async (req, res) => {
   }
 };
 
+/**
+ * GET /datasources/schemas?datasourceType=...
+ * Returns datasource connection form config schemas for one or all types.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+datasourceController.getDatasourceFormSchemas = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+    const { datasourceType } = req.query;
+
+    Logger.log('info', {
+      message: 'datasourceController:getDatasourceFormSchemas:params',
+      params: { userID: user.userID, tenantID, datasourceType },
+    });
+
+    const schemas = await datasourceService.getDatasourceFormSchemas({ datasourceType });
+
+    Logger.log('success', {
+      message: 'datasourceController:getDatasourceFormSchemas:success',
+      params: { userID: user.userID, tenantID, schemaCount: Object.keys(schemas).length },
+    });
+
+    return expressUtils.sendResponse(res, true, { schemas, message: 'Datasource schemas fetched successfully.' }, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log('error', {
+      message: 'datasourceController:getDatasourceFormSchemas:catch-1',
+      params: { error: error.message || error },
+    });
+    const status = error.code === 'SCHEMA_NOT_FOUND' ? constants.HTTP_STATUS.NOT_FOUND : constants.HTTP_STATUS.BAD_REQUEST;
+    return expressUtils.sendResponse(res, false, {}, error, status);
+  }
+};
+
 module.exports = {
   datasourceController,
 };

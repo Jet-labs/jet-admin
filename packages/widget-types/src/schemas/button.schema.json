@@ -1,0 +1,27 @@
+{
+  "widgetType": "button",
+  "description": "Button widget. A clickable button that triggers an action.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string", "description": "Button text label", "default": "Click me" },
+      "variant": {
+        "type": "string",
+        "enum": ["primary", "secondary", "danger", "success", "ghost", "outline"],
+        "default": "primary",
+        "description": "Visual style variant"
+      },
+      "size": {
+        "type": "string",
+        "enum": ["sm", "md", "lg"],
+        "default": "md"
+      },
+      "icon": { "type": "string", "description": "Icon name (from icon library)" },
+      "iconPosition": { "type": "string", "enum": ["left", "right"], "default": "left" },
+      "disabled": { "type": ["boolean", "string"], "description": "Disabled state — boolean or template expression" },
+      "loading": { "type": ["boolean", "string"], "description": "Loading state — boolean or template expression" },
+      "fullWidth": { "type": "boolean", "default": false }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onSubmit"]
+}

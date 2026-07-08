@@ -84,18 +84,24 @@ export const appPageTools = [
   {
     name: "create_app_page",
     description:
-      "Create a new App Page with a layout configuration. " +
+      "Create a new App Page with a layout configuration.\n" +
       "appPageConfig structure:\n" +
       "  {\n" +
-      "    layout: { type: 'grid', columns: 12 },\n" +
-      "    dataSources: [ { alias, type: 'query'|'workflow'|'listener', sourceID, triggerMode } ],\n" +
-      "    widgets: [ { widgetID, alias, layout: { x, y, w, h } } ],\n" +
-      "    variables: [ { key, type, defaultValue } ]\n" +
+      "    widgets: [ 'widget_<widgetID>_1' ], // Array of widget instance keys\n" +
+      "    layouts: {\n" +
+      "      lg: [ { i: 'widget_<widgetID>_1', x: 0, y: 0, w: 12, h: 6 } ] // Grid positions per breakpoint (lg, md, sm, xs, xxs)\n" +
+      "    },\n" +
+      "    dataSources: [\n" +
+      "      { alias: 'query_alias', type: 'query', queryID: 'uuid', triggerMode: 'auto' },\n" +
+      "      { alias: 'workflow_alias', type: 'workflow', workflowID: 'uuid', triggerMode: 'manual' },\n" +
+      "      { alias: 'listener_alias', type: 'listener', listenerID: 'uuid' }\n" +
+      "    ],\n" +
+      "    variables: [ { key: 'var_name', type: 'string'|'number'|'boolean'|'object'|'array', defaultValue: '' } ]\n" +
       "  }\n\n" +
       "Layout strategy by use case:\n" +
-      "  Single metric: 1 stat widget (12 cols wide)\n" +
-      "  Chart + table: chart (12 cols) stacked above table (12 cols)\n" +
-      "  Multi-metric dashboard: 3-4 KPI stats in a row (3-4 cols each) + chart below",
+      "  Single metric: 1 stat widget (w: 12, h: 6)\n" +
+      "  Chart + table: chart (w: 12, h: 6, x: 0, y: 0) stacked above table (w: 12, h: 10, x: 0, y: 6)\n" +
+      "  Multi-metric dashboard: 3-4 KPI stats in a row (w: 3-4, h: 6 each) + chart below",
     inputSchema: {
       type: "object",
       properties: {
@@ -103,7 +109,7 @@ export const appPageTools = [
         appPageDescription: { type: "string", description: "Optional description of the page's purpose." },
         appPageConfig: {
           type: "object",
-          description: "Full page configuration including layout, dataSources, widgets, and variables.",
+          description: "Full page configuration including layouts, dataSources, widgets, and variables.",
         },
       },
       required: ["appPageTitle"],

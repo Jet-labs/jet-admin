@@ -434,4 +434,50 @@ widgetService.deleteWidgetByID = async ({ authContext, tenantID, widgetID }) => 
   }
 };
 
+// ─── Schema Introspection ────────────────────────────────────────────────────
+
+/** @type {Record<string, object>|null} — in-process singleton */
+let _widgetConfigSchemas = null;
+
+/**
+ * Lazy-loads WIDGET_CONFIG_SCHEMAS from the ESM package @jet-admin/widget-types.
+ * After the first call the result is cached in-process for the lifetime of the server.
+ *
+ * @returns {Promise<Record<string, object>>}
+ */
+async function loadWidgetConfigSchemas() {
+  if (_widgetConfigSchemas) return _widgetConfigSchemas;
+  const mod = await import('@jet-admin/widget-types');
+  _widgetConfigSchemas = mod.WIDGET_CONFIG_SCHEMAS;
+  return _widgetConfigSchemas;
+}
+
+/**
+ * Returns widget config schema descriptors.
+ * If widgetType is supplied, returns only the schema for that type.
+ * If widgetType is omitted, returns all schemas.
+ *
+ * @param {object} param0
+ * @param {string|undefined} param0.widgetType
+ * @returns {Promise<Record<string, object>|object>}
+ */
+widgetService.getWidgetSchemas = async ({ widgetType } = {}) => {
+  Logger.log('info', {
+    message: 'widgetService:getWidgetSchemas:params',
+    params: { widgetType },
+  });
+
+  const all = await loadWidgetConfigSchemas();
+
+  if (widgetType) {
+    const schema = all[widgetType];
+    if (!schema) {
+      throw Object.assign(new Error(`No schema found for widgetType: '${widgetType}'`), { code: 'SCHEMA_NOT_FOUND' });
+    }
+    return { [widgetType]: schema };
+  }
+
+  return all;
+};
+
 module.exports = { widgetService };

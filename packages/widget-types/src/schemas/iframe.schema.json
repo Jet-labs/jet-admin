@@ -1,0 +1,16 @@
+{
+  "widgetType": "iframe",
+  "description": "IFrame Embed widget. Embeds an external URL inside the dashboard.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "src": { "type": "string", "description": "URL to embed. Supports template expressions." },
+      "height": { "type": ["number", "string"], "description": "Frame height in px or CSS value", "default": 400 },
+      "scrolling": { "type": "boolean", "default": true },
+      "allowFullscreen": { "type": "boolean", "default": false },
+      "sandbox": { "type": "string", "description": "HTML sandbox attribute value (space-separated tokens)" }
+    },
+    "required": ["src"]
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

@@ -17,7 +17,7 @@ const aiController = {};
  */
 aiController.streamChat = async (req, res) => {
   const { tenantID } = req.params;
-  const { messages } = req.body;
+  const { messages, clientContext, conversationID } = req.body;
   const userID = req.user?.userID || req.firebaseUser?.uid;
 
   const bearerToken =
@@ -27,7 +27,7 @@ aiController.streamChat = async (req, res) => {
 
   Logger.log('info', {
     message: 'aiController:streamChat:params',
-    params: { userID, tenantID, messageCount: messages?.length },
+    params: { userID, tenantID, messageCount: messages?.length, conversationID },
   });
 
   if (!bearerToken) {
@@ -41,7 +41,7 @@ aiController.streamChat = async (req, res) => {
   }
 
   try {
-    await aiService.streamChat({ messages, tenantID, bearerToken, res });
+    await aiService.streamChat({ messages, clientContext, conversationID, tenantID, bearerToken, res });
   } catch (error) {
     Logger.log('error', {
       message: 'aiController:streamChat:catch-1',

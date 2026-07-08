@@ -480,4 +480,40 @@ dataQueryController.deleteDataQueryByID = async (req, res) => {
   }
 };
 
+/**
+ * GET /data-queries/schemas?datasourceType=...
+ * Returns data query config schemas for one or all datasource types.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+dataQueryController.getDataQuerySchemas = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+    const { datasourceType } = req.query;
+
+    Logger.log('info', {
+      message: 'dataQueryController:getDataQuerySchemas:params',
+      params: { userID: user.userID, tenantID, datasourceType },
+    });
+
+    const schemas = await dataQueryService.getDataQuerySchemas({ datasourceType });
+
+    Logger.log('success', {
+      message: 'dataQueryController:getDataQuerySchemas:success',
+      params: { userID: user.userID, tenantID, schemaCount: Object.keys(schemas).length },
+    });
+
+    return expressUtils.sendResponse(res, true, { schemas, message: 'Data query schemas fetched successfully.' }, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log('error', {
+      message: 'dataQueryController:getDataQuerySchemas:catch-1',
+      params: { error },
+    });
+    const status = error.code === 'SCHEMA_NOT_FOUND' ? constants.HTTP_STATUS.NOT_FOUND : constants.HTTP_STATUS.BAD_REQUEST;
+    return expressUtils.sendResponse(res, false, {}, error, status);
+  }
+};
+
 module.exports = { dataQueryController };

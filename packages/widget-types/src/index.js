@@ -385,3 +385,5 @@ export const WIDGET_METHODS = {
 export const getWidgetMethods = (widgetType) => {
   return WIDGET_METHODS[widgetType] || [];
 };
+
+export * from './schemas/index.js';

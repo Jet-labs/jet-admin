@@ -1,0 +1,22 @@
+{
+  "widgetType": "alert",
+  "description": "Alert Banner widget. Shows an informational, success, warning, or error message.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "message": { "type": "string", "description": "Alert message text. Supports template expressions." },
+      "title": { "type": "string", "description": "Optional alert title" },
+      "variant": {
+        "type": "string",
+        "enum": ["info", "success", "warning", "error"],
+        "default": "info",
+        "description": "Alert severity type"
+      },
+      "dismissible": { "type": "boolean", "default": false, "description": "Whether the user can dismiss the alert" },
+      "icon": { "type": "boolean", "default": true, "description": "Show variant icon" },
+      "visible": { "type": ["boolean", "string"], "description": "Visibility — boolean or template expression", "default": true }
+    },
+    "required": ["message"]
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onDismiss"]
+}

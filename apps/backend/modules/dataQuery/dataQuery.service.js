@@ -760,6 +760,45 @@ dataQueryService.deleteDataQueryByID = async ({
   }
 };
 
+// ─── Schema Introspection ────────────────────────────────────────────────────
+
+/** @type {Record<string, object>|null} — in-process singleton */
+let _datasourceQueryConfigSchemas = null;
+
+async function loadDatasourceQueryConfigSchemas() {
+  if (_datasourceQueryConfigSchemas) return _datasourceQueryConfigSchemas;
+  const mod = await import('@jet-admin/datasource-types');
+  _datasourceQueryConfigSchemas = mod.DATASOURCE_QUERY_CONFIG_SCHEMAS;
+  return _datasourceQueryConfigSchemas;
+}
+
+/**
+ * Returns query config schemas for data queries, keyed by datasourceType.
+ * If datasourceType is supplied, returns only the schema for that type.
+ *
+ * @param {object} param0
+ * @param {string|undefined} param0.datasourceType
+ * @returns {Promise<Record<string, object>|object>}
+ */
+dataQueryService.getDataQuerySchemas = async ({ datasourceType } = {}) => {
+  Logger.log('info', {
+    message: 'dataQueryService:getDataQuerySchemas:params',
+    params: { datasourceType },
+  });
+
+  const all = await loadDatasourceQueryConfigSchemas();
+
+  if (datasourceType) {
+    const schema = all[datasourceType];
+    if (!schema) {
+      throw Object.assign(new Error(`No query schema found for datasourceType: '${datasourceType}'`), { code: 'SCHEMA_NOT_FOUND' });
+    }
+    return { [datasourceType]: schema };
+  }
+
+  return all;
+};
+
 module.exports = { 
   dataQueryService, 
 };

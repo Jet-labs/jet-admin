@@ -296,5 +296,38 @@ workflowController.getRunStatusForWidget = async (req, res) => {
   }
 };
 
+/**
+ * GET /workflows/schemas?nodeType=...
+ * Returns workflow node schemas for one or all node types.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+workflowController.getWorkflowNodeSchemas = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+    const { nodeType } = req.query;
+
+    Logger.log('info', {
+      message: 'WorkflowController:getWorkflowNodeSchemas:params',
+      params: { userID: user.userID, tenantID, nodeType },
+    });
+
+    const schemas = await workflowService.getWorkflowNodeSchemas({ nodeType });
+
+    Logger.log('success', {
+      message: 'WorkflowController:getWorkflowNodeSchemas:success',
+      params: { userID: user.userID, tenantID, schemaCount: Object.keys(schemas).length },
+    });
+
+    expressUtils.sendResponse(res, true, { schemas, message: 'Workflow node schemas fetched successfully.' }, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log('error', { message: 'WorkflowController:getWorkflowNodeSchemas:error', params: { error: error.message } });
+    const status = error.code === 'SCHEMA_NOT_FOUND' ? constants.HTTP_STATUS.NOT_FOUND : constants.HTTP_STATUS.BAD_REQUEST;
+    expressUtils.sendResponse(res, false, {}, error, status);
+  }
+};
+
 module.exports = { workflowController };
 

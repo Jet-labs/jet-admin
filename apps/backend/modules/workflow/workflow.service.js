@@ -686,6 +686,45 @@ workflowService.getRunStatusForWidget = async ({ instanceID }) => {
   }
 };
 
+// ─── Schema Introspection ────────────────────────────────────────────────────
+
+/** @type {Record<string, object>|null} — in-process singleton */
+let _workflowNodeSchemas = null;
+
+async function loadWorkflowNodeSchemas() {
+  if (_workflowNodeSchemas) return _workflowNodeSchemas;
+  const mod = await import('@jet-admin/workflow-nodes');
+  _workflowNodeSchemas = mod.WORKFLOW_NODE_SCHEMAS;
+  return _workflowNodeSchemas;
+}
+
+/**
+ * Returns workflow node schemas, keyed by nodeType value.
+ * If nodeType is supplied, returns only the schema for that type.
+ *
+ * @param {object} param0
+ * @param {string|undefined} param0.nodeType
+ * @returns {Promise<Record<string, object>|object>}
+ */
+workflowService.getWorkflowNodeSchemas = async ({ nodeType } = {}) => {
+  Logger.log('info', {
+    message: 'workflowService:getWorkflowNodeSchemas:params',
+    params: { nodeType },
+  });
+
+  const all = await loadWorkflowNodeSchemas();
+
+  if (nodeType) {
+    const schema = all[nodeType];
+    if (!schema) {
+      throw Object.assign(new Error(`No schema found for workflow nodeType: '${nodeType}'`), { code: 'SCHEMA_NOT_FOUND' });
+    }
+    return { [nodeType]: schema };
+  }
+
+  return all;
+};
+
 module.exports = { 
   workflowService,
   // Exported for testing

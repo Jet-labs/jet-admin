@@ -32,6 +32,13 @@ const router = express.Router({ mergeParams: true });
 // Connection status (must be before :listenerID param route)
 router.get('/status/connections', authMiddleware.authorize(P.listener.read), listenerController.getConnectionStatus);
 
+// Schemas
+router.get(
+  "/schemas",
+  authMiddleware.authorize(P.listener.list),
+  listenerController.getListenerSchemas
+);
+
 // Listener CRUD
 router.get('/', validate(listListenersQuerySchema, 'query'), authMiddleware.authorize(P.listener.list), listenerController.getAllListeners);
 

@@ -696,5 +696,44 @@ datasourceService.proxyDatasourceAction = async ({
 
 
 
+// ─── Schema Introspection ────────────────────────────────────────────────────
+
+/** @type {Record<string, object>|null} — in-process singleton */
+let _datasourceFormConfigSchemas = null;
+
+async function loadDatasourceFormConfigSchemas() {
+  if (_datasourceFormConfigSchemas) return _datasourceFormConfigSchemas;
+  const mod = await import('@jet-admin/datasource-types');
+  _datasourceFormConfigSchemas = mod.DATASOURCE_FORM_CONFIG_SCHEMAS;
+  return _datasourceFormConfigSchemas;
+}
+
+/**
+ * Returns datasource connection form config schemas, keyed by datasourceType.
+ * If datasourceType is supplied, returns only the form config for that type.
+ *
+ * @param {object} param0
+ * @param {string|undefined} param0.datasourceType
+ * @returns {Promise<Record<string, object>|object>}
+ */
+datasourceService.getDatasourceFormSchemas = async ({ datasourceType } = {}) => {
+  Logger.log('info', {
+    message: 'datasourceService:getDatasourceFormSchemas:params',
+    params: { datasourceType },
+  });
+
+  const all = await loadDatasourceFormConfigSchemas();
+
+  if (datasourceType) {
+    const schema = all[datasourceType];
+    if (!schema) {
+      throw Object.assign(new Error(`No form schema found for datasourceType: '${datasourceType}'`), { code: 'SCHEMA_NOT_FOUND' });
+    }
+    return { [datasourceType]: schema };
+  }
+
+  return all;
+};
+
 module.exports = { datasourceService, decryptOptions };
 

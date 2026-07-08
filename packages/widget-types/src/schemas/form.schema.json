@@ -1,0 +1,58 @@
+{
+  "widgetType": "form",
+  "description": "Form widget. Renders an input form with configurable fields and submit action.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "fields": {
+        "type": "array",
+        "description": "Form field definitions",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string", "description": "Field key (used as form data property name)" },
+            "label": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["text", "number", "email", "password", "textarea", "select", "multiselect", "checkbox", "radio", "date", "datetime", "file", "hidden"],
+              "default": "text"
+            },
+            "placeholder": { "type": "string" },
+            "defaultValue": { "description": "Default value for the field" },
+            "required": { "type": "boolean", "default": false },
+            "disabled": { "type": ["boolean", "string"], "default": false },
+            "options": {
+              "type": "array",
+              "description": "Options for select/radio/multiselect fields",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": { "type": "string" },
+                  "value": {}
+                },
+                "required": ["label", "value"]
+              }
+            },
+            "validation": {
+              "type": "object",
+              "properties": {
+                "min": { "type": "number" },
+                "max": { "type": "number" },
+                "minLength": { "type": "number" },
+                "maxLength": { "type": "number" },
+                "pattern": { "type": "string" }
+              }
+            }
+          },
+          "required": ["key", "label", "type"]
+        }
+      },
+      "submitLabel": { "type": "string", "default": "Submit" },
+      "resetLabel": { "type": "string", "description": "Label for reset button; omit to hide reset button" },
+      "layout": { "type": "string", "enum": ["vertical", "horizontal", "grid"], "default": "vertical" },
+      "columns": { "type": "number", "description": "Number of columns when layout is 'grid'", "default": 1 }
+    },
+    "required": ["fields"]
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onSubmit", "onFieldChange"]
+}

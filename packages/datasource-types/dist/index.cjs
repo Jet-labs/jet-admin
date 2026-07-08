@@ -19,6 +19,9 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.js
 var index_exports = {};
 __export(index_exports, {
+  DATASOURCE_FORM_CONFIG_SCHEMAS: () => DATASOURCE_FORM_CONFIG_SCHEMAS,
+  DATASOURCE_LISTENER_CONFIG_SCHEMAS: () => DATASOURCE_LISTENER_CONFIG_SCHEMAS,
+  DATASOURCE_QUERY_CONFIG_SCHEMAS: () => DATASOURCE_QUERY_CONFIG_SCHEMAS,
   DATASOURCE_TYPES: () => DATASOURCE_TYPES,
   getDatasourceTypeByValue: () => getDatasourceTypeByValue
 });
@@ -8762,4 +8765,13 @@ var DATASOURCE_TYPES = {
 var getDatasourceTypeByValue = (value) => {
   return Object.values(DATASOURCE_TYPES).find((type) => type.value === value);
 };
+var DATASOURCE_FORM_CONFIG_SCHEMAS = Object.fromEntries(
+  Object.values(DATASOURCE_TYPES).map((t) => [t.value, t.formConfig])
+);
+var DATASOURCE_QUERY_CONFIG_SCHEMAS = Object.fromEntries(
+  Object.values(DATASOURCE_TYPES).map((t) => [t.value, t.queryConfigForm])
+);
+var DATASOURCE_LISTENER_CONFIG_SCHEMAS = Object.fromEntries(
+  Object.values(DATASOURCE_TYPES).filter((t) => t.listenerConfigForm != null).map((t) => [t.value, t.listenerConfigForm])
+);
 //# sourceMappingURL=index.cjs.map

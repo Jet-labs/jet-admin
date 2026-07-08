@@ -407,6 +407,41 @@ const listenerController = {
       return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
     }
   },
+  /**
+   * GET /listeners/schemas?datasourceType=...
+   * Returns listener config schemas for one or all datasource types.
+   *
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   */
+  async getListenerSchemas(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID } = req.params;
+      const { datasourceType } = req.query;
+
+      Logger.log('info', {
+        message: 'listenerController:getListenerSchemas:params',
+        params: { userID: user.userID, tenantID, datasourceType },
+      });
+
+      const schemas = await listenerService.getListenerSchemas({ datasourceType });
+
+      Logger.log('success', {
+        message: 'listenerController:getListenerSchemas:success',
+        params: { userID: user.userID, tenantID, schemaCount: Object.keys(schemas).length },
+      });
+
+      return expressUtils.sendResponse(res, true, { schemas, message: 'Listener schemas fetched successfully.' }, null, constants.HTTP_STATUS.OK);
+    } catch (error) {
+      Logger.log('error', {
+        message: 'listenerController:getListenerSchemas:error',
+        params: { error },
+      });
+      const status = error.code === 'SCHEMA_NOT_FOUND' ? constants.HTTP_STATUS.NOT_FOUND : constants.HTTP_STATUS.BAD_REQUEST;
+      return expressUtils.sendResponse(res, false, {}, error, status);
+    }
+  },
 };
 
 module.exports = listenerController;

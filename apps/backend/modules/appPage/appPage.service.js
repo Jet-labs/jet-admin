@@ -425,4 +425,111 @@ appPageService.deleteAppPageByID = async ({
   }
 };
 
+// ─── Schema Introspection ────────────────────────────────────────────────────
+
+/**
+ * Static JSON schema describing the structure of appPageConfig.
+ * App pages do not have subtypes, so this returns a single fixed schema.
+ * Kept here (instead of a separate package) because app pages are
+ * purely a backend concept with no shared frontend type package yet.
+ */
+const APP_PAGE_CONFIG_SCHEMA = {
+  assetType: 'appPage',
+  description: 'App page configuration schema. An app page is a canvas that contains widget instances arranged in layouts, reactive page-level data sources, and state variables.',
+  schema: {
+    type: 'object',
+    properties: {
+      widgets: {
+        type: 'array',
+        description: 'List of widget instance keys placed on this page. Keys are formatted as widget_<widgetID>_<index>.',
+        items: { type: 'string' }
+      },
+      layouts: {
+        type: 'object',
+        description: 'Grid layout configurations indexed by viewport breakpoint (lg, md, sm, xs, xxs)',
+        properties: {
+          lg: { type: 'array', items: { $ref: '#/definitions/layoutItem' } },
+          md: { type: 'array', items: { $ref: '#/definitions/layoutItem' } },
+          sm: { type: 'array', items: { $ref: '#/definitions/layoutItem' } },
+          xs: { type: 'array', items: { $ref: '#/definitions/layoutItem' } },
+          xxs: { type: 'array', items: { $ref: '#/definitions/layoutItem' } }
+        }
+      },
+      layoutVersion: {
+        type: 'integer',
+        description: 'Optional layout system version (e.g. 2 for flexbox-based layout)',
+      },
+      layout: {
+        type: 'object',
+        description: 'Optional layout structure object (used when layoutVersion is 2)'
+      },
+      dataSources: {
+        type: 'array',
+        description: 'Page-level reactive data sources supplying data to widgets from queries, workflows, or event listeners.',
+        items: {
+          type: 'object',
+          properties: {
+            alias: { type: 'string', description: 'Unique reference name used to access this source in expressions, e.g. state.queries.<alias>.data or state.workflows.<alias>.data' },
+            type: { type: 'string', enum: ['query', 'workflow', 'listener'], description: 'The type of reactive data source' },
+            queryID: { type: 'string', description: 'UUID of the saved data query (required if type is "query")' },
+            workflowID: { type: 'string', description: 'UUID of the workflow (required if type is "workflow")' },
+            listenerID: { type: 'string', description: 'UUID of the event listener (required if type is "listener")' },
+            channelName: { type: 'string', description: 'Optional channel name for listener sources' },
+            inputValues: {
+              type: 'object',
+              description: 'Key-value map of template parameter values or expressions (e.g. {{ state.variables.userId }}) supplied to the query or workflow'
+            },
+            triggerMode: { type: 'string', enum: ['auto', 'reactive', 'manual'], description: 'Specifies when this source is fetched: auto (on load), reactive (when dependent variables change), or manual (on-demand only)' },
+            refreshOn: {
+              type: 'array',
+              description: 'List of state paths that trigger a refetch of this source when modified (e.g., variables.selectedUserId)',
+              items: { type: 'string' }
+            },
+            refetchInterval: { type: ['integer', 'null'], description: 'Optional refetch polling interval in milliseconds' }
+          },
+          required: ['alias', 'type']
+        }
+      },
+      variables: {
+        type: 'array',
+        description: 'Page-level state variables forming the reactive local state of the canvas.',
+        items: {
+          type: 'object',
+          properties: {
+            key: { type: 'string', description: 'The unique variable key used to read/write state (e.g. selectedRow)' },
+            type: { type: 'string', enum: ['string', 'number', 'boolean', 'object', 'array'], description: 'The data type of the variable' },
+            defaultValue: { type: ['string', 'number', 'boolean', 'object', 'array', 'null'], description: 'The initial default value' },
+            description: { type: 'string', description: 'Optional documentation about what this variable stores' }
+          },
+          required: ['key', 'type']
+        }
+      }
+    },
+    definitions: {
+      layoutItem: {
+        type: 'object',
+        properties: {
+          i: { type: 'string', description: 'The widgetInstance key (matches an item in the widgets array)' },
+          x: { type: 'integer', description: 'Grid column coordinate (x-axis)' },
+          y: { type: 'integer', description: 'Grid row coordinate (y-axis)' },
+          w: { type: 'integer', description: 'Width of widget in columns' },
+          h: { type: 'integer', description: 'Height of widget in rows' }
+        },
+        required: ['i', 'x', 'y', 'w', 'h']
+      }
+    }
+  }
+};
+
+/**
+ * Returns the static app page config schema.
+ * Always returns the same object — there are no appPage subtypes.
+ *
+ * @returns {Promise<object>}
+ */
+appPageService.getAppPageSchema = async () => {
+  Logger.log('info', { message: 'appPageService:getAppPageSchema:params' });
+  return APP_PAGE_CONFIG_SCHEMA;
+};
+
 module.exports = { appPageService };

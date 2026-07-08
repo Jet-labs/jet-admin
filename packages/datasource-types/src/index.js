@@ -472,3 +472,35 @@ export const DATASOURCE_TYPES = {
 export const getDatasourceTypeByValue = (value) => {
   return Object.values(DATASOURCE_TYPES).find(type => type.value === value);
 };
+
+/**
+ * Aggregated datasource connection form config schemas, keyed by datasourceType value.
+ * Each value is the formConfig JSON (field definitions for the connection form).
+ *
+ * @type {Record<string, object>}
+ */
+export const DATASOURCE_FORM_CONFIG_SCHEMAS = Object.fromEntries(
+  Object.values(DATASOURCE_TYPES).map((t) => [t.value, t.formConfig])
+);
+
+/**
+ * Aggregated query config schemas, keyed by datasourceType value.
+ * Each value is the queryConfigForm JSON Schema (field definitions for the query editor).
+ *
+ * @type {Record<string, object>}
+ */
+export const DATASOURCE_QUERY_CONFIG_SCHEMAS = Object.fromEntries(
+  Object.values(DATASOURCE_TYPES).map((t) => [t.value, t.queryConfigForm])
+);
+
+/**
+ * Aggregated listener config schemas for datasource types that support listeners,
+ * keyed by datasourceType value.
+ *
+ * @type {Record<string, object>}
+ */
+export const DATASOURCE_LISTENER_CONFIG_SCHEMAS = Object.fromEntries(
+  Object.values(DATASOURCE_TYPES)
+    .filter((t) => t.listenerConfigForm != null)
+    .map((t) => [t.value, t.listenerConfigForm])
+);

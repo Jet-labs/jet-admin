@@ -19,6 +19,13 @@ const {
 const { P } = require("../../config/permissions");
 const dataCollectionRoutes = require("./dataCollection/dataCollection.v1.routes");
 
+// Schemas
+router.get(
+  "/schemas",
+  authMiddleware.authorize(P.workflow.list),
+  workflowController.getWorkflowNodeSchemas
+);
+
 // List all workflows
 router.get(
   "/",

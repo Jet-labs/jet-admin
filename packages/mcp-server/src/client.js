@@ -138,6 +138,9 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
     list: (params = {}) =>
       call(() => http.get(`${T}/datasources`, { params })),
 
+    getSchemas: (params = {}) =>
+      call(() => http.get(`${T}/datasources/schemas`, { params })),
+
     getById: (datasourceID) =>
       call(() => http.get(`${T}/datasources/${datasourceID}`)),
 
@@ -162,6 +165,9 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
   const queryAPI = {
     list: (params = {}) =>
       call(() => http.get(`${T}/queries`, { params })),
+
+    getSchemas: (params = {}) =>
+      call(() => http.get(`${T}/queries/schemas`, { params })),
 
     getById: (dataQueryID) =>
       call(() => http.get(`${T}/queries/${dataQueryID}`)),
@@ -194,6 +200,9 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
     list: (params = {}) =>
       call(() => http.get(`${T}/listeners`, { params })),
 
+    getSchemas: (params = {}) =>
+      call(() => http.get(`${T}/listeners/schemas`, { params })),
+
     getById: (listenerID) =>
       call(() => http.get(`${T}/listeners/${listenerID}`)),
 
@@ -218,6 +227,9 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
   const workflowAPI = {
     list: (params = {}) =>
       call(() => http.get(`${T}/workflows`, { params })),
+
+    getSchemas: (params = {}) =>
+      call(() => http.get(`${T}/workflows/schemas`, { params })),
 
     getById: (workflowID) =>
       call(() => http.get(`${T}/workflows/${workflowID}`)),
@@ -244,6 +256,9 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
     list: (params = {}) =>
       call(() => http.get(`${T}/widgets`, { params })),
 
+    getSchemas: (params = {}) =>
+      call(() => http.get(`${T}/widgets/schemas`, { params })),
+
     getById: (widgetID) =>
       call(() => http.get(`${T}/widgets/${widgetID}`)),
 
@@ -262,6 +277,9 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
   const appPageAPI = {
     list: (params = {}) =>
       call(() => http.get(`${T}/app-pages`, { params })),
+
+    getSchema: () =>
+      call(() => http.get(`${T}/app-pages/schemas`)),
 
     getById: (appPageID) =>
       call(() => http.get(`${T}/app-pages/${appPageID}`)),

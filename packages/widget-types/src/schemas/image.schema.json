@@ -1,0 +1,17 @@
+{
+  "widgetType": "image",
+  "description": "Image widget. Displays an image from a URL.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "src": { "type": "string", "description": "Image URL. Supports template expressions." },
+      "alt": { "type": "string", "description": "Alt text for accessibility" },
+      "objectFit": { "type": "string", "enum": ["cover", "contain", "fill", "none", "scale-down"], "default": "cover" },
+      "borderRadius": { "type": "string", "description": "CSS border-radius e.g. '8px', '50%'" },
+      "linkUrl": { "type": "string", "description": "Optional URL to navigate to when clicking the image" },
+      "linkTarget": { "type": "string", "enum": ["_blank", "_self"], "default": "_blank" }
+    },
+    "required": ["src"]
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

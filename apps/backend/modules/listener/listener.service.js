@@ -549,4 +549,36 @@ const listenerService = {
   },
 };
 
+// ─── Schema Introspection ────────────────────────────────────────────────────
+
+/** @type {Record<string, object>|null} — in-process singleton */
+let _datasourceListenerConfigSchemas = null;
+
+async function loadDatasourceListenerConfigSchemas() {
+  if (_datasourceListenerConfigSchemas) return _datasourceListenerConfigSchemas;
+  const mod = await import('@jet-admin/datasource-types');
+  _datasourceListenerConfigSchemas = mod.DATASOURCE_LISTENER_CONFIG_SCHEMAS;
+  return _datasourceListenerConfigSchemas;
+}
+
+/**
+ * Returns listener config schemas, keyed by datasourceType.
+ * If datasourceType is supplied, returns only the schema for that type.
+ *
+ * @param {object} param0
+ * @param {string|undefined} param0.datasourceType
+ * @returns {Promise<Record<string, object>|object>}
+ */
+listenerService.getListenerSchemas = async function({ datasourceType } = {}) {
+  const all = await loadDatasourceListenerConfigSchemas();
+  if (datasourceType) {
+    const schema = all[datasourceType];
+    if (!schema) {
+      throw Object.assign(new Error(`No listener schema found for datasourceType: '${datasourceType}'`), { code: 'SCHEMA_NOT_FOUND' });
+    }
+    return { [datasourceType]: schema };
+  }
+  return all;
+};
+
 module.exports = { listenerService };

@@ -319,4 +319,38 @@ appPageController.deleteAppPageByID = async (req, res) => {
   }
 };
 
+/**
+ * GET /app-pages/schemas
+ * Returns the static JSON Schema for appPageConfig.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+appPageController.getAppPageSchema = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+
+    Logger.log('info', {
+      message: 'appPageController:getAppPageSchema:params',
+      params: { userID: user.userID, tenantID },
+    });
+
+    const schema = await appPageService.getAppPageSchema();
+
+    Logger.log('success', {
+      message: 'appPageController:getAppPageSchema:success',
+      params: { userID: user.userID, tenantID },
+    });
+
+    return expressUtils.sendResponse(res, true, { schema, message: 'App page schema fetched successfully.' }, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log('error', {
+      message: 'appPageController:getAppPageSchema:catch-1',
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
 module.exports = { appPageController };

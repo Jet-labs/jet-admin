@@ -1,0 +1,26 @@
+{
+  "widgetType": "stat",
+  "description": "Stat / KPI widget. Displays a single metric value with optional trend indicator and comparison.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "value": { "type": ["string", "number"], "description": "Main metric value. Supports template expressions." },
+      "label": { "type": "string", "description": "Label below the metric value" },
+      "prefix": { "type": "string", "description": "Prefix text/symbol (e.g. '$')" },
+      "suffix": { "type": "string", "description": "Suffix text/symbol (e.g. '%')" },
+      "trend": {
+        "type": "object",
+        "properties": {
+          "value": { "type": ["string", "number"], "description": "Trend/change value" },
+          "direction": { "type": "string", "enum": ["up", "down", "neutral"] },
+          "label": { "type": "string", "description": "e.g. 'vs last month'" },
+          "positiveIsGood": { "type": "boolean", "default": true }
+        }
+      },
+      "icon": { "type": "string", "description": "Icon name to display alongside the metric" },
+      "iconColor": { "type": "string", "description": "CSS color for the icon" },
+      "decimals": { "type": "number", "description": "Number of decimal places to display", "default": 0 }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

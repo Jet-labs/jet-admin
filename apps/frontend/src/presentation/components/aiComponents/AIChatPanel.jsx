@@ -23,7 +23,149 @@ import {
   CheckCircle2,
   AlertCircle,
   ExternalLink,
+  Zap,
+  BarChart3,
+  GitBranch,
+  Send,
+  Copy,
 } from 'lucide-react';
+
+const TOOL_COLORS = {
+  running: "text-primary border-primary/30 bg-primary/5",
+  done: "text-foreground/70 border-border bg-muted/30",
+  error: "text-destructive border-destructive/30 bg-destructive/5",
+};
+
+const CONTEXT_PILLS = [
+  { icon: Database, label: "postgres-prod", color: "text-primary" },
+  { icon: GitBranch, label: "sales-workflow", color: "text-muted-foreground" },
+];
+
+function WelcomeScreen({ onSuggestionClick }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-full text-center px-6 py-12">
+      <div className="w-12 h-12 rounded-md bg-primary/10 border border-primary/30 flex items-center justify-center mb-4 shadow-sm shadow-primary/5">
+        <Zap className="w-6 h-6 text-primary" strokeWidth={2} />
+      </div>
+      <h2 className="text-lg font-medium text-foreground mb-1 tracking-tight">
+        Jet AI Assistant
+      </h2>
+      <p className="text-sm text-muted-foreground mb-6 max-w-xs leading-relaxed">
+        Ask me to query your data sources, build automation workflows, or create dashboards.
+      </p>
+      <div className="grid grid-cols-2 gap-2 w-full max-w-sm">
+        {[
+          { icon: Database, text: "Show revenue by region for last 30 days" },
+          { icon: GitBranch, text: "Build a workflow to notify Slack on new orders" },
+          { icon: BarChart3, text: "Create a dashboard for user activity metrics" },
+          { icon: Database, text: "Explore schema of the PostgreSQL datasource" },
+        ].map(({ icon: Icon, text }, i) => (
+          <div
+            key={i}
+            onClick={() => onSuggestionClick(text)}
+            className="flex items-start gap-2 rounded-md border border-border bg-card p-2 text-left cursor-pointer hover:border-border/80 hover:bg-muted/30 transition-colors shadow-sm"
+          >
+            <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+            <span className="text-xs text-muted-foreground leading-snug">{text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function ChatInput({ onSend, disabled }) {
+  const [value, setValue] = useState("");
+  const textareaRef = useRef(null);
+
+  const handleSend = () => {
+    const trimmed = value.trim();
+    if (!trimmed || disabled) return;
+    onSend(trimmed);
+    setValue("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if ((e.metaKey || e.ctrlKey || e.shiftKey) && e.key === "Enter") {
+      // Shift+Enter should just be new line, wait no, let's make Enter send, Shift+Enter new line.
+      if (e.shiftKey) return;
+    }
+    
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const handleInput = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+  };
+
+  return (
+    <div className="border-t border-border bg-background px-4 py-3 shrink-0 relative">
+      <div className="max-w-3xl mx-auto">
+        <div className="flex items-center gap-2 mb-2">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Context
+          </p>
+          {CONTEXT_PILLS.map(({ icon: Icon, label, color }) => (
+            <div
+              key={label}
+              className="flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-border bg-muted/30 text-[10px] text-muted-foreground"
+            >
+              <Icon className={`w-2.5 h-2.5 ${color}`} />
+              {label}
+            </div>
+          ))}
+          <button className="flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors">
+            <span>+</span> Add
+          </button>
+        </div>
+
+        <div className="relative rounded-md border border-border bg-card focus-within:border-primary/50 transition-colors shadow-sm">
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onInput={handleInput}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask Jet AI anything — query data, build workflows, create dashboards…"
+            rows={1}
+            disabled={disabled}
+            className="w-full px-3 pt-3 pb-1 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 resize-none outline-none leading-relaxed min-h-[40px] max-h-40 disabled:opacity-50"
+          />
+
+          <div className="flex items-center justify-between px-2 pb-2 pt-1">
+            <div className="flex items-center gap-1" />
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-muted-foreground/50 hidden sm:block">
+                Enter to send
+              </span>
+              <button
+                type="button"
+                onClick={handleSend}
+                disabled={!value.trim() || disabled}
+                className="h-7 w-7 p-0 flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-center text-[10px] text-muted-foreground/50 mt-1.5">
+          Jet AI may make mistakes. Verify critical queries before executing on production.
+        </p>
+      </div>
+    </div>
+  );
+}
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAIStore } from '../../../logic/stores/useAIStore';
@@ -73,9 +215,25 @@ function SimpleMarkdown({ text }) {
           code: ({ className, children, ...props }) => {
             const isBlock = String(children).includes('\n') || (className && className.includes('language-'));
             if (isBlock) {
+              const copy = () => navigator.clipboard.writeText(String(children));
+              const lang = (className || '').replace('language-', '') || 'code';
               return (
-                <div className="my-2 rounded-md bg-zinc-950 text-zinc-100 p-2 font-mono text-xs overflow-x-auto border border-border/50 shadow-sm">
-                  <pre className="m-0 leading-relaxed font-mono whitespace-pre">{children}</pre>
+                <div className="my-2 rounded-md bg-background border border-border overflow-hidden">
+                  <div className="flex items-center justify-between px-2 py-1 border-b border-border bg-muted/20">
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      {lang}
+                    </span>
+                    <button
+                      onClick={copy}
+                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Copy className="w-3 h-3" />
+                      Copy
+                    </button>
+                  </div>
+                  <pre className="px-3 py-2 font-mono text-xs text-foreground/90 leading-relaxed overflow-x-auto whitespace-pre">
+                    <code>{children}</code>
+                  </pre>
                 </div>
               );
             }
@@ -482,57 +640,66 @@ function ToolCallStep({ invocation }) {
   const name = invocation.toolName?.toLowerCase() || '';
   if (name.includes('query')) ToolIcon = Database;
   else if (name.includes('datasource')) ToolIcon = Server;
-  else if (name.includes('workflow')) ToolIcon = GitFork;
+  else if (name.includes('workflow')) ToolIcon = GitBranch;
   else if (name.includes('widget')) ToolIcon = Box;
   else if (name.includes('page')) ToolIcon = Layout;
 
-  return (
-    <div className={`rounded-md overflow-hidden transition-all duration-200 ${
-      isPending
-        ? 'border border-primary/30 bg-primary/5 shadow-sm shadow-primary/5'
-        : 'border border-border/40 bg-muted/5 hover:bg-muted/10 hover:border-border/60'
-    }`}>
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="w-full flex items-center gap-2.5 px-2 py-2 text-left transition-colors"
-      >
-        {isPending
-          ? <Loader2 className="w-3.5 h-3.5 text-primary animate-spin shrink-0" />
-          : <ToolIcon className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
-        }
-        <span className="flex-1 truncate text-[13px] font-medium text-foreground">
-          {invocation.toolName}
-        </span>
-        {isPending ? (
-          <span className="text-[11px] text-primary/80 font-medium tracking-wide uppercase">running</span>
-        ) : expanded ? (
-          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
-        ) : (
-          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
-        )}
-      </button>
+  const status = isPending ? "running" : "done";
 
-      {/* Inline resource preview (shown without expanding) */}
-      {hasResult && parsedResult && (
-        <div className="px-2">
+  return (
+    <div
+      className={`rounded-md border px-2 py-1.5 flex flex-col gap-2 text-xs transition-colors mb-1 ${TOOL_COLORS[status]}`}
+    >
+      <div className="flex items-start gap-2">
+        <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
+          {status === "running" ? (
+            <Loader2 className="w-3 h-3 text-primary animate-spin" />
+          ) : (
+            <CheckCircle2 className="w-3 h-3 text-primary/70" />
+          )}
+          <ToolIcon className="w-3 h-3" />
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="w-full flex items-center justify-between text-left"
+          >
+            <div>
+              <p className="font-medium text-[11px] text-foreground">{invocation.toolName}</p>
+              <p className="text-[10px] text-muted-foreground truncate mt-0.5">
+                {isPending ? "Executing..." : "Completed successfully"}
+              </p>
+            </div>
+            {expanded ? (
+              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+            ) : (
+              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {hasResult && parsedResult && !expanded && (
+        <div className="mt-1">
           <ResourceRenderer toolName={invocation.toolName} result={parsedResult} tenantID={tenantID} />
         </div>
       )}
 
       {expanded && hasResult && (
-        <div className="border-t border-border/40 px-2 py-2 space-y-2 bg-muted/10">
+        <div className="border-t border-border/40 pt-2 pb-1 space-y-2">
           {Object.keys(invocation.args || {}).length > 0 && (
             <div>
-              <p className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-2">Arguments</p>
-              <pre className="text-[12px] text-foreground font-mono bg-background p-2 rounded-md border border-border/50 overflow-x-auto shadow-sm">
+              <p className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Arguments</p>
+              <pre className="text-[10px] text-foreground font-mono bg-background p-2 rounded-md border border-border/50 overflow-x-auto shadow-sm">
                 {JSON.stringify(invocation.args, null, 2)}
               </pre>
             </div>
           )}
           <div>
-            <p className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-2">Raw result</p>
-            <pre className="text-[12px] font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded-md overflow-x-auto max-h-60 overflow-y-auto shadow-sm">
+            <p className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Raw result</p>
+            <pre className="text-[10px] font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded-md overflow-x-auto max-h-60 overflow-y-auto shadow-sm">
               {JSON.stringify(parsedResult, null, 2)}
             </pre>
           </div>
@@ -574,7 +741,7 @@ function SuggestedActions({ content, onAppend }) {
 function extractThinking(parts) {
   if (!Array.isArray(parts)) return null;
   const reasoningPart = parts.find((p) => p.type === 'reasoning');
-  return reasoningPart?.reasoning || null;
+  return reasoningPart?.reasoning || reasoningPart?.text || null;
 }
 
 function extractToolInvocations(message) {
@@ -672,9 +839,14 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming }) {
 
   if (isUser) {
     return (
-      <div className="flex justify-end animate-in fade-in slide-in-from-bottom-2 duration-300">
-        <div className="max-w-[82%] rounded-md bg-gradient-to-br from-primary to-primary/80 border border-primary/20 shadow-sm px-2.5 py-2">
-          <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-primary-foreground">{message.content}</p>
+      <div className="flex justify-end mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="max-w-[75%]">
+          <div className="rounded-md bg-muted/50 border border-border px-3 py-2 text-sm text-foreground leading-relaxed">
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-foreground">{message.content}</p>
+          </div>
+          <p className="text-[10px] text-muted-foreground text-right mt-1">
+            {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+          </p>
         </div>
       </div>
     );
@@ -704,16 +876,23 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming }) {
   const toolInvocations = extractToolInvocations(message);
 
   return (
-    <div className="flex gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-      <div className="w-6 h-6 rounded-md bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-primary/10">
-        <Bot className="w-3.5 h-3.5 text-primary drop-shadow-sm" />
+    <div className="flex gap-2 items-start mb-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center shrink-0 mt-1 shadow-sm">
+        <Zap className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={2.5} />
       </div>
-      <div className="flex-1 min-w-0 space-y-2">
-        {thinking && <ThinkingBlock content={thinking} isStreaming={isStreaming} />}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-xs font-medium text-foreground">Jet AI</span>
+          <span className="text-[10px] text-muted-foreground">
+            {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+          </span>
+        </div>
+
+        {thinking && <div className="mb-2"><ThinkingBlock content={thinking} isStreaming={isStreaming} /></div>}
 
         {/* Tool invocations — AI SDK provides these with full state tracking */}
         {toolInvocations?.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-1.5 mb-2">
             {toolInvocations.map((inv) => (
               <ToolCallStep key={inv.toolCallId || inv.id} invocation={inv} />
             ))}
@@ -724,18 +903,22 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming }) {
           <div className="text-[15px] leading-[1.65] text-foreground">
             <SimpleMarkdown text={cleanText} />
             {isStreaming && (
-              <span className="inline-block w-[2px] h-[15px] bg-primary/70 ml-0.5 animate-pulse align-middle" />
+              <span className="inline-block w-0.5 h-3.5 bg-primary ml-0.5 animate-pulse rounded-sm align-middle" />
             )}
           </div>
         )}
 
         {/* A2UI interactive components parsed from content */}
         {rawContent && (
-          <A2UIRenderer schema={rawContent} onAction={onA2UIAction} />
+          <div className="mt-2">
+            <A2UIRenderer schema={rawContent} onAction={onA2UIAction} />
+          </div>
         )}
 
         {/* Suggested next-action chips */}
-        <SuggestedActions content={rawContent} onAppend={onAppend} />
+        <div className="mt-2">
+          <SuggestedActions content={rawContent} onAppend={onAppend} />
+        </div>
       </div>
     </div>
   );
@@ -859,13 +1042,7 @@ export const AIChatPanel = () => {
         <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2 min-h-0 bg-background">
           {messages.length === 0 && !busy ? (
             <div className="flex items-center justify-center min-h-full w-full">
-              <AnimatedAIChat
-                docked={false}
-                value={inputText}
-                onChange={setInputText}
-                onSend={handleSend}
-                busy={busy}
-              />
+              <WelcomeScreen onSuggestionClick={(text) => handleSend(text)} />
             </div>
           ) : (
             <>
@@ -882,8 +1059,8 @@ export const AIChatPanel = () => {
               {/* Real-time active status banner (tool running, reasoning, synthesizing) */}
               {busy && (
                 <div className="flex gap-2 animate-in fade-in duration-300">
-                  <div className="w-6 h-6 rounded-md bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-primary/10">
-                    <Bot className="w-3.5 h-3.5 text-primary drop-shadow-sm" />
+                  <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                    <Zap className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={2.5} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <AgentStatusBanner status={activeStatus} />
@@ -903,20 +1080,9 @@ export const AIChatPanel = () => {
         </div>
 
         {/* Input box */}
-        {(messages.length > 0 || busy) && (
-          <div className="shrink-0 border-t border-border p-2 bg-background relative">
-            <AnimatedAIChat
-              docked={true}
-              value={inputText}
-              onChange={setInputText}
-              onSend={handleSend}
-              busy={busy}
-            />
-            <p className="text-[10px] text-muted-foreground/60 mt-2 text-center">
-              Enter to send · Shift+Enter for new line
-            </p>
-          </div>
-        )}
+        <div className="shrink-0 w-full">
+          <ChatInput onSend={handleSend} disabled={busy} />
+        </div>
       </div>
     </>
   );

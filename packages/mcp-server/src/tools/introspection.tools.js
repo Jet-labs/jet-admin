@@ -236,62 +236,103 @@ export const introspectionTools = [
     },
   },
   {
-    name: "get_asset_schemas",
-    description:
-      "Get the JSON schema configurations expected for Jet Admin resources (e.g. widgetConfig, appPageConfig, dataQueryOptions, listenerConfig). " +
-      "Use this to understand what properties must be provided when creating or updating these assets.",
+    name: "get_widget_schemas",
+    description: "Get JSON schemas for widget configurations. Use this to understand the required properties and structure when creating or updating widgets.",
     inputSchema: {
       type: "object",
       properties: {
-        assetType: {
+        widgetType: {
           type: "string",
-          enum: ["widget", "appPage", "dataQuery", "listener"],
-          description: "The type of asset to get the schema for."
+          description: "Optional. Fetch schema for a specific widget type (e.g., 'table', 'button'). If omitted, returns schemas for all widget types."
         }
-      },
-      required: ["assetType"]
-    },
-    handler: async ({ assetType }) => {
-      const schemas = {
-        widget: {
-          description: "widgetConfig defines the visual and behavior properties of a widget. It varies heavily by widgetType.",
-          commonProperties: {
-            properties: "Object containing visual configuration (e.g. { layout: { w, h, x, y } }).",
-            events: "Object containing event handlers (e.g. { onClick: { action: 'runQuery', queryId: '...' } })."
-          },
-          examples: {
-            table: { properties: { columns: [{ field: "id", title: "ID" }] } },
-            chart: { properties: { chartType: "bar", xAxis: "date", yAxis: "count" } }
-          }
-        },
-        appPage: {
-          description: "appPageConfig defines the layout and bindings of a dashboard page.",
-          schema: {
-            layout: { type: "string", description: "'grid' or 'flex'" },
-            widgets: { type: "array", description: "Array of widget layout configurations [{ widgetID, layout: { x, y, w, h } }]" },
-            dataSources: { type: "array", description: "Array of query/listener bindings for the page" }
-          }
-        },
-        dataQuery: {
-          description: "dataQueryOptions defines the query execution parameters. Varies by datasource type.",
-          examples: {
-            postgresql: { sql: "SELECT * FROM users WHERE status = {{status}}" },
-            restapi: { method: "GET", path: "/users", headers: { "Authorization": "Bearer {{token}}" } }
-          }
-        },
-        listener: {
-          description: "listenerConfig defines the connection parameters for real-time streaming.",
-          examples: {
-            websocket: { url: "wss://example.com/stream" },
-            kafka: { topic: "events", groupId: "jet-admin" }
-          }
-        }
-      };
-
-      if (!schemas[assetType]) {
-        throw new Error(`Schema not found for assetType: ${assetType}`);
       }
-      return schemas[assetType];
+    },
+    handler: async ({ widgetType }, context) => {
+      const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const res = await client.widgetAPI.getSchemas({ widgetType });
+      return res?.schemas || res;
+    }
+  },
+  {
+    name: "get_data_query_schemas",
+    description: "Get JSON schemas for data query configurations. Use this to understand the required properties for querying different datasources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        datasourceType: {
+          type: "string",
+          description: "Optional. Fetch schema for a specific datasource type (e.g., 'postgresql', 'restapi'). If omitted, returns all."
+        }
+      }
+    },
+    handler: async ({ datasourceType }, context) => {
+      const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const res = await client.queryAPI.getSchemas({ datasourceType });
+      return res?.schemas || res;
+    }
+  },
+  {
+    name: "get_datasource_schemas",
+    description: "Get JSON schemas for datasource connection forms. Use this to understand the required credentials and settings when creating datasources.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        datasourceType: {
+          type: "string",
+          description: "Optional. Fetch schema for a specific datasource type. If omitted, returns all."
+        }
+      }
+    },
+    handler: async ({ datasourceType }, context) => {
+      const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const res = await client.datasourceAPI.getSchemas({ datasourceType });
+      return res?.schemas || res;
+    }
+  },
+  {
+    name: "get_listener_schemas",
+    description: "Get JSON schemas for listener configurations (real-time events). Use this to understand the required connection settings.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        datasourceType: {
+          type: "string",
+          description: "Optional. Fetch schema for a specific listener datasource type (e.g., 'firebase', 'websocket'). If omitted, returns all."
+        }
+      }
+    },
+    handler: async ({ datasourceType }, context) => {
+      const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const res = await client.listenerAPI.getSchemas({ datasourceType });
+      return res?.schemas || res;
+    }
+  },
+  {
+    name: "get_workflow_node_schemas",
+    description: "Get JSON schemas for workflow node configurations. Use this to understand the properties for different workflow steps.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        nodeType: {
+          type: "string",
+          description: "Optional. Fetch schema for a specific workflow node type. If omitted, returns all."
+        }
+      }
+    },
+    handler: async ({ nodeType }, context) => {
+      const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const res = await client.workflowAPI.getSchemas({ nodeType });
+      return res?.schemas || res;
+    }
+  },
+  {
+    name: "get_app_page_schema",
+    description: "Get the JSON schema for app page configurations. App pages define the layout grid of widgets.",
+    inputSchema: { type: "object", properties: {} },
+    handler: async (_args, context) => {
+      const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const res = await client.appPageAPI.getSchema();
+      return res?.schema || res;
     }
   }
 ];

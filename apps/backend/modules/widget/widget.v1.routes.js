@@ -25,6 +25,16 @@ const upload = multer({
 
 // Database widget routes
 
+// ============================================================
+// Schemas
+// ============================================================
+
+router.get(
+  "/schemas",
+  authMiddleware.authorize(P.widget.list),
+  widgetController.getWidgetSchemas
+);
+
 router.get(
   "/",
   validate(listWidgetsQuerySchema, "query"),

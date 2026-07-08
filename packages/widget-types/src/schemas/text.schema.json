@@ -1,0 +1,16 @@
+{
+  "widgetType": "text",
+  "description": "Text / Markdown widget. Renders static or dynamic markdown/plain text content.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "content": { "type": "string", "description": "Markdown or plain text content. Supports template expressions {{ variable }}" },
+      "format": { "type": "string", "enum": ["markdown", "plain"], "default": "markdown" },
+      "fontSize": { "type": "string", "description": "CSS font-size value e.g. '16px', '1rem'" },
+      "fontWeight": { "type": "string", "enum": ["normal", "bold", "semibold"], "default": "normal" },
+      "color": { "type": "string", "description": "CSS color value" },
+      "align": { "type": "string", "enum": ["left", "center", "right"], "default": "left" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}
