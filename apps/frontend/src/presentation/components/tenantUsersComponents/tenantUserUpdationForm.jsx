@@ -165,13 +165,13 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
               }
             />
 
-            <div className="flex-1 overflow-y-auto p-4 md:p-6">
-              <section className="mx-auto max-w-2xl w-full space-y-4">
+            <div className="flex-1 overflow-y-auto p-2">
+              <section className="mx-auto max-w-2xl w-full space-y-2">
                 <Section 
                   title={CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_PROFILE_TITLE}
                   description="General information about the user's membership."
                 >
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
                     <div className="space-y-1">
                       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_EMAIL_LABEL}
@@ -181,7 +181,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Badge
                         variant={tenantUser.isTenantAdmin ? "outline" : "secondary"}
                         className={
@@ -205,7 +205,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
                   title={CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_ASSIGNED_ROLES_TITLE}
                   description="Permissions granted to this user."
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     <div className="flex justify-end">
                       <Button
                         onClick={_handleOpenTenantRoleSelectDialog}
@@ -230,10 +230,10 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
                         }
                       />
                     ) : tenantUser.roles?.length ? (
-                      <div className="grid gap-3">
+                        <div className="grid gap-2 !mt-2">
                         {tenantUser.roles.map((tenantUserRole) => (
                           <div
-                            className="rounded-md border border-border bg-background p-3 hover:bg-muted/30 transition-colors"
+                            className="rounded border border-border bg-background p-3 hover:bg-muted/30 transition-colors"
                             key={`user_tenant_select_role_${tenantUserRole.roleID}`}
                           >
                             <div className="flex flex-col gap-1">

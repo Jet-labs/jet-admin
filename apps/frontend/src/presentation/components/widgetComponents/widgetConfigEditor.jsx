@@ -162,21 +162,21 @@ export const WidgetConfigEditor = ({
         </TabsList>
 
           <TabsContent value="data" className="mt-2">
-          <div className="space-y-2 rounded-md border border-border bg-muted/20 p-3">
+          <div className="space-y-2 rounded border border-border bg-muted/20 p-3">
             <Label className="text-xs font-semibold text-foreground">Referenced Page Data Sources</Label>
             <p className="text-[10px] text-muted-foreground leading-normal">
               This widget consumes page-level data sources reactively using expressions like <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{`{{ state.queries.alias.data }}`}</code> or <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{`{{ state.workflows.alias.data }}`}</code>.
             </p>
             {referencedDataSources.length === 0 ? (
-              <div className="text-xs text-muted-foreground italic border border-dashed rounded-md p-4 text-center bg-background/50">
+              <div className="text-xs text-muted-foreground italic border border-dashed rounded p-4 text-center bg-background/50">
                 No page data sources referenced. Bind data sources using expression syntax in the Properties tab.
               </div>
             ) : (
-              <div className="space-y-1.5 pt-1">
+              <div className="space-y-1 pt-1">
                 {referencedDataSources.map(({ alias, type }) => (
                   <div
                     key={alias}
-                    className="flex items-center justify-between rounded-md border border-border/50 bg-background px-2.5 py-1.5 font-mono text-xs text-foreground shadow-sm"
+                    className="flex items-center justify-between rounded border border-border/50 bg-background px-2.5 py-1.5 font-mono text-xs text-foreground shadow-sm"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`h-2.5 w-2.5 rounded-full animate-pulse shrink-0 ${type === 'workflow' ? 'bg-purple-500' : 'bg-emerald-500'}`} />

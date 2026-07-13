@@ -15,7 +15,7 @@ export const CustomTabRenderer = (props) => {
   }
 
   return (
-    <div className="custom-tabs-container bg-background  !rounded-md">
+    <div className="custom-tabs-container bg-background  !rounded">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col">
         {/* Tab Headers */}
         <TabsList className="h-auto">
@@ -30,7 +30,7 @@ export const CustomTabRenderer = (props) => {
         </TabsList>
 
         {/* Tab Content */}
-        <div className="p-2 rounded-md bg-background">
+        <div className="rounded p-2 bg-background">
           {categories.map((category, index) => (
             <TabsContent
               key={category.label || `tab-content-${index}`}

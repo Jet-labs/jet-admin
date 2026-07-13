@@ -385,33 +385,33 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Comprehensive instructions */}
       <div className="px-2">
-        <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-[10px] text-brand-text-primary space-y-2">
           <div className="font-semibold text-brand-text-primary text-xs">📘 Writing JavaScript Code</div>
 
           <div>
             <span className="font-medium text-brand-text-primary">Access Context:</span>
             <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
-              <div><code className="bg-brand-black px-1 rounded-sm">ctx.input.paramName</code> → workflow input</div>
-              <div><code className="bg-brand-black px-1 rounded-sm">ctx.queryResult</code> → previous node output</div>
-              <div><code className="bg-brand-black px-1 rounded-sm">ctx.item</code> → current loop item</div>
+              <div><code className="bg-brand-black px-1 rounded">ctx.input.paramName</code> → workflow input</div>
+              <div><code className="bg-brand-black px-1 rounded">ctx.queryResult</code> → previous node output</div>
+              <div><code className="bg-brand-black px-1 rounded">ctx.item</code> → current loop item</div>
             </div>
           </div>
 
           <div>
             <span className="font-medium text-brand-text-primary">Return Value:</span>
             <div className="ml-3 mt-0.5 text-brand-text-primary">
-              Use <code className="bg-brand-black px-1 py-0.5 rounded-sm font-mono">return yourValue;</code> to store result in output variable.
+              Use <code className="bg-brand-black px-1 py-0.5 rounded font-mono">return yourValue;</code> to store result in output variable.
             </div>
           </div>
 
           <div>
             <span className="font-medium text-brand-text-primary">Available Globals:</span>
             <div className="ml-3 mt-0.5 text-brand-text-primary">
-              <code className="bg-brand-black px-1 rounded-sm font-mono text-[9px]">JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat</code>
+              <code className="bg-brand-black px-1 rounded font-mono text-[9px]">JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat</code>
             </div>
           </div>
 
-          <div className="text-amber-600 bg-amber-50 border border-amber-800 rounded-sm p-1.5 mt-2">
+          <div className="text-amber-600 bg-amber-50 border border-amber-800 rounded p-1.5 mt-2">
             <strong>⚠️ Note:</strong> Code runs in a sandbox. No network access, filesystem, or require().
           </div>
         </div>
@@ -540,7 +540,7 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
               {data?.title || 'Untitled Script'}
             </span>
             {isDisabled && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
+              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-800">
                 <Ban className="w-2.5 h-2.5" />
                 Skip
               </span>

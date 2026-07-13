@@ -214,22 +214,22 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Comprehensive instructions */}
       <div className="px-2">
-        <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-[10px] text-brand-text-primary space-y-2">
           <div className="font-semibold text-brand-text-primary text-xs">📘 Loop Configuration</div>
 
           <div>
             <span className="font-medium text-brand-text-primary">Source Array Format:</span>
             <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
-              <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.queryResult}}"}</code> → array from previous node</div>
-              <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.input.items}}"}</code> → array from input</div>
+              <div><code className="bg-brand-black px-1 rounded">{"{{ctx.queryResult}}"}</code> → array from previous node</div>
+              <div><code className="bg-brand-black px-1 rounded">{"{{ctx.input.items}}"}</code> → array from input</div>
             </div>
           </div>
 
           <div>
             <span className="font-medium text-brand-text-primary">Inside Loop Body:</span>
             <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
-              <div><code className="bg-brand-black px-1 rounded-sm">ctx.item</code> → current array element</div>
-              <div><code className="bg-brand-black px-1 rounded-sm">ctx.index</code> → current iteration index (0-based)</div>
+              <div><code className="bg-brand-black px-1 rounded">ctx.item</code> → current array element</div>
+              <div><code className="bg-brand-black px-1 rounded">ctx.index</code> → current iteration index (0-based)</div>
             </div>
           </div>
 
@@ -302,7 +302,7 @@ export const LoopNode = memo(({ id, data, isConnectable }) => {
 
   return (
     <div className={`
-      relative bg-brand-black border rounded-sm
+      relative bg-brand-black border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${isDisabled ? 'border-brand-border opacity-50' : getStatusStyles()}
@@ -339,7 +339,7 @@ export const LoopNode = memo(({ id, data, isConnectable }) => {
               {data?.title || 'Loop'}
             </span>
             {isDisabled && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
+              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-800">
                 <Ban className="w-2.5 h-2.5" />
                 Skip
               </span>

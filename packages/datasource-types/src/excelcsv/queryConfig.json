@@ -73,9 +73,17 @@
         ]
       },
       {
-        "type": "Control",
-        "scope": "#/properties/inputDefinitions",
-        "label": "Dynamic Arguments"
+        "type": "Group",
+        "options": {
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Dynamic Arguments"
+          }
+        ]
       }
     ]
   },

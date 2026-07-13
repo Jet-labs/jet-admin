@@ -431,7 +431,7 @@ export const TableWidget = ({
     return (
       <div className="flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6">
         {isLoading ? (
-          <div className="flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm shadow-sm border border-border">
+          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm shadow-sm border border-border">
             <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
             Loading data...
           </div>
@@ -450,7 +450,7 @@ export const TableWidget = ({
       {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
-          <div className="flex items-center gap-2 rounded-md bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
+          <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
             <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
             Updating...
           </div>
@@ -573,7 +573,7 @@ export const TableWidget = ({
       <div className="absolute bottom-12 left-0 right-0 px-4 flex flex-col gap-2 pointer-events-none z-30">
         {/* Multi-select action bar */}
         {multiSelectConfig.enabled && selectedCount > 0 && (
-          <div className="flex items-center justify-between bg-card border border-border shadow-md rounded-md p-3 pointer-events-auto">
+          <div className="flex items-center justify-between bg-card border border-border shadow-md rounded p-3 pointer-events-auto">
             <span className="text-xs font-medium text-foreground px-2">
               <span className="text-primary font-medium">{selectedCount}</span> row{selectedCount !== 1 ? "s" : ""} selected
             </span>
@@ -590,7 +590,7 @@ export const TableWidget = ({
 
         {/* Bulk edit save bar */}
         {bulkEditConfig.enabled && pendingEditCount > 0 && (
-          <div className="flex items-center justify-between bg-card border border-primary/30 shadow-md rounded-md p-3 pointer-events-auto">
+          <div className="flex items-center justify-between bg-card border border-primary/30 shadow-md rounded p-3 pointer-events-auto">
             <span className="text-xs font-medium text-foreground px-2">
               <span className="text-primary font-medium">{pendingEditCount}</span> unsaved change{pendingEditCount !== 1 ? "s" : ""}
             </span>

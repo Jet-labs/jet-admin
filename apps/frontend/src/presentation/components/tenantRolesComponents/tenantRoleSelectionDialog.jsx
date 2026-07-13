@@ -45,7 +45,7 @@ export const TenantRoleSelectionDialog = ({
         <div className="p-4 space-y-4">
           <div className="grid grid-cols-1 gap-2">
             {isAdminSelectionEnabled && (
-              <div className="w-full flex flex-col bg-muted justify-start items-start gap-2 p-2 border-border rounded-sm">
+              <div className="w-full flex flex-col bg-muted justify-start items-start gap-2 p-2 border-border rounded">
                 <div className="w-full flex flex-row justify-start items-center gap-2">
                   <Checkbox
                     checked={

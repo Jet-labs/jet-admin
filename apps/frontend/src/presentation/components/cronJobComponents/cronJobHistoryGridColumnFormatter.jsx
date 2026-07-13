@@ -41,7 +41,7 @@ function StatusBadge({ value }) {
   return (
     <div className="flex h-full items-center">
       <span
-        className={`inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 text-[11px] font-medium capitalize ${config.bg} ${config.className}`}
+        className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[11px] font-medium capitalize ${config.bg} ${config.className}`}
       >
         <Icon className="h-3.5 w-3.5 flex-shrink-0" />
         {value ?? "—"}
@@ -69,7 +69,7 @@ function JsonCell({ value }) {
     );
   }
   return (
-    <div className="max-h-28 w-full overflow-auto rounded-sm border border-border bg-muted/30 p-1.5 text-foreground">
+    <div className="max-h-28 w-full overflow-auto rounded border border-border bg-muted/30 p-1.5 text-foreground">
       <ReactJson
         src={value}
         theme="rjv-default"

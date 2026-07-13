@@ -133,7 +133,7 @@ export const DefaultAppPageSelectionLayout = ({
     <div className="w-full h-full">
       {pinnedAppPageID && appPage ? (
         <div className="w-full flex flex-col justify-start items-center h-full">
-          <div className="flex flex-row justify-between items-center w-full px-4 py-3 border-b border-border ">
+          <div className="flex flex-row justify-between items-center w-full p-2 border-b border-border ">
             <div className="w-full flex flex-col justify-center items-start">
               {appPage && (
                 <h1 className="text-2xl font-medium leading-tight tracking-tight text-foreground">

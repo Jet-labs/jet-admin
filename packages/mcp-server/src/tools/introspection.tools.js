@@ -308,14 +308,14 @@ export const introspectionTools = [
     }
   },
   {
-    name: "get_workflow_node_schemas",
-    description: "Get JSON schemas for workflow node configurations. Use this to understand the properties for different workflow steps.",
+    name: "get_workflow_schema",
+    description: "Get JSON schema for the complete workflow, including node configurations and edges. Use this to understand the structure of a workflow and its steps.",
     inputSchema: {
       type: "object",
       properties: {
         nodeType: {
           type: "string",
-          description: "Optional. Fetch schema for a specific workflow node type. If omitted, returns all."
+          description: "Optional. Fetch schema for a specific workflow node type. If omitted, returns the complete workflow schema with all nodes."
         }
       }
     },

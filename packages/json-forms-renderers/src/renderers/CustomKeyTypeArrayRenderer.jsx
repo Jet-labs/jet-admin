@@ -41,7 +41,7 @@ export const CustomKeyTypeArrayRenderer = ({
   };
 
   return (
-    <div className="p-3 border border-border rounded-sm bg-background">
+    <div className="rounded bg-background">
       <Label className="block mb-1 text-sm font-medium text-foreground">
         {label || uischema.label || "Items"}
       </Label>

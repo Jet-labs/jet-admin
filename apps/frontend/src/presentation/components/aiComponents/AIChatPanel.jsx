@@ -44,7 +44,7 @@ const CONTEXT_PILLS = [
 function WelcomeScreen({ onSuggestionClick }) {
   return (
     <div className="flex flex-col items-center justify-center h-full text-center px-6 py-12">
-      <div className="w-12 h-12 rounded-md bg-primary/10 border border-primary/30 flex items-center justify-center mb-4 shadow-sm shadow-primary/5">
+      <div className="w-12 h-12 rounded bg-primary/10 border border-primary/30 flex items-center justify-center mb-4 shadow-sm shadow-primary/5">
         <Zap className="w-6 h-6 text-primary" strokeWidth={2} />
       </div>
       <h2 className="text-lg font-medium text-foreground mb-1 tracking-tight">
@@ -63,7 +63,7 @@ function WelcomeScreen({ onSuggestionClick }) {
           <div
             key={i}
             onClick={() => onSuggestionClick(text)}
-            className="flex items-start gap-2 rounded-md border border-border bg-card p-2 text-left cursor-pointer hover:border-border/80 hover:bg-muted/30 transition-colors shadow-sm"
+            className="flex items-start gap-2 rounded border border-border bg-card p-2 text-left cursor-pointer hover:border-border/80 hover:bg-muted/30 transition-colors shadow-sm"
           >
             <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
             <span className="text-xs text-muted-foreground leading-snug">{text}</span>
@@ -108,27 +108,11 @@ export function ChatInput({ onSend, disabled }) {
   };
 
   return (
-    <div className="border-t border-border bg-background px-4 py-3 shrink-0 relative">
+    <div className="border-t border-border bg-background p-2 shrink-0 relative">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-2 mb-2">
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            Context
-          </p>
-          {CONTEXT_PILLS.map(({ icon: Icon, label, color }) => (
-            <div
-              key={label}
-              className="flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-border bg-muted/30 text-[10px] text-muted-foreground"
-            >
-              <Icon className={`w-2.5 h-2.5 ${color}`} />
-              {label}
-            </div>
-          ))}
-          <button className="flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors">
-            <span>+</span> Add
-          </button>
-        </div>
 
-        <div className="relative rounded-md border border-border bg-card focus-within:border-primary/50 transition-colors shadow-sm">
+
+        <div className="relative rounded border border-border bg-card focus-within:border-primary/50 transition-colors shadow-sm">
           <textarea
             ref={textareaRef}
             value={value}
@@ -138,7 +122,7 @@ export function ChatInput({ onSend, disabled }) {
             placeholder="Ask Jet AI anything — query data, build workflows, create dashboards…"
             rows={1}
             disabled={disabled}
-            className="w-full px-3 pt-3 pb-1 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 resize-none outline-none leading-relaxed min-h-[40px] max-h-40 disabled:opacity-50"
+            className="w-full px-3 pt-3 pb-1 focus:shadow-none text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 resize-none outline-none leading-relaxed min-h-[40px] max-h-40 disabled:opacity-50"
           />
 
           <div className="flex items-center justify-between px-2 pb-2 pt-1">
@@ -151,7 +135,7 @@ export function ChatInput({ onSend, disabled }) {
                 type="button"
                 onClick={handleSend}
                 disabled={!value.trim() || disabled}
-                className="h-7 w-7 p-0 flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="h-7 w-7 p-0 flex items-center justify-center rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>
@@ -175,6 +159,7 @@ import { testDatasourceConnectionAPI } from '../../../data/apis/datasource';
 import { executeWorkflowAPI } from '../../../data/apis/workflow';
 import { AnimatedAIChat } from '../../../components/ui/animated-ai-chat';
 import { A2UIRenderer } from './a2ui/A2UIRenderer';
+import { A2UICard, A2UIConfirmCard, A2UIChoiceSelector, A2UISteps } from './a2ui/A2UICatalog';
 
 // ─── Markdown renderer ────────────────────────────────────────────────────────
 function SimpleMarkdown({ text }) {
@@ -205,7 +190,7 @@ function SimpleMarkdown({ text }) {
           ),
           hr: () => <hr className="my-3 border-border/50" />,
           table: ({ children }) => (
-            <div className="my-2 border border-border rounded-md overflow-hidden overflow-x-auto">
+            <div className="my-2 border border-border rounded overflow-hidden overflow-x-auto">
               <table className="w-full text-xs text-left border-collapse">{children}</table>
             </div>
           ),
@@ -218,7 +203,7 @@ function SimpleMarkdown({ text }) {
               const copy = () => navigator.clipboard.writeText(String(children));
               const lang = (className || '').replace('language-', '') || 'code';
               return (
-                <div className="my-2 rounded-md bg-background border border-border overflow-hidden">
+                <div className="my-2 rounded bg-background border border-border overflow-hidden">
                   <div className="flex items-center justify-between px-2 py-1 border-b border-border bg-muted/20">
                     <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                       {lang}
@@ -264,7 +249,7 @@ function ThinkingBlock({ content, isStreaming }) {
   if (!content) return null;
 
   return (
-    <div className="rounded-md border border-border/50 bg-muted/10 hover:border-border/80 overflow-hidden transition-all duration-200 shadow-sm">
+    <div className="rounded border border-border/50 bg-muted/10 hover:border-border/80 overflow-hidden transition-all duration-200 shadow-sm">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -326,7 +311,7 @@ function QueryPreviewCard({ query, tenantID }) {
   };
 
   return (
-    <div className="mt-2 rounded-md border border-border bg-card overflow-hidden">
+    <div className="mt-2 rounded border border-border bg-card overflow-hidden">
       <div className="flex items-center justify-between px-2 py-2 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2 min-w-0">
           <Database className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -347,7 +332,7 @@ function QueryPreviewCard({ query, tenantID }) {
 
       <div className="p-2 space-y-2">
         {sql && (
-          <pre className="text-xs font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded-md overflow-x-auto max-h-24">
+          <pre className="text-xs font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded overflow-x-auto max-h-24">
             {sql}
           </pre>
         )}
@@ -356,15 +341,15 @@ function QueryPreviewCard({ query, tenantID }) {
             type="button"
             onClick={handleRun}
             disabled={running}
-            className="h-7 text-xs font-medium bg-primary hover:bg-primary/90 text-foreground px-2 rounded-md flex items-center gap-2 disabled:opacity-50 transition-colors"
+            className="h-7 text-xs font-medium bg-primary hover:bg-primary/90 text-foreground px-2 rounded flex items-center gap-2 disabled:opacity-50 transition-colors"
           >
             {running ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
             <span>Run query</span>
           </button>
         </div>
-        {error && <p className="text-xs text-red-600 bg-red-50 p-2 rounded-md border border-red-200">{error}</p>}
+        {error && <p className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">{error}</p>}
         {results && (
-          <div className="border border-border rounded-md overflow-hidden max-h-48 overflow-y-auto">
+          <div className="border border-border rounded overflow-hidden max-h-48 overflow-y-auto">
             {Array.isArray(results) && results.length > 0 ? (
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
@@ -412,7 +397,7 @@ function WidgetPreviewCard({ widget, tenantID }) {
   const config = widget.config || widget.widgetConfig || {};
 
   return (
-    <div className="mt-2 rounded-md border border-border bg-card overflow-hidden">
+    <div className="mt-2 rounded border border-border bg-card overflow-hidden">
       <div className="flex items-center justify-between px-2 py-2 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2 min-w-0">
           <Box className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -431,7 +416,7 @@ function WidgetPreviewCard({ widget, tenantID }) {
         </button>
       </div>
       <div className="p-2">
-        <div className="bg-background border border-border rounded-md p-2 text-xs text-foreground">
+        <div className="bg-background border border-border rounded p-2 text-xs text-foreground">
           {type === 'stat' && (
             <div className="space-y-1">
               <span className="text-[11px] text-muted-foreground">{config.label || 'KPI Metric'}</span>
@@ -489,7 +474,7 @@ function DatasourcePreviewCard({ datasource, tenantID }) {
   };
 
   return (
-    <div className="mt-2 rounded-md border border-border bg-card overflow-hidden">
+    <div className="mt-2 rounded border border-border bg-card overflow-hidden">
       <div className="flex items-center justify-between px-2 py-2 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2 min-w-0">
           <Server className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -505,17 +490,17 @@ function DatasourcePreviewCard({ datasource, tenantID }) {
       </div>
       <div className="p-2 flex items-center gap-2">
         <button type="button" onClick={handleTest} disabled={testing}
-          className="h-7 text-xs font-medium bg-primary hover:bg-primary/90 text-foreground px-2 rounded-md flex items-center gap-2 disabled:opacity-50 transition-colors">
+          className="h-7 text-xs font-medium bg-primary hover:bg-primary/90 text-foreground px-2 rounded flex items-center gap-2 disabled:opacity-50 transition-colors">
           {testing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
           <span>Test connection</span>
         </button>
         {testResult && (testResult.success ? (
-          <span className="text-[11px] text-green-700 flex items-center gap-1 bg-green-50 px-2 py-1 rounded-md border border-green-200">
+          <span className="text-[11px] text-green-700 flex items-center gap-1 bg-green-50 px-2 py-1 rounded border border-green-200">
             <CheckCircle2 className="w-3 h-3 text-green-600" />
             <span>Connected {testResult.latency ? `(${testResult.latency}ms)` : ''}</span>
           </span>
         ) : (
-          <span className="text-[11px] text-red-600 flex items-center gap-1 bg-red-50 px-2 py-1 rounded-md border border-red-200" title={testResult.error}>
+            <span className="text-[11px] text-red-600 flex items-center gap-1 bg-red-50 px-2 py-1 rounded border border-red-200" title={testResult.error}>
             <AlertCircle className="w-3 h-3 text-red-500" /><span>Error</span>
           </span>
         ))}
@@ -548,7 +533,7 @@ function WorkflowPreviewCard({ workflow, tenantID }) {
   };
 
   return (
-    <div className="mt-2 rounded-md border border-border bg-card overflow-hidden">
+    <div className="mt-2 rounded border border-border bg-card overflow-hidden">
       <div className="flex items-center justify-between px-2 py-2 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2 min-w-0">
           <GitFork className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -564,16 +549,16 @@ function WorkflowPreviewCard({ workflow, tenantID }) {
       </div>
       <div className="p-2 flex items-center gap-2">
         <button type="button" onClick={handleRun} disabled={running}
-          className="h-7 text-xs font-medium bg-primary hover:bg-primary/90 text-foreground px-2 rounded-md flex items-center gap-2 disabled:opacity-50 transition-colors">
+          className="h-7 text-xs font-medium bg-primary hover:bg-primary/90 text-foreground px-2 rounded flex items-center gap-2 disabled:opacity-50 transition-colors">
           {running ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
           <span>Trigger run</span>
         </button>
         {runResult && (runResult.success ? (
-          <span className="text-[11px] text-green-700 flex items-center gap-1 bg-green-50 px-2 py-1 rounded-md border border-green-200">
+          <span className="text-[11px] text-green-700 flex items-center gap-1 bg-green-50 px-2 py-1 rounded border border-green-200">
             <CheckCircle2 className="w-3 h-3 text-green-600" /><span>Running…</span>
           </span>
         ) : (
-          <span className="text-[11px] text-red-600 flex items-center gap-1 bg-red-50 px-2 py-1 rounded-md border border-red-200" title={runResult.error}>
+            <span className="text-[11px] text-red-600 flex items-center gap-1 bg-red-50 px-2 py-1 rounded border border-red-200" title={runResult.error}>
             <AlertCircle className="w-3 h-3 text-red-500" /><span>Error</span>
           </span>
         ))}
@@ -614,6 +599,150 @@ function ResourceRenderer({ toolName, result, tenantID }) {
   return null;
 }
 
+function getPlanTrackerSteps(planArgs, toolInvocations) {
+  const steps = planArgs.steps || [];
+  if (!Array.isArray(toolInvocations)) return steps;
+
+  return steps.map(step => {
+    const stepText = (step.title || "").toLowerCase();
+    let matchedInv = null;
+
+    if (stepText.includes("datasource") || stepText.includes("connection")) {
+      matchedInv = toolInvocations.find(inv => inv.toolName?.includes("datasource") && inv.toolName !== 'createPlan' && inv.toolName !== 'askUser');
+    } else if (stepText.includes("query") || stepText.includes("sql") || stepText.includes("select")) {
+      matchedInv = toolInvocations.find(inv => inv.toolName?.includes("query") && inv.toolName !== 'createPlan' && inv.toolName !== 'askUser');
+    } else if (stepText.includes("widget") || stepText.includes("chart") || stepText.includes("table")) {
+      matchedInv = toolInvocations.find(inv => inv.toolName?.includes("widget") && inv.toolName !== 'createPlan' && inv.toolName !== 'askUser');
+    } else if (stepText.includes("page") || stepText.includes("dashboard") || stepText.includes("layout")) {
+      matchedInv = toolInvocations.find(inv => inv.toolName?.includes("page") && inv.toolName !== 'createPlan' && inv.toolName !== 'askUser');
+    } else if (stepText.includes("workflow") || stepText.includes("trigger") || stepText.includes("execute")) {
+      matchedInv = toolInvocations.find(inv => inv.toolName?.includes("workflow") && inv.toolName !== 'createPlan' && inv.toolName !== 'askUser');
+    }
+
+    if (matchedInv) {
+      if (matchedInv.state === 'result') {
+        let hasError = false;
+        try {
+          const res = typeof matchedInv.result === 'string' ? JSON.parse(matchedInv.result) : matchedInv.result;
+          if (res?.error || res?.success === false) hasError = true;
+        } catch (_) { }
+        return { ...step, status: hasError ? 'failed' : 'completed' };
+      }
+      return { ...step, status: 'in_progress' };
+    }
+
+    return step;
+  });
+}
+
+function CreatePlanToolStep({ invocation, allInvocations }) {
+  const args = invocation.args || {};
+  const steps = getPlanTrackerSteps(args, allInvocations);
+
+  return (
+    <A2UISteps
+      title={args.title || "Execution Plan Checklist"}
+      steps={steps}
+    />
+  );
+}
+
+function AskUserToolStep({ invocation, addToolResult }) {
+  const [submitting, setSubmitting] = useState(false);
+  const isPending = invocation.state === 'call' || invocation.state === 'partial-call';
+
+  if (!isPending) {
+    const result = invocation.result || {};
+    const args = invocation.args || {};
+    let recapText = "";
+    if (args.kind === 'confirm') {
+      recapText = result.confirmed ? "Approved" : "Cancelled";
+    } else if (args.kind === 'choice') {
+      const selectedChoice = args.choices?.find(c => c.value === result.selected);
+      recapText = `Selected: ${selectedChoice?.label || result.selected || 'None'}`;
+    } else if (args.kind === 'form') {
+      recapText = `Submitted parameters: ${Object.entries(result.fields || {}).map(([k, v]) => `${k}=${v}`).join(', ')}`;
+    }
+
+    return (
+      <div className="mt-2 p-3 rounded-xl border border-border bg-muted/20 text-xs text-muted-foreground flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+          <div>
+            <span className="font-semibold text-foreground">{args.title || "Clarification Provided"}</span>
+            <span className="ml-2 font-normal text-muted-foreground">({recapText})</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const args = invocation.args || {};
+  const kind = args.kind || 'form';
+
+  const handleAction = ({ action, params, actionLabel }) => {
+    setSubmitting(true);
+    let toolResult = {};
+    if (kind === 'confirm') {
+      toolResult = {
+        confirmed: action === 'APPROVE_CONFIRMATION',
+        targetTool: args.targetTool,
+        targetParams: args.targetParams
+      };
+    } else if (kind === 'choice') {
+      toolResult = {
+        selected: params.option || params.value
+      };
+    } else if (kind === 'form') {
+      toolResult = {
+        fields: params
+      };
+    }
+
+    addToolResult({
+      toolCallId: invocation.toolCallId,
+      result: toolResult
+    });
+  };
+
+  if (kind === 'confirm') {
+    return (
+      <A2UIConfirmCard
+        title={args.title}
+        description={args.description}
+        toolName={args.targetTool || 'action'}
+        params={args.targetParams}
+        onAction={handleAction}
+        submitting={submitting}
+      />
+    );
+  }
+
+  if (kind === 'choice') {
+    return (
+      <A2UIChoiceSelector
+        title={args.title}
+        description={args.description}
+        choices={args.choices || []}
+        onAction={handleAction}
+        submitting={submitting}
+      />
+    );
+  }
+
+  // Default: form
+  return (
+    <A2UICard
+      title={args.title}
+      description={args.description}
+      fields={args.fields || []}
+      actions={[{ label: "Submit & Proceed", action: "SUBMIT_FORM" }]}
+      onAction={handleAction}
+      submitting={submitting}
+    />
+  );
+}
+
 // ─── Tool invocation step (AI SDK useChat format) ─────────────────────────────
 // message.toolInvocations[n] has: { state: 'call'|'result', toolName, toolCallId, args, result? }
 function ToolCallStep({ invocation }) {
@@ -648,7 +777,7 @@ function ToolCallStep({ invocation }) {
 
   return (
     <div
-      className={`rounded-md border px-2 py-1.5 flex flex-col gap-2 text-xs transition-colors mb-1 ${TOOL_COLORS[status]}`}
+      className={`rounded border px-2 py-1.5 flex flex-col gap-2 text-xs transition-colors mb-1 ${TOOL_COLORS[status]}`}
     >
       <div className="flex items-start gap-2">
         <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
@@ -692,14 +821,14 @@ function ToolCallStep({ invocation }) {
           {Object.keys(invocation.args || {}).length > 0 && (
             <div>
               <p className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Arguments</p>
-              <pre className="text-[10px] text-foreground font-mono bg-background p-2 rounded-md border border-border/50 overflow-x-auto shadow-sm">
+              <pre className="text-[10px] text-foreground font-mono bg-background p-2 rounded border border-border/50 overflow-x-auto shadow-sm">
                 {JSON.stringify(invocation.args, null, 2)}
               </pre>
             </div>
           )}
           <div>
             <p className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Raw result</p>
-            <pre className="text-[10px] font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded-md overflow-x-auto max-h-60 overflow-y-auto shadow-sm">
+            <pre className="text-[10px] font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded overflow-x-auto max-h-60 overflow-y-auto shadow-sm">
               {JSON.stringify(parsedResult, null, 2)}
             </pre>
           </div>
@@ -727,7 +856,7 @@ function SuggestedActions({ content, onAppend }) {
           key={i}
           type="button"
           onClick={() => onAppend({ role: 'user', content: action.message })}
-          className="flex items-center gap-2 text-[13px] px-2.5 py-2 rounded-md border border-border/60 bg-muted/10 hover:bg-primary/5 hover:border-primary/40 hover:text-primary text-foreground/80 transition-all duration-200 shadow-sm"
+          className="flex items-center gap-2 text-[13px] px-2.5 py-2 rounded border border-border/60 bg-muted/10 hover:bg-primary/5 hover:border-primary/40 hover:text-primary text-foreground/80 transition-all duration-200 shadow-sm"
         >
           <Sparkles className="w-3 h-3 shrink-0 opacity-60" />
           {action.label}
@@ -815,7 +944,7 @@ function AgentStatusBanner({ status }) {
   const isLoader = Icon === Loader2 || status.type === 'working';
 
   return (
-    <div className="flex items-center gap-2 px-2.5 py-2 rounded-md bg-primary/10 border border-primary/30 text-xs text-foreground animate-in fade-in slide-in-from-bottom-1 duration-200 shadow-sm">
+    <div className="flex items-center gap-2 px-2.5 py-2 rounded bg-primary/10 border border-primary/30 text-xs text-foreground animate-in fade-in slide-in-from-bottom-1 duration-200 shadow-sm">
       <div className="w-5 h-5 rounded bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
         <Icon className={`w-3 h-3 text-primary ${isLoader ? 'animate-spin' : 'animate-pulse'}`} />
       </div>
@@ -832,7 +961,7 @@ function AgentStatusBanner({ status }) {
 }
 
 // ─── Message bubble ───────────────────────────────────────────────────────────
-function MessageBubble({ message, onA2UIAction, onAppend, isStreaming }) {
+function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolResult }) {
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
   if (!isUser && !isAssistant) return null;
@@ -841,7 +970,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming }) {
     return (
       <div className="flex justify-end mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div className="max-w-[75%]">
-          <div className="rounded-md bg-muted/50 border border-border px-3 py-2 text-sm text-foreground leading-relaxed">
+          <div className="rounded bg-muted/50 border border-border px-3 py-2 text-sm text-foreground leading-relaxed">
             <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-foreground">{message.content}</p>
           </div>
           <p className="text-[10px] text-muted-foreground text-right mt-1">
@@ -877,7 +1006,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming }) {
 
   return (
     <div className="flex gap-2 items-start mb-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-      <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center shrink-0 mt-1 shadow-sm">
+      <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0 mt-1 shadow-sm">
         <Zap className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={2.5} />
       </div>
       <div className="flex-1 min-w-0">
@@ -892,10 +1021,28 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming }) {
 
         {/* Tool invocations — AI SDK provides these with full state tracking */}
         {toolInvocations?.length > 0 && (
-          <div className="space-y-1.5 mb-2">
-            {toolInvocations.map((inv) => (
-              <ToolCallStep key={inv.toolCallId || inv.id} invocation={inv} />
-            ))}
+          <div className="space-y-1 mb-2">
+            {toolInvocations.map((inv) => {
+              if (inv.toolName === 'askUser') {
+                return (
+                  <AskUserToolStep
+                    key={inv.toolCallId || inv.id}
+                    invocation={inv}
+                    addToolResult={addToolResult}
+                  />
+                );
+              }
+              if (inv.toolName === 'createPlan') {
+                return (
+                  <CreatePlanToolStep
+                    key={inv.toolCallId || inv.id}
+                    invocation={inv}
+                    allInvocations={toolInvocations}
+                  />
+                );
+              }
+              return <ToolCallStep key={inv.toolCallId || inv.id} invocation={inv} />;
+            })}
           </div>
         )}
 
@@ -903,7 +1050,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming }) {
           <div className="text-[15px] leading-[1.65] text-foreground">
             <SimpleMarkdown text={cleanText} />
             {isStreaming && (
-              <span className="inline-block w-0.5 h-3.5 bg-primary ml-0.5 animate-pulse rounded-sm align-middle" />
+              <span className="inline-block w-0.5 h-3.5 bg-primary ml-0.5 animate-pulse rounded align-middle" />
             )}
           </div>
         )}
@@ -934,7 +1081,7 @@ export const AIChatPanel = () => {
   const [inputText, setInputText] = useState('');
   
   // ── useChat — the AI SDK hook that manages everything ──────────────────
-  const { messages, status, sendMessage: sdkSendMessage, setMessages, error } = useChat({
+  const { messages, status, sendMessage: sdkSendMessage, setMessages, error, addToolResult } = useChat({
     transport: new DefaultChatTransport({
       api: getAIChatStreamURL(tenantID),
       // Use a fetch override so we always get a fresh Firebase token per request
@@ -1010,7 +1157,7 @@ export const AIChatPanel = () => {
       >
         {/* Header */}
         <div className="flex items-center gap-2 px-2 py-2 border-b border-border/50 shrink-0 bg-background/80 backdrop-blur-md sticky top-0 z-10">
-          <div className="w-7 h-7 rounded-md bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-primary/20 shadow-sm shadow-primary/10">
+          <div className="w-7 h-7 rounded bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-primary/20 shadow-sm shadow-primary/10">
             <Sparkles className="w-3.5 h-3.5 text-primary drop-shadow-sm" />
           </div>
           <div className="flex-1 min-w-0">
@@ -1022,17 +1169,17 @@ export const AIChatPanel = () => {
           </div>
 
           <button type="button" onClick={() => setIsExpanded(!isExpanded)}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            className="w-7 h-7 flex items-center justify-center rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
             title={isExpanded ? 'Collapse view' : 'Expand view'}>
             {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
           <button type="button" onClick={handleClear}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            className="w-7 h-7 flex items-center justify-center rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
             title="Clear chat history">
             <Trash2 className="w-3.5 h-3.5" />
           </button>
           <button type="button" onClick={() => useAIStore.getState().closePanel()}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            className="w-7 h-7 flex items-center justify-center rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
             title="Close panel (Ctrl+K)">
             <X className="w-3.5 h-3.5" />
           </button>
@@ -1053,13 +1200,14 @@ export const AIChatPanel = () => {
                   onA2UIAction={handleA2UIAction}
                   onAppend={sdkSendMessage}
                   isStreaming={lastIsStreamingAssistant && i === messages.length - 1}
+                  addToolResult={addToolResult}
                 />
               ))}
 
               {/* Real-time active status banner (tool running, reasoning, synthesizing) */}
               {busy && (
                 <div className="flex gap-2 animate-in fade-in duration-300">
-                  <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                    <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
                     <Zap className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={2.5} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -1070,7 +1218,7 @@ export const AIChatPanel = () => {
 
               {/* Error banner */}
               {error && (
-                  <div className="text-xs text-red-600 bg-red-50 border border-red-200 px-2 py-2 rounded-md">
+                  <div className="text-xs text-red-600 bg-red-50 border border-red-200 px-2 py-2 rounded">
                   ⚠️ {error.message || 'An error occurred. Please try again.'}
                 </div>
               )}

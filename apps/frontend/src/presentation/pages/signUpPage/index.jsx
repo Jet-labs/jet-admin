@@ -155,7 +155,7 @@ const SignUpPage = () => {
 
             {signUpState && signUpState.error && (
               <div
-                className="mt-4 p-4 text-sm text-red-400 rounded-sm bg-red-950/40"
+                className="mt-4 p-4 text-sm text-red-400 rounded bg-red-950/40"
                 role="alert"
               >
                 <span className="font-medium">Sign up error!</span>

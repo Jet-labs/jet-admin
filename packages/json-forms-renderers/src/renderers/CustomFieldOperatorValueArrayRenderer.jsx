@@ -41,7 +41,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
   };
 
   return (
-    <div className="p-3 border border-border rounded-sm bg-background">
+    <div className="rounded bg-background">
       <Label className="block mb-2 text-sm font-medium text-foreground">
         {label || uischema.label || "Conditions"}
       </Label>
@@ -61,7 +61,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
                 onChange={(val) => handleItemChange(index, "field", val)}
                 liveStateTree={stateTree}
                 mode={templateMode}
-                className={errors && errors.length > 0 ? "ring-1 ring-red-500 rounded-sm" : ""}
+                className={errors && errors.length > 0 ? "ring-1 ring-red-500 rounded" : ""}
               />
             </div>
             {/* Operator */}

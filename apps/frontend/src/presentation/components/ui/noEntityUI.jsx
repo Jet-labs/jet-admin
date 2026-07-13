@@ -7,7 +7,7 @@ export const NoEntityUI = ({ message }) => {
     message: PropTypes.string.isRequired,
   };
   return (
-    <div className=" bg-transparent p-5 py-2 w-full flex flex-col items-center rounded-sm  justify-center  opacity-50">
+    <div className=" bg-transparent p-5 py-2 w-full flex flex-col items-center rounded  justify-center  opacity-50">
       <img src={emptyIcon} alt="Empty" className="w-12 h-12" />
       <span className="!text-primary text-xs font-normal text-center w-full mt-3">
         {message}

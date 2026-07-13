@@ -488,7 +488,7 @@ export const VegaSpecEditor = ({
         footerHint={
           workflowContext ? (
             <>
-              Type <code className="font-mono bg-muted px-1 rounded-sm">{"{{"}</code> to autocomplete data sources or context
+              Type <code className="font-mono bg-muted px-1 rounded">{"{{"}</code> to autocomplete data sources or context
             </>
           ) : null
         }

@@ -375,7 +375,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
         return (
           <div
             key={eventType}
-            className="rounded-md border border-border bg-muted/20 p-2 space-y-2"
+            className="rounded border border-border bg-muted/20 p-2 space-y-2"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -399,7 +399,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
             </div>
 
             {hasEventInputs && (
-              <div className="rounded-md border border-primary/20 bg-primary/5 p-2">
+              <div className="rounded border border-primary/20 bg-primary/5 p-2">
                 <p className="text-[10px] font-semibold text-primary mb-1.5 flex items-center gap-1">
                   <Info className="h-3 w-3 text-primary" /> Available Event Context
                 </p>
@@ -550,7 +550,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                     className="text-xs bg-background"
                                   />
                                 ) : (
-                                  <div className="rounded-md border border-dashed border-border p-2.5 text-center">
+                                    <div className="rounded border border-dashed border-border p-2.5 text-center">
                                     <p className="text-[10px] text-muted-foreground">No page-level data sources defined. Add them in the Data tab of the page editor.</p>
                                   </div>
                                 )}
@@ -560,7 +560,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                 const inputDefinitions = getInputDefinitionsForAlias(action.config.alias);
                                 if (inputDefinitions.length === 0) return null;
                                 return (
-                                  <div className="rounded-md border border-border bg-muted/30 p-2 space-y-2">
+                                  <div className="rounded border border-border bg-muted/30 p-2 space-y-2">
                                     <div className="flex items-center gap-1.5">
                                       <Info className="h-3 w-3 text-muted-foreground" />
                                       <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
@@ -619,7 +619,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                 const inputDefinitions = getInputDefinitionsForDirectAction(action.actionType, action.config);
                                 if (inputDefinitions.length === 0) return null;
                                 return (
-                                  <div className="rounded-md border border-border bg-muted/30 p-2 space-y-2">
+                                  <div className="rounded border border-border bg-muted/30 p-2 space-y-2">
                                     <div className="flex items-center gap-1.5">
                                       <Info className="h-3 w-3 text-muted-foreground" />
                                       <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
@@ -678,7 +678,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                 const inputDefinitions = getInputDefinitionsForDirectAction(action.actionType, action.config);
                                 if (inputDefinitions.length === 0) return null;
                                 return (
-                                  <div className="rounded-md border border-border bg-muted/30 p-2 space-y-2">
+                                  <div className="rounded border border-border bg-muted/30 p-2 space-y-2">
                                     <div className="flex items-center gap-1.5">
                                       <Info className="h-3 w-3 text-muted-foreground" />
                                       <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
@@ -742,7 +742,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                     </SelectContent>
                                   </Select>
                                 ) : (
-                                  <div className="rounded-md border border-dashed border-border p-2.5 text-center">
+                                      <div className="rounded border border-dashed border-border p-2.5 text-center">
                                     <p className="text-[10px] text-muted-foreground">No widgets on this page yet. Place widgets on the canvas first.</p>
                                   </div>
                                 )}
@@ -779,7 +779,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                       )}
                                     </>
                                   ) : (
-                                    <div className="rounded-md border border-dashed border-border p-2.5 text-center">
+                                        <div className="rounded border border-dashed border-border p-2.5 text-center">
                                       <p className="text-[10px] text-muted-foreground">This widget type does not expose any callable methods.</p>
                                     </div>
                                   )}
@@ -850,7 +850,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
       )}
 
       {Object.keys(events).length === 0 && (
-        <div className="rounded-md border border-dashed border-border p-6 text-center">
+        <div className="rounded border border-dashed border-border p-6 text-center">
           <p className="text-xs text-muted-foreground">
             No event handlers configured. Add an event trigger to wire widget interactions.
           </p>

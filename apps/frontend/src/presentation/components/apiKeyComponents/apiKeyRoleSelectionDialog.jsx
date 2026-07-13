@@ -51,7 +51,7 @@ export const APIKeyRoleSelectionDialog = ({
         onOpenChange={setIsAPIKeyRoleSelectDialogOpen}
       >
         <DialogContent className="max-w-lg gap-0 p-0">
-          <DialogHeader className="border-b border-border px-4 py-3">
+          <DialogHeader className="border-b border-border p-2">
             <DialogTitle className="text-base font-semibold text-foreground">
               {CONSTANTS.STRINGS.API_KEY_ROLE_SELECTION_TITLE}
             </DialogTitle>
@@ -60,7 +60,7 @@ export const APIKeyRoleSelectionDialog = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="px-4 py-4">
+          <div className="p-2">
             <TenantRoleSelectionInput
               tenantID={tenantID}
               selectedTenantRoleIDs={apiKeyEditorForm?.values?.roleIDs}
@@ -70,7 +70,7 @@ export const APIKeyRoleSelectionDialog = ({
             />
           </div>
 
-          <DialogFooter className="border-t border-border px-4 py-3">
+          <DialogFooter className="border-t border-border p-2">
             <Button
               onClick={() => setIsAPIKeyRoleSelectDialogOpen(false)}
               type="button"

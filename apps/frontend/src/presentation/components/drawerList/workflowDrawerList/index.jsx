@@ -66,15 +66,15 @@ export const WorkflowDrawerList = () => {
 
       {isLoadingWorkflows ? (
         <div role="status" className="animate-pulse w-full space-y-2 p-2">
-          <div className="h-9 bg-muted rounded-sm w-full" />
-          <div className="h-9 bg-muted rounded-sm w-full" />
-          <div className="h-9 bg-muted rounded-sm w-full" />
-          <div className="h-9 bg-muted rounded-sm w-full" />
+          <div className="h-9 bg-muted rounded w-full" />
+          <div className="h-9 bg-muted rounded w-full" />
+          <div className="h-9 bg-muted rounded w-full" />
+          <div className="h-9 bg-muted rounded w-full" />
         </div>
       ) : workflows && workflows.length > 0 ? (
         <div 
           onScroll={_handleScroll}
-          className="flex-1 w-full overflow-y-auto p-2 pb-10 space-y-1"
+            className="flex-1 w-full overflow-y-auto p-2 pt-0 pb-10 space-y-2"
         >
           {workflows.map((workflow) => {
             const key = `workflow_${workflow.workflowID}`;
@@ -90,7 +90,7 @@ export const WorkflowDrawerList = () => {
                 className="block focus:outline-none"
               >
                 <div
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${isActive
+                  className={`flex items-center gap-2 px-2 py-1.5 rounded transition-colors ${isActive
                     ? "bg-primary/5 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}

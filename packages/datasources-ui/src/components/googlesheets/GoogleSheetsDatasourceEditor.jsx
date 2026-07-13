@@ -21,7 +21,7 @@ import {
 
 function StepIndicator({ steps, currentStep }) {
   return (
-    <div className="flex items-center gap-1 mb-6">
+    <div className="flex items-center gap-2">
       {steps.map((step, i) => {
         const isActive = i === currentStep;
         const isComplete = i < currentStep;
@@ -32,7 +32,7 @@ function StepIndicator({ steps, currentStep }) {
                 isComplete ? "text-primary" : "text-muted-foreground/30"
               }`} />
             )}
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-medium transition-colors ${
+            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
               isActive
                 ? "bg-muted text-foreground"
                 : isComplete
@@ -62,7 +62,7 @@ function AuthMethodCard({ icon: Icon, title, description, isSelected, onClick })
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-start gap-3 p-3.5 rounded-sm border text-left transition-all w-full ${
+      className={`flex items-start gap-3 p-3.5 rounded border text-left transition-all w-full ${
         isSelected
           ? "border-primary bg-primary/10 text-foreground shadow-sm"
           : "border-border bg-background text-muted-foreground hover:bg-muted/30"
@@ -151,12 +151,12 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
   }, [datasourceEditorForm]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <StepIndicator steps={STEPS} currentStep={currentStep} />
 
       {/* ── Step 0: Authentication ── */}
       {currentStep === 0 && (
-        <div className="space-y-4">
+        <div className="space-y-2">
           <div className="space-y-2">
             <AuthMethodCard
               icon={KeyRound}
@@ -209,7 +209,7 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
           {authType === "oauth2" && (
             <div className="space-y-3 pt-2">
               {isOAuthConnected ? (
-                <div className="flex items-center gap-3 p-3 rounded-sm border border-primary/20 bg-primary/5">
+                <div className="flex items-center gap-3 p-3 rounded border border-primary/20 bg-primary/5">
                   <ShieldCheck className="h-5 w-5 text-primary shrink-0" />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-foreground">Google Account Connected</p>
@@ -272,7 +272,7 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
 
       {/* ── Step 1: Configuration ── */}
       {currentStep === 1 && (
-        <div className="space-y-4">
+        <div className="space-y-2">
           <Button
             type="button"
             onClick={() => setCurrentStep(0)}
@@ -284,14 +284,14 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
           </Button>
 
           {/* Connection status */}
-          <div className="flex items-center gap-2 p-2.5 rounded-sm border border-primary/20 bg-primary/5 text-xs text-primary">
+          <div className="flex items-center gap-2 p-2.5 rounded border border-primary/20 bg-primary/5 text-xs text-primary">
             <ShieldCheck className="h-4 w-4 shrink-0" />
             <span className="font-semibold">
               {authType === "oauth2" ? "OAuth 2.0" : "Service Account"} — Connected
             </span>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="gs-connectionName">
               Connection Name
             </Label>
@@ -304,7 +304,7 @@ export const GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
             />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="gs-defaultSpreadsheetId">
               Default Spreadsheet ID <span className="text-muted-foreground">(optional)</span>
             </Label>

@@ -251,7 +251,7 @@ export function AnimatedAIChat({
                                 <motion.div
                                     key={suggestion.prefix}
                                     className={cn(
-                                        "flex items-center gap-2 px-2.5 py-2 text-xs transition-colors cursor-pointer rounded-md",
+                                        "flex items-center gap-2 px-2.5 py-2 text-xs transition-colors cursor-pointer rounded",
                                         activeSuggestion === index 
                                             ? "bg-primary/10 text-primary font-medium" 
                                             : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
@@ -328,7 +328,7 @@ export function AnimatedAIChat({
                         type="button"
                         onClick={handleAttachFile}
                         whileTap={{ scale: 0.95 }}
-                        className="p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 transition-colors"
+                        className="p-2 text-muted-foreground hover:text-foreground rounded hover:bg-muted/50 transition-colors"
                     >
                         <Paperclip className="w-4 h-4" />
                     </motion.button>
@@ -341,7 +341,7 @@ export function AnimatedAIChat({
                         }}
                         whileTap={{ scale: 0.95 }}
                         className={cn(
-                            "p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 transition-colors",
+                            "p-2 text-muted-foreground hover:text-foreground rounded hover:bg-muted/50 transition-colors",
                             showCommandPalette && "bg-muted text-foreground"
                         )}
                     >
@@ -358,7 +358,7 @@ export function AnimatedAIChat({
                     }}
                     disabled={busy || !value.trim()}
                     className={cn(
-                        "h-8 px-3 rounded-md text-xs font-medium transition-all flex items-center gap-2",
+                        "h-8 px-3 rounded text-xs font-medium transition-all flex items-center gap-2",
                         value.trim()
                             ? "bg-primary text-foreground hover:bg-primary/90 shadow-sm hover:scale-[1.01] active:scale-[0.98]"
                             : "bg-muted text-muted-foreground/40 cursor-not-allowed"
@@ -422,7 +422,7 @@ export function AnimatedAIChat({
                             <motion.button
                                 key={suggestion.prefix}
                                 onClick={() => selectCommandSuggestion(index)}
-                                className="flex items-center gap-2 px-2 py-1 bg-muted/40 hover:bg-muted border border-border/80 rounded-md text-xs text-muted-foreground hover:text-foreground transition-all relative group"
+                                className="flex items-center gap-2 px-2 py-1 bg-muted/40 hover:bg-muted border border-border/80 rounded text-xs text-muted-foreground hover:text-foreground transition-all relative group"
                                 initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.05 }}

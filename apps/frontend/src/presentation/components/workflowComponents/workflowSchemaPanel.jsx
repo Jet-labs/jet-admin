@@ -53,7 +53,7 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
     return (
         <div className="fixed left-0 top-0 h-full w-[500px] bg-background shadow-2xl border-r border-border z-[100] flex flex-col">
             {/* Header */}
-            <div className="flex justify-between items-center px-4 py-3 border-b border-border bg-muted/30">
+            <div className="flex justify-between items-center p-2 border-b border-border bg-muted/30">
                 <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-foreground tracking-tight">Workflow Schema</h3>
                     <span className="text-[10px] text-muted-foreground bg-muted font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-border/50">

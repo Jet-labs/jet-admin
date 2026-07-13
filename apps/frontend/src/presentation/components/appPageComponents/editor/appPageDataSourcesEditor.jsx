@@ -390,8 +390,8 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 p-3">
-            <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 p-2">
+            <div className="flex flex-col space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Alias / Reference Name
               </Label>
@@ -411,7 +411,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Source Type
               </Label>
@@ -430,7 +430,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               </Select>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 {selectedSource.type === "query"
                   ? "Select Query"
@@ -490,7 +490,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
 
             {selectedSource.type === "listener" && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col space-y-1">
                 <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Custom Channel Name (Optional)
                 </Label>
@@ -507,7 +507,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               </div>
             )}
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Trigger Mode
               </Label>
@@ -527,7 +527,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
 
             {selectedSource.triggerMode === "reactive" && (
-              <div className="rounded-md border border-border bg-muted/30 p-2 flex flex-col gap-2">
+              <div className="rounded border border-border bg-muted/30 p-2 flex flex-col gap-2">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Refresh When Variable Changes
                 </p>
@@ -567,7 +567,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               </div>
             )}
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col space-y-1">
               <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Refetch Interval (ms)
               </Label>
@@ -584,7 +584,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
 
             {getSourceInputDefinitions(selectedSource).length > 0 && (
-              <div className="rounded-md border border-border bg-muted/30 p-2 flex flex-col gap-2">
+              <div className="rounded border border-border bg-muted/30 p-2 flex flex-col gap-2">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Parameters / Arguments
                 </p>
@@ -623,7 +623,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
           <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
             {dataSources.length === 0 ? (
-                <div className="rounded-md border border-dashed border-border bg-muted/30 p-6 text-center flex flex-col items-center justify-center">
+                <div className="rounded border border-dashed border-border bg-muted/30 p-6 text-center flex flex-col items-center justify-center">
                 <Layers className="h-8 w-8 text-muted-foreground/50 mb-2" />
                 <p className="text-xs font-medium text-foreground">No Page Data Sources</p>
                 <p className="text-[10px] text-muted-foreground/70 max-w-[200px]">
@@ -645,11 +645,11 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                   return (
                     <div
                       key={index}
-                      className="rounded-md border border-border bg-card p-2 flex flex-col gap-2 hover:shadow-sm transition-shadow group"
+                      className="rounded border border-border bg-card p-2 flex flex-col gap-2 hover:shadow-sm transition-shadow group"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted/50 border border-border">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-muted/50 border border-border">
                             <Icon className="h-4 w-4 text-primary" />
                           </div>
                           <div className="min-w-0">

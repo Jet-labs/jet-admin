@@ -126,7 +126,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
       {/* Identity section */}
       <Section title="Identity">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-3 space-y-1.5">
+          <div className="md:col-span-3 space-y-1">
             <Label htmlFor="listenerTitle">
               {CONSTANTS.STRINGS.LISTENER_EDITOR_FORM_TITLE_FIELD_LABEL}{" "}
               <span className="text-destructive">*</span>
@@ -149,7 +149,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
               </p>
             )}
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="listenerStatus">Status</Label>
             <Select
               value={listenerEditorForm.values.status}
@@ -177,7 +177,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
             </Select>
           </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="listenerDescription">Description</Label>
           <Textarea
             name="listenerDescription"
@@ -196,7 +196,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
         title={CONSTANTS.STRINGS.LISTENER_EDITOR_FORM_DATASOURCE_FIELD_LABEL}
         description="Select a datasource that supports real-time subscriptions"
       >
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <SearchSelect
             value={listenerEditorForm.values.datasourceID || ""}
             onChange={(val) => {
@@ -230,7 +230,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
 
         {/* Show selected datasource badge */}
         {datasourceTypeConfig && (
-          <div className="mt-2 flex items-center gap-2 px-3 py-2 bg-muted rounded-sm border border-border">
+          <div className="mt-2 flex items-center gap-2 px-3 py-2 bg-muted rounded border border-border">
             <DatasourceIcon
               icon={datasourceTypeConfig.icon}
               iconColor={datasourceTypeConfig.iconColor}

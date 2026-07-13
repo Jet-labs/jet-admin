@@ -71,7 +71,7 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
           onSubmit={addUserToTenantForm.handleSubmit}
           noValidate
         >
-          <DialogHeader className="p-4 border-b border-border bg-muted/20">
+          <DialogHeader className="p-2 border-b border-border bg-muted/20">
             <DialogTitle className="text-base font-semibold uppercase font-mono text-[10px] tracking-widest text-muted-foreground mb-1">
               {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_TITLE}
             </DialogTitle>
@@ -80,8 +80,8 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-4 space-y-4">
-            <div className="space-y-1.5">
+          <div className="p-2 space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="tenantUserEmail">
                 {
                   CONSTANTS.STRINGS
@@ -106,7 +106,7 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
             </div>
           </div>
 
-          <DialogFooter className="p-4 border-t border-border bg-muted/5 gap-2">
+          <DialogFooter className="p-2 border-t border-border bg-muted/5 gap-2">
             <Button
               onClick={onClose}
               type="button"

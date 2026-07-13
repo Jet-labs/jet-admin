@@ -77,7 +77,7 @@ export const RealtimeListenerGuidanceBox = ({
         {guidance.urls && guidance.urls.length > 0 && (
           <div className="space-y-2">
             {guidance.urls.map((u, i) => (
-              <div key={i} className="p-2 bg-muted/30 rounded-md border border-border space-y-2">
+              <div key={i} className="p-2 bg-muted/30 rounded border border-border space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
                     {u.label}
@@ -108,7 +108,7 @@ export const RealtimeListenerGuidanceBox = ({
         {guidance.snippets && guidance.snippets.length > 0 && (
           <div className="space-y-2">
             {guidance.snippets.map((s, i) => (
-              <div key={i} className="p-2 bg-background text-foreground rounded-md border border-border space-y-2">
+              <div key={i} className="p-2 bg-background text-foreground rounded border border-border space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-xs text-muted-foreground flex items-center gap-1.5">
                     <TbTerminal2 className="w-4 h-4 text-primary" /> {s.label}
@@ -134,7 +134,7 @@ export const RealtimeListenerGuidanceBox = ({
 
         {/* Instructions & Summary */}
         {guidance.instructions && (
-          <div className="p-2 bg-muted/30 rounded-md border border-border space-y-2">
+          <div className="p-2 bg-muted/30 rounded border border-border space-y-2">
             <div className="font-semibold text-xs text-foreground flex items-center gap-1.5">
               <TbInfoCircle className="w-4 h-4 text-primary" /> Setup & Configuration Guide
             </div>

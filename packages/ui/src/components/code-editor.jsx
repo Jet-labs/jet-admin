@@ -384,10 +384,10 @@ const CodeEditor = React.forwardRef(({
   return (
     <div
       className={cn(
-        "flex flex-col overflow-hidden rounded-md border text-sm shadow-sm transition-colors",
+        "flex flex-col overflow-hidden rounded border text-sm shadow-sm transition-colors",
         status === "error" ? "border-destructive/50 ring-1 ring-destructive/20" : "border-border hover:border-border/80",
         isExpanded
-          ? "fixed inset-4 z-50 rounded-md shadow-2xl ring-1 ring-border/50 bg-background"
+          ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-background"
           : "relative bg-background",
         className
       )}

@@ -156,7 +156,7 @@ export const CodeBlock = ({
 
   return (
     <div
-      className={`rounded-md overflow-y-auto border ${
+      className={`rounded overflow-y-auto border ${
         theme === "dark"
           ? "border-border bg-background"
           : "border-border bg-background"
@@ -187,7 +187,7 @@ export const CodeBlock = ({
         <div className="flex space-x-2">
           <Button
             onClick={toggleExpand}
-            className={`text-xs py-1 px-2 rounded-sm flex items-center space-x-1 ${
+            className={`text-xs py-1 px-2 rounded flex items-center space-x-1 ${
               theme === "dark"
                 ? "bg-background hover:bg-background0 text-muted-foreground/70"
                 : "bg-muted hover:bg-foreground/10 text-muted-foreground/70"
@@ -198,7 +198,7 @@ export const CodeBlock = ({
           </Button>
           <Button
             onClick={copyToClipboard}
-            className={`text-xs py-1 px-2 rounded-sm flex items-center space-x-1 ${
+            className={`text-xs py-1 px-2 rounded flex items-center space-x-1 ${
               theme === "dark"
                 ? "bg-background hover:bg-background0 text-muted-foreground/70"
                 : "bg-muted hover:bg-foreground/10 text-muted-foreground/70"

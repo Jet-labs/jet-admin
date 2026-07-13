@@ -7,6 +7,7 @@ import { getCronJobHistoryAPI } from "../../../data/apis/cronJob";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { getFormattedCronJobHistoryColumns } from "./cronJobHistoryGridColumnFormatter";
+import { PageHeader } from "@jet-admin/ui";
 
 import { DATAGRID_SX } from "../../../shared/dataGridTheme";
 
@@ -55,29 +56,21 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
     >
       <div className="flex h-full w-full flex-col overflow-hidden bg-background">
         {/* ── Header ──────────────────────────────────────────────────── */}
-        <div className="flex items-start justify-between border-b border-border px-4 py-3">
-          <div>
-            <h1 className="text-base font-semibold text-foreground">
-              {CONSTANTS.STRINGS.VIEW_CRON_JOB_HISTORY_TITLE}
-            </h1>
-            {cronJobID && (
-              <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-                Job ID: {cronJobID}
-              </p>
-            )}
-          </div>
-
+        <PageHeader
+          title={CONSTANTS.STRINGS.VIEW_CRON_JOB_HISTORY_TITLE}
+          id={cronJobID ? String(cronJobID) : undefined}
+        >
           {!isLoadingCronJobHistory && !isNaN(total) && total > 0 && (
-            <span className="rounded-sm border border-border bg-muted/40 px-2 py-0.5 font-mono text-xs text-muted-foreground">
+            <span className="rounded border border-border bg-muted/40 px-2 py-0.5 font-mono text-xs text-muted-foreground">
               {total.toLocaleString()} run{total !== 1 ? "s" : ""}
             </span>
           )}
-        </div>
+        </PageHeader>
 
         {/* ── Body ────────────────────────────────────────────────────── */}
         <div className="flex h-full w-full flex-col overflow-hidden p-3">
           {!cronJobHistory ? (
-            <div className="flex h-full items-center justify-center rounded-md border border-dashed border-border bg-muted/20 p-6">
+            <div className="flex h-full items-center justify-center rounded border border-dashed border-border bg-muted/20 p-6">
               <NoEntityUI message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message} />
             </div>
           ) : hasData ? (
@@ -111,7 +104,7 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
                 }}
               />
             ) : (
-              <div className="flex h-full items-center justify-center rounded-md border border-dashed border-border bg-muted/20 p-6">
+                <div className="flex h-full items-center justify-center rounded border border-dashed border-border bg-muted/20 p-6">
               <NoEntityUI message="No execution history yet. This job hasn't run." />
             </div>
           )}

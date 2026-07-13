@@ -50,15 +50,15 @@ export const TenantSelectionDropdown = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="w-full flex justify-between items-center bg-background hover:bg-muted focus:outline-none focus:ring-4 focus:ring-brand-border-dark h-10 p-2"
+          className="w-full flex justify-between items-center bg-background hover:bg-muted focus:outline-none focus:ring-4 focus:ring-brand-border-dark h-10 p-1"
         >
           <div className="flex items-center min-w-0 flex-grow">
-            <div className="flex-shrink-0 w-7 h-7 rounded-sm border border-border bg-muted flex justify-center items-center">
+            <div className="flex-shrink-0 h-7 w-7 rounded border border-border bg-muted flex justify-center items-center">
               {selectedTenant?.tenantLogoURL ? (
                 <TenantLogo
                   src={selectedTenant.tenantLogoURL}
                   alt="Tenant Logo"
-                  className="w-full h-full rounded-sm"
+                  className="w-full h-full rounded"
                 />
               ) : (
                 <Store className="w-5 h-5 text-foreground" />
@@ -73,7 +73,7 @@ export const TenantSelectionDropdown = () => {
               </span>
             </div>
           </div>
-          <ChevronDown className="text-foreground ml-2" />
+          <ChevronDown className="text-foreground ml-2 w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>
 
@@ -87,7 +87,7 @@ export const TenantSelectionDropdown = () => {
             onClick={() => handleTenantChange(tenant)}
             className="flex items-center cursor-pointer p-1.5"
           >
-            <div className="flex-shrink-0 w-7 h-7 rounded-sm border border-border bg-muted flex justify-center items-center overflow-hidden">
+            <div className="flex-shrink-0 w-7 h-7 rounded border border-border bg-muted flex justify-center items-center overflow-hidden">
               {tenant.tenantLogoURL ? (
                 <TenantLogo
                   src={tenant.tenantLogoURL}

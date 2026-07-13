@@ -7,9 +7,8 @@ const { createClient } = require("@supabase/supabase-js");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const environmentVariables = require("../../environment");
 const fileStorageUtil = require("../../utils/fileStorage.util");
-// mask() uses SENSITIVE_KEY_PATTERNS with substring matching — intentionally broader
-// than log redaction so all credential-like fields are hidden from API responses.
-const { mask } = require("../../utils/sensitive");
+// Credentials are sent as-is to the frontend (display masking is handled by the UI
+// via HTML password inputs). Logging still redacts via logger.js / sensitive.js.
 
 const datasourceController = {};
 
@@ -54,10 +53,7 @@ datasourceController.getAllDatasources = async (req, res) => {
       },
     });
 
-    const sanitizedDatasources = result.datasources.map((d) => ({
-      ...d,
-      datasourceOptions: mask(d.datasourceOptions),
-    }));
+    const sanitizedDatasources = result.datasources;
 
     return expressUtils.sendResponse(
       res,
@@ -100,7 +96,7 @@ datasourceController.testDatasourceConnection = async (req, res) => {
         userID: user.userID,
         tenantID,
         datasourceType,
-        datasourceOptions: mask(datasourceOptions),
+        // datasourceOptions intentionally omitted from log — logger.js redact() covers it
       },
     });
 
@@ -167,10 +163,7 @@ datasourceController.getDatasourceByID = async (req, res) => {
       },
     });
 
-    const sanitizedDatasource = datasource ? {
-      ...datasource,
-      datasourceOptions: mask(datasource.datasourceOptions),
-    } : null;
+    const sanitizedDatasource = datasource ?? null;
 
     return expressUtils.sendResponse(
       res,
@@ -218,7 +211,6 @@ datasourceController.createDatasource = async (req, res) => {
         datasourceTitle,
         datasourceDescription,
         datasourceType,
-        datasourceOptions: mask(datasourceOptions),
         datasourceTags,
         authContext,
       },
@@ -242,10 +234,7 @@ datasourceController.createDatasource = async (req, res) => {
       },
     });
 
-    const sanitizedDatasource = datasource ? {
-      ...datasource,
-      datasourceOptions: mask(datasource.datasourceOptions),
-    } : null;
+    const sanitizedDatasource = datasource ?? null;
 
     return expressUtils.sendResponse(
       res,
@@ -295,7 +284,6 @@ datasourceController.updateDatasourceByID = async (req, res) => {
         datasourceTitle,
         datasourceDescription,
         datasourceType,
-        datasourceOptions: mask(datasourceOptions),
         datasourceTags,
       },
     });

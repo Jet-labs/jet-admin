@@ -51,7 +51,7 @@ const DrawerLinkItem = ({ item, tenantID }) => {
   return (
     <Link
       to={item.path}
-      className={`flex items-center rounded-md w-full p-2.5 transition duration-75 group flex-row !justify-start ${isActive
+      className={`flex items-center rounded w-full p-1.5 px-2 transition duration-75 group flex-row !justify-start ${isActive
         ? "bg-primary/5 text-primary"
         : "text-foreground hover:bg-muted hover:text-foreground"
         }`}
@@ -61,7 +61,7 @@ const DrawerLinkItem = ({ item, tenantID }) => {
           isActive ? "!text-primary" : "!text-foreground"
           } group-hover:text-foreground`}
       />
-      <span className="font-semibold text-sm ml-3">{capitalize(item.title)}</span>
+      <span className="text-sm ml-3">{capitalize(item.title)}</span>
     </Link>
   );
 };
@@ -77,7 +77,7 @@ const DrawerSubMenuItem = ({ subItem, tenantID }) => {
   return (
     <Link
       to={subItem.path}
-      className={`flex items-center rounded-md mb-1 w-full p-2 transition duration-75 flex-row justify-start group ${isActive
+      className={`flex items-center rounded mb-1 w-full p-1.5 px-2 transition duration-75 flex-row justify-start group ${isActive
         ? "bg-primary/5 text-primary"
         : "text-foreground hover:bg-muted hover:text-foreground"
         }`}
@@ -86,7 +86,7 @@ const DrawerSubMenuItem = ({ subItem, tenantID }) => {
         className={`!w-4 !h-4 ${isActive ? "!text-primary" : "!text-foreground"
           } group-hover:text-foreground`}
       />
-      <span className="font-medium text-sm ml-3">{capitalize(subItem.name)}</span>
+      <span className="font-light text-sm ml-3">{capitalize(subItem.name)}</span>
     </Link>
   );
 };
@@ -105,17 +105,17 @@ const DrawerCollapsibleItem = ({
   };
   return (
     <AccordionItem value={item.expandedStateKey} className="border-none">
-      <AccordionTrigger className="w-full hover:no-underline hover:bg-muted rounded-md p-2.5 text-foreground data-[state=open]:text-foreground transition-colors">
+      <AccordionTrigger className="w-full hover:no-underline hover:bg-muted rounded p-2.5 text-foreground data-[state=open]:text-foreground transition-colors">
         <div className="flex items-center">
           <item.icon className="!w-5 !h-5 !text-foreground" />
-          <span className="flex-1 ms-3 text-left font-semibold whitespace-nowrap">
+          <span className="flex-1 ms-3 text-left whitespace-nowrap">
             {item.title}
           </span>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="pb-0 pt-1">
-        <ul className="space-y-1 ml-6 border-l pl-2 border-border">
-          <li>
+      <AccordionContent className="p-0">
+        <ul className="space-y-2 ml-6 border-l pl-2 border-border">
+
             {item.subItems.map((subItem, subIndex) => (
               <DrawerSubMenuItem
                 key={subIndex}
@@ -133,7 +133,7 @@ const DrawerCollapsibleItem = ({
                 {item.addButton.text}
               </Button>
             )}
-          </li>
+
         </ul>
       </AccordionContent>
     </AccordionItem>
@@ -253,17 +253,17 @@ export const MainDrawerList = () => {
       aria-label="Sidebar"
       ref={ref}
     >
-      <div className="p-3 bg-background flex flex-col justify-start items-stretch z-10 sticky top-0 border-b border-transparent">
+      <div className="p-2 bg-background flex flex-col justify-start items-stretch z-10 sticky top-0 border-b border-transparent">
         {isLoadingTenants ? (
           <div
             role="status"
             className="animate-pulse w-full flex flex-row justify-start items-end"
           >
-            <div className="h-10 bg-background w-10 rounded-md"></div>
+            <div className="h-10 bg-background w-10 rounded"></div>
             <div className="flex flex-col justify-start items-start flex-grow ms-2">
-              <div className="h-2 bg-background rounded-sm mb-2 w-16"></div>
-              <div className="h-2 bg-background rounded-sm mb-2 w-full"></div>
-              <div className="h-2 bg-background rounded-sm mb-0 w-full"></div>
+              <div className="h-2 bg-background rounded mb-2 w-16"></div>
+              <div className="h-2 bg-background rounded mb-2 w-full"></div>
+              <div className="h-2 bg-background rounded mb-0 w-full"></div>
             </div>
           </div>
         ) : tenants && tenants.length > 0 ? (
@@ -286,13 +286,13 @@ export const MainDrawerList = () => {
         )}
       </div>
 
-      <ScrollArea className="flex-1 w-full p-3 pt-0">
+      <ScrollArea className="flex-1 w-full p-2 pt-0">
         {tenantID ? (
           <Accordion
             type="multiple"
             value={menuItemExpandedState}
             onValueChange={setMenuItemExpandedState}
-            className="w-full flex flex-col space-y-1"
+            className="w-full flex flex-col space-y-2"
           >
             {drawerListItems.map((item, index) => {
               if (item.type === "collapsible") {

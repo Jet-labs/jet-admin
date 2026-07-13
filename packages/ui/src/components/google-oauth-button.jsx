@@ -34,7 +34,7 @@ export const GoogleOAuthButton = ({
   errors
 }) => {
   return (
-    <div className="space-y-1.5 w-full">
+    <div className="space-y-1 w-full">
       <Label
         className={`block text-xs font-medium ${
           hasErrors ? "text-red-500" : "text-muted-foreground"
@@ -43,7 +43,7 @@ export const GoogleOAuthButton = ({
         {label || description || "Google Authentication"}
       </Label>
       
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 border border-border rounded-md bg-card text-card-foreground shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 border border-border rounded bg-card text-card-foreground shadow-sm">
         {isConnected ? (
           <>
             <div className="flex items-center gap-2 flex-1">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +15,7 @@ import { PageHeader } from "@jet-admin/ui";
 import { WorkflowCloneForm } from "./workflowCloneForm";
 import { WorkflowDeletionForm } from "./workflowDeletionForm";
 
-const initialValues = {
+const EMPTY_INITIAL_VALUES = {
   title: "",
   nodes: [],
   edges: [],
@@ -73,15 +73,20 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
 
 
 
-  const workflowUpdationForm = useFormik({
-    initialValues: workflow ? {
+  const formInitialValues = useMemo(() => {
+    if (!workflow) return { ...EMPTY_INITIAL_VALUES, tenantID };
+    return {
       tenantID,
       title: workflow.title || "",
       nodes: workflow.nodes || [],
       edges: workflow.edges || [],
       workflowConfig: workflow.workflowConfig || {},
       workflowOptions: workflow.workflowOptions || { inputDefinitions: [] },
-    } : { ...initialValues, tenantID },
+    };
+  }, [workflow, tenantID]);
+
+  const workflowUpdationForm = useFormik({
+    initialValues: formInitialValues,
     validationSchema: formValidations.workflowUpdationFormValidationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {

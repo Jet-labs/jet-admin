@@ -6,7 +6,7 @@ const EmptyState = React.forwardRef(({ className, icon: Icon, message, action, .
     <div
       ref={ref}
       className={cn(
-        "rounded-sm border border-border border-dashed bg-muted/30 py-8 flex flex-col items-center gap-2",
+        "rounded border border-border border-dashed bg-muted/30 py-8 flex flex-col items-center gap-2",
         className
       )}
       {...props}

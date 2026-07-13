@@ -69,12 +69,7 @@ export default {
         display: ["Circular", "sans-serif"],
         mono: ["Source Code Pro", "Office Code Pro", "Menlo", "monospace"],
       },
-      borderRadius: {
-        lg: "16px",
-        md: "8px",
-        sm: "6px",
-        pill: "9999px",
-      },
+
       boxShadow: {
         "whisper": "none",
         "card": "none",

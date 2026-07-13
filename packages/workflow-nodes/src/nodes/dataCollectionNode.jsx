@@ -134,7 +134,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
         <div className="w-full p-2 space-y-2">
 
             {/* Title */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
                 <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Modal title
                 </Label>
@@ -147,7 +147,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
             </div>
 
             {/* Description */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
                 <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Instructions
                 </Label>
@@ -156,12 +156,12 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                     onChange={e => setDescription(e.target.value)}
                     rows={2}
                     placeholder="Tell the user what to fill in..."
-                    className="w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-brand-dark transition-colors"
+                    className="w-full text-xs text-foreground border border-border rounded px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-brand-dark transition-colors"
                 />
             </div>
 
             {/* Collection type */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
                 <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Collection method
                 </Label>
@@ -198,7 +198,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
                     {fields.map((field, idx) => (
                         <div key={field.id}
-                            className="rounded-md border border-border p-3 bg-muted/20 space-y-2">
+                            className="rounded border border-border p-3 bg-muted/20 space-y-2">
                             <div className="flex gap-2 items-center">
                                 <div className="flex-1">
                                     <Label>Key</Label>
@@ -280,7 +280,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
             )}
 
             {/* Output variable */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
                 <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Output variable
                 </Label>
@@ -292,14 +292,14 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                 />
                 <p className="text-[10px] text-muted-foreground">
                     Access via{' '}
-                    <code className="bg-muted px-1 rounded-sm font-mono">
+                    <code className="bg-muted px-1 rounded font-mono">
                         {`{{ctx.${outputVariable || 'collectedData'}}}`}
                     </code>
                 </p>
             </div>
 
             {/* Expiry */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
                 <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Expiry (minutes) — 0 = never
                 </Label>
@@ -313,7 +313,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
             </div>
 
             {/* Help callout */}
-            <div className="rounded-md border border-primary/20 bg-primary/5 p-3 text-[10px] text-primary/80 space-y-1">
+            <div className="rounded border border-primary/20 bg-primary/5 p-3 text-[10px] text-primary/80 space-y-1">
                 <div className="font-semibold text-xs text-primary">Suspend &amp; resume</div>
                 <div>
                     When this node runs, the workflow <strong>pauses</strong> and a form
@@ -322,7 +322,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                 </div>
                 <div>
                     Field values land in{' '}
-                    <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">
+                    <code className="bg-brand-dark px-1 rounded border border-border font-mono">
                         {`ctx.${outputVariable || 'collectedData'}`}
                     </code>{' '}
                     as a plain object.
@@ -394,12 +394,12 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
                             {data?.title || 'Data collection'}
                         </span>
                         {isSuspended && (
-                            <span className="inline-flex items-center gap-1 text-[9px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-sm border border-amber-800 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 text-[9px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-800 whitespace-nowrap">
                                 ⏸ Waiting
                             </span>
                         )}
                         {isDisabled && !isSuspended && (
-                            <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
+                            <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-800">
                                 <Ban className="w-2.5 h-2.5" />
                                 Skip
                             </span>

@@ -12,7 +12,7 @@ export const AppPageSettingsEditor = ({ appPageEditorForm }) => {
   };
   return (
     <div className="w-full flex flex-col gap-2 p-2">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col space-y-1">
         <Label htmlFor="appPageTitle">
           {CONSTANTS.STRINGS.APP_PAGE_EDITOR_FORM_NAME_FIELD_LABEL}
         </Label>
@@ -30,7 +30,7 @@ export const AppPageSettingsEditor = ({ appPageEditorForm }) => {
           value={appPageEditorForm.values.appPageTitle}
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col space-y-1">
         <Label htmlFor="appPageDescription">
           {CONSTANTS.STRINGS.APP_PAGE_EDITOR_FORM_DESCRIPTION_FIELD_LABEL}
         </Label>

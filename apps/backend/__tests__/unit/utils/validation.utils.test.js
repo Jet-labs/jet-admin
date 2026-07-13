@@ -103,4 +103,40 @@ describe('validation.utils', () => {
         expect(schemas.cronScheduleSchema.parse('*/5 * * * *')).toBe('*/5 * * * *');
         expect(() => schemas.cronScheduleSchema.parse('not-a-cron')).toThrow();
     });
+
+    describe('paginationSchema preprocessing', () => {
+        it('coerces valid page and pageSize numbers', () => {
+            expect(schemas.paginationSchema.parse({ page: '2', pageSize: '10' })).toEqual({
+                page: 2,
+                pageSize: 10,
+            });
+        });
+
+        it('coerces string undefined or null to default values', () => {
+            expect(schemas.paginationSchema.parse({ page: 'undefined', pageSize: 'null' })).toEqual({
+                page: 1,
+                pageSize: 20,
+            });
+        });
+
+        it('filters arrays with mixed undefined and valid numbers', () => {
+            expect(schemas.paginationSchema.parse({
+                page: ['undefined', '3'],
+                pageSize: ['25', 'undefined'],
+            })).toEqual({
+                page: 3,
+                pageSize: 25,
+            });
+        });
+
+        it('defaults on arrays containing only invalid values', () => {
+            expect(schemas.paginationSchema.parse({
+                page: ['undefined'],
+                pageSize: ['undefined', 'null'],
+            })).toEqual({
+                page: 1,
+                pageSize: 20,
+            });
+        });
+    });
 });

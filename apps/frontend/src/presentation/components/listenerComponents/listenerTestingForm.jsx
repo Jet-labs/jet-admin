@@ -149,7 +149,7 @@ export const ListenerTestingForm = ({
             </span>
           </div>
           {testResult && (
-            <div className={`ml-2 flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded-sm border ${
+            <div className={`ml-2 flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded border ${
               testResult.success
                 ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-400"
                 : "border-red-500/30 bg-red-500/5 text-red-400"

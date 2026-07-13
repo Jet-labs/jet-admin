@@ -432,90 +432,188 @@ appPageService.deleteAppPageByID = async ({
  * App pages do not have subtypes, so this returns a single fixed schema.
  * Kept here (instead of a separate package) because app pages are
  * purely a backend concept with no shared frontend type package yet.
+ *
+ * Updated based on real DB data analysis and frontend source review.
  */
 const APP_PAGE_CONFIG_SCHEMA = {
   assetType: 'appPage',
-  description: 'App page configuration schema. An app page is a canvas that contains widget instances arranged in layouts, reactive page-level data sources, and state variables.',
+  description: 'App page configuration schema. An app page is a canvas that contains widget instances arranged in a tree-based V2 layout, reactive page-level data sources, and state variables.',
   schema: {
     type: 'object',
     properties: {
-      widgets: {
-        type: 'array',
-        description: 'List of widget instance keys placed on this page. Keys are formatted as widget_<widgetID>_<index>.',
-        items: { type: 'string' }
-      },
-      layouts: {
-        type: 'object',
-        description: 'Grid layout configurations indexed by viewport breakpoint (lg, md, sm, xs, xxs)',
-        properties: {
-          lg: { type: 'array', items: { $ref: '#/definitions/layoutItem' } },
-          md: { type: 'array', items: { $ref: '#/definitions/layoutItem' } },
-          sm: { type: 'array', items: { $ref: '#/definitions/layoutItem' } },
-          xs: { type: 'array', items: { $ref: '#/definitions/layoutItem' } },
-          xxs: { type: 'array', items: { $ref: '#/definitions/layoutItem' } }
-        }
-      },
       layoutVersion: {
         type: 'integer',
-        description: 'Optional layout system version (e.g. 2 for flexbox-based layout)',
+        description: 'Layout system version. Always 2 for new pages. V2 uses a tree-based layout (the "layout" field). V1 used a flat grid (the "layouts" field) and is auto-migrated to V2 on load.',
       },
       layout: {
         type: 'object',
-        description: 'Optional layout structure object (used when layoutVersion is 2)'
+        description: 'Root of the V2 layout tree. The root is always a "column" node whose children are rows, stacks, z-stacks, or containers. Each leaf "widget" node references a widgetKey from the "widgets" array.',
+        properties: {
+          id: { type: 'string', description: 'Unique node ID (e.g. "ROOT" or a short random string like "col_abc123")' },
+          type: { type: 'string', enum: ['column'], description: 'The root node is always "column"' },
+          children: { type: 'array', items: { '$ref': '#/definitions/layoutNode' } }
+        },
+        required: ['id', 'type', 'children']
+      },
+      widgets: {
+        type: 'array',
+        description: 'Registry of all widget instance keys placed on this page. Format: "widget_<widgetID>_<instanceSuffix>". The instanceSuffix must be unique per page (use an incrementing integer like 1, 2, 3 or a timestamp). The same widgetID CAN appear multiple times with different suffixes if the same widget is placed at multiple positions.',
+        items: { type: 'string' }
       },
       dataSources: {
         type: 'array',
-        description: 'Page-level reactive data sources supplying data to widgets from queries, workflows, or event listeners.',
+        description: 'Page-level reactive data sources that supply data to widgets. Queries accessible via {{ state.queries.<alias>.data }}, workflows via {{ state.workflows.<alias>.data }}, listeners via {{ state.listeners.<alias>.data }}. The ".isLoading" and ".error" sub-keys are also available (e.g. {{ state.queries.users.isLoading }}).',
         items: {
           type: 'object',
           properties: {
-            alias: { type: 'string', description: 'Unique reference name used to access this source in expressions, e.g. state.queries.<alias>.data or state.workflows.<alias>.data' },
-            type: { type: 'string', enum: ['query', 'workflow', 'listener'], description: 'The type of reactive data source' },
-            queryID: { type: 'string', description: 'UUID of the saved data query (required if type is "query")' },
-            workflowID: { type: 'string', description: 'UUID of the workflow (required if type is "workflow")' },
-            listenerID: { type: 'string', description: 'UUID of the event listener (required if type is "listener")' },
-            channelName: { type: 'string', description: 'Optional channel name for listener sources' },
+            alias: { type: 'string', description: 'Unique camelCase or snake_case identifier for expressions. Only alphanumeric + underscore. E.g. "users_list", "workflow_1", "query_1".' },
+            type: { type: 'string', enum: ['query', 'workflow', 'listener'], description: 'Type of reactive data source' },
+            queryID: { type: 'string', description: 'UUID of the saved DataQuery (required if type="query"). Set to "" for other types.' },
+            workflowID: { type: 'string', description: 'UUID of the Workflow (required if type="workflow"). Set to "" for other types.' },
+            listenerID: { type: 'string', description: 'UUID of the Listener (required if type="listener"). Set to "" for other types.' },
+            channelName: { type: 'string', description: 'Optional custom socket channel name for listener sources. Defaults to "listener:<listenerID>". Set to "" unless custom channel is needed.' },
             inputValues: {
               type: 'object',
-              description: 'Key-value map of template parameter values or expressions (e.g. {{ state.variables.userId }}) supplied to the query or workflow'
+              description: 'Key-value map of arguments supplied to the query or workflow. Values support template expressions, e.g. "{{state.variables.startDate}}" or "{{ state.variables.userId }}".'
             },
-            triggerMode: { type: 'string', enum: ['auto', 'reactive', 'manual'], description: 'Specifies when this source is fetched: auto (on load), reactive (when dependent variables change), or manual (on-demand only)' },
+            triggerMode: { type: 'string', enum: ['auto', 'reactive', 'manual'], description: '"auto": fetched immediately on page load. "reactive": refetched when any variable in "refreshOn" changes. "manual": only triggered by widget event actions (EXECUTE_QUERY).' },
             refreshOn: {
               type: 'array',
-              description: 'List of state paths that trigger a refetch of this source when modified (e.g., variables.selectedUserId)',
+              description: 'Variable paths that trigger a refetch when changed. Only relevant when triggerMode="reactive". Format: "variables.<variableKey>", e.g. ["variables.startDate", "variables.endDate"].',
               items: { type: 'string' }
             },
-            refetchInterval: { type: ['integer', 'null'], description: 'Optional refetch polling interval in milliseconds' }
+            refetchInterval: { type: ['integer', 'null'], description: 'Optional polling interval in milliseconds (e.g. 5000). null = no polling.' }
           },
           required: ['alias', 'type']
         }
       },
       variables: {
         type: 'array',
-        description: 'Page-level state variables forming the reactive local state of the canvas.',
+        description: 'Page-level reactive state variables. Accessible in widget expressions via {{ state.variables.<key> }}. Modified by widget event actions (SET_VARIABLE). Use for: selected rows, filter values, date range inputs, toggle state, pagination offsets, etc.',
         items: {
           type: 'object',
           properties: {
-            key: { type: 'string', description: 'The unique variable key used to read/write state (e.g. selectedRow)' },
-            type: { type: 'string', enum: ['string', 'number', 'boolean', 'object', 'array'], description: 'The data type of the variable' },
-            defaultValue: { type: ['string', 'number', 'boolean', 'object', 'array', 'null'], description: 'The initial default value' },
+            key: { type: 'string', description: 'Unique variable key. Only alphanumeric + underscore. E.g. "selectedRow", "startDate", "filterStatus", "currentPage".' },
+            type: { type: 'string', enum: ['string', 'number', 'boolean', 'object', 'array'], description: 'Data type of the variable' },
+            defaultValue: { description: 'Initial value. Must match the declared type: "" for string, 0 for number, false for boolean, {} for object, [] for array.' },
             description: { type: 'string', description: 'Optional documentation about what this variable stores' }
           },
           required: ['key', 'type']
         }
+      },
+      layouts: {
+        type: 'object',
+        description: 'LEGACY V1 field. Always empty ({}) on new V2 pages. Do NOT populate this when creating or updating pages.'
+      },
+      _legacyLayouts: {
+        type: 'object',
+        description: 'Internal field preserved after V1→V2 migration. Do NOT set or modify this field.'
       }
     },
     definitions: {
-      layoutItem: {
+      layoutNode: {
+        description: 'One of the 6 supported layout node types: column, row, widget, container, stack, z-stack.',
+        oneOf: [
+          { '$ref': '#/definitions/columnNode' },
+          { '$ref': '#/definitions/rowNode' },
+          { '$ref': '#/definitions/widgetNode' },
+          { '$ref': '#/definitions/containerNode' },
+          { '$ref': '#/definitions/stackNode' },
+          { '$ref': '#/definitions/zStackNode' }
+        ]
+      },
+      columnNode: {
         type: 'object',
+        description: 'Vertical column container. Children stack top-to-bottom. The root layout node is always a column.',
         properties: {
-          i: { type: 'string', description: 'The widgetInstance key (matches an item in the widgets array)' },
-          x: { type: 'integer', description: 'Grid column coordinate (x-axis)' },
-          y: { type: 'integer', description: 'Grid row coordinate (y-axis)' },
-          w: { type: 'integer', description: 'Width of widget in columns' },
-          h: { type: 'integer', description: 'Height of widget in rows' }
+          id: { type: 'string', description: 'Unique node ID' },
+          type: { type: 'string', enum: ['column'] },
+          children: { type: 'array', items: { '$ref': '#/definitions/layoutNode' } },
+          condition: { type: 'string', description: 'Optional mustache expression. Node renders only when truthy.' },
+          style: { type: 'object', description: 'Optional inline CSS styles.' }
         },
-        required: ['i', 'x', 'y', 'w', 'h']
+        required: ['id', 'type', 'children']
+      },
+      rowNode: {
+        type: 'object',
+        description: 'Horizontal row. Children (widget/container/stack nodes) are laid out side by side. Each child has a "span" (1–12) for relative width. Total spans of all children should sum to 12 for a full-width row.',
+        properties: {
+          id: { type: 'string' },
+          type: { type: 'string', enum: ['row'] },
+          children: { type: 'array', items: { '$ref': '#/definitions/layoutNode' } },
+          sizing: { type: 'string', enum: ['auto', 'fixed'], description: '"auto" = height fits content. "fixed" = use fixedHeight.' },
+          fixedHeight: { type: 'integer', description: 'Row height in pixels when sizing="fixed". E.g. 400.' },
+          gap: { type: 'integer', description: 'Gap in pixels between child nodes.' },
+          condition: { type: 'string' },
+          style: { type: 'object' }
+        },
+        required: ['id', 'type', 'children']
+      },
+      widgetNode: {
+        type: 'object',
+        description: 'Leaf node that renders one placed widget instance. The widgetKey MUST exist in the page "widgets" array. The referenced widget (by widgetID extracted from the key) must be created via create_widget before placing it here.',
+        properties: {
+          id: { type: 'string', description: 'Unique node ID' },
+          type: { type: 'string', enum: ['widget'] },
+          widgetKey: { type: 'string', description: 'Widget instance key from the page "widgets" array. Format: "widget_<widgetID>_<suffix>".' },
+          span: { type: 'integer', minimum: 1, maximum: 12, description: 'Width fraction within the parent 12-column row/stack.' },
+          sizing: { type: 'string', enum: ['auto', 'fill', 'fixed'], description: '"auto" = natural height. "fill" = stretch to parent. "fixed" = explicit fixedHeight.' },
+          fixedHeight: { type: 'integer', description: 'Height in pixels when sizing="fixed".' },
+          width: { description: 'Optional width override: pixel integer or "grow".' },
+          height: { description: 'Optional height override: pixel integer.' },
+          minHeight: { type: 'integer' },
+          maxHeight: { type: 'integer' },
+          style: { type: 'object' },
+          condition: { type: 'string' }
+        },
+        required: ['id', 'type', 'widgetKey', 'span', 'sizing']
+      },
+      containerNode: {
+        type: 'object',
+        description: 'A wrapper that nests a column layout within a row slot. Use when you need a column of widgets inside a row cell.',
+        properties: {
+          id: { type: 'string' },
+          type: { type: 'string', enum: ['container'] },
+          span: { type: 'integer', minimum: 1, maximum: 12 },
+          sizing: { type: 'string', enum: ['auto', 'fill', 'fixed'] },
+          children: { type: 'array', items: { '$ref': '#/definitions/columnNode' } },
+          style: { type: 'object' },
+          condition: { type: 'string' }
+        },
+        required: ['id', 'type', 'span', 'sizing', 'children']
+      },
+      stackNode: {
+        type: 'object',
+        description: 'A flexbox stack. Use for flexible horizontal or vertical flows with wrapping and alignment control. For example: a header bar with a logo and a date picker side by side (direction="horizontal", align="flex-end").',
+        properties: {
+          id: { type: 'string' },
+          type: { type: 'string', enum: ['stack'] },
+          direction: { type: 'string', enum: ['horizontal', 'vertical'], description: 'Flexbox main axis.' },
+          span: { type: 'integer', minimum: 1, maximum: 12 },
+          sizing: { type: 'string', enum: ['auto', 'fill', 'fixed'] },
+          wrap: { type: 'boolean', description: 'Whether children wrap to next line.' },
+          gap: { type: 'integer', description: 'Pixel gap between children.' },
+          align: { type: 'string', description: 'CSS align-items value: "flex-start", "flex-end", "center", "stretch".' },
+          children: { type: 'array', items: { '$ref': '#/definitions/layoutNode' } },
+          style: { type: 'object' },
+          condition: { type: 'string' }
+        },
+        required: ['id', 'type', 'direction', 'span', 'sizing', 'children']
+      },
+      zStackNode: {
+        type: 'object',
+        description: 'Layers children on top of each other (like z-index stacking). Each child layer is absolutely positioned. Use for overlays, glassmorphism backgrounds, or layered chart panels. Each child\'s opacity is controlled by the matching entry in "layerOpacities".',
+        properties: {
+          id: { type: 'string' },
+          type: { type: 'string', enum: ['z-stack'] },
+          span: { type: 'integer', minimum: 1, maximum: 12 },
+          sizing: { type: 'string', enum: ['auto', 'fill', 'fixed'] },
+          children: { type: 'array', items: { '$ref': '#/definitions/layoutNode' } },
+          layerOpacities: { type: 'array', items: { type: 'number', minimum: 0, maximum: 1 }, description: 'Opacity for each child layer in order. E.g. [1, 0.8, 1].' },
+          style: { type: 'object' },
+          condition: { type: 'string' }
+        },
+        required: ['id', 'type', 'span', 'sizing', 'children']
       }
     }
   }

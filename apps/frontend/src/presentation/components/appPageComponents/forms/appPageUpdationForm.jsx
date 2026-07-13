@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { Undo } from "lucide-react";
 import { CONSTANTS } from "../../../../constants";
 import {
@@ -28,7 +28,7 @@ import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootst
 
 import { PageHeader, Button } from "@jet-admin/ui";
 
-const initialValues = {
+const EMPTY_INITIAL_VALUES = {
   appPageTitle: "",
   appPageDescription: "",
   appPageConfig: {
@@ -92,8 +92,9 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
       },
     });
 
-  const appPageUpdationForm = useFormik({
-    initialValues: appPage && appPage.appPageID ? {
+  const formInitialValues = useMemo(() => {
+    if (!appPage || !appPage.appPageID) return EMPTY_INITIAL_VALUES;
+    return {
       appPageTitle: appPage.appPageTitle || CONSTANTS.STRINGS.UNTITLED,
       appPageDescription: appPage.appPageDescription || "",
       appPageConfig: appPage.appPageConfig || {
@@ -103,7 +104,11 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
         variables: [],
       },
       fetchedDataPreview: {},
-    } : initialValues,
+    };
+  }, [appPage]);
+
+  const appPageUpdationForm = useFormik({
+    initialValues: formInitialValues,
     enableReinitialize: true,
     validateOnMount: false,
     validateOnChange: false,
@@ -181,7 +186,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
       >
         {historyIndex > 0 && (
           <div className="flex items-center gap-2 mr-2">
-            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
+            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
               {historyIndex} unsaved change{historyIndex > 1 ? "s" : ""}
             </span>
             <Button

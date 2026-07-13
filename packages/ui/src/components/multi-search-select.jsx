@@ -106,7 +106,7 @@ export const MultiSearchSelect = React.forwardRef(
             type="button"
             disabled={disabled}
             className={cn(
-              "flex min-h-8 w-full items-center flex-wrap gap-1 rounded-sm border border-input-custom bg-input-custom px-2 py-1 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50 text-left",
+              "flex min-h-8 w-full items-center flex-wrap gap-1 rounded border border-input-custom bg-input-custom p-1 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50 text-left",
               className
             )}
           >
@@ -129,7 +129,7 @@ export const MultiSearchSelect = React.forwardRef(
                       <span
                         role="button"
                         tabIndex={-1}
-                        className="rounded-sm p-0 hover:bg-muted-foreground/20 cursor-pointer"
+                        className="rounded p-0 hover:bg-muted-foreground/20 cursor-pointer"
                         onPointerDown={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -164,7 +164,7 @@ export const MultiSearchSelect = React.forwardRef(
               e.preventDefault();
               setTimeout(() => searchInputRef.current?.focus(), 0);
             }}
-            className="z-[1200] w-[var(--radix-popover-trigger-width)] max-h-80 overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
+            className="z-[1200] w-[var(--radix-popover-trigger-width)] max-h-80 overflow-hidden rounded border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
           >
             {/* Search input */}
             <div
@@ -204,7 +204,7 @@ export const MultiSearchSelect = React.forwardRef(
                       role="option"
                       aria-selected={isSelected}
                       className={cn(
-                        "relative flex w-full cursor-pointer select-none items-start rounded-sm py-1.5 pl-8 pr-2 text-sm text-left outline-none hover:bg-muted",
+                        "relative flex w-full cursor-pointer select-none items-start rounded py-1.5 pl-8 pr-2 text-sm text-left outline-none hover:bg-muted",
                         isSelected && "font-medium"
                       )}
                       onClick={() => toggleOption(option.value)}

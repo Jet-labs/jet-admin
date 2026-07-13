@@ -12,7 +12,7 @@ export const APIKeyEditor = ({ apiKeyEditorForm }) => {
   return (
     <div className="w-full space-y-4">
       <Section title="Identity" description="General information about your API key.">
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="apiKeyTitle">
             {CONSTANTS.STRINGS.API_KEY_EDITOR_FORM_NAME_FIELD_LABEL}{" "}
             <span className="text-destructive">*</span>

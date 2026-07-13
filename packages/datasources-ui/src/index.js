@@ -5,6 +5,7 @@ import { WebViewQueryResponseView } from "./components/common/webViewQueryRespon
 import { ExcelCSVQueryBuilder } from "./components/excelcsv/ExcelCSVQueryBuilder";
 import { GoogleSheetsDatasourceEditor } from "./components/googlesheets/GoogleSheetsDatasourceEditor";
 import { GoogleSheetsQueryEditor } from "./components/googlesheets/GoogleSheetsQueryEditor";
+import { PostgresQueryEditor } from "./components/postgres/PostgresQueryEditor";
 
 import { GenericDatasourceTestResultUI } from "./components/common/genericDatasourceTestResultUI";
 
@@ -36,7 +37,12 @@ const createWebUrlDatasourceUI = () => ({
 });
 
 export const DATASOURCE_UI_COMPONENTS = {
-  [DATASOURCE_TYPES.POSTGRESQL.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.POSTGRESQL.value]: {
+    ...createGenericDatasourceUI(),
+    dedicatedQueryEditor: function ({ queryEditorForm }) {
+      return React.createElement(PostgresQueryEditor, { queryEditorForm });
+    },
+  },
   [DATASOURCE_TYPES.RESTAPI.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.WEB_URL.value]: createWebUrlDatasourceUI(),
   [DATASOURCE_TYPES.FIRESTORE.value]: createGenericDatasourceUI(),

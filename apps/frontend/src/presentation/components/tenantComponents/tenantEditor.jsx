@@ -41,7 +41,7 @@ export const TenantEditor = ({ tenantEditorForm }) => {
           />
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="tenantTitle">
             {CONSTANTS.STRINGS.TENANT_EDITOR_FORM_NAME_FIELD_LABEL}{" "}
             <span className="text-destructive">*</span>

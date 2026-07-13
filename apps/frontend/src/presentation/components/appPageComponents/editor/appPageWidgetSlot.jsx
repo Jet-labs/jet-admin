@@ -305,7 +305,7 @@ export const AppPageWidgetSlot = ({
 
               {widgetRender?.errorMessage ? (
                 <div className="flex h-full w-full items-center justify-center p-2">
-                  <span className="rounded-sm border border-red-100 bg-red-950/40 p-2 text-center text-xs text-red-600">
+                  <span className="rounded border border-red-100 bg-red-950/40 p-2 text-center text-xs text-red-600">
                     {widgetRender.errorMessage}
                   </span>
                 </div>

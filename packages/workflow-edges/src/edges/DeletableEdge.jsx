@@ -103,7 +103,7 @@ export default function DeletableEdge({
               onChange={onLabelChange}
               onBlur={onLabelBlur}
               onKeyDown={onKeyDown}
-              className="text-xs border border-brand-border rounded-sm px-1 py-0.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-brand-black min-w-[60px] text-brand-text-primary placeholder:text-brand-text-primary"
+              className="text-xs border border-brand-border rounded px-1 py-0.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-brand-black min-w-[60px] text-brand-text-primary placeholder:text-brand-text-primary"
               placeholder="Name edge"
             />
           ) : (
@@ -117,7 +117,7 @@ export default function DeletableEdge({
                 </Button>
                 <div 
                     onClick={onEdgeClick}
-                    className={`px-1.5 py-0.5 rounded-sm bg-brand-black border border-brand-border text-[10px] text-brand-text-primary shadow-sm cursor-text hover:border-blue-300 transition-colors ${!edgeLabel ? 'opacity-50 hover:opacity-100' : ''}`}
+                  className={`px-1.5 py-0.5 rounded bg-brand-black border border-brand-border text-[10px] text-brand-text-primary shadow-sm cursor-text hover:border-blue-300 transition-colors ${!edgeLabel ? 'opacity-50 hover:opacity-100' : ''}`}
                 >
                     {edgeLabel || "Name edge"}
                 </div>

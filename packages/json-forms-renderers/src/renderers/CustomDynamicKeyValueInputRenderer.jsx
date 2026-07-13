@@ -19,7 +19,7 @@ export const CustomDynamicKeyValueInputRenderer = (props) => {
   }
 
   return (
-    <div className="border border-border rounded-sm p-3 bg-background">
+    <div className="border border-border rounded p-3 bg-background">
       <Label className="block mb-2 text-sm font-medium text-foreground">
         {uischema.label || "Dynamic Inputs"}
       </Label>
@@ -30,7 +30,7 @@ export const CustomDynamicKeyValueInputRenderer = (props) => {
             <div key={`arg-${index}`} className="flex flex-col gap-1.5">
               <Label className="text-xs font-medium text-muted-foreground flex items-center justify-between">
                 <span>{argName}</span>
-                {arg.type && <span className="text-[10px] bg-muted/50 px-1 rounded-sm text-muted-foreground/80 font-mono">{arg.type}</span>}
+                {arg.type && <span className="text-[10px] bg-muted/50 px-1 rounded text-muted-foreground/80 font-mono">{arg.type}</span>}
               </Label>
               <TemplateAutocompleteInput
                 value={formData[argName] || ''}

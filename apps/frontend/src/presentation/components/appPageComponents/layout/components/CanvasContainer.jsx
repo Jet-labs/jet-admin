@@ -41,7 +41,7 @@ export function CanvasContainer({ children, span, sizing, style, condition, repe
   return (
     <div
       ref={(ref) => !previewMode && connect(drag(ref))}
-      className={`flex flex-col bg-background border border-border rounded-md ${previewMode ? "" : "p-2"} self-stretch min-h-0 box-border transition-all craft-node craft-node-container ${containerSpan} ${containerSizing} ${
+      className={`flex flex-col bg-background border border-border rounded ${previewMode ? "" : "p-2"} self-stretch min-h-0 box-border transition-all craft-node craft-node-container ${containerSpan} ${containerSizing} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
       }`}
       style={containerStyle}

@@ -170,7 +170,7 @@
             "label": "Enable SSL"
           },
           {
-            "type": "Group",
+            "type": "VerticalLayout",
             "label": "Advanced Options",
             "elements": [
               {

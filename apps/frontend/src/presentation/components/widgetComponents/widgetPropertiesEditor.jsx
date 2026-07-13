@@ -33,7 +33,7 @@ export const WidgetPropertiesEditor = ({ widgetEditorForm }) => {
       </Label>
 
       {/* Container Tailwind CSS */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label
           htmlFor="containerTailwindCss"
           className="text-xs text-muted-foreground"
@@ -45,14 +45,14 @@ export const WidgetPropertiesEditor = ({ widgetEditorForm }) => {
           name="containerTailwindCss"
           id="containerTailwindCss"
           className="text-xs font-mono"
-          placeholder="e.g. p-4 rounded-md shadow"
+          placeholder="e.g. p-4 rounded shadow"
           value={properties.containerTailwindCss || ""}
           onChange={(e) => handlePropertyChange("containerTailwindCss", e.target.value)}
         />
       </div>
 
       {/* Widget Tailwind CSS */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label
           htmlFor="widgetTailwindCss"
           className="text-xs text-muted-foreground"
@@ -71,7 +71,7 @@ export const WidgetPropertiesEditor = ({ widgetEditorForm }) => {
       </div>
 
       {/* Refetch Interval */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label
           htmlFor="refetchInterval"
           className="text-xs text-muted-foreground"
@@ -109,33 +109,33 @@ export const WidgetPropertiesEditor = ({ widgetEditorForm }) => {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">Border Radius</Label>
           <Input type="text" className="text-xs" value={properties.style?.borderRadius || ""} onChange={(e) => handlePropertyChange("style.borderRadius", e.target.value)} placeholder="e.g. 4px" />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">Padding</Label>
           <Input type="text" className="text-xs" value={properties.style?.padding || ""} onChange={(e) => handlePropertyChange("style.padding", e.target.value)} placeholder="e.g. 16px" />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">Border Width</Label>
           <Input type="text" className="text-xs" value={properties.style?.borderWidth || ""} onChange={(e) => handlePropertyChange("style.borderWidth", e.target.value)} placeholder="e.g. 1px" />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">Border Color</Label>
           <Input type="text" className="text-xs" value={properties.style?.borderColor || ""} onChange={(e) => handlePropertyChange("style.borderColor", e.target.value)} placeholder="e.g. #ff0000" />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">Background Color</Label>
           <Input type="text" className="text-xs" value={properties.style?.backgroundColor || ""} onChange={(e) => handlePropertyChange("style.backgroundColor", e.target.value)} placeholder="e.g. transparent" />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">Text Color</Label>
           <Input type="text" className="text-xs" value={properties.style?.textColor || ""} onChange={(e) => handlePropertyChange("style.textColor", e.target.value)} placeholder="e.g. #333333" />
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label className="text-xs text-muted-foreground">Custom CSS</Label>
         <p className="text-[10px] text-muted-foreground leading-normal">
           Write CSS properties directly. They will be scoped to this widget only.

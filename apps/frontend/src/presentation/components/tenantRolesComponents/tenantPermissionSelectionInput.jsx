@@ -43,11 +43,11 @@ export const TenantPermissionSelectionInput = ({
 
   if (isLoadingTenantPermissions) {
     return (
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label htmlFor="rolePermissions">
           {label || CONSTANTS.STRINGS.TENANT_PERMISSION_SELECTION_LABEL}
         </Label>
-        <div className="flex h-10 items-center rounded-md border border-border px-3 text-sm text-muted-foreground">
+        <div className="flex h-10 items-center rounded border border-border px-3 text-sm text-muted-foreground">
           <Spinner size={16} className="mr-2" />
           Loading permissions...
         </div>
@@ -57,7 +57,7 @@ export const TenantPermissionSelectionInput = ({
 
   if (tenantPermissionsError) {
     return (
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <Label htmlFor="rolePermissions">
           {label || CONSTANTS.STRINGS.TENANT_PERMISSION_SELECTION_LABEL}
         </Label>
@@ -69,7 +69,7 @@ export const TenantPermissionSelectionInput = ({
   if (!tenantPermissions || !tenantPermissions.permissions) return null;
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1">
       <Label htmlFor="rolePermissions">
         {label || CONSTANTS.STRINGS.TENANT_PERMISSION_SELECTION_LABEL}
       </Label>

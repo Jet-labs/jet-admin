@@ -194,7 +194,7 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Comprehensive instructions */}
       <div className="px-2">
-        <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-[10px] text-brand-text-primary space-y-2">
           <div className="font-semibold text-brand-text-primary text-xs">📘 Delay Types</div>
 
           <div>
@@ -207,11 +207,11 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
           <div>
             <span className="font-medium text-brand-text-primary">From Variable:</span>
             <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px]">
-              <code className="bg-brand-black px-1 rounded-sm">{"{{ctx.waitTime}}"}</code> → value in milliseconds
+              <code className="bg-brand-black px-1 rounded">{"{{ctx.waitTime}}"}</code> → value in milliseconds
             </div>
           </div>
 
-          <div className="text-green-600 bg-green-50 border border-green-800 rounded-sm p-1.5 mt-2">
+          <div className="text-green-600 bg-green-50 border border-green-800 rounded p-1.5 mt-2">
             <strong>✓ Non-blocking:</strong> Delay uses queue scheduling. Workflow resources are released during wait.
           </div>
         </div>
@@ -297,7 +297,7 @@ export const DelayNode = memo(({ data, isConnectable }) => {
               {data?.title || 'Delay'}
             </span>
             {isDisabled && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
+              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-800">
                 <Ban className="w-2.5 h-2.5" />
                 Skip
               </span>

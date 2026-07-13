@@ -7,7 +7,7 @@ const Callout = React.forwardRef(({ className, children, icon: Icon = Info, ...p
     <div
       ref={ref}
       className={cn(
-        "rounded-sm border border-primary/20 bg-primary/5 p-3 text-[11px] text-primary flex gap-2",
+        "rounded border border-primary/20 bg-primary/5 p-3 text-[11px] text-primary flex gap-2",
         className
       )}
       {...props}

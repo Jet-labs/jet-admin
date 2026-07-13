@@ -267,7 +267,7 @@ export const DataQueryEditor = ({
     <div className="w-full space-y-4">
       <Section title="Query Configuration">
           <div className="space-y-2">
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="dataQueryTitle">
               {CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_LABEL} <span className="text-destructive">*</span>
             </Label>
@@ -289,12 +289,12 @@ export const DataQueryEditor = ({
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="datasourceID">
               {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL} <span className="text-destructive">*</span>
             </Label>
             {isLoadingDatasources ? (
-              <div className="h-10 flex items-center px-3 border border-input bg-background rounded-md text-sm text-muted-foreground italic">
+              <div className="h-10 flex items-center px-3 border border-input bg-background rounded text-sm text-muted-foreground italic">
                 Loading data sources...
               </div>
             ) : (
@@ -346,7 +346,7 @@ export const DataQueryEditor = ({
           )}
 
           {/* Global Query Options */}
-          <div className="space-y-1.5 pt-4 border-t">
+          <div className="space-y-1">
             <Label htmlFor="timeoutSeconds">Timeout (Seconds)</Label>
             <Input
               name="timeoutSeconds"

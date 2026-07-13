@@ -211,7 +211,7 @@ export const WorkflowTestingPanel = ({
           
           {selectedWorkflowForTesting && (
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="mb-2 p-2 bg-background rounded-sm border border-border">
+              <div className="mb-2 p-2 bg-background rounded border border-border">
                 <h3 className="text-sm font-medium text-foreground">
                   {selectedWorkflowForTesting.title}
                 </h3>

@@ -79,7 +79,7 @@ export const AppPageWidgetList = ({
     e.dataTransfer.setData("layout-type", type);
 
     const clone = document.createElement("div");
-    clone.className = "flex items-center gap-2 rounded-md border border-border bg-card p-2 shadow-sm text-xs font-semibold font-mono uppercase text-primary";
+    clone.className = "flex items-center gap-2 rounded border border-border bg-card p-2 shadow-sm text-xs font-semibold font-mono uppercase text-primary";
     clone.innerText = `${type.toUpperCase()} LAYOUT`;
     clone.style.transform = "translateX(-9999px)";
     clone.style.position = "absolute";
@@ -208,7 +208,7 @@ export const AppPageWidgetList = ({
                     key={layoutItem.type}
                     draggable
                     onDragStart={(e) => _handleLayoutDragStart(e, layoutItem.type)}
-                    className="flex items-center gap-2 rounded-md border border-border/60 bg-card/65 p-2 shadow-sm hover:border-primary/50 cursor-grab active:cursor-grabbing hover:bg-muted/10 transition-all select-none"
+                    className="flex items-center gap-2 rounded border border-border/60 bg-card/65 p-2 shadow-sm hover:border-primary/50 cursor-grab active:cursor-grabbing hover:bg-muted/10 transition-all select-none"
                   >
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-muted/50 border border-border/30">
                       {layoutItem.icon}
@@ -243,7 +243,7 @@ export const AppPageWidgetList = ({
                   <div
                     key={key}
                     id={key}
-                    className="flex items-center justify-between gap-2 rounded-md border border-border bg-card p-2 shadow-sm hover:border-border/80 transition-all duration-200 group"
+                    className="flex items-center justify-between gap-2 rounded border border-border bg-card p-2 shadow-sm hover:border-border/80 transition-all duration-200 group"
                   >
                     <div className="flex min-w-0 flex-1 items-center gap-2">
                       <div

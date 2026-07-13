@@ -71,7 +71,7 @@ export function CalendarGrid({
 
           let bgClass = '';
           let textClass = isCurrentMonth ? 'text-foreground' : 'text-muted-foreground/50';
-          let roundedClass = 'rounded-md';
+          let roundedClass = 'rounded';
 
           if (isSelected || isStart || isEnd) {
             bgClass = 'bg-primary';

@@ -63,7 +63,7 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
       ) : (
         <div className="space-y-2">
             {inputDefinitions.map((inputDef, index) => (
-            <div key={index} className="flex flex-col gap-1.5 p-2 bg-background rounded-sm border border-border">
+            <div key={index} className="flex flex-col gap-1.5 p-2 bg-background rounded border border-border">
               <div className="flex flex-row gap-2 items-center">
                 <Input
                   type="text"

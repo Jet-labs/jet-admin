@@ -1,5 +1,5 @@
 // src/index.js
-import React14 from "react";
+import React15 from "react";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
 // src/components/common/queryResponseView.js
@@ -304,7 +304,7 @@ function normalise(opts = {}) {
   };
 }
 function SourceTab({ opts, update }) {
-  return /* @__PURE__ */ React8.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React8.createElement(Callout, null, "Configure which sheet and header row to read. Leave Sheet Name blank to use the first available sheet."), /* @__PURE__ */ React8.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React8.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React8.createElement(Label, { htmlFor: "sheetName" }, "Sheet Name"), /* @__PURE__ */ React8.createElement(
+  return /* @__PURE__ */ React8.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React8.createElement(Callout, null, "Configure which sheet and header row to read. Leave Sheet Name blank to use the first available sheet."), /* @__PURE__ */ React8.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React8.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React8.createElement(Label, { htmlFor: "sheetName" }, "Sheet Name"), /* @__PURE__ */ React8.createElement(
     Input,
     {
       id: "sheetName",
@@ -313,7 +313,7 @@ function SourceTab({ opts, update }) {
       value: opts.sheetName,
       onChange: (e) => update({ sheetName: e.target.value })
     }
-  ), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "Leave blank to read the first sheet.")), /* @__PURE__ */ React8.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React8.createElement(Label, { htmlFor: "headerRow" }, "Header Row"), /* @__PURE__ */ React8.createElement(
+  ), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "Leave blank to read the first sheet.")), /* @__PURE__ */ React8.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React8.createElement(Label, { htmlFor: "headerRow" }, "Header Row"), /* @__PURE__ */ React8.createElement(
     Input,
     {
       id: "headerRow",
@@ -354,7 +354,7 @@ function ColumnsTab({ opts, update }) {
     "div",
     {
       key: col.id,
-      className: `grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center rounded-sm border px-2 py-2 transition-colors ${col.enabled ? "border-border bg-background" : "border-border/50 bg-muted/30 opacity-60"}`
+      className: `grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center rounded border px-2 py-2 transition-colors ${col.enabled ? "border-border bg-background" : "border-border/50 bg-muted/30 opacity-60"}`
     },
     /* @__PURE__ */ React8.createElement(GripVertical, { className: "h-3.5 w-3.5 text-muted-foreground/40 cursor-grab" }),
     /* @__PURE__ */ React8.createElement(
@@ -452,7 +452,7 @@ function FilterTab({ opts, update }) {
         value: filter.logic,
         onChange: (val) => patchFilter(filter.id, { logic: val })
       }
-    ), /* @__PURE__ */ React8.createElement("div", { className: "h-px flex-1 bg-border" })), /* @__PURE__ */ React8.createElement("div", { className: "flex items-center gap-2 rounded-sm border border-border bg-background px-3 py-2" }, /* @__PURE__ */ React8.createElement(
+    ), /* @__PURE__ */ React8.createElement("div", { className: "h-px flex-1 bg-border" })), /* @__PURE__ */ React8.createElement("div", { className: "flex items-center gap-2 rounded border border-border bg-background px-3 py-2" }, /* @__PURE__ */ React8.createElement(
       Input,
       {
         placeholder: "Column name",
@@ -487,7 +487,7 @@ function FilterTab({ opts, update }) {
       },
       /* @__PURE__ */ React8.createElement(Trash2, { className: "h-3.5 w-3.5" })
     )));
-  }), /* @__PURE__ */ React8.createElement(Button, { type: "button", variant: "outline", size: "sm", onClick: addFilter, className: "w-full" }, /* @__PURE__ */ React8.createElement(Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Condition")), filters.length > 0 && /* @__PURE__ */ React8.createElement("div", { className: "rounded-sm border border-border bg-muted/30 p-3 space-y-1" }, /* @__PURE__ */ React8.createElement(Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Dynamic values"), /* @__PURE__ */ React8.createElement("p", { className: "text-[11px] text-muted-foreground mt-1" }, "Use", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "{{inputs.paramName}}"), " ", "in Value fields to inject runtime inputs from the query engine.")));
+  }), /* @__PURE__ */ React8.createElement(Button, { type: "button", variant: "outline", size: "sm", onClick: addFilter, className: "w-full" }, /* @__PURE__ */ React8.createElement(Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Condition")), filters.length > 0 && /* @__PURE__ */ React8.createElement("div", { className: "rounded border border-border bg-muted/30 p-3 space-y-1" }, /* @__PURE__ */ React8.createElement(Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Dynamic values"), /* @__PURE__ */ React8.createElement("p", { className: "text-[11px] text-muted-foreground mt-1" }, "Use", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "{{inputs.paramName}}"), " ", "in Value fields to inject runtime inputs from the query engine.")));
 }
 function SortTab({ opts, update }) {
   const sort = opts.sort;
@@ -514,7 +514,7 @@ function SortTab({ opts, update }) {
     "div",
     {
       key: rule.id,
-      className: "grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center rounded-sm border border-border bg-background px-2 py-2"
+      className: "grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center rounded border border-border bg-background px-2 py-2"
     },
     /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col gap-0.5" }, /* @__PURE__ */ React8.createElement(
       "button",
@@ -573,7 +573,7 @@ function SortTab({ opts, update }) {
   )), /* @__PURE__ */ React8.createElement(Button, { type: "button", variant: "outline", size: "sm", onClick: addSort, className: "w-full" }, /* @__PURE__ */ React8.createElement(Plus, { className: "h-3.5 w-3.5 mr-1" }), "Add Sort Rule")));
 }
 function SettingsTab({ opts, update }) {
-  return /* @__PURE__ */ React8.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ React8.createElement(Callout, null, "Advanced fetch settings. ", /* @__PURE__ */ React8.createElement("strong", null, "Range"), " limits which rows are read from the file itself (before any filters). ", /* @__PURE__ */ React8.createElement("strong", null, "Limit"), " ", "caps the final result count."), /* @__PURE__ */ React8.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React8.createElement(Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Row Range"), /* @__PURE__ */ React8.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React8.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React8.createElement(Label, { htmlFor: "range" }, "A1-Notation Range"), /* @__PURE__ */ React8.createElement(
+  return /* @__PURE__ */ React8.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React8.createElement(Callout, null, "Advanced fetch settings. ", /* @__PURE__ */ React8.createElement("strong", null, "Range"), " limits which rows are read from the file itself (before any filters). ", /* @__PURE__ */ React8.createElement("strong", null, "Limit"), " ", "caps the final result count."), /* @__PURE__ */ React8.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React8.createElement(Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Row Range"), /* @__PURE__ */ React8.createElement("div", { className: "grid grid-cols-2 gap-3 !mt-0" }, /* @__PURE__ */ React8.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React8.createElement(Label, { htmlFor: "range" }, "A1-Notation Range"), /* @__PURE__ */ React8.createElement(
     Input,
     {
       id: "range",
@@ -582,7 +582,7 @@ function SettingsTab({ opts, update }) {
       value: opts.range,
       onChange: (e) => update({ range: e.target.value })
     }
-  ), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "Restricts rows read from the spreadsheet at the file-parse level. Format:", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "A1:Z100"), ". Leave blank for all rows.")), /* @__PURE__ */ React8.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React8.createElement(Label, { htmlFor: "limit" }, "Row Limit"), /* @__PURE__ */ React8.createElement(
+  ), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "Restricts rows read from the spreadsheet at the file-parse level. Format:", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "A1:Z100"), ". Leave blank for all rows.")), /* @__PURE__ */ React8.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React8.createElement(Label, { htmlFor: "limit" }, "Row Limit"), /* @__PURE__ */ React8.createElement(
     Input,
     {
       id: "limit",
@@ -595,7 +595,7 @@ function SettingsTab({ opts, update }) {
         limit: e.target.value === "" ? "" : parseInt(e.target.value, 10)
       })
     }
-  ), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "Maximum rows returned after all filters and sorts are applied. Equivalent to", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "rows.slice(0, limit)"), ".")))), /* @__PURE__ */ React8.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React8.createElement(Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Full Datasource Call Preview"), /* @__PURE__ */ React8.createElement("div", { className: "rounded-sm bg-muted/40 border border-border p-4 font-mono text-[11px] leading-relaxed overflow-x-auto text-foreground" }, /* @__PURE__ */ React8.createElement("code", { className: "whitespace-pre" }, buildDatasourcePreview(opts)))));
+  ), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "Maximum rows returned after all filters and sorts are applied. Equivalent to", " ", /* @__PURE__ */ React8.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "rows.slice(0, limit)"), ".")))), /* @__PURE__ */ React8.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React8.createElement(Label, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Full Datasource Call Preview"), /* @__PURE__ */ React8.createElement("div", { className: "rounded bg-muted/40 border border-border p-4 font-mono text-[11px] leading-relaxed overflow-x-auto text-foreground" }, /* @__PURE__ */ React8.createElement("code", { className: "whitespace-pre" }, buildDatasourcePreview(opts)))));
 }
 function buildDatasourcePreview(opts) {
   const enabledCols = (opts.columns || []).filter((c) => c.enabled && c.sourceName);
@@ -641,7 +641,7 @@ var ExcelCSVQueryBuilder = ({ queryEditorForm }) => {
     const Icon = tab.icon;
     const badgeCount = badges[tab.id];
     return /* @__PURE__ */ React8.createElement(TabsTrigger3, { key: tab.id, value: tab.id, className: "gap-2 px-3 py-2 text-xs" }, /* @__PURE__ */ React8.createElement(Icon, { className: "h-3.5 w-3.5" }), tab.label, badgeCount > 0 && /* @__PURE__ */ React8.createElement("span", { className: "ml-2 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold" }, badgeCount));
-  })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "source", className: "mt-2 pb-2" }, /* @__PURE__ */ React8.createElement(SourceTab, { opts, update })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "columns", className: "mt-2 pb-2" }, /* @__PURE__ */ React8.createElement(ColumnsTab, { opts, update })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "filter", className: "mt-2 pb-2" }, /* @__PURE__ */ React8.createElement(FilterTab, { opts, update })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "sort", className: "mt-2 pb-2" }, /* @__PURE__ */ React8.createElement(SortTab, { opts, update })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "settings", className: "mt-2 pb-2" }, /* @__PURE__ */ React8.createElement(SettingsTab, { opts, update }))));
+  })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "source", className: "pb-2" }, /* @__PURE__ */ React8.createElement(SourceTab, { opts, update })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "columns", className: "pb-2" }, /* @__PURE__ */ React8.createElement(ColumnsTab, { opts, update })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "filter", className: "pb-2" }, /* @__PURE__ */ React8.createElement(FilterTab, { opts, update })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "sort", className: "pb-2" }, /* @__PURE__ */ React8.createElement(SortTab, { opts, update })), /* @__PURE__ */ React8.createElement(TabsContent3, { value: "settings", className: "pb-2" }, /* @__PURE__ */ React8.createElement(SettingsTab, { opts, update }))));
 };
 
 // src/components/googlesheets/GoogleSheetsDatasourceEditor.jsx
@@ -678,10 +678,10 @@ import {
   ChevronRight
 } from "lucide-react";
 function StepIndicator({ steps, currentStep }) {
-  return /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-1 mb-6" }, steps.map((step, i) => {
+  return /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2" }, steps.map((step, i) => {
     const isActive = i === currentStep;
     const isComplete = i < currentStep;
-    return /* @__PURE__ */ React10.createElement(React10.Fragment, { key: step.id }, i > 0 && /* @__PURE__ */ React10.createElement(ChevronRight, { className: `h-3.5 w-3.5 shrink-0 ${isComplete ? "text-primary" : "text-muted-foreground/30"}` }), /* @__PURE__ */ React10.createElement("div", { className: `flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-medium transition-colors ${isActive ? "bg-muted text-foreground" : isComplete ? "bg-muted/50 text-foreground/70" : "text-muted-foreground/50"}` }, isComplete ? /* @__PURE__ */ React10.createElement(Check, { className: "h-3 w-3" }) : /* @__PURE__ */ React10.createElement("span", { className: "h-4 w-4 flex items-center justify-center rounded-full border text-[10px] font-bold border-current" }, i + 1), step.label));
+    return /* @__PURE__ */ React10.createElement(React10.Fragment, { key: step.id }, i > 0 && /* @__PURE__ */ React10.createElement(ChevronRight, { className: `h-3.5 w-3.5 shrink-0 ${isComplete ? "text-primary" : "text-muted-foreground/30"}` }), /* @__PURE__ */ React10.createElement("div", { className: `flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors ${isActive ? "bg-muted text-foreground" : isComplete ? "bg-muted/50 text-foreground/70" : "text-muted-foreground/50"}` }, isComplete ? /* @__PURE__ */ React10.createElement(Check, { className: "h-3 w-3" }) : /* @__PURE__ */ React10.createElement("span", { className: "h-4 w-4 flex items-center justify-center rounded-full border text-[10px] font-bold border-current" }, i + 1), step.label));
   }));
 }
 function AuthMethodCard({ icon: Icon, title, description, isSelected, onClick }) {
@@ -690,7 +690,7 @@ function AuthMethodCard({ icon: Icon, title, description, isSelected, onClick })
     {
       type: "button",
       onClick,
-      className: `flex items-start gap-3 p-3.5 rounded-sm border text-left transition-all w-full ${isSelected ? "border-primary bg-primary/10 text-foreground shadow-sm" : "border-border bg-background text-muted-foreground hover:bg-muted/30"}`
+      className: `flex items-start gap-3 p-3.5 rounded border text-left transition-all w-full ${isSelected ? "border-primary bg-primary/10 text-foreground shadow-sm" : "border-border bg-background text-muted-foreground hover:bg-muted/30"}`
     },
     /* @__PURE__ */ React10.createElement(Icon, { className: `h-5 w-5 shrink-0 mt-0.5 ${isSelected ? "text-primary" : "text-muted-foreground/80"}` }),
     /* @__PURE__ */ React10.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React10.createElement("p", { className: `text-sm font-medium ${isSelected ? "text-foreground" : "text-muted-foreground"}` }, title), /* @__PURE__ */ React10.createElement("p", { className: "text-xs text-muted-foreground mt-0.5" }, description)),
@@ -743,7 +743,7 @@ var GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
       defaultSpreadsheetId: e.target.value
     });
   }, [datasourceEditorForm]);
-  return /* @__PURE__ */ React10.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React10.createElement(StepIndicator, { steps: STEPS, currentStep }), currentStep === 0 && /* @__PURE__ */ React10.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement(
+  return /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement(StepIndicator, { steps: STEPS, currentStep }), currentStep === 0 && /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement(
     AuthMethodCard,
     {
       icon: KeyRound,
@@ -780,7 +780,7 @@ var GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
     },
     "Continue",
     /* @__PURE__ */ React10.createElement(ChevronRight, { className: "h-4 w-4" })
-  )), authType === "oauth2" && /* @__PURE__ */ React10.createElement("div", { className: "space-y-3 pt-2" }, isOAuthConnected ? /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-3 p-3 rounded-sm border border-primary/20 bg-primary/5" }, /* @__PURE__ */ React10.createElement(ShieldCheck, { className: "h-5 w-5 text-primary shrink-0" }), /* @__PURE__ */ React10.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React10.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Google Account Connected"), /* @__PURE__ */ React10.createElement("p", { className: "text-xs text-muted-foreground mt-0.5 font-mono truncate" }, "Credential ID: ", options.oauth2.vaultCredentialID)), /* @__PURE__ */ React10.createElement(
+  )), authType === "oauth2" && /* @__PURE__ */ React10.createElement("div", { className: "space-y-3 pt-2" }, isOAuthConnected ? /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-3 p-3 rounded border border-primary/20 bg-primary/5" }, /* @__PURE__ */ React10.createElement(ShieldCheck, { className: "h-5 w-5 text-primary shrink-0" }), /* @__PURE__ */ React10.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React10.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Google Account Connected"), /* @__PURE__ */ React10.createElement("p", { className: "text-xs text-muted-foreground mt-0.5 font-mono truncate" }, "Credential ID: ", options.oauth2.vaultCredentialID)), /* @__PURE__ */ React10.createElement(
     Button2,
     {
       type: "button",
@@ -810,7 +810,7 @@ var GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
       className: "w-full"
     },
     oauth.loading ? /* @__PURE__ */ React10.createElement(React10.Fragment, null, /* @__PURE__ */ React10.createElement(Loader2, { className: "h-4 w-4 animate-spin" }), "Connecting...") : /* @__PURE__ */ React10.createElement(React10.Fragment, null, /* @__PURE__ */ React10.createElement(Globe, { className: "h-4 w-4" }), "Connect Google Account")
-  ))), currentStep === 1 && /* @__PURE__ */ React10.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React10.createElement(
+  ))), currentStep === 1 && /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement(
     Button2,
     {
       type: "button",
@@ -820,7 +820,7 @@ var GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
       className: "text-muted-foreground hover:text-foreground h-7 px-2 -ml-2 font-normal"
     },
     "\u2190 Back to authentication"
-  ), /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2 p-2.5 rounded-sm border border-primary/20 bg-primary/5 text-xs text-primary" }, /* @__PURE__ */ React10.createElement(ShieldCheck, { className: "h-4 w-4 shrink-0" }), /* @__PURE__ */ React10.createElement("span", { className: "font-semibold" }, authType === "oauth2" ? "OAuth 2.0" : "Service Account", " \u2014 Connected")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label2, { htmlFor: "gs-connectionName" }, "Connection Name"), /* @__PURE__ */ React10.createElement(
+  ), /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2 p-2.5 rounded border border-primary/20 bg-primary/5 text-xs text-primary" }, /* @__PURE__ */ React10.createElement(ShieldCheck, { className: "h-4 w-4 shrink-0" }), /* @__PURE__ */ React10.createElement("span", { className: "font-semibold" }, authType === "oauth2" ? "OAuth 2.0" : "Service Account", " \u2014 Connected")), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React10.createElement(Label2, { htmlFor: "gs-connectionName" }, "Connection Name"), /* @__PURE__ */ React10.createElement(
     Input2,
     {
       id: "gs-connectionName",
@@ -829,7 +829,7 @@ var GoogleSheetsDatasourceEditor = ({ datasourceEditorForm }) => {
       value: options.connectionName || "",
       onChange: handleConnectionNameChange
     }
-  )), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label2, { htmlFor: "gs-defaultSpreadsheetId" }, "Default Spreadsheet ID ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground" }, "(optional)")), /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React10.createElement(FileSpreadsheet, { className: "h-4 w-4 text-muted-foreground shrink-0" }), /* @__PURE__ */ React10.createElement(
+  )), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React10.createElement(Label2, { htmlFor: "gs-defaultSpreadsheetId" }, "Default Spreadsheet ID ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground" }, "(optional)")), /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React10.createElement(FileSpreadsheet, { className: "h-4 w-4 text-muted-foreground shrink-0" }), /* @__PURE__ */ React10.createElement(
     Input2,
     {
       id: "gs-defaultSpreadsheetId",
@@ -961,7 +961,7 @@ function SpreadsheetSearch({ onSelect, selectedId, apiProxy }) {
       title: "Refresh list"
     },
     /* @__PURE__ */ React12.createElement(RefreshCw, { className: "h-4 w-4 text-muted-foreground hover:text-foreground" })
-  )), results.length === 0 && !loading && searched ? /* @__PURE__ */ React12.createElement("div", { className: "p-6 text-center text-sm text-muted-foreground" }, "No spreadsheets found") : results?.length > 0 && /* @__PURE__ */ React12.createElement("div", { className: "max-h-[240px] overflow-y-auto rounded-sm border border-border" }, /* @__PURE__ */ React12.createElement("div", { className: "flex flex-col" }, results.map((ss) => /* @__PURE__ */ React12.createElement(
+  )), results.length === 0 && !loading && searched ? /* @__PURE__ */ React12.createElement("div", { className: "p-6 text-center text-sm text-muted-foreground" }, "No spreadsheets found") : results?.length > 0 && /* @__PURE__ */ React12.createElement("div", { className: "max-h-[240px] overflow-y-auto rounded border border-border" }, /* @__PURE__ */ React12.createElement("div", { className: "flex flex-col" }, results.map((ss) => /* @__PURE__ */ React12.createElement(
     "button",
     {
       key: ss.id,
@@ -1022,13 +1022,13 @@ function SheetSelector({ spreadsheetId, selectedSheet, onSelect, apiProxy }) {
   if (loading) {
     return /* @__PURE__ */ React12.createElement("div", { className: "flex items-center gap-2 text-xs text-muted-foreground p-2" }, /* @__PURE__ */ React12.createElement(Loader22, { className: "h-3.5 w-3.5 animate-spin" }), "Loading sheets...");
   }
-  return /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, spreadsheetTitle && /* @__PURE__ */ React12.createElement("p", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Sheets in ", spreadsheetTitle), /* @__PURE__ */ React12.createElement("div", { className: "flex flex-wrap gap-1.5" }, sheets.map((sheet) => /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, spreadsheetTitle && /* @__PURE__ */ React12.createElement("p", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Sheets in ", spreadsheetTitle), /* @__PURE__ */ React12.createElement("div", { className: "flex flex-wrap gap-1.5" }, sheets.map((sheet) => /* @__PURE__ */ React12.createElement(
     "button",
     {
       key: sheet.sheetId,
       type: "button",
       onClick: () => onSelect(sheet.title),
-      className: `inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-medium border transition-colors ${selectedSheet === sheet.title ? "bg-primary/10 text-primary border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:bg-muted/50"}`
+      className: `inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium border transition-colors ${selectedSheet === sheet.title ? "bg-primary/10 text-primary border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:bg-muted/50"}`
     },
     /* @__PURE__ */ React12.createElement(Table2, { className: "h-3 w-3" }),
     sheet.title
@@ -1082,7 +1082,7 @@ function DataPreview({ spreadsheetId, sheetName, apiProxy }) {
       className: "h-auto p-0 text-[11px] font-normal"
     },
     "Refresh"
-  )), /* @__PURE__ */ React12.createElement("div", { className: "overflow-x-auto rounded-sm border border-border" }, /* @__PURE__ */ React12.createElement("table", { className: "w-full text-xs" }, /* @__PURE__ */ React12.createElement("thead", null, /* @__PURE__ */ React12.createElement("tr", { className: "bg-muted/50" }, preview.headers.map((h, i) => /* @__PURE__ */ React12.createElement("th", { key: i, className: "px-3 py-1.5 text-left font-semibold text-foreground whitespace-nowrap border-b border-border" }, h)))), /* @__PURE__ */ React12.createElement("tbody", null, preview.rows.map((row, ri) => /* @__PURE__ */ React12.createElement("tr", { key: ri, className: "border-b border-border last:border-0 hover:bg-muted/20" }, preview.headers.map((_, ci) => /* @__PURE__ */ React12.createElement("td", { key: ci, className: "px-3 py-1.5 text-foreground whitespace-nowrap max-w-[200px] truncate" }, row[ci] ?? ""))))))));
+  )), /* @__PURE__ */ React12.createElement("div", { className: "overflow-x-auto rounded border border-border" }, /* @__PURE__ */ React12.createElement("table", { className: "w-full text-xs" }, /* @__PURE__ */ React12.createElement("thead", null, /* @__PURE__ */ React12.createElement("tr", { className: "bg-muted/50" }, preview.headers.map((h, i) => /* @__PURE__ */ React12.createElement("th", { key: i, className: "px-3 py-1.5 text-left font-semibold text-foreground whitespace-nowrap border-b border-border" }, h)))), /* @__PURE__ */ React12.createElement("tbody", null, preview.rows.map((row, ri) => /* @__PURE__ */ React12.createElement("tr", { key: ri, className: "border-b border-border last:border-0 hover:bg-muted/20" }, preview.headers.map((_, ci) => /* @__PURE__ */ React12.createElement("td", { key: ci, className: "px-3 py-1.5 text-foreground whitespace-nowrap max-w-[200px] truncate" }, row[ci] ?? ""))))))));
 }
 var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
   const { apiProxy } = useQueryEditorContext();
@@ -1102,7 +1102,7 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
   const badges = {
     source: spreadsheetId ? 1 : 0
   };
-  return /* @__PURE__ */ React12.createElement("div", { className: "space-y-0" }, /* @__PURE__ */ React12.createElement("div", { className: "pb-4" }, /* @__PURE__ */ React12.createElement(Label3, { className: "mb-2 block" }, "Operation"), /* @__PURE__ */ React12.createElement("div", { className: "grid grid-cols-3 gap-1.5" }, OPERATIONS.map((op) => {
+  return /* @__PURE__ */ React12.createElement("div", { className: "space-y-0" }, /* @__PURE__ */ React12.createElement("div", { className: "pb-2" }, /* @__PURE__ */ React12.createElement(Label3, { className: "mb-2 block" }, "Operation"), /* @__PURE__ */ React12.createElement("div", { className: "grid grid-cols-3 gap-1.5" }, OPERATIONS.map((op) => {
     const Icon = op.icon;
     const isSelected = operation === op.id;
     return /* @__PURE__ */ React12.createElement(
@@ -1111,7 +1111,7 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
         key: op.id,
         type: "button",
         onClick: () => patch({ operation: op.id }),
-        className: `flex items-center gap-2 p-2.5 rounded-sm border text-left transition-all ${isSelected ? "border-primary bg-primary/10 text-primary shadow-sm" : "border-border bg-background text-muted-foreground hover:bg-muted/30"}`
+        className: `flex items-center gap-2 p-2.5 rounded border text-left transition-all ${isSelected ? "border-primary bg-primary/10 text-primary shadow-sm" : "border-border bg-background text-muted-foreground hover:bg-muted/30"}`
       },
       /* @__PURE__ */ React12.createElement(Icon, { className: "h-3.5 w-3.5 shrink-0" }),
       /* @__PURE__ */ React12.createElement("span", { className: "text-xs font-medium" }, op.label)
@@ -1120,7 +1120,7 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
     const Icon = tab.icon;
     const badgeCount = badges[tab.id];
     return /* @__PURE__ */ React12.createElement(TabsTrigger4, { key: tab.id, value: tab.id, className: "gap-1.5 px-3 py-2 text-xs" }, Icon && /* @__PURE__ */ React12.createElement(Icon, { className: "h-3.5 w-3.5" }), tab.label, badgeCount > 0 && /* @__PURE__ */ React12.createElement("span", { className: "ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold" }, badgeCount));
-  })), /* @__PURE__ */ React12.createElement(TabsContent4, { value: "source", className: "mt-4 pb-2" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label3, null, "Spreadsheet ID"), /* @__PURE__ */ React12.createElement(
+  })), /* @__PURE__ */ React12.createElement(TabsContent4, { value: "source", className: "mt-2 pb-2" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label3, null, "Spreadsheet ID"), /* @__PURE__ */ React12.createElement(
     Input3,
     {
       type: "text",
@@ -1129,14 +1129,14 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
       value: spreadsheetId,
       onChange: (e) => patch({ spreadsheetId: e.target.value })
     }
-  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label3, { className: "text-muted-foreground flex items-center gap-1 font-normal" }, /* @__PURE__ */ React12.createElement(Search, { className: "h-3 w-3" }), "Or search your spreadsheets"), /* @__PURE__ */ React12.createElement(
+  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label3, null, "Or search your spreadsheets"), /* @__PURE__ */ React12.createElement(
     SpreadsheetSearch,
     {
       apiProxy,
       selectedId: spreadsheetId,
       onSelect: (ss) => patch({ spreadsheetId: ss.id })
     }
-  )), spreadsheetId && /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5 pt-2 border-t border-border" }, /* @__PURE__ */ React12.createElement(Label3, null, "Sheet / Tab"), /* @__PURE__ */ React12.createElement(
+  )), spreadsheetId && /* @__PURE__ */ React12.createElement("div", { className: "space-y-1 pt-2 border-t border-border" }, /* @__PURE__ */ React12.createElement(Label3, null, "Sheet / Tab"), /* @__PURE__ */ React12.createElement(
     SheetSelector,
     {
       spreadsheetId,
@@ -1144,7 +1144,7 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
       onSelect: (name) => patch({ sheetName: name }),
       apiProxy
     }
-  )), spreadsheetId && (operation === "read" || operation === "write" || operation === "append" || operation === "update" || operation === "clear") && /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label3, null, "Range (A1 notation)"), /* @__PURE__ */ React12.createElement(
+  )), spreadsheetId && (operation === "read" || operation === "write" || operation === "append" || operation === "update" || operation === "clear") && /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label3, null, "Range (A1 notation)"), /* @__PURE__ */ React12.createElement(
     Input3,
     {
       type: "text",
@@ -1153,7 +1153,7 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
       value: opts.range || "",
       onChange: (e) => patch({ range: e.target.value })
     }
-  )))), /* @__PURE__ */ React12.createElement(TabsContent4, { value: "options", className: "mt-4 pb-2" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-4" }, operation === "read" && /* @__PURE__ */ React12.createElement(React12.Fragment, null, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label3, null, "Major Dimension"), /* @__PURE__ */ React12.createElement(
+  )))), /* @__PURE__ */ React12.createElement(TabsContent4, { value: "options", className: "pb-2" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-2" }, operation === "read" && /* @__PURE__ */ React12.createElement(React12.Fragment, null, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label3, null, "Major Dimension"), /* @__PURE__ */ React12.createElement(
     Select2,
     {
       value: opts.majorDimension || "ROWS",
@@ -1168,7 +1168,7 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
       checked: opts.includeHeaders !== false,
       onCheckedChange: (checked) => patch({ includeHeaders: checked })
     }
-  ), /* @__PURE__ */ React12.createElement(Label3, { htmlFor: "gs-includeHeaders", className: "cursor-pointer text-xs text-foreground font-normal" }, "Treat first row as headers"))), (operation === "write" || operation === "update" || operation === "append") && /* @__PURE__ */ React12.createElement(React12.Fragment, null, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label3, null, "Data (JSON array of arrays)"), /* @__PURE__ */ React12.createElement(
+  ), /* @__PURE__ */ React12.createElement(Label3, { htmlFor: "gs-includeHeaders", className: "cursor-pointer text-xs text-foreground font-normal" }, "Treat first row as headers"))), (operation === "write" || operation === "update" || operation === "append") && /* @__PURE__ */ React12.createElement(React12.Fragment, null, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label3, null, "Data (JSON array of arrays)"), /* @__PURE__ */ React12.createElement(
     Textarea2,
     {
       className: "min-h-[120px] font-mono text-xs",
@@ -1176,7 +1176,7 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
       value: opts.data || "",
       onChange: (e) => patch({ data: e.target.value })
     }
-  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label3, null, "Value Input Option"), /* @__PURE__ */ React12.createElement(
+  )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label3, null, "Value Input Option"), /* @__PURE__ */ React12.createElement(
     Select2,
     {
       value: opts.valueInputOption || "USER_ENTERED",
@@ -1184,7 +1184,7 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
     },
     /* @__PURE__ */ React12.createElement(SelectTrigger2, null, /* @__PURE__ */ React12.createElement(SelectValue2, null)),
     /* @__PURE__ */ React12.createElement(SelectContent2, null, /* @__PURE__ */ React12.createElement(SelectItem2, { value: "USER_ENTERED" }, "User Entered"), /* @__PURE__ */ React12.createElement(SelectItem2, { value: "RAW" }, "Raw"))
-  ))), operation === "append" && /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label3, null, "Insert Data Option"), /* @__PURE__ */ React12.createElement(
+  ))), operation === "append" && /* @__PURE__ */ React12.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React12.createElement(Label3, null, "Insert Data Option"), /* @__PURE__ */ React12.createElement(
     Select2,
     {
       value: opts.insertDataOption || "INSERT_ROWS",
@@ -1192,7 +1192,7 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
     },
     /* @__PURE__ */ React12.createElement(SelectTrigger2, null, /* @__PURE__ */ React12.createElement(SelectValue2, null)),
     /* @__PURE__ */ React12.createElement(SelectContent2, null, /* @__PURE__ */ React12.createElement(SelectItem2, { value: "INSERT_ROWS" }, "Insert Rows"), /* @__PURE__ */ React12.createElement(SelectItem2, { value: "OVERWRITE" }, "Overwrite"))
-  )), operation === "getSpreadsheetInfo" && /* @__PURE__ */ React12.createElement(Callout3, null, "This operation returns spreadsheet metadata including sheet names, row/column counts, and locale. No additional options required."), operation === "clear" && /* @__PURE__ */ React12.createElement(Callout3, null, "This will clear all data in the specified range. The range is configured in the Source tab."))), /* @__PURE__ */ React12.createElement(TabsContent4, { value: "preview", className: "mt-4 pb-2" }, /* @__PURE__ */ React12.createElement(
+  )), operation === "getSpreadsheetInfo" && /* @__PURE__ */ React12.createElement(Callout3, null, "This operation returns spreadsheet metadata including sheet names, row/column counts, and locale. No additional options required."), operation === "clear" && /* @__PURE__ */ React12.createElement(Callout3, null, "This will clear all data in the specified range. The range is configured in the Source tab."))), /* @__PURE__ */ React12.createElement(TabsContent4, { value: "preview", className: "pb-2" }, /* @__PURE__ */ React12.createElement(
     DataPreview,
     {
       spreadsheetId,
@@ -1202,8 +1202,827 @@ var GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
   ))));
 };
 
+// src/components/postgres/PostgresQueryEditor.jsx
+import React13, { useState as useState5, useCallback as useCallback4, useMemo as useMemo2 } from "react";
+import {
+  Input as Input4,
+  Label as Label4,
+  Button as Button4,
+  Select as Select3,
+  SelectContent as SelectContent3,
+  SelectItem as SelectItem3,
+  SelectTrigger as SelectTrigger3,
+  SelectValue as SelectValue3,
+  Callout as Callout4,
+  EmptyState as EmptyState3,
+  LogicChip as LogicChip2,
+  Tabs as Tabs5,
+  TabsList as TabsList5,
+  TabsTrigger as TabsTrigger5,
+  TabsContent as TabsContent5,
+  CodeEditor as CodeEditor4
+} from "@jet-admin/ui";
+import {
+  Plus as Plus3,
+  Trash2 as Trash23,
+  Database as Database2,
+  Layers,
+  Filter as FilterIcon2,
+  ArrowUpDown as ArrowUpDown2,
+  SlidersHorizontal as SlidersHorizontal2,
+  GitBranch,
+  GripVertical as GripVertical2,
+  MoveUp as MoveUp2,
+  MoveDown as MoveDown2,
+  Check as Check2,
+  Copy,
+  Code2,
+  LayoutGrid
+} from "lucide-react";
+var AGG_FUNCTIONS = [
+  "NONE",
+  "COUNT",
+  "COUNT DISTINCT",
+  "SUM",
+  "AVG",
+  "MIN",
+  "MAX",
+  "ARRAY_AGG",
+  "STRING_AGG"
+];
+var JOIN_TYPES = ["INNER", "LEFT", "RIGHT", "FULL", "CROSS"];
+var JOIN_OPERATORS = ["=", "<>", "<", "<=", ">", ">="];
+var WHERE_OPERATORS = [
+  "=",
+  "<>",
+  "<",
+  "<=",
+  ">",
+  ">=",
+  "LIKE",
+  "NOT LIKE",
+  "ILIKE",
+  "NOT ILIKE",
+  "IN",
+  "NOT IN",
+  "BETWEEN",
+  "IS NULL",
+  "IS NOT NULL",
+  "IS DISTINCT FROM",
+  "IS NOT DISTINCT FROM"
+];
+var NO_VALUE_OPERATORS = /* @__PURE__ */ new Set(["IS NULL", "IS NOT NULL"]);
+var LIST_OPERATORS = /* @__PURE__ */ new Set(["IN", "NOT IN"]);
+var SORT_DIRECTIONS2 = [
+  { value: "ASC", label: "ASC (Ascending)" },
+  { value: "DESC", label: "DESC (Descending)" }
+];
+var NULLS_ORDER = [
+  { value: "DEFAULT", label: "\u2014 default \u2014" },
+  { value: "NULLS FIRST", label: "NULLS FIRST" },
+  { value: "NULLS LAST", label: "NULLS LAST" }
+];
+var TABS3 = [
+  { id: "select", label: "Select", icon: Layers },
+  { id: "from", label: "From / Join", icon: GitBranch },
+  { id: "where", label: "Where", icon: FilterIcon2 },
+  { id: "groupBy", label: "Group By", icon: Database2 },
+  { id: "orderBy", label: "Order By", icon: ArrowUpDown2 },
+  { id: "settings", label: "Settings", icon: SlidersHorizontal2 }
+];
+var genId2 = () => `_${Math.random().toString(36).slice(2, 9)}`;
+function newColumn() {
+  return { id: genId2(), expression: "", alias: "", aggFn: "NONE" };
+}
+function newJoinCondition() {
+  return { id: genId2(), left: "", operator: "=", right: "" };
+}
+function newJoin() {
+  return {
+    id: genId2(),
+    type: "INNER",
+    table: "",
+    alias: "",
+    conditions: [newJoinCondition()]
+  };
+}
+function newWhereCondition() {
+  return {
+    id: genId2(),
+    column: "",
+    operator: "=",
+    value: "",
+    valueType: "literal",
+    logic: "AND"
+  };
+}
+function newGroupByItem() {
+  return { id: genId2(), expression: "" };
+}
+function newOrderByItem() {
+  return { id: genId2(), expression: "", direction: "ASC", nulls: "DEFAULT" };
+}
+function normalise2(opts = {}) {
+  return {
+    // mode — "query" = raw SQL code editor, "gui" = visual builder
+    queryType: opts.queryType ?? "query",
+    query: opts.query ?? "",
+    // visual builder state
+    distinct: opts.distinct ?? false,
+    columns: Array.isArray(opts.columns) ? opts.columns : [],
+    schema: opts.schema ?? "",
+    table: opts.table ?? "",
+    tableAlias: opts.tableAlias ?? "",
+    joins: Array.isArray(opts.joins) ? opts.joins : [],
+    where: Array.isArray(opts.where) ? opts.where : [],
+    groupBy: Array.isArray(opts.groupBy) ? opts.groupBy : [],
+    having: Array.isArray(opts.having) ? opts.having : [],
+    orderBy: Array.isArray(opts.orderBy) ? opts.orderBy : [],
+    limit: opts.limit ?? "",
+    offset: opts.offset ?? ""
+  };
+}
+function quoteLiteral(raw) {
+  if (raw === void 0 || raw === null || raw === "") return "''";
+  const s = String(raw).trim();
+  if (/^-?\d+(\.\d+)?$/.test(s)) return s;
+  if (/^(true|false|null)$/i.test(s)) return s.toUpperCase();
+  return `'${s.replace(/'/g, "''")}'`;
+}
+function renderWhereCondition(cond) {
+  const col = cond.column || "?";
+  if (NO_VALUE_OPERATORS.has(cond.operator)) return `${col} ${cond.operator}`;
+  if (cond.operator === "BETWEEN") {
+    const [a, b] = (cond.value || "").split(",").map((s) => s.trim());
+    const fmt = (v) => cond.valueType === "column" ? v || "?" : quoteLiteral(v);
+    return `${col} BETWEEN ${fmt(a)} AND ${fmt(b)}`;
+  }
+  if (LIST_OPERATORS.has(cond.operator)) {
+    const vals = (cond.value || "").split(",").map((s) => s.trim()).filter(Boolean);
+    const formatted = vals.length ? vals.map((v) => cond.valueType === "column" ? v : quoteLiteral(v)).join(", ") : "?";
+    return `${col} ${cond.operator} (${formatted})`;
+  }
+  const val = cond.valueType === "column" ? cond.value || "?" : quoteLiteral(cond.value);
+  return `${col} ${cond.operator} ${val}`;
+}
+function renderConditionGroup(conditions) {
+  if (!conditions.length) return "";
+  const parts = [];
+  conditions.forEach((cond, idx) => {
+    if (!cond.column) return;
+    const rendered = renderWhereCondition(cond);
+    if (idx === 0) {
+      parts.push(rendered);
+    } else {
+      parts.push(`${cond.logic} ${rendered}`);
+    }
+  });
+  return parts.join("\n  ");
+}
+function buildSQL(opts) {
+  const lines = [];
+  const cols = (opts.columns || []).filter((c) => c.expression);
+  const selectList = cols.length ? cols.map((c) => {
+    const base = c.aggFn === "NONE" ? c.expression : c.aggFn === "COUNT DISTINCT" ? `COUNT(DISTINCT ${c.expression})` : c.aggFn === "STRING_AGG" ? `STRING_AGG(${c.expression}, ', ')` : `${c.aggFn}(${c.expression})`;
+    return c.alias ? `${base} AS ${c.alias}` : base;
+  }).join(",\n  ") : "*";
+  lines.push(`SELECT${opts.distinct ? " DISTINCT" : ""}
+  ${selectList}`);
+  const fromTable = opts.schema ? `${opts.schema}.${opts.table || "?table"}` : opts.table || "?table";
+  const fromClause = opts.tableAlias ? `${fromTable} AS ${opts.tableAlias}` : fromTable;
+  lines.push(`FROM ${fromClause}`);
+  (opts.joins || []).forEach((join) => {
+    if (!join.table) return;
+    const joinTable = join.alias ? `${join.table} AS ${join.alias}` : join.table;
+    if (join.type === "CROSS") {
+      lines.push(`CROSS JOIN ${joinTable}`);
+      return;
+    }
+    const conds = (join.conditions || []).filter((c) => c.left && c.right).map((c) => `${c.left} ${c.operator} ${c.right}`).join("\n    AND ");
+    lines.push(`${join.type} JOIN ${joinTable}${conds ? `
+  ON ${conds}` : ""}`);
+  });
+  const whereBody = renderConditionGroup(opts.where || []);
+  if (whereBody) lines.push(`WHERE
+  ${whereBody}`);
+  const gbItems = (opts.groupBy || []).filter((g) => g.expression).map((g) => g.expression);
+  if (gbItems.length) lines.push(`GROUP BY ${gbItems.join(", ")}`);
+  const havingBody = renderConditionGroup(opts.having || []);
+  if (havingBody && gbItems.length) lines.push(`HAVING
+  ${havingBody}`);
+  const obItems = (opts.orderBy || []).filter((o) => o.expression).map(
+    (o) => `${o.expression} ${o.direction}${o.nulls !== "DEFAULT" ? ` ${o.nulls}` : ""}`
+  );
+  if (obItems.length) lines.push(`ORDER BY ${obItems.join(", ")}`);
+  if (opts.limit !== "" && opts.limit !== null && opts.limit !== void 0)
+    lines.push(`LIMIT ${opts.limit}`);
+  if (opts.offset !== "" && opts.offset !== null && opts.offset !== void 0)
+    lines.push(`OFFSET ${opts.offset}`);
+  return lines.join("\n") + ";";
+}
+function SelectTab({ opts, update }) {
+  const columns = opts.columns;
+  const addColumn = () => update({ columns: [...columns, newColumn()] });
+  const removeColumn = (id) => update({ columns: columns.filter((c) => c.id !== id) });
+  const patchColumn = (id, patch) => update({ columns: columns.map((c) => c.id === id ? { ...c, ...patch } : c) });
+  const moveColumn = (index, dir) => {
+    const next = [...columns];
+    const target = index + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    update({ columns: next });
+  };
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement(Callout4, null, "Define which columns to return. Leave empty to select", " ", /* @__PURE__ */ React13.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[11px]" }, "*"), ". Use an aggregate function to summarise grouped data."), /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2 rounded border border-border bg-background px-3 py-2" }, /* @__PURE__ */ React13.createElement(
+    "input",
+    {
+      id: "pg-distinct",
+      type: "checkbox",
+      checked: opts.distinct,
+      onChange: (e) => update({ distinct: e.target.checked }),
+      className: "h-3.5 w-3.5 rounded-sm accent-primary"
+    }
+  ), /* @__PURE__ */ React13.createElement(Label4, { htmlFor: "pg-distinct", className: "cursor-pointer text-xs font-mono font-medium" }, "DISTINCT"), /* @__PURE__ */ React13.createElement("span", { className: "text-[11px] text-muted-foreground" }, "\u2014 eliminate duplicate rows from the result set")), columns.length === 0 ? /* @__PURE__ */ React13.createElement(
+    EmptyState3,
+    {
+      icon: Layers,
+      message: "No columns added \u2014 query will SELECT *.",
+      action: /* @__PURE__ */ React13.createElement(Button4, { type: "button", variant: "outline", size: "sm", onClick: addColumn }, /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }), "Add Column")
+    }
+  ) : /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement("div", { className: "grid grid-cols-[28px_28px_140px_1fr_100px_28px_28px] gap-2 items-center px-1" }, /* @__PURE__ */ React13.createElement("span", null), /* @__PURE__ */ React13.createElement("span", null), /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Aggregate"), /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Column / Expression"), /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Alias"), /* @__PURE__ */ React13.createElement("span", null), /* @__PURE__ */ React13.createElement("span", null)), columns.map((col, idx) => /* @__PURE__ */ React13.createElement(
+    "div",
+    {
+      key: col.id,
+      className: "grid grid-cols-[28px_28px_140px_1fr_100px_28px_28px] gap-2 items-center rounded border border-border bg-background px-2 py-2"
+    },
+    /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col gap-0.5" }, /* @__PURE__ */ React13.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => moveColumn(idx, -1),
+        disabled: idx === 0,
+        className: "flex items-center justify-center h-3 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+      },
+      /* @__PURE__ */ React13.createElement(MoveUp2, { className: "h-3 w-3" })
+    ), /* @__PURE__ */ React13.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => moveColumn(idx, 1),
+        disabled: idx === columns.length - 1,
+        className: "flex items-center justify-center h-3 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+      },
+      /* @__PURE__ */ React13.createElement(MoveDown2, { className: "h-3 w-3" })
+    )),
+    /* @__PURE__ */ React13.createElement(GripVertical2, { className: "h-3.5 w-3.5 text-muted-foreground/40 cursor-grab" }),
+    /* @__PURE__ */ React13.createElement(
+      Select3,
+      {
+        value: col.aggFn,
+        onValueChange: (val) => patchColumn(col.id, { aggFn: val })
+      },
+      /* @__PURE__ */ React13.createElement(SelectTrigger3, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ React13.createElement(SelectValue3, null)),
+      /* @__PURE__ */ React13.createElement(SelectContent3, null, AGG_FUNCTIONS.map((fn) => /* @__PURE__ */ React13.createElement(SelectItem3, { key: fn, value: fn, className: "text-xs font-mono" }, fn === "NONE" ? "\u2014 none \u2014" : fn)))
+    ),
+    /* @__PURE__ */ React13.createElement(
+      Input4,
+      {
+        placeholder: "column or expression",
+        value: col.expression,
+        onChange: (e) => patchColumn(col.id, { expression: e.target.value }),
+        className: "h-7 text-xs font-mono"
+      }
+    ),
+    /* @__PURE__ */ React13.createElement(
+      Input4,
+      {
+        placeholder: "alias",
+        value: col.alias,
+        onChange: (e) => patchColumn(col.id, { alias: e.target.value }),
+        className: "h-7 text-xs font-mono"
+      }
+    ),
+    /* @__PURE__ */ React13.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => removeColumn(col.id),
+        className: "flex items-center justify-center h-7 w-7 rounded border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+      },
+      /* @__PURE__ */ React13.createElement(Trash23, { className: "h-3.5 w-3.5" })
+    ),
+    /* @__PURE__ */ React13.createElement("span", null)
+  )), /* @__PURE__ */ React13.createElement(Button4, { type: "button", variant: "outline", size: "sm", onClick: addColumn, className: "w-full" }, /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }), "Add Column")));
+}
+function JoinConditionRow({ cond, onChange, onRemove, canRemove }) {
+  return /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React13.createElement(
+    Input4,
+    {
+      placeholder: "left.column",
+      value: cond.left,
+      onChange: (e) => onChange({ ...cond, left: e.target.value }),
+      className: "flex-1 h-7 text-xs font-mono"
+    }
+  ), /* @__PURE__ */ React13.createElement("div", { className: "w-20 shrink-0" }, /* @__PURE__ */ React13.createElement(
+    Select3,
+    {
+      value: cond.operator,
+      onValueChange: (val) => onChange({ ...cond, operator: val })
+    },
+    /* @__PURE__ */ React13.createElement(SelectTrigger3, { className: "h-7 text-xs" }, /* @__PURE__ */ React13.createElement(SelectValue3, null)),
+    /* @__PURE__ */ React13.createElement(SelectContent3, null, JOIN_OPERATORS.map((op) => /* @__PURE__ */ React13.createElement(SelectItem3, { key: op, value: op, className: "text-xs font-mono" }, op)))
+  )), /* @__PURE__ */ React13.createElement(
+    Input4,
+    {
+      placeholder: "right.column",
+      value: cond.right,
+      onChange: (e) => onChange({ ...cond, right: e.target.value }),
+      className: "flex-1 h-7 text-xs font-mono"
+    }
+  ), canRemove && /* @__PURE__ */ React13.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: onRemove,
+      className: "flex items-center justify-center h-7 w-7 rounded border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors shrink-0"
+    },
+    /* @__PURE__ */ React13.createElement(Trash23, { className: "h-3.5 w-3.5" })
+  ));
+}
+function FromJoinTab({ opts, update }) {
+  const joins = opts.joins;
+  const patchJoin = (id, patch) => update({ joins: joins.map((j) => j.id === id ? { ...j, ...patch } : j) });
+  const removeJoin = (id) => update({ joins: joins.filter((j) => j.id !== id) });
+  const addJoin = () => update({ joins: [...joins, newJoin()] });
+  const updateJoinCond = (joinId, condId, patch) => {
+    patchJoin(joinId, {
+      conditions: joins.find((j) => j.id === joinId).conditions.map((c) => c.id === condId ? { ...c, ...patch } : c)
+    });
+  };
+  const removeJoinCond = (joinId, condId) => {
+    patchJoin(joinId, {
+      conditions: joins.find((j) => j.id === joinId).conditions.filter((c) => c.id !== condId)
+    });
+  };
+  const addJoinCond = (joinId) => {
+    const join = joins.find((j) => j.id === joinId);
+    patchJoin(joinId, { conditions: [...join.conditions, newJoinCondition()] });
+  };
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React13.createElement(Callout4, null, "Set the base table for the query and optionally join additional tables. Use the schema field to qualify the table (e.g.", " ", /* @__PURE__ */ React13.createElement("code", { className: "bg-background px-0.5 rounded border border-border font-mono text-[11px]" }, "public"), ")."), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Base Table (FROM)"), /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React13.createElement(
+    Input4,
+    {
+      placeholder: "schema (e.g. public)",
+      value: opts.schema,
+      onChange: (e) => update({ schema: e.target.value }),
+      className: "w-40 h-7 text-xs font-mono"
+    }
+  ), /* @__PURE__ */ React13.createElement("span", { className: "text-muted-foreground text-xs shrink-0" }, "."), /* @__PURE__ */ React13.createElement(
+    Input4,
+    {
+      placeholder: "table_name",
+      value: opts.table,
+      onChange: (e) => update({ table: e.target.value }),
+      className: "flex-1 h-7 text-xs font-mono"
+    }
+  ), /* @__PURE__ */ React13.createElement("span", { className: "text-[11px] text-muted-foreground shrink-0" }, "AS"), /* @__PURE__ */ React13.createElement(
+    Input4,
+    {
+      placeholder: "alias",
+      value: opts.tableAlias,
+      onChange: (e) => update({ tableAlias: e.target.value }),
+      className: "w-28 h-7 text-xs font-mono"
+    }
+  ))), /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Joins"), joins.length === 0 ? /* @__PURE__ */ React13.createElement(
+    EmptyState3,
+    {
+      icon: GitBranch,
+      message: "No joins added.",
+      action: /* @__PURE__ */ React13.createElement(Button4, { type: "button", variant: "outline", size: "sm", onClick: addJoin }, /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }), "Add Join")
+    }
+  ) : /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, joins.map((join) => /* @__PURE__ */ React13.createElement(
+    "div",
+    {
+      key: join.id,
+      className: "rounded border border-border bg-muted/20 p-3 space-y-2"
+    },
+    /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React13.createElement("div", { className: "w-28 shrink-0" }, /* @__PURE__ */ React13.createElement(
+      Select3,
+      {
+        value: join.type,
+        onValueChange: (val) => patchJoin(join.id, { type: val })
+      },
+      /* @__PURE__ */ React13.createElement(SelectTrigger3, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ React13.createElement(SelectValue3, null)),
+      /* @__PURE__ */ React13.createElement(SelectContent3, null, JOIN_TYPES.map((t) => /* @__PURE__ */ React13.createElement(SelectItem3, { key: t, value: t, className: "text-xs font-mono" }, t)))
+    )), /* @__PURE__ */ React13.createElement("span", { className: "text-xs text-muted-foreground shrink-0 font-mono" }, "JOIN"), /* @__PURE__ */ React13.createElement(
+      Input4,
+      {
+        placeholder: "joined_table",
+        value: join.table,
+        onChange: (e) => patchJoin(join.id, { table: e.target.value }),
+        className: "flex-1 h-7 text-xs font-mono"
+      }
+    ), /* @__PURE__ */ React13.createElement("span", { className: "text-[11px] text-muted-foreground shrink-0" }, "AS"), /* @__PURE__ */ React13.createElement(
+      Input4,
+      {
+        placeholder: "alias",
+        value: join.alias,
+        onChange: (e) => patchJoin(join.id, { alias: e.target.value }),
+        className: "w-24 h-7 text-xs font-mono"
+      }
+    ), /* @__PURE__ */ React13.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => removeJoin(join.id),
+        className: "flex items-center justify-center h-7 w-7 rounded border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors shrink-0"
+      },
+      /* @__PURE__ */ React13.createElement(Trash23, { className: "h-3.5 w-3.5" })
+    )),
+    join.type !== "CROSS" && /* @__PURE__ */ React13.createElement("div", { className: "space-y-1 border-l border-border/60 pl-3" }, /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[9px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "ON"), join.conditions.map((cond) => /* @__PURE__ */ React13.createElement(
+      JoinConditionRow,
+      {
+        key: cond.id,
+        cond,
+        onChange: (patch) => updateJoinCond(join.id, cond.id, patch),
+        onRemove: () => removeJoinCond(join.id, cond.id),
+        canRemove: join.conditions.length > 1
+      }
+    )), /* @__PURE__ */ React13.createElement(
+      Button4,
+      {
+        type: "button",
+        variant: "ghost",
+        size: "sm",
+        onClick: () => addJoinCond(join.id),
+        className: "text-[11px] h-7"
+      },
+      /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3 w-3 mr-1" }),
+      "Add condition"
+    ))
+  )), /* @__PURE__ */ React13.createElement(Button4, { type: "button", variant: "outline", size: "sm", onClick: addJoin, className: "w-full" }, /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }), "Add Join"))));
+}
+function ConditionList({ conditions, onChange, clauseLabel = "WHERE" }) {
+  const addCondition = () => onChange([...conditions, newWhereCondition()]);
+  const removeCondition = (id) => onChange(conditions.filter((c) => c.id !== id));
+  const patchCondition = (id, patch) => onChange(conditions.map((c) => c.id === id ? { ...c, ...patch } : c));
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, conditions.length === 0 ? /* @__PURE__ */ React13.createElement(
+    EmptyState3,
+    {
+      icon: FilterIcon2,
+      message: `No ${clauseLabel} conditions \u2014 all rows will be included.`,
+      action: /* @__PURE__ */ React13.createElement(Button4, { type: "button", variant: "outline", size: "sm", onClick: addCondition }, /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }), "Add Condition")
+    }
+  ) : /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, conditions.map((cond, idx) => {
+    const needsValue = !NO_VALUE_OPERATORS.has(cond.operator);
+    const isList = LIST_OPERATORS.has(cond.operator);
+    const isBetween = cond.operator === "BETWEEN";
+    return /* @__PURE__ */ React13.createElement("div", { key: cond.id, className: "space-y-1" }, idx > 0 && /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2 py-0.5 pl-1" }, /* @__PURE__ */ React13.createElement("div", { className: "h-px flex-1 bg-border" }), /* @__PURE__ */ React13.createElement(
+      LogicChip2,
+      {
+        value: cond.logic,
+        onChange: (val) => patchCondition(cond.id, { logic: val })
+      }
+    ), /* @__PURE__ */ React13.createElement("div", { className: "h-px flex-1 bg-border" })), /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2 rounded border border-border bg-background px-3 py-2" }, /* @__PURE__ */ React13.createElement(
+      Input4,
+      {
+        placeholder: "column",
+        value: cond.column,
+        onChange: (e) => patchCondition(cond.id, { column: e.target.value }),
+        className: "h-7 text-xs font-mono flex-[2]"
+      }
+    ), /* @__PURE__ */ React13.createElement("div", { className: "flex-[2] min-w-[120px]" }, /* @__PURE__ */ React13.createElement(
+      Select3,
+      {
+        value: cond.operator,
+        onValueChange: (val) => patchCondition(cond.id, { operator: val })
+      },
+      /* @__PURE__ */ React13.createElement(SelectTrigger3, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ React13.createElement(SelectValue3, null)),
+      /* @__PURE__ */ React13.createElement(SelectContent3, null, WHERE_OPERATORS.map((op) => /* @__PURE__ */ React13.createElement(SelectItem3, { key: op, value: op, className: "text-xs font-mono" }, op)))
+    )), needsValue && /* @__PURE__ */ React13.createElement("div", { className: "w-24 shrink-0" }, /* @__PURE__ */ React13.createElement(
+      Select3,
+      {
+        value: cond.valueType,
+        onValueChange: (val) => patchCondition(cond.id, { valueType: val })
+      },
+      /* @__PURE__ */ React13.createElement(SelectTrigger3, { className: "h-7 text-xs" }, /* @__PURE__ */ React13.createElement(SelectValue3, null)),
+      /* @__PURE__ */ React13.createElement(SelectContent3, null, /* @__PURE__ */ React13.createElement(SelectItem3, { value: "literal", className: "text-xs" }, "Value"), /* @__PURE__ */ React13.createElement(SelectItem3, { value: "column", className: "text-xs" }, "Column"))
+    )), needsValue ? /* @__PURE__ */ React13.createElement(
+      Input4,
+      {
+        placeholder: isList ? "a, b, c" : isBetween ? "low, high" : "value or {{inputs.param}}",
+        value: cond.value,
+        onChange: (e) => patchCondition(cond.id, { value: e.target.value }),
+        className: "h-7 text-xs font-mono flex-[3]"
+      }
+    ) : /* @__PURE__ */ React13.createElement("div", { className: "flex-[3]" }), /* @__PURE__ */ React13.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => removeCondition(cond.id),
+        className: "flex items-center justify-center h-7 w-7 rounded border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors shrink-0"
+      },
+      /* @__PURE__ */ React13.createElement(Trash23, { className: "h-3.5 w-3.5" })
+    )));
+  }), /* @__PURE__ */ React13.createElement(
+    Button4,
+    {
+      type: "button",
+      variant: "outline",
+      size: "sm",
+      onClick: addCondition,
+      className: "w-full"
+    },
+    /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }),
+    "Add Condition"
+  )), conditions.length > 0 && /* @__PURE__ */ React13.createElement("div", { className: "rounded border border-border bg-muted/30 p-3 space-y-1" }, /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Dynamic values"), /* @__PURE__ */ React13.createElement("p", { className: "text-[11px] text-muted-foreground mt-1" }, "Use", " ", /* @__PURE__ */ React13.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "{{inputs.paramName}}"), " ", "in Value fields to inject runtime inputs from the query engine.")));
+}
+function WhereTab({ opts, update }) {
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement(Callout4, null, "Filter rows ", /* @__PURE__ */ React13.createElement("strong", null, "before"), " grouping. Conditions are applied in order; use the AND / OR chip to control how they combine."), /* @__PURE__ */ React13.createElement(
+    ConditionList,
+    {
+      conditions: opts.where,
+      onChange: (where) => update({ where }),
+      clauseLabel: "WHERE"
+    }
+  ));
+}
+function GroupByTab({ opts, update }) {
+  const groupBy = opts.groupBy;
+  const having = opts.having;
+  const addGroupBy = () => update({ groupBy: [...groupBy, newGroupByItem()] });
+  const removeGroupBy = (id) => update({ groupBy: groupBy.filter((g) => g.id !== id) });
+  const patchGroupBy = (id, expression) => update({ groupBy: groupBy.map((g) => g.id === id ? { ...g, expression } : g) });
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement(Callout4, null, "Group rows sharing the same values in the listed columns. Combine with aggregate functions (SUM, COUNT, etc.) in the Select tab."), groupBy.length === 0 ? /* @__PURE__ */ React13.createElement(
+    EmptyState3,
+    {
+      icon: Database2,
+      message: "No GROUP BY \u2014 results will not be aggregated.",
+      action: /* @__PURE__ */ React13.createElement(Button4, { type: "button", variant: "outline", size: "sm", onClick: addGroupBy }, /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }), "Add Group")
+    }
+  ) : /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, groupBy.map((item) => /* @__PURE__ */ React13.createElement(
+    "div",
+    {
+      key: item.id,
+      className: "flex items-center gap-2 rounded border border-border bg-background px-3 py-2"
+    },
+    /* @__PURE__ */ React13.createElement(
+      Input4,
+      {
+        placeholder: "column or expression",
+        value: item.expression,
+        onChange: (e) => patchGroupBy(item.id, e.target.value),
+        className: "h-7 text-xs font-mono flex-1"
+      }
+    ),
+    /* @__PURE__ */ React13.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => removeGroupBy(item.id),
+        className: "flex items-center justify-center h-7 w-7 rounded border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors shrink-0"
+      },
+      /* @__PURE__ */ React13.createElement(Trash23, { className: "h-3.5 w-3.5" })
+    )
+  )), /* @__PURE__ */ React13.createElement(
+    Button4,
+    {
+      type: "button",
+      variant: "outline",
+      size: "sm",
+      onClick: addGroupBy,
+      className: "w-full"
+    },
+    /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }),
+    "Add Group"
+  ))), groupBy.length > 0 && /* @__PURE__ */ React13.createElement("div", { className: "space-y-2 border-t border-border pt-4" }, /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Having (filter on aggregates)"), /* @__PURE__ */ React13.createElement(
+    ConditionList,
+    {
+      conditions: having,
+      onChange: (h) => update({ having: h }),
+      clauseLabel: "HAVING"
+    }
+  )));
+}
+function OrderByTab({ opts, update }) {
+  const orderBy = opts.orderBy;
+  const addOrder = () => update({ orderBy: [...orderBy, newOrderByItem()] });
+  const removeOrder = (id) => update({ orderBy: orderBy.filter((o) => o.id !== id) });
+  const patchOrder = (id, patch) => update({ orderBy: orderBy.map((o) => o.id === id ? { ...o, ...patch } : o) });
+  const moveOrder = (index, dir) => {
+    const next = [...orderBy];
+    const target = index + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    update({ orderBy: next });
+  };
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement(Callout4, null, "Sort the result set. Rules are applied top-to-bottom \u2014 the first entry is the primary sort key."), orderBy.length === 0 ? /* @__PURE__ */ React13.createElement(
+    EmptyState3,
+    {
+      icon: ArrowUpDown2,
+      message: "No ORDER BY \u2014 rows returned in natural table order.",
+      action: /* @__PURE__ */ React13.createElement(Button4, { type: "button", variant: "outline", size: "sm", onClick: addOrder }, /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }), "Add Sort")
+    }
+  ) : /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement("div", { className: "grid grid-cols-[24px_24px_1fr_130px_130px_28px] gap-2 items-center px-1" }, /* @__PURE__ */ React13.createElement("span", null), /* @__PURE__ */ React13.createElement("span", null), /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Column / Expression"), /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Direction"), /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "NULLS"), /* @__PURE__ */ React13.createElement("span", null)), orderBy.map((item, idx) => /* @__PURE__ */ React13.createElement(
+    "div",
+    {
+      key: item.id,
+      className: "grid grid-cols-[24px_24px_1fr_130px_130px_28px] gap-2 items-center rounded border border-border bg-background px-2 py-2"
+    },
+    /* @__PURE__ */ React13.createElement(
+      "span",
+      {
+        className: `inline-flex items-center justify-center h-5 w-5 rounded-full text-[10px] font-bold ${idx === 0 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`
+      },
+      idx + 1
+    ),
+    /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col gap-0.5" }, /* @__PURE__ */ React13.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => moveOrder(idx, -1),
+        disabled: idx === 0,
+        className: "flex items-center justify-center h-3 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+      },
+      /* @__PURE__ */ React13.createElement(MoveUp2, { className: "h-3 w-3" })
+    ), /* @__PURE__ */ React13.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => moveOrder(idx, 1),
+        disabled: idx === orderBy.length - 1,
+        className: "flex items-center justify-center h-3 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+      },
+      /* @__PURE__ */ React13.createElement(MoveDown2, { className: "h-3 w-3" })
+    )),
+    /* @__PURE__ */ React13.createElement(
+      Input4,
+      {
+        placeholder: "column or expression",
+        value: item.expression,
+        onChange: (e) => patchOrder(item.id, { expression: e.target.value }),
+        className: "h-7 text-xs font-mono"
+      }
+    ),
+    /* @__PURE__ */ React13.createElement(
+      Select3,
+      {
+        value: item.direction,
+        onValueChange: (val) => patchOrder(item.id, { direction: val })
+      },
+      /* @__PURE__ */ React13.createElement(SelectTrigger3, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ React13.createElement(SelectValue3, null)),
+      /* @__PURE__ */ React13.createElement(SelectContent3, null, SORT_DIRECTIONS2.map((d) => /* @__PURE__ */ React13.createElement(SelectItem3, { key: d.value, value: d.value, className: "text-xs font-mono" }, d.label)))
+    ),
+    /* @__PURE__ */ React13.createElement(
+      Select3,
+      {
+        value: item.nulls,
+        onValueChange: (val) => patchOrder(item.id, { nulls: val })
+      },
+      /* @__PURE__ */ React13.createElement(SelectTrigger3, { className: "h-7 text-xs" }, /* @__PURE__ */ React13.createElement(SelectValue3, null)),
+      /* @__PURE__ */ React13.createElement(SelectContent3, null, NULLS_ORDER.map((n) => /* @__PURE__ */ React13.createElement(SelectItem3, { key: n.value, value: n.value, className: "text-xs" }, n.label)))
+    ),
+    /* @__PURE__ */ React13.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => removeOrder(item.id),
+        className: "flex items-center justify-center h-7 w-7 rounded border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+      },
+      /* @__PURE__ */ React13.createElement(Trash23, { className: "h-3.5 w-3.5" })
+    )
+  )), /* @__PURE__ */ React13.createElement(Button4, { type: "button", variant: "outline", size: "sm", onClick: addOrder, className: "w-full" }, /* @__PURE__ */ React13.createElement(Plus3, { className: "h-3.5 w-3.5 mr-1" }), "Add Sort")));
+}
+function SettingsTab2({ opts, update }) {
+  const [copied, setCopied] = useState5(false);
+  const sql = useMemo2(() => buildSQL(opts), [opts]);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(sql);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+    }
+  };
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React13.createElement(Callout4, null, "Cap and paginate the result set with ", /* @__PURE__ */ React13.createElement("strong", null, "LIMIT"), " and", " ", /* @__PURE__ */ React13.createElement("strong", null, "OFFSET"), ". The generated SQL preview updates live as you configure the query."), /* @__PURE__ */ React13.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label4, { htmlFor: "pg-limit" }, "Limit"), /* @__PURE__ */ React13.createElement(
+    Input4,
+    {
+      id: "pg-limit",
+      type: "number",
+      min: "0",
+      placeholder: "no limit",
+      value: opts.limit,
+      onChange: (e) => update({ limit: e.target.value }),
+      className: "font-mono text-xs"
+    }
+  ), /* @__PURE__ */ React13.createElement("p", { className: "text-xs text-muted-foreground" }, "Maximum rows returned. Leave blank for no cap.")), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement(Label4, { htmlFor: "pg-offset" }, "Offset"), /* @__PURE__ */ React13.createElement(
+    Input4,
+    {
+      id: "pg-offset",
+      type: "number",
+      min: "0",
+      placeholder: "0",
+      value: opts.offset,
+      onChange: (e) => update({ offset: e.target.value }),
+      className: "font-mono text-xs"
+    }
+  ), /* @__PURE__ */ React13.createElement("p", { className: "text-xs text-muted-foreground" }, "Skip this many rows before returning results."))), /* @__PURE__ */ React13.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React13.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React13.createElement(Label4, { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block" }, "Generated SQL Preview"), /* @__PURE__ */ React13.createElement(
+    Button4,
+    {
+      type: "button",
+      variant: copied ? "default" : "outline",
+      size: "sm",
+      onClick: handleCopy,
+      className: "h-7 px-2 text-xs gap-1"
+    },
+    copied ? /* @__PURE__ */ React13.createElement(Check2, { className: "h-3 w-3" }) : /* @__PURE__ */ React13.createElement(Copy, { className: "h-3 w-3" }),
+    copied ? "Copied!" : "Copy"
+  )), /* @__PURE__ */ React13.createElement("div", { className: "rounded bg-muted/40 border border-border p-4 font-mono text-[11px] leading-relaxed overflow-x-auto text-foreground" }, /* @__PURE__ */ React13.createElement("pre", { className: "whitespace-pre-wrap break-words" }, sql)), /* @__PURE__ */ React13.createElement("p", { className: "text-[11px] text-muted-foreground" }, "This SQL is generated from your visual configuration and sent to the PostgreSQL datasource at query runtime.")));
+}
+function CodeEditorPanel({ opts, update }) {
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement(Callout4, null, "Write raw PostgreSQL SQL. Use", " ", /* @__PURE__ */ React13.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono text-[11px]" }, "{{inputs.paramName}}"), " ", "to inject runtime query inputs."), /* @__PURE__ */ React13.createElement(
+    CodeEditor4,
+    {
+      value: opts.query,
+      language: "pgsql",
+      onChange: (val) => update({ query: val }),
+      height: "280px",
+      showHeader: false,
+      className: "rounded border border-border"
+    }
+  ));
+}
+var PostgresQueryEditor = ({ queryEditorForm }) => {
+  const raw = queryEditorForm?.dataQueryOptions || {};
+  const opts = normalise2(raw);
+  const [activeTab, setActiveTab] = useState5("select");
+  const queryType = opts.queryType;
+  const isGUI = queryType === "gui";
+  const update = useCallback4(
+    (updates) => {
+      queryEditorForm.setQueryOptions({
+        ...opts,
+        ...updates
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [queryEditorForm, JSON.stringify(opts)]
+  );
+  const handleModeSwitch = useCallback4(
+    (newMode) => {
+      if (newMode === queryType) return;
+      if (newMode === "query") {
+        const generatedSQL = buildSQL(opts);
+        update({ queryType: "query", query: generatedSQL });
+      } else {
+        update({ queryType: "gui" });
+      }
+    },
+    [queryType, opts, update]
+  );
+  const badges = {
+    select: opts.columns.filter((c) => c.expression).length,
+    from: opts.joins.filter((j) => j.table).length,
+    where: opts.where.filter((c) => c.column).length,
+    groupBy: opts.groupBy.filter((g) => g.expression).length + opts.having.filter((c) => c.column).length,
+    orderBy: opts.orderBy.filter((o) => o.expression).length,
+    settings: (opts.limit !== "" && opts.limit !== null && opts.limit !== void 0 ? 1 : 0) + (opts.offset !== "" && opts.offset !== null && opts.offset !== void 0 ? 1 : 0)
+  };
+  return /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-1 rounded-md border border-border bg-muted/40 p-0.5 w-fit" }, /* @__PURE__ */ React13.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => handleModeSwitch("query"),
+      className: `inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors ${!isGUI ? "bg-background text-foreground shadow-sm border border-border" : "text-muted-foreground hover:text-foreground"}`
+    },
+    /* @__PURE__ */ React13.createElement(Code2, { className: "h-3.5 w-3.5" }),
+    "Code"
+  ), /* @__PURE__ */ React13.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => handleModeSwitch("gui"),
+      className: `inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors ${isGUI ? "bg-background text-foreground shadow-sm border border-border" : "text-muted-foreground hover:text-foreground"}`
+    },
+    /* @__PURE__ */ React13.createElement(LayoutGrid, { className: "h-3.5 w-3.5" }),
+    "GUI"
+  )), !isGUI && /* @__PURE__ */ React13.createElement(CodeEditorPanel, { opts, update }), isGUI && /* @__PURE__ */ React13.createElement(Tabs5, { value: activeTab, onValueChange: setActiveTab, className: "w-full" }, /* @__PURE__ */ React13.createElement(TabsList5, null, TABS3.map((tab) => {
+    const Icon = tab.icon;
+    const badgeCount = badges[tab.id];
+    return /* @__PURE__ */ React13.createElement(
+      TabsTrigger5,
+      {
+        key: tab.id,
+        value: tab.id,
+        className: "gap-1.5 px-3 py-2 text-xs"
+      },
+      Icon && /* @__PURE__ */ React13.createElement(Icon, { className: "h-3.5 w-3.5" }),
+      tab.label,
+      badgeCount > 0 && /* @__PURE__ */ React13.createElement("span", { className: "ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold" }, badgeCount)
+    );
+  })), /* @__PURE__ */ React13.createElement(TabsContent5, { value: "select", className: "mt-2 pb-2" }, /* @__PURE__ */ React13.createElement(SelectTab, { opts, update })), /* @__PURE__ */ React13.createElement(TabsContent5, { value: "from", className: "mt-2 pb-2" }, /* @__PURE__ */ React13.createElement(FromJoinTab, { opts, update })), /* @__PURE__ */ React13.createElement(TabsContent5, { value: "where", className: "mt-2 pb-2" }, /* @__PURE__ */ React13.createElement(WhereTab, { opts, update })), /* @__PURE__ */ React13.createElement(TabsContent5, { value: "groupBy", className: "mt-2 pb-2" }, /* @__PURE__ */ React13.createElement(GroupByTab, { opts, update })), /* @__PURE__ */ React13.createElement(TabsContent5, { value: "orderBy", className: "mt-2 pb-2" }, /* @__PURE__ */ React13.createElement(OrderByTab, { opts, update })), /* @__PURE__ */ React13.createElement(TabsContent5, { value: "settings", className: "mt-2 pb-2" }, /* @__PURE__ */ React13.createElement(SettingsTab2, { opts, update }))));
+};
+
 // src/components/common/genericDatasourceTestResultUI.js
-import React13 from "react";
+import React14 from "react";
 var GenericDatasourceTestResultUI = ({ connectionResult }) => {
   console.log("connectionResult", connectionResult);
   let status = "untested";
@@ -1252,25 +2071,25 @@ var GenericDatasourceTestResultUI = ({ connectionResult }) => {
       container: "bg-primary/5 border-primary/20 text-primary",
       badge: "bg-primary/10 text-primary border border-primary/20",
       badgeText: "Success",
-      icon: /* @__PURE__ */ React13.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React13.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" }))
+      icon: /* @__PURE__ */ React14.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React14.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" }))
     },
     error: {
       container: "bg-destructive/5 border-destructive/20 text-destructive",
       badge: "bg-destructive/10 text-destructive border border-destructive/20",
       badgeText: "Failed",
-      icon: /* @__PURE__ */ React13.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React13.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" }))
+      icon: /* @__PURE__ */ React14.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React14.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" }))
     },
     warning: {
       container: "bg-amber-500/5 border-amber-500/20 text-amber-500",
       badge: "bg-amber-500/10 text-amber-500 border border-amber-500/20",
       badgeText: "Warning",
-      icon: /* @__PURE__ */ React13.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React13.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" }))
+      icon: /* @__PURE__ */ React14.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React14.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" }))
     },
     untested: {
       container: "bg-muted/30 border-border text-muted-foreground",
       badge: "bg-muted/50 text-muted-foreground border border-border/50",
       badgeText: "Untested",
-      icon: /* @__PURE__ */ React13.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React13.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }))
+      icon: /* @__PURE__ */ React14.createElement("svg", { className: "w-4 h-4 flex-shrink-0", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", strokeWidth: "2" }, /* @__PURE__ */ React14.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }))
     }
   };
   const currentStyle = styles[status];
@@ -1286,30 +2105,35 @@ var GenericDatasourceTestResultUI = ({ connectionResult }) => {
         text = String(details);
       }
     }
-    return /* @__PURE__ */ React13.createElement("div", { className: "mt-4 pt-4 border-t border-current/10 w-full space-y-2" }, /* @__PURE__ */ React13.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80" }, "Details / Logs"), /* @__PURE__ */ React13.createElement("div", { className: "rounded-md bg-foreground text-background p-4 font-mono text-xs leading-relaxed overflow-x-auto max-h-60 border border-border/50" }, /* @__PURE__ */ React13.createElement("code", null, text)));
+    return /* @__PURE__ */ React14.createElement("div", { className: `rounded bg-background w-full text-muted-foreground p-2 text-xs leading-relaxed overflow-x-auto max-h-60 border border-border/50 ${currentStyle.container} !bg-background` }, /* @__PURE__ */ React14.createElement("code", null, text));
   };
-  return /* @__PURE__ */ React13.createElement("div", { className: "w-full" }, /* @__PURE__ */ React13.createElement("div", { className: `w-full flex flex-col justify-start items-start p-4 rounded-md border transition-all duration-200 ${currentStyle.container}` }, /* @__PURE__ */ React13.createElement("div", { className: "flex flex-row justify-between items-center w-full gap-4" }, /* @__PURE__ */ React13.createElement("div", { className: "flex flex-row justify-start items-center gap-3" }, currentStyle.icon, /* @__PURE__ */ React13.createElement("span", { className: "text-sm font-medium tracking-tight" }, title)), /* @__PURE__ */ React13.createElement("span", { className: `text-[10px] font-mono font-medium uppercase px-2 py-0.5 rounded-full ${currentStyle.badge}` }, currentStyle.badgeText)), renderDetails()));
+  return /* @__PURE__ */ React14.createElement("div", { className: "w-full" }, /* @__PURE__ */ React14.createElement("div", { className: `w-full flex flex-col justify-start items-start p-2 rounded border transition-all duration-200 space-y-2 ${currentStyle.container}` }, /* @__PURE__ */ React14.createElement("div", { className: "flex flex-row justify-between items-center w-full gap-2" }, /* @__PURE__ */ React14.createElement("div", { className: "flex flex-row justify-start items-center gap-2" }, currentStyle.icon, /* @__PURE__ */ React14.createElement("span", { className: "text-sm font-medium tracking-tight" }, title)), /* @__PURE__ */ React14.createElement("span", { className: `text-[10px] font-mono font-medium uppercase px-2 py-1 rounded ${currentStyle.badge}` }, currentStyle.badgeText)), renderDetails()));
 };
 
 // src/index.js
 var createGenericDatasourceUI = () => ({
   queryResponseView: function({ queryResult }) {
-    return React14.createElement(QueryResponseView, { queryResult });
+    return React15.createElement(QueryResponseView, { queryResult });
   },
   datasourceTestResultUI: function({ connectionResult }) {
-    return React14.createElement(GenericDatasourceTestResultUI, { connectionResult });
+    return React15.createElement(GenericDatasourceTestResultUI, { connectionResult });
   }
 });
 var createWebUrlDatasourceUI = () => ({
   queryResponseView: function({ queryResult }) {
-    return React14.createElement(WebViewQueryResponseView, { queryResult });
+    return React15.createElement(WebViewQueryResponseView, { queryResult });
   },
   datasourceTestResultUI: function({ connectionResult }) {
-    return React14.createElement(GenericDatasourceTestResultUI, { connectionResult });
+    return React15.createElement(GenericDatasourceTestResultUI, { connectionResult });
   }
 });
 var DATASOURCE_UI_COMPONENTS = {
-  [DATASOURCE_TYPES.POSTGRESQL.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.POSTGRESQL.value]: {
+    ...createGenericDatasourceUI(),
+    dedicatedQueryEditor: function({ queryEditorForm }) {
+      return React15.createElement(PostgresQueryEditor, { queryEditorForm });
+    }
+  },
   [DATASOURCE_TYPES.RESTAPI.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.WEB_URL.value]: createWebUrlDatasourceUI(),
   [DATASOURCE_TYPES.FIRESTORE.value]: createGenericDatasourceUI(),
@@ -1318,10 +2142,10 @@ var DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.GOOGLESHEETS.value]: {
     ...createGenericDatasourceUI(),
     dedicatedDatasourceEditor: function({ datasourceEditorForm }) {
-      return React14.createElement(GoogleSheetsDatasourceEditor, { datasourceEditorForm });
+      return React15.createElement(GoogleSheetsDatasourceEditor, { datasourceEditorForm });
     },
     dedicatedQueryEditor: function({ queryEditorForm }) {
-      return React14.createElement(GoogleSheetsQueryEditor, { queryEditorForm });
+      return React15.createElement(GoogleSheetsQueryEditor, { queryEditorForm });
     }
   },
   [DATASOURCE_TYPES.GRAPHQL.value]: createGenericDatasourceUI(),
@@ -1357,7 +2181,7 @@ var DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.EXCELCSV.value]: {
     ...createGenericDatasourceUI(),
     dedicatedQueryEditor: function({ queryEditorForm }) {
-      return React14.createElement(ExcelCSVQueryBuilder, { queryEditorForm });
+      return React15.createElement(ExcelCSVQueryBuilder, { queryEditorForm });
     }
   }
 };

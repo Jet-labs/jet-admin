@@ -20,7 +20,7 @@ function FieldError({ message }) {
   return <p className="text-xs text-red-500">{message}</p>;
 }
 
-const initialValues = {
+const EMPTY_INITIAL_VALUES = {
   roleTitle: "",
   roleDescription: "",
   permissionIDs: [],
@@ -92,13 +92,18 @@ export const TenantRoleUpdationForm = () => {
       },
     });
 
-  const updateTenantRoleByIDForm = useFormik({
-    initialValues: tenantRole ? {
+  const formInitialValues = useMemo(() => {
+    if (!tenantRole) return EMPTY_INITIAL_VALUES;
+    return {
       roleTitle: tenantRole.roleTitle || "",
       roleDescription: tenantRole.roleDescription || "",
       permissionIDs: parsedPermissions.permissionIDs,
       assetPermissions: parsedPermissions.assetPermissions,
-    } : initialValues,
+    };
+  }, [tenantRole, parsedPermissions]);
+
+  const updateTenantRoleByIDForm = useFormik({
+    initialValues: formInitialValues,
     enableReinitialize: true,
     validationSchema: formValidations.updateTenantRoleFormValidationSchema,
     onSubmit: ({ roleTitle, roleDescription, permissionIDs, assetPermissions }) => {
@@ -153,7 +158,7 @@ export const TenantRoleUpdationForm = () => {
                   noValidate
                 >
                   <Section title="Identity" description="General information about the role.">
-                    <div className="space-y-1.5">
+                    <div className="space-y-1">
                       <Label htmlFor="roleTitle">
                         {CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_FORM_ROLE_NAME_FIELD_LABEL}{" "}
                         <span className="text-destructive">*</span>
@@ -174,7 +179,7 @@ export const TenantRoleUpdationForm = () => {
                       <FieldError message={updateTenantRoleByIDForm.touched.roleTitle && updateTenantRoleByIDForm.errors.roleTitle} />
                     </div>
 
-                    <div className="space-y-1.5">
+                    <div className="space-y-1">
                       <Label htmlFor="roleDescription">
                         {
                           CONSTANTS.STRINGS

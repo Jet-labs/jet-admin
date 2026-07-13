@@ -190,7 +190,7 @@ var React2 = __toESM(require("react"));
 var import_react_slot = require("@radix-ui/react-slot");
 var import_class_variance_authority = require("class-variance-authority");
 var buttonVariants = (0, import_class_variance_authority.cva)(
-  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 rounded",
   {
     variants: {
       variant: {
@@ -208,10 +208,10 @@ var buttonVariants = (0, import_class_variance_authority.cva)(
         "primary-outline": "bg-transparent text-primary border border-primary/50 hover:bg-primary/10"
       },
       size: {
-        default: "h-8 px-3 text-sm rounded-sm",
-        sm: "h-7 px-2.5 text-xs rounded-sm",
-        lg: "h-10 px-5 text-sm rounded-sm",
-        icon: "h-7 w-7 rounded-sm",
+        default: "h-8 px-3 text-sm rounded",
+        sm: "h-7 px-2.5 text-xs rounded",
+        lg: "h-10 px-5 text-sm rounded",
+        icon: "h-7 w-7 rounded",
         circle: "h-9 w-9 p-0 rounded-full",
         pill: "h-8 px-4 text-sm rounded-full"
       },
@@ -262,7 +262,7 @@ var AlertDialogContent = React3.forwardRef(
     {
       ref,
       className: cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-sm translate-x-[-50%] translate-y-[-50%] gap-3 border border-border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-sm translate-x-[-50%] translate-y-[-50%] gap-3 border border-border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded",
         className
       ),
       ...props
@@ -376,7 +376,7 @@ AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 var React5 = __toESM(require("react"));
 var import_class_variance_authority2 = require("class-variance-authority");
 var badgeVariants = (0, import_class_variance_authority2.cva)(
-  "inline-flex items-center rounded-pill px-[8px] py-[4px] text-[12px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2",
+  "inline-flex items-center rounded px-[8px] py-[4px] text-[12px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2",
   {
     variants: {
       variant: {
@@ -404,7 +404,7 @@ var Card = React6.forwardRef(({ className, variant = "default", ...props }, ref)
   {
     ref,
     className: cn(
-      "rounded-md bg-background border border-border text-foreground",
+      "rounded bg-background border border-border text-foreground",
       variant === "glass" && "bg-background/80 backdrop-blur-xl saturate-150",
       variant === "pastel" && "bg-muted",
       className
@@ -417,7 +417,7 @@ var CardHeader = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE_
   "div",
   {
     ref,
-    className: cn("flex flex-col space-y-1.5 p-6", className),
+    className: cn("flex flex-col space-y-1 p-6", className),
     ...props
   }
 ));
@@ -505,25 +505,26 @@ var DialogContent = React8.forwardRef(
     {
       ref,
       className: cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-md",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded",
         className
       ),
       ...props
     },
-    children,
-    !hideCloseIcon && /* @__PURE__ */ React8.createElement(DialogPrimitive.Close, { className: "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground" }, /* @__PURE__ */ React8.createElement(import_lucide_react3.X, { className: "h-4 w-4" }), /* @__PURE__ */ React8.createElement("span", { className: "sr-only" }, "Close"))
+    children
   ))
 );
 DialogContent.displayName = DialogPrimitive.Content.displayName;
-var DialogHeader = ({ className, ...props }) => /* @__PURE__ */ React8.createElement(
+var DialogHeader = ({ className, children, hideCloseIcon = false, ...props }) => /* @__PURE__ */ React8.createElement(
   "div",
   {
     className: cn(
-      "flex flex-col space-y-1.5 text-center sm:text-left",
+      "flex flex-row justify-between",
       className
     ),
     ...props
-  }
+  },
+  children,
+  !hideCloseIcon && /* @__PURE__ */ React8.createElement(DialogPrimitive.Close, { className: "rounded opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground" }, /* @__PURE__ */ React8.createElement(import_lucide_react3.X, { className: "h-4 w-4" }), /* @__PURE__ */ React8.createElement("span", { className: "sr-only" }, "Close"))
 );
 DialogHeader.displayName = "DialogHeader";
 var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ React8.createElement(
@@ -575,7 +576,7 @@ var DropdownMenuSubTrigger = React9.forwardRef(
     {
       ref,
       className: cn(
-        "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-muted data-[state=open]:bg-muted",
+        "flex cursor-default select-none items-center rounded px-2 py-1.5 text-sm outline-none focus:bg-muted data-[state=open]:bg-muted",
         inset && "pl-8",
         className
       ),
@@ -592,7 +593,7 @@ var DropdownMenuSubContent = React9.forwardRef(
     {
       ref,
       className: cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-sm border border-border bg-background p-1 text-foreground shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 min-w-[8rem] overflow-hidden rounded border border-border bg-background p-1 text-foreground shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -607,7 +608,7 @@ var DropdownMenuContent = React9.forwardRef(
       ref,
       sideOffset,
       className: cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-sm border border-border bg-background p-1 text-foreground shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 min-w-[8rem] overflow-hidden rounded border border-border bg-background p-1 text-foreground shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -621,7 +622,7 @@ var DropdownMenuItem = React9.forwardRef(
     {
       ref,
       className: cn(
-        "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex cursor-default select-none items-center rounded px-2 py-1.5 text-sm outline-none transition-colors focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         inset && "pl-8",
         className
       ),
@@ -636,7 +637,7 @@ var DropdownMenuCheckboxItem = React9.forwardRef(
     {
       ref,
       className: cn(
-        "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex cursor-default select-none items-center rounded py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       ),
       checked,
@@ -678,7 +679,7 @@ DropdownMenuShortcut.displayName = "DropdownMenuShortcut";
 var React10 = __toESM(require("react"));
 var import_class_variance_authority3 = require("class-variance-authority");
 var inputVariants = (0, import_class_variance_authority3.cva)(
-  "flex w-full rounded-sm border border-input-custom bg-input-custom text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-border/80 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
+  "flex w-full rounded border border-input-custom bg-input-custom text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-border/80 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       size: {
@@ -735,7 +736,7 @@ var PopoverContent = React12.forwardRef(
       align,
       sideOffset,
       className: cn(
-        "z-50 w-72 rounded-sm border border-border bg-background p-4 text-foreground shadow-none outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 w-72 rounded border border-border bg-background p-4 text-foreground shadow-none outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -822,7 +823,7 @@ var SelectTrigger = React15.forwardRef(
     {
       ref,
       className: cn(
-        "flex w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+        "flex w-full items-center justify-between rounded border border-input-custom bg-input-custom text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
         size === "default" && "h-8 px-2.5 py-1.5 text-sm",
         size === "sm" && "h-7 px-2 text-xs",
         className
@@ -870,7 +871,7 @@ var SelectContent = React15.forwardRef(
     {
       ref,
       className: cn(
-        "relative z-[1100] max-h-96 min-w-[8rem] overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "relative z-[1100] max-h-96 min-w-[8rem] overflow-hidden rounded border border-border bg-background text-foreground shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         position === "popper" && "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
       ),
@@ -907,7 +908,7 @@ var SelectItem = React15.forwardRef(
     {
       ref,
       className: cn(
-        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex w-full cursor-default select-none items-center rounded py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       ),
       ...props
@@ -1036,7 +1037,7 @@ var Textarea = React20.forwardRef(({ className, ...props }, ref) => {
     "textarea",
     {
       className: cn(
-        "flex min-h-[80px] w-full rounded-sm border border-border bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-border/80 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
+        "flex min-h-[80px] w-full rounded border border-border bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-border/80 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
         className
       ),
       ref,
@@ -1059,7 +1060,7 @@ var TooltipContent = React21.forwardRef(
       ref,
       sideOffset,
       className: cn(
-        "z-50 overflow-hidden rounded-sm border border-border bg-background px-3 py-1.5 text-sm text-foreground shadow-none animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 overflow-hidden rounded border border-border bg-background px-3 py-1.5 text-sm text-foreground shadow-none animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       ),
       ...props
@@ -1489,9 +1490,9 @@ var CodeEditor = React23.forwardRef(({
     "div",
     {
       className: cn(
-        "flex flex-col overflow-hidden rounded-md border text-sm shadow-sm transition-colors",
+        "flex flex-col overflow-hidden rounded border text-sm shadow-sm transition-colors",
         status === "error" ? "border-destructive/50 ring-1 ring-destructive/20" : "border-border hover:border-border/80",
-        isExpanded ? "fixed inset-4 z-50 rounded-md shadow-2xl ring-1 ring-border/50 bg-background" : "relative bg-background",
+        isExpanded ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-background" : "relative bg-background",
         className
       ),
       ...props
@@ -1960,7 +1961,18 @@ var TemplateAutocompleteInput = ({
           tr.changes.iterChanges((_fromA, _toA, _fromB, _toB, inserted) => {
             if (inserted.toString().includes("\n")) hasNewline = true;
           });
-          return hasNewline ? [] : tr;
+          if (hasNewline) {
+            const newChanges = [];
+            tr.changes.iterChanges((fromA, toA, _fromB, _toB, inserted) => {
+              const cleanedText = inserted.toString().replace(/\r?\n$/, "").replace(/\r?\n/g, " ");
+              newChanges.push({ from: fromA, to: toA, insert: cleanedText });
+            });
+            return {
+              changes: newChanges,
+              sequential: true
+            };
+          }
+          return tr;
         })
       );
     }
@@ -2007,7 +2019,7 @@ var TemplateAutocompleteInput = ({
   return /* @__PURE__ */ import_react4.default.createElement("div", { className: `relative w-full ${className}` }, /* @__PURE__ */ import_react4.default.createElement(
     "div",
     {
-      className: `bg-input-custom border border-input-custom rounded-sm transition-shadow duration-150 [&:has(.cm-focused)]:border-border/80 [&:has(.cm-focused)]:ring-2 [&:has(.cm-focused)]:ring-primary/30`
+      className: `bg-input-custom border border-input-custom rounded transition-shadow duration-150 [&:has(.cm-focused)]:border-border/80 [&:has(.cm-focused)]:ring-2 [&:has(.cm-focused)]:ring-primary/30`
     },
     /* @__PURE__ */ import_react4.default.createElement(
       "div",
@@ -2126,7 +2138,7 @@ function InputValuesForm({
         ));
     }
   };
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: className || "space-y-3" }, inputDefinitions.map((inputDef) => /* @__PURE__ */ import_react5.default.createElement("div", { key: inputDef.key, className: "space-y-1" }, renderField(inputDef), errors[inputDef.key] && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-destructive text-xs" }, errors[inputDef.key]))));
+  return /* @__PURE__ */ import_react5.default.createElement("div", { className: className || "space-y-2" }, inputDefinitions.map((inputDef) => /* @__PURE__ */ import_react5.default.createElement("div", { key: inputDef.key, className: "space-y-1" }, renderField(inputDef), errors[inputDef.key] && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-destructive text-xs" }, errors[inputDef.key]))));
 }
 InputValuesForm.propTypes = {
   inputDefinitions: import_prop_types3.default.arrayOf(
@@ -2165,19 +2177,7 @@ var PageHeader = ({
   parentTitle,
   children
 }) => {
-  return /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-3 px-4" }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex items-center gap-4" }, parentTitle && /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(
-    "h1",
-    {
-      className: "text-base font-semibold tracking-tight text-foreground leading-none"
-    },
-    parentTitle
-  ), /* @__PURE__ */ import_react6.default.createElement(
-    "span",
-    {
-      className: "text-base font-semibold tracking-tight text-foreground leading-none"
-    },
-    "/"
-  )), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("h1", { className: "text-base font-semibold tracking-tight text-foreground leading-none" }, title), id && /* @__PURE__ */ import_react6.default.createElement("p", { className: "mt-1.5 font-mono text-xs text-muted-foreground" }, "ID: ", id))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex items-center gap-2" }, children, hasHistory && onHistory && /* @__PURE__ */ import_react6.default.createElement(Button, { variant: "outline", size: "sm", onClick: onHistory }, "View History"), onClone && /* @__PURE__ */ import_react6.default.createElement(Button, { variant: "outline", size: "sm", onClick: onClone, disabled: isCloning }, isCloning && /* @__PURE__ */ import_react6.default.createElement(Spinner, { size: 14, className: "mr-2" }), "Clone"), onDelete && /* @__PURE__ */ import_react6.default.createElement(
+  return /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-2" }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex items-center gap-4" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("h1", { className: "text-base font-semibold tracking-tight text-foreground leading-none" }, title), id && /* @__PURE__ */ import_react6.default.createElement("p", { className: "mt-1.5 font-mono text-xs text-muted-foreground" }, "ID: ", id))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex items-center gap-2" }, children, hasHistory && onHistory && /* @__PURE__ */ import_react6.default.createElement(Button, { variant: "outline", size: "sm", onClick: onHistory }, "View History"), onClone && /* @__PURE__ */ import_react6.default.createElement(Button, { variant: "outline", size: "sm", onClick: onClone, disabled: isCloning }, isCloning && /* @__PURE__ */ import_react6.default.createElement(Spinner, { size: 14, className: "mr-2" }), "Clone"), onDelete && /* @__PURE__ */ import_react6.default.createElement(
     Button,
     {
       variant: "outline",
@@ -2216,7 +2216,7 @@ var Section = React28.forwardRef(
       {
         ref,
         className: cn(
-          "rounded-md border border-border bg-card",
+          "rounded border border-border bg-card",
           className
         ),
         ...props
@@ -2313,13 +2313,13 @@ var GoogleOAuthButton = ({
   hasErrors,
   errors
 }) => {
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1.5 w-full" }, /* @__PURE__ */ import_react8.default.createElement(
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1 w-full" }, /* @__PURE__ */ import_react8.default.createElement(
     Label2,
     {
       className: `block text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
     },
     label || description || "Google Authentication"
-  ), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center gap-3 p-4 border border-border rounded-md bg-card text-card-foreground shadow-sm" }, isConnected ? /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 flex-1" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react13.CheckCircle2, { className: "w-5 h-5 text-emerald-500 flex-shrink-0" }), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Google Account Connected"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground font-mono truncate max-w-xs sm:max-w-md" }, "Credential ID: ", credentialId))), /* @__PURE__ */ import_react8.default.createElement(
+  ), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center gap-3 p-4 border border-border rounded bg-card text-card-foreground shadow-sm" }, isConnected ? /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 flex-1" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react13.CheckCircle2, { className: "w-5 h-5 text-emerald-500 flex-shrink-0" }), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Google Account Connected"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground font-mono truncate max-w-xs sm:max-w-md" }, "Credential ID: ", credentialId))), /* @__PURE__ */ import_react8.default.createElement(
     Button,
     {
       type: "button",
@@ -2364,7 +2364,7 @@ var Callout = React31.forwardRef(({ className, children, icon: Icon2 = import_lu
     {
       ref,
       className: cn(
-        "rounded-sm border border-primary/20 bg-primary/5 p-3 text-[11px] text-primary flex gap-2",
+        "rounded border border-primary/20 bg-primary/5 p-3 text-[11px] text-primary flex gap-2",
         className
       ),
       ...props
@@ -2383,7 +2383,7 @@ var EmptyState = React32.forwardRef(({ className, icon: Icon2, message, action, 
     {
       ref,
       className: cn(
-        "rounded-sm border border-border border-dashed bg-muted/30 py-8 flex flex-col items-center gap-2",
+        "rounded border border-border border-dashed bg-muted/30 py-8 flex flex-col items-center gap-2",
         className
       ),
       ...props
@@ -2422,7 +2422,7 @@ var import_lucide_react15 = require("lucide-react");
 var SelectPrimitive2 = __toESM(require("@radix-ui/react-select"));
 var import_class_variance_authority5 = require("class-variance-authority");
 var searchSelectVariants = (0, import_class_variance_authority5.cva)(
-  "flex w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
+  "flex w-full items-center justify-between rounded border border-input-custom bg-input-custom text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       size: {
@@ -2527,7 +2527,7 @@ var SearchSelect = React34.forwardRef(
             e.preventDefault();
             searchInputRef.current?.focus();
           },
-          className: "relative z-[1200] max-h-96 min-w-[200px] w-[var(--radix-select-trigger-width)] overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1"
+          className: "relative z-[1200] max-h-96 min-w-[200px] w-[var(--radix-select-trigger-width)] overflow-hidden rounded border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1"
         },
         /* @__PURE__ */ React34.createElement(
           "div",
@@ -2563,7 +2563,7 @@ var SearchSelect = React34.forwardRef(
                 key: option.value,
                 value: itemValue,
                 className: cn(
-                  "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm text-left outline-none focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                  "relative flex w-full cursor-default select-none items-center rounded py-1.5 pl-8 pr-2 text-sm text-left outline-none focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
                   isSelected && "font-medium"
                 )
               },
@@ -2647,7 +2647,7 @@ var MultiSearchSelect = React35.forwardRef(
         type: "button",
         disabled,
         className: cn(
-          "flex min-h-8 w-full items-center flex-wrap gap-1 rounded-sm border border-input-custom bg-input-custom px-2 py-1 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50 text-left",
+          "flex min-h-8 w-full items-center flex-wrap gap-1 rounded border border-input-custom bg-input-custom p-1 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-border/80 focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50 text-left",
           className
         )
       },
@@ -2669,7 +2669,7 @@ var MultiSearchSelect = React35.forwardRef(
             {
               role: "button",
               tabIndex: -1,
-              className: "rounded-sm p-0 hover:bg-muted-foreground/20 cursor-pointer",
+              className: "rounded p-0 hover:bg-muted-foreground/20 cursor-pointer",
               onPointerDown: (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -2690,7 +2690,7 @@ var MultiSearchSelect = React35.forwardRef(
           e.preventDefault();
           setTimeout(() => searchInputRef.current?.focus(), 0);
         },
-        className: "z-[1200] w-[var(--radix-popover-trigger-width)] max-h-80 overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
+        className: "z-[1200] w-[var(--radix-popover-trigger-width)] max-h-80 overflow-hidden rounded border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
       },
       /* @__PURE__ */ React35.createElement(
         "div",
@@ -2719,7 +2719,7 @@ var MultiSearchSelect = React35.forwardRef(
             role: "option",
             "aria-selected": isSelected,
             className: cn(
-              "relative flex w-full cursor-pointer select-none items-start rounded-sm py-1.5 pl-8 pr-2 text-sm text-left outline-none hover:bg-muted",
+              "relative flex w-full cursor-pointer select-none items-start rounded py-1.5 pl-8 pr-2 text-sm text-left outline-none hover:bg-muted",
               isSelected && "font-medium"
             ),
             onClick: () => toggleOption(option.value)

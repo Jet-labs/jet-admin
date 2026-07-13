@@ -5,7 +5,7 @@ const Card = React.forwardRef(({ className, variant = "default", ...props }, ref
   <div
     ref={ref}
     className={cn(
-      "rounded-md bg-background border border-border text-foreground",
+      "rounded bg-background border border-border text-foreground",
       variant === "glass" && "bg-background/80 backdrop-blur-xl saturate-150",
       variant === "pastel" && "bg-muted",
       className
@@ -18,7 +18,7 @@ Card.displayName = "Card";
 const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={cn("flex flex-col space-y-1 p-6", className)}
     {...props}
   />
 ));

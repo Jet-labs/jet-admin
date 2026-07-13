@@ -103,7 +103,7 @@ function SourceTab({ opts, update }) {
       </Callout>
 
       <div className="grid grid-cols-2 gap-2">
-        <div className="space-y-2">
+        <div className="space-y-1">
           <Label htmlFor="sheetName">Sheet Name</Label>
           <Input
             id="sheetName"
@@ -117,7 +117,7 @@ function SourceTab({ opts, update }) {
           </p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <Label htmlFor="headerRow">Header Row</Label>
           <Input
             id="headerRow"
@@ -205,7 +205,7 @@ function ColumnsTab({ opts, update }) {
           {columns.map((col, idx) => (
             <div
               key={col.id}
-              className={`grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center rounded-sm border px-2 py-2 transition-colors ${col.enabled
+              className={`grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center rounded border px-2 py-2 transition-colors ${col.enabled
                   ? "border-border bg-background"
                   : "border-border/50 bg-muted/30 opacity-60"
                 }`}
@@ -360,7 +360,7 @@ function FilterTab({ opts, update }) {
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 rounded-sm border border-border bg-background px-3 py-2">
+                <div className="flex items-center gap-2 rounded border border-border bg-background px-3 py-2">
                   {/* Column name */}
                   <Input
                     placeholder="Column name"
@@ -424,7 +424,7 @@ function FilterTab({ opts, update }) {
 
       {/* Template hint */}
       {filters.length > 0 && (
-        <div className="rounded-sm border border-border bg-muted/30 p-3 space-y-1">
+        <div className="rounded border border-border bg-muted/30 p-3 space-y-1">
           <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
             Dynamic values
           </Label>
@@ -502,7 +502,7 @@ function SortTab({ opts, update }) {
           {sort.map((rule, idx) => (
             <div
               key={rule.id}
-              className="grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center rounded-sm border border-border bg-background px-2 py-2"
+              className="grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center rounded border border-border bg-background px-2 py-2"
             >
               {/* Move up/down */}
               <div className="flex flex-col gap-0.5">
@@ -584,19 +584,19 @@ function SortTab({ opts, update }) {
 /** SETTINGS TAB — range, limit (advanced datasource.js params) */
 function SettingsTab({ opts, update }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-2">
       <Callout>
         Advanced fetch settings. <strong>Range</strong> limits which rows are
         read from the file itself (before any filters). <strong>Limit</strong>{" "}
         caps the final result count.
       </Callout>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
           Row Range
         </Label>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-3 !mt-0">
+          <div className="space-y-1">
             <Label htmlFor="range">A1-Notation Range</Label>
             <Input
               id="range"
@@ -615,7 +615,7 @@ function SettingsTab({ opts, update }) {
             </p>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="limit">Row Limit</Label>
             <Input
               id="limit"
@@ -642,11 +642,11 @@ function SettingsTab({ opts, update }) {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-1">
         <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
           Full Datasource Call Preview
         </Label>
-        <div className="rounded-sm bg-muted/40 border border-border p-4 font-mono text-[11px] leading-relaxed overflow-x-auto text-foreground">
+        <div className="rounded bg-muted/40 border border-border p-4 font-mono text-[11px] leading-relaxed overflow-x-auto text-foreground">
           <code className="whitespace-pre">
             {buildDatasourcePreview(opts)}
           </code>
@@ -743,23 +743,23 @@ export const ExcelCSVQueryBuilder = ({ queryEditorForm }) => {
         </TabsList>
 
         {/* ── Tab panels ── */}
-        <TabsContent value="source" className="mt-2 pb-2">
+        <TabsContent value="source" className="pb-2">
           <SourceTab opts={opts} update={update} />
         </TabsContent>
 
-        <TabsContent value="columns" className="mt-2 pb-2">
+        <TabsContent value="columns" className="pb-2">
           <ColumnsTab opts={opts} update={update} />
         </TabsContent>
 
-        <TabsContent value="filter" className="mt-2 pb-2">
+        <TabsContent value="filter" className="pb-2">
           <FilterTab opts={opts} update={update} />
         </TabsContent>
 
-        <TabsContent value="sort" className="mt-2 pb-2">
+        <TabsContent value="sort" className="pb-2">
           <SortTab opts={opts} update={update} />
         </TabsContent>
 
-        <TabsContent value="settings" className="mt-2 pb-2">
+        <TabsContent value="settings" className="pb-2">
           <SettingsTab opts={opts} update={update} />
         </TabsContent>
       </Tabs>

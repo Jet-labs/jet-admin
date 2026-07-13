@@ -129,7 +129,7 @@ function SpreadsheetSearch({ onSelect, selectedId, apiProxy }) {
         </div>
       ) :
         results?.length > 0 &&
-        <div className="max-h-[240px] overflow-y-auto rounded-sm border border-border">
+        <div className="max-h-[240px] overflow-y-auto rounded border border-border">
 
           <div className="flex flex-col">
             {results.map((ss) => (
@@ -225,7 +225,7 @@ function SheetSelector({ spreadsheetId, selectedSheet, onSelect, apiProxy }) {
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1">
       {spreadsheetTitle && (
         <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           Sheets in {spreadsheetTitle}
@@ -237,7 +237,7 @@ function SheetSelector({ spreadsheetId, selectedSheet, onSelect, apiProxy }) {
             key={sheet.sheetId}
             type="button"
             onClick={() => onSelect(sheet.title)}
-            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-medium border transition-colors ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
               selectedSheet === sheet.title
               ? "bg-primary/10 text-primary border-primary shadow-sm"
               : "bg-background text-muted-foreground border-border hover:bg-muted/50"
@@ -320,7 +320,7 @@ function DataPreview({ spreadsheetId, sheetName, apiProxy }) {
           Refresh
         </Button>
       </div>
-      <div className="overflow-x-auto rounded-sm border border-border">
+      <div className="overflow-x-auto rounded border border-border">
         <table className="w-full text-xs">
           <thead>
             <tr className="bg-muted/50">
@@ -378,7 +378,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
   return (
     <div className="space-y-0">
       {/* ── Operation picker ── */}
-      <div className="pb-4">
+      <div className="pb-2">
         <Label className="mb-2 block">Operation</Label>
         <div className="grid grid-cols-3 gap-1.5">
           {OPERATIONS.map((op) => {
@@ -389,7 +389,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
                 key={op.id}
                 type="button"
                 onClick={() => patch({ operation: op.id })}
-                className={`flex items-center gap-2 p-2.5 rounded-sm border text-left transition-all ${
+                className={`flex items-center gap-2 p-2.5 rounded border text-left transition-all ${
                   isSelected
                   ? "border-primary bg-primary/10 text-primary shadow-sm"
                   : "border-border bg-background text-muted-foreground hover:bg-muted/30"
@@ -425,10 +425,10 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
         </TabsList>
 
         {/* ── Source tab ── */}
-        <TabsContent value="source" className="mt-4 pb-2">
-          <div className="space-y-4">
+        <TabsContent value="source" className="mt-2 pb-2">
+          <div className="space-y-2">
             {/* Spreadsheet ID — manual input OR search */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Label>Spreadsheet ID</Label>
               <Input
                 type="text"
@@ -440,9 +440,8 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
             </div>
 
             {/* Search available spreadsheets */}
-            <div className="space-y-1.5">
-              <Label className="text-muted-foreground flex items-center gap-1 font-normal">
-                <Search className="h-3 w-3" />
+            <div className="space-y-1">
+              <Label>
                 Or search your spreadsheets
               </Label>
               <SpreadsheetSearch
@@ -454,7 +453,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
 
             {/* Sheet selector */}
             {spreadsheetId && (
-              <div className="space-y-1.5 pt-2 border-t border-border">
+              <div className="space-y-1 pt-2 border-t border-border">
                 <Label>Sheet / Tab</Label>
                 <SheetSelector
                   spreadsheetId={spreadsheetId}
@@ -467,7 +466,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
 
             {/* Range */}
             {spreadsheetId && (operation === "read" || operation === "write" || operation === "append" || operation === "update" || operation === "clear") && (
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <Label>Range (A1 notation)</Label>
                 <Input
                   type="text"
@@ -482,11 +481,11 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
         </TabsContent>
 
         {/* ── Options tab ── */}
-        <TabsContent value="options" className="mt-4 pb-2">
-          <div className="space-y-4">
+        <TabsContent value="options" className="pb-2">
+          <div className="space-y-2">
             {(operation === "read") && (
               <>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Major Dimension</Label>
                   <Select
                     value={opts.majorDimension || "ROWS"}
@@ -516,7 +515,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
 
             {(operation === "write" || operation === "update" || operation === "append") && (
               <>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Data (JSON array of arrays)</Label>
                   <Textarea
                     className="min-h-[120px] font-mono text-xs"
@@ -525,7 +524,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
                     onChange={(e) => patch({ data: e.target.value })}
                   />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Value Input Option</Label>
                   <Select
                     value={opts.valueInputOption || "USER_ENTERED"}
@@ -544,7 +543,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
             )}
 
             {operation === "append" && (
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <Label>Insert Data Option</Label>
                 <Select
                   value={opts.insertDataOption || "INSERT_ROWS"}
@@ -577,7 +576,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
         </TabsContent>
 
         {/* ── Preview tab ── */}
-        <TabsContent value="preview" className="mt-4 pb-2">
+        <TabsContent value="preview" className="pb-2">
           <DataPreview
             spreadsheetId={spreadsheetId}
             sheetName={sheetName}

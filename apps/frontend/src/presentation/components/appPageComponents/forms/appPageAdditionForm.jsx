@@ -128,7 +128,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
         >
           {historyIndex > 0 && (
             <div className="flex items-center gap-2 mr-2">
-              <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
+              <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
                 {historyIndex} unsaved change{historyIndex > 1 ? "s" : ""}
               </span>
               <Button

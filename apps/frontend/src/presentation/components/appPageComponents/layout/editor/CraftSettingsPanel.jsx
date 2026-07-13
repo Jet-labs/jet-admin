@@ -10,32 +10,30 @@
  *  - Standardized spacing to p-2/gap-2 per UI guidelines.
  *  - Fixed text-primary-foreground → text-foreground (near-black on green, per §8.1).
  */
-import React, { useState, useMemo } from "react";
-import { useEditor, Element } from "@craftjs/core";
+import { useEditor } from "@craftjs/core";
+import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import {
-  Trash2,
-  Box,
-  Layers,
-  Settings2,
-  Eye,
-  Repeat,
-  ArrowUp,
   ArrowDown,
-  FolderOpen,
+  ArrowUp,
+  Box,
   Code2,
-  Sparkles,
-  Rows,
   Columns,
-  Plus,
+  Eye,
+  FolderOpen,
+  Layers,
   Lock,
+  Plus,
+  Repeat,
+  Rows,
+  Settings2,
+  Sparkles,
+  Trash2,
   Unlock,
 } from "lucide-react";
-import { Label, TemplateAutocompleteInput } from "@jet-admin/ui";
+import { useMemo, useState } from "react";
 import { CanvasContainer } from "../components/CanvasContainer.jsx";
-import { CanvasWidgetSlot } from "../components/CanvasWidgetSlot.jsx";
-import { CanvasZStack } from "../components/CanvasZStack.jsx";
-import { CanvasRow } from "../components/CanvasRow.jsx";
 import { CanvasStack } from "../components/CanvasStack.jsx";
+import { CanvasZStack } from "../components/CanvasZStack.jsx";
 
 function getNodeMeta(displayName, props = {}) {
   switch (displayName) {
@@ -457,7 +455,7 @@ export default function CraftSettingsPanel({
             e.stopPropagation();
             actions.selectNode(nodeId);
           }}
-          className={`group flex items-center justify-between p-2 rounded-md cursor-pointer transition-all ${
+          className={`group flex items-center justify-between p-2 rounded cursor-pointer transition-all ${
             isSelected
               ? "bg-primary/10 text-primary border border-primary/20 font-medium"
               : "hover:bg-muted/50 text-foreground border border-transparent"
@@ -525,7 +523,7 @@ export default function CraftSettingsPanel({
             <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
               Page Node Tree
             </div>
-            <div className="flex flex-col gap-2 bg-muted/20 p-2 rounded-md border border-border/30">
+            <div className="flex flex-col gap-2 bg-muted/20 p-2 rounded border border-border/30">
               {renderLayersTree("ROOT")}
             </div>
           </div>
@@ -641,7 +639,7 @@ export default function CraftSettingsPanel({
                     max="12"
                     value={nodeProps.span || 6}
                     onChange={(e) => handleUpdateSpan(parseInt(e.target.value))}
-                    className="w-full h-1 bg-muted rounded-md appearance-none cursor-pointer accent-primary"
+                        className="w-full h-1 bg-muted rounded appearance-none cursor-pointer accent-primary"
                   />
                 </div>
               )}
@@ -756,7 +754,7 @@ export default function CraftSettingsPanel({
                       return (
                         <div
                           key={layerNodeId}
-                          className={`flex flex-col gap-1.5 p-2 rounded-md cursor-pointer transition-all text-[11px] ${
+                          className={`flex flex-col gap-1.5 p-2 rounded cursor-pointer transition-all text-[11px] ${
                             isActive
                               ? "bg-primary/10 text-primary border border-primary/20"
                               : "hover:bg-muted/50 text-muted-foreground border border-transparent"
@@ -808,7 +806,7 @@ export default function CraftSettingsPanel({
                               max="100"
                               value={Math.round(layerOpacity * 100)}
                               onChange={(e) => handleSetLayerOpacity(idx, parseInt(e.target.value) / 100)}
-                              className="flex-1 h-1 bg-muted rounded-md appearance-none cursor-pointer accent-primary"
+                              className="flex-1 h-1 bg-muted rounded appearance-none cursor-pointer accent-primary"
                             />
                             <span className="text-[9px] font-mono text-muted-foreground w-8 text-right">{Math.round(layerOpacity * 100)}%</span>
                           </div>
@@ -900,7 +898,7 @@ export default function CraftSettingsPanel({
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-2 bg-muted/20 border border-border/50 rounded-md">
+                    <div className="flex items-center justify-between p-2 bg-muted/20 border border-border/50 rounded">
                   <div className="flex items-center gap-2">
                     {nodeProps.locked ? (
                       <Lock className="h-3.5 w-3.5 text-amber-500" />

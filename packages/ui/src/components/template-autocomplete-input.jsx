@@ -323,7 +323,21 @@ export const TemplateAutocompleteInput = ({
           tr.changes.iterChanges((_fromA, _toA, _fromB, _toB, inserted) => {
             if (inserted.toString().includes('\n')) hasNewline = true;
           });
-          return hasNewline ? [] : tr;
+          if (hasNewline) {
+            const newChanges = [];
+            tr.changes.iterChanges((fromA, toA, _fromB, _toB, inserted) => {
+              // Strip trailing newlines and convert internal ones to space
+              const cleanedText = inserted.toString()
+                .replace(/\r?\n$/, '')
+                .replace(/\r?\n/g, ' ');
+              newChanges.push({ from: fromA, to: toA, insert: cleanedText });
+            });
+            return {
+              changes: newChanges,
+              sequential: true
+            };
+          }
+          return tr;
         })
       );
     }
@@ -387,7 +401,7 @@ export const TemplateAutocompleteInput = ({
   return (
     <div className={`relative w-full ${className}`}>
       <div
-        className={`bg-input-custom border border-input-custom rounded-sm transition-shadow duration-150 [&:has(.cm-focused)]:border-border/80 [&:has(.cm-focused)]:ring-2 [&:has(.cm-focused)]:ring-primary/30`}
+        className={`bg-input-custom border border-input-custom rounded transition-shadow duration-150 [&:has(.cm-focused)]:border-border/80 [&:has(.cm-focused)]:ring-2 [&:has(.cm-focused)]:ring-primary/30`}
       >
         {/* CodeMirror editor mount point */}
         <div

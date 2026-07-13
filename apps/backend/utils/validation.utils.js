@@ -22,16 +22,28 @@ const uuidSchema = z.string().uuid("Must be a valid UUID");
  */
 const emailSchema = z.string().email("Must be a valid email address");
 
+const preprocessQueryParam = (val) => {
+  if (Array.isArray(val)) {
+    const validVals = val.filter(v => v !== undefined && v !== null && v !== "" && v !== "undefined" && v !== "null");
+    if (validVals.length === 0) return undefined;
+    return validVals[validVals.length - 1];
+  }
+  if (val === undefined || val === null || val === "" || val === "undefined" || val === "null") {
+    return undefined;
+  }
+  return val;
+};
+
 /**
  * Pagination query parameters schema
  */
 const paginationSchema = z.object({
   page: z.preprocess(
-    (val) => (val === undefined || val === null || val === "" || val === "undefined" || val === "null") ? undefined : val,
+    preprocessQueryParam,
     z.coerce.number().int().min(1).default(1)
   ),
   pageSize: z.preprocess(
-    (val) => (val === undefined || val === null || val === "" || val === "undefined" || val === "null") ? undefined : val,
+    preprocessQueryParam,
     z.coerce.number().int().min(1).max(100).default(20)
   ),
 });

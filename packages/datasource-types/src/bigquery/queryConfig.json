@@ -57,24 +57,32 @@
         "label": "Use Legacy SQL"
       },
       {
-        "type": "Control",
-        "scope": "#/properties/inputDefinitions",
-        "label": "Query Parameters",
+        "type": "Group",
         "options": {
-          "detail": {
-            "type": "HorizontalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/key"
-              },
-              {
-                "type": "Control",
-                "scope": "#/properties/type"
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Query Parameters",
+            "options": {
+              "detail": {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/key"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/type"
+                  }
+                ]
               }
-            ]
+            }
           }
-        }
+        ]
       }
     ]
   },

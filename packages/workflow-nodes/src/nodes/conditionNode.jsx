@@ -227,7 +227,7 @@ function AndOrDivider({ logic, onToggle }) {
         onClick={onToggle}
         title={`Click to switch to ${logic === 'AND' ? 'OR' : 'AND'}`}
         className={`
-          h-auto text-[9px] font-bold px-2 py-0.5 rounded-sm border tracking-wider
+          h-auto text-[9px] font-bold px-2 py-0.5 rounded border tracking-wider
           transition-colors select-none
           ${logic === 'AND'
           ? 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/15'
@@ -283,7 +283,7 @@ function BranchEditor({ branch, onChange, stateTree }) {
             type="button"
             onClick={toggleLogic}
             className={`
-              h-auto text-[9px] font-bold px-2 py-0.5 rounded-sm border transition-colors
+              h-auto text-[9px] font-bold px-2 py-0.5 rounded border transition-colors
               ${branch.conditionLogic === 'AND'
               ? 'bg-primary/10 text-primary border-primary/30'
               : 'bg-amber-950/40 text-amber-600 border-amber-800'
@@ -407,7 +407,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
     <div className="w-full p-2 space-y-2 pb-0">
 
       {/* Title */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           Task Name
         </p>
@@ -420,7 +420,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* Description */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           Description
         </p>
@@ -429,12 +429,12 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
           onChange={e => setDescription(e.target.value)}
           rows={2}
           placeholder="What does this condition check?"
-          className="w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-brand-dark transition-colors"
+          className="w-full text-xs text-foreground border border-border rounded px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-brand-dark transition-colors"
         />
       </div>
 
       {/* Branch panel */}
-      <div className="rounded-md border border-border overflow-hidden bg-background">
+      <div className="rounded border border-border overflow-hidden bg-background">
         <Tabs value={String(activeIdx)} onValueChange={(val) => setActiveIdx(Number(val))} className="w-full">
           {/* Tab bar */}
           <TabsList className="h-auto">
@@ -461,7 +461,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
                     variant="ghost"
                     size="icon"
                     onClick={e => { e.stopPropagation(); removeBranch(idx); }}
-                    className="ml-0.5 w-3.5 h-3.5 text-muted-foreground/30 hover:text-destructive rounded-sm opacity-0 group-hover:opacity-100 transition-all p-0"
+                    className="ml-0.5 w-3.5 h-3.5 text-muted-foreground/30 hover:text-destructive rounded opacity-0 group-hover:opacity-100 transition-all p-0"
                   >
                     ×
                   </Button>
@@ -497,7 +497,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* else indicator */}
-      <div className="flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded-md text-xs text-muted-foreground">
+      <div className="flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded text-xs text-muted-foreground">
         <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0">
           ∅
         </span>
@@ -508,7 +508,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* Error handling */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           On Error
         </p>
@@ -525,21 +525,21 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Help callout */}
 
-      <div className="p-3 rounded-md border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1.5">
+      <div className="p-3 rounded border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1">
         <div className="font-semibold text-xs text-primary">💡 Writing Conditions</div>
         <div>
-          Use <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">{'{{ctx.field}}'}</code> in
+          Use <code className="bg-brand-dark px-1 rounded border border-border font-mono">{'{{ctx.field}}'}</code> in
           left and right inputs — e.g.{' '}
-          <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">{'{{ctx.input.severity}}'}</code>.
+          <code className="bg-brand-dark px-1 rounded border border-border font-mono">{'{{ctx.input.severity}}'}</code>.
         </div>
         <div>
           The right side can also be a plain literal like{' '}
-          <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">High</code> or{' '}
-          <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">3</code>.
+          <code className="bg-brand-dark px-1 rounded border border-border font-mono">High</code> or{' '}
+          <code className="bg-brand-dark px-1 rounded border border-border font-mono">3</code>.
         </div>
         <div>
           For complex logic, use <strong>JS Expression</strong> — raw JS where{' '}
-          <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">ctx.field</code> is a direct variable (no braces).
+          <code className="bg-brand-dark px-1 rounded border border-border font-mono">ctx.field</code> is a direct variable (no braces).
         </div>
         <div>Branches are evaluated <strong>top → bottom</strong>; first match wins.</div>
       </div>
@@ -569,7 +569,7 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
   return (
     <div
       className={`
-        bg-brand-black rounded-sm border shadow-sm
+        bg-brand-black rounded border shadow-sm
         min-w-[260px] max-w-[340px]
         transition-all duration-150
         ${isDisabled
@@ -595,14 +595,14 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
           {data?.title || 'Condition'}
         </span>
         {isDisabled && (
-          <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800 shrink-0">
+          <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-800 shrink-0">
             <Ban className="w-2.5 h-2.5" />
             Skip
           </span>
         )}
       </div>
 
-      <div className="px-3 py-2 space-y-1.5">
+      <div className="px-3 py-2 space-y-1">
         {branches.slice(0, 6).map((branch, idx) => {
           const firstCond = branch.conditions?.[0];
           const extra = (branch.conditions?.length ?? 0) - 1;

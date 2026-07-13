@@ -185,7 +185,7 @@ export function InputValuesForm({
   };
 
   return (
-    <div className={className || "space-y-3"}>
+    <div className={className || "space-y-2"}>
       {inputDefinitions.map((inputDef) => (
         <div key={inputDef.key} className="space-y-1">
           {renderField(inputDef)}

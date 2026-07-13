@@ -1,11 +1,8 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { CONSTANTS } from "../../../constants";
 import { CronJobScheduler } from "./cronJobScheduler";
 import { useInfiniteWorkflows } from "../../../logic/hooks/useWorkflows";
-import { getWorkflowByIDAPI } from "../../../data/apis/workflow";
-import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
-import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
@@ -26,9 +23,12 @@ function FieldError({ message }) {
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 
-export const CronJobEditor = ({ cronJobEditorForm }) => {
+export const CronJobEditor = ({ cronJobEditorForm, initialWorkflow }) => {
   CronJobEditor.propTypes = {
     cronJobEditorForm: PropTypes.object.isRequired,
+    // Pre-fetched workflow object (from the parent) so the select input shows
+    // the correct name on first render without any Formik timing dependency.
+    initialWorkflow: PropTypes.object,
   };
 
   const { tenantID } = useParams();
@@ -41,16 +41,9 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-    loadWorkflowsError,
   } = useInfiniteWorkflows(tenantID, debouncedWorkflowSearch);
 
   const selectedWorkflowID = cronJobEditorForm.values?.workflowID;
-  const { data: selectedWorkflowDetail } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "detail", selectedWorkflowID],
-    queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID: selectedWorkflowID }),
-    enabled: Boolean(tenantID) && Boolean(selectedWorkflowID),
-    refetchOnWindowFocus: false,
-  });
 
   const _handleOnScheduleChange = useCallback(
     (value) => {
@@ -59,27 +52,60 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
     [cronJobEditorForm]
   );
 
-  const selectedWorkflow = useMemo(
-    () =>
-      selectedWorkflowDetail ||
-      workflows?.find(
-        (w) =>
-          String(w.workflowID) ===
-          String(selectedWorkflowID)
-      ) || null,
-    [selectedWorkflowDetail, workflows, selectedWorkflowID]
-  );
+  // Build the options list. If the initially-selected workflow was passed as a
+  // prop (fetched at parent level), inject it at the front when it isn't
+  // already present in the current page of paginated results — guaranteeing
+  // SearchSelect can always find it via strict equality.
+  const workflowOptions = (() => {
+    const pagedOptions = (workflows ?? []).map((w) => ({
+      value: String(w.workflowID),
+      label: w.title,
+    }));
+
+    // Only inject when initialWorkflow has a valid, non-null workflowID and
+    // title (guards against stale broken Workflow objects where all fields are
+    // undefined, which would inject {value:"undefined", label:undefined}).
+    const detailID = initialWorkflow?.workflowID;
+    const detailTitle = initialWorkflow?.title;
+
+    if (
+      detailID != null &&
+      detailTitle &&
+      !pagedOptions.find((o) => o.value === String(detailID))
+    ) {
+      return [{ value: String(detailID), label: detailTitle }, ...pagedOptions];
+    }
+
+    return pagedOptions;
+  })();
+
+  // Visual fallback label shown while options are still loading. Prefer the
+  // injected workflow, fall back to a match in the already-loaded page.
+  const selectedLabel =
+    initialWorkflow?.workflowID != null
+      ? initialWorkflow.title
+      : (workflows ?? []).find(
+          (w) => String(w.workflowID) === String(selectedWorkflowID)
+        )?.title;
+
+  // The workflow to use for the Arguments sub-form.
+  const selectedWorkflow =
+    initialWorkflow ||
+    (workflows ?? []).find(
+      (w) => String(w.workflowID) === String(selectedWorkflowID)
+    ) ||
+    null;
 
   const touched = cronJobEditorForm.touched ?? {};
   const errors = cronJobEditorForm.errors ?? {};
 
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-2">
 
       {/* ── Identity ──────────────────────────────────────────────────────── */}
       <Section title="Identity">
         {/* Title */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="cronJobTitle">
             {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_TITLE_FIELD_LABEL}
             <span className="ml-0.5 text-destructive">*</span>
@@ -101,7 +127,7 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
         </div>
 
         {/* Description */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="cronJobDescription">
             {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_LABEL}
           </Label>
@@ -126,39 +152,27 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
         title="Workflow"
         description="Select which workflow this job triggers and supply any required input arguments."
       >
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Label htmlFor="workflowID">Workflow</Label>
-          {workflows ? (
-            <SearchSelect
-              value={
-                cronJobEditorForm.values.workflowID
-                  ? String(cronJobEditorForm.values.workflowID)
-                  : ""
-              }
-              onChange={(val) =>
-                cronJobEditorForm.setFieldValue("workflowID", val)
-              }
-              options={workflows.map((workflow) => ({
-                value: String(workflow.workflowID),
-                label: workflow.title,
-              }))}
-              onSearchChange={setWorkflowSearch}
-              onLoadMore={fetchNextPage}
-              hasNextPage={hasNextPage}
-              isFetchingNextPage={isFetchingNextPage}
-              isLoading={isLoadingWorkflows}
-              placeholder="Select a workflow…"
-            />
-          ) : (
-            <div className="flex h-8 w-full items-center justify-between rounded-sm border border-input-custom bg-input-custom px-2.5 py-1.5 text-sm text-muted-foreground animate-pulse">
-              <span>Loading workflows...</span>
-            </div>
-          )}
+          <SearchSelect
+            value={cronJobEditorForm.values.workflowID || ""}
+            onChange={(val) =>
+              cronJobEditorForm.setFieldValue("workflowID", val)
+            }
+            options={workflowOptions}
+            selectedLabel={selectedLabel}
+            onSearchChange={setWorkflowSearch}
+            onLoadMore={fetchNextPage}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            isLoading={isLoadingWorkflows}
+            placeholder="Select a workflow…"
+          />
           {touched.workflowID && <FieldError message={errors.workflowID} />}
         </div>
 
         {selectedWorkflow?.workflowOptions?.inputDefinitions?.length > 0 && (
-          <div className="space-y-1.5 pt-1">
+          <div className="space-y-1 p-2 border rounded">
             <Label>Workflow Arguments</Label>
             <InputValuesForm
               inputDefinitions={selectedWorkflow.workflowOptions.inputDefinitions}
@@ -190,8 +204,8 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
         title="Execution"
         description="Control retry behaviour and per-run time limits."
       >
-        <div className="grid grid-cols-3 gap-3">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1">
             <Label htmlFor="timeoutSeconds">Timeout (s)</Label>
             <Input
               type="number"
@@ -204,7 +218,7 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
               placeholder="300"
             />
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="retryAttempts">Retry Attempts</Label>
             <Input
               type="number"
@@ -217,7 +231,7 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
               placeholder="0"
             />
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="retryDelaySeconds">Retry Delay (s)</Label>
             <Input
               type="number"
@@ -234,7 +248,7 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
       </Section>
 
       {/* ── Active toggle ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between rounded-md border border-border bg-card px-4 py-3">
+      <div className="flex items-center justify-between rounded border border-border bg-card p-2">
         <div>
           <p className="text-sm font-medium leading-none">Active</p>
           <p className="mt-1 text-[11px] text-muted-foreground">

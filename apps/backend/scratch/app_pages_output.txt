@@ -1,0 +1,2074 @@
+﻿
+================================================================================
+APP PAGE: 7ed1be7d-cbe0-4962-a900-36824d9d42f8
+================================================================================
+Title: Astronomy & Explorations
+Description: (none)
+
+appPageConfig:
+{
+  "layout": {
+    "id": "col_cct36hn",
+    "type": "column",
+    "children": [
+      {
+        "id": "row_z883vym",
+        "type": "row",
+        "style": {
+          "alignItems": "flex-end"
+        },
+        "children": [
+          {
+            "id": "slot_nxcuc1y",
+            "span": 4,
+            "type": "widget",
+            "style": {
+              "padding": "4px"
+            },
+            "sizing": "fill",
+            "widgetKey": "widget_63e8215a-3bcc-4322-a645-b7cc5059dfc4_1780149318124"
+          },
+          {
+            "id": "slot_py4nwtn",
+            "span": 12,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_a29ec0a3-1e3d-40a0-8d49-4f30ccb0de49_1780164984197"
+          }
+        ]
+      },
+      {
+        "id": "row_7u0s7s1",
+        "type": "row",
+        "children": [
+          {
+            "id": "slot_ksro1ju",
+            "span": 12,
+            "type": "widget",
+            "sizing": "fixed",
+            "widgetKey": "widget_fdcc2286-0a2d-4fea-b434-0a6c47f9e2f9_1780151658418",
+            "fixedHeight": 400
+          }
+        ]
+      }
+    ]
+  },
+  "layouts": {},
+  "widgets": [
+    "widget_63e8215a-3bcc-4322-a645-b7cc5059dfc4_1780149318124"
+  ],
+  "variables": [
+    {
+      "key": "startDate",
+      "type": "string",
+      "description": "",
+      "defaultValue": ""
+    },
+    {
+      "key": "endDate",
+      "type": "string",
+      "description": "",
+      "defaultValue": ""
+    }
+  ],
+  "dataSources": [
+    {
+      "type": "workflow",
+      "alias": "query_1",
+      "queryID": "",
+      "refreshOn": [
+        "variables.startDate",
+        "variables.endDate"
+      ],
+      "workflowID": "a030813f-476a-490e-9d35-28aa3ec98ec1",
+      "inputValues": {
+        "endDate": "{{ state.variables.endDate }}",
+        "startDate": "{{ state.variables.startDate }}"
+      },
+      "triggerMode": "reactive",
+      "refetchInterval": null
+    }
+  ],
+  "layoutVersion": 2,
+  "_legacyLayouts": {
+    "lg": [
+      {
+        "h": 10,
+        "i": "widget_63e8215a-3bcc-4322-a645-b7cc5059dfc4_1780149318124",
+        "w": 8,
+        "x": 0,
+        "y": 0
+      }
+    ],
+    "md": [
+      {
+        "h": 10,
+        "i": "widget_63e8215a-3bcc-4322-a645-b7cc5059dfc4_1780149318124",
+        "w": 8,
+        "x": 0,
+        "y": null
+      }
+    ],
+    "sm": [
+      {
+        "h": 10,
+        "i": "widget_63e8215a-3bcc-4322-a645-b7cc5059dfc4_1780149318124",
+        "w": 6,
+        "x": 0,
+        "y": null
+      }
+    ],
+    "xs": [
+      {
+        "h": 10,
+        "i": "widget_63e8215a-3bcc-4322-a645-b7cc5059dfc4_1780149318124",
+        "w": 4,
+        "x": 0,
+        "y": null
+      }
+    ],
+    "xxs": [
+      {
+        "h": 10,
+        "i": "widget_63e8215a-3bcc-4322-a645-b7cc5059dfc4_1780149318124",
+        "w": 4,
+        "x": 0,
+        "y": null
+      }
+    ]
+  }
+}
+
+Widget keys: ["widget_63e8215a-3bcc-4322-a645-b7cc5059dfc4_1780149318124"]
+Extracted widget IDs: ["63e8215a-3bcc-4322-a645-b7cc5059dfc4"]
+
+--- Widget: Date picker (date-range-picker) ---
+widgetID: 63e8215a-3bcc-4322-a645-b7cc5059dfc4
+widgetConfig:
+{
+  "label": "Select date range",
+  "events": {
+    "onChange": [
+      {
+        "config": {
+          "key": "state.variables.startDate",
+          "value": "{{ state.event.startDate }}"
+        },
+        "actionType": "SET_VARIABLE"
+      },
+      {
+        "config": {
+          "key": "state.variables.endDate",
+          "value": "{{ state.event.endDate }}"
+        },
+        "actionType": "SET_VARIABLE"
+      }
+    ]
+  },
+  "properties": {
+    "style": {
+      "showBorder": false
+    },
+    "widgetCss": {},
+    "showHeader": false,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}
+
+================================================================================
+APP PAGE: 8f370e46-c961-4208-849e-b7fc57edb052
+================================================================================
+Title: Covid Dashboard
+Description: (none)
+
+appPageConfig:
+{
+  "layout": {
+    "id": "ROOT",
+    "type": "column",
+    "children": [
+      {
+        "id": "BEJ_db703_",
+        "type": "row",
+        "sizing": "auto",
+        "children": [
+          {
+            "id": "ZGuX1WPBy_",
+            "span": 6,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_9d257b8b-ddca-4326-82df-caf46851b11f_1"
+          },
+          {
+            "id": "FEpm5Q-_UV",
+            "span": 6,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_8d047b85-8a74-40c8-8547-ab02a31c6f77_2"
+          }
+        ]
+      },
+      {
+        "id": "3WqlfvtmxU",
+        "type": "row",
+        "sizing": "fixed",
+        "children": [
+          {
+            "id": "kzGDhHueNa",
+            "span": 6,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_dce85630-619c-4eba-94b8-7245c9478e3a_3"
+          },
+          {
+            "id": "iFA6T04qqC",
+            "span": 6,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_6e491445-afdb-449b-ad0d-10c0ea77732a_4"
+          }
+        ],
+        "fixedHeight": 400
+      },
+      {
+        "id": "JUNFJmManW",
+        "type": "row",
+        "sizing": "fixed",
+        "children": [
+          {
+            "id": "lRs3HDAPlP",
+            "span": 6,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_c424fa6e-af39-4e06-8b83-7066c7590788_6"
+          }
+        ],
+        "fixedHeight": 400
+      }
+    ]
+  },
+  "layouts": {},
+  "widgets": [
+    "widget_8d047b85-8a74-40c8-8547-ab02a31c6f77_1780393378975",
+    "widget_6e491445-afdb-449b-ad0d-10c0ea77732a_1780393515526",
+    "widget_2d23ba8d-7563-4b2b-8ca1-c736bdb7f758_1780841876617",
+    "widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_1781979159109",
+    "widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_1781979164964",
+    "widget_9d257b8b-ddca-4326-82df-caf46851b11f_1",
+    "widget_8d047b85-8a74-40c8-8547-ab02a31c6f77_2",
+    "widget_dce85630-619c-4eba-94b8-7245c9478e3a_3",
+    "widget_6e491445-afdb-449b-ad0d-10c0ea77732a_4",
+    "widget_c424fa6e-af39-4e06-8b83-7066c7590788_6"
+  ],
+  "variables": [
+    {
+      "key": "variable_1",
+      "type": "object",
+      "description": "",
+      "defaultValue": {}
+    }
+  ],
+  "dataSources": [
+    {
+      "type": "query",
+      "alias": "query_1",
+      "queryID": "7a2bad5a-3f77-46d1-9024-b8e7847a5945",
+      "refreshOn": [],
+      "workflowID": "",
+      "inputValues": {},
+      "triggerMode": "auto",
+      "refetchInterval": null
+    },
+    {
+      "type": "query",
+      "alias": "query_2",
+      "queryID": "04dffe0e-6e9b-441a-ac05-721ba7ec5650",
+      "refreshOn": [],
+      "workflowID": "",
+      "inputValues": {},
+      "triggerMode": "auto",
+      "refetchInterval": null
+    },
+    {
+      "type": "query",
+      "alias": "query_3",
+      "queryID": "50d7bb0b-9e95-46a4-b096-3d8cfd07b24f",
+      "refreshOn": [],
+      "workflowID": "",
+      "inputValues": {},
+      "triggerMode": "auto",
+      "refetchInterval": null
+    },
+    {
+      "type": "query",
+      "alias": "query_4",
+      "queryID": "fa45374e-6349-4b12-b441-84943c65b581",
+      "refreshOn": [],
+      "workflowID": "",
+      "inputValues": {},
+      "triggerMode": "auto",
+      "refetchInterval": null
+    },
+    {
+      "type": "query",
+      "alias": "query_5",
+      "queryID": "46538598-cb1f-42c8-82eb-69692a9ca1ed",
+      "refreshOn": [],
+      "workflowID": "",
+      "inputValues": {},
+      "triggerMode": "auto",
+      "refetchInterval": null
+    },
+    {
+      "type": "query",
+      "alias": "query_6",
+      "queryID": "8e6c3468-d924-4da8-b23b-19df631da321",
+      "refreshOn": [],
+      "workflowID": "",
+      "inputValues": {},
+      "triggerMode": "manual",
+      "refetchInterval": null
+    }
+  ],
+  "layoutVersion": 2,
+  "_legacyLayouts": {}
+}
+
+Widget keys: ["widget_8d047b85-8a74-40c8-8547-ab02a31c6f77_1780393378975","widget_6e491445-afdb-449b-ad0d-10c0ea77732a_1780393515526","widget_2d23ba8d-7563-4b2b-8ca1-c736bdb7f758_1780841876617","widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_1781979159109","widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_1781979164964","widget_9d257b8b-ddca-4326-82df-caf46851b11f_1","widget_8d047b85-8a74-40c8-8547-ab02a31c6f77_2","widget_dce85630-619c-4eba-94b8-7245c9478e3a_3","widget_6e491445-afdb-449b-ad0d-10c0ea77732a_4","widget_c424fa6e-af39-4e06-8b83-7066c7590788_6"]
+Extracted widget IDs: ["8d047b85-8a74-40c8-8547-ab02a31c6f77","6e491445-afdb-449b-ad0d-10c0ea77732a","2d23ba8d-7563-4b2b-8ca1-c736bdb7f758","e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808","9d257b8b-ddca-4326-82df-caf46851b11f","dce85630-619c-4eba-94b8-7245c9478e3a","c424fa6e-af39-4e06-8b83-7066c7590788"]
+
+--- Widget: Interactive Bubble Scatter Plot (COVID-19 Metrics) (vega-lite) ---
+widgetID: 8d047b85-8a74-40c8-8547-ab02a31c6f77
+widgetConfig:
+{
+  "events": {},
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": "{{state.queries.query_1.data.data.regional}}"
+    },
+    "mark": {
+      "type": "circle",
+      "stroke": "white",
+      "opacity": 0.8,
+      "strokeWidth": 1
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "gridColor": "rgba(255, 255, 255, 0.1)",
+        "tickColor": "white",
+        "labelColor": "white",
+        "titleColor": "white",
+        "domainColor": "white"
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelColor": "white",
+        "titleColor": "white"
+      },
+      "background": "transparent"
+    },
+    "height": 400,
+    "params": [
+      {
+        "name": "brush",
+        "select": "interval"
+      }
+    ],
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {
+      "x": {
+        "axis": {
+          "grid": false,
+          "title": "Total Confirmed Cases (Log Scale)"
+        },
+        "type": "quantitative",
+        "field": "totalConfirmed",
+        "scale": {
+          "type": "symlog"
+        }
+      },
+      "y": {
+        "axis": {
+          "grid": true,
+          "title": "Total Deaths (Log Scale)"
+        },
+        "type": "quantitative",
+        "field": "deaths",
+        "scale": {
+          "type": "symlog"
+        }
+      },
+      "size": {
+        "type": "quantitative",
+        "field": "discharged",
+        "scale": {
+          "range": [
+            50,
+            1000
+          ]
+        },
+        "legend": {
+          "title": "Discharged"
+        }
+      },
+      "color": {
+        "value": "#7f8c8d",
+        "condition": {
+          "type": "nominal",
+          "field": "loc",
+          "param": "brush",
+          "legend": null
+        }
+      },
+      "tooltip": [
+        {
+          "type": "nominal",
+          "field": "loc",
+          "title": "Region"
+        },
+        {
+          "type": "quantitative",
+          "field": "totalConfirmed",
+          "title": "Confirmed",
+          "format": ","
+        },
+        {
+          "type": "quantitative",
+          "field": "deaths",
+          "title": "Deaths",
+          "format": ","
+        },
+        {
+          "type": "quantitative",
+          "field": "discharged",
+          "title": "Discharged",
+          "format": ","
+        }
+      ]
+    },
+    "description": "A scatterplot showing COVID-19 cases vs. deaths with interactive brushing."
+  },
+  "isLoading": "{{state.queries.query_1.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "editorMode": "raw",
+  "properties": {
+    "widgetCss": {},
+    "showHeader": true,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}
+
+--- Widget: Density Heatmap (Medical College Capacities) (vega-lite) ---
+widgetID: 6e491445-afdb-449b-ad0d-10c0ea77732a
+widgetConfig:
+{
+  "events": {},
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": "{{state.queries.query_3.data.data.medicalColleges}}"
+    },
+    "mark": {
+      "type": "rect",
+      "tooltip": true,
+      "cornerRadius": 2
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "grid": false,
+        "tickColor": "white",
+        "labelColor": "white",
+        "titleColor": "white",
+        "domainColor": "white"
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelColor": "white",
+        "titleColor": "white"
+      },
+      "background": "transparent"
+    },
+    "height": {
+      "step": 20
+    },
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit-x",
+      "contains": "padding"
+    },
+    "encoding": {
+      "x": {
+        "axis": {
+          "title": "Institution Ownership",
+          "labelAngle": 0
+        },
+        "type": "nominal",
+        "field": "ownership"
+      },
+      "y": {
+        "axis": {
+          "title": null
+        },
+        "type": "nominal",
+        "field": "state"
+      },
+      "color": {
+        "type": "quantitative",
+        "field": "admissionCapacity",
+        "scale": {
+          "scheme": "viridis"
+        },
+        "legend": {
+          "title": "Total Admissions"
+        },
+        "aggregate": "sum"
+      },
+      "tooltip": [
+        {
+          "type": "nominal",
+          "field": "state",
+          "title": "State"
+        },
+        {
+          "type": "nominal",
+          "field": "ownership",
+          "title": "Ownership"
+        },
+        {
+          "type": "quantitative",
+          "field": "admissionCapacity",
+          "title": "Total Capacity",
+          "aggregate": "sum"
+        },
+        {
+          "type": "quantitative",
+          "field": "name",
+          "title": "Number of Colleges",
+          "aggregate": "count"
+        }
+      ]
+    },
+    "description": "Heatmap of medical college capacities by state and ownership."
+  },
+  "isLoading": "{{state.queries.query_3.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "editorMode": "raw",
+  "properties": {
+    "widgetCss": {},
+    "showHeader": true,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}
+
+--- Widget: Normalized Stacked Bar (Urban vs. Rural Hospital Beds) (vega-lite) ---
+widgetID: 2d23ba8d-7563-4b2b-8ca1-c736bdb7f758
+widgetConfig:
+{
+  "events": {},
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": "{{state.queries.query_2.data.data.regional}}"
+    },
+    "mark": {
+      "type": "bar",
+      "tooltip": true,
+      "cornerRadiusEnd": 3
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "gridColor": "rgba(255, 255, 255, 0.1)",
+        "tickColor": "white",
+        "labelColor": "white",
+        "titleColor": "white",
+        "domainColor": "white"
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelColor": "white",
+        "titleColor": "white"
+      },
+      "background": "transparent"
+    },
+    "height": {
+      "step": 20
+    },
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit-x",
+      "contains": "padding"
+    },
+    "encoding": {
+      "x": {
+        "axis": {
+          "grid": false,
+          "title": "Proportion of Beds",
+          "format": "%"
+        },
+        "type": "quantitative",
+        "field": "count",
+        "stack": "normalize"
+      },
+      "y": {
+        "axis": {
+          "title": null,
+          "labelFontSize": 11
+        },
+        "sort": {
+          "op": "sum",
+          "field": "totalBeds",
+          "order": "descending"
+        },
+        "type": "nominal",
+        "field": "state"
+      },
+      "color": {
+        "type": "nominal",
+        "field": "bedType",
+        "scale": {
+          "range": [
+            "#2ecc71",
+            "#3498db"
+          ],
+          "domain": [
+            "ruralBeds",
+            "urbanBeds"
+          ]
+        },
+        "legend": {
+          "title": "Infrastructure Type",
+          "orient": "top"
+        }
+      },
+      "tooltip": [
+        {
+          "type": "nominal",
+          "field": "state",
+          "title": "State"
+        },
+        {
+          "type": "nominal",
+          "field": "bedType",
+          "title": "Type"
+        },
+        {
+          "type": "quantitative",
+          "field": "count",
+          "title": "Bed Count",
+          "format": ","
+        },
+        {
+          "type": "quantitative",
+          "field": "totalBeds",
+          "title": "Total State Beds",
+          "format": ","
+        }
+      ]
+    },
+    "transform": [
+      {
+        "filter": "datum.state != 'INDIA'"
+      },
+      {
+        "as": [
+          "bedType",
+          "count"
+        ],
+        "fold": [
+          "ruralBeds",
+          "urbanBeds"
+        ]
+      }
+    ],
+    "description": "Normalized stacked bar chart of Urban vs Rural Beds."
+  },
+  "isLoading": "{{state.queries.query_2.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "editorMode": "raw",
+  "properties": {
+    "widgetCss": {},
+    "showHeader": true,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}
+
+--- Widget: test widget (text) ---
+widgetID: e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808
+widgetConfig:
+{
+  "events": {},
+  "content": "{{state.variables.startDate}}",
+  "properties": {
+    "widgetCss": {},
+    "showHeader": true,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}
+
+--- Widget: Active Cases - Covid (vega-lite) ---
+widgetID: 9d257b8b-ddca-4326-82df-caf46851b11f
+widgetConfig:
+{
+  "events": {},
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "format": {
+        "type": "topojson",
+        "feature": "states"
+      },
+      "values": "{{state.queries.query_4.data}}"
+    },
+    "mark": {
+      "type": "geoshape",
+      "stroke": "rgba(255, 255, 255, 0.4)",
+      "strokeWidth": 1
+    },
+    "width": "container",
+    "config": {
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelColor": "white",
+        "titleColor": "white"
+      },
+      "background": "transparent"
+    },
+    "height": 500,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {
+      "color": {
+        "value": "rgba(255, 255, 255, 0.05)",
+        "condition": {
+          "test": "datum.totalConfirmed > 0",
+          "type": "quantitative",
+          "field": "activeCases",
+          "scale": {
+            "scheme": "oranges"
+          },
+          "legend": {
+            "title": "Active Cases",
+            "orient": "bottom-right",
+            "direction": "horizontal",
+            "gradientLength": 200
+          }
+        }
+      },
+      "tooltip": [
+        {
+          "type": "nominal",
+          "field": "properties.st_nm",
+          "title": "State"
+        },
+        {
+          "type": "quantitative",
+          "field": "activeCases",
+          "title": "Active Cases",
+          "format": ","
+        },
+        {
+          "type": "quantitative",
+          "field": "totalConfirmed",
+          "title": "Total Cases",
+          "format": ","
+        },
+        {
+          "type": "quantitative",
+          "field": "deaths",
+          "title": "Deaths",
+          "format": ","
+        }
+      ]
+    },
+    "transform": [
+      {
+        "from": {
+          "key": "loc",
+          "data": {
+            "values": "{{state.queries.query_1.data.data.regional}}"
+          },
+          "fields": [
+            "totalConfirmed",
+            "discharged",
+            "deaths"
+          ]
+        },
+        "lookup": "properties.st_nm"
+      },
+      {
+        "as": "activeCases",
+        "calculate": "isValid(datum.totalConfirmed) ? (datum.totalConfirmed - datum.discharged - datum.deaths) : null"
+      }
+    ],
+    "projection": {
+      "type": "mercator"
+    },
+    "description": "A choropleth map of India showing active COVID-19 cases."
+  },
+  "isLoading": "{{state.queries.query_1.isLoading || state.queries.query_4.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "editorMode": "raw",
+  "properties": {
+    "widgetCss": {},
+    "showHeader": true,
+    "containerCss": {},
+    "refetchInterval": 2000,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}
+
+--- Widget: Covid deaths (vega-lite) ---
+widgetID: dce85630-619c-4eba-94b8-7245c9478e3a
+widgetConfig:
+{
+  "events": {},
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": "{{state.queries.query_1.data.data.regional}}"
+    },
+    "mark": {
+      "type": "bar",
+      "tooltip": true
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "grid": true,
+        "gridOpacity": 0.15,
+        "titlePadding": 8,
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "background": "transparent"
+    },
+    "height": 300,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {
+      "x": {
+        "type": "nominal",
+        "field": "loc"
+      },
+      "y": {
+        "type": "quantitative",
+        "field": "deaths",
+        "aggregate": "sum"
+      }
+    }
+  },
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "editorMode": "raw",
+  "properties": {
+    "widgetCss": {},
+    "showHeader": true,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}
+
+--- Widget: Covid 19 News Feed (html) ---
+widgetID: c424fa6e-af39-4e06-8b83-7066c7590788
+widgetConfig:
+{
+  "css": ".notification-container {\n  font-family: system-ui, -apple-system, sans-serif;\n  padding: 12px;\n}\n\n/* Loading, Error and Empty states */\n.status-msg {\n  padding: 24px;\n  text-align: center;\n  font-size: 13px;\n  color: #8b949e;\n}\n\n.status-msg.error {\n  color: #f85149;\n}\n\n.status-msg.loading::after {\n  content: \"\";\n  display: inline-block;\n  width: 12px;\n  height: 12px;\n  margin-left: 8px;\n  border: 2px solid #8b949e;\n  border-top-color: transparent;\n  border-radius: 50%;\n  animation: spin 0.8s linear infinite;\n  vertical-align: middle;\n}\n\n@keyframes spin {\n  to { transform: rotate(360deg); }\n}\n\n/* Notification List */\n.notification-list {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.notification-item {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 8px 12px;\n  border-radius: 6px;\n  transition: all 0.2s ease;\n}\n\n.notification-item:hover {\n  transform: translateX(4px);\n}\n\n.bullet {\n  width: 8px;\n  height: 8px;\n  border-radius: 50%;\n  background-color: #ff9900;\n  flex-shrink: 0;\n  box-shadow: 0 0 8px rgba(255, 153, 0, 0.5);\n}\n\n.notification-link {\n  text-decoration: none;\n  font-size: 13px;\n  font-weight: 500;\n  line-height: 1.4;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  flex-grow: 1;\n  transition: color 0.15s ease;\n}\n\n/* Theme Adaptation (Dark / Light) */\n@media (prefers-color-scheme: dark) {\n  .notification-item {\n    background-color: rgba(255, 255, 255, 0.02);\n    border: 1px solid rgba(255, 255, 255, 0.05);\n  }\n  .notification-item:hover {\n    background-color: rgba(255, 255, 255, 0.06);\n    border-color: rgba(59, 130, 246, 0.3);\n  }\n  .notification-link {\n    color: #60a5fa;\n  }\n  .notification-link:hover {\n    color: #93c5fd;\n  }\n}\n\n@media (prefers-color-scheme: light) {\n  .notification-item {\n    background-color: rgba(0, 0, 0, 0.02);\n    border: 1px solid rgba(0, 0, 0, 0.05);\n  }\n  .notification-item:hover {\n    background-color: rgba(0, 0, 0, 0.04);\n    border-color: rgba(37, 99, 235, 0.2);\n  }\n  .notification-link {\n    color: #2563eb;\n  }\n  .notification-link:hover {\n    color: #1d4ed8;\n  }\n}\n",
+  "html": "<ul class=\"notification-list\">\n  {{ (state.queries.query_5.data.data.notifications || []).map((item) => `\n    <li class=\"notification-item\">\n      <span class=\"bullet\"></span>\n      <a href=\"${item.link}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"notification-link\" title=\"Link: ${item.link}\">\n        ${item.title}\n      </a>\n    </li>\n  `).join('') }}\n</ul>\n",
+  "events": {
+    "onClick": [
+      {
+        "config": {
+          "message": "Action run!"
+        },
+        "actionType": "SHOW_TOAST"
+      }
+    ]
+  },
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": "{{state.queries.query_5.data.data.notifications}}"
+    },
+    "layer": [
+      {
+        "mark": {
+          "size": 60,
+          "type": "circle",
+          "color": "#ff9900"
+        },
+        "encoding": {
+          "x": {
+            "value": 10
+          },
+          "y": {
+            "axis": null,
+            "sort": "ascending",
+            "type": "ordinal",
+            "field": "rank"
+          }
+        },
+        "description": "Feed item bullet point"
+      },
+      {
+        "mark": {
+          "type": "text",
+          "align": "left",
+          "cursor": "pointer",
+          "baseline": "middle",
+          "fontSize": 13
+        },
+        "encoding": {
+          "x": {
+            "value": 25
+          },
+          "y": {
+            "axis": null,
+            "sort": "ascending",
+            "type": "ordinal",
+            "field": "rank"
+          },
+          "href": {
+            "type": "nominal",
+            "field": "link"
+          },
+          "text": {
+            "type": "nominal",
+            "field": "title"
+          },
+          "color": {
+            "value": "#66b3ff"
+          },
+          "tooltip": [
+            {
+              "type": "nominal",
+              "field": "title",
+              "title": "Notification"
+            },
+            {
+              "type": "nominal",
+              "field": "link",
+              "title": "Link"
+            }
+          ]
+        },
+        "description": "Clickable feed text"
+      }
+    ],
+    "width": "container",
+    "config": {
+      "view": {
+        "stroke": "transparent"
+      },
+      "background": "transparent"
+    },
+    "height": 400,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "pad"
+    },
+    "transform": [
+      {
+        "window": [
+          {
+            "as": "rank",
+            "op": "row_number"
+          }
+        ]
+      }
+    ]
+  },
+  "isLoading": "{{state.queries.query_5.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "editorMode": "raw",
+  "properties": {
+    "widgetCss": {},
+    "showHeader": true,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}
+
+================================================================================
+APP PAGE: 57720bd1-e7b8-40f9-939e-a103de4e5274
+================================================================================
+Title: Forex dashboard
+Description: (none)
+
+appPageConfig:
+{
+  "layout": {
+    "id": "ROOT",
+    "type": "column",
+    "children": [
+      {
+        "id": "lwQEHo74bl",
+        "gap": 8,
+        "span": 12,
+        "type": "stack",
+        "wrap": false,
+        "align": "flex-end",
+        "style": {
+          "padding": "0"
+        },
+        "sizing": "auto",
+        "children": [
+          {
+            "id": "s2_3iebNXo",
+            "span": 1,
+            "type": "widget",
+            "width": 70,
+            "height": 70,
+            "sizing": "auto",
+            "widgetKey": "widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_7"
+          },
+          {
+            "id": "Sf9bOLRfg0",
+            "span": 10,
+            "type": "widget",
+            "width": "grow",
+            "sizing": "fill",
+            "widgetKey": "widget_252caf5e-396f-411b-8d5c-b21414f9b94e_6"
+          }
+        ],
+        "direction": "horizontal"
+      },
+      {
+        "id": "tPEah3QyuO",
+        "type": "row",
+        "sizing": "auto",
+        "children": [
+          {
+            "id": "HZO2am-2Wl",
+            "span": 2,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_df6e16f5-d959-46d5-993f-2a33617f8795_7"
+          },
+          {
+            "id": "Z2NBQK44Yo",
+            "span": 2,
+            "type": "widget",
+            "sizing": "auto",
+            "widgetKey": "widget_04b66ab4-2a8d-48d4-9110-198d0d1be9b8_3"
+          },
+          {
+            "id": "bVN1IHmisp",
+            "span": 2,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_f78b29e6-2a9c-4212-b9b7-c2728b3bc9ba_1"
+          },
+          {
+            "id": "czZe2hVTiW",
+            "span": 2,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_a75b9fb3-138b-4c73-8204-1623bd2ece20_2"
+          },
+          {
+            "id": "ecGlcupmvY",
+            "span": 2,
+            "type": "widget",
+            "width": "grow",
+            "height": 108,
+            "sizing": "fill",
+            "widgetKey": "widget_3adcd70d-82f7-4688-bffe-763c191c95e4_5"
+          },
+          {
+            "id": "ULM1hZ0q-B",
+            "span": 2,
+            "type": "widget",
+            "sizing": "fill",
+            "widgetKey": "widget_a9a74bb1-2dbe-4f9d-8bf2-66eb19a15815_5"
+          }
+        ]
+      },
+      {
+        "id": "terYz-UpOy",
+        "span": 12,
+        "type": "z-stack",
+        "sizing": "fill",
+        "children": [
+          {
+            "id": "uAl8R80RNU",
+            "gap": 8,
+            "span": 12,
+            "type": "stack",
+            "wrap": false,
+            "align": "stretch",
+            "sizing": "fill",
+            "children": [
+              {
+                "id": "MW05joTHuA",
+                "span": 6,
+                "type": "widget",
+                "sizing": "fill",
+                "widgetKey": "widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_3"
+              }
+            ],
+            "direction": "vertical"
+          },
+          {
+            "id": "OZgqsCNa3u",
+            "gap": 8,
+            "span": 12,
+            "type": "stack",
+            "wrap": false,
+            "align": "stretch",
+            "sizing": "fill",
+            "children": [
+              {
+                "id": "QuaE4uIkYJ",
+                "span": 6,
+                "type": "widget",
+                "sizing": "fill",
+                "widgetKey": "widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_4"
+              }
+            ],
+            "direction": "vertical"
+          },
+          {
+            "id": "h0QNbbMKSU",
+            "gap": 8,
+            "span": 12,
+            "type": "stack",
+            "wrap": false,
+            "align": "stretch",
+            "sizing": "fill",
+            "children": [
+              {
+                "id": "JH8B8KkMAs",
+                "span": 6,
+                "type": "widget",
+                "sizing": "fill",
+                "widgetKey": "widget_df6e16f5-d959-46d5-993f-2a33617f8795_5"
+              }
+            ],
+            "direction": "vertical"
+          }
+        ],
+        "layerOpacities": [
+          1,
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  "layouts": {},
+  "widgets": [
+    "widget_252caf5e-396f-411b-8d5c-b21414f9b94e_1781119655033",
+    "widget_df6e16f5-d959-46d5-993f-2a33617f8795_1781158877499",
+    "widget_04b66ab4-2a8d-48d4-9110-198d0d1be9b8_1781158895418",
+    "widget_3adcd70d-82f7-4688-bffe-763c191c95e4_1781158909587",
+    "widget_a9a74bb1-2dbe-4f9d-8bf2-66eb19a15815_1781158919159",
+    "widget_f78b29e6-2a9c-4212-b9b7-c2728b3bc9ba_1781159006631",
+    "widget_a75b9fb3-138b-4c73-8204-1623bd2ece20_1781159026801",
+    "widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_1781546742460",
+    "widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_1781939258604",
+    "widget_3adcd70d-82f7-4688-bffe-763c191c95e4_5",
+    "widget_df6e16f5-d959-46d5-993f-2a33617f8795_7",
+    "widget_f78b29e6-2a9c-4212-b9b7-c2728b3bc9ba_1",
+    "widget_a75b9fb3-138b-4c73-8204-1623bd2ece20_2",
+    "widget_a9a74bb1-2dbe-4f9d-8bf2-66eb19a15815_5",
+    "widget_252caf5e-396f-411b-8d5c-b21414f9b94e_6",
+    "widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_7",
+    "widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_1",
+    "widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_2",
+    "widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_3",
+    "widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_4",
+    "widget_df6e16f5-d959-46d5-993f-2a33617f8795_5"
+  ],
+  "variables": [
+    {
+      "key": "startDate",
+      "type": "string",
+      "description": "",
+      "defaultValue": "2026-06-01"
+    },
+    {
+      "key": "endDate",
+      "type": "string",
+      "description": "",
+      "defaultValue": "2026-06-02"
+    }
+  ],
+  "widgetKey": "widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_1781939258604",
+  "dataSources": [
+    {
+      "type": "workflow",
+      "alias": "workflow_1",
+      "queryID": "",
+      "refreshOn": [
+        "variables.startDate",
+        "variables.endDate"
+      ],
+      "listenerID": "",
+      "workflowID": "9871ab65-b4a8-4b26-8633-2dc5de747ace",
+      "channelName": "",
+      "inputValues": {
+        "endDate": "{{state.variables.endDate}}",
+        "startDate": "{{state.variables.startDate}}"
+      },
+      "triggerMode": "reactive",
+      "refetchInterval": null
+    }
+  ],
+  "layoutVersion": 2,
+  "_legacyLayouts": {
+    "lg": [
+      {
+        "h": 10,
+        "i": "widget_252caf5e-396f-411b-8d5c-b21414f9b94e_1781117405346",
+        "w": 8,
+        "x": 0,
+        "y": 0
+      }
+    ],
+    "md": [
+      {
+        "h": 10,
+        "i": "widget_252caf5e-396f-411b-8d5c-b21414f9b94e_1781117405346",
+        "w": 8,
+        "x": 0,
+        "y": null
+      }
+    ],
+    "sm": [
+      {
+        "h": 10,
+        "i": "widget_252caf5e-396f-411b-8d5c-b21414f9b94e_1781117405346",
+        "w": 6,
+        "x": 0,
+        "y": null
+      }
+    ],
+    "xs": [
+      {
+        "h": 10,
+        "i": "widget_252caf5e-396f-411b-8d5c-b21414f9b94e_1781117405346",
+        "w": 4,
+        "x": 0,
+        "y": null
+      }
+    ],
+    "xxs": [
+      {
+        "h": 10,
+        "i": "widget_252caf5e-396f-411b-8d5c-b21414f9b94e_1781117405346",
+        "w": 4,
+        "x": 0,
+        "y": null
+      }
+    ]
+  }
+}
+
+Widget keys: ["widget_252caf5e-396f-411b-8d5c-b21414f9b94e_1781119655033","widget_df6e16f5-d959-46d5-993f-2a33617f8795_1781158877499","widget_04b66ab4-2a8d-48d4-9110-198d0d1be9b8_1781158895418","widget_3adcd70d-82f7-4688-bffe-763c191c95e4_1781158909587","widget_a9a74bb1-2dbe-4f9d-8bf2-66eb19a15815_1781158919159","widget_f78b29e6-2a9c-4212-b9b7-c2728b3bc9ba_1781159006631","widget_a75b9fb3-138b-4c73-8204-1623bd2ece20_1781159026801","widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_1781546742460","widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_1781939258604","widget_3adcd70d-82f7-4688-bffe-763c191c95e4_5","widget_df6e16f5-d959-46d5-993f-2a33617f8795_7","widget_f78b29e6-2a9c-4212-b9b7-c2728b3bc9ba_1","widget_a75b9fb3-138b-4c73-8204-1623bd2ece20_2","widget_a9a74bb1-2dbe-4f9d-8bf2-66eb19a15815_5","widget_252caf5e-396f-411b-8d5c-b21414f9b94e_6","widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_7","widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_1","widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_2","widget_e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808_3","widget_f7f68219-5e0d-4543-8065-0d619b5d0c4f_4","widget_df6e16f5-d959-46d5-993f-2a33617f8795_5"]
+Extracted widget IDs: ["252caf5e-396f-411b-8d5c-b21414f9b94e","df6e16f5-d959-46d5-993f-2a33617f8795","04b66ab4-2a8d-48d4-9110-198d0d1be9b8","3adcd70d-82f7-4688-bffe-763c191c95e4","a9a74bb1-2dbe-4f9d-8bf2-66eb19a15815","f78b29e6-2a9c-4212-b9b7-c2728b3bc9ba","a75b9fb3-138b-4c73-8204-1623bd2ece20","f7f68219-5e0d-4543-8065-0d619b5d0c4f","e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808"]
+
+--- Widget: Forex dashboard date range selector (date-range-picker) ---
+widgetID: 252caf5e-396f-411b-8d5c-b21414f9b94e
+widgetConfig:
+{
+  "label": "Select date range",
+  "events": {
+    "onChange": [
+      {
+        "config": {
+          "key": "{{state.variables.startDate}}",
+          "value": "{{event.startDate}}"
+        },
+        "actionType": "SET_VARIABLE"
+      },
+      {
+        "config": {
+          "key": "{{state.variables.endDate}}",
+          "value": "{{event.endDate}}"
+        },
+        "actionType": "SET_VARIABLE"
+      }
+    ]
+  },
+  "properties": {
+    "style": {
+      "padding": "8px",
+      "showBorder": false
+    },
+    "widgetCss": {},
+    "showHeader": false,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  },
+  "placeholderEnd": "2026-05-01",
+  "placeholderStart": "2026-04-01"
+}
+
+--- Widget: FPI SWISS FR (stat) ---
+widgetID: df6e16f5-d959-46d5-993f-2a33617f8795
+widgetConfig:
+{
+  "events": {},
+  "prefix": "CHF",
+  "suffix": "",
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": []
+    },
+    "mark": {
+      "type": "bar",
+      "tooltip": true
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "grid": true,
+        "gridOpacity": 0.15,
+        "titlePadding": 8,
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "background": "transparent"
+    },
+    "height": 300,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {}
+  },
+  "isLoading": "{{state.workflows.workflow_1.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "properties": {
+    "widgetCss": {},
+    "showHeader": false,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  },
+  "trendTemplate": "{{Number(state.workflows.workflow_1.data.scriptResult[1].CHF) - Number(state.workflows.workflow_1.data.scriptResult[0].CHF)}}",
+  "valueTemplate": "{{state.workflows.workflow_1.data.scriptResult[1].CHF}}"
+}
+
+--- Widget: FPI BR POUND (stat) ---
+widgetID: 04b66ab4-2a8d-48d4-9110-198d0d1be9b8
+widgetConfig:
+{
+  "events": {},
+  "prefix": "GBP",
+  "suffix": "",
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": []
+    },
+    "mark": {
+      "type": "bar",
+      "tooltip": true
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "grid": true,
+        "gridOpacity": 0.15,
+        "titlePadding": 8,
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "background": "transparent"
+    },
+    "height": 300,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {}
+  },
+  "isLoading": "{{state.workflows.workflow_1.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "properties": {
+    "widgetCss": {},
+    "showHeader": false,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  },
+  "trendTemplate": "{{Number(state.workflows.workflow_1.data.scriptResult[1].GBP) - Number(state.workflows.workflow_1.data.scriptResult[0].GBP)}}",
+  "valueTemplate": "{{state.workflows.workflow_1.data.scriptResult[1].GBP}}"
+}
+
+--- Widget: FPI JP YEN (stat) ---
+widgetID: 3adcd70d-82f7-4688-bffe-763c191c95e4
+widgetConfig:
+{
+  "events": {},
+  "prefix": "JPY",
+  "suffix": "",
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": []
+    },
+    "mark": {
+      "type": "bar",
+      "tooltip": true
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "grid": true,
+        "gridOpacity": 0.15,
+        "titlePadding": 8,
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "background": "transparent"
+    },
+    "height": 300,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {}
+  },
+  "isLoading": "{{state.workflows.workflow_1.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "properties": {
+    "widgetCss": {},
+    "showHeader": false,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  },
+  "trendTemplate": "{{Number(state.workflows.workflow_1.data.scriptResult[1].JPY) - Number(state.workflows.workflow_1.data.scriptResult[0].JPY)}}",
+  "valueTemplate": "{{state.workflows.workflow_1.data.scriptResult[1].JPY}}"
+}
+
+--- Widget: FPI SW KRONA (stat) ---
+widgetID: a9a74bb1-2dbe-4f9d-8bf2-66eb19a15815
+widgetConfig:
+{
+  "events": {},
+  "prefix": "SEK",
+  "suffix": "",
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": []
+    },
+    "mark": {
+      "type": "bar",
+      "tooltip": true
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "grid": true,
+        "gridOpacity": 0.15,
+        "titlePadding": 8,
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "background": "transparent"
+    },
+    "height": 300,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {}
+  },
+  "isLoading": "{{state.workflows.workflow_1.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "properties": {
+    "widgetCss": {},
+    "showHeader": false,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  },
+  "trendTemplate": "{{Number(state.workflows.workflow_1.data.scriptResult[1].SEK) - Number(state.workflows.workflow_1.data.scriptResult[0].SEK)}}",
+  "valueTemplate": "{{state.workflows.workflow_1.data.scriptResult[1].SEK}}"
+}
+
+--- Widget: FPI INR (stat) ---
+widgetID: f78b29e6-2a9c-4212-b9b7-c2728b3bc9ba
+widgetConfig:
+{
+  "events": {},
+  "prefix": "INR",
+  "suffix": "",
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": []
+    },
+    "mark": {
+      "type": "bar",
+      "tooltip": true
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "grid": true,
+        "gridOpacity": 0.15,
+        "titlePadding": 8,
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "background": "transparent"
+    },
+    "height": 300,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {}
+  },
+  "isLoading": "{{state.workflows.workflow_1.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "properties": {
+    "widgetCss": {},
+    "showHeader": false,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  },
+  "trendTemplate": "{{Number(state.workflows.workflow_1.data.scriptResult[1].INR) - Number(state.workflows.workflow_1.data.scriptResult[0].INR)}}",
+  "valueTemplate": "{{state.workflows.workflow_1.data.scriptResult[1].INR}}"
+}
+
+--- Widget: FPI EURO (stat) ---
+widgetID: a75b9fb3-138b-4c73-8204-1623bd2ece20
+widgetConfig:
+{
+  "events": {},
+  "prefix": "EUR",
+  "suffix": "",
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": []
+    },
+    "mark": {
+      "type": "bar",
+      "tooltip": true
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "grid": true,
+        "gridOpacity": 0.15,
+        "titlePadding": 8,
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "background": "transparent"
+    },
+    "height": 300,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {}
+  },
+  "isLoading": "{{state.workflows.workflow_1.isLoading}}",
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "properties": {
+    "widgetCss": {},
+    "showHeader": false,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  },
+  "trendTemplate": "{{Number(state.workflows.workflow_1.data.scriptResult[1].EUR) - Number(state.workflows.workflow_1.data.scriptResult[0].EUR)}}",
+  "valueTemplate": "{{state.workflows.workflow_1.data.scriptResult[1].EUR}}"
+}
+
+--- Widget: Logo test (image) ---
+widgetID: f7f68219-5e0d-4543-8065-0d619b5d0c4f
+widgetConfig:
+{
+  "src": "https://apopjzvhqwlrcykesema.supabase.co/storage/v1/object/public/jet-admin-datasource-file-uploads/widget-files/c7d62f04-720b-4d78-9e58-0d157c301097/1781546723100-a-device-control-app-icon-minimalist-icon-abstract.png",
+  "events": {},
+  "options": {},
+  "vegaSpec": {
+    "data": {
+      "values": []
+    },
+    "mark": {
+      "type": "bar",
+      "tooltip": true
+    },
+    "width": "container",
+    "config": {
+      "axis": {
+        "grid": true,
+        "gridOpacity": 0.15,
+        "titlePadding": 8,
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "view": {
+        "stroke": "transparent"
+      },
+      "legend": {
+        "labelFontSize": 11,
+        "titleFontSize": 12
+      },
+      "background": "transparent"
+    },
+    "height": 300,
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "autosize": {
+      "type": "fit",
+      "contains": "padding"
+    },
+    "encoding": {}
+  },
+  "shelfSpec": {
+    "mark": "auto",
+    "config": {
+      "title": "",
+      "width": "container",
+      "height": 300,
+      "colorScheme": "tableau10"
+    },
+    "encoding": {
+      "x": null,
+      "y": null,
+      "row": null,
+      "size": null,
+      "text": null,
+      "color": null,
+      "shape": null,
+      "column": null,
+      "detail": null,
+      "opacity": null,
+      "tooltip": [],
+      "strokeDash": null
+    },
+    "dataSource": "",
+    "inlineValues": null
+  },
+  "properties": {
+    "style": {
+      "showBorder": false
+    },
+    "widgetCss": {},
+    "showHeader": false,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}
+
+--- Widget: test widget (text) ---
+widgetID: e5f4aaa7-cfba-4f11-9e97-ed7c1fc54808
+widgetConfig:
+{
+  "events": {},
+  "content": "{{state.variables.startDate}}",
+  "properties": {
+    "widgetCss": {},
+    "showHeader": true,
+    "containerCss": {},
+    "refetchInterval": 0,
+    "widgetTailwindCss": "text-foreground",
+    "containerTailwindCss": ""
+  }
+}

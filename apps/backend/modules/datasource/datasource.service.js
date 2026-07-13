@@ -7,9 +7,8 @@ const { vaultService } = require("../vault/vault.service");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { encrypt, decrypt } = require("../../utils/encryption.util");
 // MASK_PLACEHOLDER is the sentinel written by mask() in sensitive.js.
-// Importing it here ensures the producer (controller) and consumer (service)
-// always agree on the same value — no magic strings duplicated.
-const { MASK_PLACEHOLDER, mask } = require("../../utils/sensitive");
+// Kept here as a safety fallback in mergeAndRestoreMaskedOptions.
+const { MASK_PLACEHOLDER } = require("../../utils/sensitive");
 
 function encryptOptions(options) {
   if (!options) return options;
@@ -195,7 +194,6 @@ datasourceService.testDatasourceConnection = async ({
       userID,
       tenantID,
       datasourceType,
-      datasourceOptions: mask(datasourceOptions),
       datasourceID,
     },
   });
@@ -287,7 +285,6 @@ datasourceService.createDatasource = async ({
       tenantID,
       datasourceTitle,
       datasourceType,
-      datasourceOptions: mask(datasourceOptions),
       datasourceTags,
       authContext,
     },
@@ -472,7 +469,6 @@ datasourceService.updateDatasourceByID = async ({
       datasourceID,
       datasourceTitle,
       datasourceType,
-      datasourceOptions: mask(datasourceOptions),
       datasourceTags,
     },
   });

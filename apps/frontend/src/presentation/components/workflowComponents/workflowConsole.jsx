@@ -95,13 +95,13 @@ export const WorkflowConsole = ({
             <span>No logs yet. Click "Test Run" to start.</span>
           </div>
         ) : (
-            <div className="space-y-1.5">
+            <div className="space-y-1">
             {logs.map((log, index) => {
               const { icon: Icon, color, bgColor } = getLogStyle(log);
               return (
                 <div
                   key={index}
-                  className={`flex items-start gap-2.5 py-1.5 px-2.5 rounded-md ${bgColor} group transition-colors`}
+                  className={`flex items-start gap-2.5 py-1.5 px-2.5 rounded ${bgColor} group transition-colors`}
                 >
                   {/* Timestamp */}
                   <span className="text-muted-foreground/50 whitespace-nowrap shrink-0 font-medium">
@@ -123,7 +123,7 @@ export const WorkflowConsole = ({
                       </span>
                     )}
                     {log.output && (
-                      <div className="mt-1.5 p-2.5 bg-background/80 rounded-md border border-border text-foreground/90 overflow-x-auto shadow-sm">
+                      <div className="mt-1.5 p-2.5 bg-background/80 rounded border border-border text-foreground/90 overflow-x-auto shadow-sm">
                         <pre className="whitespace-pre-wrap break-all leading-relaxed">
                           {typeof log.output === 'object' 
                             ? JSON.stringify(log.output, null, 2) 
@@ -132,7 +132,7 @@ export const WorkflowConsole = ({
                       </div>
                     )}
                     {log.error && (
-                      <div className="mt-1.5 p-2.5 bg-destructive/5 rounded-md border border-destructive/20 text-destructive overflow-x-auto shadow-sm">
+                      <div className="mt-1.5 p-2.5 bg-destructive/5 rounded border border-destructive/20 text-destructive overflow-x-auto shadow-sm">
                         <pre className="whitespace-pre-wrap break-all font-semibold leading-relaxed">{log.error}</pre>
                       </div>
                     )}

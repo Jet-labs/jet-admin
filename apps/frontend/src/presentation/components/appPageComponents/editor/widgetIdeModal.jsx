@@ -31,7 +31,7 @@ import { resolveConfig } from "../../../../logic/evaluationEngine";
 import { useAppPageStateTree } from "../../../../logic/appPageRuntime";
 
 const defaultWidgetType = WIDGET_TYPES.VEGA_LITE.value;
-const initialValues = {
+const EMPTY_INITIAL_VALUES = {
   widgetTitle: "",
   widgetType: defaultWidgetType,
   widgetConfig: {
@@ -63,15 +63,20 @@ export const WidgetIdeModal = ({
     enabled: !!widgetID && isOpen,
   });
 
-  const widgetForm = useFormik({
-    initialValues: widget && widgetID ? {
+  const formInitialValues = useMemo(() => {
+    if (!widget || !widgetID) return EMPTY_INITIAL_VALUES;
+    return {
       widgetTitle: widget.widgetTitle || "",
       widgetType: widget.widgetType || defaultWidgetType,
       widgetConfig: widget.widgetConfig || {
         properties: { showHeader: true },
         events: {},
       },
-    } : initialValues,
+    };
+  }, [widget, widgetID]);
+
+  const widgetForm = useFormik({
+    initialValues: formInitialValues,
     enableReinitialize: true,
     validationSchema: formValidations.addWidgetFormValidationSchema,
     validateOnMount: false,

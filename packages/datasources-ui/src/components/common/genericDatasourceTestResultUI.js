@@ -52,7 +52,7 @@ export const GenericDatasourceTestResultUI = ({ connectionResult }) => {
     }
   }
 
-  // Set style mappings according to UI Guidelines V3 (keeping border radius rounded-md / 6px)
+  // Set style mappings according to UI Guidelines V3 (keeping border radius rounded / 6px)
   const styles = {
     success: {
       container: "bg-primary/5 border-primary/20 text-primary",
@@ -113,28 +113,25 @@ export const GenericDatasourceTestResultUI = ({ connectionResult }) => {
     }
 
     return (
-      <div className="mt-4 pt-4 border-t border-current/10 w-full space-y-2">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/80">
-          Details / Logs
-        </p>
-        <div className="rounded-md bg-foreground text-background p-4 font-mono text-xs leading-relaxed overflow-x-auto max-h-60 border border-border/50">
+
+      <div className={`rounded bg-background w-full text-muted-foreground p-2 text-xs leading-relaxed overflow-x-auto max-h-60 border border-border/50 ${currentStyle.container} !bg-background`}>
           <code>{text}</code>
         </div>
-      </div>
+
     );
   };
 
   return (
     <div className="w-full">
-      <div className={`w-full flex flex-col justify-start items-start p-4 rounded-md border transition-all duration-200 ${currentStyle.container}`}>
-        <div className="flex flex-row justify-between items-center w-full gap-4">
-          <div className="flex flex-row justify-start items-center gap-3">
+      <div className={`w-full flex flex-col justify-start items-start p-2 rounded border transition-all duration-200 space-y-2 ${currentStyle.container}`}>
+        <div className="flex flex-row justify-between items-center w-full gap-2">
+          <div className="flex flex-row justify-start items-center gap-2">
             {currentStyle.icon}
             <span className="text-sm font-medium tracking-tight">
               {title}
             </span>
           </div>
-          <span className={`text-[10px] font-mono font-medium uppercase px-2 py-0.5 rounded-full ${currentStyle.badge}`}>
+          <span className={`text-[10px] font-mono font-medium uppercase px-2 py-1 rounded ${currentStyle.badge}`}>
             {currentStyle.badgeText}
           </span>
         </div>

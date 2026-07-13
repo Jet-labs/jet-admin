@@ -255,24 +255,32 @@
         ]
       },
       {
-        "type": "Control",
-        "scope": "#/properties/inputDefinitions",
-        "label": "Dynamic Arguments",
+        "type": "Group",
         "options": {
-          "detail": {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/key"
-              },
-              {
-                "type": "Control",
-                "scope": "#/properties/type"
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Dynamic Arguments",
+            "options": {
+              "detail": {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/key"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/type"
+                  }
+                ]
               }
-            ]
+            }
           }
-        }
+        ]
       }
     ]
   },

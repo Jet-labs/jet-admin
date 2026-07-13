@@ -53,7 +53,7 @@ export const CustomTextInput = (props) => {
             isTextArea={!!isMulti}
             rows={options.rows || 3}
             readOnly={isDisabled}
-            className={hasErrors ? "ring-1 ring-red-500 rounded-sm" : ""}
+            className={hasErrors ? "ring-1 ring-red-500 rounded" : ""}
         />
       )}
       {hasErrors && (

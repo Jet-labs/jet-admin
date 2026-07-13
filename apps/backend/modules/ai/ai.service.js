@@ -25,6 +25,39 @@
 const Logger = require('../../utils/logger');
 const environment = require('../../environment');
 const constants = require('../../constants');
+const { z } = require('zod');
+
+function hasUserConfirmedAction(messages, toolName, args) {
+  if (!Array.isArray(messages)) return false;
+  
+  for (const msg of messages) {
+    if (Array.isArray(msg.toolInvocations)) {
+      for (const inv of msg.toolInvocations) {
+        if (inv.toolName === 'askUser' && inv.state === 'result') {
+          const askArgs = inv.args || {};
+          const askResult = inv.result || {};
+          if (
+            askArgs.kind === 'confirm' &&
+            askResult.confirmed === true &&
+            askResult.targetTool === toolName
+          ) {
+            // Check if all parameters from args match targetParams
+            const targetParams = askResult.targetParams || {};
+            let isMatch = true;
+            for (const [key, value] of Object.entries(targetParams)) {
+              if (args[key] !== value) {
+                isMatch = false;
+                break;
+              }
+            }
+            if (isMatch) return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}
 
 // ─── Lazy SDK loader (ESM → CJS bridge) ──────────────────────────────────────
 
@@ -212,10 +245,105 @@ aiService.streamChat = async ({ messages, tenantID, bearerToken, clientContext, 
   const localizedContextBlock = await aiContextService.buildSessionContext({ tenantID, conversationID, clientContext });
   const dynamicSystemPrompt = aiSystemPrompt.build(localizedContextBlock);
 
+  // Critical operations that must go through confirmation
+  const criticalTools = [
+    'create_datasource',
+    'update_datasource',
+    'delete_datasource',
+    'create_query',
+    'update_query',
+    'delete_query',
+    'create_widget',
+    'update_widget',
+    'delete_widget',
+    'create_app_page',
+    'update_app_page',
+    'delete_app_page',
+    'create_workflow',
+    'update_workflow',
+    'delete_workflow',
+    'execute_workflow',
+    'create_listener',
+    'update_listener',
+    'delete_listener',
+    'activate_listener',
+    'deactivate_listener'
+  ];
+
+  const processedTools = {};
+  
+  // Wrap MCP tools to intercept critical actions
+  for (const [name, tool] of Object.entries(tools)) {
+    if (criticalTools.includes(name)) {
+      const originalExecute = tool.execute;
+      processedTools[name] = {
+        ...tool,
+        execute: async (args, context) => {
+          if (!hasUserConfirmedAction(sanitizedMessages, name, args)) {
+            return {
+              error: "CONFIRMATION_REQUIRED",
+              message: `Confirmation required. You must call 'askUser' with kind='confirm' to get the user's explicit confirmation before running '${name}'.`,
+              targetTool: name,
+              targetParams: args
+            };
+          }
+          return originalExecute(args, context);
+        }
+      };
+    } else {
+      processedTools[name] = tool;
+    }
+  }
+
+  // Add client-side elicitation and planning tools
+  processedTools.askUser = {
+    description: "Ask the user a clarifying question before proceeding, when a required parameter is ambiguous or critical action needs confirmation.",
+    parameters: z.object({
+      kind: z.enum(["form", "choice", "confirm"]),
+      title: z.string().describe("Concise title for the prompt widget"),
+      description: z.string().optional().describe("Helpful context explaining what is being asked or warned about"),
+      fields: z.array(
+        z.object({
+          name: z.string().describe("Input identifier key"),
+          label: z.string().describe("Input display label"),
+          type: z.enum(["text", "number", "select", "boolean", "secret", "textarea"]),
+          defaultValue: z.any().optional(),
+          options: z.array(z.string()).optional(),
+        })
+      ).optional().describe("Form input fields if kind is 'form'"),
+      choices: z.array(
+        z.object({
+          label: z.string().describe("Short choice label"),
+          description: z.string().optional().describe("Detailed description of this choice"),
+          value: z.string().describe("Value returned to the agent loop if chosen"),
+        })
+      ).optional().describe("Multi-choice options if kind is 'choice'"),
+      targetTool: z.string().optional().describe("If confirm, the tool name being confirmed"),
+      targetParams: z.record(z.any()).optional().describe("If confirm, the tool parameters being confirmed"),
+    }),
+  };
+
+  processedTools.createPlan = {
+    description: "Initialize a plan tracker with a checklist of steps before executing complex or multi-step operations.",
+    parameters: z.object({
+      title: z.string().describe("Overall objective of the plan"),
+      steps: z.array(
+        z.object({
+          id: z.string().describe("Unique ID for the step"),
+          title: z.string().describe("Short checklist item title"),
+          status: z.enum(["pending", "in_progress", "completed", "failed"]),
+        })
+      ),
+    }),
+    execute: async (args) => {
+      return { success: true, plan: args };
+    }
+  };
+
   const agent = new _ToolLoopAgent({
     model: modelInstance,
     instructions: dynamicSystemPrompt,
-    tools,
+    tools: processedTools,
     onEnd: async ({ usage, steps }) => {
       Logger.log('success', {
         message: 'ai.service:streamChat:done',

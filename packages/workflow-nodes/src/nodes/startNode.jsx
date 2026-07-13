@@ -58,7 +58,7 @@ export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Help callout */}
 
-      <div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
+      <div className="rounded border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
         <div className="font-semibold text-xs text-foreground">📘 How This Works</div>
 
         <div>
@@ -75,16 +75,16 @@ export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
           <div className="ml-3 mt-0.5 text-muted-foreground">
             Define inputs in the <strong>"Input Parameters"</strong> panel (right side).
             Access them using:{' '}
-            <code className="bg-brand-dark px-1 py-0.5 rounded-sm border border-border font-mono">{'{{ctx.input.paramName}}'}</code>
+            <code className="bg-brand-dark px-1 py-0.5 rounded border border-border font-mono">{'{{ctx.input.paramName}}'}</code>
           </div>
         </div>
 
         <div>
           <span className="font-medium text-foreground">Variable Format:</span>
           <div className="ml-3 mt-0.5 font-mono text-[9px] space-y-0.5 text-muted-foreground">
-            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.input.userId}}'}</code> → input parameter</div>
-            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.queryResult}}'}</code> → previous node output</div>
-            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'id_{{ctx.input.id}}'}</code> → string interpolation</div>
+            <div><code className="bg-brand-dark px-1 rounded border border-border">{'{{ctx.input.userId}}'}</code> → input parameter</div>
+            <div><code className="bg-brand-dark px-1 rounded border border-border">{'{{ctx.queryResult}}'}</code> → previous node output</div>
+            <div><code className="bg-brand-dark px-1 rounded border border-border">{'id_{{ctx.input.id}}'}</code> → string interpolation</div>
           </div>
         </div>
       </div>
@@ -142,7 +142,7 @@ export const StartNode = memo(({ id, data, isConnectable }) => {
   };
 
   return (
-    <div className={`relative bg-brand-black border rounded-sm min-w-[280px] max-w-[350px] transition-all duration-150 ${getStatusStyles()}`}>
+    <div className={`relative bg-brand-black border rounded min-w-[280px] max-w-[350px] transition-all duration-150 ${getStatusStyles()}`}>
       <StatusIndicator />
       <div className="flex items-stretch">
         <div style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}

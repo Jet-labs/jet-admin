@@ -60,7 +60,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables, state
       </p>
 
       {parameters.length === 0 ? (
-        <div className="text-xs text-brand-text-primary italic py-3 text-center border border-dashed border-brand-border rounded-sm">
+        <div className="text-xs text-brand-text-primary italic py-3 text-center border border-dashed border-brand-border rounded">
           No output parameters defined. Workflow will complete with no output.
         </div>
       ) : (
@@ -68,7 +68,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables, state
           {parameters.map((param, index) => (
             <div
               key={param.id}
-              className="border border-brand-border rounded-sm p-2 bg-brand-dark"
+              className="border border-brand-border rounded p-2 bg-brand-dark"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -293,14 +293,14 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* Comprehensive instructions */}
-      <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
+      <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-[10px] text-brand-text-primary space-y-2">
         <div className="font-semibold text-brand-text-primary text-xs">📘 Workflow Output</div>
 
         <div>
           <span className="font-medium text-brand-text-primary">Source Variable Format:</span>
           <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
-            <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.queryResult}}"}</code> → from previous node</div>
-            <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.processedData}}"}</code> → from script node</div>
+            <div><code className="bg-brand-black px-1 rounded">{"{{ctx.queryResult}}"}</code> → from previous node</div>
+            <div><code className="bg-brand-black px-1 rounded">{"{{ctx.processedData}}"}</code> → from script node</div>
           </div>
         </div>
 
@@ -500,7 +500,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
             <span className="text-xs font-semibold truncate text-brand-text-primary">
               {data?.title || 'End'}
             </span>
-            <span className={`text-xs font-medium px-1.5 py-0.5 rounded-sm border ${statusConfig.bgColor} ${statusConfig.textColor} ${statusConfig.borderColor}`}>
+            <span className={`text-xs font-medium px-1.5 py-0.5 rounded border ${statusConfig.bgColor} ${statusConfig.textColor} ${statusConfig.borderColor}`}>
               {statusConfig.label}
             </span>
           </div>

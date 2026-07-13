@@ -81,7 +81,7 @@ export const FieldPill = ({
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
-          className="ml-auto h-3.5 w-3.5 rounded-sm flex items-center justify-center hover:bg-background/20 shrink-0"
+          className="ml-auto h-3.5 w-3.5 rounded flex items-center justify-center hover:bg-background/20 shrink-0"
           title="Remove"
         >
           <X className="w-2.5 h-2.5" />

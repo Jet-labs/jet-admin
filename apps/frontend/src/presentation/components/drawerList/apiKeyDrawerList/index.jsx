@@ -32,12 +32,12 @@ export const APIKeyDrawerList = () => {
 
       {isLoadingAPIKeys || isFetchingAPIKeys ? (
         <div role="status" className="animate-pulse w-full space-y-2 p-2">
-          <div className="h-9 rounded-md bg-muted" />
-          <div className="h-9 rounded-md bg-muted" />
-          <div className="h-9 rounded-md bg-muted" />
+          <div className="h-9 rounded bg-muted" />
+          <div className="h-9 rounded bg-muted" />
+          <div className="h-9 rounded bg-muted" />
         </div>
       ) : apiKeys && apiKeys.length > 0 ? (
-          <div className="flex-1 w-full overflow-y-auto p-2 pb-10 space-y-1">
+          <div className="flex-1 w-full overflow-y-auto p-2 pt-0 pb-10 space-y-2">
           {apiKeys.map((apiKey) => {
             const key = `apiKey_${apiKey.apiKeyID}`;
             const isActive = routeParam?.apiKeyID == apiKey.apiKeyID;
@@ -52,7 +52,7 @@ export const APIKeyDrawerList = () => {
                 className="block focus:outline-none"
               >
                 <div
-                  className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
+                  className={`flex items-center gap-2 rounded px-2 py-1.5 transition-colors ${isActive
                     ? "bg-primary/5 text-primary"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}

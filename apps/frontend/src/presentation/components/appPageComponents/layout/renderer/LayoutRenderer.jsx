@@ -151,7 +151,7 @@ export function LayoutContainer({
 
   return (
     <div
-      className={`flex flex-col bg-background border border-border rounded-md box-border transition-all ${spanClass} ${sizingClass}`}
+      className={`flex flex-col bg-background border border-border rounded box-border transition-all ${spanClass} ${sizingClass}`}
       style={containerStyle}
       onClick={handleClick}
       id={node.id}

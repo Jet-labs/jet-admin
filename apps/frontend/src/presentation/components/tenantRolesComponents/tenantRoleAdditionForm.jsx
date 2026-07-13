@@ -91,7 +91,7 @@ export const TenantRoleAdditionForm = () => {
             noValidate
           >
             <Section title="Identity" description="General information about the role.">
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <Label htmlFor="roleTitle">
                   {CONSTANTS.STRINGS.TENANT_ROLE_ADDITION_FORM_ROLE_NAME_FIELD_LABEL}{" "}
                   <span className="text-destructive">*</span>
@@ -112,7 +112,7 @@ export const TenantRoleAdditionForm = () => {
                 <FieldError message={addTenantRoleForm.touched.roleTitle && addTenantRoleForm.errors.roleTitle} />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <Label htmlFor="roleDescription">
                   {
                     CONSTANTS.STRINGS

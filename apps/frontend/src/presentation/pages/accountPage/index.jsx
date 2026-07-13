@@ -60,8 +60,8 @@ const AccountPage = () => {
                 </div>
               </div>
               <div className="flex flex-1 flex-col justify-start items-start space-y-4">
-                <div className="h-6 bg-background rounded-sm w-full"></div>
-                <div className="h-6 bg-background rounded-sm  w-full"></div>
+                <div className="h-6 bg-background rounded w-full"></div>
+                <div className="h-6 bg-background rounded  w-full"></div>
               </div>
             </div>
           ) : (
@@ -101,7 +101,7 @@ const AccountPage = () => {
 
                 <Button
                   type="button"
-                  className="flex items-center justify-center px-4 py-2 text-xs font-medium text-foreground bg-background border border-border rounded-sm  hover:bg-muted focus:outline-none focus:ring-1 focus:ring-brand-border-mid focus:ring-opacity-30 transition-colors"
+                  className="flex items-center justify-center px-4 py-2 text-xs font-medium text-foreground bg-background border border-border rounded  hover:bg-muted focus:outline-none focus:ring-1 focus:ring-brand-border-mid focus:ring-opacity-30 transition-colors"
                   onClick={_handleSignOut}
                 >
                   <LogOut className="mr-2 opacity-70" size={14} />

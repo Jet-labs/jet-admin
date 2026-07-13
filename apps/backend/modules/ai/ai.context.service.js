@@ -21,12 +21,15 @@ const aiContextService = {};
  * @returns {Promise<string>} The generated context block string
  */
 aiContextService.buildSessionContext = async ({ tenantID, conversationID, clientContext = {} }) => {
-  // Return cached context if available for this conversation
-  if (conversationID && sessionContextCache.has(conversationID)) {
-    return sessionContextCache.get(conversationID);
-  }
-
   const { appPageID, widgetID, route } = clientContext;
+  const cacheKey = conversationID
+    ? `${conversationID}:${route || ''}:${appPageID || ''}:${widgetID || ''}`
+    : null;
+
+  // Return cached context if available for this specific context
+  if (cacheKey && sessionContextCache.has(cacheKey)) {
+    return sessionContextCache.get(cacheKey);
+  }
   let contextBlock = "## Current User Context\n";
 
   contextBlock += `- **Active Route**: ${route || 'Unknown'}\n`;
@@ -60,9 +63,9 @@ aiContextService.buildSessionContext = async ({ tenantID, conversationID, client
     contextBlock += "- The user is in a general context. Use `get_tenant_resource_summary` to explore their resources.\n";
   }
 
-  // Cache the result if we have a conversation ID
-  if (conversationID) {
-    sessionContextCache.set(conversationID, contextBlock);
+  // Cache the result if we have a cache key
+  if (cacheKey) {
+    sessionContextCache.set(cacheKey, contextBlock);
   }
 
   return contextBlock;

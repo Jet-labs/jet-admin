@@ -17,7 +17,7 @@ import { Button } from "@jet-admin/ui";
       <div key={id} className="mb-4">
         <Button
           onClick={() => toggleSection(id)}
-          className="flex justify-between items-center w-full text-left font-semibold text-lg bg-muted p-2 rounded-sm"
+          className="flex justify-between items-center w-full text-left font-semibold text-lg bg-muted p-2 rounded"
         >
           {title}
           {/* {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />} */}

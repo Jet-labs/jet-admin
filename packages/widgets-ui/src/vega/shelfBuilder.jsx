@@ -156,7 +156,7 @@ export const ShelfBuilder = ({
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center gap-2 px-2.5 py-2 rounded-md border border-border bg-muted/30 hover:bg-muted/60 cursor-pointer transition-colors text-left"
+        className="w-full flex items-center gap-2 px-2.5 py-2 rounded border border-border bg-muted/30 hover:bg-muted/60 cursor-pointer transition-colors text-left"
       >
         {isExpanded
           ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
@@ -173,7 +173,7 @@ export const ShelfBuilder = ({
 
       {/* ── Expanded Content ── */}
       {isExpanded && (
-        <div className="mt-1.5 rounded-md border border-border bg-card overflow-hidden">
+        <div className="mt-1.5 rounded border border-border bg-card overflow-hidden">
 
           {!hasAnyData ? (
             /* ── Empty State ── */

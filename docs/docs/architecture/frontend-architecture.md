@@ -1178,7 +1178,7 @@ const Button = forwardRef(function Button(
       ref={ref}
       className={`
         inline-flex items-center justify-center
-        font-medium rounded-md
+        font-medium rounded
         transition-colors duration-200
         disabled:opacity-50 disabled:cursor-not-allowed
         ${variants[variant]}

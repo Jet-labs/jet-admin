@@ -27,7 +27,7 @@ import { PageHeader } from "@jet-admin/ui";
 const datasourceOptionsMetadata =
   DATASOURCE_TYPES.POSTGRESQL.formConfig;
 
-const initialValues = {
+const EMPTY_INITIAL_VALUES = {
   datasourceTitle: "",
   datasourceType: DATASOURCE_TYPES.POSTGRESQL.value,
   datasourceOptions: datasourceOptionsMetadata.data,
@@ -85,12 +85,17 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
       },
     });
 
-  const datasourceUpdationForm = useFormik({
-    initialValues: datasource ? {
+  const formInitialValues = useMemo(() => {
+    if (!datasource) return EMPTY_INITIAL_VALUES;
+    return {
       datasourceTitle: datasource.datasourceTitle || "",
       datasourceType: datasource.datasourceType || DATASOURCE_TYPES.POSTGRESQL.value,
       datasourceOptions: datasource.datasourceOptions || datasourceOptionsMetadata.data,
-    } : initialValues,
+    };
+  }, [datasource]);
+
+  const datasourceUpdationForm = useFormik({
+    initialValues: formInitialValues,
     enableReinitialize: true, // Re-initialize form when datasource changes
     onSubmit: (data) => {
       updateDatasource(data);

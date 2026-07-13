@@ -177,7 +177,7 @@
             "label": "SSL Mode"
           },
           {
-            "type": "Group",
+            "type": "VerticalLayout",
             "label": "Advanced Options",
             "elements": [
               {

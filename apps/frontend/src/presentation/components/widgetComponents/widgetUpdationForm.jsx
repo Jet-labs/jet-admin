@@ -2,7 +2,7 @@ import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   getWidgetByIDAPI,
@@ -23,7 +23,7 @@ import { WidgetPreview } from "./widgetPreview";
 
 import { PageHeader } from "@jet-admin/ui";
 
-const initialValues = {
+const EMPTY_INITIAL_VALUES = {
   widgetTitle: "",
   widgetType: "vega-lite",
   widgetConfig: {
@@ -88,13 +88,18 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     },
   });
 
-  const updateWidgetForm = useFormik({
-    initialValues: widget && widget.widgetID ? {
+  const formInitialValues = useMemo(() => {
+    if (!widget || !widget.widgetID) return EMPTY_INITIAL_VALUES;
+    return {
       widgetTitle: widget.widgetTitle || CONSTANTS.STRINGS.UNTITLED,
       widgetType: widget.widgetType || WIDGETS_MAP.text.value,
       widgetDescription: widget.widgetDescription || "",
       widgetConfig: widget.widgetConfig || { properties: {}, events: {} },
-    } : initialValues,
+    };
+  }, [widget]);
+
+  const updateWidgetForm = useFormik({
+    initialValues: formInitialValues,
     enableReinitialize: true,
     validationSchema: formValidations.updateWidgetFormValidationSchema,
     validateOnMount: false,

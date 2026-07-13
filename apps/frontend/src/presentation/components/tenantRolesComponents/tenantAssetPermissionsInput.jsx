@@ -126,7 +126,7 @@ export const TenantAssetPermissionsInput = ({ value = [], onChange, error }) => 
       <div className="space-y-2">
         <Label className="text-sm font-semibold text-foreground">Active Asset Permissions</Label>
         {value.length === 0 ? (
-          <div className="rounded-md border border-dashed border-border p-2 text-center text-xs text-muted-foreground">
+          <div className="rounded border border-dashed border-border p-2 text-center text-xs text-muted-foreground">
             No asset-specific permissions defined yet. Use the tool below to define granular policies.
           </div>
         ) : (
@@ -134,7 +134,7 @@ export const TenantAssetPermissionsInput = ({ value = [], onChange, error }) => 
             {value.map((item, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-1.5 rounded-md border border-border bg-muted/40 px-2 py-1 text-xs text-foreground"
+                className="flex items-center gap-1.5 rounded border border-border bg-muted/40 px-2 py-1 text-xs text-foreground"
               >
                 <span className="text-muted-foreground uppercase text-[10px] tracking-wider font-semibold">
                   {resourceTypeLabels[item.resourceType] || item.resourceType}:
@@ -161,7 +161,7 @@ export const TenantAssetPermissionsInput = ({ value = [], onChange, error }) => 
       </div>
 
       {/* Form to add a new asset permission */}
-      <div className="rounded-md border border-border p-2 bg-muted/20 space-y-2">
+      <div className="rounded border border-border p-2 bg-muted/20 space-y-2">
         <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Add Granular Asset Rule
         </h4>

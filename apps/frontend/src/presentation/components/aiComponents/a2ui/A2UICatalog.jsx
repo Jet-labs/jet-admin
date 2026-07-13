@@ -72,7 +72,7 @@ export function A2UICard({ title, description, fields, actions, onAction, submit
                 <select
                   value={formState[field.name] || ""}
                   onChange={(e) => handleFieldChange(field.name, e.target.value)}
-                  className="w-full h-8 text-xs px-2.5 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full h-8 text-xs px-2.5 rounded border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   {Array.isArray(field.options) ? (
                     field.options.map((opt, oIdx) => (
@@ -90,10 +90,10 @@ export function A2UICard({ title, description, fields, actions, onAction, submit
                   value={formState[field.name] || ""}
                   onChange={(e) => handleFieldChange(field.name, e.target.value)}
                   placeholder={field.placeholder || ""}
-                  className="w-full text-xs p-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-mono"
+                    className="w-full text-xs p-2 rounded border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-mono"
                 />
               ) : field.type === "boolean" || field.type === "switch" ? (
-                <label className="flex items-center justify-between p-2 rounded-md border border-border bg-background cursor-pointer">
+                    <label className="flex items-center justify-between p-2 rounded border border-border bg-background cursor-pointer">
                   <span className="text-xs text-foreground font-medium">{field.description || field.label || "Enable option"}</span>
                   <input
                     type="checkbox"
@@ -108,7 +108,7 @@ export function A2UICard({ title, description, fields, actions, onAction, submit
                   value={formState[field.name] || ""}
                   onChange={(e) => handleFieldChange(field.name, e.target.value)}
                   placeholder={field.placeholder || ""}
-                  className="w-full h-8 text-xs px-2.5 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-mono"
+                        className="w-full h-8 text-xs px-2.5 rounded border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-mono"
                 />
               )}
             </div>
@@ -199,7 +199,7 @@ export function A2UIConfirmCard({ title, description, toolName, params, onAction
             <span>{showDetails ? "Hide" : "View"} Execution Parameters</span>
           </button>
           {showDetails && (
-            <pre className="text-[11px] font-mono bg-muted/40 p-2.5 rounded-md border border-border/60 overflow-x-auto max-h-36">
+            <pre className="text-[11px] font-mono bg-muted/40 p-2.5 rounded border border-border/60 overflow-x-auto max-h-36">
               {JSON.stringify(params, null, 2)}
             </pre>
           )}

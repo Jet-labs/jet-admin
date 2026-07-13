@@ -93,7 +93,7 @@ export const VegaConfigEditor = ({
       )}
 
       {showParseWarning && (
-        <div className="my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20">
+        <div className="my-2 shrink-0 rounded border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20">
           <div className="flex items-start gap-2 text-xs">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
             <div className="flex-1">

@@ -69,7 +69,7 @@ export const CustomNumberInput = (props) => {
         liveStateTree={stateTree}
         mode={templateMode}
         readOnly={isDisabled}
-        className={hasErrors ? "ring-1 ring-red-500 rounded-sm" : ""}
+        className={hasErrors ? "ring-1 ring-red-500 rounded" : ""}
       />
       {hasErrors && (
         <p className="text-xs text-red-500 mt-1">{displayErrors}</p>

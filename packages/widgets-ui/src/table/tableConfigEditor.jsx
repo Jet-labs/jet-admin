@@ -258,7 +258,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
 
         {/* Hint: auto-detect available */}
         {discoveredColumns.length > 0 && columns.length === 0 && (
-          <div className="flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+          <div className="flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
             <Zap className="w-3.5 h-3.5 shrink-0" />
             <span>
               <strong>{discoveredColumns.length}</strong> fields detected from
@@ -270,7 +270,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
 
         {/* No data source hint */}
         {!dataArrayPath && columns.length === 0 && (
-          <div className="text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs">
+          <div className="text-center p-4 border border-dashed rounded text-muted-foreground text-xs">
             Configure a Data Array Template above first, then come back
             here to set up columns.
           </div>
@@ -280,7 +280,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
         {dataArrayPath &&
           discoveredColumns.length === 0 &&
           columns.length === 0 && (
-            <div className="text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs leading-relaxed">
+          <div className="text-center p-4 border border-dashed rounded text-muted-foreground text-xs leading-relaxed">
               No columns detected from <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{dataArrayPath}</code>.
               <br/><br/>
               Make sure the expression points to an array of objects and that you have executed the data source in the App Page Editor, or add columns manually.
@@ -293,7 +293,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
             {columns.map((col, idx) => (
               <div
                 key={idx}
-                className="flex flex-col gap-2 p-2 border rounded-md bg-muted/30"
+                className="flex flex-col gap-2 p-2 border rounded bg-muted/30"
               >
                 <div className="flex items-end gap-1.5">
                   {/* Reorder buttons */}
@@ -406,7 +406,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
         </div>
 
         {pagination.enabled && (
-          <div className="space-y-2 bg-muted/30 p-2 rounded-md border mt-1">
+          <div className="space-y-2 bg-muted/30 p-2 rounded border mt-1">
             <p className="text-[0.6rem] text-muted-foreground">
               Configure pagination actions in the <strong>Events</strong> tab
               using the <strong>On Page Change</strong> event.

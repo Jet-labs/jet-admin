@@ -46,33 +46,41 @@
         "label": "Action"
       },
       {
-        "type": "Control",
-        "scope": "#/properties/inputDefinitions",
-        "label": "Arguments",
+        "type": "Group",
         "options": {
-          "detail": {
-            "type": "VerticalLayout",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/key"
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Arguments",
+            "options": {
+              "detail": {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/key"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/type"
+                  }
+                ]
               },
-              {
-                "type": "Control",
-                "scope": "#/properties/type"
+              "typeOptions": {
+                "enumLabels": {
+                  "string": "String",
+                  "number": "Number",
+                  "boolean": "Boolean",
+                  "array": "Array",
+                  "object": "Object (JSON)"
+                }
               }
-            ]
-          },
-          "typeOptions": {
-            "enumLabels": {
-              "string": "String",
-              "number": "Number",
-              "boolean": "Boolean",
-              "array": "Array",
-              "object": "Object (JSON)"
             }
           }
-        }
+        ]
       }
     ]
   },

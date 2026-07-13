@@ -50,7 +50,7 @@ export const APIKeyDisplayDialog = ({ open, onClose, apiKey }) => {
 
         <div className="flex flex-col gap-2 p-2 py-0">
           {/* Warning banner */}
-          <div className="flex items-start gap-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-md text-amber-500">
+          <div className="flex items-start gap-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded text-amber-500">
             <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
             <div className="text-xs leading-normal font-medium">
               For security reasons, this key will only be shown once. If you lose it, you will need to create a new one.
@@ -58,7 +58,7 @@ export const APIKeyDisplayDialog = ({ open, onClose, apiKey }) => {
           </div>
 
           {/* Key display container */}
-          <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-md border border-border">
+          <div className="flex items-center gap-2 bg-muted/50 p-2 rounded border border-border">
             <code className="text-xs font-mono select-all break-all flex-1 text-foreground">
               {apiKey}
             </code>

@@ -22,21 +22,21 @@ export const PageHeader = ({
 }) => {
 
   return (
-    <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-3 px-4">
+    <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-2">
 
       <div className="flex items-center gap-4">
-        {parentTitle && (
+        {/* {parentTitle && (
           <>
             <h1
               className="text-base font-semibold tracking-tight text-foreground leading-none"
             >
-              
+
               {parentTitle}
             </h1>
             <span className="text-base font-semibold tracking-tight text-foreground leading-none"
 >/</span>
           </>
-        )}
+        )} */}
         <div>
           <h1 className="text-base font-semibold tracking-tight text-foreground leading-none">
             {title}

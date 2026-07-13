@@ -171,7 +171,7 @@ export const TenantStats = ({ tenants }) => {
 
       {/* Grid or List View */}
       {sorted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 border border-border rounded-md bg-muted/30">
+        <div className="flex flex-col items-center justify-center p-12 border border-border rounded bg-muted/30">
           <p className="text-muted-foreground text-sm">No projects found</p>
         </div>
       ) : viewMode === "grid" ? (
@@ -180,12 +180,12 @@ export const TenantStats = ({ tenants }) => {
             <div
               key={tenant.tenantID}
               onClick={() => handleTenantClick(tenant.tenantID)}
-              className="group relative bg-card border border-border hover:border-border/80 rounded-md p-3 flex flex-col justify-between  cursor-pointer transition-all duration-200"
+              className="group relative bg-card border border-border hover:border-border/80 rounded p-3 flex flex-col justify-between  cursor-pointer transition-all duration-200"
             >
               {/* Card Top Section */}
               <div className="flex justify-between items-start w-full">
                 <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-sm border border-border bg-muted/50 flex justify-center items-center overflow-hidden">
+                  <div className="flex-shrink-0 w-8 h-8 rounded border border-border bg-muted/50 flex justify-center items-center overflow-hidden">
                     {tenant.tenantLogoURL ? (
                       <TenantLogo
                         src={tenant.tenantLogoURL}
@@ -270,10 +270,10 @@ export const TenantStats = ({ tenants }) => {
               <div
                 key={tenant.tenantID}
                 onClick={() => handleTenantClick(tenant.tenantID)}
-                className="group relative bg-card border border-border hover:border-border/80 rounded-md p-4 flex items-center justify-between cursor-pointer transition-all duration-200"
+                className="group relative bg-card border border-border hover:border-border/80 rounded p-4 flex items-center justify-between cursor-pointer transition-all duration-200"
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-sm border border-border bg-muted/50 flex justify-center items-center overflow-hidden">
+                  <div className="flex-shrink-0 w-8 h-8 rounded border border-border bg-muted/50 flex justify-center items-center overflow-hidden">
                     {tenant.tenantLogoURL ? (
                       <TenantLogo
                         src={tenant.tenantLogoURL}

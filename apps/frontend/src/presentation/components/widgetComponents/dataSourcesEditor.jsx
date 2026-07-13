@@ -132,7 +132,7 @@ export const DataSourcesEditor = ({
   );
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           Data Sources
@@ -163,7 +163,7 @@ export const DataSourcesEditor = ({
       </div>
 
       {dataSources.length === 0 && (
-        <div className="rounded-md border border-dashed border-border bg-muted/30 p-3 text-center py-6">
+        <div className="rounded border border-dashed border-border bg-muted/30 p-3 text-center py-6">
           <p className="text-[10px] text-muted-foreground">
             No data sources bound. Add a data query or workflow to feed data into
             this widget.
@@ -176,7 +176,7 @@ export const DataSourcesEditor = ({
         return (
           <div
             key={idx}
-            className="rounded-md border border-border bg-card p-3 space-y-2.5"
+            className="rounded border border-border bg-card p-3 space-y-2.5"
           >
             {/* Header row */}
             <div className="flex items-center justify-between">
@@ -281,7 +281,7 @@ export const DataSourcesEditor = ({
 
             {/* Input Arguments */}
             {inputDefinitions.length > 0 && (
-              <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2 mt-2">
+              <div className="rounded border border-border bg-muted/30 p-3 space-y-2 mt-2">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Input Arguments
                 </p>
@@ -331,7 +331,7 @@ export const DataSourcesEditor = ({
                   };
                   
                   return (
-                    <div className="mt-1 h-48 border border-border rounded-md overflow-hidden flex flex-col">
+                    <div className="mt-1 h-48 border border-border rounded overflow-hidden flex flex-col">
                       <WorkflowConsole 
                         logs={executionData.logs}
                         isRunning={executionData.status !== 'COMPLETED' && executionData.status !== 'FAILED'}
@@ -340,7 +340,7 @@ export const DataSourcesEditor = ({
                     </div>
                   );
                 })() : (
-                  <pre className="mt-1 max-h-24 overflow-auto rounded-md bg-foreground text-background p-2 text-[10px] font-mono leading-relaxed">
+                    <pre className="mt-1 max-h-24 overflow-auto rounded bg-foreground text-background p-2 text-[10px] font-mono leading-relaxed">
                     {JSON.stringify(dataSourceResults[source.alias], null, 2)?.slice(
                       0,
                       500

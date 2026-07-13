@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   updateListenerAPI,
   getListenerByIDAPI,
@@ -25,7 +25,7 @@ import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { useNavigate } from "react-router-dom";
 import { ListenerActionManager } from "./listenerActionManager";
 
-const initialValues = {
+const EMPTY_INITIAL_VALUES = {
   listenerTitle: "",
   listenerDescription: "",
   datasourceID: undefined,
@@ -80,15 +80,20 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
 
 
 
-  const listenerUpdationForm = useFormik({
-    initialValues: listener ? {
+  const formInitialValues = useMemo(() => {
+    if (!listener) return EMPTY_INITIAL_VALUES;
+    return {
       listenerTitle: listener.listenerTitle || "",
       listenerDescription: listener.listenerDescription || "",
       datasourceID: listener.datasourceID,
       listenerType: listener.listenerType || "",
       listenerConfig: listener.listenerConfig || {},
       status: listener.status || "inactive",
-    } : initialValues,
+    };
+  }, [listener]);
+
+  const listenerUpdationForm = useFormik({
+    initialValues: formInitialValues,
     enableReinitialize: true,
     onSubmit: (data) => {
       updateListener(data);

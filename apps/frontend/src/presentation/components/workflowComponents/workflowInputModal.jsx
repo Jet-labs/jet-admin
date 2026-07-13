@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { Play, X } from 'lucide-react';
+import { Play } from 'lucide-react';
 import PropTypes from "prop-types";
-import { Button, InputValuesForm } from "@jet-admin/ui";
+import { Button, InputValuesForm, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@jet-admin/ui";
 /**
  * Modal to prompt for workflow input parameters before test run.
  * Renders form fields based on the inputDefinitions schema defined in workflowOptions.
@@ -98,28 +98,20 @@ export const WorkflowInputModal = ({ inputDefinitions, onSubmit, onClose }) => {
   }, [inputDefinitions, values, validate, onSubmit]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-background rounded-md shadow-xl w-full max-w-md mx-4 overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background">
-          <h3 className="text-sm font-semibold text-foreground">
+    <Dialog open={true} onOpenChange={(open) => {
+      if (!open && onClose) {
+        onClose();
+      }
+    }}>
+      <DialogContent className="sm:max-w-md flex flex-col p-0 overflow-hidden gap-0">
+        <DialogHeader className="p-2 border-b shrink-0 text-left">
+          <DialogTitle className="text-base text-foreground font-medium">
             Workflow Input Parameters
-          </h3>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            square
-            onClick={onClose}
-            className="h-8 w-8 text-foreground hover:text-foreground"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Body */}
-        <form>
-          <div className="p-4 max-h-[60vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="p-2 overflow-y-auto flex-1">
             <InputValuesForm
               inputDefinitions={inputDefinitions}
               values={values}
@@ -128,8 +120,7 @@ export const WorkflowInputModal = ({ inputDefinitions, onSubmit, onClose }) => {
             />
           </div>
 
-          {/* Footer */}
-          <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border bg-background">
+          <DialogFooter className="p-2 bg-muted/20 shrink-0 sm:justify-end">
             <Button
               type="button"
               variant="outline"
@@ -139,18 +130,16 @@ export const WorkflowInputModal = ({ inputDefinitions, onSubmit, onClose }) => {
               Cancel
             </Button>
             <Button
-              type='button'
+              type="submit"
               size="sm"
-              onClick={handleSubmit}
-              // className="bg-green-600 hover:bg-green-700 text-white"
             >
               <Play className="w-3 h-3 mr-1.5" />
               Run Workflow
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

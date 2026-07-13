@@ -31,7 +31,7 @@ export default function EditorHeader({ previewMode, setPreviewMode }) {
               type="button"
               disabled={!canUndo}
               onClick={() => actions.history?.undo?.()}
-              className="h-7 px-2 text-[11px] font-medium rounded-md border border-border/50 bg-background text-muted-foreground cursor-pointer transition-all whitespace-nowrap inline-flex items-center gap-2 hover:not-disabled:bg-muted hover:not-disabled:text-foreground hover:not-disabled:border-border disabled:opacity-35 disabled:cursor-not-allowed"
+              className="h-7 px-2 text-[11px] font-medium rounded border border-border/50 bg-background text-muted-foreground cursor-pointer transition-all whitespace-nowrap inline-flex items-center gap-2 hover:not-disabled:bg-muted hover:not-disabled:text-foreground hover:not-disabled:border-border disabled:opacity-35 disabled:cursor-not-allowed"
               title="Undo (Ctrl+Z)"
             >
               <Undo2 className="h-3 w-3" /> Undo
@@ -40,7 +40,7 @@ export default function EditorHeader({ previewMode, setPreviewMode }) {
               type="button"
               disabled={!canRedo}
               onClick={() => actions.history?.redo?.()}
-              className="h-7 px-2 text-[11px] font-medium rounded-md border border-border/50 bg-background text-muted-foreground cursor-pointer transition-all whitespace-nowrap inline-flex items-center gap-2 hover:not-disabled:bg-muted hover:not-disabled:text-foreground hover:not-disabled:border-border disabled:opacity-35 disabled:cursor-not-allowed"
+              className="h-7 px-2 text-[11px] font-medium rounded border border-border/50 bg-background text-muted-foreground cursor-pointer transition-all whitespace-nowrap inline-flex items-center gap-2 hover:not-disabled:bg-muted hover:not-disabled:text-foreground hover:not-disabled:border-border disabled:opacity-35 disabled:cursor-not-allowed"
               title="Redo (Ctrl+Y)"
             >
               <Redo2 className="h-3 w-3" /> Redo
@@ -48,10 +48,10 @@ export default function EditorHeader({ previewMode, setPreviewMode }) {
           </div>
         )}
 
-        <div className="flex bg-muted/60 p-0.5 rounded-md border border-border/40 gap-2">
+        <div className="flex bg-muted/60 p-0.5 rounded border border-border/40 gap-2">
           <button
             type="button"
-            className={`flex items-center gap-2 text-[11px] font-medium px-2 py-0.5 rounded-md cursor-pointer transition-all ${
+            className={`flex items-center gap-2 text-[11px] font-medium px-2 py-0.5 rounded cursor-pointer transition-all ${
               !previewMode
                 ? "bg-card text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
@@ -65,7 +65,7 @@ export default function EditorHeader({ previewMode, setPreviewMode }) {
           </button>
           <button
             type="button"
-            className={`flex items-center gap-2 text-[11px] font-medium px-2 py-0.5 rounded-md cursor-pointer transition-all ${
+            className={`flex items-center gap-2 text-[11px] font-medium px-2 py-0.5 rounded cursor-pointer transition-all ${
               previewMode
                 ? "bg-card text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"

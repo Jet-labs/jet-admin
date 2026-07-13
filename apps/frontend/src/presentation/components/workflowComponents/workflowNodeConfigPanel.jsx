@@ -80,12 +80,12 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
                 {/* Advanced Settings — Join Mode */}
                 {node.type !== 'start' && node.type !== 'end' && (
                     <div className='p-2'>
-                        <Accordion type="single" collapsible className="border border-border rounded-sm bg-background">
+                        <Accordion type="single" collapsible className="border border-border rounded bg-background">
                         <AccordionItem value="advanced" className="border-none">
                             <AccordionTrigger className="px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:no-underline data-[state=open]:border-b data-[state=open]:border-border">
                                 Advanced Settings
                             </AccordionTrigger>
-                            <AccordionContent className="px-4 py-3 space-y-2">
+                                <AccordionContent className="p-2 space-y-2">
                                 <Label className="block text-xs font-medium text-muted-foreground">
                                     Join Mode
                                     <span className="block text-[10px] text-muted-foreground/70 mt-0.5 font-normal">
@@ -96,7 +96,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
                                     value={node.data?.joinMode || 'all'}
                                     onValueChange={(value) => onChange(node.id, { ...node.data, joinMode: value })}
                                 >
-                                    <SelectTrigger className="w-full rounded-sm border border-border bg-background px-3 py-1.5 h-auto text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                                        <SelectTrigger className="w-full rounded border border-border bg-background px-3 py-1.5 h-auto text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                                         <SelectValue placeholder="Select join mode" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -114,7 +114,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
             {/* Delete Confirmation Modal Overlay */}
             {showDeleteConfirm && (
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-                    <div className="bg-background rounded-sm shadow-2xl border border-border p-6 w-full max-w-sm animate-in fade-in zoom-in duration-200">
+                    <div className="bg-background rounded shadow-2xl border border-border p-6 w-full max-w-sm animate-in fade-in zoom-in duration-200">
                         <h4 className="font-bold text-foreground text-lg mb-2">Delete Node?</h4>
                         <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                             This will remove the node and all its connections. This action cannot be undone.

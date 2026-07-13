@@ -105,9 +105,9 @@ export const CustomFileUploadInput = (props) => {
       </Label>
 
       {fileUrl ? (
-        <div className="flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-md">
+        <div className="flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="p-2 bg-primary/10 rounded-md text-primary">
+            <div className="p-2 bg-primary/10 rounded text-primary">
               <FileSpreadsheet className="h-5 w-5" />
             </div>
             <div className="overflow-hidden">
@@ -137,7 +137,7 @@ export const CustomFileUploadInput = (props) => {
           onDragOver={handleDrag}
           onDragLeave={handleDrag}
           onDrop={handleDrop}
-          className={`relative flex flex-col items-center justify-center p-6 border border-dashed rounded-md transition-colors ${
+            className={`relative flex flex-col items-center justify-center p-6 border border-dashed rounded transition-colors ${
             dragActive
               ? "border-primary bg-primary/5"
               : "border-border bg-background hover:border-muted-foreground/50 hover:bg-muted/50"
@@ -162,7 +162,7 @@ export const CustomFileUploadInput = (props) => {
               </div>
             ) : (
               <>
-                <div className="p-3 bg-primary/10 text-primary rounded-md">
+                    <div className="p-3 bg-primary/10 text-primary rounded">
                   <CloudUpload className="h-6 w-6" />
                 </div>
                 <div className="text-center">

@@ -176,7 +176,7 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
                 <Card className={`w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] p-4 transition-all duration-300 border shadow-sm hover:shadow-md ${!action.isEnabled ? 'opacity-60 grayscale-[0.3]' : 'hover:border-border/80 bg-background/60 backdrop-blur-sm'}`}>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border ${typeConfig?.border || 'border-border'} ${typeConfig?.bg || 'bg-muted'} shadow-inner`}>
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded border ${typeConfig?.border || 'border-border'} ${typeConfig?.bg || 'bg-muted'} shadow-inner`}>
                         <Icon className={`h-4 w-4 ${typeConfig?.color || 'text-muted-foreground'}`} />
                       </div>
                       <div className="min-w-0 flex-1 pt-0.5">
@@ -294,7 +294,7 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, tenantID, listenerID }
             </Select>
           </div>
 
-          <div className="rounded-sm border border-border/50 bg-background/40 p-2">
+          <div className="rounded border border-border/50 bg-background/40 p-2">
             <div className="flex items-center gap-2 mb-2">
               <selectedType.icon className={`h-4 w-4 ${selectedType.color}`} />
               <h4 className="text-sm font-medium text-foreground">Configuration Details</h4>
@@ -308,9 +308,9 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, tenantID, listenerID }
             />
           </div>
 
-          <div className="flex items-center justify-between rounded-sm border border-border/50 bg-background/40 p-2">
+          <div className="flex items-center justify-between rounded border border-border/50 bg-background/40 p-2">
             <div className="flex items-center gap-3">
-              <div className={`flex h-8 w-8 items-center justify-center rounded-sm ${formData.isEnabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+              <div className={`flex h-8 w-8 items-center justify-center rounded ${formData.isEnabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                 {formData.isEnabled ? <Play className="h-4 w-4" /> : <CircleSlash className="h-4 w-4" />}
               </div>
               <div className="space-y-0.5">
@@ -425,7 +425,7 @@ const TriggerWorkflowConfig = ({ config, onChange, tenantID, renderModeToggle, i
           
           if (!config.workflowID) {
             return (
-              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
+              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded text-center bg-background/20">
                 Select a workflow above to configure its inputs.
               </p>
             );
@@ -433,7 +433,7 @@ const TriggerWorkflowConfig = ({ config, onChange, tenantID, renderModeToggle, i
           
           if (inputDefinitions.length === 0) {
             return (
-              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
+              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded text-center bg-background/20">
                 This workflow has no inputs defined.
               </p>
             );
@@ -442,7 +442,7 @@ const TriggerWorkflowConfig = ({ config, onChange, tenantID, renderModeToggle, i
           const normalizedInputDefs = inputDefinitions.map(inputDef => ({ ...inputDef, key: inputDef.key || inputDef.name }));
 
           return (
-            <div className="rounded-sm border border-border/60 bg-background/30 p-2 shadow-sm">
+            <div className="rounded border border-border/60 bg-background/30 p-2 shadow-sm">
               <InputValuesForm
                 inputDefinitions={normalizedInputDefs}
                 values={typeof config.inputValues === 'object' ? config.inputValues : {}}
@@ -551,7 +551,7 @@ const TriggerQueryConfig = ({ config, onChange, tenantID, renderModeToggle, isJs
           
           if (!config.dataQueryID) {
             return (
-              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
+              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded text-center bg-background/20">
                 Select a data query above to configure its arguments.
               </p>
             );
@@ -559,7 +559,7 @@ const TriggerQueryConfig = ({ config, onChange, tenantID, renderModeToggle, isJs
           
           if (inputDefinitions.length === 0) {
             return (
-              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded-sm text-center bg-background/20">
+              <p className="text-xs text-muted-foreground italic border border-dashed border-border/50 p-2 rounded text-center bg-background/20">
                 This query has no arguments defined.
               </p>
             );
@@ -568,7 +568,7 @@ const TriggerQueryConfig = ({ config, onChange, tenantID, renderModeToggle, isJs
           const normalizedInputDefs = inputDefinitions.map(inputDef => ({ ...inputDef, key: inputDef.key || inputDef.name }));
 
           return (
-            <div className="rounded-sm border border-border/60 bg-background/30 p-2 shadow-sm">
+            <div className="rounded border border-border/60 bg-background/30 p-2 shadow-sm">
               <InputValuesForm
                 inputDefinitions={normalizedInputDefs}
                 values={typeof config.inputValues === 'object' ? config.inputValues : {}}
@@ -685,15 +685,15 @@ const ActionConfigEditor = ({ type, config, onChange, tenantID, listenerID }) =>
   };
 
   const renderModeToggle = () => (
-    <div className="flex items-center gap-1 mt-1.5 bg-background/60 p-0.5 rounded-sm border border-border/40 w-fit">
+    <div className="flex items-center gap-1 mt-1.5 bg-background/60 p-0.5 rounded border border-border/40 w-fit">
       <span 
-        className={`text-[10px] px-2.5 py-1 rounded-sm cursor-pointer transition-colors ${!isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
+        className={`text-[10px] px-2.5 py-1 rounded cursor-pointer transition-colors ${!isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
         onClick={() => setIsJsonMode(false)}
       >
         Form
       </span>
       <span 
-        className={`text-[10px] px-2.5 py-1 rounded-sm cursor-pointer transition-colors ${isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
+        className={`text-[10px] px-2.5 py-1 rounded cursor-pointer transition-colors ${isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
         onClick={() => setIsJsonMode(true)}
       >
         JSON

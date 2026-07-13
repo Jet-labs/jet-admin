@@ -112,8 +112,8 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
   return (
     <div className="w-full">
       <Section title="Datasource Configuration">
-        <div className="space-y-4">
-          <div className="space-y-1.5">
+        <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="datasourceTitle">
               {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TITLE_FIELD_LABEL} <span className="text-destructive">*</span>
             </Label>
@@ -136,7 +136,7 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label htmlFor="datasourceType">
               {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL} <span className="text-destructive">*</span>
             </Label>
@@ -175,7 +175,7 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
           </div>
 
           {currentDatasourceType && (
-            <div className="flex items-center gap-2 p-2 bg-muted/20 rounded-sm border border-border">
+            <div className="flex items-center gap-2 p-2 bg-muted/20 rounded border border-border">
               <DatasourceIcon
                 icon={currentDatasourceType.icon}
                 iconColor={currentDatasourceType.iconColor}

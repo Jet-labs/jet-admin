@@ -144,6 +144,7 @@ export const DATASOURCE_TYPES = {
     listenerConfigForm: postgresqlListenerConfigForm,
     listenerGuidance: postgresqlGuidance,
     supportsListener: true,
+    hasDedicatedQueryEditor: true,
   },
   RESTAPI: {
     name: "REST API",

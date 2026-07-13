@@ -207,7 +207,7 @@ var formConfig_default = {
             label: "SSL Mode"
           },
           {
-            type: "Group",
+            type: "VerticalLayout",
             label: "Advanced Options",
             elements: [
               {
@@ -332,33 +332,41 @@ var queryConfig_default = {
         ]
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Arguments",
+        type: "Group",
         options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Arguments",
+            options: {
+              detail: {
+                type: "VerticalLayout",
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/key"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/type"
+                  }
+                ]
               },
-              {
-                type: "Control",
-                scope: "#/properties/type"
+              typeOptions: {
+                enumLabels: {
+                  string: "String",
+                  number: "Number",
+                  boolean: "Boolean",
+                  array: "Array",
+                  object: "Object (JSON)"
+                }
               }
-            ]
-          },
-          typeOptions: {
-            enumLabels: {
-              string: "String",
-              number: "Number",
-              boolean: "Boolean",
-              array: "Array",
-              object: "Object (JSON)"
             }
           }
-        }
+        ]
       }
     ]
   },
@@ -895,33 +903,41 @@ var queryConfig_default2 = {
         ]
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Arguments",
+        type: "Group",
         options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Arguments",
+            options: {
+              detail: {
+                type: "VerticalLayout",
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/key"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/type"
+                  }
+                ]
               },
-              {
-                type: "Control",
-                scope: "#/properties/type"
+              typeOptions: {
+                enumLabels: {
+                  string: "String",
+                  number: "Number",
+                  boolean: "Boolean",
+                  array: "Array",
+                  object: "Object (JSON)"
+                }
               }
-            ]
-          },
-          typeOptions: {
-            enumLabels: {
-              string: "String",
-              number: "Number",
-              boolean: "Boolean",
-              array: "Array",
-              object: "Object (JSON)"
             }
           }
-        }
+        ]
       }
     ]
   },
@@ -1025,33 +1041,41 @@ var queryConfig_default3 = {
         label: "Action"
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Arguments",
+        type: "Group",
         options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Arguments",
+            options: {
+              detail: {
+                type: "VerticalLayout",
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/key"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/type"
+                  }
+                ]
               },
-              {
-                type: "Control",
-                scope: "#/properties/type"
+              typeOptions: {
+                enumLabels: {
+                  string: "String",
+                  number: "Number",
+                  boolean: "Boolean",
+                  array: "Array",
+                  object: "Object (JSON)"
+                }
               }
-            ]
-          },
-          typeOptions: {
-            enumLabels: {
-              string: "String",
-              number: "Number",
-              boolean: "Boolean",
-              array: "Array",
-              object: "Object (JSON)"
             }
           }
-        }
+        ]
       }
     ]
   },
@@ -1366,27 +1390,35 @@ var queryConfig_default4 = {
         ]
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Arguments",
+        type: "Group",
         options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              { type: "Control", scope: "#/properties/key" },
-              { type: "Control", scope: "#/properties/type" }
-            ]
-          },
-          typeOptions: {
-            enumLabels: {
-              string: "String",
-              number: "Number",
-              boolean: "Boolean",
-              array: "Array",
-              object: "Object (JSON)"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Arguments",
+            options: {
+              detail: {
+                type: "VerticalLayout",
+                elements: [
+                  { type: "Control", scope: "#/properties/key" },
+                  { type: "Control", scope: "#/properties/type" }
+                ]
+              },
+              typeOptions: {
+                enumLabels: {
+                  string: "String",
+                  number: "Number",
+                  boolean: "Boolean",
+                  array: "Array",
+                  object: "Object (JSON)"
+                }
+              }
             }
           }
-        }
+        ]
       }
     ]
   },
@@ -1607,7 +1639,7 @@ var formConfig_default5 = {
             label: "Enable SSL"
           },
           {
-            type: "Group",
+            type: "VerticalLayout",
             label: "Advanced Options",
             elements: [
               {
@@ -1732,33 +1764,41 @@ var queryConfig_default5 = {
         ]
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Arguments",
+        type: "Group",
         options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Arguments",
+            options: {
+              detail: {
+                type: "VerticalLayout",
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/key"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/type"
+                  }
+                ]
               },
-              {
-                type: "Control",
-                scope: "#/properties/type"
+              typeOptions: {
+                enumLabels: {
+                  string: "String",
+                  number: "Number",
+                  boolean: "Boolean",
+                  array: "Array",
+                  object: "Object (JSON)"
+                }
               }
-            ]
-          },
-          typeOptions: {
-            enumLabels: {
-              string: "String",
-              number: "Number",
-              boolean: "Boolean",
-              array: "Array",
-              object: "Object (JSON)"
             }
           }
-        }
+        ]
       }
     ]
   },
@@ -2253,24 +2293,32 @@ var queryConfig_default6 = {
         ]
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Dynamic Arguments",
+        type: "Group",
         options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/type"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Dynamic Arguments",
+            options: {
+              detail: {
+                type: "VerticalLayout",
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/key"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/type"
+                  }
+                ]
               }
-            ]
+            }
           }
-        }
+        ]
       }
     ]
   },
@@ -2692,24 +2740,32 @@ var queryConfig_default7 = {
         ]
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Dynamic Arguments",
+        type: "Group",
         options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/type"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Dynamic Arguments",
+            options: {
+              detail: {
+                type: "VerticalLayout",
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/key"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/type"
+                  }
+                ]
               }
-            ]
+            }
           }
-        }
+        ]
       }
     ]
   },
@@ -2916,7 +2972,7 @@ var formConfig_default8 = {
         ]
       },
       {
-        type: "Group",
+        type: "VerticalLayout",
         label: "Advanced Options",
         elements: [
           {
@@ -3038,24 +3094,32 @@ var queryConfig_default8 = {
         label: "Operation Name (Optional)"
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Dynamic Arguments",
+        type: "Group",
         options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/type"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Dynamic Arguments",
+            options: {
+              detail: {
+                type: "VerticalLayout",
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/key"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/type"
+                  }
+                ]
               }
-            ]
+            }
           }
-        }
+        ]
       }
     ]
   },
@@ -3510,9 +3574,17 @@ var queryConfig_default9 = {
         ]
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Dynamic Arguments"
+        type: "Group",
+        options: {
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Dynamic Arguments"
+          }
+        ]
       }
     ]
   },
@@ -3868,7 +3940,15 @@ var queryConfig_default10 = {
           }
         ]
       },
-      { type: "Control", scope: "#/properties/inputDefinitions", label: "Dynamic Arguments" }
+      {
+        type: "Group",
+        options: {
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          { type: "Control", scope: "#/properties/inputDefinitions", label: "Dynamic Arguments" }
+        ]
+      }
     ]
   },
   data: {
@@ -4299,7 +4379,15 @@ var queryConfig_default11 = {
           }
         ]
       },
-      { type: "Control", scope: "#/properties/inputDefinitions", label: "Dynamic Arguments" }
+      {
+        type: "Group",
+        options: {
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          { type: "Control", scope: "#/properties/inputDefinitions", label: "Dynamic Arguments" }
+        ]
+      }
     ]
   },
   data: {
@@ -4675,33 +4763,41 @@ var queryConfig_default12 = {
         ]
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Arguments",
+        type: "Group",
         options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Arguments",
+            options: {
+              detail: {
+                type: "VerticalLayout",
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/key"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/type"
+                  }
+                ]
               },
-              {
-                type: "Control",
-                scope: "#/properties/type"
+              typeOptions: {
+                enumLabels: {
+                  string: "String",
+                  number: "Number",
+                  boolean: "Boolean",
+                  array: "Array",
+                  object: "Object (JSON)"
+                }
               }
-            ]
-          },
-          typeOptions: {
-            enumLabels: {
-              string: "String",
-              number: "Number",
-              boolean: "Boolean",
-              array: "Array",
-              object: "Object (JSON)"
             }
           }
-        }
+        ]
       }
     ]
   },
@@ -5088,24 +5184,32 @@ var queryConfig_default14 = {
         label: "Use Legacy SQL"
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Query Parameters",
+        type: "Group",
         options: {
-          detail: {
-            type: "HorizontalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/type"
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Query Parameters",
+            options: {
+              detail: {
+                type: "HorizontalLayout",
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/key"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/type"
+                  }
+                ]
               }
-            ]
+            }
           }
-        }
+        ]
       }
     ]
   },
@@ -6276,9 +6380,17 @@ var queryConfig_default19 = {
         label: "SQL Query"
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Arguments"
+        type: "Group",
+        options: {
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Arguments"
+          }
+        ]
       }
     ]
   },
@@ -6376,9 +6488,17 @@ var queryConfig_default20 = {
         label: "SQL Query"
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Arguments"
+        type: "Group",
+        options: {
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Arguments"
+          }
+        ]
       }
     ]
   },
@@ -6486,9 +6606,17 @@ var queryConfig_default21 = {
         label: "SQL Query"
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Arguments"
+        type: "Group",
+        options: {
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Arguments"
+          }
+        ]
       }
     ]
   },
@@ -6614,9 +6742,17 @@ var queryConfig_default22 = {
         label: "Cypher Query"
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Parameters"
+        type: "Group",
+        options: {
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Parameters"
+          }
+        ]
       }
     ]
   },
@@ -7532,9 +7668,17 @@ var queryConfig_default29 = {
         ]
       },
       {
-        type: "Control",
-        scope: "#/properties/inputDefinitions",
-        label: "Dynamic Arguments"
+        type: "Group",
+        options: {
+          customClass: "!border-none !bg-transparent p-2"
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/inputDefinitions",
+            label: "Dynamic Arguments"
+          }
+        ]
       }
     ]
   },
@@ -8442,7 +8586,8 @@ var DATASOURCE_TYPES = {
     queryConfigForm: queryConfig_default,
     listenerConfigForm: listenerConfig_default,
     listenerGuidance: getPostgresqlGuidance,
-    supportsListener: true
+    supportsListener: true,
+    hasDedicatedQueryEditor: true
   },
   RESTAPI: {
     name: "REST API",

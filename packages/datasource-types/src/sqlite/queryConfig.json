@@ -45,9 +45,17 @@
         "label": "SQL Query"
       },
       {
-        "type": "Control",
-        "scope": "#/properties/inputDefinitions",
-        "label": "Arguments"
+        "type": "Group",
+        "options": {
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Arguments"
+          }
+        ]
       }
     ]
   },

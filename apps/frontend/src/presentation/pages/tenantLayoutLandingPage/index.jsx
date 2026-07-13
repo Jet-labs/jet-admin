@@ -152,13 +152,13 @@ const TenantLayoutLandingPage = () => {
               Resources
             </p>
 
-            <div className="rounded-sm border border-border overflow-hidden">
+            <div className="rounded border border-border overflow-hidden">
               {tenantCards.map((card, index) => (
                 <div
                   key={index}
                   onClick={card.action}
                   className={`
-                    flex items-center gap-3 px-4 py-2.5 cursor-pointer
+                    flex items-center gap-2 p-2 cursor-pointer
                     hover:bg-muted/50 transition-colors group
                     ${index !== tenantCards.length - 1 ? "border-b border-border" : ""}
                   `}

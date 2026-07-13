@@ -169,7 +169,7 @@ export const DataFieldPanel = ({
               title="Workflow data source path"
             />
             {showSuggestions && allSuggestions.length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-1 bg-popover border border-border rounded-md shadow-xl z-50 max-h-48 overflow-y-auto">
+              <div className="absolute left-0 right-0 top-full mt-1 bg-popover border border-border rounded shadow-xl z-50 max-h-48 overflow-y-auto">
                 <div className="px-2.5 py-1 text-[9px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted/50 sticky top-0">
                   Variables ({allSuggestions.length})
                 </div>

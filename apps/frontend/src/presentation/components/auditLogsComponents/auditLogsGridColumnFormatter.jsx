@@ -93,7 +93,7 @@ export const getFormattedAuditLogColumns = () => {
               }
             >
               <span
-                className={`${"px-2 py-0.5 rounded-sm text-sm font-medium w-min"} ${
+                className={`${"px-2 py-0.5 rounded text-sm font-medium w-min"} ${
                   // eslint-disable-next-line no-extra-boolean-cast
                   !!params.value
                     ? "bg-green-950/40 text-green-400 w-full flex  flex-row justify-start items-center p-2"
@@ -150,7 +150,7 @@ export const getFormattedAuditLogColumns = () => {
                 "w-full flex h-full flex-row justify-start items-center"
               }
             >
-              <span className="px-2 py-0.5 rounded-sm text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2">
+              <span className="px-2 py-0.5 rounded text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2">
                 {params.value}
               </span>
             </div>
@@ -171,7 +171,7 @@ export const getFormattedAuditLogColumns = () => {
         },
         renderCell: (params) => {
           let chipStyle =
-            "px-2 py-0.5 rounded-sm text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2";
+            "px-2 py-0.5 rounded text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2";
           switch (params.value) {
             case "GET":
               chipStyle += " bg-green-950/40 text-green-400";
@@ -215,7 +215,7 @@ export const getFormattedAuditLogColumns = () => {
         },
         renderCell: (params) => {
           return (
-            <div className="max-h-32 overflow-auto rounded-sm !text-foreground p-2">
+            <div className="max-h-32 overflow-auto rounded !text-foreground p-2">
               <ReactJson
                 src={params.value}
                 theme="rjv-default"

@@ -27,7 +27,7 @@ import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
 import { Input, Label, PageHeader } from "@jet-admin/ui";
 
-const initialValues = {
+const EMPTY_INITIAL_VALUES = {
   dataQueryTitle: "Untitled",
   datasourceID: undefined,
   datasourceType: "",
@@ -86,14 +86,19 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
       },
     });
 
-  const queryUpdationForm = useFormik({
-    initialValues: dataQuery ? {
+  const formInitialValues = useMemo(() => {
+    if (!dataQuery) return EMPTY_INITIAL_VALUES;
+    return {
       dataQueryTitle: dataQuery.dataQueryTitle || "Untitled",
       datasourceID: dataQuery.datasourceID,
       datasourceType: dataQuery.datasourceType || "",
       dataQueryOptions: dataQuery.dataQueryOptions || {},
       runOnLoad: dataQuery.runOnLoad || false,
-    } : initialValues,
+    };
+  }, [dataQuery]);
+
+  const queryUpdationForm = useFormik({
+    initialValues: formInitialValues,
     enableReinitialize: true, // Re-initialize form when dataQuery changes
     validateOnMount: false,
     validateOnChange: false,

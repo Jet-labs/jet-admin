@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
-import { Input, Label, Checkbox } from "@jet-admin/ui";
+import { Input, Label } from "@jet-admin/ui";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -38,16 +38,30 @@ const MONTHS = [
   { value: 12, label: "Dec", full: "December" },
 ];
 
-// ─── Cron Parsing Helpers ────────────────────────────────────────────────────
+const DEFAULT_PARSED = {
+  period: "day",
+  minute: 0,
+  hour: 9,
+  dom: 1,
+  months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  dows: [1, 2, 3, 4, 5], // Mon–Fri
+};
 
-/** Parse a cron field that may contain wildcards, single values, or comma-separated lists. */
+// ─── Cron Parsing & Building ─────────────────────────────────────────────────
+
 function parseCronField(field, min, max) {
-  if (field === "*") return null; // wildcard
-  const values = field.split(",").map(Number).filter((n) => !isNaN(n) && n >= min && n <= max);
+  if (field === "*") return null;
+  const values = field
+    .split(",")
+    .map(Number)
+    .filter((n) => !isNaN(n) && n >= min && n <= max);
   return values.length > 0 ? values : null;
 }
 
-/** Derive a structured state from a raw cron string. Returns null on failure. */
+/**
+ * Parse a raw 5-field cron expression into a structured object.
+ * Returns null if the string is invalid.
+ */
 function parseCron(raw) {
   if (!raw || typeof raw !== "string") return null;
   const parts = raw.trim().split(/\s+/);
@@ -61,14 +75,14 @@ function parseCron(raw) {
   const months = parseCronField(monthF, 1, 12);
   const dows = parseCronField(dowF, 0, 6);
 
-  // Detect period
+  // Detect period from pattern
   let period = "minute";
-  if (minuteF !== "*" && hourF === "*") period = "hour";  // e.g. "30 * * * *" → every hour at :30
-  if (minuteF !== "*" && hourF !== "*" && domF === "*" && monthF === "*" && dowF === "*") period = "day";
-  if (minuteF !== "*" && hourF !== "*" && domF === "*" && monthF === "*" && dowF !== "*") period = "week";
-  if (minuteF !== "*" && hourF !== "*" && domF !== "*" && monthF === "*" && dowF === "*") period = "month";
-  if (minuteF !== "*" && hourF !== "*" && domF !== "*" && monthF !== "*" && dowF === "*") period = "year";
   if (minuteF === "*" && hourF === "*" && domF === "*" && monthF === "*" && dowF === "*") period = "minute";
+  else if (minuteF !== "*" && hourF === "*" && domF === "*" && monthF === "*" && dowF === "*") period = "hour";
+  else if (minuteF !== "*" && hourF !== "*" && domF === "*" && monthF === "*" && dowF === "*") period = "day";
+  else if (minuteF !== "*" && hourF !== "*" && domF === "*" && monthF === "*" && dowF !== "*") period = "week";
+  else if (minuteF !== "*" && hourF !== "*" && domF !== "*" && monthF === "*" && dowF === "*") period = "month";
+  else if (minuteF !== "*" && hourF !== "*" && domF !== "*" && monthF !== "*" && dowF === "*") period = "year";
 
   return {
     period,
@@ -80,10 +94,12 @@ function parseCron(raw) {
   };
 }
 
-/** Build a cron expression string from structured state. */
+/**
+ * Build a cron expression string from a structured state object.
+ */
 function buildCron({ period, minute, hour, dom, months, dows }) {
-  const m = String(minute).padStart(2, "0");
-  const h = String(hour).padStart(2, "0");
+  const m = String(minute);
+  const h = String(hour);
   const d = String(dom);
   const mo = months.length === 12 ? "*" : [...months].sort((a, b) => a - b).join(",");
   const dw = dows.length === 7 ? "*" : [...dows].sort((a, b) => a - b).join(",");
@@ -99,36 +115,30 @@ function buildCron({ period, minute, hour, dom, months, dows }) {
   }
 }
 
-/** Human-readable description of a cron expression. */
+/** Human-readable summary of the schedule. */
 function humanize({ period, minute, hour, dom, months, dows }) {
   const timeStr = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-
   switch (period) {
-    case "minute":
-      return "Every minute";
-    case "hour":
-      return `Every hour at :${String(minute).padStart(2, "0")}`;
-    case "day":
-      return `Every day at ${timeStr}`;
+    case "minute": return "Every minute";
+    case "hour": return `Every hour at :${String(minute).padStart(2, "0")}`;
+    case "day": return `Every day at ${timeStr}`;
     case "week": {
       const dayNames = dows.map((d) => WEEKDAYS[d]?.label).join(", ");
       return `Every week on ${dayNames} at ${timeStr}`;
     }
-    case "month":
-      return `Monthly on day ${dom} at ${timeStr}`;
+    case "month": return `Monthly on day ${dom} at ${timeStr}`;
     case "year": {
-      const monthNames = months
+      const monthNames = [...months]
         .sort((a, b) => a - b)
         .map((m) => MONTHS[m - 1]?.label)
         .join(", ");
       return `Yearly on ${monthNames} ${dom} at ${timeStr}`;
     }
-    default:
-      return "";
+    default: return "";
   }
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function ToggleChip({ label, selected, onClick, size = "sm" }) {
   return (
@@ -136,7 +146,7 @@ function ToggleChip({ label, selected, onClick, size = "sm" }) {
       type="button"
       onClick={onClick}
       className={[
-        "inline-flex items-center justify-center rounded-sm font-mono transition-all duration-150 select-none",
+        "inline-flex items-center justify-center rounded font-mono transition-all duration-150 select-none",
         "border focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         size === "xs"
           ? "h-7 min-w-[2.25rem] px-1.5 text-[11px]"
@@ -172,16 +182,23 @@ function NumberField({ label, value, onChange, min, max, className = "" }) {
   );
 }
 
-function SectionLabel({ children }) {
-  return (
-    <p className="mb-2 text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground">
-      {children}
-    </p>
-  );
-}
+// ─── Main Component (fully controlled) ───────────────────────────────────────
 
-// ─── Main Component ──────────────────────────────────────────────────────────
-
+/**
+ * CronJobScheduler
+ *
+ * A **fully controlled** cron expression builder.
+ * The external `value` prop is always the single source of truth.
+ * Every user interaction derives a new cron string and calls `handleChange`
+ * with it — Formik (or any other controller) then feeds the new string back
+ * as the updated `value` prop on the next render.
+ *
+ * There is NO internal state that mirrors `value`. This means:
+ *  - No sync races between Formik and local state.
+ *  - No need for effects that watch `value` and try to reconcile.
+ *  - Loading an existing cron job "just works" because we always render
+ *    from whatever `value` the parent gives us.
+ */
 export const CronJobScheduler = ({
   value,
   handleChange,
@@ -197,77 +214,88 @@ export const CronJobScheduler = ({
     onError: PropTypes.func,
   };
 
-  // Initialise state from incoming cron string (or defaults)
-  const initState = useMemo(
-    () =>
-      parseCron(value) ?? {
-        period: "day",
-        minute: 0,
-        hour: 9,
-        dom: 1,
-        months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        dows: [1, 2, 3, 4, 5], // Mon–Fri
-      },
-    // Only run once on mount; subsequent changes come from UI interactions.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  // ── Derive display state from external value (no useState mirror) ──────────
+  const parsed = useMemo(() => parseCron(value) ?? DEFAULT_PARSED, [value]);
 
-  const [state, setState] = useState(initState);
+  // Raw cron input state: only needed for the "Edit raw" text field.
+  // We keep it as local UI state because typing intermediate invalid values
+  // (e.g. "30 9 * *") should not propagate upstream until valid.
+  const [showRaw, setShowRaw] = useState(false);
   const [rawInput, setRawInput] = useState(value ?? "");
   const [rawError, setRawError] = useState(false);
-  const [showRaw, setShowRaw] = useState(false);
 
-  // Sync raw input whenever state changes
-  useEffect(() => {
-    const expr = buildCron(state);
-    setRawInput(expr);
-    handleChange?.(expr);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  // Keep rawInput in sync when value changes externally (e.g. on load)
+  // We compare by value to avoid overwriting what the user is actively typing.
+  const syncedRaw = useMemo(() => value ?? "", [value]);
+  // Only sync rawInput when the panel is closed (not being actively edited)
+  const effectivRaw = showRaw ? rawInput : syncedRaw;
 
-  const update = useCallback((patch) => {
-    if (disabled || readOnly) return;
-    setState((prev) => ({ ...prev, ...patch }));
-  }, [disabled, readOnly]);
+  // ── Emit a patched cron string ──────────────────────────────────────────────
+  const emit = useCallback(
+    (patch) => {
+      if (disabled || readOnly) return;
+      const next = buildCron({ ...parsed, ...patch });
+      handleChange?.(next);
+    },
+    [parsed, handleChange, disabled, readOnly]
+  );
 
-  const toggleMulti = useCallback((field, val, list) => {
-    const next = list.includes(val)
-      ? list.filter((v) => v !== val)
-      : [...list, val];
-    if (next.length > 0) update({ [field]: next });
-  }, [update]);
+  const toggleMulti = useCallback(
+    (field, val, list) => {
+      const next = list.includes(val)
+        ? list.filter((v) => v !== val)
+        : [...list, val];
+      if (next.length > 0) emit({ [field]: next });
+    },
+    [emit]
+  );
 
-  // Handle raw cron input
-  const handleRawChange = useCallback((raw) => {
-    setRawInput(raw);
-    const parsed = parseCron(raw);
-    if (parsed) {
-      setRawError(false);
-      setState(parsed);
-      handleChange?.(raw);
-    } else {
-      setRawError(raw.length > 0);
-      if (onError) onError(raw.length > 0 ? new Error("Invalid cron expression") : null);
-    }
-  }, [handleChange, onError]);
+  // ── Raw input handling ──────────────────────────────────────────────────────
+  const handleRawChange = useCallback(
+    (raw) => {
+      setRawInput(raw);
+      const p = parseCron(raw);
+      if (p) {
+        setRawError(false);
+        handleChange?.(raw);
+        onError?.(null);
+      } else {
+        const hasContent = raw.length > 0;
+        setRawError(hasContent);
+        onError?.(hasContent ? new Error("Invalid cron expression") : null);
+      }
+    },
+    [handleChange, onError]
+  );
 
-  const description = humanize(state);
-  const expression = buildCron(state);
+  const handleShowRawToggle = useCallback(() => {
+    setShowRaw((v) => {
+      if (!v) {
+        // Opening — seed raw input from current value
+        setRawInput(value ?? "");
+        setRawError(false);
+      }
+      return !v;
+    });
+  }, [value]);
+
+  // ── Render ──────────────────────────────────────────────────────────────────
+  const expression = buildCron(parsed);
+  const description = humanize(parsed);
 
   return (
-    <div className={`w-full space-y-4 ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
+    <div className={`w-full space-y-2 ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
 
       {/* ── Period selector ─────────────────────────────────────────────── */}
-      <div>
-        <SectionLabel>Repeat every</SectionLabel>
-        <div className="flex flex-wrap gap-1.5">
+      <div className="space-y-1">
+        <Label>Repeat every</Label>
+        <div className="flex flex-wrap gap-2">
           {PERIODS.map((p) => (
             <ToggleChip
               key={p.value}
               label={p.label}
-              selected={state.period === p.value}
-              onClick={() => update({ period: p.value })}
+              selected={parsed.period === p.value}
+              onClick={() => emit({ period: p.value })}
             />
           ))}
         </div>
@@ -276,100 +304,100 @@ export const CronJobScheduler = ({
       {/* ── Conditional fields ──────────────────────────────────────────── */}
 
       {/* MINUTE – no extra fields */}
-      {state.period === "minute" && (
+      {parsed.period === "minute" && (
         <p className="text-xs text-muted-foreground italic">
           Runs on every minute tick — no further configuration needed.
         </p>
       )}
 
       {/* HOUR – minute offset */}
-      {state.period === "hour" && (
-        <div className="grid grid-cols-2 gap-3">
+      {parsed.period === "hour" && (
+        <div className="grid grid-cols-2 gap-2">
           <NumberField
             label="At minute"
-            value={state.minute}
+            value={parsed.minute}
             min={0}
             max={59}
-            onChange={(v) => update({ minute: v })}
+            onChange={(v) => emit({ minute: v })}
           />
         </div>
       )}
 
       {/* DAY – time of day */}
-      {state.period === "day" && (
-        <div className="grid grid-cols-2 gap-3">
-          <NumberField label="Hour (0–23)" value={state.hour} min={0} max={23} onChange={(v) => update({ hour: v })} />
-          <NumberField label="Minute (0–59)" value={state.minute} min={0} max={59} onChange={(v) => update({ minute: v })} />
+      {parsed.period === "day" && (
+        <div className="grid grid-cols-2 gap-2">
+          <NumberField label="Hour (0–23)" value={parsed.hour} min={0} max={23} onChange={(v) => emit({ hour: v })} />
+          <NumberField label="Minute (0–59)" value={parsed.minute} min={0} max={59} onChange={(v) => emit({ minute: v })} />
         </div>
       )}
 
       {/* WEEK – day-of-week toggles + time */}
-      {state.period === "week" && (
-        <div className="space-y-3">
-          <div>
-            <SectionLabel>On days</SectionLabel>
-            <div className="flex flex-wrap gap-1.5">
+      {parsed.period === "week" && (
+        <div className="space-y-2">
+          <div className="space-y-1">
+            <Label>On days</Label>
+            <div className="flex flex-wrap gap-2">
               {WEEKDAYS.map((d) => (
                 <ToggleChip
                   key={d.value}
                   label={d.label}
                   size="xs"
-                  selected={state.dows.includes(d.value)}
-                  onClick={() => toggleMulti("dows", d.value, state.dows)}
+                  selected={parsed.dows.includes(d.value)}
+                  onClick={() => toggleMulti("dows", d.value, parsed.dows)}
                 />
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <NumberField label="Hour (0–23)" value={state.hour} min={0} max={23} onChange={(v) => update({ hour: v })} />
-            <NumberField label="Minute (0–59)" value={state.minute} min={0} max={59} onChange={(v) => update({ minute: v })} />
+          <div className="grid grid-cols-2 gap-2">
+            <NumberField label="Hour (0–23)" value={parsed.hour} min={0} max={23} onChange={(v) => emit({ hour: v })} />
+            <NumberField label="Minute (0–59)" value={parsed.minute} min={0} max={59} onChange={(v) => emit({ minute: v })} />
           </div>
         </div>
       )}
 
       {/* MONTH – day-of-month + time */}
-      {state.period === "month" && (
-        <div className="space-y-3">
-          <div className="grid grid-cols-3 gap-3">
-            <NumberField label="Day (1–31)" value={state.dom} min={1} max={31} onChange={(v) => update({ dom: v })} />
-            <NumberField label="Hour (0–23)" value={state.hour} min={0} max={23} onChange={(v) => update({ hour: v })} />
-            <NumberField label="Minute (0–59)" value={state.minute} min={0} max={59} onChange={(v) => update({ minute: v })} />
+      {parsed.period === "month" && (
+        <div className="space-y-2">
+          <div className="grid grid-cols-3 gap-2">
+            <NumberField label="Day (1–31)" value={parsed.dom} min={1} max={31} onChange={(v) => emit({ dom: v })} />
+            <NumberField label="Hour (0–23)" value={parsed.hour} min={0} max={23} onChange={(v) => emit({ hour: v })} />
+            <NumberField label="Minute (0–59)" value={parsed.minute} min={0} max={59} onChange={(v) => emit({ minute: v })} />
           </div>
         </div>
       )}
 
       {/* YEAR – month toggles + day + time */}
-      {state.period === "year" && (
-        <div className="space-y-3">
-          <div>
-            <SectionLabel>In months</SectionLabel>
-            <div className="flex flex-wrap gap-1.5">
+      {parsed.period === "year" && (
+        <div className="space-y-2">
+          <div className="space-y-1">
+            <Label>In months</Label>
+            <div className="flex flex-wrap gap-2">
               {MONTHS.map((m) => (
                 <ToggleChip
                   key={m.value}
                   label={m.label}
                   size="xs"
-                  selected={state.months.includes(m.value)}
-                  onClick={() => toggleMulti("months", m.value, state.months)}
+                  selected={parsed.months.includes(m.value)}
+                  onClick={() => toggleMulti("months", m.value, parsed.months)}
                 />
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <NumberField label="Day (1–31)" value={state.dom} min={1} max={31} onChange={(v) => update({ dom: v })} />
-            <NumberField label="Hour (0–23)" value={state.hour} min={0} max={23} onChange={(v) => update({ hour: v })} />
-            <NumberField label="Minute (0–59)" value={state.minute} min={0} max={59} onChange={(v) => update({ minute: v })} />
+          <div className="grid grid-cols-3 gap-2">
+            <NumberField label="Day (1–31)" value={parsed.dom} min={1} max={31} onChange={(v) => emit({ dom: v })} />
+            <NumberField label="Hour (0–23)" value={parsed.hour} min={0} max={23} onChange={(v) => emit({ hour: v })} />
+            <NumberField label="Minute (0–59)" value={parsed.minute} min={0} max={59} onChange={(v) => emit({ minute: v })} />
           </div>
         </div>
       )}
 
       {/* ── Expression preview ──────────────────────────────────────────── */}
-      <div className="rounded-md border border-border bg-muted/40 px-3 py-2.5 space-y-1">
+      <div className="rounded border border-border bg-muted/40 p-2 space-y-2">
         <div className="flex items-center justify-between gap-2">
           <code className="font-mono text-sm font-semibold tracking-wider text-foreground">
             {expression}
           </code>
-          <span className="shrink-0 rounded-sm bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-primary">
+          <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-primary">
             cron
           </span>
         </div>
@@ -379,11 +407,11 @@ export const CronJobScheduler = ({
       </div>
 
       {/* ── Raw input (collapsible) ──────────────────────────────────────── */}
-      <div className="border-t border-border/60 pt-3">
+      <div>
         <button
           type="button"
-          onClick={() => setShowRaw((v) => !v)}
-          className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground hover:text-foreground transition-colors"
+          onClick={handleShowRawToggle}
+          className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground hover:text-foreground transition-colors"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -400,7 +428,7 @@ export const CronJobScheduler = ({
           <div className="mt-2 space-y-1">
             <Input
               type="text"
-              value={rawInput}
+              value={effectivRaw}
               onChange={(e) => handleRawChange(e.target.value)}
               placeholder="* * * * *"
               readOnly={readOnly}

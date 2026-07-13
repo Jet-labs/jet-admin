@@ -8,7 +8,7 @@ import { useTenantActions } from "../../../logic/hooks/useTenant";
 import { TenantEditor } from "./tenantEditor";
 import { formValidations } from "../../../utils/formValidation";
 import React from "react";
-import { Button, Spinner } from "@jet-admin/ui";
+import { PageHeader } from "@jet-admin/ui";
 export const TenantAdditionForm = () => {
   const queryClient = useQueryClient();
   const { saveTenantLocallyAndReload } = useTenantActions();
@@ -44,16 +44,13 @@ export const TenantAdditionForm = () => {
 
   return (
     <div className="flex w-full h-full flex-col overflow-hidden bg-background">
-      <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 shrink-0">
-        <div>
-          <h1 className="text-base font-semibold tracking-tight text-foreground">
-            {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
-          </h1>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            Create a new tenant with a dedicated database and brand identity.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
+        parentTitle="Tenants"
+        onSave={addTenantForm.handleSubmit}
+        isSaving={isCreatingNewTenant}
+        saveText="Save"
+      />
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
         <section className="mx-auto max-w-2xl w-full">
@@ -64,17 +61,7 @@ export const TenantAdditionForm = () => {
           >
             <TenantEditor tenantEditorForm={addTenantForm} />
 
-            <div className="flex justify-end pt-2">
-              <Button
-                type="submit"
-                disabled={isCreatingNewTenant}
-              >
-                {isCreatingNewTenant && (
-                  <Spinner className="mr-2" size={14} />
-                )}
-                {CONSTANTS.STRINGS.ADD_TENANT_FORM_SUBMIT_BUTTON}
-              </Button>
-            </div>
+
           </form>
         </section>
       </div>
