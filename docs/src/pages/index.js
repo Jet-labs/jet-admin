@@ -1,49 +1,40 @@
 import React, { useState, useEffect } from "react";
-import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import Heading from "@theme/Heading";
-import styles from "./index.module.css";
-// Icons can be imported from react-icons if available, or use SVGs/Images.
-// For now we stick to simple elements or img tags to minimize dependency issues if react-icons isn't installed.
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <header className={styles.heroBanner}>
-      <div className={styles.heroBackground}>
-        <div className={styles.heroBackgroundCircle1}></div>
-        <div className={styles.heroBackgroundCircle2}></div>
-        <div className={styles.heroBackgroundPattern}></div>
-      </div>
-      <div className="container">
-        <div className={styles.heroContent}>
-          <div className={styles.heroTextContent}>
-            <Heading as="h1" className={styles.title}>
+    <header className="relative py-16 md:py-24 bg-background overflow-hidden border-b border-border">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex flex-col lg:flex-row items-center gap-8">
+          <div className="flex-1 space-y-4 text-left">
+            <Heading as="h1" className="text-4xl md:text-6xl font-medium tracking-tight text-foreground leading-tight">
               {siteConfig.title}
             </Heading>
-            <p className={styles.subtitle}>{siteConfig.tagline}</p>
-            <div className={styles.buttonContainer}>
-              <Link className={styles.getStartedButton} to="/docs/intro">
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+              {siteConfig.tagline}
+            </p>
+            <div className="flex items-center gap-2 pt-2">
+              <Link className="h-10 px-5 bg-primary text-primary-foreground font-medium rounded-sm hover:bg-primary/90 transition-all inline-flex items-center justify-center text-sm" to="/docs/introduction">
                 Get Started
               </Link>
-              <Link className={styles.secondaryButton} to="https://github.com/Jet-labs/Jet-admin">
+              <Link className="h-10 px-5 bg-background border border-border text-foreground font-medium rounded-sm hover:bg-muted/50 transition-all inline-flex items-center justify-center text-sm" to="https://github.com/Jet-labs/Jet-admin">
                 GitHub
               </Link>
             </div>
           </div>
-          <div className={styles.heroImageContainer}>
-            <div className={styles.browserMockup}>
-              <div className={styles.browserHeader}>
-                <div className={styles.browserButtons}>
-                  <span style={{ background: '#ff5f56' }}></span>
-                  <span style={{ background: '#ffbd2e' }}></span>
-                  <span style={{ background: '#27c93f' }}></span>
-                </div>
+          <div className="flex-1 w-full max-w-lg lg:max-w-none">
+            <div className="rounded-sm border border-border bg-card shadow-md overflow-hidden">
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/50 border-b border-border">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]" />
               </div>
-              <div className={styles.browserContent}>
-                <img src="img/mockup.png" alt="Jet Admin Dashboard" />
+              <div className="bg-background p-2">
+                <img src="img/mockup.png" alt="Jet Admin Dashboard" className="w-full h-auto block rounded-sm border border-border shadow-sm" />
               </div>
             </div>
           </div>
@@ -53,15 +44,18 @@ function HomepageHeader() {
   );
 }
 
-function FeatureCard({ title, description, icon, delay }) {
+function FeatureCard({ title, description, icon }) {
   return (
-    <div className={styles.featureCard} style={{ transitionDelay: `${delay}ms` }}>
-      <div className={styles.featureIcon}>
-        {/* Simple placeholder icon if no image provided */}
-        {icon ? <img src={icon} alt={title} width="24" height="24" /> : <span>★</span>}
+    <div className="rounded-sm border border-border bg-card p-2 flex flex-col gap-2 transition-all hover:border-border/80">
+      <div className="bg-muted/30 p-2 rounded-sm border border-border w-10 h-10 flex items-center justify-center">
+        {icon ? <img src={icon} alt={title} className="w-5 h-5 object-contain" /> : <span className="text-primary text-sm">★</span>}
       </div>
-      <Heading as="h3">{title}</Heading>
-      <p>{description}</p>
+      <Heading as="h3" className="text-lg font-medium text-foreground">
+        {title}
+      </Heading>
+      <p className="text-[13px] text-muted-foreground leading-relaxed">
+        {description}
+      </p>
     </div>
   );
 }
@@ -91,15 +85,17 @@ function HomepageFeatureHighlights() {
   ];
 
   return (
-    <section className={styles.featureHighlights}>
-      <div className="container">
-        <div className={styles.featureHighlightsHeader}>
-          <h2>Why Jet Admin?</h2>
-          <p>The most powerful PostgreSQL admin panel for your operations team, built for speed and flexibility.</p>
+    <section className="py-16 md:py-24 bg-muted/50 border-b border-border">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
+          <h2 className="text-3xl font-medium tracking-tight text-foreground">Why Jet Admin?</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            The most powerful PostgreSQL admin panel for your operations team, built for speed and flexibility.
+          </p>
         </div>
-        <div className={styles.featureGrid}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
           {features.map((props, idx) => (
-            <FeatureCard key={idx} {...props} delay={idx * 100} />
+            <FeatureCard key={idx} {...props} />
           ))}
         </div>
       </div>
@@ -141,42 +137,56 @@ function ScreenshotShowcase() {
   };
   const goToSlide = (index) => setActiveIndex(index);
 
-  // Auto-advance
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <section className={styles.demonstrationSection}>
-      <div className="container">
-        <div className={styles.screenshotShowcase}>
-          <div className={styles.screenshotBrowserFrame}>
-            <div className={styles.browserHeader}>
-              <div className={styles.browserButtons}>
-                <span style={{ background: '#ff5f56' }}></span>
-                <span style={{ background: '#ffbd2e' }}></span>
-                <span style={{ background: '#27c93f' }}></span>
+    <section className="py-16 md:py-24 bg-background border-b border-border">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1 w-full relative">
+            <div className="rounded-sm border border-border bg-card shadow-md overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2 bg-muted/50 border-b border-border">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="w-6 h-6 flex items-center justify-center bg-background border border-border text-foreground hover:bg-muted/50 rounded-sm transition-colors text-xs cursor-pointer" onClick={prevSlide}>
+                    &larr;
+                  </button>
+                  <button className="w-6 h-6 flex items-center justify-center bg-background border border-border text-foreground hover:bg-muted/50 rounded-sm transition-colors text-xs cursor-pointer" onClick={nextSlide}>
+                    &rarr;
+                  </button>
+                </div>
+              </div>
+              <div className="relative overflow-hidden w-full h-[300px] md:h-[400px] bg-background">
+                {screenshots.map((s, idx) => (
+                  <div
+                    key={idx}
+                    className={`absolute inset-0 transition-opacity duration-500 p-2 ${idx === activeIndex ? "opacity-100 z-10" : "opacity-0 z-0"}`}
+                  >
+                    <img src={s.image} alt={s.title} className="w-full h-full object-cover rounded-sm border border-border/50" />
+                  </div>
+                ))}
               </div>
             </div>
-            <div className={styles.screenshotSlider} style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
-              {screenshots.map((s, idx) => (
-                <div className={styles.screenshotSlide} key={idx}>
-                  <img src={s.image} alt={s.title} style={{ width: '100%', display: 'block' }} />
-                </div>
-              ))}
-            </div>
-            <button className={`${styles.screenshotNavButton} ${styles.screenshotNavButtonPrev}`} onClick={prevSlide}>←</button>
-            <button className={`${styles.screenshotNavButton} ${styles.screenshotNavButtonNext}`} onClick={nextSlide}>→</button>
           </div>
-          <div className={styles.screenshotInfo}>
-            <Heading as="h3">{screenshots[activeIndex].title}</Heading>
-            <p>{screenshots[activeIndex].description}</p>
-            <div className={styles.screenshotDots}>
+          <div className="flex-1 space-y-4 text-left">
+            <Heading as="h3" className="text-3xl font-medium tracking-tight text-foreground">
+              {screenshots[activeIndex].title}
+            </Heading>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {screenshots[activeIndex].description}
+            </p>
+            <div className="flex items-center gap-1.5 pt-2">
               {screenshots.map((_, idx) => (
                 <button
                   key={idx}
-                  className={`${styles.screenshotDot} ${idx === activeIndex ? styles.screenshotDotActive : ''}`}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${idx === activeIndex ? "w-6 bg-primary" : "w-2 bg-muted/50 hover:bg-muted"}`}
                   onClick={() => goToSlide(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
                 />
@@ -209,18 +219,24 @@ function HomepageTestimonials() {
   ];
 
   return (
-    <section className={styles.testimonialsSection}>
-      <div className="container">
-        <h2 className={styles.testimonialsHeader}>Trusted by Data Teams</h2>
-        <div className={styles.testimonialCards}>
+    <section className="py-16 md:py-24 bg-muted/50 border-b border-border">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <h2 className="text-3xl font-medium tracking-tight text-foreground">Trusted by Data Teams</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           {testimonials.map((t, i) => (
-            <div key={i} className={styles.testimonialCard}>
-              <div className={styles.testimonialContent}>"{t.quote}"</div>
-              <div className={styles.testimonialAuthor}>
-                <div className={styles.testimonialAvatar}></div>
-                <div className={styles.testimonialInfo}>
-                  <h4>{t.author}</h4>
-                  <p>{t.role}</p>
+            <div key={i} className="rounded-sm border border-border bg-card p-2 flex flex-col justify-between gap-4">
+              <div className="text-[13px] text-foreground/90 leading-relaxed italic">
+                "{t.quote}"
+              </div>
+              <div className="flex items-center gap-2 pt-2 border-t border-border/50">
+                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold text-primary">
+                  {t.author.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-foreground leading-none">{t.author}</h4>
+                  <p className="text-[10px] text-muted-foreground mt-1 leading-none">{t.role}</p>
                 </div>
               </div>
             </div>
@@ -233,16 +249,18 @@ function HomepageTestimonials() {
 
 function HomepageCTA() {
   return (
-    <section className={styles.ctaSection}>
-      <div className="container">
-        <div className={styles.ctaContent}>
-          <h2>Ready to Supercharge Your Workflow?</h2>
-          <p>Join thousands of developers and teams managing their PostgreSQL databases with Jet Admin.</p>
-          <div className={styles.ctaButtons}>
-            <Link to="/docs/intro" className={styles.getStartedButton}>
+    <section className="py-16 md:py-24 bg-background">
+      <div className="max-w-4xl mx-auto px-6 text-center">
+        <div className="rounded-sm border border-border bg-card p-4 space-y-4 shadow-sm">
+          <h2 className="text-3xl font-medium tracking-tight text-foreground">Ready to Supercharge Your Workflow?</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-xl mx-auto">
+            Join thousands of developers and teams managing their PostgreSQL databases with Jet Admin.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+            <Link to="/docs/introduction" className="h-10 px-5 bg-primary text-primary-foreground font-medium rounded-sm hover:bg-primary/90 transition-all inline-flex items-center justify-center text-sm">
               Get Started Now
             </Link>
-            <Link to="https://github.com/Jet-labs/Jet-admin" className={styles.ghostButton}>
+            <Link to="https://github.com/Jet-labs/Jet-admin" className="h-10 px-5 bg-background border border-border text-foreground font-medium rounded-sm hover:bg-muted/50 transition-all inline-flex items-center justify-center text-sm">
               View on GitHub
             </Link>
           </div>
@@ -266,4 +284,3 @@ export default function Home() {
     </Layout>
   );
 }
-

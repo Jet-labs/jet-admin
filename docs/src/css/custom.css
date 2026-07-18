@@ -1,84 +1,247 @@
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import Inter font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 :root {
-  /* Brand Colors - Indigo/Violet base for a premium tech feel */
-  --ifm-color-primary: #4f46e5;
-  --ifm-color-primary-dark: #4338ca;
-  --ifm-color-primary-darker: #3730a3;
-  --ifm-color-primary-darkest: #312e81;
-  --ifm-color-primary-light: #6366f1;
-  --ifm-color-primary-lighter: #818cf8;
-  --ifm-color-primary-lightest: #c7d2fe;
+  /* Brand Colors - Jet Admin Accent (#7582ff) */
+  --ifm-color-primary: #7582ff;
+  --ifm-color-primary-dark: #5c6aff;
+  --ifm-color-primary-darker: #4b59e6;
+  --ifm-color-primary-darkest: #3a47cc;
+  --ifm-color-primary-light: #8e9aff;
+  --ifm-color-primary-lighter: #a7b2ff;
+  --ifm-color-primary-lightest: #cdd3ff;
 
-  /* UI Colors */
-  --ifm-menu-color: #4b5563; /* Gray-600 */
-  --ifm-menu-color-active: #4f46e5;
-  --ifm-navbar-background-color: rgba(255, 255, 255, 0.85);
-  --ifm-background-color: #ffffff;
+  /* UI Colors - Near Black Canvas (#171717) and Ink (#fafafa) */
+  --ifm-background-color: #171717;
+  --ifm-background-double-hover-color: #242424;
+  --ifm-navbar-background-color: #171717;
+  --ifm-font-color-base: #fafafa;
+  --ifm-heading-color: #fafafa;
   --ifm-font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --ifm-font-family-monospace: ui-monospace, Menlo, Monaco, Consolas, 'Fira Code', monospace;
+  
+  /* Menu (Sidebar) styling */
+  --ifm-menu-color: #898989; /* Ink Mute */
+  --ifm-menu-color-active: #7582ff; /* Primary */
+  --ifm-menu-color-background-active: rgba(117, 130, 255, 0.1); /* bg-primary/10 */
+  --ifm-menu-color-background-hover: #242424; /* Canvas Night Soft */
   
   /* Typography */
-  --ifm-heading-font-weight: 600;
+  --ifm-heading-font-weight: 500;
   --ifm-font-size-base: 16px;
-  --ifm-line-height-base: 1.6;
+  --ifm-line-height-base: 1.5;
 
-  /* Components */
-  --ifm-code-font-size: 90%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.05);
-  --ifm-global-radius: 0.5rem;
+  /* Global components radius */
+  --ifm-global-radius: 6px; /* rounded-sm */
   --ifm-navbar-height: 4rem;
-  --ifm-navbar-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ifm-navbar-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --ifm-color-border: #2e2e2e;
+  --ifm-toc-border-color: #2e2e2e;
+  --ifm-hr-border-color: #2e2e2e;
+  --ifm-color-emphasis-200: #2e2e2e;
+  --ifm-color-emphasis-300: #2e2e2e;
 }
 
-/* Dark Mode - Deep Slate/Blue Gray */
+/* Ensure the same theme variables apply inside the dark data-theme context */
 [data-theme='dark'] {
-  --ifm-color-primary: #6366f1;
-  --ifm-color-primary-dark: #4f46e5;
-  --ifm-color-primary-darker: #4338ca;
-  --ifm-color-primary-darkest: #3730a3;
-  --ifm-color-primary-light: #818cf8;
-  --ifm-color-primary-lighter: #a5b4fc;
-  --ifm-color-primary-lightest: #e0e7ff;
+  --ifm-color-primary: #7582ff;
+  --ifm-color-primary-dark: #5c6aff;
+  --ifm-color-primary-darker: #4b59e6;
+  --ifm-color-primary-darkest: #3a47cc;
+  --ifm-color-primary-light: #8e9aff;
+  --ifm-color-primary-lighter: #a7b2ff;
+  --ifm-color-primary-lightest: #cdd3ff;
 
-  --ifm-background-color: #0f172a; /* Slate-900 */
-  --ifm-navbar-background-color: rgba(15, 23, 42, 0.85);
-  --ifm-menu-color: #cbd5e1; /* Slate-300 */
-  --ifm-menu-color-active: #818cf8;
+  --ifm-background-color: #171717;
+  --ifm-navbar-background-color: #171717;
+  --ifm-font-color-base: #fafafa;
+  --ifm-heading-color: #fafafa;
   
-  --ifm-font-color-base: #e2e8f0; /* Slate-200 */
-  --ifm-heading-color: #f8fafc; /* Slate-50 */
+  --ifm-menu-color: #898989;
+  --ifm-menu-color-active: #7582ff;
   
-  --ifm-color-primary-border: #334155;
-  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.05);
+  --ifm-color-border: #2e2e2e;
+  --ifm-toc-border-color: #2e2e2e;
+  --ifm-hr-border-color: #2e2e2e;
+  --ifm-color-emphasis-200: #2e2e2e;
+  --ifm-color-emphasis-300: #2e2e2e;
 }
 
-/* Glassmorphism Utilities */
+/* Global Border Color Fallback */
+* {
+  border-color: #2e2e2e;
+}
+
+/* Base Headings - Keep Display & UI Typography at weight 500 & tight letter spacing */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500 !important;
+  letter-spacing: -0.02em !important;
+  color: #fafafa;
+}
+
+/* Clean up navbar styling */
 .navbar {
+  border-bottom: 1px solid #2e2e2e !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--ifm-color-emphasis-200);
 }
 
-[data-theme='dark'] .navbar {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.navbar__brand {
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
-/* Button Refinements */
-.button {
-  font-weight: 600;
-  transition: all 0.2s ease;
+.navbar__item {
+  font-weight: 500;
+  font-size: 14px;
 }
 
-.button--primary {
-  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06);
+/* Sidebar navigation link refinements */
+.menu__link {
+  font-size: 14px;
+  font-weight: 400;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.button--primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2), 0 4px 6px -2px rgba(79, 70, 229, 0.1);
+.menu__link--active {
+  font-weight: 500 !important;
+}
+
+/* Sidebar container border override */
+.theme-doc-sidebar-container {
+  border-right: 1px solid #2e2e2e !important;
+}
+
+/* Documentation page images */
+.markdown img {
+  border: 1px solid #2e2e2e !important;
+  border-radius: 6px !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Force dark near-black style for code blocks */
+code {
+  background-color: #242424 !important;
+  border: 1px solid #2e2e2e !important;
+  border-radius: 6px !important;
+  color: #fafafa !important;
+  font-family: ui-monospace, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 0.85em;
+  padding: 2px 6px;
+}
+
+/* Docusaurus markdown code container */
+.theme-code-block {
+  border: 1px solid #2e2e2e !important;
+  border-radius: 6px !important;
+  background-color: #171717 !important;
+  margin-bottom: 1rem !important;
+  overflow: hidden;
+}
+
+.theme-code-block pre {
+  background-color: transparent !important;
+  font-family: ui-monospace, Menlo, Monaco, Consolas, monospace !important;
+  padding: 12px !important;
+  margin: 0 !important;
+}
+
+/* Tables inside documentation */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  border: 1px solid #2e2e2e !important;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #171717;
+}
+
+th {
+  background-color: #1f1f1f !important;
+  border: 1px solid #2e2e2e !important;
+  color: #fafafa !important;
+  padding: 10px 14px;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: left;
+}
+
+td {
+  border: 1px solid #2e2e2e !important;
+  color: #b4b4b4 !important;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+tr:nth-child(even) {
+  background-color: rgba(36, 36, 36, 0.4) !important; /* Muted banding */
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #171717;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2e2e2e;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #363636;
+}
+
+/* Footer overrides */
+.footer {
+  background-color: #171717 !important;
+  border-t: 1px solid #2e2e2e !important;
+  padding: 4rem 2rem !important;
+}
+
+.footer__title {
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  color: #fafafa !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footer__link-item {
+  font-size: 13px !important;
+  color: #898989 !important;
+}
+
+.footer__link-item:hover {
+  color: #7582ff !important;
+  text-decoration: none !important;
+}
+
+/* Table of Contents overrides for readability on dark canvas */
+.table-of-contents__link {
+  color: #898989 !important;
+  transition: color 0.15s ease;
+}
+
+.table-of-contents__link:hover {
+  color: #fafafa !important;
+  text-decoration: none !important;
+}
+
+.table-of-contents__link--active,
+.table-of-contents__link.toc-highlight {
+  color: #7582ff !important;
+  font-weight: 500 !important;
 }

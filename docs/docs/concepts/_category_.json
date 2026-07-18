@@ -1,8 +1,0 @@
-{
-  "label": "Core Concepts",
-  "position": 4,
-  "link": {
-    "type": "generated-index",
-    "description": "Learn how data flow, workflow execution, and platform concepts fit together in the current codebase."
-  }
-}

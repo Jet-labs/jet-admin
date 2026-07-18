@@ -66,7 +66,7 @@ const config = {
       // Replace with your project's social card
       image: "img/docusaurus-social-card.jpg",
       colorMode: {
-        defaultMode: "light",
+        defaultMode: "dark",
         disableSwitch: true,
         respectPrefersColorScheme: false,
       },
@@ -84,11 +84,6 @@ const config = {
             label: "Documentation",
           },
           {
-            to: '/docs/api-reference',
-            label: 'API Reference',
-            position: 'left',
-          },
-          {
             href: "https://github.com/Jet-labs/Jet-admin",
             label: "GitHub",
             position: "right",
@@ -103,11 +98,7 @@ const config = {
             items: [
               {
                 label: "Documentation",
-                to: "/docs/intro",
-              },
-              {
-                label: "API Reference",
-                to: "/docs/api-reference",
+                to: "/docs/introduction",
               },
             ],
           },
@@ -123,7 +114,7 @@ const config = {
         ],
       },
       prism: {
-        theme: prismThemes.github,
+        theme: prismThemes.dracula,
         darkTheme: prismThemes.dracula,
       },
     }),

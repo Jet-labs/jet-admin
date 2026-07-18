@@ -7,25 +7,34 @@ module.exports = {
     container: false,
   },
   darkMode: ["class", '[data-theme="dark"]'],
-  content: ["./src/**/*.{jsx,tsx,html}"],
+  content: ["./src/**/*.{js,jsx,tsx,html}"],
   theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#4f46e5',
-          dark: '#3730a3',
-          light: '#818cf8',
+          DEFAULT: '#7582ff',
+          deep: '#5c6aff',
+          soft: '#949fff',
         },
-        slate: {
-          900: '#0f172a',
-          800: '#1e293b',
-          700: '#334155',
-          200: '#e2e8f0',
-          50: '#f8fafc',
-        }
+        background: '#171717',
+        card: '#1f1f1f',
+        'brand-black': '#171717',
+        'brand-black-text': '#0f0f0f',
+        'primary-foreground': '#0f0f0f',
+        muted: {
+          DEFAULT: '#242424',
+          foreground: '#898989',
+        },
+        border: '#2e2e2e',
+        foreground: '#fafafa',
+      },
+      borderRadius: {
+        sm: '6px',
+        full: '9999px',
       },
       fontFamily: {
         sans: ['Inter', ...fontFamily.sans],
+        mono: ['ui-monospace', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
     },
   },

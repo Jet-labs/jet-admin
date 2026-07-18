@@ -1,11 +1,11 @@
 # jet-admin — Design System
 
-> **Scope:** This document governs all UI work across the `jet-admin` monorepo. It merges
-> jet-admin's established component conventions with the Supabase-derived visual identity.
+> **Scope:** This document governs all UI work across the `jet-admin` monorepo. It defines
+> jet-admin's design system, visual language, and component conventions.
 > Tailwind **semantic tokens** (`bg-primary`, `text-foreground`, `border-border`, …) are the
 > canonical way to express every design decision; raw hex values and arbitrary Tailwind classes
 > (e.g. `bg-[#3ecf8e]`, `text-slate-500`) are **banned** except in the one allowed exception
-> documented in §19.
+> documented in §13.
 
 ---
 
@@ -13,7 +13,7 @@
 
 jet-admin's design language is built for **clarity and technical precision**. Marketing and
 product surfaces sit on a dark near-black canvas (`bg-background`) with near-white ink (`text-foreground`).
-The only consistent chromatic event across the entire system is the **emerald green primary** —
+The only consistent chromatic event across the entire system is the **primary accent** —
 used for filled CTAs, brand accents, and active-state indicators. Everything else is a calibrated
 greyscale hierarchy.
 
@@ -22,25 +22,24 @@ negative letter-spacing pulling display headings into editorial density. Product
 dominant decorative element — never photography, never atmospheric gradients.
 
 **Key commitments:**
-- Single emerald primary as the only chromatic event; all else is monochrome.
+- Single primary accent as the only chromatic event; all else is monochrome.
 - Dark canvas product track — no light-canvas marketing, no full-bleed gradients.
 - Square-ish button radii (`rounded-sm` / 6px) — never pill-shaped.
-- Near-black text ON the emerald button (the "lit surface" idiom) — never white-on-green.
-- Composited product UI mockups as decoration; compositing always uses `rounded-md` containers.
+- Near-black text ON the primary button (the "lit surface" idiom) — never white-on-primary.
+- Composited product UI mockups as decoration; compositing always uses `rounded-sm` containers.
 - Code blocks always in `bg-background` deep near-black with system mono.
 
 ---
 
-## 2. Token Map — Supabase Concepts → jet-admin Tailwind
+## 2. Token Map — jet-admin Design Tokens
 
-The table below is the authoritative mapping. When any design reference uses a Supabase token,
-translate it to the right-hand jet-admin class. Never hard-code the hex.
+The table below is the authoritative mapping. Always use the jet-admin Tailwind token — never hard-code hex values.
 
-| Supabase Concept | Hex | jet-admin Tailwind Token |
+| Concept | Hex | jet-admin Tailwind Token |
 |---|---|---|
-| `primary` (emerald) | `#3ecf8e` | `bg-primary` / `text-primary` |
-| `primary-deep` (pressed) | `#24b47e` | `bg-primary/90` (hover/active modifier) |
-| `primary-soft` | `#4ade80` | `bg-primary/60` |
+| `primary` (brand accent) | `#7582ff` | `bg-primary` / `text-primary` |
+| `primary-deep` (pressed) | `#5c6aff` | `bg-primary/90` (hover/active modifier) |
+| `primary-soft` | `#949fff` | `bg-primary/60` |
 | `canvas` (page bg) | `#171717` | `bg-background` |
 | `canvas-soft` | `#1f1f1f` | `bg-card` or `bg-muted/50` |
 | `canvas-night` (dark surface) | `#171717` | `bg-background` or `bg-brand-black` |
@@ -53,7 +52,7 @@ translate it to the right-hand jet-admin class. Never hard-code the hex.
 | `ink-mute` (secondary text) | `#898989` | `text-muted-foreground` |
 | `ink-mute-2` (tertiary text) | `#4d4d4d` | `text-muted-foreground/70` |
 | `ink-faint` (placeholder) | `#363636` | `text-muted-foreground/50` |
-| `on-primary` (text on green) | `#0f0f0f` | `text-brand-black` or `text-primary-foreground` |
+| `on-primary` (text on accent) | `#0f0f0f` | `text-brand-black` or `text-primary-foreground` |
 | `on-dark` (text on night) | `#fafafa` | `text-foreground` |
 | Accent purple | `#6b01c2` | Chart/logo use only — no Tailwind token |
 | Accent yellow | `#ffdb13` | Status indicator only — no Tailwind token |
@@ -65,12 +64,12 @@ translate it to the right-hand jet-admin class. Never hard-code the hex.
 
 ## 3. Colors — Usage Rules
 
-### Primary (Emerald)
+### Primary (Brand Accent)
 - `bg-primary` — filled CTA buttons and the brand wordmark accent **only**.
-- `text-primary` — active-state labels, selected-state text, and "pill-tag-green" fills.
+- `text-primary` — active-state labels, selected-state text, and "pill-tag" fills.
 - `bg-primary/10` — selected/highlighted backgrounds (e.g. `ChartTypeSelector`, AND-logic chips).
 - `border-primary` / `border-primary/30` — selected-state borders and focus rings.
-- Keep emerald **scarce** — aim for one `bg-primary` element per viewport section.
+- Keep primary **scarce** — aim for one `bg-primary` element per viewport section.
 
 ### Surface Hierarchy
 ```
@@ -127,31 +126,31 @@ border-border/50   ← hairline-cool — very fine chrome work
 - **Never exceed weight 500** on display headings — mid-weight reads as engineered, not decorative; 600+ breaks the brand.
 - **Negative tracking on display only.** Apply `tracking-tight` or inline `letter-spacing` for display tiers; body and UI copy stay at 0.
 - **Monospace everywhere code appears** — section configurators, vega spec editors, variable paths, inline code in callouts.
-- The `font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground` pattern is the canonical section label style (see §§ 18–19). It maps to `micro` weight 600 — the one permitted weight exception at this micro scale.
+- The `font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground` pattern is the canonical section label style (see §§ 12–13). It maps to `micro` weight 600 — the one permitted weight exception at this micro scale.
 
 ---
 
 ## 5. Spacing
 
-Base unit: **8px**. All component internal spacing must use these increments.
+All spacing must use the tokens below — never use arbitrary values or ad-hoc paddings.
 
-| Token | Value | Tailwind Equivalent |
-|---|---|---|
-| `xxs` | 2px | `p-0.5` / `gap-0.5` |
-| `xs` | 4px | `p-1` / `gap-1` |
-| `sm` | 8px | `p-2` / `gap-2` |
-| `md` | 12px | `p-3` / `gap-3` |
-| `lg` | 16px | `p-4` / `gap-4` |
-| `xl` | 24px | `p-6` / `gap-6` |
-| `xxl` | 32px | `p-8` / `gap-8` |
-| `huge` | 64px | `p-16` / `gap-16` |
+| Token | Value | Tailwind Class | Use |
+|---|---|---|---|
+| `xxs` | 2px | `p-0.5` / `gap-0.5` | Icon insets, fine chrome |
+| `xs` | 4px | `p-1` / `gap-1` | Tight internal gaps |
+| `sm` | 8px | `p-2` / `gap-2` | **Default** — cards, panels, forms, configurators |
+| `md` | 12px | `p-3` / `gap-3` | Use sparingly; only when `p-2` is visually insufficient |
+| `lg` | 16px | `p-4` / `gap-4` | Section headers, prominent UI groupings only |
+| `xl` | 24px | `p-6` / `gap-6` | Navigation bar, top-level page chrome |
+| `xxl` | 32px | `p-8` / `gap-8` | Reserved for marketing hero areas |
+| `huge` | 64px | `p-16` / `gap-16` | Section vertical rhythm (marketing) |
 
-- **Feature / pricing cards:** internal padding should preferably be `p-2` (8px), using `gap-2` or `space-y-2`/`space-x-2` for layout.
+### Spacing Directive — Agents Must Follow
+> **REQUIRED:** Use `p-2` (`sm` / 8px) as the default padding for all cards, panels, forms, configurators, and UI containers. Use `gap-2` / `space-x-2` / `space-y-2` as the default gap between elements. Only step up to `p-3` or `p-4` when explicitly justified. Marketing section bands use `py-16` to `py-24` for vertical rhythm.
+
+- **Feature / pricing cards:** `p-2`, `gap-2` or `space-y-2`/`space-x-2`.
 - **Marketing section bands:** vertical padding `py-16` to `py-24` (64–96px).
-- **Configurator panels:** internal padding should preferably be `p-2` (and use `gap-2` or `space-y-2`/`space-x-2` for layout).
-
-### Rules
-- **Prefer Dense & Compact Spacing:** Across all UI elements (cards, containers, forms, navigations, and panels), **preferably use `p-2` (8px padding), spacing-2 (`space-x-2` / `space-y-2`), and `gap-2`** wherever possible. Avoid larger paddings (`p-3`, `p-4`, `p-8`) or spacing values (`gap-3`, `space-y-4` etc.) unless strictly necessary for top-level marketing layout sections.
+- **Configurator panels:** `p-2`, `gap-2` or `space-y-2`/`space-x-2`.
 
 ---
 
@@ -159,15 +158,14 @@ Base unit: **8px**. All component internal spacing must use these increments.
 
 | Token | Value | Tailwind | Use |
 |---|---|---|---|
-| `xs` | 4px | `rounded` | Form inputs, hairline tags |
-| `sm` | 6px | `rounded-md` | **Buttons** (signature shape), code blocks |
-| `md` | 8px | `rounded-lg` | Compact cards, alerts, dropdowns, Feature cards, pricing cards, product mockups, Modal dialogs, large chrome |
-| `lg` | 12px | `rounded-xl` | Dont use |
-| `xl` | 16px | `rounded-2xl` | Dont use |
-| `full` | 9999px | `rounded-full` | Pill tags, avatars |
+| `sm` | 6px | `rounded-sm` | **Default everywhere** — buttons, inputs, cards, alerts, dropdowns, modals, code blocks, product mockups |
+| `full` | 9999px | `rounded-full` | Pills and avatars **only** |
 
-> **Critical:** Buttons are **never** pill-shaped (`rounded-full`). The 6px square-ish radius is
-> the brand signature. `rounded-md` is the closest Tailwind shorthand.
+> **Critical rules:**
+> - Use `rounded-sm` for **all** components and containers — buttons, inputs, cards, alerts, dropdowns, modals, code blocks, product mockups.
+> - `rounded-full` is reserved **exclusively** for pill tags and avatars.
+> - `rounded`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl` are **banned**.
+> - Buttons are **never** pill-shaped (`rounded-full`). The 6px square-ish radius (`rounded-sm`) is the brand signature.
 
 ---
 
@@ -188,13 +186,13 @@ Depth comes from composited **product UI mockups**, not gradients. Never add atm
 
 ### 8.1 Buttons
 
-#### Primary (Emerald CTA)
+#### Primary (CTA)
 ```jsx
 <Button type="button" onClick={handleAction} className="w-full">
   Get Started
 </Button>
 ```
-- Background `bg-primary`, text `text-foreground` (near-black — NOT white), `rounded-md` (6px), `text-sm font-medium`.
+- Background `bg-primary`, text `text-foreground` (near-black — NOT white), `rounded-sm` (6px), `text-sm font-medium`.
 - Hover/pressed: `bg-primary/90`.
 - **One per viewport section maximum.**
 
@@ -204,7 +202,7 @@ Depth comes from composited **product UI mockups**, not gradients. Never add atm
   Learn More
 </Button>
 ```
-- Background `bg-background`, border `border-border`, text `text-foreground`.
+- Background `bg-background`, border `border-border`, text `text-foreground`, `rounded-sm`.
 
 #### Ghost (Active state)
 ```jsx
@@ -232,6 +230,9 @@ className="rounded-full"
 
 /* Never: white text on primary */
 className="bg-primary text-white"
+
+/* Never: any rounded variant other than rounded-sm */
+className="rounded rounded-md rounded-lg rounded-xl"
 ```
 
 ---
@@ -240,21 +241,21 @@ className="bg-primary text-white"
 
 #### Feature Card (standard / default card)
 ```jsx
-<div className="rounded-xl border border-border bg-card p-2 space-y-2">
+<div className="rounded-sm border border-border bg-card p-2 space-y-2">
   {/* content */}
 </div>
 ```
 
 #### Feature Card (deep dark / code-heavy)
 ```jsx
-<div className="rounded-xl border border-border bg-brand-black text-foreground p-2 space-y-2">
+<div className="rounded-sm border border-border bg-brand-black text-foreground p-2 space-y-2">
   {/* content */}
 </div>
 ```
 
 #### Pricing Card (standard)
 ```jsx
-<div className="rounded-xl border border-border bg-card p-2 flex flex-col gap-2">
+<div className="rounded-sm border border-border bg-card p-2 flex flex-col gap-2">
   <p className="text-2xl font-medium tracking-tight text-foreground">Plan Name</p>
   <p className="text-3xl font-medium text-foreground">$X<span className="text-sm text-muted-foreground">/mo</span></p>
   {/* feature list */}
@@ -264,23 +265,23 @@ className="bg-primary text-white"
 
 #### Pricing Card (featured / light inverted)
 ```jsx
-<div className="rounded-xl border border-border bg-foreground text-background p-2 flex flex-col gap-2">
+<div className="rounded-sm border border-border bg-foreground text-background p-2 flex flex-col gap-2">
   {/* same structure, text-background overrides */}
 </div>
 ```
-- The light inversion is the featured-tier treatment. Do NOT use `bg-primary` as the featured tier background — green is reserved for buttons.
+- The light inversion is the featured-tier treatment. Do NOT use `bg-primary` as the featured tier background — primary accent is reserved for buttons.
 
 ---
 
 ### 8.3 Code Blocks
 ```jsx
-<div className="rounded-md bg-background text-foreground p-2 font-mono text-sm leading-relaxed border border-border">
+<div className="rounded-sm bg-background text-foreground p-2 font-mono text-sm leading-relaxed border border-border">
   <code>{snippet}</code>
 </div>
 ```
 Inline code inside callouts:
 ```jsx
-<code className="bg-background px-1 rounded border border-border font-mono text-xs">
+<code className="bg-background px-1 rounded-sm border border-border font-mono text-xs">
   variable.path
 </code>
 ```
@@ -296,7 +297,7 @@ Inline code inside callouts:
 />
 ```
 - Background `bg-background`, border `border-border`, text `text-foreground`, placeholder `text-muted-foreground/50`.
-- `rounded-md` (6px — matches button radius).
+- `rounded-sm` (6px — matches button radius).
 - Height ≥ 36px (WCAG AA touch target).
 - Never override `bg-slate-50`, `border-slate-300`, or `placeholder:text-slate-400` — these are banned.
 
@@ -304,7 +305,7 @@ Inline code inside callouts:
 
 ### 8.5 Pills & Tags
 
-#### Green pill (new / featured)
+#### Primary pill (new / featured)
 ```jsx
 <span className="bg-primary text-foreground text-xs font-medium px-2 py-0.5 rounded-full">
   New
@@ -317,6 +318,8 @@ Inline code inside callouts:
   Tag
 </span>
 ```
+
+> Pills and avatars are the **only** components that use `rounded-full`.
 
 ---
 
@@ -359,7 +362,7 @@ Inline code inside callouts:
 </section>
 ```
 
-**Do NOT:** Add gradients, atmospheric backdrops, or full-bleed imagery to section bands. The white canvas is the design.
+**Do NOT:** Add gradients, atmospheric backdrops, or full-bleed imagery to section bands. The dark canvas is the design.
 
 ---
 
@@ -381,20 +384,23 @@ Display type stair-steps: `text-6xl` → `text-5xl` → `text-4xl` → `text-3xl
 ### ✅ Do
 - Use `bg-primary` for filled CTAs and wordmark accent — sparingly, once per section.
 - Render display headings weight 500 with negative letter-spacing.
-- Use `rounded-md` (6px) for all buttons.
+- Use `rounded-sm` (6px) for **all** components — buttons, inputs, cards, modals, dropdowns.
+- Use `rounded-full` **only** for pills and avatars.
 - Use `text-foreground` (near-black) on `bg-primary` buttons — never white.
-- Wrap product UI mockups in `rounded-xl border border-border shadow-md`.
+- Wrap product UI mockups in `rounded-sm border border-border shadow-md`.
 - Use system mono (`font-mono`) for every code surface.
-- Map all Supabase design tokens to jet-admin Tailwind semantics (§2 table).
+- Use `p-2` and `gap-2` as the default spacing inside all components.
 
 ### ❌ Don't
 - Don't introduce accent colors (purple, yellow, pink) as component fills or button backgrounds.
 - Don't exceed font weight 500 on display headings.
-- Don't use pill-shaped buttons (`rounded-full`).
+- Don't use pill-shaped buttons (`rounded-full` on buttons).
+- Don't use `rounded`, `rounded-md`, `rounded-lg`, `rounded-xl`, or `rounded-2xl` anywhere.
 - Don't use white text on `bg-primary`.
 - Don't add atmospheric gradients to section bands or hero areas.
 - Don't use `bg-white`, `bg-slate-50`, `border-slate-200`, or any raw `bg-[#hex]` in components.
 - Don't use the `bg-primary` color for a featured pricing tier — use `bg-foreground` (dark inversion).
+- Don't use `p-3`, `p-4`, `p-8`, `gap-3`, `gap-4`, `space-y-4` inside component UI — stick to `p-2` / `gap-2`.
 
 ---
 
@@ -447,7 +453,7 @@ Every configurator closes with a single full-width save button using `Button var
 ### Help Callout Containers
 
 ```jsx
-<div className="rounded-md border border-border bg-muted/30 p-2 text-[10px] text-muted-foreground space-y-2">
+<div className="rounded-sm border border-border bg-muted/30 p-2 text-[10px] text-muted-foreground space-y-2">
   <div className="font-semibold text-xs text-foreground">📘 Title</div>
   {/* body */}
 </div>
@@ -456,7 +462,7 @@ Every configurator closes with a single full-width save button using `Button var
 Rules:
 - Background `bg-muted/30` — never `bg-slate-50` or `bg-white`.
 - Border `border-border` — never `border-slate-200`.
-- Inline code: `<code className="bg-background px-1 rounded border border-border font-mono">`.
+- Inline code: `<code className="bg-background px-1 rounded-sm border border-border font-mono">`.
 - Primary callouts (tips): `bg-primary/5 border-primary/20 text-primary/80`.
 - Warning callouts: `bg-amber-50 border-amber-200 text-amber-700`.
 
@@ -477,7 +483,7 @@ import { Textarea } from '@jet-admin/ui';
 ### AND/OR Logic Dividers
 
 ```jsx
-<button className={`text-[9px] font-bold px-2 py-0.5 rounded border transition-colors ${
+<button className={`text-[9px] font-bold px-2 py-0.5 rounded-sm border transition-colors ${
   logic === 'AND'
     ? 'bg-primary/10 text-primary border-primary/30'
     : 'bg-amber-50 text-amber-600 border-amber-200'
@@ -577,7 +583,7 @@ All `--we-*` inline style variables are replaced with Tailwind semantic tokens:
 ### Suggestions Dropdown
 
 ```jsx
-<div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg max-h-48 overflow-auto">
+<div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-sm shadow-lg max-h-48 overflow-auto">
   {suggestions.map(s => (
     <div
       key={s.id}
@@ -604,7 +610,7 @@ import { Label } from "@jet-admin/ui";
 
 ```jsx
 /* ✅ Correct */
-<div className="rounded-md border border-border bg-card overflow-hidden shadow-sm">
+<div className="rounded-sm border border-border bg-card overflow-hidden shadow-sm">
   <div className="flex items-center justify-between p-2 bg-muted/50 border-b border-border">
 
 /* ❌ Wrong */
@@ -636,7 +642,12 @@ bg-blue-50        → bg-primary/10
 bg-indigo-50      → bg-primary/10
 bg-[#646cff]      → bg-primary
 text-white (on primary button) → text-foreground
-rounded-full (on buttons) → rounded-md
+rounded           → rounded-sm
+rounded-md        → rounded-sm
+rounded-lg        → rounded-sm
+rounded-xl        → rounded-sm
+rounded-2xl       → rounded-sm
+rounded-full (on anything except pills/avatars) → rounded-sm
 font-weight 600+  → font-medium (500) on display headings
 p-3 / p-4 / p-8   → p-2 (preferably, except for section vertical padding)
 gap-3 / gap-4     → gap-2 (preferably)
@@ -653,7 +664,7 @@ Run after every design change:
 npx @google/design.md lint UI_GUIDELINES_V3.md
 ```
 
-Default body references must use `body-md` / `text-base`. Code surfaces must use `code` / `font-mono`. Spacing must preferably use `p-2`, `space-x-2`/`space-y-2`, and `gap-2` wherever possible. Keep emerald scarce — one `bg-primary` filled element per viewport section is the target.
+Default body references must use `body-md` / `text-base`. Code surfaces must use `code` / `font-mono`. Spacing must preferably use `p-2`, `space-x-2`/`space-y-2`, and `gap-2` wherever possible. Keep primary accent scarce — one `bg-primary` filled element per viewport section is the target.
 
 ---
 
