@@ -382,7 +382,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                 <h4 className="text-xs font-bold text-foreground">
                   {eventLabel}
                 </h4>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {eventInfo?.desc || ""}
                 </p>
               </div>
@@ -400,7 +400,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
 
             {hasEventInputs && (
               <div className="rounded border border-primary/20 bg-primary/5 p-2">
-                <p className="text-[10px] font-semibold text-primary mb-1.5 flex items-center gap-1">
+                <p className="text-xs font-semibold text-primary mb-1.5 flex items-center gap-1">
                   <Info className="h-3 w-3 text-primary" /> Available Event Context
                 </p>
                 <div className="space-y-1">
@@ -434,7 +434,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                         onClick={() => toggleExpand(path)}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted border border-border text-[10px] font-bold text-muted-foreground">
+                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted border border-border text-xs font-bold text-muted-foreground">
                             {actionIndex + 1}
                           </div>
                           
@@ -446,7 +446,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                             <span className="text-xs font-semibold text-foreground block leading-none mb-0.5">
                               {typeConfig.label}
                             </span>
-                            <span className="text-[10px] text-muted-foreground font-mono truncate block max-w-[200px]">
+                            <span className="text-xs text-muted-foreground font-mono truncate block max-w-[200px]">
                               {getActionSummary(action)}
                             </span>
                           </div>
@@ -476,7 +476,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                       {isExpanded && (
                         <div className="p-2 border-t border-border/50 bg-muted/10 space-y-2 animate-in slide-in-from-top-1 duration-200">
                           <div className="space-y-1">
-                            <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                            <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                               Action Type
                             </Label>
                             <Select
@@ -507,7 +507,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                           {action.actionType === "SET_VARIABLE" && (
                             <div className="space-y-2">
                               <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Variable Key</Label>
+                                <Label className="text-xs text-muted-foreground font-semibold">Variable Key</Label>
                                 <TemplateAutocompleteInput
                                   value={action.config?.key || ""}
                                   onChange={(val) =>
@@ -518,7 +518,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                 />
                               </div>
                               <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Value Expression</Label>
+                                <Label className="text-xs text-muted-foreground font-semibold">Value Expression</Label>
                                 <TemplateAutocompleteInput
                                   value={action.config?.value || ""}
                                   onChange={(val) =>
@@ -534,7 +534,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                           {action.actionType === "EXECUTE_QUERY" && (
                             <div className="space-y-2">
                               <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Data Source</Label>
+                                <Label className="text-xs text-muted-foreground font-semibold">Data Source</Label>
                                 {pageDataSources.length > 0 ? (
                                   <SearchSelect
                                     value={action.config?.alias || ""}
@@ -551,7 +551,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                   />
                                 ) : (
                                     <div className="rounded border border-dashed border-border p-2.5 text-center">
-                                    <p className="text-[10px] text-muted-foreground">No page-level data sources defined. Add them in the Data tab of the page editor.</p>
+                                      <p className="text-xs text-muted-foreground">No page-level data sources defined. Add them in the Data tab of the page editor.</p>
                                   </div>
                                 )}
                               </div>
@@ -563,14 +563,14 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                   <div className="rounded border border-border bg-muted/30 p-2 space-y-2">
                                     <div className="flex items-center gap-1.5">
                                       <Info className="h-3 w-3 text-muted-foreground" />
-                                      <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
+                                      <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
                                     </div>
                                     <p className="text-[9px] text-muted-foreground">Override argument values when this data source is executed by this event action.</p>
                                     {inputDefinitions.map((inputDef) => {
                                       const inputKey = inputDef.key || inputDef.name;
                                       return (
                                         <div key={inputKey} className="space-y-0.5">
-                                          <Label className="text-[10px] font-medium text-muted-foreground">
+                                          <Label className="text-xs font-medium text-muted-foreground">
                                             {inputKey}
                                             {inputDef.type && <span className="ml-1 text-muted-foreground/50">({inputDef.type})</span>}
                                           </Label>
@@ -594,7 +594,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                           {action.actionType === "TRIGGER_QUERY" && (
                             <div className="space-y-2">
                               <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Data Query</Label>
+                                <Label className="text-xs text-muted-foreground font-semibold">Data Query</Label>
                                 <SearchSelect
                                   value={action.config?.queryID || ""}
                                   onChange={(val) => {
@@ -622,14 +622,14 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                   <div className="rounded border border-border bg-muted/30 p-2 space-y-2">
                                     <div className="flex items-center gap-1.5">
                                       <Info className="h-3 w-3 text-muted-foreground" />
-                                      <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
+                                      <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
                                     </div>
                                     <p className="text-[9px] text-muted-foreground">Override argument values when this query is executed.</p>
                                     {inputDefinitions.map((inputDef) => {
                                       const inputKey = inputDef.key || inputDef.name;
                                       return (
                                         <div key={inputKey} className="space-y-0.5">
-                                          <Label className="text-[10px] font-medium text-muted-foreground">
+                                          <Label className="text-xs font-medium text-muted-foreground">
                                             {inputKey}
                                             {inputDef.type && <span className="ml-1 text-muted-foreground/50">({inputDef.type})</span>}
                                           </Label>
@@ -653,7 +653,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                           {action.actionType === "TRIGGER_WORKFLOW" && (
                             <div className="space-y-2">
                               <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Workflow</Label>
+                                <Label className="text-xs text-muted-foreground font-semibold">Workflow</Label>
                                 <SearchSelect
                                   value={action.config?.workflowID || ""}
                                   onChange={(val) => {
@@ -681,14 +681,14 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                   <div className="rounded border border-border bg-muted/30 p-2 space-y-2">
                                     <div className="flex items-center gap-1.5">
                                       <Info className="h-3 w-3 text-muted-foreground" />
-                                      <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
+                                      <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">Input Arguments</p>
                                     </div>
                                     <p className="text-[9px] text-muted-foreground">Override argument values when this workflow is executed.</p>
                                     {inputDefinitions.map((inputDef) => {
                                       const inputKey = inputDef.key || inputDef.name;
                                       return (
                                         <div key={inputKey} className="space-y-0.5">
-                                          <Label className="text-[10px] font-medium text-muted-foreground">
+                                          <Label className="text-xs font-medium text-muted-foreground">
                                             {inputKey}
                                             {inputDef.type && <span className="ml-1 text-muted-foreground/50">({inputDef.type})</span>}
                                           </Label>
@@ -717,7 +717,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                             return (
                               <div className="space-y-2">
                               <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Target Widget</Label>
+                                  <Label className="text-xs text-muted-foreground font-semibold">Target Widget</Label>
                                 {pageWidgets.length > 0 ? (
                                   <Select
                                     value={selectedWidgetID}
@@ -743,13 +743,13 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                   </Select>
                                 ) : (
                                       <div className="rounded border border-dashed border-border p-2.5 text-center">
-                                    <p className="text-[10px] text-muted-foreground">No widgets on this page yet. Place widgets on the canvas first.</p>
+                                        <p className="text-xs text-muted-foreground">No widgets on this page yet. Place widgets on the canvas first.</p>
                                   </div>
                                 )}
                               </div>
                               {selectedWidgetID && (
                                 <div className="space-y-1">
-                                  <Label className="text-[10px] text-muted-foreground font-semibold">Method</Label>
+                                    <Label className="text-xs text-muted-foreground font-semibold">Method</Label>
                                   {availableMethods.length > 0 ? (
                                     <>
                                       <Select
@@ -772,7 +772,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                         </SelectContent>
                                       </Select>
                                       {selectedMethod && (
-                                          <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1">
+                                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                                           <Info className="h-3 w-3" />
                                           {selectedMethod.description}
                                         </p>
@@ -780,7 +780,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                     </>
                                   ) : (
                                         <div className="rounded border border-dashed border-border p-2.5 text-center">
-                                      <p className="text-[10px] text-muted-foreground">This widget type does not expose any callable methods.</p>
+                                          <p className="text-xs text-muted-foreground">This widget type does not expose any callable methods.</p>
                                     </div>
                                   )}
                                 </div>
@@ -792,7 +792,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                           {action.actionType === "SHOW_TOAST" && (
                             <div className="space-y-2">
                               <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Toast Message</Label>
+                                <Label className="text-xs text-muted-foreground font-semibold">Toast Message</Label>
                                 <TemplateAutocompleteInput
                                   value={action.config?.message || ""}
                                   onChange={(val) =>
@@ -803,7 +803,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                 />
                               </div>
                               <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-semibold">Variant</Label>
+                                <Label className="text-xs text-muted-foreground font-semibold">Variant</Label>
                                 <Select
                                   value={action.config?.variant || "success"}
                                   onValueChange={(val) =>

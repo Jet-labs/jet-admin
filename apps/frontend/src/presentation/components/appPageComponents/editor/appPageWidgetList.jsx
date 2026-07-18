@@ -146,7 +146,7 @@ export const AppPageWidgetList = ({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 bg-background overflow-hidden">
       <div className="flex items-center justify-between p-2 pb-0">
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <span className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           {CONSTANTS.STRINGS.APP_PAGE_WIDGET_LIST_WIDGETS_TITLE}
         </span>
         <Button

@@ -72,7 +72,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-7 px-2 text-[10px] gap-1"
+                    className="h-7 px-2 text-xs gap-1"
                     onClick={handleAddField}
                 >
                     <Plus className="h-3 w-3" /> Add Field
@@ -96,7 +96,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                         <div className="grid grid-cols-2 gap-2 pr-5">
                             {/* Field Label */}
                             <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-medium">Label</Label>
+                                <Label className="text-xs text-muted-foreground font-medium">Label</Label>
                                 <Input
                                     type="text"
                                     className="text-xs h-7"
@@ -108,7 +108,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
 
                             {/* Unique Key */}
                             <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-medium">Key (Unique ID)</Label>
+                                <Label className="text-xs text-muted-foreground font-medium">Key (Unique ID)</Label>
                                 <Input
                                     type="text"
                                     className="text-xs h-7 font-mono"
@@ -122,7 +122,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                         <div className="grid grid-cols-2 gap-2">
                             {/* Type Select */}
                             <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-medium">Input Type</Label>
+                                <Label className="text-xs text-muted-foreground font-medium">Input Type</Label>
                                 <Select
                                     value={field.type || "text"}
                                     onValueChange={(val) => handleFieldChange(idx, "type", val)}
@@ -144,7 +144,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                             {/* Placeholder */}
                             {field.type !== "checkbox" && (
                                 <div className="space-y-1">
-                                    <Label className="text-[10px] text-muted-foreground font-medium">Placeholder</Label>
+                                    <Label className="text-xs text-muted-foreground font-medium">Placeholder</Label>
                                     <Input
                                         type="text"
                                         className="text-xs h-7"
@@ -159,7 +159,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                         {/* Options list for select type */}
                         {field.type === "select" && (
                             <div className="space-y-1">
-                                <Label className="text-[10px] text-muted-foreground font-medium">Options (comma-separated)</Label>
+                                <Label className="text-xs text-muted-foreground font-medium">Options (comma-separated)</Label>
                                 <Input
                                     type="text"
                                     className="text-xs h-7"
@@ -178,7 +178,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                                     checked={!!field.required}
                                     onCheckedChange={(val) => handleFieldChange(idx, "required", !!val)}
                                   />
-                                  <Label htmlFor={`field-req-${idx}`} className="text-[10px] text-muted-foreground cursor-pointer font-medium">
+                                <Label htmlFor={`field-req-${idx}`} className="text-xs text-muted-foreground cursor-pointer font-medium">
                                       Required field
                                   </Label>
                               </div>
@@ -188,7 +188,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                                   <Label className="text-[9px] text-muted-foreground block leading-none">Default Value</Label>
                                   <Input
                                       type="text"
-                                      className="text-[10px] h-6 font-mono px-1.5"
+                                    className="text-xs h-6 font-mono px-1.5"
                                       value={field.defaultValue || ""}
                                       onChange={(e) => handleFieldChange(idx, "defaultValue", e.target.value)}
                                       placeholder="e.g. {{widgets.table1.selectedRow.name}}"

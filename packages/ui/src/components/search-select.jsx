@@ -184,7 +184,7 @@ export const SearchSelect = React.forwardRef(
                     );
                   })}
                   {isFetchingNextPage && (
-                    <div className="flex items-center justify-center p-2 text-[10px] text-muted-foreground animate-pulse">
+                        <div className="flex items-center justify-center p-2 text-xs text-muted-foreground animate-pulse">
                       <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
                       Loading more...
                     </div>

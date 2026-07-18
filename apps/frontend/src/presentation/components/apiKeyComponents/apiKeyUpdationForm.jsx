@@ -117,11 +117,11 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
         isLoading={isLoadingAPIKey}
         error={loadAPIKeyError}
       >
-        <div className="mx-auto w-full max-w-2xl space-y-4 p-4 md:p-6">
+        <div className="mx-auto w-full max-w-2xl p-8">
 
           <form
             id="api-key-updation-form"
-            className="space-y-4"
+            className="space-y-2"
             onSubmit={apiKeyUpdationForm.handleSubmit}
           >
             <APIKeyEditor

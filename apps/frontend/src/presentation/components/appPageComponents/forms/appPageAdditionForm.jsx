@@ -61,6 +61,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
   const [history, setHistory] = useState([initialAppPageConfig]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const isUndoAction = useRef(false);
+  const [editorKey, setEditorKey] = useState(0);
 
   const appPageAdditionForm = useFormik({
     initialValues: {
@@ -102,6 +103,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
       isUndoAction.current = true;
       appPageAdditionForm.setFieldValue("appPageConfig", prevConfig);
       setHistoryIndex(historyIndex - 1);
+      setEditorKey((prev) => prev + 1);
     }
   };
 
@@ -127,7 +129,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
           saveText="Save"
         >
           {historyIndex > 0 && (
-            <div className="flex items-center gap-2 mr-2">
+            <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
                 {historyIndex} unsaved change{historyIndex > 1 ? "s" : ""}
               </span>
@@ -170,6 +172,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
                   <ResizableHandle withHandle={true} />
                   <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_ADD_DROPZONE_PANEL} defaultSize={80} className="overflow-hidden bg-background">
                     <AppPageDropzone
+                      key={`dropzone_new_${editorKey}`}
                       tenantID={tenantID}
                       pageConfig={appPageAdditionForm.values.appPageConfig}
                       widgets={appPageAdditionForm.values.appPageConfig.widgets}

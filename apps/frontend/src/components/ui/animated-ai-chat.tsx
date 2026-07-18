@@ -265,7 +265,7 @@ export function AnimatedAIChat({
                                         {suggestion.icon}
                                     </div>
                                     <div className="flex-1 truncate">{suggestion.label}</div>
-                                    <div className="text-[10px] font-mono opacity-50 px-1 border border-border rounded shrink-0">
+                                    <div className="text-xs font-mono opacity-50 px-1 border border-border rounded shrink-0">
                                         {suggestion.prefix}
                                     </div>
                                 </motion.div>

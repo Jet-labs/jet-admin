@@ -221,7 +221,7 @@ export const DataFieldPanel = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Filter..."
-              className="flex-1 text-[10px] bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-4 p-0"
+              className="flex-1 text-xs bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-4 p-0"
             />
           </div>
         </div>
@@ -238,7 +238,7 @@ export const DataFieldPanel = ({
         ) : (
           <div className="flex flex-col items-center justify-center py-3 text-center">
             <Database className="w-5 h-5 mb-1 text-muted-foreground/25" />
-            <p className="text-[10px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
               {dataSource ? 'Run workflow to detect fields' : 'Select a data source'}
             </p>
           </div>
@@ -253,7 +253,7 @@ export const DataFieldPanel = ({
               onChange={(e) => setManualField(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddManualField()}
               placeholder="field_name"
-              className="w-full text-[10px] font-mono h-6"
+              className="w-full text-xs font-mono h-6"
               autoFocus
             />
             <div className="flex items-center gap-1 justify-end">

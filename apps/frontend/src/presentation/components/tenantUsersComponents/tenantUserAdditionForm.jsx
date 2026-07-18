@@ -6,6 +6,7 @@ import React from "react";
 import {
   Button,
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -71,16 +72,15 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
           onSubmit={addUserToTenantForm.handleSubmit}
           noValidate
         >
-          <DialogHeader className="p-2 border-b border-border bg-muted/20">
-            <DialogTitle className="text-base font-semibold uppercase font-mono text-[10px] tracking-widest text-muted-foreground mb-1">
+          <DialogHeader>
+            <DialogTitle >
               {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_TITLE}
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground mt-0">
+            <DialogDescription >
               {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_DESCRIPTION}
             </DialogDescription>
           </DialogHeader>
-
-          <div className="p-2 space-y-2">
+          <DialogBody>
             <div className="space-y-1">
               <Label htmlFor="tenantUserEmail">
                 {
@@ -104,9 +104,11 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
               />
               <FieldError message={addUserToTenantForm.touched.tenantUserEmail && addUserToTenantForm.errors.tenantUserEmail} />
             </div>
-          </div>
+          </DialogBody>
 
-          <DialogFooter className="p-2 border-t border-border bg-muted/5 gap-2">
+
+
+          <DialogFooter>
             <Button
               onClick={onClose}
               type="button"

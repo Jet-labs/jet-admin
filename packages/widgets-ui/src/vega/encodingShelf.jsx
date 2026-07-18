@@ -110,13 +110,13 @@ export const EncodingShelf = ({
       {/* Channel icon + label */}
       <div className="flex items-center gap-1.5 w-14 shrink-0">
         <Icon className="w-3 h-3 text-muted-foreground shrink-0" />
-        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide truncate">{label}</span>
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide truncate">{label}</span>
       </div>
 
       {/* Content */}
       <div className="flex-1 flex flex-nowrap items-center gap-1 min-w-0 overflow-hidden">
         {isEmpty ? (
-          <span className="text-[10px] text-muted-foreground/60 italic">
+          <span className="text-xs text-muted-foreground/60 italic">
             {isDragOver ? 'Release' : 'Drop field'}
           </span>
         ) : (
@@ -131,7 +131,7 @@ export const EncodingShelf = ({
 
             {/* Type select */}
             <Select value={value.type || 'nominal'} onValueChange={handleTypeChange}>
-              <SelectTrigger className="h-5 w-auto min-w-0 px-1 text-[10px] border-border/50 bg-transparent gap-0.5 shrink-0" title="Type">
+                <SelectTrigger className="h-5 w-auto min-w-0 px-1 text-xs border-border/50 bg-transparent gap-0.5 shrink-0" title="Type">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="z-[200]">
@@ -144,7 +144,7 @@ export const EncodingShelf = ({
             {/* Aggregate */}
             {(value.type === 'quantitative' || value.aggregate) && (
               <Select value={value.aggregate || 'none'} onValueChange={handleAggChange}>
-                <SelectTrigger className="h-5 w-auto min-w-0 px-1 text-[10px] border-border/50 bg-transparent gap-0.5 shrink-0" title="Aggregate">
+                  <SelectTrigger className="h-5 w-auto min-w-0 px-1 text-xs border-border/50 bg-transparent gap-0.5 shrink-0" title="Aggregate">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="z-[200]">

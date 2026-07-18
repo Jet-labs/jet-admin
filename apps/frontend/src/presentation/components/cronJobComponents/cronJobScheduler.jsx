@@ -164,7 +164,7 @@ function ToggleChip({ label, selected, onClick, size = "sm" }) {
 function NumberField({ label, value, onChange, min, max, className = "" }) {
   return (
     <div className={`space-y-1 ${className}`}>
-      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+      <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
       <Input
@@ -397,7 +397,7 @@ export const CronJobScheduler = ({
           <code className="font-mono text-sm font-semibold tracking-wider text-foreground">
             {expression}
           </code>
-          <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-primary">
+          <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 font-mono text-xs uppercase tracking-widest text-primary">
             cron
           </span>
         </div>

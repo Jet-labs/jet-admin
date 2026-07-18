@@ -24,9 +24,9 @@ dominant decorative element — never photography, never atmospheric gradients.
 **Key commitments:**
 - Single primary accent as the only chromatic event; all else is monochrome.
 - Dark canvas product track — no light-canvas marketing, no full-bleed gradients.
-- Square-ish button radii (`rounded-sm` / 6px) — never pill-shaped.
+- Square-ish button radii (`rounded` / 6px) — never pill-shaped.
 - Near-black text ON the primary button (the "lit surface" idiom) — never white-on-primary.
-- Composited product UI mockups as decoration; compositing always uses `rounded-sm` containers.
+- Composited product UI mockups as decoration; compositing always uses `rounded` containers.
 - Code blocks always in `bg-background` deep near-black with system mono.
 
 ---
@@ -126,7 +126,7 @@ border-border/50   ← hairline-cool — very fine chrome work
 - **Never exceed weight 500** on display headings — mid-weight reads as engineered, not decorative; 600+ breaks the brand.
 - **Negative tracking on display only.** Apply `tracking-tight` or inline `letter-spacing` for display tiers; body and UI copy stay at 0.
 - **Monospace everywhere code appears** — section configurators, vega spec editors, variable paths, inline code in callouts.
-- The `font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground` pattern is the canonical section label style (see §§ 12–13). It maps to `micro` weight 600 — the one permitted weight exception at this micro scale.
+- The `font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground` pattern is the canonical section label style (see §§ 12–13). It maps to `micro` weight 600 — the one permitted weight exception at this micro scale.
 
 ---
 
@@ -158,14 +158,14 @@ All spacing must use the tokens below — never use arbitrary values or ad-hoc p
 
 | Token | Value | Tailwind | Use |
 |---|---|---|---|
-| `sm` | 6px | `rounded-sm` | **Default everywhere** — buttons, inputs, cards, alerts, dropdowns, modals, code blocks, product mockups |
+| `sm` | 6px | `rounded` | **Default everywhere** — buttons, inputs, cards, alerts, dropdowns, modals, code blocks, product mockups |
 | `full` | 9999px | `rounded-full` | Pills and avatars **only** |
 
 > **Critical rules:**
-> - Use `rounded-sm` for **all** components and containers — buttons, inputs, cards, alerts, dropdowns, modals, code blocks, product mockups.
+> - Use `rounded` for **all** components and containers — buttons, inputs, cards, alerts, dropdowns, modals, code blocks, product mockups.
 > - `rounded-full` is reserved **exclusively** for pill tags and avatars.
 > - `rounded`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl` are **banned**.
-> - Buttons are **never** pill-shaped (`rounded-full`). The 6px square-ish radius (`rounded-sm`) is the brand signature.
+> - Buttons are **never** pill-shaped (`rounded-full`). The 6px square-ish radius (`rounded`) is the brand signature.
 
 ---
 
@@ -192,7 +192,7 @@ Depth comes from composited **product UI mockups**, not gradients. Never add atm
   Get Started
 </Button>
 ```
-- Background `bg-primary`, text `text-foreground` (near-black — NOT white), `rounded-sm` (6px), `text-sm font-medium`.
+- Background `bg-primary`, text `text-foreground` (near-black — NOT white), `rounded` (6px), `text-sm font-medium`.
 - Hover/pressed: `bg-primary/90`.
 - **One per viewport section maximum.**
 
@@ -202,7 +202,7 @@ Depth comes from composited **product UI mockups**, not gradients. Never add atm
   Learn More
 </Button>
 ```
-- Background `bg-background`, border `border-border`, text `text-foreground`, `rounded-sm`.
+- Background `bg-background`, border `border-border`, text `text-foreground`, `rounded`.
 
 #### Ghost (Active state)
 ```jsx
@@ -231,7 +231,7 @@ className="rounded-full"
 /* Never: white text on primary */
 className="bg-primary text-white"
 
-/* Never: any rounded variant other than rounded-sm */
+/* Never: any rounded variant other than rounded */
 className="rounded rounded-md rounded-lg rounded-xl"
 ```
 
@@ -241,21 +241,21 @@ className="rounded rounded-md rounded-lg rounded-xl"
 
 #### Feature Card (standard / default card)
 ```jsx
-<div className="rounded-sm border border-border bg-card p-2 space-y-2">
+<div className="rounded border border-border bg-card p-2 space-y-2">
   {/* content */}
 </div>
 ```
 
 #### Feature Card (deep dark / code-heavy)
 ```jsx
-<div className="rounded-sm border border-border bg-brand-black text-foreground p-2 space-y-2">
+<div className="roundedrder border-border bg-brand-black text-foreground p-2 space-y-2">
   {/* content */}
 </div>
 ```
 
 #### Pricing Card (standard)
 ```jsx
-<div className="rounded-sm border border-border bg-card p-2 flex flex-col gap-2">
+<div className="rounded border border-border bg-card p-2 flex flex-col gap-2">
   <p className="text-2xl font-medium tracking-tight text-foreground">Plan Name</p>
   <p className="text-3xl font-medium text-foreground">$X<span className="text-sm text-muted-foreground">/mo</span></p>
   {/* feature list */}
@@ -265,7 +265,7 @@ className="rounded rounded-md rounded-lg rounded-xl"
 
 #### Pricing Card (featured / light inverted)
 ```jsx
-<div className="rounded-sm border border-border bg-foreground text-background p-2 flex flex-col gap-2">
+<div className="rounded border border-border bg-foreground text-background p-2 flex flex-col gap-2">
   {/* same structure, text-background overrides */}
 </div>
 ```
@@ -275,13 +275,13 @@ className="rounded rounded-md rounded-lg rounded-xl"
 
 ### 8.3 Code Blocks
 ```jsx
-<div className="rounded-sm bg-background text-foreground p-2 font-mono text-sm leading-relaxed border border-border">
+<div className="rounded bg-background text-foreground p-2 font-mono text-sm leading-relaxed border border-border">
   <code>{snippet}</code>
 </div>
 ```
 Inline code inside callouts:
 ```jsx
-<code className="bg-background px-1 rounded-sm border border-border font-mono text-xs">
+<code className="bg-background px-1 rounded border border-border font-mono text-xs">
   variable.path
 </code>
 ```
@@ -297,7 +297,7 @@ Inline code inside callouts:
 />
 ```
 - Background `bg-background`, border `border-border`, text `text-foreground`, placeholder `text-muted-foreground/50`.
-- `rounded-sm` (6px — matches button radius).
+- `rounded` (6px — matches button radius).
 - Height ≥ 36px (WCAG AA touch target).
 - Never override `bg-slate-50`, `border-slate-300`, or `placeholder:text-slate-400` — these are banned.
 
@@ -384,10 +384,10 @@ Display type stair-steps: `text-6xl` → `text-5xl` → `text-4xl` → `text-3xl
 ### ✅ Do
 - Use `bg-primary` for filled CTAs and wordmark accent — sparingly, once per section.
 - Render display headings weight 500 with negative letter-spacing.
-- Use `rounded-sm` (6px) for **all** components — buttons, inputs, cards, modals, dropdowns.
+- Use `rounded` (6px) for **all** components — buttons, inputs, cards, modals, dropdowns.
 - Use `rounded-full` **only** for pills and avatars.
 - Use `text-foreground` (near-black) on `bg-primary` buttons — never white.
-- Wrap product UI mockups in `rounded-sm border border-border shadow-md`.
+- Wrap product UI mockups in `rounded border border-border shadow-md`.
 - Use system mono (`font-mono`) for every code surface.
 - Use `p-2` and `gap-2` as the default spacing inside all components.
 
@@ -445,7 +445,7 @@ Every configurator closes with a single full-width save button using `Button var
 ### Section Labels Inside Configurators
 
 ```jsx
-<p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+<p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
   Task Name
 </p>
 ```
@@ -453,7 +453,7 @@ Every configurator closes with a single full-width save button using `Button var
 ### Help Callout Containers
 
 ```jsx
-<div className="rounded-sm border border-border bg-muted/30 p-2 text-[10px] text-muted-foreground space-y-2">
+<div className="rounded border border-border bg-muted/30 p-2 text-xs text-muted-foreground space-y-2">
   <div className="font-semibold text-xs text-foreground">📘 Title</div>
   {/* body */}
 </div>
@@ -462,7 +462,7 @@ Every configurator closes with a single full-width save button using `Button var
 Rules:
 - Background `bg-muted/30` — never `bg-slate-50` or `bg-white`.
 - Border `border-border` — never `border-slate-200`.
-- Inline code: `<code className="bg-background px-1 rounded-sm border border-border font-mono">`.
+- Inline code: `<code className="bg-background px-1 rounded border border-border font-mono">`.
 - Primary callouts (tips): `bg-primary/5 border-primary/20 text-primary/80`.
 - Warning callouts: `bg-amber-50 border-amber-200 text-amber-700`.
 
@@ -483,7 +483,7 @@ import { Textarea } from '@jet-admin/ui';
 ### AND/OR Logic Dividers
 
 ```jsx
-<button className={`text-[9px] font-bold px-2 py-0.5 rounded-sm border transition-colors ${
+<button className={`text-[9px] font-bold px-2 py-0.5 rounded border transition-colors ${
   logic === 'AND'
     ? 'bg-primary/10 text-primary border-primary/30'
     : 'bg-amber-50 text-amber-600 border-amber-200'
@@ -583,7 +583,7 @@ All `--we-*` inline style variables are replaced with Tailwind semantic tokens:
 ### Suggestions Dropdown
 
 ```jsx
-<div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-sm shadow-lg max-h-48 overflow-auto">
+<div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded shadow-lg max-h-48 overflow-auto">
   {suggestions.map(s => (
     <div
       key={s.id}
@@ -600,17 +600,17 @@ All `--we-*` inline style variables are replaced with Tailwind semantic tokens:
 ```jsx
 /* ✅ Correct */
 import { Label } from "@jet-admin/ui";
-<Label className="text-[10px] font-medium text-muted-foreground">Chart Title</Label>
+<Label className="text-xs font-medium text-muted-foreground">Chart Title</Label>
 
 /* ❌ Wrong */
-<label className="block text-[10px] font-medium text-slate-500 mb-1">Chart Title</label>
+<label className="block text-xs font-medium text-slate-500 mb-1">Chart Title</label>
 ```
 
 ### EncodingChannelEditor Card
 
 ```jsx
 /* ✅ Correct */
-<div className="rounded-sm border border-border bg-card overflow-hidden shadow-sm">
+<div className="rounded border border-border bg-card overflow-hidden shadow-sm">
   <div className="flex items-center justify-between p-2 bg-muted/50 border-b border-border">
 
 /* ❌ Wrong */
@@ -642,12 +642,12 @@ bg-blue-50        → bg-primary/10
 bg-indigo-50      → bg-primary/10
 bg-[#646cff]      → bg-primary
 text-white (on primary button) → text-foreground
-rounded           → rounded-sm
-rounded-md        → rounded-sm
-rounded-lg        → rounded-sm
-rounded-xl        → rounded-sm
-rounded-2xl       → rounded-sm
-rounded-full (on anything except pills/avatars) → rounded-sm
+rounded           → rounded
+rounded-md        → rounded
+rounded-lg        → rounded
+rounded-xl        → rounded
+rounded-2xl       → rounded
+rounded-full (on anything except pills/avatars) → rounded
 font-weight 600+  → font-medium (500) on display headings
 p-3 / p-4 / p-8   → p-2 (preferably, except for section vertical padding)
 gap-3 / gap-4     → gap-2 (preferably)

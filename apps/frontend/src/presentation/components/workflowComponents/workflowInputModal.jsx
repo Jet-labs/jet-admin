@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Play } from 'lucide-react';
 import PropTypes from "prop-types";
-import { Button, InputValuesForm, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@jet-admin/ui";
+import { Button, InputValuesForm, Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogBody } from "@jet-admin/ui";
 /**
  * Modal to prompt for workflow input parameters before test run.
  * Renders form fields based on the inputDefinitions schema defined in workflowOptions.
@@ -103,24 +103,23 @@ export const WorkflowInputModal = ({ inputDefinitions, onSubmit, onClose }) => {
         onClose();
       }
     }}>
-      <DialogContent className="sm:max-w-md flex flex-col p-0 overflow-hidden gap-0">
-        <DialogHeader className="p-2 border-b shrink-0 text-left">
-          <DialogTitle className="text-base text-foreground font-medium">
+      <DialogContent >
+        <DialogHeader >
+          <DialogTitle >
             Workflow Input Parameters
           </DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <div className="p-2 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit}>
+          <DialogBody>
             <InputValuesForm
               inputDefinitions={inputDefinitions}
               values={values}
               onChange={handleChange}
               errors={errors}
             />
-          </div>
+          </DialogBody>
 
-          <DialogFooter className="p-2 bg-muted/20 shrink-0 sm:justify-end">
+          <DialogFooter >
             <Button
               type="button"
               variant="outline"
@@ -137,7 +136,9 @@ export const WorkflowInputModal = ({ inputDefinitions, onSubmit, onClose }) => {
               Run Workflow
             </Button>
           </DialogFooter>
+
         </form>
+
       </DialogContent>
     </Dialog>
   );

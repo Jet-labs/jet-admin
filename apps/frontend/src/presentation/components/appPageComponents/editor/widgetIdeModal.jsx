@@ -5,10 +5,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   Button,
   Spinner,
+  DialogDescription,
+  DialogBody,
 } from "@jet-admin/ui";
 import {
   ResizableHandle,
@@ -131,40 +134,17 @@ export const WidgetIdeModal = ({
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open && !isSaving) onClose();
     }}>
-      <DialogContent hideCloseIcon={true} className="max-w-7xl w-[95vw] h-[90vh] flex flex-col gap-0 p-0 overflow-hidden bg-background border border-border [&>button]:hidden">
-        <DialogHeader className="p-2 border-b border-border/80 flex flex-row items-center justify-between shrink-0">
-          <div>
-            <DialogTitle className="text-base font-semibold text-foreground">
-              {widgetID ? "Inline Widget Configuration IDE" : "Create New Widget Inline"}
+      <DialogContent hideCloseIcon={true} className="max-w-7xl w-[95vw] ">
+        <DialogHeader>
+          <DialogTitle>
+            {widgetID ? "Widget configuration" : "Create new widget"}
             </DialogTitle>
-            <p className="text-[10px] text-muted-foreground">
+          <DialogDescription>
               Design, preview, and map data sources to this widget inline.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={isSaving}
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="default"
-              size="sm"
-              disabled={isSaving || (widgetID && isLoadingWidget)}
-              onClick={handleSave}
-            >
-              {isSaving ? <Spinner className="mr-2 h-4 w-4" /> : null}
-              {widgetID ? "Save Changes" : "Create & Place"}
-            </Button>
-          </div>
-        </DialogHeader>
+          </DialogDescription>
 
-        <div className="flex-1 min-h-0 relative">
+        </DialogHeader>
+        <DialogBody className="max-h-[70vh] overflow-auto p-0">
           <ReactQueryLoadingErrorWrapper
             isLoading={widgetID ? isLoadingWidget : false}
             error={loadWidgetError}
@@ -181,7 +161,7 @@ export const WidgetIdeModal = ({
                   <WidgetConfigEditor
                     widgetEditorForm={widgetForm}
                     dataSourceResults={previewStateTree}
-                    onDataSourceResults={() => {}}
+                    onDataSourceResults={() => { }}
                     appPageEditorForm={appPageEditorForm}
                   />
                 </div>
@@ -190,7 +170,7 @@ export const WidgetIdeModal = ({
               <ResizableHandle withHandle={true} />
 
               <ResizablePanel defaultSize={50} minSize={30}>
-                <div className="h-full bg-muted/20 border-l border-border/40 relative flex flex-col min-h-0">
+                <div className="h-full bg-muted/20 relative flex flex-col min-h-0">
                   <div className="flex-1 min-h-0 relative">
                     <WidgetPreview
                       tenantID={tenantID}
@@ -201,14 +181,37 @@ export const WidgetIdeModal = ({
                       dataSourceResults={previewStateTree?.queries}
                       isFetchingData={false}
                       isRefreshingData={false}
-                      refreshData={() => {}}
+                      refreshData={() => { }}
                     />
                   </div>
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>
           </ReactQueryLoadingErrorWrapper>
-        </div>
+        </DialogBody>
+
+
+        <DialogFooter >
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isSaving}
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            disabled={isSaving || (widgetID && isLoadingWidget)}
+            onClick={handleSave}
+          >
+            {isSaving ? <Spinner className="mr-2 h-4 w-4" /> : null}
+            {widgetID ? "Save Changes" : "Create & Place"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

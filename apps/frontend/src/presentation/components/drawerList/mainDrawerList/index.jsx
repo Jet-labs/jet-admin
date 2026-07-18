@@ -22,6 +22,7 @@ import {
   GitBranch,
   KeyRound,
   LayoutDashboard,
+  LayoutGrid,
   PanelTop,
   Radio,
   ShieldCheck,
@@ -158,6 +159,12 @@ export const MainDrawerList = () => {
 
 
   const drawerListItems = [
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_DASHBOARD_TITLE,
+      icon: LayoutGrid,
+      path: CONSTANTS.ROUTES.VIEW_TENANT.path(tenantID),
+    },
     {
       type: "link",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_DATASOURCE_TITLE,

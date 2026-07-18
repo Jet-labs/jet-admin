@@ -36,7 +36,8 @@
   --ifm-line-height-base: 1.5;
 
   /* Global components radius */
-  --ifm-global-radius: 6px; /* rounded-sm */
+  --ifm-global-radius: 6px;
+    /* rounded */
   --ifm-navbar-height: 4rem;
   --ifm-navbar-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
   --ifm-color-border: #2e2e2e;

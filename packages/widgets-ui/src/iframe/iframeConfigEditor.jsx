@@ -18,7 +18,7 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
           placeholder="e.g. https://example.com"
           liveStateTree={liveStateTree}
         />
-        <p className="text-[10px] text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           Make sure the target site supports framing (doesn't send X-Frame-Options: DENY).
         </p>
       </div>
@@ -26,7 +26,7 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
       {/* Sandbox Settings */}
       <div className="space-y-2 border-t pt-2 mt-2">
         <Label className="text-xs font-medium text-foreground">Sandbox Security Options</Label>
-        <p className="text-[10px] text-muted-foreground leading-snug mb-1">
+        <p className="text-xs text-muted-foreground leading-snug mb-1">
           Toggle capabilities granted to the embedded page. Restricted by default.
         </p>
 

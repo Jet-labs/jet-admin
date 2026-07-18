@@ -56,7 +56,7 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
             <div className="flex justify-between items-center p-2 border-b border-border bg-muted/30">
                 <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-foreground tracking-tight">Workflow Schema</h3>
-                    <span className="text-[10px] text-muted-foreground bg-muted font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-border/50">
+                    <span className="text-xs text-muted-foreground bg-muted font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-border/50">
                         JSON
                     </span>
                 </div>
@@ -91,7 +91,7 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
             </div>
 
             {/* Stats Bar */}
-            <div className="flex items-center gap-6 px-4 py-2 bg-muted/20 border-b border-border text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
+            <div className="flex items-center gap-6 px-4 py-2 bg-muted/20 border-b border-border text-xs text-muted-foreground font-medium uppercase tracking-wide">
                 <span>
                     <strong className="text-foreground font-extrabold">{values.nodes?.length || 0}</strong> Nodes
                 </span>
@@ -115,7 +115,7 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
             </div>
 
             {/* Footer */}
-            <div className="px-4 py-2 bg-muted/20 border-t border-border text-[10px] text-muted-foreground/60 font-medium italic">
+            <div className="px-4 py-2 bg-muted/20 border-t border-border text-xs text-muted-foreground/60 font-medium italic">
                 Read-only view • Use copy button to export schema
             </div>
         </div>

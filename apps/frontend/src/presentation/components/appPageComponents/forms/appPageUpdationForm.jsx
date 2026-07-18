@@ -128,6 +128,20 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
     },
   });
 
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const [editorKey, setEditorKey] = useState(0);
+
+  useEffect(() => {
+    setHasInitialized(false);
+    setEditorKey(0);
+  }, [appPageID]);
+
+  useEffect(() => {
+    if (appPage && !isLoadingAppPage && appPage.appPageID === appPageID) {
+      setHasInitialized(true);
+    }
+  }, [appPage, isLoadingAppPage, appPageID]);
+
   useEffect(() => {
     if (appPage) {
       setHistory([appPage.appPageConfig || {}]);
@@ -161,6 +175,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
       isUndoAction.current = true;
       appPageUpdationForm.setFieldValue("appPageConfig", prevConfig);
       setHistoryIndex(historyIndex - 1);
+      setEditorKey((prev) => prev + 1);
     }
   };
 
@@ -185,7 +200,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
         isSaving={isUpdatingAppPage}
       >
         {historyIndex > 0 && (
-          <div className="flex items-center gap-2 mr-2">
+          <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
               {historyIndex} unsaved change{historyIndex > 1 ? "s" : ""}
             </span>
@@ -213,7 +228,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
       </PageHeader>
 
       <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingAppPage}
+        isLoading={isLoadingAppPage || !hasInitialized}
         error={loadAppPageError}
       >
         {appPageUpdationForm.values.appPageConfig ? (
@@ -243,6 +258,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
                   <ResizableHandle withHandle={true} />
                   <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_DROPZONE_PANEL} defaultSize={80} className="overflow-hidden bg-background">
                     <AppPageDropzone
+                      key={`dropzone_${appPageID}_${editorKey}`}
                       tenantID={tenantID}
                       pageID={appPageID}
                       pageConfig={appPageUpdationForm.values.appPageConfig}

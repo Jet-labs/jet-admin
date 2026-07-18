@@ -37,7 +37,7 @@ export const Breadcrumbs = () => {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex items-center gap-0.5 bg-muted rounded mx-3 px-2.5 py-1 h-7 w-fit max-w-full overflow-hidden"
+      className="flex items-center gap-0.5 bg-muted rounded  px-2.5 py-1 h-7 w-fit max-w-full overflow-hidden"
     >
       <Link
         to="/"

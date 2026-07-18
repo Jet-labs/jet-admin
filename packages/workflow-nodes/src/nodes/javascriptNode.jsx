@@ -385,7 +385,7 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Comprehensive instructions */}
       <div className="px-2">
-        <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-[10px] text-brand-text-primary space-y-2">
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-xs text-brand-text-primary space-y-2">
           <div className="font-semibold text-brand-text-primary text-xs">📘 Writing JavaScript Code</div>
 
           <div>
@@ -548,7 +548,7 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
           </div>
 
           {/* Code preview */}
-          <div className={`text-[10px] font-mono truncate mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
+          <div className={`text-xs font-mono truncate mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
             {codePreview}
           </div>
         </div>

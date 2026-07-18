@@ -9,8 +9,14 @@ import { create } from 'zustand';
  */
 export const useAIStore = create((set) => ({
   isOpen: false,
+  pendingMessage: null,
 
   openPanel: () => set({ isOpen: true }),
   closePanel: () => set({ isOpen: false }),
   togglePanel: () => set((state) => ({ isOpen: !state.isOpen })),
+
+  /** Open the panel and pre-populate (or immediately send) a message. */
+  openWithMessage: (message) => set({ isOpen: true, pendingMessage: message }),
+  /** Clear the pending message after it has been consumed. */
+  clearPendingMessage: () => set({ pendingMessage: null }),
 }));

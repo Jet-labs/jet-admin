@@ -55,7 +55,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables, state
         </Button>
       </div>
 
-      <p className="text-[10px] text-brand-text-primary">
+      <p className="text-xs text-brand-text-primary">
         Define outputs that will be returned when the workflow completes.
       </p>
 
@@ -96,7 +96,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables, state
 
               {/* Source Variable */}
               <div>
-                <label className="text-[10px] text-brand-text-primary mb-1 block">Source Variable</label>
+                <label className="text-xs text-brand-text-primary mb-1 block">Source Variable</label>
                 <TemplateAutocompleteInput
                   value={param.sourceVariable}
                   onChange={(val) => updateParameter(index, 'sourceVariable', val)}
@@ -113,7 +113,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables, state
 
               {/* Description */}
               <div className="mt-2">
-                <label className="text-[10px] text-brand-text-primary">Description</label>
+                <label className="text-xs text-brand-text-primary">Description</label>
                 <Input
                   type="text"
                   size="sm"
@@ -293,7 +293,7 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* Comprehensive instructions */}
-      <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-[10px] text-brand-text-primary space-y-2">
+      <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-xs text-brand-text-primary space-y-2">
         <div className="font-semibold text-brand-text-primary text-xs">📘 Workflow Output</div>
 
         <div>
@@ -506,7 +506,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
           </div>
 
           {/* Output info */}
-          <div className="text-[10px] mt-0.5 text-brand-text-primary">
+          <div className="text-xs mt-0.5 text-brand-text-primary">
             {outputCount === 0 
               ? 'No outputs defined' 
               : `${outputCount} output${outputCount !== 1 ? 's' : ''}: ${outputParams.slice(0, 3).map(p => p.name).join(', ')}${outputCount > 3 ? '...' : ''}`

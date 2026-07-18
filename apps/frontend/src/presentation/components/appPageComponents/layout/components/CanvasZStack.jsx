@@ -116,7 +116,7 @@ export function CanvasZStack({
                 e.stopPropagation();
                 setProp((props) => { props.activeLayerIndex = idx; });
               }}
-              className={`w-6 h-6 flex items-center justify-center text-[10px] rounded transition-all select-none font-mono ${
+              className={`w-6 h-6 flex items-center justify-center text-xs rounded transition-all select-none font-mono ${
                 activeLayerIndex === idx
                   ? "bg-primary text-primary-foreground font-bold shadow-sm ring-1 ring-primary/30"
                   : "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -130,7 +130,7 @@ export function CanvasZStack({
           <button
             type="button"
             onClick={handleAddLayer}
-            className="w-6 h-6 flex items-center justify-center text-[10px] rounded bg-transparent hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+            className="w-6 h-6 flex items-center justify-center text-xs rounded bg-transparent hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
             title="Add new layer"
           >
             <Plus className="h-3 w-3" />
@@ -168,7 +168,7 @@ export function CanvasZStack({
           className="flex justify-center items-center h-16 border border-dashed border-muted-foreground/45 text-muted-foreground text-[11px] transition-all bg-transparent rounded hover:border-primary/70 hover:bg-primary/5 cursor-pointer w-full"
         >
           <Plus className="h-3.5 w-3.5 mr-1.5 opacity-50" />
-          <span className="text-muted-foreground/60 text-[10px] uppercase font-mono select-none">
+          <span className="text-muted-foreground/60 text-xs uppercase font-mono select-none">
             Add First Layer
           </span>
         </button>

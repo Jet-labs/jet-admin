@@ -137,7 +137,7 @@ export function ArrayInput({
           <Plus className="mr-2 h-3.5 w-3.5" />
           Add Item
         </Button>
-        <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 h-5">
+        <Badge variant="secondary" className="text-xs px-1.5 py-0.5 h-5">
           {currentArray.length}{maxItems !== undefined ? ` / ${maxItems}` : ""}
         </Badge>
       </div>

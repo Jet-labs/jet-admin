@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   Spinner,
+  DialogBody
 } from "@jet-admin/ui";
 export const APIKeyRoleSelectionDialog = ({
   tenantID,
@@ -50,8 +51,8 @@ export const APIKeyRoleSelectionDialog = ({
         open={isAPIKeyRoleSelectDialogOpen}
         onOpenChange={setIsAPIKeyRoleSelectDialogOpen}
       >
-        <DialogContent className="max-w-lg gap-0 p-0">
-          <DialogHeader className="border-b border-border p-2">
+        <DialogContent>
+          <DialogHeader>
             <DialogTitle className="text-base font-semibold text-foreground">
               {CONSTANTS.STRINGS.API_KEY_ROLE_SELECTION_TITLE}
             </DialogTitle>
@@ -60,7 +61,7 @@ export const APIKeyRoleSelectionDialog = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-2">
+          <DialogBody>
             <TenantRoleSelectionInput
               tenantID={tenantID}
               selectedTenantRoleIDs={apiKeyEditorForm?.values?.roleIDs}
@@ -68,9 +69,10 @@ export const APIKeyRoleSelectionDialog = ({
                 apiKeyEditorForm.setFieldValue("roleIDs", roleIDs)
               }
             />
-          </div>
+          </DialogBody>
 
-          <DialogFooter className="border-t border-border p-2">
+
+          <DialogFooter>
             <Button
               onClick={() => setIsAPIKeyRoleSelectDialogOpen(false)}
               type="button"
@@ -84,7 +86,7 @@ export const APIKeyRoleSelectionDialog = ({
                 setIsAPIKeyRoleSelectDialogOpen(false);
               }}
               type="button"
-              variant="primary-outline"
+
             >
               {CONSTANTS.STRINGS.API_KEY_ROLE_SELECTION_SUBMIT}
             </Button>

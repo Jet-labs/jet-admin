@@ -42,7 +42,7 @@ function StepIndicator({ steps, currentStep }) {
               {isComplete ? (
                 <Check className="h-3 w-3" />
               ) : (
-                <span className="h-4 w-4 flex items-center justify-center rounded-full border text-[10px] font-bold border-current">
+                  <span className="h-4 w-4 flex items-center justify-center rounded-full border text-xs font-bold border-current">
                   {i + 1}
                 </span>
               )}

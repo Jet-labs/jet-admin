@@ -137,7 +137,7 @@ export const WidgetPropertiesEditor = ({ widgetEditorForm }) => {
 
       <div className="space-y-1">
         <Label className="text-xs text-muted-foreground">Custom CSS</Label>
-        <p className="text-[10px] text-muted-foreground leading-normal">
+        <p className="text-xs text-muted-foreground leading-normal">
           Write CSS properties directly. They will be scoped to this widget only.
         </p>
         <Textarea className="text-xs font-mono min-h-[80px]" value={properties.style?.customCSS || ""} onChange={(e) => handlePropertyChange("style.customCSS", e.target.value)} placeholder="box-shadow: 0 4px 6px rgba(0,0,0,0.1);&#10;opacity: 0.9;" />

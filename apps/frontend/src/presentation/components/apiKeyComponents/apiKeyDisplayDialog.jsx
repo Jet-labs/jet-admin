@@ -4,6 +4,7 @@ import { Copy, Check, AlertTriangle } from 'lucide-react';
 import {
   Button,
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -32,23 +33,22 @@ export const APIKeyDisplayDialog = ({ open, onClose, apiKey }) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={() => { }}>
       <DialogContent
-        className="max-w-md p-2 gap-2"
         hideCloseIcon={true}
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader className="p-2 pb-0">
-          <DialogTitle className="text-lg font-semibold text-foreground">
+        <DialogHeader>
+          <DialogTitle>
             API Key Created
           </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground mt-2">
+          <DialogDescription>
             Please make sure to copy your API key now. You will not be able to see it again.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-2 p-2 py-0">
+        <DialogBody>
           {/* Warning banner */}
           <div className="flex items-start gap-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded text-amber-500">
             <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
@@ -77,9 +77,9 @@ export const APIKeyDisplayDialog = ({ open, onClose, apiKey }) => {
               )}
             </Button>
           </div>
-        </div>
+        </DialogBody>
 
-        <DialogFooter className="p-2 pt-0 mt-2">
+        <DialogFooter>
           <Button onClick={onClose} type="button" className="w-full sm:w-auto">
             I've copied the key
           </Button>

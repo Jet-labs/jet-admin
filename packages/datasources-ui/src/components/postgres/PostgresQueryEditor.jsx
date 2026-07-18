@@ -317,7 +317,7 @@ function SelectTab({ opts, update }) {
           type="checkbox"
           checked={opts.distinct}
           onChange={(e) => update({ distinct: e.target.checked })}
-          className="h-3.5 w-3.5 rounded-sm accent-primary"
+          className="h-3.5 w-3.5 rounded accent-primary"
         />
         <Label htmlFor="pg-distinct" className="cursor-pointer text-xs font-mono font-medium">
           DISTINCT
@@ -344,13 +344,13 @@ function SelectTab({ opts, update }) {
           <div className="grid grid-cols-[28px_28px_140px_1fr_100px_28px_28px] gap-2 items-center px-1">
             <span />
             <span />
-            <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
               Aggregate
             </Label>
-            <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
               Column / Expression
             </Label>
-            <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
               Alias
             </Label>
             <span />
@@ -533,7 +533,7 @@ function FromJoinTab({ opts, update }) {
 
       {/* Base table */}
       <div className="space-y-1">
-        <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+        <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
           Base Table (FROM)
         </Label>
         <div className="flex items-center gap-2">
@@ -562,7 +562,7 @@ function FromJoinTab({ opts, update }) {
 
       {/* Joins */}
       <div className="space-y-2">
-        <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+        <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
           Joins
         </Label>
 
@@ -816,7 +816,7 @@ function ConditionList({ conditions, onChange, clauseLabel = "WHERE" }) {
       {/* Dynamic values hint */}
       {conditions.length > 0 && (
         <div className="rounded border border-border bg-muted/30 p-3 space-y-1">
-          <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+          <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
             Dynamic values
           </Label>
           <p className="text-[11px] text-muted-foreground mt-1">
@@ -923,7 +923,7 @@ function GroupByTab({ opts, update }) {
       {/* HAVING — only useful when GROUP BY is set */}
       {groupBy.length > 0 && (
         <div className="space-y-2 border-t border-border pt-4">
-          <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+          <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
             Having (filter on aggregates)
           </Label>
           <ConditionList
@@ -983,13 +983,13 @@ function OrderByTab({ opts, update }) {
           <div className="grid grid-cols-[24px_24px_1fr_130px_130px_28px] gap-2 items-center px-1">
             <span />
             <span />
-            <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
               Column / Expression
             </Label>
-            <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
               Direction
             </Label>
-            <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
               NULLS
             </Label>
             <span />
@@ -1002,7 +1002,7 @@ function OrderByTab({ opts, update }) {
             >
               {/* Priority badge */}
               <span
-                className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-[10px] font-bold ${
+                className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold ${
                   idx === 0
                     ? "bg-primary/10 text-primary"
                     : "bg-muted text-muted-foreground"
@@ -1155,7 +1155,7 @@ function SettingsTab({ opts, update }) {
       {/* Generated SQL preview */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+          <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
             Generated SQL Preview
           </Label>
           <Button
@@ -1329,7 +1329,7 @@ export const PostgresQueryEditor = ({ queryEditorForm }) => {
                   {Icon && <Icon className="h-3.5 w-3.5" />}
                   {tab.label}
                   {badgeCount > 0 && (
-                    <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
+                    <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                       {badgeCount}
                     </span>
                   )}

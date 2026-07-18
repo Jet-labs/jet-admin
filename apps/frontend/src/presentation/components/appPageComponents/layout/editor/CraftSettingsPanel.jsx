@@ -16,6 +16,8 @@ import {
   ArrowDown,
   ArrowUp,
   Box,
+  ChevronLeft,
+  ChevronRight,
   Code2,
   Columns,
   Eye,
@@ -81,6 +83,7 @@ export default function CraftSettingsPanel({
   onEditWidget,
 }) {
   const [activeTab, setActiveTab] = useState("settings");
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const { selectedNodeId, selectedNode, actions, query, allNodes } = useEditor((state) => {
     const id = state.events.selected?.size > 0
@@ -487,12 +490,41 @@ export default function CraftSettingsPanel({
 
   return (
     <div
-      className="w-[320px] border-l border-border/50 bg-card flex flex-col h-full shrink-0 z-40"
+      className={`border-l border-border/50 bg-card flex flex-col h-full shrink-0 z-40 transition-all duration-200 ${isCollapsed ? "w-10" : "w-[320px]"}`}
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
+      {/* Collapsed icon strip */}
+      {isCollapsed ? (
+        <div className="flex flex-col items-center pt-2 gap-2">
+          <button
+            onClick={() => setIsCollapsed(false)}
+            className="w-7 h-7 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            title="Expand panel"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => { setIsCollapsed(false); setActiveTab("settings"); }}
+            className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${activeTab === "settings" ? "text-primary bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            title="Properties"
+          >
+            <Settings2 className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => { setIsCollapsed(false); setActiveTab("layers"); }}
+            className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${activeTab === "layers" ? "text-primary bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            title="Layers"
+          >
+            <FolderOpen className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ) : (
+        <>
       {/* Sidebar Tabs */}
-      <div className="flex border-b border-border/40 bg-muted/20">
+            <div className="flex items-center border-b border-border/40 bg-muted/20 pr-1 select-none">
         <div
           className={`flex-1 p-2 text-[11px] font-semibold uppercase tracking-wider text-center border-b-2 cursor-pointer transition-all ${
             activeTab === "settings"
@@ -515,12 +547,20 @@ export default function CraftSettingsPanel({
           <FolderOpen className="h-3.5 w-3.5 inline mr-1" />
           Layers
         </div>
+              <button
+                type="button"
+                onClick={() => setIsCollapsed(true)}
+                className="w-7 h-7 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                title="Collapse panel"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
         {activeTab === "layers" ? (
           <div className="flex flex-col gap-2">
-            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               Page Node Tree
             </div>
             <div className="flex flex-col gap-2 bg-muted/20 p-2 rounded border border-border/30">
@@ -531,7 +571,7 @@ export default function CraftSettingsPanel({
           <div className="flex flex-col items-center justify-center text-center p-2 text-muted-foreground">
             <Sparkles className="h-8 w-8 text-muted-foreground/30 mb-2 animate-pulse" />
             <p className="text-xs font-medium">Select an element on canvas</p>
-            <p className="text-[10px] text-muted-foreground/60 mt-1 max-w-[200px]">
+            <p className="text-xs text-muted-foreground/60 mt-1 max-w-[200px]">
               Click any row, container, stack or widget on the left to configure spacing, styles, and logic.
             </p>
           </div>
@@ -600,20 +640,20 @@ export default function CraftSettingsPanel({
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={handleWrapInContainer}
-                  className="p-2 text-[10px] text-left hover:bg-muted rounded border border-border/50 text-foreground flex items-center gap-2"
+                  className="p-2 text-xs text-left hover:bg-muted rounded border border-border/50 text-foreground flex items-center gap-2"
                 >
                   <Box className="h-3 w-3" /> Wrap Container
                 </button>
                 <button
                   onClick={handleWrapInZStack}
-                  className="p-2 text-[10px] text-left hover:bg-muted rounded border border-border/50 text-foreground flex items-center gap-2"
+                  className="p-2 text-xs text-left hover:bg-muted rounded border border-border/50 text-foreground flex items-center gap-2"
                 >
                   <Layers className="h-3 w-3" /> Wrap Z-Stack
                 </button>
                 {(displayName === "CanvasContainer" || displayName === "CanvasStack" || displayName === "CanvasZStack") && (
                   <button
                     onClick={handleUnwrapNode}
-                    className="p-2 text-[10px] text-left hover:bg-muted rounded border border-border/50 text-foreground flex items-center gap-2 col-span-2"
+                    className="p-2 text-xs text-left hover:bg-muted rounded border border-border/50 text-foreground flex items-center gap-2 col-span-2"
                   >
                     <Plus className="h-3 w-3 rotate-45" /> Unwrap Children & Delete
                   </button>
@@ -645,7 +685,7 @@ export default function CraftSettingsPanel({
               )}
 
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] text-muted-foreground">Height Mode</span>
+                <span className="text-xs text-muted-foreground">Height Mode</span>
                 <select
                   value={nodeProps.sizing || "auto"}
                   onChange={(e) => handleUpdateSizing(e.target.value, nodeProps.fixedHeight)}
@@ -659,7 +699,7 @@ export default function CraftSettingsPanel({
 
               {nodeProps.sizing === "fixed" && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-muted-foreground">Height (px)</span>
+                  <span className="text-xs text-muted-foreground">Height (px)</span>
                   <input
                     type="number"
                     min="40"
@@ -680,7 +720,7 @@ export default function CraftSettingsPanel({
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex flex-col gap-2">
-                    <span className="text-[10px] text-muted-foreground">Direction</span>
+                    <span className="text-xs text-muted-foreground">Direction</span>
                     <select
                       value={nodeProps.direction || "vertical"}
                       onChange={(e) => actions.setProp(selectedNodeId, (props) => { props.direction = e.target.value; })}
@@ -691,7 +731,7 @@ export default function CraftSettingsPanel({
                     </select>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <span className="text-[10px] text-muted-foreground">Gap (px)</span>
+                    <span className="text-xs text-muted-foreground">Gap (px)</span>
                     <input
                       type="number"
                       min="0"
@@ -704,7 +744,7 @@ export default function CraftSettingsPanel({
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <span className="text-[10px] text-muted-foreground">Align Items</span>
+                  <span className="text-xs text-muted-foreground">Align Items</span>
                   <div className="flex bg-muted/40 p-2 rounded border border-border/40 gap-2">
                     {[
                       { val: "stretch", label: "Stretch" },
@@ -715,7 +755,7 @@ export default function CraftSettingsPanel({
                       <button
                         key={item.val}
                         onClick={() => actions.setProp(selectedNodeId, (props) => { props.align = item.val; })}
-                        className={`flex-1 text-[10px] py-1 rounded transition-colors ${
+                        className={`flex-1 text-xs py-1 rounded transition-colors ${
                           (nodeProps.align || "stretch") === item.val
                             ? "bg-background shadow-sm text-primary font-bold"
                             : "hover:bg-background/40 text-muted-foreground"
@@ -815,7 +855,7 @@ export default function CraftSettingsPanel({
                     })}
                   </div>
                 ) : (
-                  <div className="text-[10px] text-muted-foreground/60 italic p-2 text-center">
+                  <div className="text-xs text-muted-foreground/60 italic p-2 text-center">
                     No layers yet. Add a layer to get started.
                   </div>
                 )}
@@ -916,7 +956,7 @@ export default function CraftSettingsPanel({
                         props.locked = !props.locked;
                       });
                     }}
-                    className={`text-[10px] px-2 py-1 rounded border transition-colors ${
+                    className={`text-xs px-2 py-1 rounded border transition-colors ${
                       nodeProps.locked
                         ? "border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
                         : "border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -1071,6 +1111,8 @@ export default function CraftSettingsPanel({
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }

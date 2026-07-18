@@ -4,7 +4,7 @@ import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 
-import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, InputValuesForm } from "@jet-admin/ui";
+import { Button, Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, InputValuesForm } from "@jet-admin/ui";
 
 /**
  * Parse raw form values based on inputDefinitions.
@@ -123,22 +123,22 @@ export const DataQueryInputsForm = ({
     <Dialog open={open} onOpenChange={(v) => { if (!v) onDecline(); }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold tracking-tight">
+          <DialogTitle >
             {CONSTANTS.STRINGS.DATA_QUERY_INPUTS_FORM_TITLE}
           </DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <DialogDescription>
             {CONSTANTS.STRINGS.DATA_QUERY_INPUTS_FORM_DESCRIPTION}
-          </p>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody >
           <InputValuesForm
             inputDefinitions={inputDefinitions}
             values={dataQueryInputsForm.values}
             onChange={(key, value) => dataQueryInputsForm.setFieldValue(key, value)}
             errors={dataQueryInputsForm.errors}
           />
-        </div>
-        <DialogFooter className="gap-2 sm:gap-3 mt-4">
+        </DialogBody>
+        <DialogFooter >
           <Button
             onClick={onDecline}
             type="button"

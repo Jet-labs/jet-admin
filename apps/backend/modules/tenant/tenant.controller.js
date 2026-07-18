@@ -258,7 +258,7 @@ tenantController.getTenantAIConfig = async (req, res) => {
     });
 
     const aiConfig = {
-      isApiKeySet: !!(credential && credential.apiKey),
+      apiKey: credential?.apiKey || "",
       baseURL: credential?.baseURL || "",
       provider: credential?.provider || "openai",
       model: credential?.model || "",
@@ -295,19 +295,12 @@ tenantController.updateTenantAIConfig = async (req, res) => {
     });
 
     const { vaultService } = require("../vault/vault.service");
-    
-    // We only update apiKey if it's provided. If it's a placeholder "******", we keep the old one.
-    let finalApiKey = apiKey;
-    if (!apiKey || apiKey === "******") {
-      const existing = await vaultService.getCredentialByProvider({ tenantID, provider: "ai_config" });
-      finalApiKey = existing?.apiKey || "";
-    }
 
     await vaultService.upsertCredentialByProvider({
       tenantID,
       provider: "ai_config",
       name: "Tenant AI Configuration",
-      data: { apiKey: finalApiKey, baseURL, provider, model },
+      data: { apiKey: apiKey || "", baseURL, provider, model },
       creatorID: user?.userID,
       createdByApiKeyID: systemApiKey?.apiKeyID,
     });

@@ -71,9 +71,9 @@ export const APIKeyAdditionForm = ({ tenantID }) => {
         saveText="Save"
       />
 
-      <div className="mx-auto w-full max-w-2xl p-4 md:p-6">
+      <div className="mx-auto w-full max-w-2xl p-8">
         <form
-          className="space-y-4"
+          className="space-y-2"
           onSubmit={apiKeyAdditionForm.handleSubmit}
         >
           <APIKeyEditor

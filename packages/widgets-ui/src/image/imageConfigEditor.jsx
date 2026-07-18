@@ -67,7 +67,7 @@ export const ImageConfigEditor = ({ widgetEditorForm, stateTree }) => {
               liveStateTree={liveStateTree}
             />
           </div>
-          <p className="text-[10px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Supports template expressions for dynamic content.
           </p>
         </div>

@@ -136,7 +136,7 @@ export const TenantAssetPermissionsInput = ({ value = [], onChange, error }) => 
                 key={idx}
                 className="flex items-center gap-1.5 rounded border border-border bg-muted/40 px-2 py-1 text-xs text-foreground"
               >
-                <span className="text-muted-foreground uppercase text-[10px] tracking-wider font-semibold">
+                <span className="text-muted-foreground uppercase text-xs tracking-wider font-semibold">
                   {resourceTypeLabels[item.resourceType] || item.resourceType}:
                 </span>
                 <span className="font-medium">

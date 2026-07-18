@@ -30,7 +30,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
           placeholder="e.g. {{state.queries.stats.data[0].count}}"
           liveStateTree={liveStateTree}
         />
-        <p className="text-[10px] text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           The primary metric value. Use template expressions to bind to data sources.
         </p>
       </div>
@@ -68,7 +68,7 @@ export const StatConfigEditor = ({ widgetEditorForm, stateTree }) => {
           placeholder="e.g. {{state.queries.stats.data[0].change_pct}}"
           liveStateTree={liveStateTree}
         />
-        <p className="text-[10px] text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           Optional percentage change. Positive = up trend, negative = down trend.
         </p>
       </div>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 
@@ -15,12 +15,15 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resi
 import { Sparkles } from "lucide-react";
 import { AIChatPanel } from "../aiComponents/AIChatPanel";
 import { useAIStore } from "../../../logic/stores/useAIStore";
+import { Input } from "@jet-admin/ui";
 
 export const ProtectedLayout = () => {
   const { firebaseUserState } = useAuthState();
   const { tenantID } = useParams();
   const { getUserConfig } = useAuthActions();
-  const { isOpen, togglePanel } = useAIStore();
+  const { isOpen, togglePanel, openPanel, openWithMessage } = useAIStore();
+  const [agentQuery, setAgentQuery] = useState("");
+  const agentInputRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -62,34 +65,43 @@ export const ProtectedLayout = () => {
         <nav className="w-full  border-b-2 border-primary bg-background">
           <div className="px-4 py-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center justify-start rtl:justify-end">
+              <div className="flex items-center justify-start rtl:justify-end gap-4">
                 <Link to="/">
                   <div className="flex flex-row items-end">
                     <img src={logo} className="w-8 h-8" />
                   </div>
                 </Link>
-              </div>
-              <Breadcrumbs />
 
-              <div className="flex flex-row justify-end items-center gap-2">
-                {/* AI Agent toggle button */}
+              </div>
+
+
+              <div className="flex flex-row justify-end items-center gap-3 flex-1 ">
+                <Breadcrumbs />
+                {/* AI Agent input */}
                 {tenantID && (
-                  <button
-                    id="ai-panel-toggle"
-                    onClick={togglePanel}
-                    title="AI Agent (Ctrl+K)"
-                    className={`
-                      flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[12px] font-medium
-                      transition-all duration-150
-                      ${isOpen
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
+
+                  <Input
+                    ref={agentInputRef}
+                    type="text"
+                    size="sm"
+                    value={agentQuery}
+                    className="max-w-32"
+                    onChange={(e) => setAgentQuery(e.target.value)}
+                    onFocus={() => openPanel()}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && agentQuery.trim()) {
+                        e.preventDefault();
+                        openWithMessage(agentQuery.trim());
+                        setAgentQuery("");
                       }
-                    `}
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>AI</span>
-                  </button>
+                      if (e.key === "Escape") {
+                        agentInputRef.current?.blur();
+                      }
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    placeholder="Ask Agent…"
+                  />
+
                 )}
 
                 <UserAvatar />

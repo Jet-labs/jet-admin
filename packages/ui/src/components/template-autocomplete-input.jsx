@@ -413,9 +413,9 @@ export const TemplateAutocompleteInput = ({
         {/* Token chip bar — shows all {{bindings}} currently in the value (multiline only) */}
         {multiline && boundTokens.length > 0 && (
           <div className="flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50 rounded-b-[2px]">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0">bound</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0">bound</span>
             {boundTokens.map((tok, i) => (
-              <span key={i} className="inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-[10px] font-mono text-primary cursor-default max-w-full" title={tok}>
+              <span key={i} className="inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-xs font-mono text-primary cursor-default max-w-full" title={tok}>
                 <span className="truncate min-w-0">{tok}</span>
               </span>
             ))}

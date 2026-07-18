@@ -58,7 +58,7 @@ export const StartNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Help callout */}
 
-      <div className="rounded border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
+      <div className="rounded border border-border bg-muted/30 p-3 text-xs text-muted-foreground space-y-2">
         <div className="font-semibold text-xs text-foreground">📘 How This Works</div>
 
         <div>
@@ -162,7 +162,7 @@ export const StartNode = memo(({ id, data, isConnectable }) => {
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-semibold truncate text-brand-text-primary">{data?.title || 'Start'}</span>
           </div>
-          <div className="text-[10px] mt-0.5 text-brand-text-primary">Workflow entry point</div>
+          <div className="text-xs mt-0.5 text-brand-text-primary">Workflow entry point</div>
         </div>
         <div className="flex flex-col items-center justify-center px-2 border-l border-brand-border">
           <div className="w-2 h-2 rounded-full bg-green-400" title="Output" />

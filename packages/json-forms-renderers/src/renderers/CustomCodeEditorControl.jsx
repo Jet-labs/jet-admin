@@ -47,7 +47,7 @@ export const CustomCodeEditorControl = ({
       </Label>
       
       {hint && (
-        <p className="text-[10px] text-muted-foreground mb-1">{hint}</p>
+        <p className="text-xs text-muted-foreground mb-1">{hint}</p>
       )}
       
       <CodeEditor

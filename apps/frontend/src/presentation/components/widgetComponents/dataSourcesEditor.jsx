@@ -134,12 +134,12 @@ export const DataSourcesEditor = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Data Sources
         </p>
         <div className="flex items-center gap-1.5">
           {dataSourceResults && (
-            <span className="inline-flex items-center text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/30">
+            <span className="inline-flex items-center text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/30">
               Data loaded
             </span>
           )}
@@ -164,7 +164,7 @@ export const DataSourcesEditor = ({
 
       {dataSources.length === 0 && (
         <div className="rounded border border-dashed border-border bg-muted/30 p-3 text-center py-6">
-          <p className="text-[10px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             No data sources bound. Add a data query or workflow to feed data into
             this widget.
           </p>
@@ -180,7 +180,7 @@ export const DataSourcesEditor = ({
           >
             {/* Header row */}
             <div className="flex items-center justify-between">
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Source {idx + 1}
               </p>
               <Button
@@ -196,7 +196,7 @@ export const DataSourcesEditor = ({
 
             {/* Type selector */}
             <div className="space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Type
               </Label>
               <Select
@@ -217,7 +217,7 @@ export const DataSourcesEditor = ({
 
             {/* Source picker */}
             <div className="space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {source.type === "query" ? "Data Query" : "Workflow"}
               </Label>
               {source.type === "query" ? (
@@ -261,7 +261,7 @@ export const DataSourcesEditor = ({
 
             {/* Alias */}
             <div className="space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Alias
               </Label>
               <Input
@@ -273,7 +273,7 @@ export const DataSourcesEditor = ({
                 }
                 placeholder="e.g. orders"
               />
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Used as the key in query results. E.g.{" "}
                 <code className="bg-background px-1 rounded border border-border font-mono text-xs">{source.alias || "alias"}.data</code>
               </p>
@@ -282,14 +282,14 @@ export const DataSourcesEditor = ({
             {/* Input Arguments */}
             {inputDefinitions.length > 0 && (
               <div className="rounded border border-border bg-muted/30 p-3 space-y-2 mt-2">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                   Input Arguments
                 </p>
                 {inputDefinitions.map((inputDef) => {
                   const argKey = inputDef.key || inputDef.name;
                   return (
                     <div key={argKey} className="space-y-0.5">
-                      <Label className="text-[10px] font-medium text-muted-foreground">
+                      <Label className="text-xs font-medium text-muted-foreground">
                         {argKey}
                         {inputDef.type && (
                           <span className="ml-1 text-muted-foreground/50">
@@ -315,7 +315,7 @@ export const DataSourcesEditor = ({
             {/* Query result preview */}
             {dataSourceResults?.[source.alias] && (
               <div className="mt-2">
-                <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                   {source.type === 'workflow' && dataSourceResults[source.alias]?.instanceID ? 'Execution Status' : 'Result Preview'}
                 </Label>
                 {source.type === 'workflow' && dataSourceResults[source.alias]?.instanceID ? (() => {
@@ -340,7 +340,7 @@ export const DataSourcesEditor = ({
                     </div>
                   );
                 })() : (
-                    <pre className="mt-1 max-h-24 overflow-auto rounded bg-foreground text-background p-2 text-[10px] font-mono leading-relaxed">
+                    <pre className="mt-1 max-h-24 overflow-auto rounded bg-foreground text-background p-2 text-xs font-mono leading-relaxed">
                     {JSON.stringify(dataSourceResults[source.alias], null, 2)?.slice(
                       0,
                       500

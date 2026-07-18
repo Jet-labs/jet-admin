@@ -194,7 +194,7 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Comprehensive instructions */}
       <div className="px-2">
-        <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-[10px] text-brand-text-primary space-y-2">
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-xs text-brand-text-primary space-y-2">
           <div className="font-semibold text-brand-text-primary text-xs">📘 Delay Types</div>
 
           <div>
@@ -305,7 +305,7 @@ export const DelayNode = memo(({ data, isConnectable }) => {
           </div>
 
           {/* Delay info */}
-          <div className={`text-[10px] font-mono mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
+          <div className={`text-xs font-mono mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
             wait {getDelayDisplay()}
           </div>
         </div>

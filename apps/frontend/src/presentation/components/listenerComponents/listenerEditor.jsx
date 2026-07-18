@@ -240,7 +240,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
               <span className="text-sm font-medium text-foreground">
                 {selectedDatasource?.datasourceTitle}
               </span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">
                 {datasourceTypeConfig.name} listener
               </span>
             </div>

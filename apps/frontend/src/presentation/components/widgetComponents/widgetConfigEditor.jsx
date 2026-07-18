@@ -164,7 +164,7 @@ export const WidgetConfigEditor = ({
           <TabsContent value="data" className="mt-2">
           <div className="space-y-2 rounded border border-border bg-muted/20 p-3">
             <Label className="text-xs font-semibold text-foreground">Referenced Page Data Sources</Label>
-            <p className="text-[10px] text-muted-foreground leading-normal">
+            <p className="text-xs text-muted-foreground leading-normal">
               This widget consumes page-level data sources reactively using expressions like <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{`{{ state.queries.alias.data }}`}</code> or <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary">{`{{ state.workflows.alias.data }}`}</code>.
             </p>
             {referencedDataSources.length === 0 ? (

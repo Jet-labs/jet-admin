@@ -131,7 +131,7 @@ export const GenericDatasourceTestResultUI = ({ connectionResult }) => {
               {title}
             </span>
           </div>
-          <span className={`text-[10px] font-mono font-medium uppercase px-2 py-1 rounded ${currentStyle.badge}`}>
+          <span className={`text-xs font-mono font-medium uppercase px-2 py-1 rounded ${currentStyle.badge}`}>
             {currentStyle.badgeText}
           </span>
         </div>

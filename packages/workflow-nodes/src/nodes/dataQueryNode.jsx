@@ -195,7 +195,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Help callout */}
       <div className='px-2'>
-        <div className="rounded border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
+        <div className="rounded border border-border bg-muted/30 p-3 text-xs text-muted-foreground space-y-2">
           <div className="font-semibold text-xs text-foreground">📘 Query Inputs</div>
           <div>
             <span className="font-medium text-foreground">Input Format:</span>

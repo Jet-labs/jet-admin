@@ -141,7 +141,7 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
         isLoading={isLoadingCronJob}
         error={loadCronJobError}
       >
-        <div className="mx-auto w-full max-w-2xl p-4 md:p-6">
+        <div className="mx-auto w-full max-w-2xl p-8">
           <form
             id="cron-job-updation-form"
             onSubmit={cronJobUpdationForm.handleSubmit}

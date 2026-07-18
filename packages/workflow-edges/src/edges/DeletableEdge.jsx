@@ -109,7 +109,7 @@ export default function DeletableEdge({
           ) : (
             <div className="flex items-center gap-1 group">
                 <Button
-                    className="w-5 h-5 bg-brand-black border border-brand-border rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-red-50 hover:border-red-200 transition-colors text-brand-text-primary hover:text-red-500 text-[10px]"
+                  className="w-5 h-5 bg-brand-black border border-brand-border rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-red-50 hover:border-red-200 transition-colors text-brand-text-primary hover:text-red-500 text-xs"
                     onClick={onDeleteClick}
                     title="Delete Edge"
                 >
@@ -117,7 +117,7 @@ export default function DeletableEdge({
                 </Button>
                 <div 
                     onClick={onEdgeClick}
-                  className={`px-1.5 py-0.5 rounded bg-brand-black border border-brand-border text-[10px] text-brand-text-primary shadow-sm cursor-text hover:border-blue-300 transition-colors ${!edgeLabel ? 'opacity-50 hover:opacity-100' : ''}`}
+                  className={`px-1.5 py-0.5 rounded bg-brand-black border border-brand-border text-xs text-brand-text-primary shadow-sm cursor-text hover:border-blue-300 transition-colors ${!edgeLabel ? 'opacity-50 hover:opacity-100' : ''}`}
                 >
                     {edgeLabel || "Name edge"}
                 </div>

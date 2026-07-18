@@ -148,7 +148,7 @@ function SpreadsheetSearch({ onSelect, selectedId, apiProxy }) {
                 }`} />
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-medium text-foreground truncate">{ss.name}</p>
-                  <p className="text-[10px] text-muted-foreground truncate">
+                  <p className="text-xs text-muted-foreground truncate">
                     {ss.owner && `${ss.owner} · `}
                     {ss.modifiedTime && new Date(ss.modifiedTime).toLocaleDateString()}
                   </p>
@@ -227,7 +227,7 @@ function SheetSelector({ spreadsheetId, selectedSheet, onSelect, apiProxy }) {
   return (
     <div className="space-y-1">
       {spreadsheetTitle && (
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Sheets in {spreadsheetTitle}
         </p>
       )}
@@ -415,7 +415,7 @@ export const GoogleSheetsQueryEditor = ({ queryEditorForm }) => {
                 {Icon && <Icon className="h-3.5 w-3.5" />}
                 {tab.label}
                 {badgeCount > 0 && (
-                  <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
+                  <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                     {badgeCount}
                   </span>
                 )}

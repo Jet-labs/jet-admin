@@ -40,7 +40,7 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center gap-2">
           <Settings className="text-foreground w-3 h-3" />
-          <span className="text-[10px] font-bold text-foreground tracking-wider">
+          <span className="text-xs font-bold text-foreground tracking-wider">
             Input Parameters
           </span>
         </div>
@@ -49,7 +49,7 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
           variant="ghost"
           size="sm"
           onClick={_handleAddInputDef}
-          className="h-6 px-2 text-[10px] text-primary hover:bg-primary/10 hover:text-primary"
+          className="h-6 px-2 text-xs text-primary hover:bg-primary/10 hover:text-primary"
         >
           <Plus className="w-2.5 h-2.5 mr-1" />
           Add
@@ -57,7 +57,7 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
       </div>
 
       {inputDefinitions.length === 0 ? (
-        <p className="text-[10px] text-foreground italic">
+        <p className="text-xs text-foreground italic">
           No input parameters defined.
         </p>
       ) : (
@@ -120,7 +120,7 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
                   <Input
                     type={(inputDef.type || "string") === "number" ? "number" : "text"}
                     placeholder={`Default ${inputDef.key || "value"}`}
-                    className="text-[10px]"
+                        className="text-xs"
                     size="sm"
                     value={inputDef.defaultValue ?? ""}
                     onChange={(e) => _handleUpdateInputDef(

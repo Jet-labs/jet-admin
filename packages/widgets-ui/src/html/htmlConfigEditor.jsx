@@ -11,7 +11,7 @@ export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       {/* HTML Source */}
       <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">HTML Markup</Label>
-        <p className="text-[10px] text-muted-foreground leading-snug">
+        <p className="text-xs text-muted-foreground leading-snug">
           Supports standard HTML structure, inline styles, and <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]">{"{{expression}}"}</code> templates.
         </p>
         <CodeEditor
@@ -31,7 +31,7 @@ export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
       {/* CSS Stylesheet */}
       <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">CSS Stylesheet</Label>
-        <p className="text-[10px] text-muted-foreground leading-snug">
+        <p className="text-xs text-muted-foreground leading-snug">
           Custom styles scoped to this widget's sandboxed iframe container.
         </p>
         <CodeEditor
@@ -69,7 +69,7 @@ export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
         <div className="flex items-center justify-between">
           <div className="space-y-0.5 pr-2">
             <Label className="text-xs font-medium text-foreground">Execute JavaScript</Label>
-            <p className="text-[10px] text-muted-foreground">Allows running &lt;script&gt; tags inside the iframe sandbox.</p>
+            <p className="text-xs text-muted-foreground">Allows running &lt;script&gt; tags inside the iframe sandbox.</p>
           </div>
           <Switch
             checked={config.allowScripts === true || config.allowScripts === "true"}
@@ -81,7 +81,7 @@ export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
         <div className="flex items-center justify-between">
           <div className="space-y-0.5 pr-2">
             <Label className="text-xs font-medium text-foreground">Submit Forms</Label>
-            <p className="text-[10px] text-muted-foreground">Allows form submissions within the sandboxed iframe.</p>
+            <p className="text-xs text-muted-foreground">Allows form submissions within the sandboxed iframe.</p>
           </div>
           <Switch
             checked={config.allowForms === true || config.allowForms === "true"}
@@ -93,7 +93,7 @@ export const HtmlConfigEditor = ({ widgetEditorForm, stateTree }) => {
         <div className="flex items-center justify-between">
           <div className="space-y-0.5 pr-2">
             <Label className="text-xs font-medium text-foreground">Allow Popups</Label>
-            <p className="text-[10px] text-muted-foreground">Allows links opening in new tabs or window popups.</p>
+            <p className="text-xs text-muted-foreground">Allows links opening in new tabs or window popups.</p>
           </div>
           <Switch
             checked={config.allowPopups === true || config.allowPopups === "true"}

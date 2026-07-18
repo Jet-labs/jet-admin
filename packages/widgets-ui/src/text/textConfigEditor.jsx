@@ -13,7 +13,7 @@ export const TextConfigEditor = ({ widgetEditorForm, stateTree }) => {
       {/* Content */}
       <div className="space-y-1">
         <Label className="text-xs font-medium text-foreground">Content</Label>
-        <p className="text-[10px] text-muted-foreground leading-snug">
+        <p className="text-xs text-muted-foreground leading-snug">
           Supports Markdown formatting and <code className="font-mono bg-muted px-1 py-0.5 rounded text-primary text-[9px]">{"{{expression}}"}</code> templates. Full JS expressions supported.
         </p>
         <TemplateAutocompleteInput

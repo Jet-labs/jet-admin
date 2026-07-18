@@ -184,7 +184,7 @@ function ConditionRow({ condition, onChange, onDelete, canDelete, stateTree }) {
             <SelectContent>
               {OPERATORS.map(o => (
                 <SelectItem key={o.value} value={o.value} className="text-xs">
-                  <span className="font-mono text-muted-foreground mr-1.5 text-[10px]">{o.symbol}</span>
+                  <span className="font-mono text-muted-foreground mr-1.5 text-xs">{o.symbol}</span>
                   {o.label}
                 </SelectItem>
               ))}
@@ -265,7 +265,7 @@ function BranchEditor({ branch, onChange, stateTree }) {
   return (
     <div className="space-y-3 p-3">
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-medium text-muted-foreground w-10 shrink-0">Label</span>
+        <span className="text-xs font-medium text-muted-foreground w-10 shrink-0">Label</span>
         <Input
           value={branch.label}
           onChange={e => updateField({ label: e.target.value })}
@@ -275,7 +275,7 @@ function BranchEditor({ branch, onChange, stateTree }) {
       </div>
 
       <div className="flex items-center justify-between pt-1">
-        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
           Conditions
         </span>
         {branch.conditions.length > 1 && (
@@ -317,7 +317,7 @@ function BranchEditor({ branch, onChange, stateTree }) {
         variant="ghost"
         size="sm"
         onClick={addCondition}
-        className="flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors h-auto py-1"
+        className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors h-auto py-1"
       >
         <Plus className="w-2.5 h-2.5" />
         Add condition
@@ -408,7 +408,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Title */}
       <div className="space-y-1">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Task Name
         </p>
         <Input
@@ -421,7 +421,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Description */}
       <div className="space-y-1">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Description
         </p>
         <Textarea
@@ -498,7 +498,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* else indicator */}
       <div className="flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded text-xs text-muted-foreground">
-        <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0">
+        <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-xs font-bold shrink-0">
           ∅
         </span>
         <span>
@@ -509,7 +509,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Error handling */}
       <div className="space-y-1">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           On Error
         </p>
         <Select value={errorHandling} onValueChange={setErrorHandling}>
@@ -525,7 +525,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Help callout */}
 
-      <div className="p-3 rounded border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1">
+      <div className="p-3 rounded border border-primary/20 bg-primary/5 text-xs text-primary/80 space-y-1">
         <div className="font-semibold text-xs text-primary">💡 Writing Conditions</div>
         <div>
           Use <code className="bg-brand-dark px-1 rounded border border-border font-mono">{'{{ctx.field}}'}</code> in
@@ -608,7 +608,7 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
           const extra = (branch.conditions?.length ?? 0) - 1;
           const summary = firstCond ? conditionSummary(firstCond) : '';
           return (
-            <div key={branch.id} className="flex items-start gap-2 text-[10px]">
+            <div key={branch.id} className="flex items-start gap-2 text-xs">
               <div className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${isDisabled ? 'bg-brand-black' : 'bg-indigo-400'}`} />
               <span className={`font-semibold shrink-0 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
                 {branch.label || `Branch ${idx + 1}`}
@@ -623,7 +623,7 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
         {branches.length > 6 && (
           <div className="text-[9px] text-brand-text-primary pl-3.5">+{branches.length - 6} more branches</div>
         )}
-        <div className="flex items-center gap-2 text-[10px] pt-1.5 mt-0.5 border-t border-brand-border">
+        <div className="flex items-center gap-2 text-xs pt-1.5 mt-0.5 border-t border-brand-border">
           <div className="w-1.5 h-1.5 rounded-full bg-brand-black shrink-0" />
           <span className="font-semibold text-brand-text-primary">else</span>
           <span className="text-brand-text-primary">default path</span>

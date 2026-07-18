@@ -470,7 +470,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WORKFLOW_SIDEBAR_PANEL} defaultSize={20} className="flex flex-col h-full overflow-hidden">
 
                                 <div className="flex-1 overflow-y-auto space-y-2 p-2 flex flex-col justify-start items-stretch bg-background">
-                                <div>
+                                <div className="space-y-1">
                                         <Label htmlFor="title" className="block mb-1.5">
                                         {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_LABEL}
                                         </Label>
@@ -489,8 +489,9 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                     )}
                                 </div>
 
+                                <div className="space-y-1">
+                                    <Label>Nodes</Label>
                                     <div className="flex flex-col gap-2">
-                                    <p className="text-[10px] font-bold text-muted-foreground tracking-wider mb-0.5">Nodes</p>
                                     {Object.values(WORKFLOW_NODES_MAP)
                                         .filter(node => {
                                             return true;
@@ -516,43 +517,42 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 {node.label}
                                             </Button>
                                         ))}
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="mb-1 block">Edge Style</Label>
+                                    <Select
+                                        value={values.edgeType || 'smoothstep'}
+                                        onValueChange={(val) => {
+                                            setFieldValue("edgeType", val);
+                                            updateAllEdgesType(val);
+                                        }}
+                                    >
+                                        <SelectTrigger className="text-sm h-8">
+                                            <SelectValue placeholder="Select style" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="default">Bezier (Curved)</SelectItem>
+                                            <SelectItem value="straight">Straight</SelectItem>
+                                            <SelectItem value="step">Step (Sharp)</SelectItem>
+                                            <SelectItem value="smoothstep">Smooth Step</SelectItem>
+                                            <SelectItem value="simplebezier">Simple Bezier</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
 
-                                <div className="flex flex-col gap-2">
-                                    <div>
-                                            <Label className="mb-1 block">Edge Style</Label>
-                                        <Select
-                                            value={values.edgeType || 'smoothstep'}
-                                            onValueChange={(val) => {
-                                                setFieldValue("edgeType", val);
-                                                updateAllEdgesType(val);
-                                            }}
-                                        >
-                                            <SelectTrigger className="text-sm h-8">
-                                                <SelectValue placeholder="Select style" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="default">Bezier (Curved)</SelectItem>
-                                                <SelectItem value="straight">Straight</SelectItem>
-                                                <SelectItem value="step">Step (Sharp)</SelectItem>
-                                                <SelectItem value="smoothstep">Smooth Step</SelectItem>
-                                                <SelectItem value="simplebezier">Simple Bezier</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                            <Label>Snap to Grid</Label>
-                                        <Checkbox
-                                            checked={values.snapToGrid ?? true}
-                                            onCheckedChange={(checked) => setFieldValue("snapToGrid", checked)}
-                                        />
-                                    </div>
+                                <div className="flex items-center justify-between">
+                                    <Label>Snap to Grid</Label>
+                                    <Checkbox
+                                        checked={values.snapToGrid ?? true}
+                                        onCheckedChange={(checked) => setFieldValue("snapToGrid", checked)}
+                                    />
                                 </div>
 
                                 <WorkflowInputDefinitionsPanel workflowForm={workflowEditorForm} />
 
-                                <div className="flex flex-col gap-2">
-                                    <p className="text-[10px] font-bold text-muted-foreground tracking-wider">Actions</p>
+                                <div className="space-y-1">
+                                    <Label >Actions</Label>
                                     <div className="flex flex-row gap-2">
                                         <Button
                                             type="button"

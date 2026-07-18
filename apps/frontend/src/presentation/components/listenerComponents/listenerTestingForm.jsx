@@ -141,7 +141,7 @@ export const ListenerTestingForm = ({
                 <Unplug className="w-3.5 h-3.5 text-zinc-500" />
             )}
             <span
-              className={`text-[10px] font-semibold uppercase tracking-wider ${
+              className={`text-xs font-semibold uppercase tracking-wider ${
                 isActive ? "text-emerald-500" : "text-zinc-500"
               }`}
             >
@@ -149,7 +149,7 @@ export const ListenerTestingForm = ({
             </span>
           </div>
           {testResult && (
-            <div className={`ml-2 flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded border ${
+            <div className={`ml-2 flex items-center gap-1.5 text-xs font-mono px-2 py-0.5 rounded border ${
               testResult.success
                 ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-400"
                 : "border-red-500/30 bg-red-500/5 text-red-400"
@@ -219,7 +219,7 @@ export const ListenerTestingForm = ({
       <ResizablePanelGroup direction="horizontal" className="flex-1">
         {/* Raw Event Stream */}
         <ResizablePanel defaultSize={50} className="flex flex-col bg-zinc-950">
-          <div className="px-3 py-1.5 border-b border-zinc-800 text-[10px] uppercase font-semibold text-zinc-500 tracking-wider flex-shrink-0">
+          <div className="px-3 py-1.5 border-b border-zinc-800 text-xs uppercase font-semibold text-zinc-500 tracking-wider flex-shrink-0">
              Raw Event Stream
           </div>
           <div className="flex-1 overflow-y-auto p-4 font-mono text-[11px] leading-relaxed text-zinc-300" ref={scrollRef}>
@@ -246,7 +246,7 @@ export const ListenerTestingForm = ({
 
         {/* Transformed Event Stream */}
         <ResizablePanel defaultSize={50} className="flex flex-col bg-zinc-950">
-          <div className="px-3 py-1.5 border-b border-zinc-800 text-[10px] uppercase font-semibold text-indigo-400/70 tracking-wider flex-shrink-0">
+          <div className="px-3 py-1.5 border-b border-zinc-800 text-xs uppercase font-semibold text-indigo-400/70 tracking-wider flex-shrink-0">
              Transformed Stream
           </div>
           <div className="flex-1 overflow-y-auto p-4 font-mono text-[11px] leading-relaxed text-zinc-300" ref={scrollRefTransformed}>

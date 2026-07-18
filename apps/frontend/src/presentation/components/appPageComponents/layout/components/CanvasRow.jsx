@@ -47,7 +47,7 @@ export function CanvasRow({ children, sizing, fixedHeight, style, condition, rep
       )}
       {isEmpty && !previewMode ? (
         <div className="col-span-12 flex justify-center items-center h-12 border border-dashed border-muted-foreground/45 text-muted-foreground text-[11px] transition-all bg-transparent rounded hover:border-primary/70 hover:bg-primary/5">
-          <span className="text-muted-foreground/40 text-[10px] uppercase font-mono select-none">
+          <span className="text-muted-foreground/40 text-xs uppercase font-mono select-none">
             Empty Row (Drop components here)
           </span>
         </div>

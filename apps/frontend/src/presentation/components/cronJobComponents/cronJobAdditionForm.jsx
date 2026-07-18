@@ -67,7 +67,7 @@ export const CronJobAdditionForm = ({ tenantID }) => {
       />
 
       {/* ── Form body ───────────────────────────────────────────────────── */}
-      <div className="mx-auto w-full max-w-2xl p-4 md:p-6">
+      <div className="mx-auto w-full max-w-2xl p-8">
         <form onSubmit={cronJobAdditionForm.handleSubmit} noValidate>
           <CronJobEditor
             tenantID={tenantID}

@@ -1,107 +1,99 @@
+/**
+ * alert-dialog.jsx
+ *
+ * A thin semantic layer over dialog.jsx — all components delegate to Dialog
+ * primitives so there is a single source of truth for layout, styling, and
+ * context. The AlertDialog* names are kept for call-site compatibility.
+ *
+ * Trade-offs vs @radix-ui/react-alert-dialog:
+ *  - role="dialog"  (not "alertdialog") — acceptable for internal usage
+ *  - Escape key CAN close the dialog (Radix AlertDialog blocks it)
+ *  - Action / Cancel are plain buttons wrapped in DialogClose (no Radix focus-guard)
+ */
 import * as React from "react";
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { cn } from "../lib/utils";
 import { buttonVariants } from "./button";
+import {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogBody,
+} from "./dialog";
 
-const AlertDialog = AlertDialogPrimitive.Root;
+// ─── Root & trigger ───────────────────────────────────────────────────────────
 
-const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
+const AlertDialog = Dialog;
+const AlertDialogTrigger = DialogTrigger;
+const AlertDialogPortal = DialogPortal;
+const AlertDialogOverlay = DialogOverlay;
 
-const AlertDialogPortal = AlertDialogPrimitive.Portal;
+// ─── Content (narrower max-width than the default Dialog) ─────────────────────
 
-const AlertDialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Overlay
-    className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
-    )}
-    {...props}
+const AlertDialogContent = React.forwardRef(({ className, ...props }, ref) => (
+  <DialogContent
     ref={ref}
+    className={cn("max-w-sm", className)}
+    {...props}
   />
 ));
-AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
+AlertDialogContent.displayName = "AlertDialogContent";
 
-const AlertDialogContent = React.forwardRef(
-  ({ className, ...props }, ref) => (
-    <AlertDialogPortal>
-      <AlertDialogOverlay />
-      <AlertDialogPrimitive.Content
-        ref={ref}
-        className={cn(
-          "fixed left-[50%] top-[50%] z-50 grid w-full max-w-sm translate-x-[-50%] translate-y-[-50%] gap-3 border border-border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded",
-          className
-        )}
-        {...props}
-      />
-    </AlertDialogPortal>
-  )
-);
-AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
+// ─── Header (hides the generic close icon — alert dialogs require
+//     explicit confirmation or cancellation) ────────────────────────────────────
 
-const AlertDialogHeader = ({ className, ...props }) => (
-  <div
-    className={cn(
-      "flex flex-col space-y-1 text-center sm:text-left",
-      className
-    )}
-    {...props}
-  />
+const AlertDialogHeader = ({ hideCloseIcon = true, ...props }) => (
+  <DialogHeader hideCloseIcon={hideCloseIcon} {...props} />
 );
 AlertDialogHeader.displayName = "AlertDialogHeader";
 
-const AlertDialogFooter = ({ className, ...props }) => (
-  <div
-    className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
-    )}
-    {...props}
-  />
-);
+// ─── Footer & Body (straight aliases) ────────────────────────────────────────
+
+const AlertDialogFooter = DialogFooter;
 AlertDialogFooter.displayName = "AlertDialogFooter";
 
-const AlertDialogTitle = React.forwardRef(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Title
-    ref={ref}
-    className={cn("text-sm font-semibold", className)}
-    {...props}
-  />
-));
-AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
+const AlertDialogBody = DialogBody;
+AlertDialogBody.displayName = "AlertDialogBody";
 
-const AlertDialogDescription = React.forwardRef(
-  ({ className, ...props }, ref) => (
-    <AlertDialogPrimitive.Description
-      ref={ref}
-      className={cn("text-xs text-muted-foreground", className)}
-      {...props}
-    />
-  )
-);
-AlertDialogDescription.displayName =
-  AlertDialogPrimitive.Description.displayName;
+// ─── Title & Description (straight aliases) ───────────────────────────────────
+
+const AlertDialogTitle = DialogTitle;
+AlertDialogTitle.displayName = "AlertDialogTitle";
+
+const AlertDialogDescription = DialogDescription;
+AlertDialogDescription.displayName = "AlertDialogDescription";
+
+// ─── Action (closes dialog + primary style) ───────────────────────────────────
 
 const AlertDialogAction = React.forwardRef(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Action
-    ref={ref}
-    className={cn(buttonVariants(), className)}
-    {...props}
-  />
+  <DialogClose asChild>
+    <button
+      ref={ref}
+      className={cn(buttonVariants(), className)}
+      {...props}
+    />
+  </DialogClose>
 ));
-AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
+AlertDialogAction.displayName = "AlertDialogAction";
+
+// ─── Cancel (closes dialog + outline style) ───────────────────────────────────
 
 const AlertDialogCancel = React.forwardRef(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Cancel
-    ref={ref}
-    className={cn(
-      buttonVariants({ variant: "outline" }),
-      "mt-2 sm:mt-0",
-      className
-    )}
-    {...props}
-  />
+  <DialogClose asChild>
+    <button
+      ref={ref}
+      className={cn(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className)}
+      {...props}
+    />
+  </DialogClose>
 ));
-AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
+AlertDialogCancel.displayName = "AlertDialogCancel";
 
 export {
   AlertDialog,
@@ -111,9 +103,9 @@ export {
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogFooter,
+  AlertDialogBody,
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
 };
-

@@ -71,9 +71,9 @@ const config = {
         respectPrefersColorScheme: false,
       },
       navbar: {
-        title: "Jet Labs",
+        title: "Jet Admin",
         logo: {
-          alt: "Jet Labs Logo",
+          alt: "Jet Admin Logo",
           src: "img/logo.png",
         },
         items: [

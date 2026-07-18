@@ -188,13 +188,13 @@ function ColumnsTab({ opts, update }) {
           {/* Header row */}
           <div className="grid grid-cols-[20px_1fr_1fr_100px_28px_28px_28px] gap-2 items-center px-1">
             <span />
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
                 Source Column
               </Label>
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
                 Alias (optional)
               </Label>
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
                 Type
               </Label>
             <span />
@@ -425,7 +425,7 @@ function FilterTab({ opts, update }) {
       {/* Template hint */}
       {filters.length > 0 && (
         <div className="rounded border border-border bg-muted/30 p-3 space-y-1">
-          <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+          <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
             Dynamic values
           </Label>
           <p className="text-[11px] text-muted-foreground mt-1">
@@ -487,13 +487,13 @@ function SortTab({ opts, update }) {
           {/* Priority indicator header */}
           <div className="grid grid-cols-[24px_24px_1fr_160px_28px] gap-2 items-center px-1">
             <span />
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
                 #
               </Label>
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
                 Column
               </Label>
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
                 Direction
               </Label>
             <span />
@@ -526,7 +526,7 @@ function SortTab({ opts, update }) {
 
               {/* Priority badge */}
               <span
-                className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-[10px] font-bold ${idx === 0
+                className={`inline-flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold ${idx === 0
                     ? "bg-primary/10 text-primary"
                     : "bg-muted text-muted-foreground"
                   }`}
@@ -592,7 +592,7 @@ function SettingsTab({ opts, update }) {
       </Callout>
 
       <div className="space-y-2">
-        <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+        <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
           Row Range
         </Label>
         <div className="grid grid-cols-2 gap-3 !mt-0">
@@ -643,7 +643,7 @@ function SettingsTab({ opts, update }) {
       </div>
 
       <div className="space-y-1">
-        <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block">
+        <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground block">
           Full Datasource Call Preview
         </Label>
         <div className="rounded bg-muted/40 border border-border p-4 font-mono text-[11px] leading-relaxed overflow-x-auto text-foreground">
@@ -733,7 +733,7 @@ export const ExcelCSVQueryBuilder = ({ queryEditorForm }) => {
                 <Icon className="h-3.5 w-3.5" />
                 {tab.label}
                 {badgeCount > 0 && (
-                  <span className="ml-2 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
+                  <span className="ml-2 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                     {badgeCount}
                   </span>
                 )}

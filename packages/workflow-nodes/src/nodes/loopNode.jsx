@@ -214,7 +214,7 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
 
       {/* Comprehensive instructions */}
       <div className="px-2">
-        <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-[10px] text-brand-text-primary space-y-2">
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded text-xs text-brand-text-primary space-y-2">
           <div className="font-semibold text-brand-text-primary text-xs">📘 Loop Configuration</div>
 
           <div>
@@ -347,7 +347,7 @@ export const LoopNode = memo(({ id, data, isConnectable }) => {
           </div>
 
           {/* Loop info */}
-          <div className={`text-[10px] font-mono mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
+          <div className={`text-xs font-mono mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
             for ({itemVariable} in {sourceVariable.length > 20 ? sourceVariable.substring(0, 20) + '...' : sourceVariable})
           </div>
         </div>

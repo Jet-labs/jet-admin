@@ -180,7 +180,7 @@ export const ShelfBuilder = ({
             <div className="flex flex-col items-center justify-center p-6 text-center">
               <Database className="w-7 h-7 mb-2 text-muted-foreground/30" />
               <p className="text-xs font-medium text-foreground mb-0.5">No Data Source</p>
-              <p className="text-[10px] text-muted-foreground leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 Add a Data Source in the Data tab and run a Test, or select a Workflow.
               </p>
             </div>
@@ -297,7 +297,7 @@ export const ShelfBuilder = ({
 
                     {/* Title */}
                     <div>
-                      <Label className="text-[10px] font-medium text-muted-foreground mb-0.5 block">Title</Label>
+                        <Label className="text-xs font-medium text-muted-foreground mb-0.5 block">Title</Label>
                       <Input
                         type="text"
                         value={shelfSpec.config?.title || ''}
@@ -309,7 +309,7 @@ export const ShelfBuilder = ({
 
                     {/* Color Scheme */}
                     <div>
-                      <Label className="text-[10px] font-medium text-muted-foreground mb-0.5 block">Colors</Label>
+                        <Label className="text-xs font-medium text-muted-foreground mb-0.5 block">Colors</Label>
                       <Select value={shelfSpec.config?.colorScheme || 'tableau10'} onValueChange={(val) => handleConfigChange('colorScheme', val)}>
                         <SelectTrigger className="text-[11px] h-7"><SelectValue /></SelectTrigger>
                         <SelectContent className="z-[200]">
@@ -321,7 +321,7 @@ export const ShelfBuilder = ({
                     {/* Width + Height */}
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <Label className="text-[10px] font-medium text-muted-foreground mb-0.5 block">Width</Label>
+                          <Label className="text-xs font-medium text-muted-foreground mb-0.5 block">Width</Label>
                         <Select value={shelfSpec.config?.width === 'container' ? 'container' : 'custom'} onValueChange={(val) => handleConfigChange('width', val === 'container' ? 'container' : 400)}>
                           <SelectTrigger className="text-[11px] h-7"><SelectValue /></SelectTrigger>
                           <SelectContent className="z-[200]">
@@ -331,7 +331,7 @@ export const ShelfBuilder = ({
                         </Select>
                       </div>
                       <div>
-                        <Label className="text-[10px] font-medium text-muted-foreground mb-0.5 block">Height</Label>
+                          <Label className="text-xs font-medium text-muted-foreground mb-0.5 block">Height</Label>
                         <Input
                           type="number"
                           value={shelfSpec.config?.height || 300}

@@ -135,7 +135,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
             {/* Title */}
             <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     Modal title
                 </Label>
                 <Input
@@ -148,7 +148,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
             {/* Description */}
             <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     Instructions
                 </Label>
                 <Textarea
@@ -162,7 +162,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
             {/* Collection type */}
             <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     Collection method
                 </Label>
                 <Select value={collectionType} onValueChange={setCollectionType}>
@@ -183,17 +183,17 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
             {collectionType === 'form' && (
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                        <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                             Form fields
                         </Label>
                         <Button type="button" variant="ghost" size="sm" onClick={addField}
-                            className="h-6 px-2 text-[10px] text-primary hover:bg-primary/10">
+                            className="h-6 px-2 text-xs text-primary hover:bg-primary/10">
                             <Plus className="w-2.5 h-2.5 mr-1" /> Add field
                         </Button>
                     </div>
 
                     {fields.length === 0 && (
-                        <p className="text-[10px] text-muted-foreground italic">No fields yet.</p>
+                        <p className="text-xs text-muted-foreground italic">No fields yet.</p>
                     )}
 
                     {fields.map((field, idx) => (
@@ -281,7 +281,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
             {/* Output variable */}
             <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     Output variable
                 </Label>
                 <Input
@@ -290,7 +290,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                     placeholder="collectedData"
                     className="h-8 text-xs font-mono"
                 />
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                     Access via{' '}
                     <code className="bg-muted px-1 rounded font-mono">
                         {`{{ctx.${outputVariable || 'collectedData'}}}`}
@@ -300,7 +300,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
 
             {/* Expiry */}
             <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     Expiry (minutes) — 0 = never
                 </Label>
                 <Input
@@ -313,7 +313,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
             </div>
 
             {/* Help callout */}
-            <div className="rounded border border-primary/20 bg-primary/5 p-3 text-[10px] text-primary/80 space-y-1">
+            <div className="rounded border border-primary/20 bg-primary/5 p-3 text-xs text-primary/80 space-y-1">
                 <div className="font-semibold text-xs text-primary">Suspend &amp; resume</div>
                 <div>
                     When this node runs, the workflow <strong>pauses</strong> and a form
@@ -405,7 +405,7 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
                             </span>
                         )}
                     </div>
-                    <div className={`text-[10px] mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
+                    <div className={`text-xs mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
                         {fieldCount > 0
                             ? `${fieldCount} field${fieldCount !== 1 ? 's' : ''} · saves to ctx.${data?.outputVariable || 'collectedData'}`
                             : 'No fields defined yet'}

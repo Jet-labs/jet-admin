@@ -185,7 +185,7 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
                             {typeConfig?.label || action.actionType}
                           </h4>
                           {!action.isEnabled && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] font-medium text-zinc-400 ring-1 ring-inset ring-zinc-800">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-2 py-0.5 text-xs font-medium text-zinc-400 ring-1 ring-inset ring-zinc-800">
                               <CircleSlash className="h-3 w-3" />
                               Disabled
                             </span>
@@ -399,7 +399,7 @@ const TriggerWorkflowConfig = ({ config, onChange, tenantID, renderModeToggle, i
             <Label className="text-xs text-muted-foreground">Input Values</Label>
             {renderModeToggle()}
           </div>
-          <span className="text-[10px] text-muted-foreground/60 mb-1">Supports {"{{event.property}}"} syntax</span>
+          <span className="text-xs text-muted-foreground/60 mb-1">Supports {"{{event.property}}"} syntax</span>
         </div>
         
         {isJsonMode ? (
@@ -525,7 +525,7 @@ const TriggerQueryConfig = ({ config, onChange, tenantID, renderModeToggle, isJs
             <Label className="text-xs text-muted-foreground">Argument Values</Label>
             {renderModeToggle()}
           </div>
-          <span className="text-[10px] text-muted-foreground/60 mb-1">Supports {"{{event.property}}"} syntax</span>
+          <span className="text-xs text-muted-foreground/60 mb-1">Supports {"{{event.property}}"} syntax</span>
         </div>
         
         {isJsonMode ? (
@@ -633,7 +633,7 @@ const PushToAppPageConfig = ({ config, onChange, tenantID, listenerID }) => {
           placeholder="Choose an app page..."
           selectedLabel={selectedAppPageDetail ? `${selectedAppPageDetail.appPageTitle} (${selectedAppPageDetail.appPageID})` : ""}
         />
-        <p className="text-[10px] text-muted-foreground">The App Page to push data to.</p>
+        <p className="text-xs text-muted-foreground">The App Page to push data to.</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <div className="space-y-1">
@@ -644,7 +644,7 @@ const PushToAppPageConfig = ({ config, onChange, tenantID, listenerID }) => {
             placeholder="Leave empty to use listener ID"
             className="font-mono text-sm bg-background"
           />
-          <p className="text-[10px] text-muted-foreground">Defaults to `listener:${listenerID}`.</p>
+          <p className="text-xs text-muted-foreground">Defaults to `listener:${listenerID}`.</p>
         </div>
         <div className="space-y-1">
           <Label className="text-xs text-muted-foreground">Update Mode</Label>
@@ -687,13 +687,13 @@ const ActionConfigEditor = ({ type, config, onChange, tenantID, listenerID }) =>
   const renderModeToggle = () => (
     <div className="flex items-center gap-1 mt-1.5 bg-background/60 p-0.5 rounded border border-border/40 w-fit">
       <span 
-        className={`text-[10px] px-2.5 py-1 rounded cursor-pointer transition-colors ${!isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
+        className={`text-xs px-2.5 py-1 rounded cursor-pointer transition-colors ${!isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
         onClick={() => setIsJsonMode(false)}
       >
         Form
       </span>
       <span 
-        className={`text-[10px] px-2.5 py-1 rounded cursor-pointer transition-colors ${isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
+        className={`text-xs px-2.5 py-1 rounded cursor-pointer transition-colors ${isJsonMode ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-brand-border/30'}`} 
         onClick={() => setIsJsonMode(true)}
       >
         JSON
@@ -716,7 +716,7 @@ const ActionConfigEditor = ({ type, config, onChange, tenantID, listenerID }) =>
             title="Transform Script (JS)"
             stateTree={LISTENER_EVENT_STATE_TREE}
           />
-          <p className="text-[10px] text-muted-foreground italic">
+          <p className="text-xs text-muted-foreground italic">
             Receives <code>event</code> in scope. Return the transformed event object, or return <code>null</code> / <code>undefined</code> to filter out (discard) the event.
           </p>
         </div>

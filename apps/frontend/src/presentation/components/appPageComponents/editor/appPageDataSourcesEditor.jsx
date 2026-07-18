@@ -384,7 +384,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {isAdding ? "New Data Source" : "Edit Data Source"}
               </p>
             </div>
@@ -392,7 +392,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
           <div className="flex flex-col gap-2 p-2">
             <div className="flex flex-col space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Alias / Reference Name
               </Label>
               <Input
@@ -405,14 +405,14 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                   handleSourceChange(editingIndex, "alias", val);
                 }}
               />
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Accessible via expression engine, e.g.{" "}
                 <code className="bg-background px-1.5 py-0.5 rounded border border-border font-mono text-xs">{`{{ state.${selectedSource.type === "workflow" ? "workflows" : "queries"}.${selectedSource.alias || "alias"}.data }}`}</code>
               </p>
             </div>
 
             <div className="flex flex-col space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Source Type
               </Label>
               <Select
@@ -431,7 +431,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             </div>
 
             <div className="flex flex-col space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {selectedSource.type === "query"
                   ? "Select Query"
                   : selectedSource.type === "workflow"
@@ -491,7 +491,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
             {selectedSource.type === "listener" && (
               <div className="flex flex-col space-y-1">
-                <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                   Custom Channel Name (Optional)
                 </Label>
                 <Input
@@ -501,14 +501,14 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                   value={selectedSource.channelName || ""}
                   onChange={(e) => handleSourceChange(editingIndex, "channelName", e.target.value)}
                 />
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Defaults to <code className="bg-background p-2 rounded border border-border font-mono text-xs">{`listener:${selectedSource.listenerID}`}</code> if left blank.
                 </p>
               </div>
             )}
 
             <div className="flex flex-col space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Trigger Mode
               </Label>
               <Select
@@ -528,11 +528,11 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
             {selectedSource.triggerMode === "reactive" && (
               <div className="rounded border border-border bg-muted/30 p-2 flex flex-col gap-2">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                   Refresh When Variable Changes
                 </p>
                 {variables.length === 0 ? (
-                  <p className="text-[10px] text-muted-foreground/70 italic">
+                  <p className="text-xs text-muted-foreground/70 italic">
                     No page variables defined. Define variables in the Variables tab first.
                   </p>
                 ) : (
@@ -568,7 +568,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
             )}
 
             <div className="flex flex-col space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Refetch Interval (ms)
               </Label>
               <Input
@@ -585,12 +585,12 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
 
             {getSourceInputDefinitions(selectedSource).length > 0 && (
               <div className="rounded border border-border bg-muted/30 p-2 flex flex-col gap-2">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                   Parameters / Arguments
                 </p>
                 {getSourceInputDefinitions(selectedSource).map((inputDef) => (
                   <div key={inputDef.key} className="flex flex-col gap-2">
-                    <Label className="text-[10px] text-muted-foreground font-mono">{inputDef.key}</Label>
+                    <Label className="text-xs text-muted-foreground font-mono">{inputDef.key}</Label>
                     <TemplateAutocompleteInput
                       value={selectedSource.inputValues?.[inputDef.key] || ""}
                       onChange={(val) => {
@@ -612,10 +612,10 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         <div className="flex-1 flex flex-col min-h-0">
             <div className="flex items-center justify-between p-3 border-b border-border">
             <div>
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Page Data Sources
               </p>
-              <p className="text-[10px] text-muted-foreground/70">
+              <p className="text-xs text-muted-foreground/70">
                 Define the query models that fuel this page.
               </p>
             </div>
@@ -626,7 +626,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                 <div className="rounded border border-dashed border-border bg-muted/30 p-6 text-center flex flex-col items-center justify-center">
                 <Layers className="h-8 w-8 text-muted-foreground/50 mb-2" />
                 <p className="text-xs font-medium text-foreground">No Page Data Sources</p>
-                <p className="text-[10px] text-muted-foreground/70 max-w-[200px]">
+                <p className="text-xs text-muted-foreground/70 max-w-[200px]">
                   Add queries or workflows that widgets can consume reactively.
                 </p>
               </div>
@@ -656,7 +656,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                             <span className="text-xs font-mono font-medium truncate text-foreground block">
                               {source.alias || `source_${index + 1}`}
                             </span>
-                            <p className="text-[10px] text-muted-foreground truncate font-mono mt-0.5">
+                            <p className="text-xs text-muted-foreground truncate font-mono mt-0.5">
                               {source.type} : {isQuery ? source.queryID : isWorkflow ? source.workflowID : source.listenerID}
                             </p>
                           </div>
@@ -672,7 +672,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                             </span>
                           </div>
                           {summary && (
-                            <div className={`text-[10px] font-medium flex items-center gap-2 ${
+                            <div className={`text-xs font-medium flex items-center gap-2 ${
                               summary.status === "error" ? "text-destructive" :
                               summary.status === "success" ? "text-primary" :
                               "text-muted-foreground"

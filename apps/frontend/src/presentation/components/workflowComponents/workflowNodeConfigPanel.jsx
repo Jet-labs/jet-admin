@@ -88,7 +88,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
                                 <AccordionContent className="p-2 space-y-2">
                                 <Label className="block text-xs font-medium text-muted-foreground">
                                     Join Mode
-                                    <span className="block text-[10px] text-muted-foreground/70 mt-0.5 font-normal">
+                                        <span className="block text-xs text-muted-foreground/70 mt-0.5 font-normal">
                                         When this node has multiple upstream parents
                                     </span>
                                 </Label>

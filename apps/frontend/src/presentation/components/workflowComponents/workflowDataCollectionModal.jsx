@@ -11,7 +11,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogDescription,
-    DialogFooter 
+    DialogFooter,
+    DialogBody
 } from '@jet-admin/ui';
 
 /**
@@ -54,19 +55,19 @@ export const WorkflowDataCollectionModal = ({
                 onDismiss();
             }
         }}>
-            <DialogContent className="sm:max-w-[480px] max-h-[85vh] flex flex-col p-0 overflow-hidden gap-0">
-                <DialogHeader className="px-5 py-4 border-b shrink-0 text-left">
-                    <DialogTitle className="text-base text-foreground font-medium">
+            <DialogContent >
+                <DialogHeader >
+                    <DialogTitle >
                         {title}
                     </DialogTitle>
                     {description && (
-                        <DialogDescription className="text-sm text-muted-foreground">
+                        <DialogDescription >
                             {description}
                         </DialogDescription>
                     )}
                 </DialogHeader>
 
-                <div className="p-5 overflow-y-auto flex-1">
+                <DialogBody >
                     <JsonForms
                         schema={formSchema}
                         uischema={formUischema}
@@ -74,9 +75,9 @@ export const WorkflowDataCollectionModal = ({
                         renderers={jetFormsRenderers}
                         onChange={handleChange}
                     />
-                </div>
+                </DialogBody>
 
-                <DialogFooter className="px-5 py-3.5 border-t bg-muted/20 shrink-0 sm:justify-end gap-2">
+                <DialogFooter >
                     <Button type="button" variant="outline" size="sm" onClick={onDismiss}>
                         Cancel
                     </Button>

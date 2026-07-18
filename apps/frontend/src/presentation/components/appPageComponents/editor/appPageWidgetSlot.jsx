@@ -235,7 +235,7 @@ export const AppPageWidgetSlot = ({
               onTouchStart={(e) => e.stopPropagation()}
               aria-label="Remove widget"
             >
-              <X className="!text-[10px]" />
+              <X className="!text-xs" />
             </Button>
           </div>
         )}

@@ -60,7 +60,7 @@ export const FieldPill = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={onClick}
-      className={`flex items-center gap-1.5 rounded font-medium cursor-grab border transition-colors hover:brightness-110 max-w-full min-w-0 ${typeClass} ${isCompact ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-[11px]'} ${isDragging ? 'opacity-50' : ''} ${className}`}
+      className={`flex items-center gap-1.5 rounded font-medium cursor-grab border transition-colors hover:brightness-110 max-w-full min-w-0 ${typeClass} ${isCompact ? 'px-1.5 py-0.5 text-xs' : 'px-2 py-1 text-[11px]'} ${isDragging ? 'opacity-50' : ''} ${className}`}
       title={`${field.name} (${field.type})`}
     >
       {/* Type icon */}

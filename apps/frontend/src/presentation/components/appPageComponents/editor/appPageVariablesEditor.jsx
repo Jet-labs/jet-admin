@@ -152,7 +152,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {isAdding ? "New Variable" : "Edit Variable"}
               </p>
             </div>
@@ -160,7 +160,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
 
           <div className="flex flex-col gap-2 p-2">
             <div className="flex flex-col space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Variable Key / Name
               </Label>
               <Input
@@ -173,14 +173,14 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
                   handleVariableChange(editingIndex, "key", val);
                 }}
               />
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Accessible via expression engine, e.g.{" "}
                 <code className="bg-background px-1.5 py-0.5 rounded border border-border font-mono text-xs">{`{{variables.${selectedVariable.key || "key"}}}`}</code>
               </p>
             </div>
 
             <div className="flex flex-col space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Variable Type
               </Label>
               <Select
@@ -201,14 +201,14 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
             </div>
 
             <div className="flex flex-col space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Default Value
               </Label>
               {renderDefaultValueInput(selectedVariable, editingIndex)}
             </div>
 
             <div className="flex flex-col space-y-1">
-              <Label className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Description
               </Label>
               <Input
@@ -225,10 +225,10 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
         <div className="flex-1 flex flex-col min-h-0">
             <div className="flex items-center justify-between p-2 border-b border-border">
             <div>
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Page Variables
               </p>
-              <p className="text-[10px] text-muted-foreground/70">
+              <p className="text-xs text-muted-foreground/70">
                 Manage variables that form the local reactive state of the page.
               </p>
             </div>
@@ -239,7 +239,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
                 <div className="rounded border border-dashed border-border bg-muted/30 p-6 text-center flex flex-col items-center justify-center">
                 <Key className="h-8 w-8 text-muted-foreground/50 mb-2" />
                 <p className="text-xs font-medium text-foreground">No Page Variables</p>
-                <p className="text-[10px] text-muted-foreground/70 max-w-[200px]">
+                <p className="text-xs text-muted-foreground/70 max-w-[200px]">
                   Add local variables to store selection, filtering state, or page configurations.
                 </p>
               </div>
@@ -260,14 +260,14 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
                             {variable.key || `variable_${index + 1}`}
                           </span>
                           {variable.defaultValue !== undefined && variable.defaultValue !== "" && (
-                            <p className="text-[10px] text-muted-foreground/75 truncate mt-1">
-                              Default: <code className="text-[10px] font-mono font-semibold bg-muted px-1.5 py-0.5 rounded border border-border/50">{typeof variable.defaultValue === "object"
+                            <p className="text-xs text-muted-foreground/75 truncate mt-1">
+                              Default: <code className="text-xs font-mono font-semibold bg-muted px-1.5 py-0.5 rounded border border-border/50">{typeof variable.defaultValue === "object"
                                 ? JSON.stringify(variable.defaultValue)
                                 : String(variable.defaultValue)}</code>
                             </p>
                           )}
                           {variable.description && (
-                            <p className="text-[10px] text-muted-foreground/50 truncate mt-0.5">
+                            <p className="text-xs text-muted-foreground/50 truncate mt-0.5">
                               {variable.description}
                             </p>
                           )}

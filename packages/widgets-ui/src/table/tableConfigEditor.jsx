@@ -383,7 +383,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
                     onCheckedChange={(val) => handleUpdateColumn(idx, "editable", !!val)}
                     className="h-3.5 w-3.5"
                   />
-                  <Label htmlFor={`col-edit-${idx}`} className="text-[10px] ml-1.5 text-muted-foreground cursor-pointer">
+                  <Label htmlFor={`col-edit-${idx}`} className="text-xs ml-1.5 text-muted-foreground cursor-pointer">
                     Editable Column
                   </Label>
                 </div>
@@ -410,9 +410,9 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
             <p className="text-[0.6rem] text-muted-foreground">
               Configure pagination actions in the <strong>Events</strong> tab
               using the <strong>On Page Change</strong> event.
-              Event data: <code className="bg-background px-1 rounded border border-border font-mono text-[10px]">{"{{ event.page }}"}</code>,{" "}
-              <code className="bg-background px-1 rounded border border-border font-mono text-[10px]">{"{{ event.offset }}"}</code>,{" "}
-              <code className="bg-background px-1 rounded border border-border font-mono text-[10px]">{"{{ event.pageSize }}"}</code>
+              Event data: <code className="bg-background px-1 rounded border border-border font-mono text-xs">{"{{ event.page }}"}</code>,{" "}
+              <code className="bg-background px-1 rounded border border-border font-mono text-xs">{"{{ event.offset }}"}</code>,{" "}
+              <code className="bg-background px-1 rounded border border-border font-mono text-xs">{"{{ event.pageSize }}"}</code>
             </p>
           </div>
         )}
@@ -436,7 +436,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
                   checked={search.serverSide}
                   onCheckedChange={(v) => handleConfigChange("search", { ...search, serverSide: !!v })}
                 />
-                <Label htmlFor="search-server" className="text-[10px] cursor-pointer">Server-side (fires onSearch)</Label>
+                <Label htmlFor="search-server" className="text-xs cursor-pointer">Server-side (fires onSearch)</Label>
               </div>
               <Input
                 value={search.placeholder || ""}
@@ -464,7 +464,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
                   checked={exportConfig.serverSide}
                   onCheckedChange={(v) => handleConfigChange("export", { ...exportConfig, serverSide: !!v })}
                 />
-                <Label htmlFor="export-server" className="text-[10px] cursor-pointer">Server-side (fires onExport)</Label>
+                <Label htmlFor="export-server" className="text-xs cursor-pointer">Server-side (fires onExport)</Label>
               </div>
               <div className="flex gap-2">
                 <Input
@@ -508,18 +508,18 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
                 checked={multiSelect.showSelectAll}
                 onCheckedChange={(v) => handleConfigChange("multiSelect", { ...multiSelect, showSelectAll: !!v })}
               />
-              <Label htmlFor="ms-select-all" className="text-[10px] cursor-pointer">Show "Select All" Checkbox</Label>
+              <Label htmlFor="ms-select-all" className="text-xs cursor-pointer">Show "Select All" Checkbox</Label>
             </div>
             
             <div className="pt-1">
               <div className="flex justify-between items-center mb-2">
-                <Label className="text-[10px] font-medium">Bulk Actions</Label>
-                <Button type="button" variant="outline" size="sm" onClick={handleAddBulkAction} className="h-6 text-[10px] px-2">
+                <Label className="text-xs font-medium">Bulk Actions</Label>
+                <Button type="button" variant="outline" size="sm" onClick={handleAddBulkAction} className="h-6 text-xs px-2">
                   <Plus className="mr-1 h-3 w-3" /> Add Action
                 </Button>
               </div>
               {(!multiSelect.actions || multiSelect.actions.length === 0) && (
-                <p className="text-[10px] text-muted-foreground italic">No bulk actions configured. Selection will be tracked in widgetState.</p>
+                <p className="text-xs text-muted-foreground italic">No bulk actions configured. Selection will be tracked in widgetState.</p>
               )}
               <div className="space-y-1">
                 {(multiSelect.actions || []).map((act, idx) => (
@@ -528,16 +528,16 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
                       value={act.label}
                       onChange={(e) => handleUpdateBulkAction(idx, "label", e.target.value)}
                       placeholder="Label"
-                      className="h-6 text-[10px] w-24"
+                      className="h-6 text-xs w-24"
                     />
                     <Input
                       value={act.actionKey}
                       onChange={(e) => handleUpdateBulkAction(idx, "actionKey", e.target.value)}
                       placeholder="actionKey"
-                      className="h-6 text-[10px] font-mono flex-1"
+                      className="h-6 text-xs font-mono flex-1"
                     />
                     <Select value={act.variant || "default"} onValueChange={(v) => handleUpdateBulkAction(idx, "variant", v)}>
-                      <SelectTrigger className="h-6 text-[10px] w-20">
+                      <SelectTrigger className="h-6 text-xs w-20">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -593,7 +593,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
           </p>
           {bulkEdit.enabled && (
             <div className="space-y-1 bg-muted/30 p-2 rounded border mt-2">
-              <Label className="text-[10px]">Save Button Label</Label>
+              <Label className="text-xs">Save Button Label</Label>
               <Input
                 value={bulkEdit.saveLabel || "Save All Changes"}
                 onChange={(e) => handleConfigChange("bulkEdit", { ...bulkEdit, saveLabel: e.target.value })}

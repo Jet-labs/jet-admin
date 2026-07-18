@@ -263,7 +263,7 @@ export function A2UIChoiceSelector({ title, description, choices = [], onAction,
                   {choice.label}
                 </span>
                 {choice.badge && (
-                  <span className="text-[10px] bg-primary/15 text-primary px-2 py-0.5 rounded font-medium">
+                  <span className="text-xs bg-primary/15 text-primary px-2 py-0.5 rounded font-medium">
                     {choice.badge}
                   </span>
                 )}
@@ -355,7 +355,7 @@ export function A2UIChart({ title, chartType = "bar", data = [] }) {
           )}
           <span className="text-xs font-semibold text-foreground">{title || "Data Visualization"}</span>
         </div>
-        <span className="text-[10px] bg-muted px-2 py-0.5 rounded text-muted-foreground uppercase font-mono">
+        <span className="text-xs bg-muted px-2 py-0.5 rounded text-muted-foreground uppercase font-mono">
           {chartType}
         </span>
       </div>

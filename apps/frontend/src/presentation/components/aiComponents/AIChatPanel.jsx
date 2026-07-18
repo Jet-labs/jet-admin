@@ -128,7 +128,7 @@ export function ChatInput({ onSend, disabled }) {
           <div className="flex items-center justify-between px-2 pb-2 pt-1">
             <div className="flex items-center gap-1" />
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground/50 hidden sm:block">
+              <span className="text-xs text-muted-foreground/50 hidden sm:block">
                 Enter to send
               </span>
               <button
@@ -143,7 +143,7 @@ export function ChatInput({ onSend, disabled }) {
           </div>
         </div>
 
-        <p className="text-center text-[10px] text-muted-foreground/50 mt-1.5">
+        <p className="text-center text-xs text-muted-foreground/50 mt-1.5">
           Jet AI may make mistakes. Verify critical queries before executing on production.
         </p>
       </div>
@@ -205,12 +205,12 @@ function SimpleMarkdown({ text }) {
               return (
                 <div className="my-2 rounded bg-background border border-border overflow-hidden">
                   <div className="flex items-center justify-between px-2 py-1 border-b border-border bg-muted/20">
-                    <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    <span className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                       {lang}
                     </span>
                     <button
                       onClick={copy}
-                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <Copy className="w-3 h-3" />
                       Copy
@@ -347,7 +347,12 @@ function QueryPreviewCard({ query, tenantID }) {
             <span>Run query</span>
           </button>
         </div>
-        {error && <p className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">{error}</p>}
+        {error && (
+          <div className="text-xs text-red-400 bg-red-500/5 border border-red-500/30 p-2 rounded flex items-center gap-1.5">
+            <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
         {results && (
           <div className="border border-border rounded overflow-hidden max-h-48 overflow-y-auto">
             {Array.isArray(results) && results.length > 0 ? (
@@ -495,13 +500,14 @@ function DatasourcePreviewCard({ datasource, tenantID }) {
           <span>Test connection</span>
         </button>
         {testResult && (testResult.success ? (
-          <span className="text-[11px] text-green-700 flex items-center gap-1 bg-green-50 px-2 py-1 rounded border border-green-200">
-            <CheckCircle2 className="w-3 h-3 text-green-600" />
+          <span className="text-[11px] text-green-400 flex items-center gap-1 bg-green-500/5 px-2 py-1 rounded border border-green-500/20">
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
             <span>Connected {testResult.latency ? `(${testResult.latency}ms)` : ''}</span>
           </span>
         ) : (
-            <span className="text-[11px] text-red-600 flex items-center gap-1 bg-red-50 px-2 py-1 rounded border border-red-200" title={testResult.error}>
-            <AlertCircle className="w-3 h-3 text-red-500" /><span>Error</span>
+            <span className="text-[11px] text-red-400 flex items-center gap-1 bg-red-500/5 px-2 py-1 rounded border border-red-500/30" title={testResult.error}>
+              <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+              <span>Error</span>
           </span>
         ))}
       </div>
@@ -554,12 +560,14 @@ function WorkflowPreviewCard({ workflow, tenantID }) {
           <span>Trigger run</span>
         </button>
         {runResult && (runResult.success ? (
-          <span className="text-[11px] text-green-700 flex items-center gap-1 bg-green-50 px-2 py-1 rounded border border-green-200">
-            <CheckCircle2 className="w-3 h-3 text-green-600" /><span>Running…</span>
+          <span className="text-[11px] text-green-400 flex items-center gap-1 bg-green-500/5 px-2 py-1 rounded border border-green-500/20">
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
+            <span>Running…</span>
           </span>
         ) : (
-            <span className="text-[11px] text-red-600 flex items-center gap-1 bg-red-50 px-2 py-1 rounded border border-red-200" title={runResult.error}>
-            <AlertCircle className="w-3 h-3 text-red-500" /><span>Error</span>
+            <span className="text-[11px] text-red-400 flex items-center gap-1 bg-red-500/5 px-2 py-1 rounded border border-red-500/30" title={runResult.error}>
+              <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+              <span>Error</span>
           </span>
         ))}
       </div>
@@ -797,7 +805,7 @@ function ToolCallStep({ invocation }) {
           >
             <div>
               <p className="font-medium text-[11px] text-foreground">{invocation.toolName}</p>
-              <p className="text-[10px] text-muted-foreground truncate mt-0.5">
+              <p className="text-xs text-muted-foreground truncate mt-0.5">
                 {isPending ? "Executing..." : "Completed successfully"}
               </p>
             </div>
@@ -820,15 +828,15 @@ function ToolCallStep({ invocation }) {
         <div className="border-t border-border/40 pt-2 pb-1 space-y-2">
           {Object.keys(invocation.args || {}).length > 0 && (
             <div>
-              <p className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Arguments</p>
-              <pre className="text-[10px] text-foreground font-mono bg-background p-2 rounded border border-border/50 overflow-x-auto shadow-sm">
+              <p className="text-xs font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Arguments</p>
+              <pre className="text-xs text-foreground font-mono bg-background p-2 rounded border border-border/50 overflow-x-auto shadow-sm">
                 {JSON.stringify(invocation.args, null, 2)}
               </pre>
             </div>
           )}
           <div>
-            <p className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Raw result</p>
-            <pre className="text-[10px] font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded overflow-x-auto max-h-60 overflow-y-auto shadow-sm">
+            <p className="text-xs font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Raw result</p>
+            <pre className="text-xs font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded overflow-x-auto max-h-60 overflow-y-auto shadow-sm">
               {JSON.stringify(parsedResult, null, 2)}
             </pre>
           </div>
@@ -951,7 +959,7 @@ function AgentStatusBanner({ status }) {
       <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
         <span className="font-medium text-foreground truncate">{status.label}</span>
         {status.toolName && (
-          <span className="px-2 py-0.5 rounded bg-primary/20 border border-primary/40 text-[10px] font-mono text-foreground font-semibold shrink-0">
+          <span className="px-2 py-0.5 rounded bg-primary/20 border border-primary/40 text-xs font-mono text-foreground font-semibold shrink-0">
             {status.toolName}
           </span>
         )}
@@ -973,7 +981,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
           <div className="rounded bg-muted/50 border border-border px-3 py-2 text-sm text-foreground leading-relaxed">
             <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-foreground">{message.content}</p>
           </div>
-          <p className="text-[10px] text-muted-foreground text-right mt-1">
+          <p className="text-xs text-muted-foreground text-right mt-1">
             {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
           </p>
         </div>
@@ -1012,7 +1020,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-medium text-foreground">Jet AI</span>
-          <span className="text-[10px] text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
           </span>
         </div>
@@ -1156,16 +1164,13 @@ export const AIChatPanel = () => {
         style={{ width: isExpanded ? '900px' : '420px', maxWidth: 'calc(100vw - 32px)' }}
       >
         {/* Header */}
-        <div className="flex items-center gap-2 px-2 py-2 border-b border-border/50 shrink-0 bg-background/80 backdrop-blur-md sticky top-0 z-10">
+        <div className="flex items-center gap-2 px-2 py-2  shrink-0 bg-background/80 backdrop-blur-md sticky top-0 z-10">
           <div className="w-7 h-7 rounded bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-primary/20 shadow-sm shadow-primary/10">
             <Sparkles className="w-3.5 h-3.5 text-primary drop-shadow-sm" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground">AI Agent</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-2 min-w-0">
-              <span className={`w-2 h-2 rounded-full shrink-0 ${busy ? 'bg-primary animate-pulse' : 'bg-muted-foreground/40'}`} />
-              <span className="truncate font-medium">{activeStatus ? activeStatus.label : '46 tools available'}</span>
-            </p>
+
           </div>
 
           <button type="button" onClick={() => setIsExpanded(!isExpanded)}
@@ -1218,8 +1223,23 @@ export const AIChatPanel = () => {
 
               {/* Error banner */}
               {error && (
-                  <div className="text-xs text-red-600 bg-red-50 border border-red-200 px-2 py-2 rounded">
-                  ⚠️ {error.message || 'An error occurred. Please try again.'}
+                  <div className="text-xs text-red-400 bg-red-500/5 border border-red-500/30 p-2 rounded space-y-2">
+                    <div className="flex items-center gap-2 font-medium">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                      <span>{error.message || 'An error occurred. Please try again.'}</span>
+                    </div>
+                    <details className="text-xs text-red-400/85 cursor-pointer">
+                      <summary className="hover:text-red-300 transition-colors select-none font-mono">
+                        Error Details
+                      </summary>
+                      <pre className="mt-1 p-2 bg-background border border-border/50 rounded font-mono text-xs text-foreground/90 overflow-x-auto whitespace-pre-wrap cursor-text selection:bg-red-900/30">
+                        {JSON.stringify(
+                          error,
+                          null,
+                          2
+                        )}
+                      </pre>
+                    </details>
                 </div>
               )}
             </>

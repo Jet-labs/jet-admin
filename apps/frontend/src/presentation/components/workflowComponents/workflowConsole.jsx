@@ -118,7 +118,7 @@ export const WorkflowConsole = ({
                       <span className="text-foreground/80 ml-2">{log.message}</span>
                     )}
                     {log.nodeId && (
-                      <span className="text-muted-foreground/60 ml-2 text-[10px]">
+                      <span className="text-muted-foreground/60 ml-2 text-xs">
                         ({log.nodeId.substring(0, 8)}...)
                       </span>
                     )}

@@ -147,7 +147,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
         >
           <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WIDGET_EDITOR_SIDEBAR} defaultSize={35} className="!overflow-y-auto !pb-10">
             <form
-              className="flex w-full flex-col items-stretch gap-2 bg-background p-4"
+              className="flex w-full flex-col items-stretch gap-2 bg-background p-2"
               onSubmit={updateWidgetForm.handleSubmit}
             >
               {updateWidgetForm && (

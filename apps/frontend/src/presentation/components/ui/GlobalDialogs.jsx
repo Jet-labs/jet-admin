@@ -2,6 +2,7 @@ import React from "react";
 import { Loader2 } from "lucide-react";
 import {
   AlertDialog,
+  AlertDialogBody,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -26,10 +27,11 @@ export const GlobalDialogs = () => {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{dialogState.title}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {dialogState.message}
-          </AlertDialogDescription>
+
         </AlertDialogHeader>
+        <AlertDialogBody>
+          {dialogState.message}
+        </AlertDialogBody>
 
         <AlertDialogFooter>
           <Button

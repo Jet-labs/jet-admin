@@ -79,6 +79,7 @@ export const CONSTANTS = {
     APP_PAGE_DROPPING_ELEMENT_TAG: "__dropping-elem__",
     HIDE_QUERY_META_CONTENT_BUTTON_TEXT: "Hide metadata",
     SHOW_QUERY_META_CONTENT_BUTTON_TEXT: "Show metadata",
+    MAIN_DRAWER_DASHBOARD_TITLE: "Dashboard",
     MAIN_DRAWER_DATASOURCE_TITLE: "Data sources",
     MAIN_DRAWER_APP_PAGES_TITLE: "App Pages",
     MAIN_DRAWER_WIDGETS_TITLE: "Widgets",
@@ -684,193 +685,238 @@ export const CONSTANTS = {
     SIGN_UP: {
       code: "/sign-up/*",
       path: () => "/sign-up",
+      title: "Sign Up",
     },
     SIGN_IN: {
       code: "/sign-in/*",
       path: () => "/sign-in",
+      title: "Sign In",
     },
     HOME: {
       code: "/",
       path: () => "/",
+      title: "Home",
     },
     VIEW_TENANT: {
       code: "/tenants/:tenantID/",
       path: (tenantID) => `/tenants/${tenantID}/`,
+      title: "Tenant",
     },
     ADD_TENANT: {
       code: "/tenants/add",
       path: () => "/tenants/add",
+      title: "Add Tenant",
     },
     UPDATE_TENANT: {
       code: "/tenants/:tenantID/settings",
       path: (tenantID) => `/tenants/${tenantID}/settings`,
+      title: "Tenant Settings",
     },
     VIEW_WORKFLOWS: {
       code: "/tenants/:tenantID/workflows",
       path: (tenantID) => `/tenants/${tenantID}/workflows`,
+      title: "Workflows",
     },
     ADD_WORKFLOW: {
       code: "/tenants/:tenantID/workflows/add",
       path: (tenantID) => `/tenants/${tenantID}/workflows/add`,
+      title: "Add Workflow",
     },
     WORKFLOW_BUILDER: {
       code: "/tenants/:tenantID/workflows/:workflowID/editor",
       path: (tenantID, workflowID) =>
         `/tenants/${tenantID}/workflows/${workflowID}/editor`,
+      title: "Workflow Editor",
     },
     UPDATE_WORKFLOW_BY_ID: {
       code: "/tenants/:tenantID/workflows/:workflowID",
       path: (tenantID, workflowID) =>
         `/tenants/${tenantID}/workflows/${workflowID}`,
+      title: "Edit Workflow",
     },
     VIEW_LISTENERS: {
       code: "/tenants/:tenantID/listeners",
       path: (tenantID) => `/tenants/${tenantID}/listeners`,
+      title: "Listeners",
     },
     ADD_LISTENER: {
       code: "/tenants/:tenantID/listeners/add",
       path: (tenantID) => `/tenants/${tenantID}/listeners/add`,
+      title: "Add Listener",
     },
     UPDATE_LISTENER_BY_ID: {
       code: "/tenants/:tenantID/listeners/:listenerID",
       path: (tenantID, listenerID) =>
         `/tenants/${tenantID}/listeners/${listenerID}`,
+      title: "Edit Listener",
     },
     ADD_DATASOURCE: {
       code: "/tenants/:tenantID/datasources/add",
       path: (tenantID) => `/tenants/${tenantID}/datasources/add`,
+      title: "Add Datasource",
     },
     VIEW_DATASOURCES: {
       code: "/tenants/:tenantID/datasources",
       path: (tenantID) => `/tenants/${tenantID}/datasources`,
+      title: "Datasources",
     },
     UPDATE_DATASOURCE_BY_ID: {
       code: "/tenants/:tenantID/datasources/:datasourceID",
       path: (tenantID, datasourceID) =>
         `/tenants/${tenantID}/datasources/${datasourceID}`,
+      title: "Edit Datasource",
     },
     ADD_DATA_QUERY: {
       code: "/tenants/:tenantID/queries/add",
       path: (tenantID) => `/tenants/${tenantID}/queries/add`,
+      title: "Add Query",
     },
     VIEW_QUERIES: {
       code: "/tenants/:tenantID/queries",
       path: (tenantID) => `/tenants/${tenantID}/queries`,
+      title: "Data Queries",
     },
     UPDATE_DATA_QUERY_BY_ID: {
       code: "/tenants/:tenantID/queries/:dataQueryID",
       path: (tenantID, dataQueryID) =>
         `/tenants/${tenantID}/queries/${dataQueryID}`,
+      title: "Edit Query",
     },
     ADD_WIDGET: {
       code: "/tenants/:tenantID/widgets/add",
       path: (tenantID) => `/tenants/${tenantID}/widgets/add`,
+      title: "Add Widget",
     },
     VIEW_WIDGETS: {
       code: "/tenants/:tenantID/widgets",
       path: (tenantID) => `/tenants/${tenantID}/widgets`,
+      title: "Widgets",
     },
     UPDATE_WIDGET_BY_ID: {
       code: "/tenants/:tenantID/widgets/:widgetID",
       path: (tenantID, widgetID) => `/tenants/${tenantID}/widgets/${widgetID}`,
+      title: "Edit Widget",
     },
     ADD_APP_PAGE: {
       code: "/tenants/:tenantID/app-pages/add",
       path: (tenantID) => `/tenants/${tenantID}/app-pages/add`,
+      title: "Add App Page",
     },
     VIEW_APP_PAGES: {
       code: "/tenants/:tenantID/app-pages",
       path: (tenantID) => `/tenants/${tenantID}/app-pages`,
+      title: "App Pages",
     },
     UPDATE_APP_PAGE_BY_ID: {
       code: "/tenants/:tenantID/app-pages/:appPageID",
       path: (tenantID, appPageID) =>
         `/tenants/${tenantID}/app-pages/${appPageID}`,
+      title: "Edit App Page",
     },
     VIEW_TENANT_USERS: {
       code: "/tenants/:tenantID/users/",
       path: (tenantID) => `/tenants/${tenantID}/users`,
+      title: "User Management",
     },
     UPDATE_TENANT_USER_BY_ID: {
       code: "/tenants/:tenantID/users/:tenantUserID",
       path: (tenantID, tenantUserID) =>
         `/tenants/${tenantID}/users/${tenantUserID}`,
+      title: "Edit User",
     },
     VIEW_TENANT_ROLES: {
       code: "/tenants/:tenantID/roles/",
       path: (tenantID) => `/tenants/${tenantID}/roles`,
+      title: "Role Management",
     },
     ADD_TENANT_ROLE: {
       code: "/tenants/:tenantID/roles/add",
       path: (tenantID) => `/tenants/${tenantID}/roles/add`,
+      title: "Add Role",
     },
     UPDATE_TENANT_ROLE_BY_ID: {
       code: "/tenants/:tenantID/roles/:tenantRoleID",
       path: (tenantID, tenantRoleID) =>
         `/tenants/${tenantID}/roles/${tenantRoleID}`,
+      title: "Edit Role",
     },
     ACCOUNT: {
       code: "/account",
       path: () => "/account",
+      title: "Account",
     },
     CONTACT: {
       code: "/contact-us",
       path: () => "/contact-us",
+      title: "Contact Us",
     },
     LEGAL: {
       code: "/terms",
       path: () => "/terms",
+      title: "Terms",
     },
     VIEW_DATABASE_NOTIFICATIONS: {
       code: "/tenants/:tenantID/notifications",
       path: (tenantID) => `/tenants/${tenantID}/notifications`,
+      title: "Notifications",
     },
     ADD_DATABASE_NOTIFICATION: {
       code: "/tenants/:tenantID/notifications/add",
       path: (tenantID) => `/tenants/${tenantID}/notifications/add`,
+      title: "Add Notification",
     },
     UPDATE_DATABASE_NOTIFICATION_BY_ID: {
       code: "/tenants/:tenantID/notifications/:databaseNotificationID",
       path: (tenantID, databaseNotificationID) =>
         `/tenants/${tenantID}/notifications/${databaseNotificationID}`,
+      title: "Edit Notification",
     },
     VIEW_API_KEYS: {
       code: "/tenants/:tenantID/apikeys",
       path: (tenantID) => `/tenants/${tenantID}/apikeys`,
+      title: "API Keys",
     },
     ADD_API_KEY: {
       code: "/tenants/:tenantID/apikeys/add",
       path: (tenantID) => `/tenants/${tenantID}/apikeys/add`,
+      title: "Add API Key",
     },
     UPDATE_API_KEY_BY_ID: {
       code: "/tenants/:tenantID/apikeys/:apiKeyID",
       path: (tenantID, apiKeyID) => `/tenants/${tenantID}/apikeys/${apiKeyID}`,
+      title: "Edit API Key",
     },
     VIEW_CRON_JOBS: {
       code: "/tenants/:tenantID/cronjobs",
       path: (tenantID) => `/tenants/${tenantID}/cronjobs`,
+      title: "Scheduled Jobs",
     },
     ADD_CRON_JOB: {
       code: "/tenants/:tenantID/cronjobs/add",
       path: (tenantID) => `/tenants/${tenantID}/cronjobs/add`,
+      title: "Add Scheduled Job",
     },
     UPDATE_CRON_JOB_BY_ID: {
       code: "/tenants/:tenantID/cronjobs/:cronJobID",
       path: (tenantID, cronJobID) =>
         `/tenants/${tenantID}/cronjobs/${cronJobID}`,
+      title: "Edit Scheduled Job",
     },
     VIEW_CRON_JOB_HISTORY_BY_ID: {
       code: "/tenants/:tenantID/cronjobs/:cronJobID/history",
       path: (tenantID, cronJobID) =>
         `/tenants/${tenantID}/cronjobs/${cronJobID}/history`,
+      title: "Job History",
     },
     VIEW_AUDIT_LOGS: {
       code: "/tenants/:tenantID/audit",
       path: (tenantID) => `/tenants/${tenantID}/audit`,
+      title: "Audit Logs",
     },
     VIEW_ENGINES: {
       code: "/tenants/:tenantID/engines",
       path: (tenantID) => `/tenants/${tenantID}/engines`,
+      title: "Engines",
     },
   },
 

@@ -49,8 +49,7 @@ var AccordionContent = React.forwardRef(
 AccordionContent.displayName = AccordionPrimitive.Content.displayName;
 
 // src/components/alert-dialog.jsx
-import * as React3 from "react";
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
+import * as React4 from "react";
 
 // src/components/button.jsx
 import * as React2 from "react";
@@ -107,105 +106,146 @@ var Button = React2.forwardRef(
 );
 Button.displayName = "Button";
 
-// src/components/alert-dialog.jsx
-var AlertDialog = AlertDialogPrimitive.Root;
-var AlertDialogTrigger = AlertDialogPrimitive.Trigger;
-var AlertDialogPortal = AlertDialogPrimitive.Portal;
-var AlertDialogOverlay = React3.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(
-  AlertDialogPrimitive.Overlay,
+// src/components/dialog.jsx
+import * as React3 from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+var Dialog = DialogPrimitive.Root;
+var DialogTrigger = DialogPrimitive.Trigger;
+var DialogPortal = DialogPrimitive.Portal;
+var DialogClose = DialogPrimitive.Close;
+var DialogOverlay = React3.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(
+  DialogPrimitive.Overlay,
   {
+    ref,
     className: cn(
       "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     ),
-    ...props,
-    ref
+    ...props
   }
 ));
-AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
-var AlertDialogContent = React3.forwardRef(
-  ({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(AlertDialogPortal, null, /* @__PURE__ */ React3.createElement(AlertDialogOverlay, null), /* @__PURE__ */ React3.createElement(
-    AlertDialogPrimitive.Content,
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
+var DialogContent = React3.forwardRef(
+  ({ className, children, hideCloseIcon = false, ...props }, ref) => /* @__PURE__ */ React3.createElement(DialogPortal, null, /* @__PURE__ */ React3.createElement(DialogOverlay, null), /* @__PURE__ */ React3.createElement(
+    DialogPrimitive.Content,
     {
       ref,
       className: cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-sm translate-x-[-50%] translate-y-[-50%] gap-3 border border-border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] border border-border bg-background p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded",
         className
       ),
       ...props
-    }
+    },
+    children
   ))
 );
-AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
-var AlertDialogHeader = ({ className, ...props }) => /* @__PURE__ */ React3.createElement(
+DialogContent.displayName = DialogPrimitive.Content.displayName;
+var DialogHeader = ({ className, children, hideCloseIcon = false, ...props }) => /* @__PURE__ */ React3.createElement(
   "div",
   {
     className: cn(
-      "flex flex-col space-y-1 text-center sm:text-left",
+      "flex flex-row justify-between border-b border-border p-2",
+      className
+    ),
+    ...props
+  },
+  /* @__PURE__ */ React3.createElement("div", { className: "flex flex-col justify-start items-start gap-2" }, children),
+  !hideCloseIcon && /* @__PURE__ */ React3.createElement(DialogPrimitive.Close, { className: "h-4 w-4 rounded opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground" }, /* @__PURE__ */ React3.createElement(X, { className: "h-4 w-4" }), /* @__PURE__ */ React3.createElement("span", { className: "sr-only" }, "Close"))
+);
+DialogHeader.displayName = "DialogHeader";
+var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ React3.createElement(
+  "div",
+  {
+    className: cn(
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 border-t border-border p-2",
       className
     ),
     ...props
   }
 );
-AlertDialogHeader.displayName = "AlertDialogHeader";
-var AlertDialogFooter = ({ className, ...props }) => /* @__PURE__ */ React3.createElement(
-  "div",
-  {
-    className: cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
-    ),
-    ...props
-  }
-);
-AlertDialogFooter.displayName = "AlertDialogFooter";
-var AlertDialogTitle = React3.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(
-  AlertDialogPrimitive.Title,
+DialogFooter.displayName = "DialogFooter";
+var DialogTitle = React3.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(
+  DialogPrimitive.Title,
   {
     ref,
-    className: cn("text-sm font-semibold", className),
+    className: cn(
+      "text-lg font-medium leading-none tracking-tight",
+      className
+    ),
     ...props
   }
 ));
-AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
-var AlertDialogDescription = React3.forwardRef(
-  ({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(
-    AlertDialogPrimitive.Description,
-    {
-      ref,
-      className: cn("text-xs text-muted-foreground", className),
-      ...props
-    }
-  )
-);
-AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName;
-var AlertDialogAction = React3.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(
-  AlertDialogPrimitive.Action,
+DialogTitle.displayName = DialogPrimitive.Title.displayName;
+var DialogDescription = React3.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(
+  DialogPrimitive.Description,
+  {
+    ref,
+    className: cn("text-sm text-muted-foreground", className),
+    ...props
+  }
+));
+DialogDescription.displayName = DialogPrimitive.Description.displayName;
+var DialogBody = React3.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(
+  "div",
+  {
+    ref,
+    className: cn(
+      "flex flex-col justify-start items-stretch gap-2 p-2",
+      className
+    ),
+    ...props
+  }
+));
+DialogBody.displayName = "DialogBody";
+
+// src/components/alert-dialog.jsx
+var AlertDialog = Dialog;
+var AlertDialogTrigger = DialogTrigger;
+var AlertDialogPortal = DialogPortal;
+var AlertDialogOverlay = DialogOverlay;
+var AlertDialogContent = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React4.createElement(
+  DialogContent,
+  {
+    ref,
+    className: cn("max-w-sm", className),
+    ...props
+  }
+));
+AlertDialogContent.displayName = "AlertDialogContent";
+var AlertDialogHeader = ({ hideCloseIcon = true, ...props }) => /* @__PURE__ */ React4.createElement(DialogHeader, { hideCloseIcon, ...props });
+AlertDialogHeader.displayName = "AlertDialogHeader";
+var AlertDialogFooter = DialogFooter;
+AlertDialogFooter.displayName = "AlertDialogFooter";
+var AlertDialogBody = DialogBody;
+AlertDialogBody.displayName = "AlertDialogBody";
+var AlertDialogTitle = DialogTitle;
+AlertDialogTitle.displayName = "AlertDialogTitle";
+var AlertDialogDescription = DialogDescription;
+AlertDialogDescription.displayName = "AlertDialogDescription";
+var AlertDialogAction = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React4.createElement(DialogClose, { asChild: true }, /* @__PURE__ */ React4.createElement(
+  "button",
   {
     ref,
     className: cn(buttonVariants(), className),
     ...props
   }
-));
-AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
-var AlertDialogCancel = React3.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React3.createElement(
-  AlertDialogPrimitive.Cancel,
+)));
+AlertDialogAction.displayName = "AlertDialogAction";
+var AlertDialogCancel = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React4.createElement(DialogClose, { asChild: true }, /* @__PURE__ */ React4.createElement(
+  "button",
   {
     ref,
-    className: cn(
-      buttonVariants({ variant: "outline" }),
-      "mt-2 sm:mt-0",
-      className
-    ),
+    className: cn(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className),
     ...props
   }
-));
-AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
+)));
+AlertDialogCancel.displayName = "AlertDialogCancel";
 
 // src/components/avatar.jsx
-import * as React4 from "react";
+import * as React5 from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-var Avatar = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React4.createElement(
+var Avatar = React5.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React5.createElement(
   AvatarPrimitive.Root,
   {
     ref,
@@ -217,7 +257,7 @@ var Avatar = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */
   }
 ));
 Avatar.displayName = AvatarPrimitive.Root.displayName;
-var AvatarImage = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React4.createElement(
+var AvatarImage = React5.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React5.createElement(
   AvatarPrimitive.Image,
   {
     ref,
@@ -226,7 +266,7 @@ var AvatarImage = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE
   }
 ));
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
-var AvatarFallback = React4.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React4.createElement(
+var AvatarFallback = React5.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React5.createElement(
   AvatarPrimitive.Fallback,
   {
     ref,
@@ -240,7 +280,7 @@ var AvatarFallback = React4.forwardRef(({ className, ...props }, ref) => /* @__P
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
 // src/components/badge.jsx
-import * as React5 from "react";
+import * as React6 from "react";
 import { cva as cva2 } from "class-variance-authority";
 var badgeVariants = cva2(
   "inline-flex items-center rounded px-[8px] py-[4px] text-[12px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2",
@@ -261,12 +301,12 @@ var badgeVariants = cva2(
   }
 );
 function Badge({ className, variant, ...props }) {
-  return /* @__PURE__ */ React5.createElement("div", { className: cn(badgeVariants({ variant }), className), ...props });
+  return /* @__PURE__ */ React6.createElement("div", { className: cn(badgeVariants({ variant }), className), ...props });
 }
 
 // src/components/card.jsx
-import * as React6 from "react";
-var Card = React6.forwardRef(({ className, variant = "default", ...props }, ref) => /* @__PURE__ */ React6.createElement(
+import * as React7 from "react";
+var Card = React7.forwardRef(({ className, variant = "default", ...props }, ref) => /* @__PURE__ */ React7.createElement(
   "div",
   {
     ref,
@@ -280,7 +320,7 @@ var Card = React6.forwardRef(({ className, variant = "default", ...props }, ref)
   }
 ));
 Card.displayName = "Card";
-var CardHeader = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React6.createElement(
+var CardHeader = React7.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React7.createElement(
   "div",
   {
     ref,
@@ -289,7 +329,7 @@ var CardHeader = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE_
   }
 ));
 CardHeader.displayName = "CardHeader";
-var CardTitle = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React6.createElement(
+var CardTitle = React7.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React7.createElement(
   "h3",
   {
     ref,
@@ -301,7 +341,7 @@ var CardTitle = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE__
   }
 ));
 CardTitle.displayName = "CardTitle";
-var CardDescription = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React6.createElement(
+var CardDescription = React7.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React7.createElement(
   "p",
   {
     ref,
@@ -310,9 +350,9 @@ var CardDescription = React6.forwardRef(({ className, ...props }, ref) => /* @__
   }
 ));
 CardDescription.displayName = "CardDescription";
-var CardContent = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React6.createElement("div", { ref, className: cn("p-6 pt-0", className), ...props }));
+var CardContent = React7.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React7.createElement("div", { ref, className: cn("p-6 pt-0", className), ...props }));
 CardContent.displayName = "CardContent";
-var CardFooter = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React6.createElement(
+var CardFooter = React7.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React7.createElement(
   "div",
   {
     ref,
@@ -323,10 +363,10 @@ var CardFooter = React6.forwardRef(({ className, ...props }, ref) => /* @__PURE_
 CardFooter.displayName = "CardFooter";
 
 // src/components/checkbox.jsx
-import * as React7 from "react";
+import * as React8 from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
-var Checkbox = React7.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React7.createElement(
+var Checkbox = React8.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React8.createElement(
   CheckboxPrimitive.Root,
   {
     ref,
@@ -336,96 +376,15 @@ var Checkbox = React7.forwardRef(({ className, ...props }, ref) => /* @__PURE__ 
     ),
     ...props
   },
-  /* @__PURE__ */ React7.createElement(
+  /* @__PURE__ */ React8.createElement(
     CheckboxPrimitive.Indicator,
     {
       className: cn("flex items-center justify-center text-current")
     },
-    /* @__PURE__ */ React7.createElement(Check, { className: "h-4 w-4" })
+    /* @__PURE__ */ React8.createElement(Check, { className: "h-4 w-4" })
   )
 ));
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
-
-// src/components/dialog.jsx
-import * as React8 from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
-var Dialog = DialogPrimitive.Root;
-var DialogTrigger = DialogPrimitive.Trigger;
-var DialogPortal = DialogPrimitive.Portal;
-var DialogClose = DialogPrimitive.Close;
-var DialogOverlay = React8.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React8.createElement(
-  DialogPrimitive.Overlay,
-  {
-    ref,
-    className: cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
-    ),
-    ...props
-  }
-));
-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
-var DialogContent = React8.forwardRef(
-  ({ className, children, hideCloseIcon = false, ...props }, ref) => /* @__PURE__ */ React8.createElement(DialogPortal, null, /* @__PURE__ */ React8.createElement(DialogOverlay, null), /* @__PURE__ */ React8.createElement(
-    DialogPrimitive.Content,
-    {
-      ref,
-      className: cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded",
-        className
-      ),
-      ...props
-    },
-    children
-  ))
-);
-DialogContent.displayName = DialogPrimitive.Content.displayName;
-var DialogHeader = ({ className, children, hideCloseIcon = false, ...props }) => /* @__PURE__ */ React8.createElement(
-  "div",
-  {
-    className: cn(
-      "flex flex-row justify-between",
-      className
-    ),
-    ...props
-  },
-  children,
-  !hideCloseIcon && /* @__PURE__ */ React8.createElement(DialogPrimitive.Close, { className: "rounded opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground" }, /* @__PURE__ */ React8.createElement(X, { className: "h-4 w-4" }), /* @__PURE__ */ React8.createElement("span", { className: "sr-only" }, "Close"))
-);
-DialogHeader.displayName = "DialogHeader";
-var DialogFooter = ({ className, ...props }) => /* @__PURE__ */ React8.createElement(
-  "div",
-  {
-    className: cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
-    ),
-    ...props
-  }
-);
-DialogFooter.displayName = "DialogFooter";
-var DialogTitle = React8.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React8.createElement(
-  DialogPrimitive.Title,
-  {
-    ref,
-    className: cn(
-      "text-lg font-medium leading-none tracking-tight",
-      className
-    ),
-    ...props
-  }
-));
-DialogTitle.displayName = DialogPrimitive.Title.displayName;
-var DialogDescription = React8.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React8.createElement(
-  DialogPrimitive.Description,
-  {
-    ref,
-    className: cn("text-sm text-muted-foreground", className),
-    ...props
-  }
-));
-DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 // src/components/dropdown-menu.jsx
 import * as React9 from "react";
@@ -1365,7 +1324,7 @@ var CodeEditor = React23.forwardRef(({
       ...props
     },
     showHeader && /* @__PURE__ */ React23.createElement("div", { className: "flex min-h-[36px] flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-1.5" }, /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-3" }, (title || titleIcon) && /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5 font-medium text-foreground" }, titleIcon ? titleIcon : /* @__PURE__ */ React23.createElement(Code, { className: "h-3.5 w-3.5 text-primary" }), title && /* @__PURE__ */ React23.createElement("span", { className: "text-xs" }, title)), status && /* @__PURE__ */ React23.createElement("span", { className: cn(
-      "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide",
+      "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold tracking-wide",
       status === "valid" ? "bg-green-950/40 text-green-400 border border-green-800" : status === "error" ? "bg-red-950/40 text-red-400 border border-red-800" : ""
     ) }, status === "valid" ? /* @__PURE__ */ React23.createElement(CheckCircle2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(AlertTriangle, { className: "h-3 w-3" }), status === "valid" ? "Valid" : "Invalid"), headerLeft), /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5" }, headerExtra, showExpandButton && /* @__PURE__ */ React23.createElement(
       "button",
@@ -1377,7 +1336,7 @@ var CodeEditor = React23.forwardRef(({
       },
       isExpanded ? /* @__PURE__ */ React23.createElement(Minimize2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(Maximize2, { className: "h-3 w-3" })
     ))),
-    /* @__PURE__ */ React23.createElement("div", { className: "relative flex-1", style: { height: isExpanded ? "calc(100vh - 80px)" : typeof height === "number" ? `${height}px` : height } }, /* @__PURE__ */ React23.createElement("div", { ref: containerRef, className: "h-full w-full" }), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm" }, footerHint)),
+    /* @__PURE__ */ React23.createElement("div", { className: "relative flex-1", style: { height: isExpanded ? "calc(100vh - 80px)" : typeof height === "number" ? `${height}px` : height } }, /* @__PURE__ */ React23.createElement("div", { ref: containerRef, className: "h-full w-full" }), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur-sm" }, footerHint)),
     status === "error" && statusMessage && /* @__PURE__ */ React23.createElement("div", { className: "flex items-start gap-2 border-t border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive" }, /* @__PURE__ */ React23.createElement(AlertTriangle, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" }), /* @__PURE__ */ React23.createElement("span", { className: "font-medium whitespace-pre-wrap leading-relaxed" }, statusMessage))
   );
 });
@@ -1480,7 +1439,7 @@ function ArrayInput({
     },
     /* @__PURE__ */ React24.createElement(Plus, { className: "mr-2 h-3.5 w-3.5" }),
     "Add Item"
-  ), /* @__PURE__ */ React24.createElement(Badge, { variant: "secondary", className: "text-[10px] px-1.5 py-0.5 h-5" }, currentArray.length, maxItems !== void 0 ? ` / ${maxItems}` : "")));
+  ), /* @__PURE__ */ React24.createElement(Badge, { variant: "secondary", className: "text-xs px-1.5 py-0.5 h-5" }, currentArray.length, maxItems !== void 0 ? ` / ${maxItems}` : "")));
 }
 ArrayInput.propTypes = {
   value: PropTypes2.array,
@@ -1901,7 +1860,7 @@ var TemplateAutocompleteInput = ({
         style: { cursor: "text" }
       }
     ),
-    multiline && boundTokens.length > 0 && /* @__PURE__ */ React25.createElement("div", { className: "flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50 rounded-b-[2px]" }, /* @__PURE__ */ React25.createElement("span", { className: "text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0" }, "bound"), boundTokens.map((tok, i) => /* @__PURE__ */ React25.createElement("span", { key: i, className: "inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-[10px] font-mono text-primary cursor-default max-w-full", title: tok }, /* @__PURE__ */ React25.createElement("span", { className: "truncate min-w-0" }, tok))))
+    multiline && boundTokens.length > 0 && /* @__PURE__ */ React25.createElement("div", { className: "flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50 rounded-b-[2px]" }, /* @__PURE__ */ React25.createElement("span", { className: "text-xs font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0" }, "bound"), boundTokens.map((tok, i) => /* @__PURE__ */ React25.createElement("span", { key: i, className: "inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-xs font-mono text-primary cursor-default max-w-full", title: tok }, /* @__PURE__ */ React25.createElement("span", { className: "truncate min-w-0" }, tok))))
   ));
 };
 
@@ -2139,7 +2098,7 @@ var ErrorBoundary = class extends React29.Component {
       if (this.props.fallback) {
         return this.props.fallback(this.state.error);
       }
-      return /* @__PURE__ */ React29.createElement("div", { className: "flex h-full w-full items-center justify-center p-4" }, /* @__PURE__ */ React29.createElement("div", { className: "bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2 text-center" }, /* @__PURE__ */ React29.createElement("div", { className: "flex justify-center" }, /* @__PURE__ */ React29.createElement(AlertTriangle2, { className: "h-4 w-4 text-foreground/80" })), /* @__PURE__ */ React29.createElement("div", { className: "font-medium text-xs text-foreground" }, this.props.title || "Component Error"), /* @__PURE__ */ React29.createElement("div", { className: "max-w-xs break-words" }, this.state.error?.message || "Something went wrong while rendering this component.")));
+      return /* @__PURE__ */ React29.createElement("div", { className: "flex h-full w-full items-center justify-center p-4" }, /* @__PURE__ */ React29.createElement("div", { className: "bg-muted/30 p-3 text-xs text-muted-foreground space-y-2 text-center" }, /* @__PURE__ */ React29.createElement("div", { className: "flex justify-center" }, /* @__PURE__ */ React29.createElement(AlertTriangle2, { className: "h-4 w-4 text-foreground/80" })), /* @__PURE__ */ React29.createElement("div", { className: "font-medium text-xs text-foreground" }, this.props.title || "Component Error"), /* @__PURE__ */ React29.createElement("div", { className: "max-w-xs break-words" }, this.state.error?.message || "Something went wrong while rendering this component.")));
     }
     return this.props.children;
   }
@@ -2442,7 +2401,7 @@ var SearchSelect = React34.forwardRef(
               /* @__PURE__ */ React34.createElement("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center" }, /* @__PURE__ */ React34.createElement(SelectPrimitive2.ItemIndicator, null, /* @__PURE__ */ React34.createElement(Check4, { className: "h-4 w-4 text-primary" }))),
               /* @__PURE__ */ React34.createElement(SelectPrimitive2.ItemText, null, /* @__PURE__ */ React34.createElement("span", { className: "truncate" }, option.label))
             );
-          }), isFetchingNextPage && /* @__PURE__ */ React34.createElement("div", { className: "flex items-center justify-center p-2 text-[10px] text-muted-foreground animate-pulse" }, /* @__PURE__ */ React34.createElement(Loader22, { className: "h-3 w-3 animate-spin mr-1.5" }), "Loading more..."))
+          }), isFetchingNextPage && /* @__PURE__ */ React34.createElement("div", { className: "flex items-center justify-center p-2 text-xs text-muted-foreground animate-pulse" }, /* @__PURE__ */ React34.createElement(Loader22, { className: "h-3 w-3 animate-spin mr-1.5" }), "Loading more..."))
         )
       ))
     );
@@ -2620,6 +2579,7 @@ export {
   AccordionTrigger,
   AlertDialog,
   AlertDialogAction,
+  AlertDialogBody,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -2646,6 +2606,7 @@ export {
   CodeEditor,
   CollapseComponent,
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,

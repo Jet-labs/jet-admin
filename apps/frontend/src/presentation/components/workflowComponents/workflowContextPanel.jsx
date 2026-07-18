@@ -48,7 +48,7 @@ export const WorkflowContextPanel = ({
             </span>
           )}
           {!isEmpty && (
-            <span className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-wider">
+            <span className="text-xs text-muted-foreground/60 font-bold uppercase tracking-wider">
               {contextKeys.length} {contextKeys.length !== 1 ? 'Variables' : 'Variable'}
             </span>
           )}
@@ -103,7 +103,7 @@ export const WorkflowContextPanel = ({
 
       {/* Footer */}
       {!isEmpty && (
-        <div className="px-4 py-2 bg-muted/20 border-t border-border text-[10px] text-muted-foreground/70 font-medium italic">
+        <div className="px-4 py-2 bg-muted/20 border-t border-border text-xs text-muted-foreground/70 font-medium italic">
           <span>Context contains results from completed nodes</span>
         </div>
       )}

@@ -408,7 +408,7 @@ const CodeEditor = React.forwardRef(({
             {/* Status Pills */}
             {status && (
               <span className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide",
+                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold tracking-wide",
                 status === "valid" ? "bg-green-950/40 text-green-400 border border-green-800" :
                 status === "error" ? "bg-red-950/40 text-red-400 border border-red-800" : ""
               )}>
@@ -444,7 +444,7 @@ const CodeEditor = React.forwardRef(({
 
         {/* Footer Hint Overlay */}
         {footerHint && (
-          <div className="absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm">
+          <div className="absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur-sm">
             {footerHint}
           </div>
         )}

@@ -121,7 +121,7 @@ export function CanvasStack({
       )}
       {isEmpty && !previewMode ? (
         <div className="w-full flex items-center justify-center p-2 border border-dashed border-muted-foreground/45 text-muted-foreground text-[11px] transition-all bg-transparent rounded hover:border-primary/70 hover:bg-primary/5">
-          <span className="text-muted-foreground/40 text-[10px] uppercase font-mono select-none">
+          <span className="text-muted-foreground/40 text-xs uppercase font-mono select-none">
             Empty Stack (Drop components here)
           </span>
         </div>

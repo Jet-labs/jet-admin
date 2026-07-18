@@ -98,7 +98,7 @@ export const TenantAIConfigEditor = ({ tenantID }) => {
         provider: aiConfig.provider || "openai",
         model: aiConfig.model || "",
         baseURL: aiConfig.baseURL || "",
-        apiKey: aiConfig.isApiKeySet ? "******" : "",
+        apiKey: aiConfig.apiKey || "",
       });
     }
   }, [aiConfig]);
