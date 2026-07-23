@@ -49,6 +49,7 @@ const DrawerLinkItem = ({ item, tenantID }) => {
   const location = useLocation();
   const isActive = decodeURIComponent(location.pathname).includes(item.path);
 
+
   return (
     <Link
       to={item.path}

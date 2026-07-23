@@ -1,5 +1,5 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
-import { Plus, Search } from 'lucide-react';
+import { ChartArea, ChartLineIcon, Plus, Search } from 'lucide-react';
 import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
@@ -42,13 +42,11 @@ export const WidgetDrawerList = () => {
     const widgetConfig = WIDGETS_MAP[widgetType];
     if (!widgetConfig || !widgetConfig.icon) {
       return (
-        <span className={`text-xl ${isActive ? "text-primary" : "text-muted-foreground"}`}>
-          📊
-        </span>
+        <ChartLineIcon className={`h-4 w-4 ${isActive ? "!text-primary" : "!text-muted-foreground"}`} />
       );
     }
     return widgetConfig.icon({
-      className: `!text-xl ${
+      className: `!text-sm h-4 w-4 ${
         isActive ? "!text-primary" : "!text-muted-foreground"
       }`,
     });

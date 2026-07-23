@@ -159,18 +159,20 @@ export const DefaultAppPageSelectionLayout = ({
                     }))}
                     placeholder="Select an app page"
                     className="text-xs"
+                      size="sm"
                   />
                   <Button
                     onClick={() => _handleSetDefaultAppPage(null)}
-                    variant="primary-ghost" className="w-fit text-nowrap"
+                      variant="secondary" className="w-7 h-7 p-2"
                   >
-                    <PinOff className="!w-3.5 !h-3.5 !text-primary" />
+                      <PinOff className="!w-4 !h-4 !text-primary" />
                   </Button>
                   <Button
                     onClick={fullScreenHandle.enter}
-                    variant="primary-ghost" className="w-fit text-nowrap"
+
+                      variant="secondary" className="w-7 h-7 p-2"
                   >
-                    <Maximize2 className="text-primary h-4 w-4" />
+                      <Maximize2 className="text-primary h-4 w-4" />
                   </Button>
                 </>
               )}

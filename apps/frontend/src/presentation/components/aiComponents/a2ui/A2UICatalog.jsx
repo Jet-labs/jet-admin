@@ -190,7 +190,7 @@ export function A2UIConfirmCard({ title, description, toolName, params, onAction
       </p>
 
       {params && Object.keys(params).length > 0 && (
-        <div className="space-y-1">
+        <div className="space-y-2">
           <button
             type="button"
             onClick={() => setShowDetails(!showDetails)}
@@ -293,7 +293,7 @@ export function A2UICodeView({ title, language = "sql", code, actions = [], onAc
   };
 
   return (
-    <div className="mt-2.5 rounded-xl border border-border bg-card overflow-hidden shadow-sm">
+    <div className="mt-2 rounded border border-border bg-card overflow-hidden shadow-sm">
       <div className="flex items-center justify-between px-3 py-2 bg-muted/40 border-b border-border">
         <div className="flex items-center gap-2">
           <Code2 className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -369,7 +369,7 @@ export function A2UIChart({ title, chartType = "bar", data = [] }) {
             const pct = Math.min(100, Math.max(8, Math.round((val / max) * 100)));
 
             return (
-              <div key={idx} className="space-y-1 text-xs">
+              <div key={idx} className="space-y-2 text-xs">
                 <div className="flex justify-between text-muted-foreground text-[11px]">
                   <span className="font-medium text-foreground truncate max-w-[150px]">{label}</span>
                   <span className="font-mono">{val.toLocaleString()}</span>
@@ -438,7 +438,7 @@ export function A2UISteps({ title, steps = [] }) {
 // ─── 7. A2UI Stat Component ───────────────────────────────────────────────────
 export function A2UIStat({ title, value, label, trend, change }) {
   return (
-    <div className="mt-2.5 rounded-xl border border-border bg-card p-3.5 space-y-1">
+    <div className="mt-2.5 rounded-xl border border-border bg-card p-3.5 space-y-2">
       <span className="text-xs text-muted-foreground font-medium">{title || label || "Metric"}</span>
       <div className="text-xl font-bold text-foreground tracking-tight">{value || 0}</div>
       {change && (
@@ -458,7 +458,7 @@ export function A2UIStat({ title, value, label, trend, change }) {
 // ─── 8. A2UI Table Component ──────────────────────────────────────────────────
 export function A2UITable({ title, columns = [], rows = [] }) {
   return (
-    <div className="mt-2.5 rounded-xl border border-border bg-card overflow-hidden">
+    <div className="mt-2 rounded border border-border bg-card overflow-hidden">
       {title && (
         <div className="px-3 py-2 bg-muted/40 border-b border-border text-xs font-semibold text-foreground">
           {title}
@@ -505,7 +505,7 @@ export function A2UIAlert({ title, description, variant = "info" }) {
   return (
     <div
       className={cn(
-        "mt-2.5 p-3 rounded-xl border flex gap-2.5 items-start text-xs",
+        "mt-2 p-2 rounded border flex gap-2 items-start text-xs",
         isDanger
           ? "bg-red-500/10 border-red-500/30 text-red-600"
           : isWarning

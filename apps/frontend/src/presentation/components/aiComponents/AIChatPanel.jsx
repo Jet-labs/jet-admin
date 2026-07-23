@@ -63,7 +63,7 @@ function WelcomeScreen({ onSuggestionClick }) {
           <div
             key={i}
             onClick={() => onSuggestionClick(text)}
-            className="flex items-start gap-2 rounded border border-border bg-card p-2 text-left cursor-pointer hover:border-border/80 hover:bg-muted/30 transition-colors shadow-sm"
+            className="flex items-start gap-2 rounded border border-border bg-card p-2 text-left cursor-pointer hover:border-border hover:bg-muted/30 transition-colors shadow-sm"
           >
             <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
             <span className="text-xs text-muted-foreground leading-snug">{text}</span>
@@ -165,16 +165,16 @@ import { A2UICard, A2UIConfirmCard, A2UIChoiceSelector, A2UISteps } from './a2ui
 function SimpleMarkdown({ text }) {
   if (!text) return null;
   return (
-    <div className="text-[14px] leading-[1.65] text-foreground space-y-2">
+    <div className="text-[14px] leading-[1.65] text-foreground space-y-2 mt-2">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ children }) => <h1 className="text-base font-bold tracking-tight text-foreground my-2">{children}</h1>,
           h2: ({ children }) => <h2 className="text-sm font-semibold tracking-tight text-foreground my-2">{children}</h2>,
           h3: ({ children }) => <h3 className="text-xs font-semibold tracking-tight text-foreground my-1">{children}</h3>,
-          p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
-          ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 my-2">{children}</ul>,
-          ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 my-2">{children}</ol>,
+          p: ({ children }) => <p className="last:mb-0 leading-relaxed">{children}</p>,
+          ul: ({ children }) => <ul className="list-disc pl-5 space-y-2 my-2">{children}</ul>,
+          ol: ({ children }) => <ol className="list-decimal pl-5 space-y-2 my-2">{children}</ol>,
           li: ({ children }) => <li className="leading-relaxed text-[14px]">{children}</li>,
           strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
           em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
@@ -188,15 +188,15 @@ function SimpleMarkdown({ text }) {
               {children}
             </a>
           ),
-          hr: () => <hr className="my-3 border-border/50" />,
+          hr: () => <hr className="my-3 border-border" />,
           table: ({ children }) => (
             <div className="my-2 border border-border rounded overflow-hidden overflow-x-auto">
               <table className="w-full text-xs text-left border-collapse">{children}</table>
             </div>
           ),
           thead: ({ children }) => <thead className="bg-muted/60 border-b border-border">{children}</thead>,
-          th: ({ children }) => <th className="px-2.5 py-2 font-semibold text-foreground border-r border-border/60 last:border-r-0">{children}</th>,
-          td: ({ children }) => <td className="px-2.5 py-2 border-b border-r border-border/40 text-muted-foreground last:border-r-0">{children}</td>,
+          th: ({ children }) => <th className="px-2.5 py-2 font-semibold text-foreground border-r border-border last:border-r-0">{children}</th>,
+          td: ({ children }) => <td className="px-2.5 py-2 border-b border-r border-border text-muted-foreground last:border-r-0">{children}</td>,
           code: ({ className, children, ...props }) => {
             const isBlock = String(children).includes('\n') || (className && className.includes('language-'));
             if (isBlock) {
@@ -223,7 +223,7 @@ function SimpleMarkdown({ text }) {
               );
             }
             return (
-              <code className="bg-muted/80 px-2 py-0.5 rounded border border-border/60 text-[13px] font-mono text-foreground font-normal" {...props}>
+              <code className="bg-muted/80 px-2 py-0.5 rounded border border-border text-[13px] font-mono text-foreground font-normal" {...props}>
                 {children}
               </code>
             );
@@ -249,7 +249,7 @@ function ThinkingBlock({ content, isStreaming }) {
   if (!content) return null;
 
   return (
-    <div className="rounded border border-border/50 bg-muted/10 hover:border-border/80 overflow-hidden transition-all duration-200 shadow-sm">
+    <div className="rounded border border-border bg-muted/10 overflow-hidden transition-all duration-200 shadow-sm">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -275,7 +275,7 @@ function ThinkingBlock({ content, isStreaming }) {
         )}
       </button>
       {expanded && (
-        <div className="border-t border-border/50 px-2 py-2 bg-background/60">
+        <div className="border-t border-border px-2 py-2 bg-background/60">
           <p className="text-[13px] text-muted-foreground leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto font-mono">
             {content}
           </p>
@@ -332,7 +332,7 @@ function QueryPreviewCard({ query, tenantID }) {
 
       <div className="p-2 space-y-2">
         {sql && (
-          <pre className="text-xs font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded overflow-x-auto max-h-24">
+          <pre className="text-xs font-mono bg-zinc-950 text-zinc-100 border border-border p-2 rounded overflow-x-auto max-h-24">
             {sql}
           </pre>
         )}
@@ -366,9 +366,9 @@ function QueryPreviewCard({ query, tenantID }) {
                 </thead>
                 <tbody>
                   {results.slice(0, 10).map((row, i) => (
-                    <tr key={i} className="border-b border-border/60 last:border-0 bg-background hover:bg-muted/20">
+                    <tr key={i} className="border-b border-border last:border-0 bg-background hover:bg-muted/20">
                       {Object.values(row).map((val, j) => (
-                        <td key={j} className="px-2 py-2 text-muted-foreground border-r border-border/60 last:border-0 truncate max-w-[120px]" title={String(val)}>
+                        <td key={j} className="px-2 py-2 text-muted-foreground border-r border-border last:border-0 truncate max-w-[120px]" title={String(val)}>
                           {val === null ? <span className="italic text-muted-foreground/50">null</span> : String(val)}
                         </td>
                       ))}
@@ -423,7 +423,7 @@ function WidgetPreviewCard({ widget, tenantID }) {
       <div className="p-2">
         <div className="bg-background border border-border rounded p-2 text-xs text-foreground">
           {type === 'stat' && (
-            <div className="space-y-1">
+            <div className="space-y-2">
               <span className="text-[11px] text-muted-foreground">{config.label || 'KPI Metric'}</span>
               <div className="text-lg font-medium tracking-tight text-primary">1,280</div>
               <span className="text-[11px] text-green-600 font-medium">↑ +12.3% from last month</span>
@@ -442,7 +442,7 @@ function WidgetPreviewCard({ widget, tenantID }) {
             </div>
           )}
           {type !== 'stat' && type !== 'chart' && (
-            <div className="space-y-1">
+            <div className="space-y-2">
               <span className="text-[11px] text-muted-foreground">Widget · {type}</span>
               <pre className="text-[11px] font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap">
                 {JSON.stringify(config, null, 2)}
@@ -785,19 +785,19 @@ function ToolCallStep({ invocation }) {
 
   return (
     <div
-      className={`rounded border px-2 py-1.5 flex flex-col gap-2 text-xs transition-colors mb-1 ${TOOL_COLORS[status]}`}
+      className={`rounded border px-2 py-1.5 flex flex-col text-xs transition-colors ${TOOL_COLORS[status]}`}
     >
-      <div className="flex items-start gap-2">
-        <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
+      <div className="flex items-start">
+        <div className="flex items-center gap-1.5 shrink-0 mr-2">
           {status === "running" ? (
             <Loader2 className="w-3 h-3 text-primary animate-spin" />
           ) : (
             <CheckCircle2 className="w-3 h-3 text-primary/70" />
           )}
-          <ToolIcon className="w-3 h-3" />
+
         </div>
         
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 space-y-2">
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
@@ -818,25 +818,26 @@ function ToolCallStep({ invocation }) {
         </div>
       </div>
 
-      {hasResult && parsedResult && !expanded && (
-        <div className="mt-1">
+      {hasResult && parsedResult && !expanded && !(!parsedResult || typeof parsedResult !== 'object') && (
+        <div>
+
           <ResourceRenderer toolName={invocation.toolName} result={parsedResult} tenantID={tenantID} />
         </div>
       )}
 
       {expanded && hasResult && (
-        <div className="border-t border-border/40 pt-2 pb-1 space-y-2">
+        <div className="pt-2 pb-1 space-y-2">
           {Object.keys(invocation.args || {}).length > 0 && (
             <div>
-              <p className="text-xs font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Arguments</p>
-              <pre className="text-xs text-foreground font-mono bg-background p-2 rounded border border-border/50 overflow-x-auto shadow-sm">
+              <p className="text-xs font-semibold tracking-wider text-muted-foreground/70 mb-1">Arguments</p>
+              <pre className="text-xs text-foreground font-mono bg-background p-2 rounded border border-border overflow-x-auto shadow-sm">
                 {JSON.stringify(invocation.args, null, 2)}
               </pre>
             </div>
           )}
           <div>
-            <p className="text-xs font-semibold tracking-wider uppercase text-muted-foreground/70 mb-1">Raw result</p>
-            <pre className="text-xs font-mono bg-zinc-950 text-zinc-100 border border-border/50 p-2 rounded overflow-x-auto max-h-60 overflow-y-auto shadow-sm">
+            <p className="text-xs font-semibold tracking-wider text-muted-foreground/70 mb-1">Raw result</p>
+            <pre className="text-xs font-mono bg-zinc-950 text-zinc-100 border border-border p-2 rounded overflow-x-auto max-h-60 overflow-y-auto shadow-sm">
               {JSON.stringify(parsedResult, null, 2)}
             </pre>
           </div>
@@ -858,13 +859,13 @@ function SuggestedActions({ content, onAppend }) {
   if (!actions.length) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 pt-1">
+    <div className="flex flex-wrap gap-2">
       {actions.map((action, i) => (
         <button
           key={i}
           type="button"
           onClick={() => onAppend({ role: 'user', content: action.message })}
-          className="flex items-center gap-2 text-[13px] px-2.5 py-2 rounded border border-border/60 bg-muted/10 hover:bg-primary/5 hover:border-primary/40 hover:text-primary text-foreground/80 transition-all duration-200 shadow-sm"
+          className="flex items-center gap-2 text-[13px] px-2.5 py-2 rounded border border-border bg-muted/10 hover:bg-primary/5 hover:border-primary/40 hover:text-primary text-foreground/80 transition-all duration-200 shadow-sm"
         >
           <Sparkles className="w-3 h-3 shrink-0 opacity-60" />
           {action.label}
@@ -956,7 +957,7 @@ function AgentStatusBanner({ status }) {
       <div className="w-5 h-5 rounded bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
         <Icon className={`w-3 h-3 text-primary ${isLoader ? 'animate-spin' : 'animate-pulse'}`} />
       </div>
-      <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+      <div className="flex-1 min-w-0 space-y-2 flex items-center justify-between gap-2">
         <span className="font-medium text-foreground truncate">{status.label}</span>
         {status.toolName && (
           <span className="px-2 py-0.5 rounded bg-primary/20 border border-primary/40 text-xs font-mono text-foreground font-semibold shrink-0">
@@ -978,8 +979,8 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
     return (
       <div className="flex justify-end mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div className="max-w-[75%]">
-          <div className="rounded bg-muted/50 border border-border px-3 py-2 text-sm text-foreground leading-relaxed">
-            <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-foreground">{message.content}</p>
+          <div className="rounded bg-muted/50 border border-border px-2 py-1 text-sm text-foreground leading-relaxed">
+            <p className="text-xs leading-relaxed whitespace-pre-wrap text-foreground">{message.content}</p>
           </div>
           <p className="text-xs text-muted-foreground text-right mt-1">
             {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
@@ -1017,7 +1018,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
       <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0 mt-1 shadow-sm">
         <Zap className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={2.5} />
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 space-y-2">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-medium text-foreground">Jet AI</span>
           <span className="text-xs text-muted-foreground">
@@ -1029,7 +1030,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
 
         {/* Tool invocations — AI SDK provides these with full state tracking */}
         {toolInvocations?.length > 0 && (
-          <div className="space-y-1 mb-2">
+          <div className="space-y-2">
             {toolInvocations.map((inv) => {
               if (inv.toolName === 'askUser') {
                 return (
@@ -1055,7 +1056,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
         )}
 
         {cleanText && (
-          <div className="text-[15px] leading-[1.65] text-foreground">
+          <div className="text-xs leading-[1.65] text-foreground">
             <SimpleMarkdown text={cleanText} />
             {isStreaming && (
               <span className="inline-block w-0.5 h-3.5 bg-primary ml-0.5 animate-pulse rounded align-middle" />
@@ -1065,13 +1066,13 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
 
         {/* A2UI interactive components parsed from content */}
         {rawContent && (
-          <div className="mt-2">
+          <div >
             <A2UIRenderer schema={rawContent} onAction={onA2UIAction} />
           </div>
         )}
 
         {/* Suggested next-action chips */}
-        <div className="mt-2">
+        <div >
           <SuggestedActions content={rawContent} onAppend={onAppend} />
         </div>
       </div>
@@ -1168,7 +1169,7 @@ export const AIChatPanel = () => {
           <div className="w-7 h-7 rounded bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-primary/20 shadow-sm shadow-primary/10">
             <Sparkles className="w-3.5 h-3.5 text-primary drop-shadow-sm" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 space-y-2">
             <p className="text-sm font-medium text-foreground">AI Agent</p>
 
           </div>
@@ -1215,7 +1216,7 @@ export const AIChatPanel = () => {
                     <div className="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
                     <Zap className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={2.5} />
                   </div>
-                  <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 space-y-2">
                     <AgentStatusBanner status={activeStatus} />
                   </div>
                 </div>
@@ -1232,7 +1233,7 @@ export const AIChatPanel = () => {
                       <summary className="hover:text-red-300 transition-colors select-none font-mono">
                         Error Details
                       </summary>
-                      <pre className="mt-1 p-2 bg-background border border-border/50 rounded font-mono text-xs text-foreground/90 overflow-x-auto whitespace-pre-wrap cursor-text selection:bg-red-900/30">
+                      <pre className="mt-1 p-2 bg-background border border-border rounded font-mono text-xs text-foreground/90 overflow-x-auto whitespace-pre-wrap cursor-text selection:bg-red-900/30">
                         {JSON.stringify(
                           error,
                           null,

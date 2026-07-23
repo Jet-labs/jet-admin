@@ -18,14 +18,17 @@ export const PageHeader = ({
   hasHistory = false,
   saveText = "Update",
   parentTitle,
+  subTitle,
   children,
+  leadingChildren,
 }) => {
 
   return (
     <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-2">
-
-      <div className="flex items-center gap-4">
-        {/* {parentTitle && (
+      <div className="flex flex-row justify-start items-center gap-2">
+        {leadingChildren}
+        <div className="flex items-center gap-4">
+          {/* {parentTitle && (
           <>
             <h1
               className="text-base font-semibold tracking-tight text-foreground leading-none"
@@ -37,17 +40,24 @@ export const PageHeader = ({
 >/</span>
           </>
         )} */}
-        <div>
-          <h1 className="text-base font-semibold tracking-tight text-foreground leading-none">
-            {title}
-          </h1>
-          {id && (
-            <p className="mt-1.5 font-mono text-xs text-muted-foreground">
-              ID: {id}
-            </p>
-          )}
+          <div>
+            <h1 className="text-base font-semibold tracking-tight text-foreground leading-none">
+              {title}
+            </h1>
+            {id && (
+              <p className="mt-1.5 font-mono text-xs text-muted-foreground">
+                ID: {id}
+              </p>
+            )}
+            {subTitle && (
+              <p className="mt-1.5 font-mono text-xs text-muted-foreground">
+                {subTitle}
+              </p>
+            )}
+          </div>
         </div>
       </div>
+
 
       <div className="flex items-center gap-2">
         {children}

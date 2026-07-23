@@ -8,7 +8,7 @@ export const RootLayout = () => {
   const routeTitle = matches.findLast((m) => m.handle?.title)?.handle?.title;
 
   useEffect(() => {
-    document.title = routeTitle ? `${routeTitle} — Jet Admin` : "Jet Admin";
+    document.title = routeTitle ? `${routeTitle} | Jet Admin` : "Jet Admin";
   }, [routeTitle]);
 
   return <Outlet />;
