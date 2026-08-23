@@ -13,6 +13,7 @@ export { Checkbox } from './components/checkbox';
 export { Dialog, DialogPortal, DialogBody, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from './components/dialog';
 export { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuRadioGroup } from './components/dropdown-menu';
 export { Input } from './components/input';
+export { JsonViewer } from './components/json-viewer';
 export { Label } from './components/label';
 export { Popover, PopoverTrigger, PopoverContent } from './components/popover';
 export { RadioGroup, RadioGroupItem } from './components/radio-group';

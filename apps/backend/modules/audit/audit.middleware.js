@@ -113,6 +113,7 @@ auditLogMiddleware.audit = (req, res, next) => {
       subType: req.method,
       userID: req.user?.userID ? req.user.userID : null,
       tenantID: req?.params?.tenantID ? req.params.tenantID : null,
+      apiKeyID: req.authContext?.apiKey?.apiKeyID || null,
       success: res.statusCode >= 200 && res.statusCode < 400,
       metadata: {
         request: requestDetails,

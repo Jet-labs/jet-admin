@@ -1,5 +1,5 @@
 import React from "react";
-import { AppPageAdditionForm } from "../../components/appPageComponents/appPageAdditionForm";
+import { AppPageAdditionForm } from "../../components/appPageComponents/forms/appPageAdditionForm";
 import { useParams } from "react-router-dom";
 
 const AddAppPagePage = () => {

@@ -16,20 +16,14 @@ import { runDataQueryByIDAPI } from "../../data/apis/dataQuery";
 import { executeWorkflowWithStreaming } from "./executeWorkflowWithStreaming";
 import { displaySuccess, displayError } from "../../utils/notification";
 
-// Module-level dictionary to track active workflow stream disconnectors
-const activeWorkflowDisconnectors = {};
-
-const disconnectWorkflowStream = (alias) => {
-  if (typeof activeWorkflowDisconnectors[alias] === "function") {
-    activeWorkflowDisconnectors[alias]();
-  }
-  delete activeWorkflowDisconnectors[alias];
-};
-
 /**
  * Execute a single action within the AppPage context.
+ *
+ * @param {object} workflowRegistry - Per-page-instance map of alias →
+ *   disconnector for active workflow streams. Scoped to one provider so two
+ *   open pages (or editor + viewer) never clobber each other's streams.
  */
-const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
+const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowRegistry) => {
   const { actionType, config: rawConfig } = action;
 
   // Resolve {{ }} expressions in action config against current state + event input
@@ -55,7 +49,7 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
       // Strip state.variables. prefix — configs are saved with the full path
       // (e.g. "state.variables.selectedUserId") but the reducer expects the bare key.
       variableKey = variableKey.replace(/^state\.variables\./, "");
-      
+
       dispatch(appPageActions.setVariable(variableKey, config.value));
       return { key: variableKey, value: config.value };
     }
@@ -84,7 +78,10 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
 
         const isWorkflow = dataSource.type === "workflow";
         if (isWorkflow) {
-          disconnectWorkflowStream(alias);
+          if (typeof workflowRegistry[alias] === "function") {
+            workflowRegistry[alias]();
+          }
+          delete workflowRegistry[alias];
 
           const { disconnect } = executeWorkflowWithStreaming({
             tenantID: meta.tenantID,
@@ -94,7 +91,7 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
             dispatch,
           });
 
-          activeWorkflowDisconnectors[alias] = disconnect;
+          workflowRegistry[alias] = disconnect;
           return null;
         } else {
           dispatch(appPageActions.setQueryLoading(alias));
@@ -109,7 +106,10 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
       } catch (error) {
         if (dataSource.type === "workflow") {
           dispatch(appPageActions.setWorkflowResult(alias, null, error));
-          disconnectWorkflowStream(alias);
+          if (typeof workflowRegistry[alias] === "function") {
+            workflowRegistry[alias]();
+          }
+          delete workflowRegistry[alias];
         } else {
           dispatch(appPageActions.setQueryResult(alias, null, error));
         }
@@ -150,7 +150,14 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
         const eventInputValues = stateTree.event?.inputValues || {};
         const mergedInputValues = { ...config.inputValues, ...eventInputValues };
 
-        const temporaryAlias = `direct_workflow_${workflowID}_${Date.now()}`;
+        // Stable alias per target workflow: re-triggering replaces the active
+        // stream instead of accumulating new reducer entries/disconnectors
+        // (the old Date.now()-suffixed aliases leaked both).
+        const temporaryAlias = `direct_workflow_${workflowID}`;
+        if (typeof workflowRegistry[temporaryAlias] === "function") {
+          workflowRegistry[temporaryAlias]();
+        }
+
         const { disconnect } = executeWorkflowWithStreaming({
           tenantID: meta.tenantID,
           workflowID: workflowID,
@@ -158,8 +165,8 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
           alias: temporaryAlias,
           dispatch,
         });
-        
-        activeWorkflowDisconnectors[temporaryAlias] = disconnect;
+
+        workflowRegistry[temporaryAlias] = disconnect;
         return null;
       } catch (error) {
         console.error(`[AppPageEvents] TRIGGER_WORKFLOW "${workflowID}" failed:`, error);
@@ -175,12 +182,10 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
       targetWidgetID = targetWidgetID.replace(/^state\.widgets\./, "");
 
       const { methodName, inputs = [] } = config || {};
-      console.log(`[AppPageEvents] CALL_WIDGET_METHOD resolved config:`, { targetWidgetID, methodName, inputs });
       if (!targetWidgetID || !methodName) {
         console.warn("[AppPageEvents] CALL_WIDGET_METHOD missing target or method");
         return null;
       }
-      console.log(`[AppPageEvents] Available widgetMethods in stateTree:`, stateTree.widgetMethods);
       const widgetMethods = stateTree.widgetMethods?.[targetWidgetID];
       if (!widgetMethods) {
         console.warn(`[AppPageEvents] CALL_WIDGET_METHOD: widget ${targetWidgetID} not found or has no registered methods`);
@@ -192,7 +197,6 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta) => {
         return null;
       }
       try {
-        console.log(`[AppPageEvents] CALL_WIDGET_METHOD: Executing ${targetWidgetID}.${methodName}()`);
         return method(...inputs);
       } catch (error) {
         console.error(`[AppPageEvents] CALL_WIDGET_METHOD: Failed to execute ${targetWidgetID}.${methodName}():`, error);
@@ -232,27 +236,49 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
     metaRef.current = meta;
   });
 
+  // Active workflow streams started by THIS page instance. Disconnected when
+  // the provider subtree unmounts so nothing leaks across pages.
+  const workflowRegistryRef = useRef({});
+
+  useEffect(() => {
+    const registry = workflowRegistryRef.current;
+    return () => {
+      for (const alias of Object.keys(registry)) {
+        if (typeof registry[alias] === "function") {
+          registry[alias]();
+        }
+      }
+      workflowRegistryRef.current = {};
+    };
+  }, []);
+
   const fireWidgetEvent = useCallback(
     async (eventType, eventInputs = {}) => {
       const currentWidgetConfig = widgetConfigRef.current;
-      const currentStateTree = stateTreeRef.current;
       const currentMeta = metaRef.current;
 
       const events = currentWidgetConfig?.events || {};
       const actions = events[eventType];
-      console.log(`[AppPageEvents] fireWidgetEvent triggered for widget "${widgetID}", eventType: "${eventType}"`, { actions, eventInputs });
 
       if (!actions || !Array.isArray(actions) || actions.length === 0) {
         return [];
       }
 
       const results = [];
+      // SET_VARIABLE results applied synchronously to subsequent action
+      // contexts — dispatch alone only updates the tree after a re-render,
+      // so sequential chains would otherwise read stale values.
+      const pendingMutations = {};
       for (const action of actions) {
-        // Dynamically rebuild the state tree with the latest global state
-        // to ensure sequential actions see previous mutations (e.g., SET_VARIABLE)
-        const currentLiveStateTree = stateTreeRef.current;
+        // Re-read the latest tree before each action so sequential chains see
+        // mutations from earlier steps whenever a re-render has committed.
+        const latestStateTree = stateTreeRef.current;
         const dynamicEventStateTree = {
-          ...currentLiveStateTree,
+          ...latestStateTree,
+          variables: {
+            ...latestStateTree.variables,
+            ...pendingMutations,
+          },
           event: {
             type: eventType,
             widgetID,
@@ -265,8 +291,12 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
             action,
             dynamicEventStateTree,
             dispatch,
-            currentMeta
+            currentMeta,
+            workflowRegistryRef.current
           );
+          if (action.actionType === "SET_VARIABLE" && result?.key !== undefined) {
+            pendingMutations[result.key] = result.value;
+          }
           results.push({ actionType: action.actionType, success: true, result });
         } catch (error) {
           results.push({ actionType: action.actionType, success: false, error });

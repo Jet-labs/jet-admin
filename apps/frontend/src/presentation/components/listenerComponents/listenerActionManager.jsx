@@ -251,6 +251,10 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, tenantID, listenerID }
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // This form is rendered inside the listener update page's outer <form>;
+    // submit events bubble through React's tree, so without stopPropagation
+    // saving a step would also trigger the outer Formik submit.
+    e.stopPropagation();
     onSave(formData);
   };
 

@@ -209,6 +209,33 @@ workflowController.getRunStatus = async (req, res) => {
 };
 
 /**
+ * List workflow run history for a tenant, optionally scoped to one workflow.
+ * Query params: workflowID?, status?, page?, pageSize?
+ */
+workflowController.getWorkflowInstances = async (req, res) => {
+  try {
+    const { tenantID } = req.params;
+    const { workflowID, status, page, pageSize } = req.query;
+    const authContext = getServiceAuthContext(req);
+
+    Logger.log("info", { message: "WorkflowController:getWorkflowInstances:params", params: { tenantID, workflowID, status, authContext } });
+
+    const result = await workflowService.listInstances({
+      tenantID,
+      ...(workflowID ? { workflowID } : {}),
+      ...(status ? { status } : {}),
+      page: page ? parseInt(page, 10) : 1,
+      pageSize: pageSize ? parseInt(pageSize, 10) : 50,
+    });
+
+    expressUtils.sendResponse(res, true, result, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log("error", { message: "WorkflowController:getWorkflowInstances:error", params: { error: error.message } });
+    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+/**
  * Test run a workflow without saving.
  * Accepts nodes and edges directly in request body.
  */

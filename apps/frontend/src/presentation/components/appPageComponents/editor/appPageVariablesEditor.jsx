@@ -95,7 +95,7 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
           />
         );
       case "object":
-      case "array":
+      case "array": {
         const displayValue =
           typeof variable.defaultValue === "object"
             ? JSON.stringify(variable.defaultValue, null, 2)
@@ -113,13 +113,14 @@ export const AppPageVariablesEditor = ({ appPageEditorForm }) => {
                 try {
                   const parsed = JSON.parse(val);
                   handleVariableChange(index, "defaultValue", parsed);
-                } catch (e) {
+                } catch {
                   handleVariableChange(index, "defaultValue", val);
                 }
               }}
             />
           </div>
         );
+      }
       case "string":
       default:
         return (

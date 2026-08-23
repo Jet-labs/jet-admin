@@ -11,12 +11,6 @@ import React from "react";
 import { Button, Spinner } from "@jet-admin/ui";
 
 export const AppPageDeletionForm = ({ tenantID, appPageID }) => {
-  AppPageDeletionForm.propTypes = {
-    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-    appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-  };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
   const queryClient = useQueryClient();
@@ -71,4 +65,11 @@ export const AppPageDeletionForm = ({ tenantID, appPageID }) => {
       )}
     </Button>
   );
+};
+
+AppPageDeletionForm.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
 };

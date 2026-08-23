@@ -7,9 +7,6 @@ import { AppPageDataSourcesEditor } from "./appPageDataSourcesEditor";
 import { AppPageVariablesEditor } from "./appPageVariablesEditor";
 
 export const AppPageSettingsEditor = ({ appPageEditorForm }) => {
-  AppPageSettingsEditor.propTypes = {
-    appPageEditorForm: PropTypes.object.isRequired,
-  };
   return (
     <div className="w-full flex flex-col gap-2 p-2">
       <div className="flex flex-col space-y-1">
@@ -52,13 +49,11 @@ export const AppPageSettingsEditor = ({ appPageEditorForm }) => {
   );
 };
 
-export const AppPageEditor = ({ appPageEditorForm, tenantID, onAddWidget }) => {
-  AppPageEditor.propTypes = {
-    appPageEditorForm: PropTypes.object.isRequired,
-    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    onAddWidget: PropTypes.func.isRequired,
-  };
+AppPageSettingsEditor.propTypes = {
+  appPageEditorForm: PropTypes.object.isRequired,
+};
 
+export const AppPageEditor = ({ appPageEditorForm, tenantID, onAddWidget }) => {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       <Tabs defaultValue="widgets" className="flex flex-col h-full w-full">
@@ -92,4 +87,10 @@ export const AppPageEditor = ({ appPageEditorForm, tenantID, onAddWidget }) => {
       </Tabs>
     </div>
   );
+};
+
+AppPageEditor.propTypes = {
+  appPageEditorForm: PropTypes.object.isRequired,
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  onAddWidget: PropTypes.func.isRequired,
 };

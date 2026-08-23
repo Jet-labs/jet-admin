@@ -13,11 +13,10 @@ import { AppPageEditor } from "../editor/appPageEditor";
 import { AppPageConsole } from "../editor/appPageConsole";
 import { appendWidgetToAppPageConfig } from "../editor/appPageLayoutUtils";
 import { formValidations } from "../../../../utils/formValidation";
+import { useUnsavedChangesGuard } from "../../../../logic/hooks/useUnsavedChangesGuard";
 import PropTypes from "prop-types";
 import React, { useState, useRef, useEffect } from "react";
 import { Undo } from "lucide-react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { AppPageRuntimeProvider } from "../../../../logic/appPageRuntime/AppPageRuntimeProvider";
 import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootstrapper";
 
@@ -30,11 +29,10 @@ const initialAppPageConfig = {
   variables: [],
 };
 
+// Maximum number of undo snapshots kept in memory (see updation form note).
+const MAX_HISTORY_ENTRIES = 50;
+
 export const AppPageAdditionForm = ({ tenantID }) => {
-  AppPageAdditionForm.propTypes = {
-    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-  };
   const queryClient = useQueryClient();
   const { isPending: isAddingAppPage, mutate: addAppPage } = useMutation({
     mutationFn: (data) => {
@@ -89,13 +87,21 @@ export const AppPageAdditionForm = ({ tenantID }) => {
       const lastConfig = history[historyIndex];
 
       if (JSON.stringify(currentConfig) !== JSON.stringify(lastConfig)) {
-        const newHistory = history.slice(0, historyIndex + 1);
-        newHistory.push(currentConfig);
+        const branched = [...history.slice(0, historyIndex + 1), currentConfig];
+        const newHistory =
+          branched.length > MAX_HISTORY_ENTRIES
+            ? branched.slice(branched.length - MAX_HISTORY_ENTRIES)
+            : branched;
         setHistory(newHistory);
         setHistoryIndex(newHistory.length - 1);
       }
     }
   }, [appPageAdditionForm.values.appPageConfig]);
+
+  useUnsavedChangesGuard({
+    isDirty: historyIndex > 0,
+    title: CONSTANTS.STRINGS.ADD_APP_PAGE_FORM_TITLE,
+  });
 
   const handleUndo = () => {
     if (historyIndex > 0) {
@@ -119,8 +125,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="flex h-full w-full flex-col items-center bg-background">
+    <div className="flex h-full w-full flex-col items-center bg-background">
         <PageHeader
           title={CONSTANTS.STRINGS.ADD_APP_PAGE_FORM_TITLE}
           parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_APP_PAGES_TITLE}
@@ -208,6 +213,10 @@ export const AppPageAdditionForm = ({ tenantID }) => {
           </AppPageRuntimeProvider>
         ) : null}
       </div>
-    </DndProvider>
   );
+};
+
+AppPageAdditionForm.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
 };

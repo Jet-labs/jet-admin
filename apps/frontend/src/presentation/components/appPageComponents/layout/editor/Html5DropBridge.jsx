@@ -10,6 +10,7 @@
  *  - Visual drop feedback: highlights the insertion point during dragover.
  *  - No silent error swallowing: validates node IDs before querying Craft state.
  */
+import PropTypes from "prop-types";
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useEditor } from "@craftjs/core";
 import { Element } from "@craftjs/core";
@@ -93,7 +94,7 @@ function computeInsertionIndex(query, nodeId, displayName, targetEl, clientX, cl
   return childIds.length;
 }
 
-export default function Html5DropBridge({ widgets, setWidgets }) {
+export default function Html5DropBridge({ setWidgets }) {
   const { query, actions, enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
@@ -213,14 +214,6 @@ export default function Html5DropBridge({ widgets, setWidgets }) {
             activeLayerIdx = 0;
           }
           let layerId = zChildIds[activeLayerIdx];
-
-          console.log("[Html5DropBridge] Z-Stack Drop Redirect Debug:", {
-            zStackId,
-            zChildIds,
-            activeLayerIdx,
-            layerId,
-            props: zStackNode?.data?.props
-          });
 
           // Auto-create first layer if Z-Stack is empty
           if (!layerId) {
@@ -370,7 +363,9 @@ export default function Html5DropBridge({ widgets, setWidgets }) {
                   checkDisplayName = "CanvasZStack";
                 }
               }
-            } catch {}
+            } catch {
+              // Not a valid Craft node — skip the Z-Stack redirect check
+            }
           }
 
           // If targeting a Z-Stack, redirect guide to active layer
@@ -393,7 +388,9 @@ export default function Html5DropBridge({ widgets, setWidgets }) {
                 setDropIndicator({ nodeId: activeLayerId, index, displayName: "CanvasStack" });
                 return;
               }
-            } catch {}
+            } catch {
+              // Active layer could not be resolved — fall through to default indicator
+            }
           }
 
           const targetNode = query.node(checkNodeId).get();
@@ -504,3 +501,7 @@ export default function Html5DropBridge({ widgets, setWidgets }) {
     />
   );
 }
+
+Html5DropBridge.propTypes = {
+  setWidgets: PropTypes.func,
+};

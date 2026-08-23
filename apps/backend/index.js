@@ -217,7 +217,7 @@ socketIO.on("connection", async (socket) => {
 
   socket.on('leave_room', (room) => {
     try {
-      if (typeof room === 'string' && room.startsWith('listener_test:')) {
+      if (typeof room === 'string' && (room.startsWith('listener_test:') || room.startsWith('listener:'))) {
         socket.leave(room);
       }
     } catch (error) {

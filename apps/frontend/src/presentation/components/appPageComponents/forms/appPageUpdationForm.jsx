@@ -9,6 +9,7 @@ import {
   updateAppPageByIDAPI,
 } from "../../../../data/apis/appPage";
 import { useGlobalUI } from "../../../../logic/stores/useUIStore";
+import { useUnsavedChangesGuard } from "../../../../logic/hooks/useUnsavedChangesGuard";
 import { formValidations } from "../../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../../utils/notification";
 import { ReactQueryLoadingErrorWrapper } from "../../ui/reactQueryLoadingErrorWrapper";
@@ -40,13 +41,12 @@ const EMPTY_INITIAL_VALUES = {
   fetchedDataPreview: {},
 };
 
+// Maximum number of undo snapshots kept in memory. Canvas syncs are
+// debounced but continuous dragging still produces many entries; without a
+// cap the history grows without bound over long editing sessions.
+const MAX_HISTORY_ENTRIES = 50;
+
 export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
-  AppPageUpdationForm.propTypes = {
-    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-    appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-  };
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
 
@@ -113,7 +113,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
     validateOnMount: false,
     validateOnChange: false,
     validationSchema: formValidations.updateAppPageFormValidationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async () => {
       window.dispatchEvent(new CustomEvent("flush-editor-sync"));
 
       const confirmed = await showConfirmation({
@@ -161,13 +161,21 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
       const lastConfig = history[historyIndex];
 
       if (JSON.stringify(currentConfig) !== JSON.stringify(lastConfig)) {
-        const newHistory = history.slice(0, historyIndex + 1);
-        newHistory.push(currentConfig);
+        const branched = [...history.slice(0, historyIndex + 1), currentConfig];
+        const newHistory =
+          branched.length > MAX_HISTORY_ENTRIES
+            ? branched.slice(branched.length - MAX_HISTORY_ENTRIES)
+            : branched;
         setHistory(newHistory);
         setHistoryIndex(newHistory.length - 1);
       }
     }
   }, [appPageUpdationForm.values.appPageConfig]);
+
+  useUnsavedChangesGuard({
+    isDirty: historyIndex > 0,
+    title: CONSTANTS.STRINGS.UPDATE_APP_PAGE_FORM_TITLE,
+  });
 
   const handleUndo = () => {
     if (historyIndex > 0) {
@@ -297,4 +305,11 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
       </ReactQueryLoadingErrorWrapper>
     </div>
   );
+};
+
+AppPageUpdationForm.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
 };

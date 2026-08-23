@@ -314,9 +314,13 @@ var init_tableWidget = __esm({
         }, 300);
         return () => clearTimeout(timer);
       }, [globalFilter, searchConfig.serverSide, searchConfig.enabled, fireWidgetEvent]);
+      const lastSyncSignatureRef = useRef5(null);
       useEffect5(() => {
         if (!setWidgetState) return;
         const selectedIndices = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number);
+        const signature = JSON.stringify([globalFilter, selectedIndices, pendingEdits]);
+        if (lastSyncSignatureRef.current === signature) return;
+        lastSyncSignatureRef.current = signature;
         setWidgetState((prev) => ({
           ...prev,
           searchTerm: globalFilter,
@@ -524,23 +528,32 @@ var init_tableWidget = __esm({
         if (onRowSelect) onRowSelect(rowOriginal, rowIdx);
         if (fireWidgetEvent) fireWidgetEvent("onRowSelect", { row: rowOriginal, rowIndex: rowIdx });
       }, [setWidgetState, onRowSelect, fireWidgetEvent]);
+      const rowsRef = useRef5(rows);
+      useEffect5(() => {
+        rowsRef.current = rows;
+      }, [rows]);
+      const widgetMethodsRef = useRef5(null);
+      if (!widgetMethodsRef.current) {
+        widgetMethodsRef.current = {
+          refresh: () => {
+            if (runWorkflow) runWorkflow();
+            if (refreshData) refreshData();
+          },
+          setSelectedRow: (index) => {
+            const i = Number(index);
+            const currentRows = rowsRef.current;
+            if (!isNaN(i) && i >= 0 && i < currentRows.length) {
+              if (setWidgetState) setWidgetState((prev) => ({ ...prev, selectedRowIndex: i, selectedRow: currentRows[i] }));
+              if (onRowSelect) onRowSelect(currentRows[i], i);
+            }
+          }
+        };
+      }
       useEffect5(() => {
         if (onWidgetInit) {
-          onWidgetInit({
-            refresh: () => {
-              if (runWorkflow) runWorkflow();
-              if (refreshData) refreshData();
-            },
-            setSelectedRow: (index) => {
-              const i = Number(index);
-              if (!isNaN(i) && i >= 0 && i < rows.length) {
-                if (setWidgetState) setWidgetState((prev) => ({ ...prev, selectedRowIndex: i, selectedRow: rows[i] }));
-                if (onRowSelect) onRowSelect(rows[i], i);
-              }
-            }
-          });
+          onWidgetInit(widgetMethodsRef.current);
         }
-      }, [onWidgetInit, runWorkflow, refreshData, rows, setWidgetState, onRowSelect]);
+      }, [onWidgetInit]);
       const showToolbar = searchConfig.enabled || exportConfig.enabled;
       const selectedCount = Object.keys(rowSelection).filter((k) => rowSelection[k]).length;
       const pendingEditCount = Object.values(pendingEdits).reduce((s, c) => s + Object.keys(c).length, 0);

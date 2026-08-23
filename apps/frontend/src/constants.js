@@ -75,6 +75,10 @@ export const CONSTANTS = {
     UPDATE_WORKFLOW_FORM_TITLE: "Update workflow",
     UPDATE_WORKFLOW_BUTTON_TEXT: "Update workflow",
     UPDATE_WORKFLOW_FORM_WORKFLOW_UPDATION_SUCCESS: "Workflow updated successfully!",
+    VIEW_WORKFLOW_RUNS_TITLE: "Workflow runs",
+    VIEW_WORKFLOW_RUN_DETAILS_TITLE: "Run details",
+    WORKFLOW_RUNS_NO_RUNS: "No workflow runs yet. Runs appear here whenever this workflow executes.",
+    WORKFLOW_RUNS_SEARCH_PLACEHOLDER: "Search by run ID…",
     NO_DATABASE_URL: "Please add database URL in the tenant settings",
     APP_PAGE_DROPPING_ELEMENT_TAG: "__dropping-elem__",
     HIDE_QUERY_META_CONTENT_BUTTON_TEXT: "Hide metadata",
@@ -582,8 +586,7 @@ export const CONSTANTS = {
     ADD_CRON_JOB_SUBMIT_BUTTON_TEXT: "Add scheduled job",
     ADD_CRON_JOB_FORM_TITLE: "Create new scheduled job",
     UPDATE_CRON_JOB_FORM_TITLE: "Update scheduled job",
-    VIEW_CRON_JOB_HISTORY_TITLE: "Scheduled job history",
-    UPDATE_CRON_JOB_SUBMIT_BUTTON_TEXT: "Update job",
+    VIEW_CRON_JOB_HISTORY_TITLE: "Scheduled job history",    UPDATE_CRON_JOB_SUBMIT_BUTTON_TEXT: "Update job",
     CRON_JOB_ADDED_SUCCESS: "Scheduled job created successfully",
     CRON_JOB_UPDATED_SUCCESS: "Scheduled job updated successfully",
     CRON_JOB_DELETED_SUCCESS: "Scheduled job deleted successfully",
@@ -733,6 +736,23 @@ export const CONSTANTS = {
       path: (tenantID, workflowID) =>
         `/tenants/${tenantID}/workflows/${workflowID}`,
       title: "Edit Workflow",
+    },
+    VIEW_WORKFLOW_RUNS: {
+      code: "/tenants/:tenantID/workflows/history",
+      path: (tenantID) => `/tenants/${tenantID}/workflows/history`,
+      title: "Workflow Runs",
+    },
+    VIEW_WORKFLOW_RUN_HISTORY_BY_ID: {
+      code: "/tenants/:tenantID/workflows/:workflowID/history",
+      path: (tenantID, workflowID) =>
+        `/tenants/${tenantID}/workflows/${workflowID}/history`,
+      title: "Run History",
+    },
+    VIEW_WORKFLOW_RUN_DETAILS_BY_ID: {
+      code: "/tenants/:tenantID/workflows/runs/:runID",
+      path: (tenantID, runID) =>
+        `/tenants/${tenantID}/workflows/runs/${runID}`,
+      title: "Run Details",
     },
     VIEW_LISTENERS: {
       code: "/tenants/:tenantID/listeners",
@@ -958,6 +978,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/workflows/${workflowID}/clone`,
       executeWorkflowAPI: (tenantID, workflowID) =>
         `/api/v1/tenants/${tenantID}/workflows/${workflowID}/execute`,
+      getWorkflowRunHistoryAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/workflows/instances`,
       testWorkflowAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/workflows/test`,
       getWorkflowRunStatusAPI: (tenantID, instanceID) =>
@@ -1049,8 +1071,20 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/cronjobs/status/connections`,
     },
     AUDIT_LOG: {
-      getAuditLogsAPI: (tenantID, page, pageSize) =>
-        `/api/v1/tenants/${tenantID}/audit?page=${page}&pageSize=${pageSize}`,
+      getAuditLogsAPI: (tenantID, page, pageSize, dateFrom, dateTo) => {
+        let url = `/api/v1/tenants/${tenantID}/audit?page=${page}&pageSize=${pageSize}`;
+        if (dateFrom) url += `&dateFrom=${encodeURIComponent(dateFrom)}`;
+        if (dateTo) url += `&dateTo=${encodeURIComponent(dateTo)}`;
+        return url;
+      },
+      exportAuditLogsAPI: (tenantID, dateFrom, dateTo) => {
+        let url = `/api/v1/tenants/${tenantID}/audit/export`;
+        const params = [];
+        if (dateFrom) params.push(`dateFrom=${encodeURIComponent(dateFrom)}`);
+        if (dateTo) params.push(`dateTo=${encodeURIComponent(dateTo)}`);
+        if (params.length) url += `?${params.join("&")}`;
+        return url;
+      },
     },
     OAUTH: {
       getAuthUrlAPI: (provider, tenantID) =>
@@ -1218,6 +1252,8 @@ export const CONSTANTS = {
     WIDGETS: (tenantID) => `${tenantID}-WIDGETS`,
 
     WORKFLOWS: (tenantID) => `${tenantID}-WORKFLOWS`,
+
+    WORKFLOW_RUNS: (tenantID) => `${tenantID}-WORKFLOW_RUNS`,
 
     APP_PAGES: (tenantID) => `${tenantID}-APP_PAGES`,
 

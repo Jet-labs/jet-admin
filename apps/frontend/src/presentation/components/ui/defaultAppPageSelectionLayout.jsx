@@ -12,11 +12,11 @@ import {
 } from "../../../logic/hooks/useAuth";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "./reactQueryLoadingErrorWrapper";
-import { AppPageWidgetSlot } from "../appPageComponents/appPageWidgetSlot";
+import { AppPageWidgetSlot } from "../appPageComponents/editor/appPageWidgetSlot";
 import { AppPageRuntimeProvider } from "../../../logic/appPageRuntime/AppPageRuntimeProvider";
-import { AppPageDataSourceBootstrapper } from "../appPageComponents/appPageDataSourceBootstrapper";
+import { AppPageDataSourceBootstrapper } from "../appPageComponents/editor/appPageDataSourceBootstrapper";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import { Button, Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SearchSelect } from "@jet-admin/ui";
+import { Button, Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SearchSelect, ErrorBoundary } from "@jet-admin/ui";
 import { migrateV1ToV2, LayoutRenderer } from "../appPageComponents/layout/index.js";
 import { useAppPageStateTree } from "../../../logic/appPageRuntime";
 import { resolveValue } from "../../../logic/evaluationEngine";
@@ -48,14 +48,25 @@ const DefaultPageViewerContent = ({ tenantID, pinnedAppPageID, migratedPageConfi
         className="w-full overflow-y-auto bg-muted h-full p-2"
         id={`printable-area-app-page-${pinnedAppPageID}`}
       >
-        {migratedPageConfig.layout && (
-          <LayoutRenderer
-            node={migratedPageConfig.layout}
-            renderWidget={renderWidget}
-            mode="view"
-            stateTree={stateTree}
-            resolveValue={resolveValue}
-          />
+        {migratedPageConfig.layout ? (
+          <ErrorBoundary title="Page layout error">
+            <LayoutRenderer
+              node={migratedPageConfig.layout}
+              renderWidget={renderWidget}
+              mode="view"
+              stateTree={stateTree}
+              resolveValue={resolveValue}
+            />
+          </ErrorBoundary>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center p-2">
+            <div className="rounded border border-dashed border-border bg-card p-4 text-center">
+              <p className="text-sm font-medium text-foreground">This page is empty</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Open this page in the editor and drag widgets onto the canvas.
+              </p>
+            </div>
+          </div>
         )}
       </div>
     </>
@@ -66,10 +77,6 @@ export const DefaultAppPageSelectionLayout = ({
   tenantID,
   userConfigKey,
 }) => {
-  DefaultAppPageSelectionLayout.propTypes = {
-    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    userConfigKey: PropTypes.string.isRequired,
-  };
   const fullScreenHandle = useFullScreenHandle();
   const { userConfig, isFetchingUserConfig, isUpdatingUserConfig } =
     useAuthState();
@@ -191,6 +198,7 @@ export const DefaultAppPageSelectionLayout = ({
                   pageID={pinnedAppPageID}
                   tenantID={tenantID}
                   pageConfig={migratedPageConfig}
+                  syncVariablesToUrl={true}
                 >
                   <DefaultPageViewerContent
                     tenantID={tenantID}
@@ -253,4 +261,9 @@ export const DefaultAppPageSelectionLayout = ({
       )}
     </div>
   );
+};
+
+DefaultAppPageSelectionLayout.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  userConfigKey: PropTypes.string.isRequired,
 };

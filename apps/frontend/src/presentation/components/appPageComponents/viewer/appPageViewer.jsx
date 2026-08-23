@@ -8,7 +8,7 @@
  * 4. Renders the responsive grid layout with AppPageWidgetSlot instances
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../../constants";
@@ -21,6 +21,18 @@ import { AppPagePrintForm } from "../forms/appPagePrintForm";
 import { migrateV1ToV2, LayoutRenderer } from "../layout/index.js";
 import { useAppPageStateTree } from "../../../../logic/appPageRuntime";
 import { resolveValue } from "../../../../logic/evaluationEngine";
+import { ErrorBoundary } from "@jet-admin/ui";
+
+const EmptyPageState = () => (
+  <div className="flex h-full w-full items-center justify-center p-2">
+    <div className="rounded border border-dashed border-border bg-card p-4 text-center">
+      <p className="text-sm font-medium text-foreground">This page is empty</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Open this page in the editor and drag widgets onto the canvas.
+      </p>
+    </div>
+  </div>
+);
 
 const AppPageViewerContent = ({ tenantID, appPageID, migratedPageConfig }) => {
   const stateTree = useAppPageStateTree();
@@ -46,28 +58,33 @@ const AppPageViewerContent = ({ tenantID, appPageID, migratedPageConfig }) => {
         className="w-full overflow-y-auto bg-muted p-2"
         id={`printable-area-app-page-${appPageID}`}
       >
-        {migratedPageConfig.layout && (
-          <LayoutRenderer
-            node={migratedPageConfig.layout}
-            renderWidget={renderWidget}
-            mode="view"
-            stateTree={stateTree}
-            resolveValue={resolveValue}
-          />
+        {migratedPageConfig.layout ? (
+          <ErrorBoundary title="Page layout error">
+            <LayoutRenderer
+              node={migratedPageConfig.layout}
+              renderWidget={renderWidget}
+              mode="view"
+              stateTree={stateTree}
+              resolveValue={resolveValue}
+            />
+          </ErrorBoundary>
+        ) : (
+          <EmptyPageState />
         )}
       </div>
     </>
   );
 };
 
-export const AppPageViewer = ({ tenantID, appPageID }) => {
-  AppPageViewer.propTypes = {
-    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-    appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-  };
+AppPageViewerContent.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  migratedPageConfig: PropTypes.object.isRequired,
+};
 
+export const AppPageViewer = ({ tenantID, appPageID }) => {
   const {
     isLoading: isLoadingAppPage,
     data: appPage,
@@ -121,6 +138,7 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
             pageID={appPageID}
             tenantID={tenantID}
             pageConfig={migratedPageConfig}
+            syncVariablesToUrl={true}
           >
             <AppPageViewerContent
               tenantID={tenantID}
@@ -132,4 +150,11 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
       </ReactQueryLoadingErrorWrapper>
     </div>
   );
+};
+
+AppPageViewer.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
 };

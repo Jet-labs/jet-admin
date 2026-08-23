@@ -47,10 +47,27 @@ let _widgetInstanceCounter = 0;
  * Creates a unique widget instance key.
  * Format: widget_<widgetID>_<instanceIndex>
  * The instance index ensures uniqueness when the same widget is placed multiple times.
+ *
+ * @param {string|number} widgetID - The widget ID
+ * @param {Array<string>} [existingKeys=[]] - Widget keys already present in the
+ *   page config. The module counter resets on every page load, so without this
+ *   the generated key could collide with one saved in a previous session.
  */
-export const createWidgetInstanceKey = (widgetID) => {
-  _widgetInstanceCounter += 1;
-  return `widget_${widgetID}_${_widgetInstanceCounter}`;
+export const createWidgetInstanceKey = (widgetID, existingKeys = []) => {
+  const prefix = `widget_${widgetID}_`;
+
+  let maxExistingIndex = 0;
+  for (const key of existingKeys) {
+    if (typeof key === "string" && key.startsWith(prefix)) {
+      const suffix = Number(key.slice(prefix.length));
+      if (Number.isFinite(suffix) && suffix > maxExistingIndex) {
+        maxExistingIndex = suffix;
+      }
+    }
+  }
+
+  _widgetInstanceCounter = Math.max(_widgetInstanceCounter, maxExistingIndex) + 1;
+  return `${prefix}${_widgetInstanceCounter}`;
 };
 
 /**
@@ -71,10 +88,11 @@ export const appendWidgetToAppPageConfig = (
   widgetID,
   preferredBreakpoint = "lg"
 ) => {
-  const widgetKey = createWidgetInstanceKey(widgetID);
+  const existingWidgets = appPageConfig.widgets || [];
+  const widgetKey = createWidgetInstanceKey(widgetID, existingWidgets);
 
   if (appPageConfig.layoutVersion === 2) {
-    const nextWidgets = [...(appPageConfig.widgets || []), widgetKey];
+    const nextWidgets = [...existingWidgets, widgetKey];
     const nextLayout = cloneDeep(appPageConfig.layout);
 
     if (!nextLayout || nextLayout.children.length === 0) {
@@ -115,7 +133,7 @@ export const appendWidgetToAppPageConfig = (
     };
   }
 
-  const nextWidgets = [...(appPageConfig.widgets || []), widgetKey];
+  const nextWidgets = [...existingWidgets, widgetKey];
   const nextLayouts = cloneDeep(appPageConfig.layouts || {});
 
   GRID_BREAKPOINT_ORDER.forEach((breakpoint) => {

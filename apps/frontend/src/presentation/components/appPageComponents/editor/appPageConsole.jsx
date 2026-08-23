@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import PropTypes from "prop-types";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../../ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "../../ui/resizable";
 import { useAppPageStateTree } from "../../../../logic/appPageRuntime";
-import { CodeEditor, Label } from "@jet-admin/ui";
+import { CodeEditor, Label, Checkbox } from "@jet-admin/ui";
 import { StringUtils } from "../../../../utils/string";
 
 export const AppPageConsole = () => {
@@ -19,11 +18,10 @@ export const AppPageConsole = () => {
         </div>
         <div className="flex items-center gap-2">
           <Label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={isTruncated}
-              onChange={(e) => setIsTruncated(e.target.checked)}
-              className="w-3 h-3 accent-primary"
+              onCheckedChange={(checked) => setIsTruncated(checked === true)}
+              aria-label="Truncate large data"
             />
             Truncate Large Data
           </Label>
@@ -31,12 +29,12 @@ export const AppPageConsole = () => {
       </div>
 
       <ResizablePanelGroup direction="horizontal" className="flex-1">
-        <ResizablePanel defaultSize={100} className="flex flex-col bg-zinc-950">
+        <ResizablePanel defaultSize={100} className="flex flex-col bg-background">
           <div className="flex-1 overflow-hidden">
             {!contextTree ? (
-               <div className="text-zinc-600 italic p-2 text-[11px]">Console not connected to runtime.</div>
+               <div className="text-muted-foreground italic p-2 text-[11px]">Console not connected to runtime.</div>
             ) : Object.keys(contextTree.queries || {}).length === 0 && Object.keys(contextTree.workflows || {}).length === 0 && Object.keys(contextTree.listeners || {}).length === 0 ? (
-               <div className="text-zinc-600 italic p-2 text-[11px]">No data sources configured yet.</div>
+               <div className="text-muted-foreground italic p-2 text-[11px]">No data sources configured yet.</div>
             ) : (
               <CodeEditor
                 language="json"
@@ -49,7 +47,7 @@ export const AppPageConsole = () => {
                 readOnly={true}
                 height="100%"
                 showHeader={false}
-                className="h-full border-0 rounded-none bg-zinc-950"
+                className="h-full border-0 rounded-none bg-background"
               />
             )}
           </div>

@@ -25,6 +25,7 @@ import { CanvasWidgetSlot } from "../components/CanvasWidgetSlot.jsx";
 import { CraftEditorContext } from "../components/CraftEditorContext.js";
 import Html5DropBridge from "./Html5DropBridge.jsx";
 import EditorSyncBridge from "./EditorSyncBridge.jsx";
+import EditorClipboardBridge from "./EditorClipboardBridge.jsx";
 import EditorHeader from "./EditorHeader.jsx";
 import CraftSettingsPanel from "./CraftSettingsPanel.jsx";
 import "../renderer/layout.css";
@@ -86,6 +87,7 @@ export default function CraftLayoutEditorCanvas({
           enabled={true}
         >
           <EditorSyncBridge onChangeLayout={stableOnChangeLayout} />
+          <EditorClipboardBridge />
           <EditorHeader previewMode={previewMode} setPreviewMode={setPreviewMode} />
 
           <div className="craft-editor-workspace">

@@ -144,7 +144,7 @@ export function CanvasWidgetSlot({
       {!previewMode && (condition || repeat || locked) && (
         <div className="absolute left-2 top-2 z-50 pointer-events-none flex gap-1 items-center">
           {locked && (
-            <div className="flex items-center gap-1.5 rounded bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 shadow-sm leading-none uppercase tracking-wider">
+            <div className="flex items-center gap-1.5 rounded bg-amber-500/20 text-amber-600 border border-amber-500/30 text-[9px] font-bold px-1.5 py-0.5 leading-none uppercase tracking-wider">
               <Lock className="h-2.5 w-2.5" />
               <span>Locked</span>
             </div>

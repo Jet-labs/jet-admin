@@ -6,9 +6,6 @@ import PropTypes from "prop-types";
 import { Button } from "@jet-admin/ui";
 
 export const AppPagePrintForm = ({ appPageID }) => {
-  AppPagePrintForm.propTypes = {
-    appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  };
   const getDocumentStyles = () => {
     const styles = Array.from(
       document.querySelectorAll('style, link[rel="stylesheet"]')
@@ -125,4 +122,8 @@ export const AppPagePrintForm = ({ appPageID }) => {
       <Download className="text-primary h-4 w-4" />
     </Button>
   );
+};
+
+AppPagePrintForm.propTypes = {
+  appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };

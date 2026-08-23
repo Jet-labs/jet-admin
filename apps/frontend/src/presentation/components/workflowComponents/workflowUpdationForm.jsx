@@ -102,6 +102,15 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
         id={workflowID}
         onSave={workflowUpdationForm.handleSubmit}
         isSaving={isUpdatingWorkflow}
+        onHistory={() =>
+          navigate(
+            CONSTANTS.ROUTES.VIEW_WORKFLOW_RUN_HISTORY_BY_ID.path(
+              tenantID,
+              workflowID
+            )
+          )
+        }
+        hasHistory={true}
       >
         <WorkflowDeletionForm tenantID={tenantID} workflowID={workflowID} />
         <WorkflowCloneForm tenantID={tenantID} workflowID={workflowID} />

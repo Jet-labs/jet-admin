@@ -33,6 +33,7 @@ model tblAPIKeys {
   tblUsers                                            tblUsers?               @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblAPIKeysCreatorID")
   tblTenants                                          tblTenants              @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAPIKeysTenantID")
   tblAppPages                                         tblAppPages[]
+  tblAuditLogs                                        tblAuditLogs[]
   tblCronJobs                                         tblCronJobs[]
   tblDataQueries                                      tblDataQueries[]
   tblDatasources                                      tblDatasources[]
@@ -47,15 +48,21 @@ model tblAPIKeys {
 }
 
 model tblAuditLogs {
-  auditLogID String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userID     String?  @db.Uuid
-  tenantID   String?  @db.Uuid
-  type       String   @db.VarChar
-  subType    String?  @db.VarChar
+  auditLogID String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userID     String?     @db.Uuid
+  tenantID   String?     @db.Uuid
+  type       String      @db.VarChar
+  subType    String?     @db.VarChar
   success    Boolean
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  createdAt  DateTime    @default(now()) @db.Timestamptz(6)
   metadata   Json?
   error      Json?
+  apiKeyID   String?     @db.Uuid
+  tblAPIKeys tblAPIKeys? @relation(fields: [apiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblAuditLogsApiKeyID")
+  tblUsers   tblUsers?   @relation(fields: [userID], references: [userID], onUpdate: NoAction, map: "fkTblAuditLogsUserID")
+
+  @@index([apiKeyID], map: "idx_tblAuditLogs_apiKeyID")
+  @@index([userID], map: "idx_tblAuditLogs_userID")
 }
 
 model tblCronJobHistory {
@@ -257,6 +264,7 @@ model tblUsers {
   lastSeen                    DateTime?                     @db.Timestamptz(6)
   tblAPIKeys                  tblAPIKeys[]
   tblAppPages                 tblAppPages[]
+  tblAuditLogs                tblAuditLogs[]
   tblCronJobs                 tblCronJobs[]
   tblDataQueries              tblDataQueries[]
   tblDatasources              tblDatasources[]

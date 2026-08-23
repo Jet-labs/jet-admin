@@ -74,6 +74,12 @@ const WorkflowLayoutLandingPage = lazy(() =>
 const UpdateWorkflowPage = lazy(() =>
   import("../../pages/updateWorkflowPage")
 );
+const ViewWorkflowRunsPage = lazy(() =>
+  import("../../pages/viewWorkflowRunsPage")
+);
+const ViewWorkflowRunDetailsPage = lazy(() =>
+  import("../../pages/viewWorkflowRunDetailsPage")
+);
 const AddDatasourcePage = lazy(() => import("../../pages/addDatasourcePage"));
 const UpdateDatasourcePage = lazy(() =>
   import("../../pages/updateDatasourcePage")
@@ -306,6 +312,25 @@ const router = createBrowserRouter([
                 path: CONSTANTS.ROUTES.UPDATE_WORKFLOW_BY_ID.code,
                 element: <UpdateWorkflowPage />,
                 handle: { title: CONSTANTS.ROUTES.UPDATE_WORKFLOW_BY_ID.title },
+              },
+              {
+                path: CONSTANTS.ROUTES.VIEW_WORKFLOW_RUN_DETAILS_BY_ID.code,
+                element: <ViewWorkflowRunDetailsPage />,
+                handle: {
+                  title: CONSTANTS.ROUTES.VIEW_WORKFLOW_RUN_DETAILS_BY_ID.title,
+                },
+              },
+              {
+                path: CONSTANTS.ROUTES.VIEW_WORKFLOW_RUN_HISTORY_BY_ID.code,
+                element: <ViewWorkflowRunsPage />,
+                handle: {
+                  title: CONSTANTS.ROUTES.VIEW_WORKFLOW_RUN_HISTORY_BY_ID.title,
+                },
+              },
+              {
+                path: CONSTANTS.ROUTES.VIEW_WORKFLOW_RUNS.code,
+                element: <ViewWorkflowRunsPage />,
+                handle: { title: CONSTANTS.ROUTES.VIEW_WORKFLOW_RUNS.title },
               },
             ],
           },

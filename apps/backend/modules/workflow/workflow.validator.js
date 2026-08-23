@@ -158,6 +158,11 @@ const listWorkflowsQuerySchema = z.object({
   search: z.string().optional(),
 }).merge(schemas.paginationSchema).passthrough();
 
+const listInstancesQuerySchema = z.object({
+  workflowID: schemas.uuidSchema.optional(),
+  status: z.string().optional(),
+}).merge(schemas.paginationSchema).passthrough();
+
 // ============================================================
 // Exports
 // ============================================================
@@ -170,4 +175,5 @@ module.exports = {
   workflowIdParamSchema,
   instanceIdParamSchema,
   listWorkflowsQuerySchema,
+  listInstancesQuerySchema,
 };

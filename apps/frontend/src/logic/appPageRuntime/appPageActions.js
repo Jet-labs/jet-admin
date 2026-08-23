@@ -46,9 +46,9 @@ export const APP_PAGE_ACTIONS = {
 // ============================================================
 
 export const appPageActions = {
-  init: (variableDefinitions, globals) => ({
+  init: (variableDefinitions, globals, initialValues = {}) => ({
     type: APP_PAGE_ACTIONS.INIT,
-    payload: { variableDefinitions, globals },
+    payload: { variableDefinitions, globals, initialValues },
   }),
 
   setVariable: (key, value) => ({

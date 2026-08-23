@@ -65,6 +65,12 @@ export const WorkflowInputModal = ({ inputDefinitions, onSubmit, onClose }) => {
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
+    // This modal renders (via React portal) inside the workflow update
+    // page's outer <form>. Submit events bubble through the React tree even
+    // across portals, so without stopPropagation the outer form's
+    // onSubmit (Formik -> updateWorkflowAPI) also fires and SAVES the
+    // workflow whenever the user runs a test.
+    e.stopPropagation();
     if (!validate()) return;
 
     // Parse values based on type

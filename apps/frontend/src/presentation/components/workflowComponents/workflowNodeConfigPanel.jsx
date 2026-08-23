@@ -121,6 +121,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
                         </p>
                         <div className="flex justify-end gap-3">
                             <Button
+                                type="button"
                                 onClick={() => setShowDeleteConfirm(false)}
                                 variant="outline"
                                 size="sm"
@@ -128,6 +129,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
                                 Cancel
                             </Button>
                             <Button
+                                type="button"
                                 onClick={handleDelete}
                                 variant="destructive"
                                 size="sm"

@@ -1,24 +1,88 @@
 import { DataGrid } from "@mui/x-data-grid";
 import { useQuery } from "@tanstack/react-query";
+import { Download, X } from "lucide-react";
+import moment from "moment";
 import PropTypes from "prop-types";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import "react-data-grid/lib/styles.css";
 import jsonSchemaGenerator from "to-json-schema";
 import { CONSTANTS } from "../../../constants";
+import { exportAuditLogsCSVAPI, getAuditLogsAPI } from "../../../data/apis/auditLog";
+import { DATAGRID_SX } from "../../../shared/dataGridTheme";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { AuditLogMetadataViewer } from "./AuditLogMetadataViewer";
 import { getFormattedAuditLogColumns } from "./auditLogsGridColumnFormatter";
-import { getAuditLogsAPI } from "../../../data/apis/auditLog";
-import { DATAGRID_SX } from "../../../shared/dataGridTheme";
+import {
+  Button,
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  PageHeader,
+  Spinner,
+} from "@jet-admin/ui";
 
-export const AuditLogsGrid = ({ tenantID,  }) => {
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
+export const AuditLogsGrid = ({ tenantID }) => {
   AuditLogsGrid.propTypes = {
     tenantID: PropTypes.number.isRequired,
   };
+
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
+  const [selectedMetadata, setSelectedMetadata] = useState(null);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Date filter state
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [appliedDateFrom, setAppliedDateFrom] = useState("");
+  const [appliedDateTo, setAppliedDateTo] = useState("");
+
   const datagridRef = useRef();
   const datagridAPIRef = useRef();
+
+  // When a filter changes, reset to page 1
+  const applyFilters = useCallback(
+    ({ newDateFrom = appliedDateFrom, newDateTo = appliedDateTo } = {}) => {
+      setAppliedDateFrom(newDateFrom);
+      setAppliedDateTo(newDateTo);
+      setPage(1);
+    },
+    [appliedDateFrom, appliedDateTo]
+  );
+
+  const clearFilters = () => {
+    setDateFrom("");
+    setDateTo("");
+    setAppliedDateFrom("");
+    setAppliedDateTo("");
+    setPage(1);
+  };
+
+  const hasActiveFilters = appliedDateFrom || appliedDateTo;
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await exportAuditLogsCSVAPI({
+        tenantID,
+        dateFrom: appliedDateFrom || undefined,
+        dateTo: appliedDateTo || undefined,
+      });
+    } catch (err) {
+      console.error("Audit log CSV export failed:", err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const {
     isLoading: isLoadingAuditLogs,
@@ -28,12 +92,20 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
     isPreviousData: isPreviousAuditLogsData,
     refetch: refetchAuditLogs,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.AUDIT_LOGS(tenantID), page, pageSize],
+    queryKey: [
+      CONSTANTS.REACT_QUERY_KEYS.AUDIT_LOGS(tenantID),
+      page,
+      pageSize,
+      appliedDateFrom,
+      appliedDateTo,
+    ],
     queryFn: () =>
       getAuditLogsAPI({
         tenantID,
         page,
         pageSize,
+        dateFrom: appliedDateFrom || undefined,
+        dateTo: appliedDateTo || undefined,
       }),
     refetchOnWindowFocus: false,
   });
@@ -47,20 +119,15 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
 
   const columns = useMemo(() => {
     if (auditLogsSchema && auditLogsSchema.properties) {
-      const formattedColumns = getFormattedAuditLogColumns({
+      return getFormattedAuditLogColumns({
         auditLogsSchema,
+        onMetadataClick: (value) => setSelectedMetadata(value),
       });
-      return formattedColumns;
-    } else {
-      return null;
     }
+    return null;
   }, [auditLogsSchema]);
 
-  const _getRowID = (row) => {
-    return row.auditLogID;
-  };
-
-  console.log(auditLogsData);
+  const _getRowID = (row) => row.auditLogID;
 
   return (
     <ReactQueryLoadingErrorWrapper
@@ -70,16 +137,93 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
       isPreviousData={isPreviousAuditLogsData}
       refetch={refetchAuditLogs}
     >
-      <div
-        className={`w-full h-full !overflow-y-hidden flex flex-col justify-start items-stretch`}
-      >
+      <div className={`w-full h-full !overflow-y-hidden flex flex-col justify-start items-stretch`}>
         {auditLogsData ? (
           <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
-            <div className="w-full px-3 py-2 border-b border-border flex flex-col justify-center items-start">
-              <h1 className="text-lg font-bold leading-tight tracking-tight text-foreground">
-                {CONSTANTS.STRINGS.VIEW_AUDIT_LOGS_TITLE}
-              </h1>
-            </div>
+
+            {/* ── Header bar ─────────────────────────────────────────── */}
+            <PageHeader title={CONSTANTS.STRINGS.VIEW_AUDIT_LOGS_TITLE}>
+              {/* Date range filters */}
+              <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                Date range:
+              </span>
+
+              <Input
+                id="audit-logs-date-from"
+                type="date"
+                size="sm"
+                value={dateFrom}
+                max={dateTo || undefined}
+                onChange={(e) => {
+                  setDateFrom(e.target.value);
+                  applyFilters({ newDateFrom: e.target.value });
+                }}
+                aria-label="Filter from date"
+                className="w-auto"
+              />
+
+              <span className="text-xs text-muted-foreground">to</span>
+
+              <Input
+                id="audit-logs-date-to"
+                type="date"
+                size="sm"
+                value={dateTo}
+                min={dateFrom || undefined}
+                onChange={(e) => {
+                  setDateTo(e.target.value);
+                  applyFilters({ newDateTo: e.target.value });
+                }}
+                aria-label="Filter to date"
+                className="w-auto"
+              />
+
+              {hasActiveFilters && (
+                <>
+                  <span className="text-xs text-muted-foreground italic">
+                    {appliedDateFrom && appliedDateTo
+                      ? `${moment(appliedDateFrom).format("MMM D, YYYY")} – ${moment(appliedDateTo).format("MMM D, YYYY")}`
+                      : appliedDateFrom
+                        ? `From ${moment(appliedDateFrom).format("MMM D, YYYY")}`
+                        : `Until ${moment(appliedDateTo).format("MMM D, YYYY")}`}
+                  </span>
+                  <Button
+                    id="audit-logs-clear-filters-btn"
+                    variant="secondary"
+                    size="sm"
+                    onClick={clearFilters}
+                    title="Clear date filters"
+                  >
+                    <X size={11} />
+                    Clear
+                  </Button>
+                </>
+              )}
+
+              {/* Export button */}
+              <Button
+                id="audit-logs-export-csv-btn"
+                variant="primary-outline"
+                size="sm"
+                onClick={handleExport}
+                disabled={isExporting}
+                title="Export all matching logs as CSV (server-side)"
+              >
+                {isExporting ? (
+                  <>
+                    <Spinner size={13} />
+                    Exporting…
+                  </>
+                ) : (
+                  <>
+                    <Download size={13} />
+                    Export CSV
+                  </>
+                )}
+              </Button>
+            </PageHeader>
+
+            {/* ── Data grid ──────────────────────────────────────────── */}
             <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
               <DataGrid
                 ref={datagridRef}
@@ -87,8 +231,8 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
                 rows={auditLogsData.auditLogs}
                 columns={columns}
                 density="compact"
-                loading={isLoadingAuditLogs}
-                getRowId={(row) => _getRowID(row)} // Custom row ID getter
+                loading={isLoadingAuditLogs || isFetchingAuditLogs}
+                getRowId={(row) => _getRowID(row)}
                 sx={{
                   ...DATAGRID_SX,
                   "& .MuiDataGrid-cell": {
@@ -100,15 +244,6 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
                 className="!border-0"
                 disableRowSelectionOnClick
                 disableColumnFilter
-                // onSortModelChange={(model) => {
-                //   if (model.length > 0) {
-                //     const { field, sort } = model[0];
-                //     setAuditLogsColumnSortModel({
-                //       field: field,
-                //       order: lowerCase(sort),
-                //     });
-                //   }
-                // }}
                 paginationMode="server"
                 rowCount={
                   !isNaN(auditLogsData?.auditLogsCount)
@@ -121,7 +256,7 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
                   page: newPage,
                   pageSize: newPageSize,
                 }) => {
-                  setPage(newPage + 1); // Convert to 1-based for API
+                  setPage(newPage + 1);
                   setPageSize(newPageSize);
                 }}
                 hideFooterSelectedRowCount
@@ -134,6 +269,30 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
           </div>
         )}
       </div>
+
+      {/* Metadata dialog */}
+      {selectedMetadata !== null && (
+        <Dialog
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) setSelectedMetadata(null);
+          }}
+        >
+          <DialogContent className="max-w-2xl w-full">
+            <DialogHeader>
+              <DialogTitle>Request Details</DialogTitle>
+              <DialogDescription>
+                Human-readable breakdown of this audit log entry.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogBody>
+              <div className="overflow-auto max-h-[70vh] px-1 py-2">
+                <AuditLogMetadataViewer metadata={selectedMetadata} />
+              </div>
+            </DialogBody>
+          </DialogContent>
+        </Dialog>
+      )}
     </ReactQueryLoadingErrorWrapper>
   );
 };

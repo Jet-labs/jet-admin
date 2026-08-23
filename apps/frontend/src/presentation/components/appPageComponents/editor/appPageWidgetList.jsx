@@ -18,14 +18,6 @@ export const AppPageWidgetList = ({
   onAddWidget,
   appPageEditorForm,
 }) => {
-  AppPageWidgetList.propTypes = {
-    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-    placedWidgets: PropTypes.array,
-    onAddWidget: PropTypes.func,
-    appPageEditorForm: PropTypes.object.isRequired,
-  };
-
   const [isIdeOpen, setIsIdeOpen] = useState(false);
   const [selectedWidgetID, setSelectedWidgetID] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,7 +44,7 @@ export const AppPageWidgetList = ({
   const _handleDragStart = (e, widgetKey) => {
     // Extract the widget ID and create a unique instance key
     const widgetID = parseWidgetKey(widgetKey);
-    const instanceKey = createWidgetInstanceKey(widgetID);
+    const instanceKey = createWidgetInstanceKey(widgetID, placedWidgets || []);
     e.dataTransfer.setData("widget", instanceKey);
 
     const parentElement = document.getElementById(widgetKey);
@@ -309,4 +301,12 @@ export const AppPageWidgetList = ({
       />
     </div>
   );
+};
+
+AppPageWidgetList.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  placedWidgets: PropTypes.array,
+  onAddWidget: PropTypes.func,
+  appPageEditorForm: PropTypes.object.isRequired,
 };

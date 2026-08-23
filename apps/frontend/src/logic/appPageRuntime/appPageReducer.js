@@ -44,9 +44,14 @@ export const createAppPageInitialState = () => ({
 export const appPageReducer = (state, action) => {
   switch (action.type) {
     case APP_PAGE_ACTIONS.INIT: {
-      const { variableDefinitions = [], globals = {} } = action.payload;
+      const { variableDefinitions = [], globals = {}, initialValues = {} } = action.payload;
       const variables = {};
       for (const def of variableDefinitions) {
+        // Explicit overrides (e.g. seeded from URL params) win over defaults
+        if (initialValues[def.key] !== undefined) {
+          variables[def.key] = initialValues[def.key];
+          continue;
+        }
         variables[def.key] = def.defaultValue !== undefined
           ? def.defaultValue
           : null;
@@ -161,8 +166,10 @@ export const appPageReducer = (state, action) => {
 
     case APP_PAGE_ACTIONS.UNREGISTER_WIDGET: {
       const { widgetID } = action.payload;
-      const { [widgetID]: _removedMethods, ...remainingMethods } = state.widgetMethods;
-      const { [widgetID]: _removedState, ...remainingStates } = state.widgetStates;
+      const remainingMethods = { ...state.widgetMethods };
+      delete remainingMethods[widgetID];
+      const remainingStates = { ...state.widgetStates };
+      delete remainingStates[widgetID];
       return {
         ...state,
         widgetMethods: remainingMethods,

@@ -522,6 +522,7 @@ workflowService.cloneWorkflow = async ({ userID, tenantID, workflowID, authConte
 
 /**
  * Get the status and logs of a workflow run.
+ * Reads from the unified append-only instance log (tblWorkflowInstanceLogs).
  * @param {string} instanceID
  * @returns {Promise<object>}
  */
@@ -531,17 +532,9 @@ workflowService.getRunStatus = async (instanceID) => {
     params: { instanceID },
   });
   try {
-    const instance = await prisma.tblWorkflowInstances.findUnique({
-      where: { instanceID: instanceID },
-      include: {
-        tblNodeExecutionLogs: {
-          orderBy: { createdAt: 'asc' },
-        },
-        tblWorkflows: {
-          select: { title: true },
-        },
-      },
-    });
+    const { stateManager: sm } = require("./workflowEngine/stateManager");
+    const instance = await sm.getInstanceWithLogs(instanceID);
+
     Logger.log("info", {
       message: "workflowService:getRunStatus:result",
       params: { instanceID, found: !!instance },
@@ -551,34 +544,105 @@ workflowService.getRunStatus = async (instanceID) => {
       return null;
     }
 
-    // Convert BigInt executionLogID to string to avoid JSON serialization issues
-    const logs = instance.tblNodeExecutionLogs.map(log => ({
-      ...log,
-      executionLogID: log.executionLogID.toString(),
+    const { tblWorkflows, ...instanceData } = instance;
+    // Newest last for chronological display
+    const logs = (instance.tblWorkflowInstanceLogs || []).map((log) => ({
+      logID: log.logID,
+      nodeID: log.nodeID,
+      eventType: log.eventType,
+      nodeStatus: log.nodeStatus,
+      outputVariable: log.outputVariable,
+      payload: log.payload,
+      errorMessage: log.errorMessage,
+      nodeAttempt: log.nodeAttempt,
+      createdAt: log.createdAt,
     }));
 
     // Assemble context from unified log and strip internal keys
-    const { stateManager: sm } = require("./workflowEngine/stateManager");
     const fullContext = await sm.assembleContext(instanceID);
     const contextData = Object.fromEntries(
       Object.entries(fullContext).filter(([key]) => !key.startsWith('__'))
     );
 
     return {
-      instanceID: instance.instanceID,
-      workflowID: instance.workflowID,
-      workflowTitle: instance.tblWorkflows?.title,
-      status: instance.status,
+      instanceID: instanceData.instanceID,
+      workflowID: instanceData.workflowID,
+      workflowTitle: tblWorkflows?.title,
+      status: instanceData.status,
+      isTest: instanceData.isTest,
+      startedAt: instanceData.startedAt,
+      completedAt: instanceData.completedAt,
       contextData,
-      startedAt: instance.startedAt,
-      completedAt: instance.completedAt,
-      logs: logs,
+      logs,
     };
   }
   catch (error) {
     Logger.log("error", {
       message: "workflowService:getRunStatus:failure",
       params: { instanceID, error: error.message },
+    });
+    throw error;
+  }
+};
+
+/**
+ * List workflow run history for a tenant, optionally scoped to one workflow.
+ *
+ * @param {object} param0
+ * @param {string} param0.tenantID
+ * @param {string} [param0.workflowID]  - Only runs of this workflow
+ * @param {string} [param0.status]      - Filter by run status
+ * @param {number} [param0.page=1]
+ * @param {number} [param0.pageSize=50]
+ * @returns {Promise<{instances: Array, totalCount: number, page: number, pageSize: number}>}
+ */
+workflowService.listInstances = async ({
+  tenantID,
+  workflowID,
+  status,
+  page = 1,
+  pageSize = 50,
+}) => {
+  try {
+    const where = {
+      tenantID,
+      ...(workflowID ? { workflowID } : {}),
+      ...(status ? { status } : {}),
+    };
+
+    const skip = (page - 1) * pageSize;
+
+    const [instances, totalCount] = await prisma.$transaction([
+      prisma.tblWorkflowInstances.findMany({
+        where,
+        include: {
+          tblWorkflows: { select: { title: true } },
+        },
+        orderBy: { startedAt: 'desc' },
+        skip,
+        take: pageSize,
+      }),
+      prisma.tblWorkflowInstances.count({ where }),
+    ]);
+
+    return {
+      instances: instances.map((instance) => ({
+        instanceID: instance.instanceID,
+        workflowID: instance.workflowID,
+        workflowTitle: instance.tblWorkflows?.title ?? null,
+        status: instance.status,
+        isTest: instance.isTest,
+        startedAt: instance.startedAt,
+        completedAt: instance.completedAt,
+      })),
+      totalCount,
+      page,
+      pageSize,
+    };
+  } catch (error) {
+    Logger.log("error", {
+      message: "workflowService:listInstances:failure",
+      params: { tenantID, workflowID, error: error.message },
     });
     throw error;
   }

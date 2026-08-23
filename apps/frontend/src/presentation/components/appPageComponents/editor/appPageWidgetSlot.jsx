@@ -32,7 +32,7 @@ import {
 import { resolveConfig } from "../../../../logic/evaluationEngine";
 import { parseWidgetKey } from "./appPageLayoutUtils";
 
-const MemoizedWidgetContent = React.memo(({
+const WidgetContent = ({
   RenderedWidgetComponent,
   widgetTitle,
   widgetType,
@@ -76,7 +76,25 @@ const MemoizedWidgetContent = React.memo(({
       {...runtimeEventHandlers}
     />
   );
-});
+};
+
+WidgetContent.propTypes = {
+  RenderedWidgetComponent: PropTypes.elementType.isRequired,
+  widgetTitle: PropTypes.string,
+  widgetType: PropTypes.string.isRequired,
+  resolvedConfig: PropTypes.object,
+  stateTreeQueries: PropTypes.object,
+  handleOnWidgetInit: PropTypes.func,
+  refreshInterval: PropTypes.number,
+  refetchWidget: PropTypes.func,
+  fireWidgetEvent: PropTypes.func,
+  runtimeEventHandlers: PropTypes.object,
+  widgetState: PropTypes.object,
+  setWidgetState: PropTypes.func,
+  widgetID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+const MemoizedWidgetContent = React.memo(WidgetContent);
 
 export const AppPageWidgetSlot = ({
   tenantID,
@@ -87,17 +105,6 @@ export const AppPageWidgetSlot = ({
   sizing,
   scopedStateTree = null,
 }) => {
-  AppPageWidgetSlot.propTypes = {
-    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-    widgetKey: PropTypes.string.isRequired,
-    index: PropTypes.number,
-    handleDelete: PropTypes.func,
-    editable: PropTypes.bool,
-    sizing: PropTypes.string,
-    scopedStateTree: PropTypes.object,
-  };
-
   const widgetID = parseWidgetKey(widgetKey);
   const [ref, size] = useComponentSize();
   const [isMouseHover, setIsMouseHover] = useState(false);
@@ -305,7 +312,7 @@ export const AppPageWidgetSlot = ({
 
               {widgetRender?.errorMessage ? (
                 <div className="flex h-full w-full items-center justify-center p-2">
-                  <span className="rounded border border-red-100 bg-red-950/40 p-2 text-center text-xs text-red-600">
+                  <span className="rounded border border-destructive/30 bg-destructive/10 p-2 text-center text-xs text-destructive">
                     {widgetRender.errorMessage}
                   </span>
                 </div>
@@ -340,4 +347,15 @@ export const AppPageWidgetSlot = ({
       </Card>
     </>
   );
+};
+
+AppPageWidgetSlot.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  widgetKey: PropTypes.string.isRequired,
+  index: PropTypes.number,
+  handleDelete: PropTypes.func,
+  editable: PropTypes.bool,
+  sizing: PropTypes.string,
+  scopedStateTree: PropTypes.object,
 };

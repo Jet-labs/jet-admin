@@ -236,6 +236,48 @@ export const executeWorkflowAPI = async ({ tenantID, workflowID, inputValues = {
 };
 
 /**
+ * List workflow run history for a tenant, optionally scoped to one workflow.
+ */
+export const getWorkflowRunHistoryAPI = async ({
+  tenantID,
+  workflowID,
+  status,
+  page = 1,
+  pageSize = 50,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.WORKFLOW.getWorkflowRunHistoryAPI(tenantID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        params: {
+          ...(workflowID ? { workflowID } : {}),
+          ...(status ? { status } : {}),
+          page,
+          pageSize,
+        },
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      if (response.data && response.data.success === true) {
+        return response.data;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
  * Test run a workflow without saving (uses in-memory nodes/edges)
  */
 export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputValues = {} }) => {

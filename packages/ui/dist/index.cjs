@@ -91,6 +91,7 @@ __export(index_exports, {
   GoogleOAuthButton: () => GoogleOAuthButton,
   Input: () => Input,
   InputValuesForm: () => InputValuesForm,
+  JsonViewer: () => JsonViewer,
   Label: () => Label2,
   LogicChip: () => LogicChip,
   MultiSearchSelect: () => MultiSearchSelect,
@@ -285,7 +286,7 @@ var DialogHeader = ({ className, children, hideCloseIcon = false, ...props }) =>
     ),
     ...props
   },
-  /* @__PURE__ */ React3.createElement("div", { className: "flex flex-col justify-start items-start gap-2" }, children),
+  /* @__PURE__ */ React3.createElement("div", { className: "flex flex-col justify-start items-start gap-1" }, children),
   !hideCloseIcon && /* @__PURE__ */ React3.createElement(DialogPrimitive.Close, { className: "h-4 w-4 rounded opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground" }, /* @__PURE__ */ React3.createElement(import_lucide_react2.X, { className: "h-4 w-4" }), /* @__PURE__ */ React3.createElement("span", { className: "sr-only" }, "Close"))
 );
 DialogHeader.displayName = "DialogHeader";
@@ -667,14 +668,86 @@ var Input = React10.forwardRef(({ className, type, size, ...props }, ref) => {
 });
 Input.displayName = "Input";
 
-// src/components/label.jsx
+// src/components/json-viewer.jsx
 var React11 = __toESM(require("react"));
+var import_react = require("react");
+var import_lucide_react5 = require("lucide-react");
+var JsonValue = ({ value }) => {
+  if (value === null) {
+    return /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground italic" }, "null");
+  }
+  if (typeof value === "boolean") {
+    return /* @__PURE__ */ React11.createElement("span", { className: value ? "text-green-400" : "text-red-400" }, String(value));
+  }
+  if (typeof value === "number") {
+    return /* @__PURE__ */ React11.createElement("span", { className: "text-primary" }, value);
+  }
+  if (typeof value === "string") {
+    return /* @__PURE__ */ React11.createElement("span", { className: "text-foreground/80 break-all" }, '"', value, '"');
+  }
+  return /* @__PURE__ */ React11.createElement("span", { className: "text-foreground" }, String(value));
+};
+var JsonNode = ({ data, depth = 0, label }) => {
+  const [expanded, setExpanded] = (0, import_react.useState)(depth < 2);
+  const isArray = Array.isArray(data);
+  const isObject = data !== null && typeof data === "object";
+  const entries = isObject ? Object.entries(data) : [];
+  const isEmpty = entries.length === 0;
+  const openBracket = isArray ? "[" : "{";
+  const closeBracket = isArray ? "]" : "}";
+  if (!isObject) {
+    return /* @__PURE__ */ React11.createElement("div", { style: { paddingLeft: depth * 12 }, className: "flex items-start gap-1 min-w-0" }, label !== void 0 && /* @__PURE__ */ React11.createElement("span", { className: "text-primary/80 shrink-0 font-mono" }, typeof label === "number" ? label : `"${label}"`, /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground" }, ": ")), /* @__PURE__ */ React11.createElement(JsonValue, { value: data }));
+  }
+  return /* @__PURE__ */ React11.createElement("div", { style: { paddingLeft: label !== void 0 ? depth * 12 : 0 }, className: "min-w-0" }, /* @__PURE__ */ React11.createElement(
+    "button",
+    {
+      onClick: () => setExpanded((e) => !e),
+      className: "flex items-center gap-1 text-left w-full hover:bg-muted/20 rounded transition-colors"
+    },
+    /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground shrink-0 w-3" }, expanded ? /* @__PURE__ */ React11.createElement(import_lucide_react5.ChevronDown, { className: "w-3 h-3" }) : /* @__PURE__ */ React11.createElement(import_lucide_react5.ChevronRight, { className: "w-3 h-3" })),
+    label !== void 0 && /* @__PURE__ */ React11.createElement("span", { className: "text-primary/80 font-mono shrink-0" }, typeof label === "number" ? label : `"${label}"`, /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground" }, ": ")),
+    /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-mono" }, openBracket),
+    !expanded && /* @__PURE__ */ React11.createElement(React11.Fragment, null, /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground/60 font-mono text-xs" }, !isEmpty && (isArray ? `${entries.length} items` : `${entries.length} keys`)), /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-mono" }, closeBracket))
+  ), expanded && /* @__PURE__ */ React11.createElement("div", { className: "min-w-0" }, entries.map(([key, val], idx) => {
+    const childLabel = isArray ? idx : key;
+    const isLeaf = val === null || typeof val !== "object";
+    return /* @__PURE__ */ React11.createElement("div", { key, style: { paddingLeft: 12 }, className: "min-w-0" }, isLeaf ? /* @__PURE__ */ React11.createElement("div", { className: "flex items-start gap-1 min-w-0 py-0.5" }, /* @__PURE__ */ React11.createElement("span", { className: "text-primary/80 font-mono shrink-0 text-xs" }, isArray ? idx : `"${key}"`, /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground" }, ": ")), /* @__PURE__ */ React11.createElement("span", { className: "min-w-0 break-all" }, /* @__PURE__ */ React11.createElement(JsonValue, { value: val })), idx < entries.length - 1 && /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground shrink-0" }, ",")) : /* @__PURE__ */ React11.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ React11.createElement(JsonNode, { data: val, depth: depth + 1, label: childLabel }), idx < entries.length - 1 && /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground font-mono text-xs" }, ",")));
+  }), /* @__PURE__ */ React11.createElement("div", { className: "font-mono text-muted-foreground" }, closeBracket)));
+};
+var JsonViewer = React11.forwardRef(({ data, className, ...props }, ref) => {
+  const [copied, setCopied] = (0, import_react.useState)(false);
+  const handleCopy = (0, import_react.useCallback)(() => {
+    try {
+      navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+    }
+  }, [data]);
+  if (data === null || data === void 0) {
+    return /* @__PURE__ */ React11.createElement("div", { className: cn("text-muted-foreground text-xs italic p-2", className), ref, ...props }, "No data");
+  }
+  return /* @__PURE__ */ React11.createElement("div", { ref, className: cn("relative min-w-0 w-full", className), ...props }, /* @__PURE__ */ React11.createElement(
+    "button",
+    {
+      onClick: handleCopy,
+      className: "absolute top-0 right-0 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded border border-border bg-background hover:bg-muted/30",
+      title: "Copy JSON",
+      type: "button"
+    },
+    copied ? /* @__PURE__ */ React11.createElement(React11.Fragment, null, /* @__PURE__ */ React11.createElement(import_lucide_react5.Check, { className: "w-3 h-3 text-green-400" }), /* @__PURE__ */ React11.createElement("span", { className: "text-green-400" }, "Copied")) : /* @__PURE__ */ React11.createElement(React11.Fragment, null, /* @__PURE__ */ React11.createElement(import_lucide_react5.Copy, { className: "w-3 h-3" }), /* @__PURE__ */ React11.createElement("span", null, "Copy"))
+  ), /* @__PURE__ */ React11.createElement("div", { className: "font-mono text-xs text-foreground overflow-auto w-full min-w-0 pr-16" }, /* @__PURE__ */ React11.createElement(JsonNode, { data, depth: 0 })));
+});
+JsonViewer.displayName = "JsonViewer";
+
+// src/components/label.jsx
+var React12 = __toESM(require("react"));
 var LabelPrimitive = __toESM(require("@radix-ui/react-label"));
 var import_class_variance_authority4 = require("class-variance-authority");
 var labelVariants = (0, import_class_variance_authority4.cva)(
   "text-xs font-medium text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 );
-var Label2 = React11.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React11.createElement(
+var Label2 = React12.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React12.createElement(
   LabelPrimitive.Root,
   {
     ref,
@@ -685,12 +758,12 @@ var Label2 = React11.forwardRef(({ className, ...props }, ref) => /* @__PURE__ *
 Label2.displayName = LabelPrimitive.Root.displayName;
 
 // src/components/popover.jsx
-var React12 = __toESM(require("react"));
+var React13 = __toESM(require("react"));
 var PopoverPrimitive = __toESM(require("@radix-ui/react-popover"));
 var Popover = PopoverPrimitive.Root;
 var PopoverTrigger = PopoverPrimitive.Trigger;
-var PopoverContent = React12.forwardRef(
-  ({ className, align = "center", sideOffset = 4, ...props }, ref) => /* @__PURE__ */ React12.createElement(PopoverPrimitive.Portal, null, /* @__PURE__ */ React12.createElement(
+var PopoverContent = React13.forwardRef(
+  ({ className, align = "center", sideOffset = 4, ...props }, ref) => /* @__PURE__ */ React13.createElement(PopoverPrimitive.Portal, null, /* @__PURE__ */ React13.createElement(
     PopoverPrimitive.Content,
     {
       ref,
@@ -707,11 +780,11 @@ var PopoverContent = React12.forwardRef(
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
 // src/components/radio-group.jsx
-var React13 = __toESM(require("react"));
+var React14 = __toESM(require("react"));
 var RadioGroupPrimitive = __toESM(require("@radix-ui/react-radio-group"));
-var import_lucide_react5 = require("lucide-react");
-var RadioGroup2 = React13.forwardRef(({ className, ...props }, ref) => {
-  return /* @__PURE__ */ React13.createElement(
+var import_lucide_react6 = require("lucide-react");
+var RadioGroup2 = React14.forwardRef(({ className, ...props }, ref) => {
+  return /* @__PURE__ */ React14.createElement(
     RadioGroupPrimitive.Root,
     {
       className: cn("grid gap-2", className),
@@ -721,8 +794,8 @@ var RadioGroup2 = React13.forwardRef(({ className, ...props }, ref) => {
   );
 });
 RadioGroup2.displayName = RadioGroupPrimitive.Root.displayName;
-var RadioGroupItem = React13.forwardRef(({ className, ...props }, ref) => {
-  return /* @__PURE__ */ React13.createElement(
+var RadioGroupItem = React14.forwardRef(({ className, ...props }, ref) => {
+  return /* @__PURE__ */ React14.createElement(
     RadioGroupPrimitive.Item,
     {
       ref,
@@ -732,28 +805,28 @@ var RadioGroupItem = React13.forwardRef(({ className, ...props }, ref) => {
       ),
       ...props
     },
-    /* @__PURE__ */ React13.createElement(RadioGroupPrimitive.Indicator, { className: "flex items-center justify-center" }, /* @__PURE__ */ React13.createElement(import_lucide_react5.Circle, { className: "h-2.5 w-2.5 fill-current text-current" }))
+    /* @__PURE__ */ React14.createElement(RadioGroupPrimitive.Indicator, { className: "flex items-center justify-center" }, /* @__PURE__ */ React14.createElement(import_lucide_react6.Circle, { className: "h-2.5 w-2.5 fill-current text-current" }))
   );
 });
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
 
 // src/components/scroll-area.jsx
-var React14 = __toESM(require("react"));
+var React15 = __toESM(require("react"));
 var ScrollAreaPrimitive = __toESM(require("@radix-ui/react-scroll-area"));
-var ScrollArea = React14.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ React14.createElement(
+var ScrollArea = React15.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ React15.createElement(
   ScrollAreaPrimitive.Root,
   {
     ref,
     className: cn("relative overflow-hidden", className),
     ...props
   },
-  /* @__PURE__ */ React14.createElement(ScrollAreaPrimitive.Viewport, { className: "h-full w-full rounded-[inherit]" }, children),
-  /* @__PURE__ */ React14.createElement(ScrollBar, null),
-  /* @__PURE__ */ React14.createElement(ScrollAreaPrimitive.Corner, null)
+  /* @__PURE__ */ React15.createElement(ScrollAreaPrimitive.Viewport, { className: "h-full w-full rounded-[inherit]" }, children),
+  /* @__PURE__ */ React15.createElement(ScrollBar, null),
+  /* @__PURE__ */ React15.createElement(ScrollAreaPrimitive.Corner, null)
 ));
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
-var ScrollBar = React14.forwardRef(
-  ({ className, orientation = "vertical", ...props }, ref) => /* @__PURE__ */ React14.createElement(
+var ScrollBar = React15.forwardRef(
+  ({ className, orientation = "vertical", ...props }, ref) => /* @__PURE__ */ React15.createElement(
     ScrollAreaPrimitive.ScrollAreaScrollbar,
     {
       ref,
@@ -766,20 +839,20 @@ var ScrollBar = React14.forwardRef(
       ),
       ...props
     },
-    /* @__PURE__ */ React14.createElement(ScrollAreaPrimitive.ScrollAreaThumb, { className: "relative flex-1 rounded-full bg-muted-foreground/30 hover:bg-muted-foreground/50 transition-colors duration-150" })
+    /* @__PURE__ */ React15.createElement(ScrollAreaPrimitive.ScrollAreaThumb, { className: "relative flex-1 rounded-full bg-muted-foreground/30 hover:bg-muted-foreground/50 transition-colors duration-150" })
   )
 );
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
 
 // src/components/select.jsx
-var React15 = __toESM(require("react"));
+var React16 = __toESM(require("react"));
 var SelectPrimitive = __toESM(require("@radix-ui/react-select"));
-var import_lucide_react6 = require("lucide-react");
+var import_lucide_react7 = require("lucide-react");
 var Select = SelectPrimitive.Root;
 var SelectGroup = SelectPrimitive.Group;
 var SelectValue = SelectPrimitive.Value;
-var SelectTrigger = React15.forwardRef(
-  ({ className, children, size = "default", ...props }, ref) => /* @__PURE__ */ React15.createElement(
+var SelectTrigger = React16.forwardRef(
+  ({ className, children, size = "default", ...props }, ref) => /* @__PURE__ */ React16.createElement(
     SelectPrimitive.Trigger,
     {
       ref,
@@ -792,12 +865,12 @@ var SelectTrigger = React15.forwardRef(
       ...props
     },
     children,
-    /* @__PURE__ */ React15.createElement(SelectPrimitive.Icon, { asChild: true }, /* @__PURE__ */ React15.createElement(import_lucide_react6.ChevronDown, { className: "h-4 w-4 opacity-50" }))
+    /* @__PURE__ */ React16.createElement(SelectPrimitive.Icon, { asChild: true }, /* @__PURE__ */ React16.createElement(import_lucide_react7.ChevronDown, { className: "h-4 w-4 opacity-50" }))
   )
 );
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
-var SelectScrollUpButton = React15.forwardRef(
-  ({ className, ...props }, ref) => /* @__PURE__ */ React15.createElement(
+var SelectScrollUpButton = React16.forwardRef(
+  ({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
     SelectPrimitive.ScrollUpButton,
     {
       ref,
@@ -807,12 +880,12 @@ var SelectScrollUpButton = React15.forwardRef(
       ),
       ...props
     },
-    /* @__PURE__ */ React15.createElement(import_lucide_react6.ChevronUp, { className: "h-4 w-4" })
+    /* @__PURE__ */ React16.createElement(import_lucide_react7.ChevronUp, { className: "h-4 w-4" })
   )
 );
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
-var SelectScrollDownButton = React15.forwardRef(
-  ({ className, ...props }, ref) => /* @__PURE__ */ React15.createElement(
+var SelectScrollDownButton = React16.forwardRef(
+  ({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
     SelectPrimitive.ScrollDownButton,
     {
       ref,
@@ -822,12 +895,12 @@ var SelectScrollDownButton = React15.forwardRef(
       ),
       ...props
     },
-    /* @__PURE__ */ React15.createElement(import_lucide_react6.ChevronDown, { className: "h-4 w-4" })
+    /* @__PURE__ */ React16.createElement(import_lucide_react7.ChevronDown, { className: "h-4 w-4" })
   )
 );
 SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
-var SelectContent = React15.forwardRef(
-  ({ className, children, position = "popper", ...props }, ref) => /* @__PURE__ */ React15.createElement(SelectPrimitive.Portal, null, /* @__PURE__ */ React15.createElement(
+var SelectContent = React16.forwardRef(
+  ({ className, children, position = "popper", ...props }, ref) => /* @__PURE__ */ React16.createElement(SelectPrimitive.Portal, null, /* @__PURE__ */ React16.createElement(
     SelectPrimitive.Content,
     {
       ref,
@@ -839,8 +912,8 @@ var SelectContent = React15.forwardRef(
       position,
       ...props
     },
-    /* @__PURE__ */ React15.createElement(SelectScrollUpButton, null),
-    /* @__PURE__ */ React15.createElement(
+    /* @__PURE__ */ React16.createElement(SelectScrollUpButton, null),
+    /* @__PURE__ */ React16.createElement(
       SelectPrimitive.Viewport,
       {
         className: cn(
@@ -850,11 +923,11 @@ var SelectContent = React15.forwardRef(
       },
       children
     ),
-    /* @__PURE__ */ React15.createElement(SelectScrollDownButton, null)
+    /* @__PURE__ */ React16.createElement(SelectScrollDownButton, null)
   ))
 );
 SelectContent.displayName = SelectPrimitive.Content.displayName;
-var SelectLabel = React15.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React15.createElement(
+var SelectLabel = React16.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
   SelectPrimitive.Label,
   {
     ref,
@@ -863,8 +936,8 @@ var SelectLabel = React15.forwardRef(({ className, ...props }, ref) => /* @__PUR
   }
 ));
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
-var SelectItem = React15.forwardRef(
-  ({ className, children, ...props }, ref) => /* @__PURE__ */ React15.createElement(
+var SelectItem = React16.forwardRef(
+  ({ className, children, ...props }, ref) => /* @__PURE__ */ React16.createElement(
     SelectPrimitive.Item,
     {
       ref,
@@ -874,12 +947,12 @@ var SelectItem = React15.forwardRef(
       ),
       ...props
     },
-    /* @__PURE__ */ React15.createElement("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center" }, /* @__PURE__ */ React15.createElement(SelectPrimitive.ItemIndicator, null, /* @__PURE__ */ React15.createElement(import_lucide_react6.Check, { className: "h-4 w-4" }))),
-    /* @__PURE__ */ React15.createElement(SelectPrimitive.ItemText, null, children)
+    /* @__PURE__ */ React16.createElement("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center" }, /* @__PURE__ */ React16.createElement(SelectPrimitive.ItemIndicator, null, /* @__PURE__ */ React16.createElement(import_lucide_react7.Check, { className: "h-4 w-4" }))),
+    /* @__PURE__ */ React16.createElement(SelectPrimitive.ItemText, null, children)
   )
 );
 SelectItem.displayName = SelectPrimitive.Item.displayName;
-var SelectSeparator = React15.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React15.createElement(
+var SelectSeparator = React16.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React16.createElement(
   SelectPrimitive.Separator,
   {
     ref,
@@ -890,10 +963,10 @@ var SelectSeparator = React15.forwardRef(({ className, ...props }, ref) => /* @_
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
 // src/components/separator.jsx
-var React16 = __toESM(require("react"));
+var React17 = __toESM(require("react"));
 var SeparatorPrimitive = __toESM(require("@radix-ui/react-separator"));
-var Separator3 = React16.forwardRef(
-  ({ className, orientation = "horizontal", decorative = true, ...props }, ref) => /* @__PURE__ */ React16.createElement(
+var Separator3 = React17.forwardRef(
+  ({ className, orientation = "horizontal", decorative = true, ...props }, ref) => /* @__PURE__ */ React17.createElement(
     SeparatorPrimitive.Root,
     {
       ref,
@@ -911,11 +984,11 @@ var Separator3 = React16.forwardRef(
 Separator3.displayName = SeparatorPrimitive.Root.displayName;
 
 // src/components/spinner.jsx
-var React17 = __toESM(require("react"));
-var import_lucide_react7 = require("lucide-react");
-var Spinner = React17.forwardRef(
-  ({ className, size = 16, ...props }, ref) => /* @__PURE__ */ React17.createElement(
-    import_lucide_react7.Loader2,
+var React18 = __toESM(require("react"));
+var import_lucide_react8 = require("lucide-react");
+var Spinner = React18.forwardRef(
+  ({ className, size = 16, ...props }, ref) => /* @__PURE__ */ React18.createElement(
+    import_lucide_react8.Loader2,
     {
       ref,
       className: cn("animate-spin text-current", className),
@@ -927,9 +1000,9 @@ var Spinner = React17.forwardRef(
 Spinner.displayName = "Spinner";
 
 // src/components/switch.jsx
-var React18 = __toESM(require("react"));
+var React19 = __toESM(require("react"));
 var SwitchPrimitives = __toESM(require("@radix-ui/react-switch"));
-var Switch = React18.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React18.createElement(
+var Switch = React19.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React19.createElement(
   SwitchPrimitives.Root,
   {
     className: cn(
@@ -939,7 +1012,7 @@ var Switch = React18.forwardRef(({ className, ...props }, ref) => /* @__PURE__ *
     ...props,
     ref
   },
-  /* @__PURE__ */ React18.createElement(
+  /* @__PURE__ */ React19.createElement(
     SwitchPrimitives.Thumb,
     {
       className: cn(
@@ -951,10 +1024,10 @@ var Switch = React18.forwardRef(({ className, ...props }, ref) => /* @__PURE__ *
 Switch.displayName = SwitchPrimitives.Root.displayName;
 
 // src/components/tabs.jsx
-var React19 = __toESM(require("react"));
+var React20 = __toESM(require("react"));
 var TabsPrimitive = __toESM(require("@radix-ui/react-tabs"));
 var Tabs = TabsPrimitive.Root;
-var TabsList = React19.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React19.createElement(
+var TabsList = React20.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React20.createElement(
   TabsPrimitive.List,
   {
     ref,
@@ -966,7 +1039,7 @@ var TabsList = React19.forwardRef(({ className, ...props }, ref) => /* @__PURE__
   }
 ));
 TabsList.displayName = TabsPrimitive.List.displayName;
-var TabsTrigger = React19.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React19.createElement(
+var TabsTrigger = React20.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React20.createElement(
   TabsPrimitive.Trigger,
   {
     ref,
@@ -978,7 +1051,7 @@ var TabsTrigger = React19.forwardRef(({ className, ...props }, ref) => /* @__PUR
   }
 ));
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
-var TabsContent = React19.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React19.createElement(
+var TabsContent = React20.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ React20.createElement(
   TabsPrimitive.Content,
   {
     ref,
@@ -992,9 +1065,9 @@ var TabsContent = React19.forwardRef(({ className, ...props }, ref) => /* @__PUR
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
 // src/components/textarea.jsx
-var React20 = __toESM(require("react"));
-var Textarea = React20.forwardRef(({ className, ...props }, ref) => {
-  return /* @__PURE__ */ React20.createElement(
+var React21 = __toESM(require("react"));
+var Textarea = React21.forwardRef(({ className, ...props }, ref) => {
+  return /* @__PURE__ */ React21.createElement(
     "textarea",
     {
       className: cn(
@@ -1009,13 +1082,13 @@ var Textarea = React20.forwardRef(({ className, ...props }, ref) => {
 Textarea.displayName = "Textarea";
 
 // src/components/tooltip.jsx
-var React21 = __toESM(require("react"));
+var React22 = __toESM(require("react"));
 var TooltipPrimitive = __toESM(require("@radix-ui/react-tooltip"));
 var TooltipProvider = TooltipPrimitive.Provider;
 var Tooltip = TooltipPrimitive.Root;
 var TooltipTrigger = TooltipPrimitive.Trigger;
-var TooltipContent = React21.forwardRef(
-  ({ className, sideOffset = 4, ...props }, ref) => /* @__PURE__ */ React21.createElement(
+var TooltipContent = React22.forwardRef(
+  ({ className, sideOffset = 4, ...props }, ref) => /* @__PURE__ */ React22.createElement(
     TooltipPrimitive.Content,
     {
       ref,
@@ -1031,7 +1104,7 @@ var TooltipContent = React21.forwardRef(
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
 // src/components/collapseComponent.jsx
-var import_react = __toESM(require("react"));
+var import_react2 = __toESM(require("react"));
 var import_bi = require("react-icons/bi");
 var import_prop_types = __toESM(require("prop-types"));
 var import_ui = require("@jet-admin/ui");
@@ -1047,16 +1120,16 @@ var CollapseComponent = ({
     containerClass: import_prop_types.default.string,
     content: import_prop_types.default.func.isRequired
   };
-  const [isOpen, setIsOpen] = (0, import_react.useState)(false);
+  const [isOpen, setIsOpen] = (0, import_react2.useState)(false);
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
-  return /* @__PURE__ */ import_react.default.createElement(
+  return /* @__PURE__ */ import_react2.default.createElement(
     "div",
     {
       className: `flex flex-col justify-start items-stretch ${containerClass}`
     },
-    /* @__PURE__ */ import_react.default.createElement(
+    /* @__PURE__ */ import_react2.default.createElement(
       import_ui.Button,
       {
         onClick: handleToggle,
@@ -1064,21 +1137,21 @@ var CollapseComponent = ({
         variant: "ghost",
         className: "p-0 m-0 text-primary hover:text-primary"
       },
-      isOpen ? /* @__PURE__ */ import_react.default.createElement(import_bi.BiChevronUp, { className: "text-base mr-1" }) : /* @__PURE__ */ import_react.default.createElement(import_bi.BiChevronDown, { className: "text-base mr-1" }),
+      isOpen ? /* @__PURE__ */ import_react2.default.createElement(import_bi.BiChevronUp, { className: "text-base mr-1" }) : /* @__PURE__ */ import_react2.default.createElement(import_bi.BiChevronDown, { className: "text-base mr-1" }),
       isOpen ? hideButtonText || "Hide" : showButtonText || "Show"
     ),
-    /* @__PURE__ */ import_react.default.createElement(
+    /* @__PURE__ */ import_react2.default.createElement(
       "div",
       {
         className: `grid transition-all duration-200 ease-in-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`
       },
-      /* @__PURE__ */ import_react.default.createElement("div", { className: "overflow-hidden" }, content())
+      /* @__PURE__ */ import_react2.default.createElement("div", { className: "overflow-hidden" }, content())
     )
   );
 };
 
 // src/components/code-editor.jsx
-var React23 = __toESM(require("react"));
+var React24 = __toESM(require("react"));
 var import_state = require("@codemirror/state");
 var import_view = require("@codemirror/view");
 var import_commands = require("@codemirror/commands");
@@ -1091,7 +1164,7 @@ var import_lang_html = require("@codemirror/lang-html");
 var import_lang_css = require("@codemirror/lang-css");
 var import_theme_one_dark = require("@codemirror/theme-one-dark");
 var import_expression_engine = require("@jet-admin/expression-engine");
-var import_lucide_react8 = require("lucide-react");
+var import_lucide_react9 = require("lucide-react");
 var languageCompartment = new import_state.Compartment();
 var readOnlyCompartment = new import_state.Compartment();
 var autocompleteCompartment = new import_state.Compartment();
@@ -1138,7 +1211,7 @@ function toCmOption(s) {
     info: s.detail ? `Value: ${s.detail}` : void 0
   };
 }
-var CodeEditor = React23.forwardRef(({
+var CodeEditor = React24.forwardRef(({
   value,
   defaultValue,
   onChange,
@@ -1168,16 +1241,16 @@ var CodeEditor = React23.forwardRef(({
   templateMode,
   ...props
 }, ref) => {
-  const [isExpanded, setIsExpanded] = React23.useState(false);
-  const containerRef = React23.useRef(null);
-  const viewRef = React23.useRef(null);
-  const internalChange = React23.useRef(false);
+  const [isExpanded, setIsExpanded] = React24.useState(false);
+  const containerRef = React24.useRef(null);
+  const viewRef = React24.useRef(null);
+  const internalChange = React24.useRef(false);
   const isReadOnly = disabled || readOnly;
-  const effectiveTemplateMode = React23.useMemo(() => {
+  const effectiveTemplateMode = React24.useMemo(() => {
     if (templateMode) return templateMode;
     return language === "javascript" ? import_expression_engine.MODES.JS_TEMPLATE : import_expression_engine.MODES.SAFE_PATH;
   }, [templateMode, language]);
-  const autocompletionExtension = React23.useMemo(() => {
+  const autocompletionExtension = React24.useMemo(() => {
     const completionSource = (ctx) => {
       const isSql = language === "sql";
       let inMustache = false;
@@ -1290,7 +1363,7 @@ var CodeEditor = React23.forwardRef(({
     };
     return (0, import_autocomplete.autocompletion)({ override: [completionSource], activateOnTyping: true, maxRenderedOptions: 50 });
   }, [language, stateTree, effectiveTemplateMode]);
-  React23.useEffect(() => {
+  React24.useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape" && isExpanded) {
         setIsExpanded(false);
@@ -1301,7 +1374,7 @@ var CodeEditor = React23.forwardRef(({
     }
     return () => document.removeEventListener("keydown", handleEsc);
   }, [isExpanded]);
-  React23.useEffect(() => {
+  React24.useEffect(() => {
     if (!containerRef.current) return;
     containerRef.current.innerHTML = "";
     const baseExtensions = [
@@ -1415,7 +1488,7 @@ var CodeEditor = React23.forwardRef(({
       viewRef.current = null;
     };
   }, []);
-  React23.useEffect(() => {
+  React24.useEffect(() => {
     const view = viewRef.current;
     if (!view) return;
     if (internalChange.current) {
@@ -1430,7 +1503,7 @@ var CodeEditor = React23.forwardRef(({
       });
     }
   }, [value]);
-  React23.useEffect(() => {
+  React24.useEffect(() => {
     if (viewRef.current) {
       viewRef.current.dispatch({
         effects: [
@@ -1440,14 +1513,14 @@ var CodeEditor = React23.forwardRef(({
       });
     }
   }, [language, isReadOnly]);
-  React23.useEffect(() => {
+  React24.useEffect(() => {
     if (viewRef.current) {
       viewRef.current.dispatch({
         effects: autocompleteCompartment.reconfigure(autocompletionExtension)
       });
     }
   }, [autocompletionExtension]);
-  return /* @__PURE__ */ React23.createElement(
+  return /* @__PURE__ */ React24.createElement(
     "div",
     {
       className: cn(
@@ -1458,10 +1531,10 @@ var CodeEditor = React23.forwardRef(({
       ),
       ...props
     },
-    showHeader && /* @__PURE__ */ React23.createElement("div", { className: "flex min-h-[36px] flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-1.5" }, /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-3" }, (title || titleIcon) && /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5 font-medium text-foreground" }, titleIcon ? titleIcon : /* @__PURE__ */ React23.createElement(import_lucide_react8.Code, { className: "h-3.5 w-3.5 text-primary" }), title && /* @__PURE__ */ React23.createElement("span", { className: "text-xs" }, title)), status && /* @__PURE__ */ React23.createElement("span", { className: cn(
+    showHeader && /* @__PURE__ */ React24.createElement("div", { className: "flex min-h-[36px] flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-1.5" }, /* @__PURE__ */ React24.createElement("div", { className: "flex items-center gap-3" }, (title || titleIcon) && /* @__PURE__ */ React24.createElement("div", { className: "flex items-center gap-1.5 font-medium text-foreground" }, titleIcon ? titleIcon : /* @__PURE__ */ React24.createElement(import_lucide_react9.Code, { className: "h-3.5 w-3.5 text-primary" }), title && /* @__PURE__ */ React24.createElement("span", { className: "text-xs" }, title)), status && /* @__PURE__ */ React24.createElement("span", { className: cn(
       "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold tracking-wide",
       status === "valid" ? "bg-green-950/40 text-green-400 border border-green-800" : status === "error" ? "bg-red-950/40 text-red-400 border border-red-800" : ""
-    ) }, status === "valid" ? /* @__PURE__ */ React23.createElement(import_lucide_react8.CheckCircle2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(import_lucide_react8.AlertTriangle, { className: "h-3 w-3" }), status === "valid" ? "Valid" : "Invalid"), headerLeft), /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5" }, headerExtra, showExpandButton && /* @__PURE__ */ React23.createElement(
+    ) }, status === "valid" ? /* @__PURE__ */ React24.createElement(import_lucide_react9.CheckCircle2, { className: "h-3 w-3" }) : /* @__PURE__ */ React24.createElement(import_lucide_react9.AlertTriangle, { className: "h-3 w-3" }), status === "valid" ? "Valid" : "Invalid"), headerLeft), /* @__PURE__ */ React24.createElement("div", { className: "flex items-center gap-1.5" }, headerExtra, showExpandButton && /* @__PURE__ */ React24.createElement(
       "button",
       {
         type: "button",
@@ -1469,18 +1542,18 @@ var CodeEditor = React23.forwardRef(({
         className: "inline-flex h-6 w-6 items-center justify-center rounded border border-transparent text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:border-border/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
         title: isExpanded ? "Exit fullscreen (Esc)" : "Fullscreen"
       },
-      isExpanded ? /* @__PURE__ */ React23.createElement(import_lucide_react8.Minimize2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(import_lucide_react8.Maximize2, { className: "h-3 w-3" })
+      isExpanded ? /* @__PURE__ */ React24.createElement(import_lucide_react9.Minimize2, { className: "h-3 w-3" }) : /* @__PURE__ */ React24.createElement(import_lucide_react9.Maximize2, { className: "h-3 w-3" })
     ))),
-    /* @__PURE__ */ React23.createElement("div", { className: "relative flex-1", style: { height: isExpanded ? "calc(100vh - 80px)" : typeof height === "number" ? `${height}px` : height } }, /* @__PURE__ */ React23.createElement("div", { ref: containerRef, className: "h-full w-full" }), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur-sm" }, footerHint)),
-    status === "error" && statusMessage && /* @__PURE__ */ React23.createElement("div", { className: "flex items-start gap-2 border-t border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive" }, /* @__PURE__ */ React23.createElement(import_lucide_react8.AlertTriangle, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" }), /* @__PURE__ */ React23.createElement("span", { className: "font-medium whitespace-pre-wrap leading-relaxed" }, statusMessage))
+    /* @__PURE__ */ React24.createElement("div", { className: "relative flex-1", style: { height: isExpanded ? "calc(100vh - 80px)" : typeof height === "number" ? `${height}px` : height } }, /* @__PURE__ */ React24.createElement("div", { ref: containerRef, className: "h-full w-full" }), footerHint && /* @__PURE__ */ React24.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border bg-background/95 px-2 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur-sm" }, footerHint)),
+    status === "error" && statusMessage && /* @__PURE__ */ React24.createElement("div", { className: "flex items-start gap-2 border-t border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive" }, /* @__PURE__ */ React24.createElement(import_lucide_react9.AlertTriangle, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" }), /* @__PURE__ */ React24.createElement("span", { className: "font-medium whitespace-pre-wrap leading-relaxed" }, statusMessage))
   );
 });
 CodeEditor.displayName = "CodeEditor";
 
 // src/components/array-input.jsx
-var import_react2 = __toESM(require("react"));
+var import_react3 = __toESM(require("react"));
 var import_prop_types2 = __toESM(require("prop-types"));
-var import_lucide_react9 = require("lucide-react");
+var import_lucide_react10 = require("lucide-react");
 function ArrayInput({
   value,
   onChange,
@@ -1510,7 +1583,7 @@ function ArrayInput({
   const renderItem = (item, index) => {
     if (itemType === "object") {
       const displayValue = typeof item === "object" && item !== null ? JSON.stringify(item, null, 2) : typeof item === "string" ? item : JSON.stringify(item);
-      return /* @__PURE__ */ import_react2.default.createElement("div", { key: index, className: "flex gap-2 w-full" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ import_react2.default.createElement(
+      return /* @__PURE__ */ import_react3.default.createElement("div", { key: index, className: "flex gap-2 w-full" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ import_react3.default.createElement(
         CodeEditor,
         {
           language: "json",
@@ -1523,7 +1596,7 @@ function ArrayInput({
           onChange: (val) => handleItemChange(index, val),
           disabled
         }
-      )), /* @__PURE__ */ import_react2.default.createElement(
+      )), /* @__PURE__ */ import_react3.default.createElement(
         Button,
         {
           type: "button",
@@ -1533,10 +1606,10 @@ function ArrayInput({
           onClick: () => handleRemoveItem(index),
           disabled: disabled || !canRemove
         },
-        /* @__PURE__ */ import_react2.default.createElement(import_lucide_react9.Trash2, { className: "h-4 w-4" })
+        /* @__PURE__ */ import_react3.default.createElement(import_lucide_react10.Trash2, { className: "h-4 w-4" })
       ));
     }
-    return /* @__PURE__ */ import_react2.default.createElement("div", { key: index, className: "flex items-center gap-2 w-full" }, /* @__PURE__ */ import_react2.default.createElement(
+    return /* @__PURE__ */ import_react3.default.createElement("div", { key: index, className: "flex items-center gap-2 w-full" }, /* @__PURE__ */ import_react3.default.createElement(
       Input,
       {
         className: "flex-1 text-xs",
@@ -1549,7 +1622,7 @@ function ArrayInput({
         },
         disabled
       }
-    ), /* @__PURE__ */ import_react2.default.createElement(
+    ), /* @__PURE__ */ import_react3.default.createElement(
       Button,
       {
         type: "button",
@@ -1559,10 +1632,10 @@ function ArrayInput({
         onClick: () => handleRemoveItem(index),
         disabled: disabled || !canRemove
       },
-      /* @__PURE__ */ import_react2.default.createElement(import_lucide_react9.Trash2, { className: "h-4 w-4" })
+      /* @__PURE__ */ import_react3.default.createElement(import_lucide_react10.Trash2, { className: "h-4 w-4" })
     ));
   };
-  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-2 w-full" }, currentArray.length > 0 ? /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-2" }, currentArray.map(renderItem)) : /* @__PURE__ */ import_react2.default.createElement("p", { className: "text-xs text-[#1c1c1e] italic" }, "No items added to array."), /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react2.default.createElement(
+  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2 w-full" }, currentArray.length > 0 ? /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2" }, currentArray.map(renderItem)) : /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-xs text-[#1c1c1e] italic" }, "No items added to array."), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(
     Button,
     {
       type: "button",
@@ -1572,9 +1645,9 @@ function ArrayInput({
       onClick: handleAddItem,
       disabled: disabled || !canAdd
     },
-    /* @__PURE__ */ import_react2.default.createElement(import_lucide_react9.Plus, { className: "mr-2 h-3.5 w-3.5" }),
+    /* @__PURE__ */ import_react3.default.createElement(import_lucide_react10.Plus, { className: "mr-2 h-3.5 w-3.5" }),
     "Add Item"
-  ), /* @__PURE__ */ import_react2.default.createElement(Badge, { variant: "secondary", className: "text-xs px-1.5 py-0.5 h-5" }, currentArray.length, maxItems !== void 0 ? ` / ${maxItems}` : "")));
+  ), /* @__PURE__ */ import_react3.default.createElement(Badge, { variant: "secondary", className: "text-xs px-1.5 py-0.5 h-5" }, currentArray.length, maxItems !== void 0 ? ` / ${maxItems}` : "")));
 }
 ArrayInput.propTypes = {
   value: import_prop_types2.default.array,
@@ -1587,18 +1660,18 @@ ArrayInput.propTypes = {
 };
 
 // src/components/input-values-form.jsx
-var import_react5 = __toESM(require("react"));
+var import_react6 = __toESM(require("react"));
 var import_prop_types3 = __toESM(require("prop-types"));
 
 // src/components/template-autocomplete-input.jsx
-var import_react4 = __toESM(require("react"));
+var import_react5 = __toESM(require("react"));
 var import_view3 = require("@codemirror/view");
 var import_state3 = require("@codemirror/state");
 var import_commands2 = require("@codemirror/commands");
 var import_autocomplete2 = require("@codemirror/autocomplete");
 
 // src/components/template-autocomplete/useMustacheCompletions.js
-var import_react3 = require("react");
+var import_react4 = require("react");
 var import_expression_engine2 = require("@jet-admin/expression-engine");
 function engineTypeToCmType2(type) {
   switch (type) {
@@ -1649,7 +1722,7 @@ function getCursorZone(state, pos) {
   return { inZone: false };
 }
 function useMustacheCompletions(jsonContext, mode = import_expression_engine2.MODES.JS_TEMPLATE) {
-  return (0, import_react3.useMemo)(() => {
+  return (0, import_react4.useMemo)(() => {
     const stateTree = jsonContext && typeof jsonContext === "object" ? jsonContext : null;
     return (ctx) => {
       const zone = getCursorZone(ctx.state, ctx.pos);
@@ -1746,24 +1819,24 @@ var TemplateAutocompleteInput = ({
   className = ""
 }) => {
   const multiline = isTextArea || isParagraph;
-  const containerRef = (0, import_react4.useRef)(null);
-  const viewRef = (0, import_react4.useRef)(null);
-  const internalChange = (0, import_react4.useRef)(false);
-  const readOnlyCompartment2 = (0, import_react4.useRef)(new import_state3.Compartment()).current;
-  const autocompleteCompartment2 = (0, import_react4.useRef)(new import_state3.Compartment()).current;
-  const effectiveContext = (0, import_react4.useMemo)(() => {
+  const containerRef = (0, import_react5.useRef)(null);
+  const viewRef = (0, import_react5.useRef)(null);
+  const internalChange = (0, import_react5.useRef)(false);
+  const readOnlyCompartment2 = (0, import_react5.useRef)(new import_state3.Compartment()).current;
+  const autocompleteCompartment2 = (0, import_react5.useRef)(new import_state3.Compartment()).current;
+  const effectiveContext = (0, import_react5.useMemo)(() => {
     if (jsonContext && typeof jsonContext === "object") return jsonContext;
     if (context && typeof context === "object") return context;
     if (liveStateTree && typeof liveStateTree === "object") return liveStateTree;
     return {};
   }, [jsonContext, context, liveStateTree]);
   const mustacheSource = useMustacheCompletions(effectiveContext, mode);
-  const mustacheSourceRef = (0, import_react4.useRef)(mustacheSource);
+  const mustacheSourceRef = (0, import_react5.useRef)(mustacheSource);
   mustacheSourceRef.current = mustacheSource;
-  const stableCompletionSource = (0, import_react4.useCallback)((ctx) => {
+  const stableCompletionSource = (0, import_react5.useCallback)((ctx) => {
     return mustacheSourceRef.current(ctx);
   }, []);
-  const boundTokens = (0, import_react4.useMemo)(() => extractTokens(value), [value]);
+  const boundTokens = (0, import_react5.useMemo)(() => extractTokens(value), [value]);
   let singleLineHeight = "26px";
   let fontSize = "12px";
   let px = "8px";
@@ -1780,7 +1853,7 @@ var TemplateAutocompleteInput = ({
   const paddingPx = multiline ? 12 : 0;
   const minContentH = multiline ? `${Math.max(rows * lineHeightPx + paddingPx * 2, 80)}px` : singleLineHeight;
   const maxContentH = multiline ? "400px" : singleLineHeight;
-  const baseExtensions = (0, import_react4.useMemo)(() => {
+  const baseExtensions = (0, import_react5.useMemo)(() => {
     const exts = [
       (0, import_commands2.history)(),
       mustacheHighlighter,
@@ -1939,7 +2012,7 @@ var TemplateAutocompleteInput = ({
     }
     return exts;
   }, [multiline, minContentH, maxContentH, fontSize, px]);
-  (0, import_react4.useEffect)(() => {
+  (0, import_react5.useEffect)(() => {
     if (!containerRef.current) return;
     containerRef.current.innerHTML = "";
     const state = import_state3.EditorState.create({
@@ -1957,7 +2030,7 @@ var TemplateAutocompleteInput = ({
       viewRef.current = null;
     };
   }, [baseExtensions]);
-  (0, import_react4.useEffect)(() => {
+  (0, import_react5.useEffect)(() => {
     const view = viewRef.current;
     if (!view) return;
     if (internalChange.current) {
@@ -1972,17 +2045,17 @@ var TemplateAutocompleteInput = ({
       });
     }
   }, [value]);
-  (0, import_react4.useEffect)(() => {
+  (0, import_react5.useEffect)(() => {
     viewRef.current?.dispatch({
       effects: readOnlyCompartment2.reconfigure(import_state3.EditorState.readOnly.of(readOnly))
     });
   }, [readOnly]);
-  return /* @__PURE__ */ import_react4.default.createElement("div", { className: `relative w-full ${className}` }, /* @__PURE__ */ import_react4.default.createElement(
+  return /* @__PURE__ */ import_react5.default.createElement("div", { className: `relative w-full ${className}` }, /* @__PURE__ */ import_react5.default.createElement(
     "div",
     {
       className: `bg-input-custom border border-input-custom rounded transition-shadow duration-150 [&:has(.cm-focused)]:border-border/80 [&:has(.cm-focused)]:ring-2 [&:has(.cm-focused)]:ring-primary/30`
     },
-    /* @__PURE__ */ import_react4.default.createElement(
+    /* @__PURE__ */ import_react5.default.createElement(
       "div",
       {
         ref: containerRef,
@@ -1990,7 +2063,7 @@ var TemplateAutocompleteInput = ({
         style: { cursor: "text" }
       }
     ),
-    multiline && boundTokens.length > 0 && /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50 rounded-b-[2px]" }, /* @__PURE__ */ import_react4.default.createElement("span", { className: "text-xs font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0" }, "bound"), boundTokens.map((tok, i) => /* @__PURE__ */ import_react4.default.createElement("span", { key: i, className: "inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-xs font-mono text-primary cursor-default max-w-full", title: tok }, /* @__PURE__ */ import_react4.default.createElement("span", { className: "truncate min-w-0" }, tok))))
+    multiline && boundTokens.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center flex-wrap gap-1 px-2 py-1.5 border-t border-border bg-muted/50 rounded-b-[2px]" }, /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-xs font-semibold uppercase tracking-widest text-muted-foreground mr-0.5 shrink-0" }, "bound"), boundTokens.map((tok, i) => /* @__PURE__ */ import_react5.default.createElement("span", { key: i, className: "inline-flex items-center gap-1 px-1.5 py-[1px] rounded-[3px] bg-primary/10 border border-primary/30 text-xs font-mono text-primary cursor-default max-w-full", title: tok }, /* @__PURE__ */ import_react5.default.createElement("span", { className: "truncate min-w-0" }, tok))))
   ));
 };
 
@@ -2006,14 +2079,14 @@ function InputValuesForm({
   templateMode
 }) {
   if (!Array.isArray(inputDefinitions) || inputDefinitions.length === 0) {
-    return /* @__PURE__ */ import_react5.default.createElement("p", { className: "text-xs text-[#1c1c1e] italic" }, "No input parameters defined.");
+    return /* @__PURE__ */ import_react6.default.createElement("p", { className: "text-xs text-[#1c1c1e] italic" }, "No input parameters defined.");
   }
   const renderField = (inputDef) => {
     const inputName = inputDef.key;
     const inputType = inputDef.type || "string";
     const value = values[inputName];
     if (stateTree) {
-      return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", inputType !== "string" && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+      return /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-red-500" }, "*"), " ", inputType !== "string" && /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react6.default.createElement(
         TemplateAutocompleteInput,
         {
           value: typeof value === "string" ? value : value == null ? "" : String(value),
@@ -2027,7 +2100,7 @@ function InputValuesForm({
     }
     switch (inputType) {
       case "boolean":
-        return /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react5.default.createElement(
+        return /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react6.default.createElement(
           Checkbox,
           {
             id: `input-def-${inputName}`,
@@ -2035,18 +2108,18 @@ function InputValuesForm({
             onCheckedChange: (checked) => onChange(inputName, checked),
             disabled
           }
-        ), /* @__PURE__ */ import_react5.default.createElement(
+        ), /* @__PURE__ */ import_react6.default.createElement(
           Label2,
           {
             htmlFor: `input-def-${inputName}`,
             className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           },
           inputName,
-          inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500 ml-1" }, "*"),
-          /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground ml-1" }, "(", inputType, ")")
+          inputDef.required && /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-red-500 ml-1" }, "*"),
+          /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-muted-foreground ml-1" }, "(", inputType, ")")
         ));
       case "array":
-        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+        return /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react6.default.createElement(
           ArrayInput,
           {
             value: Array.isArray(value) ? value : [],
@@ -2056,7 +2129,7 @@ function InputValuesForm({
           }
         ));
       case "object":
-        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+        return /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react6.default.createElement(
           CodeEditor,
           {
             language: "json",
@@ -2068,7 +2141,7 @@ function InputValuesForm({
           }
         ));
       case "number":
-        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+        return /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react6.default.createElement(
           Input,
           {
             type: "number",
@@ -2085,7 +2158,7 @@ function InputValuesForm({
         ));
       // string & default
       default:
-        return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-red-500" }, "*"), " ", inputType !== "string" && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react5.default.createElement(
+        return /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(Label2, { htmlFor: `input-def-${inputName}`, className: "text-xs" }, inputName, " ", inputDef.required && /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-red-500" }, "*"), " ", inputType !== "string" && /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-muted-foreground" }, "(", inputType, ")")), /* @__PURE__ */ import_react6.default.createElement(
           Input,
           {
             type: "text",
@@ -2099,7 +2172,7 @@ function InputValuesForm({
         ));
     }
   };
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: className || "space-y-2" }, inputDefinitions.map((inputDef) => /* @__PURE__ */ import_react5.default.createElement("div", { key: inputDef.key, className: "space-y-1" }, renderField(inputDef), errors[inputDef.key] && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-destructive text-xs" }, errors[inputDef.key]))));
+  return /* @__PURE__ */ import_react6.default.createElement("div", { className: className || "space-y-2" }, inputDefinitions.map((inputDef) => /* @__PURE__ */ import_react6.default.createElement("div", { key: inputDef.key, className: "space-y-1" }, renderField(inputDef), errors[inputDef.key] && /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-destructive text-xs" }, errors[inputDef.key]))));
 }
 InputValuesForm.propTypes = {
   inputDefinitions: import_prop_types3.default.arrayOf(
@@ -2119,9 +2192,9 @@ InputValuesForm.propTypes = {
 };
 
 // src/components/pageHeader.jsx
-var import_react6 = __toESM(require("react"));
+var import_react7 = __toESM(require("react"));
 var import_prop_types4 = __toESM(require("prop-types"));
-var import_lucide_react10 = require("lucide-react");
+var import_lucide_react11 = require("lucide-react");
 var import_react_router_dom = require("react-router-dom");
 var PageHeader = ({
   title,
@@ -2140,7 +2213,7 @@ var PageHeader = ({
   children,
   leadingChildren
 }) => {
-  return /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-2" }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex flex-row justify-start items-center gap-2" }, leadingChildren, /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex items-center gap-4" }, /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement("h1", { className: "text-base font-semibold tracking-tight text-foreground leading-none" }, title), id && /* @__PURE__ */ import_react6.default.createElement("p", { className: "mt-1.5 font-mono text-xs text-muted-foreground" }, "ID: ", id), subTitle && /* @__PURE__ */ import_react6.default.createElement("p", { className: "mt-1.5 font-mono text-xs text-muted-foreground" }, subTitle)))), /* @__PURE__ */ import_react6.default.createElement("div", { className: "flex items-center gap-2" }, children, hasHistory && onHistory && /* @__PURE__ */ import_react6.default.createElement(Button, { variant: "outline", size: "sm", onClick: onHistory }, "View History"), onClone && /* @__PURE__ */ import_react6.default.createElement(Button, { variant: "outline", size: "sm", onClick: onClone, disabled: isCloning }, isCloning && /* @__PURE__ */ import_react6.default.createElement(Spinner, { size: 14, className: "mr-2" }), "Clone"), onDelete && /* @__PURE__ */ import_react6.default.createElement(
+  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-2" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex flex-row justify-start items-center gap-2" }, leadingChildren, /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex items-center gap-4" }, /* @__PURE__ */ import_react7.default.createElement("div", null, /* @__PURE__ */ import_react7.default.createElement("h1", { className: "text-base font-semibold tracking-tight text-foreground leading-none" }, title), id && /* @__PURE__ */ import_react7.default.createElement("p", { className: "mt-1.5 font-mono text-xs text-muted-foreground" }, "ID: ", id), subTitle && /* @__PURE__ */ import_react7.default.createElement("p", { className: "mt-1.5 font-mono text-xs text-muted-foreground" }, subTitle)))), /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex items-center gap-2" }, children, hasHistory && onHistory && /* @__PURE__ */ import_react7.default.createElement(Button, { variant: "outline", size: "sm", onClick: onHistory }, "View History"), onClone && /* @__PURE__ */ import_react7.default.createElement(Button, { variant: "outline", size: "sm", onClick: onClone, disabled: isCloning }, isCloning && /* @__PURE__ */ import_react7.default.createElement(Spinner, { size: 14, className: "mr-2" }), "Clone"), onDelete && /* @__PURE__ */ import_react7.default.createElement(
     Button,
     {
       variant: "outline",
@@ -2149,9 +2222,9 @@ var PageHeader = ({
       disabled: isDeleting,
       className: "text-destructive hover:bg-destructive/10 border-destructive/20"
     },
-    isDeleting && /* @__PURE__ */ import_react6.default.createElement(Spinner, { size: 14, className: "mr-2" }),
+    isDeleting && /* @__PURE__ */ import_react7.default.createElement(Spinner, { size: 14, className: "mr-2" }),
     "Delete"
-  ), onSave && /* @__PURE__ */ import_react6.default.createElement(Button, { size: "sm", onClick: onSave, disabled: isSaving }, isSaving && /* @__PURE__ */ import_react6.default.createElement(Spinner, { size: 14, className: "mr-2" }), saveText)));
+  ), onSave && /* @__PURE__ */ import_react7.default.createElement(Button, { size: "sm", onClick: onSave, disabled: isSaving }, isSaving && /* @__PURE__ */ import_react7.default.createElement(Spinner, { size: 14, className: "mr-2" }), saveText)));
 };
 PageHeader.propTypes = {
   title: import_prop_types4.default.string.isRequired,
@@ -2169,12 +2242,12 @@ PageHeader.propTypes = {
 };
 
 // src/components/section.jsx
-var React28 = __toESM(require("react"));
-var import_lucide_react11 = require("lucide-react");
-var Section = React28.forwardRef(
+var React29 = __toESM(require("react"));
+var import_lucide_react12 = require("lucide-react");
+var Section = React29.forwardRef(
   ({ className, title, description, children, collapsible = false, defaultOpen = true, ...props }, ref) => {
-    const [isOpen, setIsOpen] = React28.useState(defaultOpen);
-    return /* @__PURE__ */ React28.createElement(
+    const [isOpen, setIsOpen] = React29.useState(defaultOpen);
+    return /* @__PURE__ */ React29.createElement(
       "div",
       {
         ref,
@@ -2184,7 +2257,7 @@ var Section = React28.forwardRef(
         ),
         ...props
       },
-      (title || description) && /* @__PURE__ */ React28.createElement(
+      (title || description) && /* @__PURE__ */ React29.createElement(
         "div",
         {
           className: cn(
@@ -2194,27 +2267,27 @@ var Section = React28.forwardRef(
           ),
           onClick: collapsible ? () => setIsOpen((prev) => !prev) : void 0
         },
-        /* @__PURE__ */ React28.createElement("div", { className: "flex items-center gap-1.5" }, collapsible && /* @__PURE__ */ React28.createElement(
-          import_lucide_react11.ChevronRight,
+        /* @__PURE__ */ React29.createElement("div", { className: "flex items-center gap-1.5" }, collapsible && /* @__PURE__ */ React29.createElement(
+          import_lucide_react12.ChevronRight,
           {
             className: cn(
               "h-3.5 w-3.5 text-muted-foreground transition-transform duration-200",
               isOpen && "rotate-90"
             )
           }
-        ), /* @__PURE__ */ React28.createElement("div", { className: "flex-1 min-w-0" }, title && /* @__PURE__ */ React28.createElement("h3", { className: "text-xs font-semibold text-foreground" }, title), description && /* @__PURE__ */ React28.createElement("p", { className: "text-[11px] text-muted-foreground mt-0.5" }, description)))
+        ), /* @__PURE__ */ React29.createElement("div", { className: "flex-1 min-w-0" }, title && /* @__PURE__ */ React29.createElement("h3", { className: "text-xs font-semibold text-foreground" }, title), description && /* @__PURE__ */ React29.createElement("p", { className: "text-[11px] text-muted-foreground mt-0.5" }, description)))
       ),
-      (!collapsible || isOpen) && /* @__PURE__ */ React28.createElement("div", { className: "p-2 space-y-2" }, children)
+      (!collapsible || isOpen) && /* @__PURE__ */ React29.createElement("div", { className: "p-2 space-y-2" }, children)
     );
   }
 );
 Section.displayName = "Section";
 
 // src/components/error-boundary.jsx
-var import_react7 = __toESM(require("react"));
-var import_lucide_react12 = require("lucide-react");
+var import_react8 = __toESM(require("react"));
+var import_lucide_react13 = require("lucide-react");
 var import_prop_types5 = __toESM(require("prop-types"));
-var ErrorBoundary = class extends import_react7.default.Component {
+var ErrorBoundary = class extends import_react8.default.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -2230,7 +2303,7 @@ var ErrorBoundary = class extends import_react7.default.Component {
       if (this.props.fallback) {
         return this.props.fallback(this.state.error);
       }
-      return /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex h-full w-full items-center justify-center p-4" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "bg-muted/30 p-3 text-xs text-muted-foreground space-y-2 text-center" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex justify-center" }, /* @__PURE__ */ import_react7.default.createElement(import_lucide_react12.AlertTriangle, { className: "h-4 w-4 text-foreground/80" })), /* @__PURE__ */ import_react7.default.createElement("div", { className: "font-medium text-xs text-foreground" }, this.props.title || "Component Error"), /* @__PURE__ */ import_react7.default.createElement("div", { className: "max-w-xs break-words" }, this.state.error?.message || "Something went wrong while rendering this component.")));
+      return /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex h-full w-full items-center justify-center p-4" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-muted/30 p-3 text-xs text-muted-foreground space-y-2 text-center" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex justify-center" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react13.AlertTriangle, { className: "h-4 w-4 text-foreground/80" })), /* @__PURE__ */ import_react8.default.createElement("div", { className: "font-medium text-xs text-foreground" }, this.props.title || "Component Error"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "max-w-xs break-words" }, this.state.error?.message || "Something went wrong while rendering this component.")));
     }
     return this.props.children;
   }
@@ -2242,10 +2315,10 @@ ErrorBoundary.propTypes = {
 };
 
 // src/components/google-oauth-button.jsx
-var import_react8 = __toESM(require("react"));
+var import_react9 = __toESM(require("react"));
 var import_prop_types6 = __toESM(require("prop-types"));
-var import_lucide_react13 = require("lucide-react");
-var GoogleIcon = () => /* @__PURE__ */ import_react8.default.createElement(
+var import_lucide_react14 = require("lucide-react");
+var GoogleIcon = () => /* @__PURE__ */ import_react9.default.createElement(
   "svg",
   {
     className: "mr-2 h-4 w-4",
@@ -2257,7 +2330,7 @@ var GoogleIcon = () => /* @__PURE__ */ import_react8.default.createElement(
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 488 512"
   },
-  /* @__PURE__ */ import_react8.default.createElement(
+  /* @__PURE__ */ import_react9.default.createElement(
     "path",
     {
       fill: "currentColor",
@@ -2276,13 +2349,13 @@ var GoogleOAuthButton = ({
   hasErrors,
   errors
 }) => {
-  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "space-y-1 w-full" }, /* @__PURE__ */ import_react8.default.createElement(
+  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "space-y-1 w-full" }, /* @__PURE__ */ import_react9.default.createElement(
     Label2,
     {
       className: `block text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
     },
     label || description || "Google Authentication"
-  ), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center gap-3 p-4 border border-border rounded bg-card text-card-foreground shadow-sm" }, isConnected ? /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 flex-1" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react13.CheckCircle2, { className: "w-5 h-5 text-emerald-500 flex-shrink-0" }), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Google Account Connected"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground font-mono truncate max-w-xs sm:max-w-md" }, "Credential ID: ", credentialId))), /* @__PURE__ */ import_react8.default.createElement(
+  ), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center gap-3 p-4 border border-border rounded bg-card text-card-foreground shadow-sm" }, isConnected ? /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center gap-2 flex-1" }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react14.CheckCircle2, { className: "w-5 h-5 text-emerald-500 flex-shrink-0" }), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Google Account Connected"), /* @__PURE__ */ import_react9.default.createElement("p", { className: "text-xs text-muted-foreground font-mono truncate max-w-xs sm:max-w-md" }, "Credential ID: ", credentialId))), /* @__PURE__ */ import_react9.default.createElement(
     Button,
     {
       type: "button",
@@ -2292,7 +2365,7 @@ var GoogleOAuthButton = ({
       onClick
     },
     loading ? "Connecting..." : "Reconnect Account"
-  )) : /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 flex-1" }, /* @__PURE__ */ import_react8.default.createElement(import_lucide_react13.AlertCircle, { className: "w-5 h-5 text-yellow-500 flex-shrink-0" }), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Account authentication required"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Connect your Google Account to enable database query execution."))), /* @__PURE__ */ import_react8.default.createElement(
+  )) : /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-center gap-2 flex-1" }, /* @__PURE__ */ import_react9.default.createElement(import_lucide_react14.AlertCircle, { className: "w-5 h-5 text-yellow-500 flex-shrink-0" }), /* @__PURE__ */ import_react9.default.createElement("div", null, /* @__PURE__ */ import_react9.default.createElement("p", { className: "text-sm font-semibold text-foreground" }, "Account authentication required"), /* @__PURE__ */ import_react9.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Connect your Google Account to enable database query execution."))), /* @__PURE__ */ import_react9.default.createElement(
     Button,
     {
       type: "button",
@@ -2302,9 +2375,9 @@ var GoogleOAuthButton = ({
       onClick,
       className: "bg-blue-600 hover:bg-blue-700 text-white flex items-center"
     },
-    /* @__PURE__ */ import_react8.default.createElement(GoogleIcon, null),
+    /* @__PURE__ */ import_react9.default.createElement(GoogleIcon, null),
     loading ? "Connecting..." : "Connect Google Account"
-  ))), hasErrors && errors && /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
+  ))), hasErrors && errors && /* @__PURE__ */ import_react9.default.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
 };
 GoogleOAuthButton.propTypes = {
   isConnected: import_prop_types6.default.bool.isRequired,
@@ -2319,10 +2392,10 @@ GoogleOAuthButton.propTypes = {
 };
 
 // src/components/callout.jsx
-var React31 = __toESM(require("react"));
-var import_lucide_react14 = require("lucide-react");
-var Callout = React31.forwardRef(({ className, children, icon: Icon2 = import_lucide_react14.Info, ...props }, ref) => {
-  return /* @__PURE__ */ React31.createElement(
+var React32 = __toESM(require("react"));
+var import_lucide_react15 = require("lucide-react");
+var Callout = React32.forwardRef(({ className, children, icon: Icon2 = import_lucide_react15.Info, ...props }, ref) => {
+  return /* @__PURE__ */ React32.createElement(
     "div",
     {
       ref,
@@ -2332,16 +2405,16 @@ var Callout = React31.forwardRef(({ className, children, icon: Icon2 = import_lu
       ),
       ...props
     },
-    /* @__PURE__ */ React31.createElement(Icon2, { className: "h-3.5 w-3.5 mt-0.5 shrink-0" }),
-    /* @__PURE__ */ React31.createElement("span", { className: "flex-1" }, children)
+    /* @__PURE__ */ React32.createElement(Icon2, { className: "h-3.5 w-3.5 mt-0.5 shrink-0" }),
+    /* @__PURE__ */ React32.createElement("span", { className: "flex-1" }, children)
   );
 });
 Callout.displayName = "Callout";
 
 // src/components/empty-state.jsx
-var React32 = __toESM(require("react"));
-var EmptyState = React32.forwardRef(({ className, icon: Icon2, message, action, ...props }, ref) => {
-  return /* @__PURE__ */ React32.createElement(
+var React33 = __toESM(require("react"));
+var EmptyState = React33.forwardRef(({ className, icon: Icon2, message, action, ...props }, ref) => {
+  return /* @__PURE__ */ React33.createElement(
     "div",
     {
       ref,
@@ -2351,17 +2424,17 @@ var EmptyState = React32.forwardRef(({ className, icon: Icon2, message, action, 
       ),
       ...props
     },
-    Icon2 && /* @__PURE__ */ React32.createElement(Icon2, { className: "h-8 w-8 text-muted-foreground/40" }),
-    /* @__PURE__ */ React32.createElement("p", { className: "text-sm text-muted-foreground text-center" }, message),
+    Icon2 && /* @__PURE__ */ React33.createElement(Icon2, { className: "h-8 w-8 text-muted-foreground/40" }),
+    /* @__PURE__ */ React33.createElement("p", { className: "text-sm text-muted-foreground text-center" }, message),
     action
   );
 });
 EmptyState.displayName = "EmptyState";
 
 // src/components/logic-chip.jsx
-var React33 = __toESM(require("react"));
-var LogicChip = React33.forwardRef(({ className, value, onChange, ...props }, ref) => {
-  return /* @__PURE__ */ React33.createElement(
+var React34 = __toESM(require("react"));
+var LogicChip = React34.forwardRef(({ className, value, onChange, ...props }, ref) => {
+  return /* @__PURE__ */ React34.createElement(
     "button",
     {
       ref,
@@ -2380,8 +2453,8 @@ var LogicChip = React33.forwardRef(({ className, value, onChange, ...props }, re
 LogicChip.displayName = "LogicChip";
 
 // src/components/search-select.jsx
-var React34 = __toESM(require("react"));
-var import_lucide_react15 = require("lucide-react");
+var React35 = __toESM(require("react"));
+var import_lucide_react16 = require("lucide-react");
 var SelectPrimitive2 = __toESM(require("@radix-ui/react-select"));
 var import_class_variance_authority5 = require("class-variance-authority");
 var searchSelectVariants = (0, import_class_variance_authority5.cva)(
@@ -2399,7 +2472,7 @@ var searchSelectVariants = (0, import_class_variance_authority5.cva)(
     }
   }
 );
-var SearchSelect = React34.forwardRef(
+var SearchSelect = React35.forwardRef(
   ({
     value,
     onChange,
@@ -2416,10 +2489,10 @@ var SearchSelect = React34.forwardRef(
     disabled = false,
     selectedLabel
   }, ref) => {
-    const [open, setOpen] = React34.useState(false);
-    const [localQuery, setLocalQuery] = React34.useState("");
-    const searchInputRef = React34.useRef(null);
-    React34.useEffect(() => {
+    const [open, setOpen] = React35.useState(false);
+    const [localQuery, setLocalQuery] = React35.useState("");
+    const searchInputRef = React35.useRef(null);
+    React35.useEffect(() => {
       if (!open) {
         setLocalQuery("");
         if (onSearchChange) {
@@ -2446,7 +2519,7 @@ var SearchSelect = React34.forwardRef(
         }
       }
     };
-    const filteredOptions = React34.useMemo(() => {
+    const filteredOptions = React35.useMemo(() => {
       if (onSearchChange) {
         return options;
       }
@@ -2457,10 +2530,10 @@ var SearchSelect = React34.forwardRef(
         (option) => option.label.toLowerCase().includes(localQuery.toLowerCase())
       );
     }, [options, localQuery, onSearchChange]);
-    const selectedOption = React34.useMemo(() => {
+    const selectedOption = React35.useMemo(() => {
       return options.find((opt) => opt.value === value);
     }, [options, value]);
-    return /* @__PURE__ */ React34.createElement(
+    return /* @__PURE__ */ React35.createElement(
       SelectPrimitive2.Root,
       {
         open,
@@ -2471,7 +2544,7 @@ var SearchSelect = React34.forwardRef(
         },
         disabled
       },
-      /* @__PURE__ */ React34.createElement(SelectPrimitive2.Trigger, { asChild: true }, /* @__PURE__ */ React34.createElement(
+      /* @__PURE__ */ React35.createElement(SelectPrimitive2.Trigger, { asChild: true }, /* @__PURE__ */ React35.createElement(
         "button",
         {
           ref,
@@ -2479,10 +2552,10 @@ var SearchSelect = React34.forwardRef(
           disabled,
           className: cn(searchSelectVariants({ size }), className)
         },
-        /* @__PURE__ */ React34.createElement("span", { className: "truncate" }, selectedOption ? selectedOption.label : selectedLabel || placeholder),
-        /* @__PURE__ */ React34.createElement(import_lucide_react15.ChevronDown, { className: "h-4 w-4 opacity-50 shrink-0 ml-2" })
+        /* @__PURE__ */ React35.createElement("span", { className: "truncate" }, selectedOption ? selectedOption.label : selectedLabel || placeholder),
+        /* @__PURE__ */ React35.createElement(import_lucide_react16.ChevronDown, { className: "h-4 w-4 opacity-50 shrink-0 ml-2" })
       )),
-      /* @__PURE__ */ React34.createElement(SelectPrimitive2.Portal, null, /* @__PURE__ */ React34.createElement(
+      /* @__PURE__ */ React35.createElement(SelectPrimitive2.Portal, null, /* @__PURE__ */ React35.createElement(
         SelectPrimitive2.Content,
         {
           position: "popper",
@@ -2492,14 +2565,14 @@ var SearchSelect = React34.forwardRef(
           },
           className: "relative z-[1200] max-h-96 min-w-[200px] w-[var(--radix-select-trigger-width)] overflow-hidden rounded border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1"
         },
-        /* @__PURE__ */ React34.createElement(
+        /* @__PURE__ */ React35.createElement(
           "div",
           {
             className: "border-b border-border/50 p-2",
             onKeyDown: (e) => e.stopPropagation(),
             onPointerDown: (e) => e.stopPropagation()
           },
-          /* @__PURE__ */ React34.createElement("div", { className: "relative" }, /* @__PURE__ */ React34.createElement(import_lucide_react15.Search, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" }), /* @__PURE__ */ React34.createElement(
+          /* @__PURE__ */ React35.createElement("div", { className: "relative" }, /* @__PURE__ */ React35.createElement(import_lucide_react16.Search, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" }), /* @__PURE__ */ React35.createElement(
             Input,
             {
               ref: searchInputRef,
@@ -2511,16 +2584,16 @@ var SearchSelect = React34.forwardRef(
             }
           ))
         ),
-        /* @__PURE__ */ React34.createElement(
+        /* @__PURE__ */ React35.createElement(
           SelectPrimitive2.Viewport,
           {
             onScroll: handleScroll,
             className: "max-h-[220px] overflow-y-auto p-1 space-y-0.5"
           },
-          isLoading ? /* @__PURE__ */ React34.createElement("div", { className: "flex items-center justify-center p-4 text-xs text-muted-foreground" }, /* @__PURE__ */ React34.createElement(import_lucide_react15.Loader2, { className: "h-4 w-4 animate-spin mr-2" }), "Loading...") : filteredOptions.length === 0 ? /* @__PURE__ */ React34.createElement("div", { className: "p-4 text-center text-xs text-muted-foreground" }, "No options found") : /* @__PURE__ */ React34.createElement(React34.Fragment, null, filteredOptions.map((option) => {
+          isLoading ? /* @__PURE__ */ React35.createElement("div", { className: "flex items-center justify-center p-4 text-xs text-muted-foreground" }, /* @__PURE__ */ React35.createElement(import_lucide_react16.Loader2, { className: "h-4 w-4 animate-spin mr-2" }), "Loading...") : filteredOptions.length === 0 ? /* @__PURE__ */ React35.createElement("div", { className: "p-4 text-center text-xs text-muted-foreground" }, "No options found") : /* @__PURE__ */ React35.createElement(React35.Fragment, null, filteredOptions.map((option) => {
             const isSelected = option.value === value;
             const itemValue = option.value === "" ? "___EMPTY___" : option.value;
-            return /* @__PURE__ */ React34.createElement(
+            return /* @__PURE__ */ React35.createElement(
               SelectPrimitive2.Item,
               {
                 key: option.value,
@@ -2530,10 +2603,10 @@ var SearchSelect = React34.forwardRef(
                   isSelected && "font-medium"
                 )
               },
-              /* @__PURE__ */ React34.createElement("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center" }, /* @__PURE__ */ React34.createElement(SelectPrimitive2.ItemIndicator, null, /* @__PURE__ */ React34.createElement(import_lucide_react15.Check, { className: "h-4 w-4 text-primary" }))),
-              /* @__PURE__ */ React34.createElement(SelectPrimitive2.ItemText, null, /* @__PURE__ */ React34.createElement("span", { className: "truncate" }, option.label))
+              /* @__PURE__ */ React35.createElement("span", { className: "absolute left-2 flex h-3.5 w-3.5 items-center justify-center" }, /* @__PURE__ */ React35.createElement(SelectPrimitive2.ItemIndicator, null, /* @__PURE__ */ React35.createElement(import_lucide_react16.Check, { className: "h-4 w-4 text-primary" }))),
+              /* @__PURE__ */ React35.createElement(SelectPrimitive2.ItemText, null, /* @__PURE__ */ React35.createElement("span", { className: "truncate" }, option.label))
             );
-          }), isFetchingNextPage && /* @__PURE__ */ React34.createElement("div", { className: "flex items-center justify-center p-2 text-xs text-muted-foreground animate-pulse" }, /* @__PURE__ */ React34.createElement(import_lucide_react15.Loader2, { className: "h-3 w-3 animate-spin mr-1.5" }), "Loading more..."))
+          }), isFetchingNextPage && /* @__PURE__ */ React35.createElement("div", { className: "flex items-center justify-center p-2 text-xs text-muted-foreground animate-pulse" }, /* @__PURE__ */ React35.createElement(import_lucide_react16.Loader2, { className: "h-3 w-3 animate-spin mr-1.5" }), "Loading more..."))
         )
       ))
     );
@@ -2542,10 +2615,10 @@ var SearchSelect = React34.forwardRef(
 SearchSelect.displayName = "SearchSelect";
 
 // src/components/multi-search-select.jsx
-var React35 = __toESM(require("react"));
-var import_lucide_react16 = require("lucide-react");
+var React36 = __toESM(require("react"));
+var import_lucide_react17 = require("lucide-react");
 var PopoverPrimitive2 = __toESM(require("@radix-ui/react-popover"));
-var MultiSearchSelect = React35.forwardRef(
+var MultiSearchSelect = React36.forwardRef(
   ({
     value = [],
     onChange,
@@ -2560,10 +2633,10 @@ var MultiSearchSelect = React35.forwardRef(
     renderLabel,
     maxDisplayed = 5
   }, ref) => {
-    const [open, setOpen] = React35.useState(false);
-    const [localQuery, setLocalQuery] = React35.useState("");
-    const searchInputRef = React35.useRef(null);
-    React35.useEffect(() => {
+    const [open, setOpen] = React36.useState(false);
+    const [localQuery, setLocalQuery] = React36.useState("");
+    const searchInputRef = React36.useRef(null);
+    React36.useEffect(() => {
       if (!open) {
         setLocalQuery("");
       }
@@ -2571,7 +2644,7 @@ var MultiSearchSelect = React35.forwardRef(
     const handleSearchChange = (e) => {
       setLocalQuery(e.target.value);
     };
-    const filteredOptions = React35.useMemo(() => {
+    const filteredOptions = React36.useMemo(() => {
       if (!localQuery) {
         return options;
       }
@@ -2580,21 +2653,21 @@ var MultiSearchSelect = React35.forwardRef(
         (option) => option.label.toLowerCase().includes(q) || option.description && option.description.toLowerCase().includes(q)
       );
     }, [options, localQuery]);
-    const toggleOption = React35.useCallback(
+    const toggleOption = React36.useCallback(
       (optionValue) => {
         const newValue = value.includes(optionValue) ? value.filter((v) => v !== optionValue) : [...value, optionValue];
         onChange(newValue);
       },
       [value, onChange]
     );
-    const removeOption = React35.useCallback(
+    const removeOption = React36.useCallback(
       (optionValue, e) => {
         e.stopPropagation();
         onChange(value.filter((v) => v !== optionValue));
       },
       [value, onChange]
     );
-    const optionMap = React35.useMemo(() => {
+    const optionMap = React36.useMemo(() => {
       const map = {};
       options.forEach((opt) => {
         map[opt.value] = opt;
@@ -2603,7 +2676,7 @@ var MultiSearchSelect = React35.forwardRef(
     }, [options]);
     const displayedValues = value.slice(0, maxDisplayed);
     const overflowCount = value.length - maxDisplayed;
-    return /* @__PURE__ */ React35.createElement(PopoverPrimitive2.Root, { open, onOpenChange: setOpen }, /* @__PURE__ */ React35.createElement(PopoverPrimitive2.Trigger, { asChild: true }, /* @__PURE__ */ React35.createElement(
+    return /* @__PURE__ */ React36.createElement(PopoverPrimitive2.Root, { open, onOpenChange: setOpen }, /* @__PURE__ */ React36.createElement(PopoverPrimitive2.Trigger, { asChild: true }, /* @__PURE__ */ React36.createElement(
       "button",
       {
         ref,
@@ -2614,9 +2687,9 @@ var MultiSearchSelect = React35.forwardRef(
           className
         )
       },
-      value.length > 0 ? /* @__PURE__ */ React35.createElement(React35.Fragment, null, displayedValues.map((v) => {
+      value.length > 0 ? /* @__PURE__ */ React36.createElement(React36.Fragment, null, displayedValues.map((v) => {
         const opt = optionMap[v];
-        return /* @__PURE__ */ React35.createElement(
+        return /* @__PURE__ */ React36.createElement(
           Badge,
           {
             key: v,
@@ -2626,8 +2699,8 @@ var MultiSearchSelect = React35.forwardRef(
               badgeClassName
             )
           },
-          /* @__PURE__ */ React35.createElement("span", { className: "truncate max-w-[120px]" }, opt ? opt.label : v),
-          /* @__PURE__ */ React35.createElement(
+          /* @__PURE__ */ React36.createElement("span", { className: "truncate max-w-[120px]" }, opt ? opt.label : v),
+          /* @__PURE__ */ React36.createElement(
             "span",
             {
               role: "button",
@@ -2639,12 +2712,12 @@ var MultiSearchSelect = React35.forwardRef(
               },
               onClick: (e) => removeOption(v, e)
             },
-            /* @__PURE__ */ React35.createElement(import_lucide_react16.X, { className: "h-3 w-3" })
+            /* @__PURE__ */ React36.createElement(import_lucide_react17.X, { className: "h-3 w-3" })
           )
         );
-      }), overflowCount > 0 && /* @__PURE__ */ React35.createElement("span", { className: "text-xs text-muted-foreground" }, "+", overflowCount, " more")) : /* @__PURE__ */ React35.createElement("span", { className: "text-sm text-muted-foreground py-0.5" }, placeholder),
-      /* @__PURE__ */ React35.createElement(import_lucide_react16.ChevronDown, { className: "h-4 w-4 opacity-50 shrink-0 ml-auto" })
-    )), /* @__PURE__ */ React35.createElement(PopoverPrimitive2.Portal, null, /* @__PURE__ */ React35.createElement(
+      }), overflowCount > 0 && /* @__PURE__ */ React36.createElement("span", { className: "text-xs text-muted-foreground" }, "+", overflowCount, " more")) : /* @__PURE__ */ React36.createElement("span", { className: "text-sm text-muted-foreground py-0.5" }, placeholder),
+      /* @__PURE__ */ React36.createElement(import_lucide_react17.ChevronDown, { className: "h-4 w-4 opacity-50 shrink-0 ml-auto" })
+    )), /* @__PURE__ */ React36.createElement(PopoverPrimitive2.Portal, null, /* @__PURE__ */ React36.createElement(
       PopoverPrimitive2.Content,
       {
         align: "start",
@@ -2655,13 +2728,13 @@ var MultiSearchSelect = React35.forwardRef(
         },
         className: "z-[1200] w-[var(--radix-popover-trigger-width)] max-h-80 overflow-hidden rounded border border-border bg-background text-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
       },
-      /* @__PURE__ */ React35.createElement(
+      /* @__PURE__ */ React36.createElement(
         "div",
         {
           className: "border-b border-border/50 p-2",
           onKeyDown: (e) => e.stopPropagation()
         },
-        /* @__PURE__ */ React35.createElement("div", { className: "relative" }, /* @__PURE__ */ React35.createElement(import_lucide_react16.Search, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" }), /* @__PURE__ */ React35.createElement(
+        /* @__PURE__ */ React36.createElement("div", { className: "relative" }, /* @__PURE__ */ React36.createElement(import_lucide_react17.Search, { className: "absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50 z-10" }), /* @__PURE__ */ React36.createElement(
           Input,
           {
             ref: searchInputRef,
@@ -2673,9 +2746,9 @@ var MultiSearchSelect = React35.forwardRef(
           }
         ))
       ),
-      /* @__PURE__ */ React35.createElement("div", { className: "max-h-[220px] overflow-y-auto p-1 space-y-0.5" }, isLoading ? /* @__PURE__ */ React35.createElement("div", { className: "flex items-center justify-center p-4 text-xs text-muted-foreground" }, /* @__PURE__ */ React35.createElement(import_lucide_react16.Loader2, { className: "h-4 w-4 animate-spin mr-2" }), "Loading...") : filteredOptions.length === 0 ? /* @__PURE__ */ React35.createElement("div", { className: "p-4 text-center text-xs text-muted-foreground" }, "No options found") : filteredOptions.map((option) => {
+      /* @__PURE__ */ React36.createElement("div", { className: "max-h-[220px] overflow-y-auto p-1 space-y-0.5" }, isLoading ? /* @__PURE__ */ React36.createElement("div", { className: "flex items-center justify-center p-4 text-xs text-muted-foreground" }, /* @__PURE__ */ React36.createElement(import_lucide_react17.Loader2, { className: "h-4 w-4 animate-spin mr-2" }), "Loading...") : filteredOptions.length === 0 ? /* @__PURE__ */ React36.createElement("div", { className: "p-4 text-center text-xs text-muted-foreground" }, "No options found") : filteredOptions.map((option) => {
         const isSelected = value.includes(option.value);
-        return /* @__PURE__ */ React35.createElement(
+        return /* @__PURE__ */ React36.createElement(
           "div",
           {
             key: option.value,
@@ -2687,11 +2760,11 @@ var MultiSearchSelect = React35.forwardRef(
             ),
             onClick: () => toggleOption(option.value)
           },
-          /* @__PURE__ */ React35.createElement("span", { className: "absolute left-2 top-2 flex h-3.5 w-3.5 items-center justify-center" }, isSelected && /* @__PURE__ */ React35.createElement(import_lucide_react16.Check, { className: "h-4 w-4 text-primary" })),
-          renderLabel ? renderLabel(option) : /* @__PURE__ */ React35.createElement("div", { className: "flex flex-col" }, /* @__PURE__ */ React35.createElement("span", { className: "truncate" }, option.label), option.description && /* @__PURE__ */ React35.createElement("span", { className: "text-xs text-muted-foreground truncate" }, option.description))
+          /* @__PURE__ */ React36.createElement("span", { className: "absolute left-2 top-2 flex h-3.5 w-3.5 items-center justify-center" }, isSelected && /* @__PURE__ */ React36.createElement(import_lucide_react17.Check, { className: "h-4 w-4 text-primary" })),
+          renderLabel ? renderLabel(option) : /* @__PURE__ */ React36.createElement("div", { className: "flex flex-col" }, /* @__PURE__ */ React36.createElement("span", { className: "truncate" }, option.label), option.description && /* @__PURE__ */ React36.createElement("span", { className: "text-xs text-muted-foreground truncate" }, option.description))
         );
       })),
-      value.length > 0 && /* @__PURE__ */ React35.createElement("div", { className: "border-t border-border/50 px-2 py-1.5 text-[11px] text-muted-foreground flex items-center justify-between" }, /* @__PURE__ */ React35.createElement("span", null, value.length, " selected"), /* @__PURE__ */ React35.createElement(
+      value.length > 0 && /* @__PURE__ */ React36.createElement("div", { className: "border-t border-border/50 px-2 py-1.5 text-[11px] text-muted-foreground flex items-center justify-between" }, /* @__PURE__ */ React36.createElement("span", null, value.length, " selected"), /* @__PURE__ */ React36.createElement(
         "button",
         {
           type: "button",

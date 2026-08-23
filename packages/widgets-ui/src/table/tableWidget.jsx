@@ -172,9 +172,16 @@ export const TableWidget = ({
   }, [globalFilter, searchConfig.serverSide, searchConfig.enabled, fireWidgetEvent]);
 
   // ── Sync selection state to runtime ──
+  // Signature-guarded: without this, every dispatch here re-renders the slot
+  // with fresh prop identities, which re-fires this effect → dispatch → …
+  // ("Maximum update depth exceeded").
+  const lastSyncSignatureRef = useRef(null);
   useEffect(() => {
     if (!setWidgetState) return;
     const selectedIndices = Object.keys(rowSelection).filter(k => rowSelection[k]).map(Number);
+    const signature = JSON.stringify([globalFilter, selectedIndices, pendingEdits]);
+    if (lastSyncSignatureRef.current === signature) return;
+    lastSyncSignatureRef.current = signature;
     setWidgetState(prev => ({
       ...prev,
       searchTerm: globalFilter,
@@ -404,20 +411,33 @@ export const TableWidget = ({
   }, [setWidgetState, onRowSelect, fireWidgetEvent]);
 
   // ── Widget init ──
+  // Register methods ONCE per mount. The handlers read live data through
+  // refs so the registration never needs to repeat (re-registering on every
+  // data change would dispatch new method objects into the page runtime in
+  // an infinite loop).
+  const rowsRef = useRef(rows);
+  useEffect(() => { rowsRef.current = rows; }, [rows]);
+
+  const widgetMethodsRef = useRef(null);
+  if (!widgetMethodsRef.current) {
+    widgetMethodsRef.current = {
+      refresh: () => { if (runWorkflow) runWorkflow(); if (refreshData) refreshData(); },
+      setSelectedRow: (index) => {
+        const i = Number(index);
+        const currentRows = rowsRef.current;
+        if (!isNaN(i) && i >= 0 && i < currentRows.length) {
+          if (setWidgetState) setWidgetState(prev => ({ ...prev, selectedRowIndex: i, selectedRow: currentRows[i] }));
+          if (onRowSelect) onRowSelect(currentRows[i], i);
+        }
+      },
+    };
+  }
+
   useEffect(() => {
     if (onWidgetInit) {
-      onWidgetInit({
-        refresh: () => { if (runWorkflow) runWorkflow(); if (refreshData) refreshData(); },
-        setSelectedRow: (index) => {
-          const i = Number(index);
-          if (!isNaN(i) && i >= 0 && i < rows.length) {
-            if (setWidgetState) setWidgetState(prev => ({ ...prev, selectedRowIndex: i, selectedRow: rows[i] }));
-            if (onRowSelect) onRowSelect(rows[i], i);
-          }
-        },
-      });
+      onWidgetInit(widgetMethodsRef.current);
     }
-  }, [onWidgetInit, runWorkflow, refreshData, rows, setWidgetState, onRowSelect]);
+  }, [onWidgetInit]);
 
   // ── Render states ──
   const showToolbar = searchConfig.enabled || exportConfig.enabled;

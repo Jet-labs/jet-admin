@@ -105,7 +105,7 @@ export function CanvasZStack({
 
       {/* Layer Switcher — shown when selected and has layers */}
       {!previewMode && isSelected && hasLayers && (
-        <div className="absolute top-2 left-2 z-50 flex items-center gap-1 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-md px-1.5 py-1">
+        <div className="absolute top-2 left-2 z-50 flex items-center gap-1 bg-background/95 backdrop-blur-sm border border-border rounded shadow-md px-1.5 py-1">
           <span className="text-[8px] font-mono text-muted-foreground px-1 uppercase tracking-widest">Layers</span>
           <div className="w-px h-4 bg-border/60" />
           {childNodeIds.map((_, idx) => (

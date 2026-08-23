@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { AppPageUpdationForm } from "../../components/appPageComponents/appPageUpdationForm";
+import { AppPageUpdationForm } from "../../components/appPageComponents/forms/appPageUpdationForm";
 
 const UpdateAppPagePage = () => {
   const { tenantID, appPageID } = useParams();

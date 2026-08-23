@@ -11,12 +11,6 @@ import { displayError, displaySuccess } from "../../../../utils/notification";
 import { Button, Spinner } from "@jet-admin/ui";
 
 export const AppPageCloneForm = ({ tenantID, appPageID }) => {
-  AppPageCloneForm.propTypes = {
-    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-    appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-      .isRequired,
-  };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
   const queryClient = useQueryClient();
@@ -73,4 +67,11 @@ export const AppPageCloneForm = ({ tenantID, appPageID }) => {
       )}
     </Button>
   );
+};
+
+AppPageCloneForm.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
 };

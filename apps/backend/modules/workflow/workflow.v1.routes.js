@@ -15,6 +15,7 @@ const {
   workflowIdParamSchema,
   instanceIdParamSchema,
   listWorkflowsQuerySchema,
+  listInstancesQuerySchema,
 } = require("./workflow.validator");
 const { P } = require("../../config/permissions");
 const dataCollectionRoutes = require("./dataCollection/dataCollection.v1.routes");
@@ -32,6 +33,16 @@ router.get(
   validate(listWorkflowsQuerySchema, "query"),
   authMiddleware.authorize(P.workflow.list),
   workflowController.getAllWorkflows
+);
+
+// List workflow run history for the tenant (query: workflowID?, status?, page, pageSize)
+// NOTE: must be registered before GET /:workflowID, otherwise Express
+// matches "instances" as a workflowID param and rejects it as non-UUID.
+router.get(
+  "/instances",
+  validate(listInstancesQuerySchema, "query"),
+  authMiddleware.authorize(P.workflow.list),
+  workflowController.getWorkflowInstances
 );
 
 // Create workflow

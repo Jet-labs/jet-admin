@@ -11,7 +11,8 @@
  *    (prevents unnecessary sync calls that cause infinite re-render loops).
  *  - Properly flushes pending sync on unmount.
  */
-import React, { useCallback, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
+import { useCallback, useEffect, useRef } from "react";
 import { useEditor } from "@craftjs/core";
 import { craftToTree } from "../engine/craftAdapter.js";
 import { balanceCraftRow } from "../engine/layoutEngine.js";
@@ -61,7 +62,7 @@ export default function EditorSyncBridge({ onChangeLayout }) {
 
       // Apply span changes to Craft state if balancing modified anything
       if (changed) {
-        Object.entries(craftNodes).forEach(([id, node]) => {
+        Object.values(craftNodes).forEach((node) => {
           if (node.displayName === "CanvasRow") {
             (node.nodes || []).forEach((childId) => {
               const child = craftNodes[childId];
@@ -82,8 +83,6 @@ export default function EditorSyncBridge({ onChangeLayout }) {
       lastSerializedRef.current = finalSerialized;
 
       const finalNodes = JSON.parse(finalSerialized);
-      console.log("[EditorSyncBridge] Serialized Craft Nodes State:", finalNodes);
-      
       const treeRoot = craftToTree(finalNodes, "ROOT");
       if (treeRoot) {
         onChangeLayout(treeRoot);
@@ -111,9 +110,7 @@ export default function EditorSyncBridge({ onChangeLayout }) {
     const handleFlush = () => sync();
     window.addEventListener("flush-editor-sync", handleFlush);
     return () => window.removeEventListener("flush-editor-sync", handleFlush);
-  }, [sync]);
-
-  // Keyboard shortcuts (Ctrl+Z / Ctrl+Y / Delete)
+  }, [sync]);  // Keyboard shortcuts (Ctrl+Z / Ctrl+Y / Delete)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!enabled) return;
@@ -143,3 +140,7 @@ export default function EditorSyncBridge({ onChangeLayout }) {
 
   return null;
 }
+
+EditorSyncBridge.propTypes = {
+  onChangeLayout: PropTypes.func,
+};

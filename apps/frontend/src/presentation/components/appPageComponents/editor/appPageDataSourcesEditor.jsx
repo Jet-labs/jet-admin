@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState } from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useInfiniteWorkflows } from "../../../../logic/hooks/useWorkflows";
@@ -29,12 +29,13 @@ import { stopTestWorkflowAPI } from "../../../../data/apis/workflow";
 import { executeWorkflowWithStreaming } from "../../../../logic/appPageRuntime/executeWorkflowWithStreaming";
 import { resolveValue } from "../../../../logic/evaluationEngine";
 import { useSocketStore } from "../../../../logic/stores/useSocketStore";
-import { ReactQueryLoadingErrorWrapper } from "../../ui/reactQueryLoadingErrorWrapper";
 import { displaySuccess, displayError } from "../../../../utils/notification";
 import { CONSTANTS } from "../../../../constants";
+import { useGlobalUI } from "../../../../logic/stores/useUIStore";
 
 export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
   const { tenantID } = useParams();
+  const { showConfirmation } = useGlobalUI();
 
   const [workflowSearch, setWorkflowSearch] = useState("");
   const debouncedWorkflowSearch = useDebounce(workflowSearch, 300);
@@ -44,7 +45,6 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     isFetchingNextPage: isFetchingNextWorkflowsPage,
     hasNextPage: hasNextWorkflowsPage,
     fetchNextPage: fetchNextWorkflowsPage,
-    loadWorkflowsError,
   } = useInfiniteWorkflows(tenantID, debouncedWorkflowSearch);
 
   const [querySearch, setQuerySearch] = useState("");
@@ -55,7 +55,6 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     isFetchingNextPage: isFetchingNextQueriesPage,
     hasNextPage: hasNextQueriesPage,
     fetchNextPage: fetchNextQueriesPage,
-    loadDataQueriesError,
   } = useInfiniteDataQueries(tenantID, debouncedQuerySearch);
 
   const [listenerSearch, setListenerSearch] = useState("");
@@ -66,7 +65,6 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     isFetchingNextPage: isFetchingNextListenersPage,
     hasNextPage: hasNextListenersPage,
     fetchNextPage: fetchNextListenersPage,
-    loadListenersError,
   } = useInfiniteListeners(tenantID, debouncedListenerSearch);
 
   const dispatch = useAppPageDispatch();
@@ -140,17 +138,28 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     }
 
     try {
-      const resolvedInputValues = {};
+      // Resolve against the LIVE runtime tree first so Play uses the page's
+      // current variable values; declared defaults fill any gaps for
+      // variables that have not been initialised yet.
       const variablesList = appPageEditorForm.values.appPageConfig?.variables || [];
-      const mockStateTree = {
-        variables: variablesList.reduce((acc, v) => ({ ...acc, [v.key]: v.defaultValue }), {}),
-        globals: {},
+      const defaultVariables = variablesList.reduce(
+        (acc, v) => ({ ...acc, [v.key]: v.defaultValue }),
+        {}
+      );
+      const mergedVariables = {
+        ...defaultVariables,
+        ...(stateTree?.variables || {}),
       };
+      const mockStateTree = { variables: mergedVariables, globals: {} };
 
       const inputValues = source.inputValues || {};
+      const resolvedInputValues = {};
       for (const [k, v] of Object.entries(inputValues)) {
-        if (typeof v === "string" && v.startsWith("{{") && v.endsWith("}}")) {
-          resolvedInputValues[k] = resolveValue(v, mockStateTree) || "";
+        if (typeof v === "string" && v.includes("{{")) {
+          // NOTE: ?? (not ||) — legitimate falsy results such as 0 or false
+          // must survive. `0 || ""` previously wiped computed offsets and
+          // corrupted the generated SQL ("syntax error at or near ::").
+          resolvedInputValues[k] = resolveValue(v, mockStateTree) ?? "";
         } else {
           resolvedInputValues[k] = v;
         }
@@ -280,9 +289,24 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     [appPageEditorForm]
   );
 
+  /**
+   * Generates an alias that never collides with existing sources.
+   * A naive `query_${length + 1}` produced duplicates after deletions,
+   * which made two data sources write to the same reducer slot.
+   */
+  const generateUniqueAlias = (sources) => {
+    let index = sources.length + 1;
+    let alias = `query_${index}`;
+    while (sources.some((source) => source.alias === alias)) {
+      index += 1;
+      alias = `query_${index}`;
+    }
+    return alias;
+  };
+
   const handleAddSource = () => {
     const newSource = {
-      alias: `query_${dataSources.length + 1}`,
+      alias: generateUniqueAlias(dataSources),
       type: "query",
       queryID: "",
       workflowID: "",
@@ -296,16 +320,24 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     setIsAdding(true);
   };
 
-  const handleRemoveSource = (index) => {
-    if (confirm("Are you sure you want to delete this data source?")) {
-      const updated = dataSources.filter((_, i) => i !== index);
-      updateDataSources(updated);
-      if (editingIndex === index) {
-        setEditingIndex(null);
-        setIsAdding(false);
-      } else if (editingIndex > index) {
-        setEditingIndex(editingIndex - 1);
-      }
+  const handleRemoveSource = async (index) => {
+    const confirmed = await showConfirmation({
+      title: "Delete data source",
+      message: `Are you sure you want to delete "${
+        dataSources[index]?.alias || "this data source"
+      }"? Widgets referencing it will lose their data.`,
+      confirmText: "Delete",
+      cancelText: "Cancel",
+    });
+    if (!confirmed) return;
+
+    const updated = dataSources.filter((_, i) => i !== index);
+    updateDataSources(updated);
+    if (editingIndex === index) {
+      setEditingIndex(null);
+      setIsAdding(false);
+    } else if (editingIndex > index) {
+      setEditingIndex(editingIndex - 1);
     }
   };
 
@@ -370,7 +402,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     <div className="flex flex-col h-full min-h-0 bg-background">
       {editingIndex !== null && selectedSource ? (
         <div className="flex-1 overflow-y-auto">
-          <div className="flex items-center justify-between p-3 border-b border-border">
+          <div className="flex items-center justify-between p-2 border-b border-border">
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -405,6 +437,11 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
                   handleSourceChange(editingIndex, "alias", val);
                 }}
               />
+              {selectedSource.alias && dataSources.some((source, i) => i !== editingIndex && source.alias === selectedSource.alias) && (
+                <p className="text-xs text-destructive">
+                  This alias is already used by another data source — results will overwrite each other.
+                </p>
+              )}
               <p className="text-xs text-muted-foreground">
                 Accessible via expression engine, e.g.{" "}
                 <code className="bg-background px-1.5 py-0.5 rounded border border-border font-mono text-xs">{`{{ state.${selectedSource.type === "workflow" ? "workflows" : "queries"}.${selectedSource.alias || "alias"}.data }}`}</code>
@@ -610,7 +647,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         </div>
       ) : (
         <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex items-center justify-between p-3 border-b border-border">
+            <div className="flex items-center justify-between p-2 border-b border-border">
             <div>
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Page Data Sources

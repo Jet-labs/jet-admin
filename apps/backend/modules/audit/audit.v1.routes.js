@@ -1,14 +1,21 @@
 
 const express = require("express");
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const { authMiddleware } = require("../auth/auth.middleware");
 const { auditController } = require("./audit.controller");
 const { validate } = require("../../utils/validation.utils");
-const { listAuditLogsQuerySchema } = require("./audit.validator");
+const { listAuditLogsQuerySchema, exportAuditLogsQuerySchema } = require("./audit.validator");
 const { P } = require("../../config/permissions");
 
-//auth routes
+// Export as CSV (server-side, full date range, no pagination)
+router.get(
+  "/export",
+  validate(exportAuditLogsQuerySchema, "query"),
+  authMiddleware.authorize(P.audit.list),
+  auditController.exportAuditLogsCSV
+);
 
+// List audit logs (paginated)
 router.get(
   "/",
   validate(listAuditLogsQuerySchema, "query"),

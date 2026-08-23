@@ -44,7 +44,15 @@ export const executeWorkflowWithStreaming = ({
   let nodeUpdateListener = null;
   let statusUpdateListener = null;
 
+  // Set by disconnect(). Guards against the race where a fast re-trigger or
+  // unmount tears this stream down BEFORE the async body below registers its
+  // socket listeners — without it those late-registered listeners would leak
+  // forever (nothing would ever call .off on them).
+  let disposed = false;
+
   const disconnect = () => {
+    if (disposed) return;
+    disposed = true;
     const socket = useSocketStore.getState().socket;
     if (socket) {
       if (nodeUpdateListener) socket.off("workflow_node_update", nodeUpdateListener);
@@ -73,7 +81,7 @@ export const executeWorkflowWithStreaming = ({
       }
 
       // 3. Store initial result (still loading — streaming will update it)
-      if (!isStale()) {
+      if (!isStale() && !disposed) {
         dispatch(appPageActions.setWorkflowResult(alias, runRes, null, true, instanceID));
       }
 
@@ -82,11 +90,14 @@ export const executeWorkflowWithStreaming = ({
       if (!socket) {
         console.warn(`[WorkflowStream] Shared socket not connected for "${alias}"`);
         // No socket — mark as done with just the API response
-        if (!isStale()) {
+        if (!isStale() && !disposed) {
           dispatch(appPageActions.setWorkflowResult(alias, runRes, null, false, instanceID));
         }
         return;
       }
+
+      // The stream may have been disconnected while awaiting the API call.
+      if (disposed) return;
 
       // Join the room for this workflow run
       socket.emit("workflow_run_join", { runId: instanceID });
@@ -142,10 +153,13 @@ export const executeWorkflowWithStreaming = ({
         }
       };
 
+      // Register only if still connected — disconnect() may have been called
+      // while the listeners were being defined above.
+      if (disposed) return;
       socket.on("workflow_node_update", nodeUpdateListener);
       socket.on("workflow_status_update", statusUpdateListener);
     } catch (error) {
-      if (!isStale()) {
+      if (!isStale() && !disposed) {
         dispatch(appPageActions.setWorkflowResult(alias, null, error));
       }
       console.error(`[WorkflowStream] Failed to execute "${alias}":`, error);
