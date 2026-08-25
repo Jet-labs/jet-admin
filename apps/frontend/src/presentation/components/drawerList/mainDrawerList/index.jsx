@@ -1,11 +1,7 @@
-// DrawerLinkItem.jsx
-import { Link, useLocation } from "react-router-dom";
-import { Plus } from 'lucide-react';
-// MainDrawerList.jsx (Updated)
-import { Settings } from "lucide-react";
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Plus, Settings } from "lucide-react";
 import PropTypes from "prop-types";
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useAuthState } from "../../../../logic/hooks/useAuth";
 import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
@@ -15,11 +11,15 @@ import { NoEntityUI } from "../../ui/noEntityUI";
 
 const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
+const normalizePath = (path) => {
+  const stripped = decodeURIComponent(path ?? "").replace(/\/+$/, "");
+  return stripped === "" ? "/" : stripped;
+};
+
 import {
   Clock,
   Database,
   FileCode2,
-  GitBranch,
   KeyRound,
   LayoutDashboard,
   LayoutGrid,
@@ -28,7 +28,6 @@ import {
   ShieldCheck,
   UserCog,
   Users,
-  Activity,
   Workflow
 } from "lucide-react";
 
@@ -40,103 +39,111 @@ import {
   Button,
   ScrollArea,
 } from "@jet-admin/ui";
-// eslint-disable-next-line no-unused-vars
-const DrawerLinkItem = ({ item, tenantID }) => {
+const DrawerLinkItem = ({ item, isActive }) => {
   DrawerLinkItem.propTypes = {
     item: PropTypes.object.isRequired,
-    tenantID: PropTypes.number.isRequired,
+    isActive: PropTypes.bool.isRequired,
   };
-  const location = useLocation();
-  const isActive = decodeURIComponent(location.pathname).includes(item.path);
-
 
   return (
     <Link
       to={item.path}
-      className={`flex items-center rounded w-full p-1.5 px-2 transition duration-75 group flex-row !justify-start ${isActive
-        ? "bg-primary/5 text-primary"
-        : "text-foreground hover:bg-muted hover:text-foreground"
-        }`}
+      aria-current={isActive ? "page" : undefined}
+      className={`flex items-center gap-2 w-full rounded px-2 py-2 text-sm font-medium transition-colors duration-75 group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40 ${
+        isActive
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+      }`}
     >
       <item.icon
-        className={`!w-5 !h-5 ${
-          isActive ? "!text-primary" : "!text-foreground"
-          } group-hover:text-foreground`}
+        className={`size-5 shrink-0 transition-colors ${
+          isActive
+            ? "text-primary"
+            : "text-muted-foreground group-hover:text-foreground"
+        }`}
       />
-      <span className="text-sm ml-3">{capitalize(item.title)}</span>
+      <span className="truncate">{capitalize(item.title)}</span>
     </Link>
   );
 };
-// eslint-disable-next-line no-unused-vars
-const DrawerSubMenuItem = ({ subItem, tenantID }) => {
+
+const DrawerSubMenuItem = ({ subItem, isActive }) => {
   DrawerSubMenuItem.propTypes = {
     subItem: PropTypes.object.isRequired,
-    tenantID: PropTypes.number.isRequired,
+    isActive: PropTypes.bool.isRequired,
   };
-  const location = useLocation();
-  const isActive = decodeURIComponent(location.pathname).includes(subItem.path);
 
   return (
-    <Link
-      to={subItem.path}
-      className={`flex items-center rounded mb-1 w-full p-1.5 px-2 transition duration-75 flex-row justify-start group ${isActive
-        ? "bg-primary/5 text-primary"
-        : "text-foreground hover:bg-muted hover:text-foreground"
+    <li>
+      <Link
+        to={subItem.path}
+        aria-current={isActive ? "page" : undefined}
+        className={`flex items-center gap-2 w-full rounded px-2 py-1.5 text-sm transition-colors duration-75 group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40 ${
+          isActive
+            ? "bg-primary/10 font-semibold text-primary"
+            : "text-muted-foreground hover:bg-muted hover:text-foreground"
         }`}
-    >
-      <subItem.icon
-        className={`!w-4 !h-4 ${isActive ? "!text-primary" : "!text-foreground"
-          } group-hover:text-foreground`}
-      />
-      <span className="font-light text-sm ml-3">{capitalize(subItem.name)}</span>
-    </Link>
+      >
+        <subItem.icon
+          className={`size-4 shrink-0 transition-colors ${
+            isActive
+              ? "text-primary"
+              : "text-muted-foreground group-hover:text-foreground"
+          }`}
+        />
+        <span className="truncate">{capitalize(subItem.name)}</span>
+      </Link>
+    </li>
   );
 };
 
-const DrawerCollapsibleItem = ({
-  item,
-  isExpanded,
-  setExpanded,
-  tenantID,
-}) => {
+const DrawerCollapsibleItem = ({ item, hasActiveChild, activeSubItemKey }) => {
   DrawerCollapsibleItem.propTypes = {
     item: PropTypes.object.isRequired,
-    isExpanded: PropTypes.bool.isRequired,
-    setExpanded: PropTypes.func.isRequired,
-    tenantID: PropTypes.number.isRequired,
+    hasActiveChild: PropTypes.bool.isRequired,
+    activeSubItemKey: PropTypes.string,
   };
   return (
     <AccordionItem value={item.expandedStateKey} className="border-none">
-      <AccordionTrigger className="w-full hover:no-underline hover:bg-muted rounded p-2.5 text-foreground data-[state=open]:text-foreground transition-colors">
-        <div className="flex items-center">
-          <item.icon className="!w-5 !h-5 !text-foreground" />
-          <span className="flex-1 ms-3 text-left whitespace-nowrap">
-            {item.title}
-          </span>
-        </div>
+      <AccordionTrigger
+        className={`w-full gap-2 rounded px-2 py-2 text-sm font-medium hover:no-underline hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40 [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-muted-foreground ${
+          hasActiveChild ? "text-primary" : "text-muted-foreground data-[state=open]:text-foreground"
+        }`}
+      >
+        <span className="flex min-w-0 flex-1 items-center gap-2">
+          <item.icon
+            className={`size-5 shrink-0 transition-colors ${
+              hasActiveChild
+                ? "text-primary"
+                : "text-muted-foreground"
+            }`}
+          />
+          <span className="truncate text-left">{capitalize(item.title)}</span>
+        </span>
       </AccordionTrigger>
       <AccordionContent className="p-0">
-        <ul className="space-y-2 ml-6 border-l pl-2 border-border">
-
+        <div className="ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-border/60 pl-2">
+          <ul className="flex flex-col gap-0.5">
             {item.subItems.map((subItem, subIndex) => (
               <DrawerSubMenuItem
                 key={subIndex}
                 subItem={subItem}
-                tenantID={tenantID}
+                isActive={activeSubItemKey === subItem.activeKey}
               />
             ))}
-            {item.addButton && (
-              <Button
-                onClick={item.addButton.onClick}
-                variant="outline"
-                className="w-full mt-2 justify-start px-2 py-1.5 h-auto text-sm"
-              >
-                <item.addButton.icon className="!w-3.5 !h-3.5 mr-2" />
-                {item.addButton.text}
-              </Button>
-            )}
-
-        </ul>
+          </ul>
+          {item.addButton && (
+            <Button
+              onClick={item.addButton.onClick}
+              variant="outline"
+              size="sm"
+              className="w-full justify-start mt-1"
+            >
+              <item.addButton.icon className="size-4 mr-2" />
+              {item.addButton.text}
+            </Button>
+          )}
+        </div>
       </AccordionContent>
     </AccordionItem>
   );
@@ -144,16 +151,12 @@ const DrawerCollapsibleItem = ({
 
 export const MainDrawerList = () => {
   const navigate = useNavigate();
-  const { user } = useAuthState();
+  const location = useLocation();
+  useAuthState();
   const { isLoadingTenants, tenants } = useTenantState();
   const { tenantID } = useParams();
   const [ref] = useComponentSize();
 
-  const _handleNavigateToEditTenantPage = () => {
-    if (tenantID) {
-      navigate(CONSTANTS.ROUTES.UPDATE_TENANT.path(tenantID));
-    }
-  };
   const _handleNavigateToAddTenantPage = () => {
     navigate(CONSTANTS.ROUTES.ADD_TENANT.path());
   };
@@ -162,54 +165,63 @@ export const MainDrawerList = () => {
   const drawerListItems = [
     {
       type: "link",
+      activeKey: "dashboard",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_DASHBOARD_TITLE,
       icon: LayoutGrid,
       path: CONSTANTS.ROUTES.VIEW_TENANT.path(tenantID),
     },
     {
       type: "link",
+      activeKey: "datasources",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_DATASOURCE_TITLE,
       icon: Database,
       path: CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID),
     },
     {
       type: "link",
+      activeKey: "queries",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_QUERIES_TITLE,
       icon: FileCode2,
       path: CONSTANTS.ROUTES.VIEW_QUERIES.path(tenantID),
     },
     {
       type: "link",
+      activeKey: "listeners",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_LISTENERS_TITLE,
       icon: Radio,
       path: CONSTANTS.ROUTES.VIEW_LISTENERS.path(tenantID),
     },
     {
       type: "link",
+      activeKey: "workflows",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_WORKFLOWS_TITLE,
       icon: Workflow,
       path: CONSTANTS.ROUTES.VIEW_WORKFLOWS.path(tenantID),
     },
     {
       type: "link",
+      activeKey: "widgets",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_WIDGETS_TITLE,
       icon: PanelTop,
       path: CONSTANTS.ROUTES.VIEW_WIDGETS.path(tenantID),
     },
     {
       type: "link",
+      activeKey: "app-pages",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_APP_PAGES_TITLE,
       icon: LayoutDashboard,
       path: CONSTANTS.ROUTES.VIEW_APP_PAGES.path(tenantID),
     },
     {
       type: "link",
+      activeKey: "api-keys",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_API_KEYS_TITLE,
       icon: KeyRound,
       path: CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID),
     },
     {
       type: "link",
+      activeKey: "cron-jobs",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_CRON_JOBS_TITLE,
       icon: Clock,
       path: CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID),
@@ -229,11 +241,13 @@ export const MainDrawerList = () => {
       subItems: [
         {
           name: "Users",
+          activeKey: "users",
           path: CONSTANTS.ROUTES.VIEW_TENANT_USERS.path(tenantID),
           icon: Users,
         },
         {
           name: "Roles and permissions",
+          activeKey: "roles",
           path: CONSTANTS.ROUTES.VIEW_TENANT_ROLES.path(tenantID),
           icon: ShieldCheck,
         },
@@ -241,6 +255,7 @@ export const MainDrawerList = () => {
     },
     {
       type: "link",
+      activeKey: "tenant-settings",
       title: "Tenant Settings",
       icon: Settings,
       path: CONSTANTS.ROUTES.UPDATE_TENANT.path(tenantID),
@@ -254,6 +269,29 @@ export const MainDrawerList = () => {
       .map((item) => item.expandedStateKey)
   );
 
+  // Resolve the single active entry: the candidate whose path is the longest
+  // segment-boundary prefix of the current pathname wins. This keeps the
+  // Dashboard (tenant root) from matching every tenant sub-route, and makes
+  // deep routes (e.g. /datasources/:id) highlight their owning section.
+  const normalizedPathname = normalizePath(location.pathname);
+  let bestMatch = null;
+  drawerListItems.forEach((item) => {
+    const candidates =
+      item.type === "link"
+        ? [{ activeKey: item.activeKey, path: item.path }]
+        : item.subItems;
+    candidates.forEach(({ activeKey, path }) => {
+      const target = normalizePath(path);
+      const isMatch =
+        normalizedPathname === target ||
+        normalizedPathname.startsWith(`${target}/`);
+      if (isMatch && (!bestMatch || target.length > bestMatch.targetLength)) {
+        bestMatch = { activeKey, targetLength: target.length };
+      }
+    });
+  });
+  const activeItemKey = bestMatch ? bestMatch.activeKey : null;
+
   return (
     <aside
       id="logo-sidebar"
@@ -261,32 +299,29 @@ export const MainDrawerList = () => {
       aria-label="Sidebar"
       ref={ref}
     >
-      <div className="p-2 bg-background flex flex-col justify-start items-stretch z-10 sticky top-0 border-b border-transparent">
+      <div className="p-2 bg-background flex flex-col justify-start items-stretch z-10 sticky top-0 border-b border-border/50">
         {isLoadingTenants ? (
           <div
             role="status"
-            className="animate-pulse w-full flex flex-row justify-start items-end"
+            className="animate-pulse w-full h-10 flex flex-row justify-start items-center gap-2"
+            aria-label="Loading tenants"
           >
-            <div className="h-10 bg-background w-10 rounded"></div>
-            <div className="flex flex-col justify-start items-start flex-grow ms-2">
-              <div className="h-2 bg-background rounded mb-2 w-16"></div>
-              <div className="h-2 bg-background rounded mb-2 w-full"></div>
-              <div className="h-2 bg-background rounded mb-0 w-full"></div>
+            <div className="h-10 w-10 bg-muted rounded shrink-0"></div>
+            <div className="flex-1 space-y-1.5">
+              <div className="h-2 bg-muted/70 rounded w-16"></div>
+              <div className="h-2 bg-muted/50 rounded w-full"></div>
             </div>
           </div>
         ) : tenants && tenants.length > 0 ? (
-            <div className="w-full">
-              <TenantSelectionDropdown />
-            </div>
+          <div className="w-full">
+            <TenantSelectionDropdown />
+          </div>
         ) : (
           <>
-                <Button
-              onClick={_handleNavigateToAddTenantPage}
-                  className="w-full"
-            >
+            <Button onClick={_handleNavigateToAddTenantPage} className="w-full">
               {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
-                  <Plus className="!w-4 !h-4 !text-foreground ml-2" />
-                </Button>
+              <Plus className="size-4 ml-2" />
+            </Button>
             <NoEntityUI
               message={CONSTANTS.STRINGS.NO_TENANT_CREATED_TILL_NOW}
             />
@@ -300,22 +335,28 @@ export const MainDrawerList = () => {
             type="multiple"
             value={menuItemExpandedState}
             onValueChange={setMenuItemExpandedState}
-            className="w-full flex flex-col space-y-2"
+            className="w-full flex flex-col gap-1 pt-2"
           >
             {drawerListItems.map((item, index) => {
               if (item.type === "collapsible") {
+                const hasActiveChild = item.subItems.some(
+                  (subItem) => subItem.activeKey === activeItemKey
+                );
                 return (
                   <DrawerCollapsibleItem
                     key={index}
                     item={item}
-                    isExpanded={menuItemExpandedState.includes(item.expandedStateKey)}
-                    setExpanded={() => { }}
-                    tenantID={tenantID}
+                    hasActiveChild={hasActiveChild}
+                    activeSubItemKey={activeItemKey}
                   />
                 );
               } else if (item.type === "link") {
                 return (
-                  <DrawerLinkItem key={index} item={item} tenantID={tenantID} />
+                  <DrawerLinkItem
+                    key={index}
+                    item={item}
+                    isActive={item.activeKey === activeItemKey}
+                  />
                 );
               }
               return null;

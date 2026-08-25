@@ -14,6 +14,7 @@ export class CronJob {
     tenantID,
     createdAt,
     updatedAt,
+    folderID,
   }) {
     this.cronJobID = cronJobID;
     this.cronJobTitle = cronJobTitle;
@@ -29,6 +30,7 @@ export class CronJob {
     this.tenantID = tenantID;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.folderID = folderID ?? null;
   }
 
   static toList(data) {

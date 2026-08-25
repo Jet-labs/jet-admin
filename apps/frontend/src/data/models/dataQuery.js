@@ -14,6 +14,7 @@ export class DataQuery {
     dataQueryResultSchema,
     runOnLoad,
     tblDatasources,
+    folderID,
   }) {
     this.dataQueryID = dataQueryID;
     this.createdAt = createdAt;
@@ -22,6 +23,7 @@ export class DataQuery {
     this.isDisabled = isDisabled;
     this.dataQueryTitle = dataQueryTitle;
     this.runOnLoad = runOnLoad;
+    this.folderID = folderID ?? null;
     this.dataQueryResultSchema = dataQueryResultSchema;
     this.dataQueryOptions = dataQueryOptions;
     this.datasourceID = datasourceID;

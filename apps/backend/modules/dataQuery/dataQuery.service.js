@@ -65,7 +65,7 @@ dataQueryService.getDataQueriesWithDatasource = async ({
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-dataQueryService.getAllDataQueries = async ({ userID, tenantID, search, page, pageSize }) => {
+dataQueryService.getAllDataQueries = async ({ userID, tenantID, search, page, pageSize, folderID }) => {
   Logger.log("info", {
     message: "dataQueryService:getAllDataQueries:params",
     params: {
@@ -81,6 +81,10 @@ dataQueryService.getAllDataQueries = async ({ userID, tenantID, search, page, pa
     const where = {
       tenantID: tenantID,
     };
+
+    if (folderID) {
+      where.folderID = folderID;
+    }
 
     if (search) {
       where.OR = [

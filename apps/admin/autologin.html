@@ -1,0 +1,14 @@
+<!doctype html>
+<html><body><pre id="out">…</pre>
+<script type="module">
+  try {
+    const r = await fetch("http://localhost:8090/api/v1/operator/auth/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "platform-admin@jetlabs.dev", password: "ChangeMe-2026!operator" }),
+    });
+    const d = await r.json();
+    localStorage.setItem("jet-admin.operatorToken", d.token);
+    localStorage.setItem("jet-admin.operator", JSON.stringify(d.operator));
+    location.href = new URLSearchParams(location.search).get("to") || "/library";
+  } catch (e) { document.getElementById("out").textContent = e.message; }
+</script></body></html>

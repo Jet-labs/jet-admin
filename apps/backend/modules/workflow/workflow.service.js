@@ -58,7 +58,7 @@ const workflowService = {}
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-workflowService.getAllWorkflows = async ({ userID, tenantID, search, page, pageSize, authContext }) => {
+workflowService.getAllWorkflows = async ({ userID, tenantID, search, page, pageSize, folderID, authContext }) => {
   Logger.log("info", {
     message: "workflowService:getAllWorkflows:params",
     params: {
@@ -81,6 +81,10 @@ workflowService.getAllWorkflows = async ({ userID, tenantID, search, page, pageS
         contains: search,
         mode: "insensitive",
       };
+    }
+
+    if (folderID) {
+      where.folderID = folderID;
     }
 
     const findManyOptions = {

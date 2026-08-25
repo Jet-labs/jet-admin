@@ -36,7 +36,7 @@ export const useListeners = (tenantID, options = {}) => {
 };
 
 export const useInfiniteListeners = (tenantID, searchQuery = "", options = {}) => {
-  const { enabled = true } = options;
+  const { enabled = true, folderID } = options;
   const {
     data,
     fetchNextPage,
@@ -46,13 +46,14 @@ export const useInfiniteListeners = (tenantID, searchQuery = "", options = {}) =
     error: loadListenersError,
     refetch: refetchListeners,
   } = useInfiniteQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), "infinite", searchQuery],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), "infinite", searchQuery, folderID ?? null],
     queryFn: ({ pageParam = 1 }) =>
       getAllListenersAPI({
         tenantID,
         search: searchQuery,
         page: pageParam,
         pageSize: 50,
+        folderID,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

@@ -26,6 +26,7 @@ import { useDatasourceOptions } from "../../../logic/hooks/useDatasourceOptions"
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
 import { Input, Label, PageHeader } from "@jet-admin/ui";
+import { BundleExportButton } from "../bundleComponents/bundleExportButton";
 
 const EMPTY_INITIAL_VALUES = {
   dataQueryTitle: "Untitled",
@@ -142,6 +143,11 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
           key={`dataQueryCloneForm_${dataQuery?.dataQueryID}`}
           tenantID={tenantID}
           dataQueryID={dataQueryID}
+        />
+        <BundleExportButton
+          tenantID={tenantID}
+          entityType="dataQuery"
+          entityID={dataQueryID}
         />
         <DataQueryTestingForm
           key={`dataQueryTestingForm_${dataQuery?.dataQueryID}`}

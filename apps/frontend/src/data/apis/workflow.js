@@ -4,7 +4,7 @@ import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import { Workflow } from "../models/workflow";
 
-export const getAllWorkflowsAPI = async ({ tenantID, search, page, pageSize }) => {
+export const getAllWorkflowsAPI = async ({ tenantID, search, page, pageSize, folderID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -16,6 +16,7 @@ export const getAllWorkflowsAPI = async ({ tenantID, search, page, pageSize }) =
           search,
           page,
           pageSize,
+          folderID,
         },
         headers: {
           authorization: `Bearer ${bearerToken}`,

@@ -49,6 +49,22 @@ const paginationSchema = z.object({
 });
 
 /**
+ * Pagination for folder-explorer list fetches: the drawer tree must render
+ * every item of an entity type, so a single request may return more rows
+ * than the standard page cap allows.
+ */
+const explorerPaginationSchema = z.object({
+  page: z.preprocess(
+    preprocessQueryParam,
+    z.coerce.number().int().min(1).default(1)
+  ),
+  pageSize: z.preprocess(
+    preprocessQueryParam,
+    z.coerce.number().int().min(1).max(1000).default(1000)
+  ),
+});
+
+/**
  * Date string schema (ISO 8601 format)
  */
 const dateStringSchema = z.string().datetime().or(z.string().date());
@@ -230,6 +246,7 @@ const schemas = {
   uuidSchema,
   emailSchema,
   paginationSchema,
+  explorerPaginationSchema,
   dateStringSchema,
   nonEmptyStringSchema,
   optionalStringSchema,

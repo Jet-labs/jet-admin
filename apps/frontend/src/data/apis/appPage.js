@@ -4,7 +4,7 @@ import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import { AppPage } from "../models/appPage";
 
-export const getAllAppPagesAPI = async ({ tenantID, search, page, pageSize }) => {
+export const getAllAppPagesAPI = async ({ tenantID, search, page, pageSize, folderID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -16,6 +16,7 @@ export const getAllAppPagesAPI = async ({ tenantID, search, page, pageSize }) =>
           search,
           page,
           pageSize,
+          folderID,
         },
         headers: {
           authorization: `Bearer ${bearerToken}`,

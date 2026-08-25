@@ -28,6 +28,7 @@ import { AppPageRuntimeProvider } from "../../../../logic/appPageRuntime/AppPage
 import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootstrapper";
 
 import { PageHeader, Button } from "@jet-admin/ui";
+import { BundleExportButton } from "../../bundleComponents/bundleExportButton";
 
 const EMPTY_INITIAL_VALUES = {
   appPageTitle: "",
@@ -232,6 +233,11 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
           key={`appPageCloneForm_${appPage?.appPageID}`}
           tenantID={tenantID}
           appPageID={appPageID}
+        />
+        <BundleExportButton
+          tenantID={tenantID}
+          entityType="appPage"
+          entityID={appPageID}
         />
       </PageHeader>
 

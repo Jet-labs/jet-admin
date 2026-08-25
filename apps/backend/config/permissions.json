@@ -16,10 +16,15 @@
     "create": { "title": "tenant:apppage:create", "description": "Permission to create a new app page" },
     "read": { "title": "tenant:apppage:read", "description": "Permission to read a specific app page" },
     "update": { "title": "tenant:apppage:update", "description": "Permission to update an app page" },
-    "delete": { "title": "tenant:apppage:delete", "description": "Permission to delete an app page" }
+    "delete": { "title": "tenant:apppage:delete", "description": "Permission to delete an app page" },
+    "export": { "title": "tenant:apppage:export", "description": "Permission to export an app page as a dependency bundle" }
   },
   "audit": {
     "list": { "title": "tenant:audit:list", "description": "Permission to list audit logs" }
+  },
+  "bundle": {
+    "preview": { "title": "tenant:bundle:preview", "description": "Permission to preview an import bundle" },
+    "execute": { "title": "tenant:bundle:execute", "description": "Permission to execute an import bundle" }
   },
   "cronjob": {
     "list": { "title": "tenant:cronjob:list", "description": "Permission to list all cron jobs" },
@@ -35,7 +40,8 @@
     "update": { "title": "tenant:dataquery:update", "description": "Permission to update a data query" },
     "delete": { "title": "tenant:dataquery:delete", "description": "Permission to delete a data query" },
     "test": { "title": "tenant:dataquery:test", "description": "Permission to test a data query" },
-    "execute": { "title": "tenant:dataquery:execute", "description": "Permission to execute a data query" }
+    "execute": { "title": "tenant:dataquery:execute", "description": "Permission to execute a data query" },
+    "export": { "title": "tenant:dataquery:export", "description": "Permission to export a data query as a dependency bundle" }
   },
   "datasource": {
     "list": { "title": "tenant:datasource:list", "description": "Permission to list all datasources" },
@@ -45,13 +51,20 @@
     "delete": { "title": "tenant:datasource:delete", "description": "Permission to delete a datasource" },
     "test": { "title": "tenant:datasource:test", "description": "Permission to test a datasource connection" }
   },
+  "folder": {
+    "list": { "title": "tenant:folder:list", "description": "Permission to list folders" },
+    "create": { "title": "tenant:folder:create", "description": "Permission to create a folder" },
+    "update": { "title": "tenant:folder:update", "description": "Permission to update or move folders and items" },
+    "delete": { "title": "tenant:folder:delete", "description": "Permission to delete a folder" }
+  },
   "listener": {
     "list": { "title": "tenant:listener:list", "description": "Permission to list all listeners" },
     "create": { "title": "tenant:listener:create", "description": "Permission to create a new listener" },
     "read": { "title": "tenant:listener:read", "description": "Permission to read a specific listener" },
     "update": { "title": "tenant:listener:update", "description": "Permission to update a listener" },
     "delete": { "title": "tenant:listener:delete", "description": "Permission to delete a listener" },
-    "execute": { "title": "tenant:listener:execute", "description": "Permission to execute a listener (cross-resource binding)" }
+    "execute": { "title": "tenant:listener:execute", "description": "Permission to execute a listener (cross-resource binding)" },
+    "export": { "title": "tenant:listener:export", "description": "Permission to export a listener as a dependency bundle" }
   },
   "permission": {
     "list": { "title": "tenant:permissions:list", "description": "Permission to list all permissions" }
@@ -81,7 +94,14 @@
     "read": { "title": "tenant:widget:read", "description": "Permission to read a specific widget" },
     "update": { "title": "tenant:widget:update", "description": "Permission to update a widget" },
     "delete": { "title": "tenant:widget:delete", "description": "Permission to delete a widget" },
-    "execute": { "title": "tenant:widget:execute", "description": "Permission to execute a widget (cross-resource binding)" }
+    "execute": { "title": "tenant:widget:execute", "description": "Permission to execute a widget (cross-resource binding)" },
+    "export": { "title": "tenant:widget:export", "description": "Permission to export a widget as a dependency bundle" }
+  },
+  "widgetLibrary": {
+    "list": { "title": "tenant:widgetlibrary:list", "description": "Permission to browse the shared widget library" },
+    "publish": { "title": "tenant:widgetlibrary:publish", "description": "Permission to publish a widget to the shared library" },
+    "unpublish": { "title": "tenant:widgetlibrary:unpublish", "description": "Permission to remove a widget from the shared library" },
+    "install": { "title": "tenant:widgetlibrary:install", "description": "Permission to install a library widget into the tenant" }
   },
   "workflow": {
     "list": { "title": "tenant:workflow:list", "description": "Permission to list all workflows" },
@@ -90,6 +110,7 @@
     "update": { "title": "tenant:workflow:update", "description": "Permission to update a workflow" },
     "delete": { "title": "tenant:workflow:delete", "description": "Permission to delete a workflow" },
     "execute": { "title": "tenant:workflow:execute", "description": "Permission to execute a workflow" },
-    "test": { "title": "tenant:workflow:test", "description": "Permission to test-run a workflow" }
+    "test": { "title": "tenant:workflow:test", "description": "Permission to test-run a workflow" },
+    "export": { "title": "tenant:workflow:export", "description": "Permission to export a workflow as a dependency bundle" }
   }
 }

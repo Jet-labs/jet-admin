@@ -15,7 +15,7 @@ dataQueryController.getAllDataQueries = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { search, page, pageSize } = req.query;
+    const { search, page, pageSize, folderID } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "dataQueryController:getAllDataQueries:params",
@@ -35,6 +35,7 @@ dataQueryController.getAllDataQueries = async (req, res) => {
       search,
       page,
       pageSize,
+      folderID,
       authContext,
     });
 

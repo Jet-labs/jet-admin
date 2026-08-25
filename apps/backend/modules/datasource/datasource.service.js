@@ -731,5 +731,5 @@ datasourceService.getDatasourceFormSchemas = async ({ datasourceType } = {}) => 
   return all;
 };
 
-module.exports = { datasourceService, decryptOptions };
+module.exports = { datasourceService, decryptOptions, encryptOptions };
 

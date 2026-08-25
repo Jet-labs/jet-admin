@@ -5,7 +5,7 @@ import { firebaseAuth } from "../../config/firebase";
 import { CronJob } from "../models/cronJob";
 import { CronJobHistory } from "../models/cronJobHistory";
 
-export const getAllCronJobsAPI = async ({ tenantID, search, page, pageSize }) => {
+export const getAllCronJobsAPI = async ({ tenantID, search, page, pageSize, folderID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -17,6 +17,7 @@ export const getAllCronJobsAPI = async ({ tenantID, search, page, pageSize }) =>
           search,
           page,
           pageSize,
+          folderID,
         },
         headers: {
           authorization: `Bearer ${bearerToken}`,

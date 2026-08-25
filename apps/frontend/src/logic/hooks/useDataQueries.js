@@ -36,7 +36,7 @@ export const useDataQueries = (tenantID, options = {}) => {
 };
 
 export const useInfiniteDataQueries = (tenantID, searchQuery = "", options = {}) => {
-  const { enabled = true } = options;
+  const { enabled = true, folderID } = options;
   const {
     data,
     fetchNextPage,
@@ -46,13 +46,14 @@ export const useInfiniteDataQueries = (tenantID, searchQuery = "", options = {})
     error: loadDataQueriesError,
     refetch: refetchDataQueries,
   } = useInfiniteQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), "infinite", searchQuery],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), "infinite", searchQuery, folderID ?? null],
     queryFn: ({ pageParam = 1 }) =>
       getAllDataQueriesAPI({
         tenantID,
         search: searchQuery,
         page: pageParam,
         pageSize: 50,
+        folderID,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

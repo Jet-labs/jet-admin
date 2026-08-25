@@ -43,6 +43,7 @@ const moduleDependencies = {
   ],
   userManagement: [constants.MODULES.AUTH, constants.MODULES.TENANT],
   workflow: [constants.MODULES.AUTH, constants.MODULES.TENANT, constants.MODULES.DATAQUERY],
+  operatorAuth: [],
   ai: [
     constants.MODULES.AUTH,
     constants.MODULES.TENANT,

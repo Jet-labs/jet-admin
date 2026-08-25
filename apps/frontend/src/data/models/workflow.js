@@ -22,6 +22,7 @@ export class Workflow {
     tblWorkflowNodes,
     tblWorkflowEdge,
     workflowOptions,
+    folderID,
   }) {
     this.workflowID = workflowID;
     this.title = title;
@@ -32,6 +33,7 @@ export class Workflow {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.workflowOptions = workflowOptions || {};
+    this.folderID = folderID ?? null;
 
     // Transform nodes using WorkflowNode model
     // Handle both backend format (tblWorkflowNodes) and direct format (nodes)

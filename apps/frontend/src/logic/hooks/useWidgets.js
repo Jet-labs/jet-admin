@@ -32,7 +32,7 @@ export const useWidgets = (tenantID, options = {}) => {
 };
 
 export const useInfiniteWidgets = (tenantID, searchQuery = "", options = {}) => {
-  const { enabled = true } = options;
+  const { enabled = true, folderID } = options;
   const {
     data,
     fetchNextPage,
@@ -42,13 +42,14 @@ export const useInfiniteWidgets = (tenantID, searchQuery = "", options = {}) => 
     error: loadWidgetsError,
     refetch: refetchWidgets,
   } = useInfiniteQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), "infinite", searchQuery],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), "infinite", searchQuery, folderID ?? null],
     queryFn: ({ pageParam = 1 }) =>
       getAllWidgetsAPI({
         tenantID,
         search: searchQuery,
         page: pageParam,
         pageSize: 50,
+        folderID,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

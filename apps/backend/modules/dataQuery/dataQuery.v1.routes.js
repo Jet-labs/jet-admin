@@ -13,6 +13,7 @@ const {
   listDataQueriesQuerySchema,
 } = require("./dataQuery.validator");
 const { P } = require("../../config/permissions");
+const { bundleController } = require("../bundle/bundle.controller");
 
 // Database query routes
 
@@ -42,6 +43,13 @@ router.post(
     }
   ]),
   dataQueryController.createDataQuery
+);
+
+router.get(
+  "/:dataQueryID/export",
+  validate(dataQueryIdParamSchema, "params"),
+  authMiddleware.authorize(P.dataquery.export),
+  bundleController.exportDataQuery
 );
 
 router.post(

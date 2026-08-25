@@ -24,8 +24,10 @@ const {
   addListenerActionSchema,
   updateListenerActionSchema,
   listListenersQuerySchema,
+  listenerIdParamSchema,
 } = require("./listener.validator");
 const { P } = require("../../config/permissions");
+const { bundleController } = require("../bundle/bundle.controller");
 
 const router = express.Router({ mergeParams: true });
 
@@ -69,6 +71,12 @@ router.put('/:listenerID',
 );
 
 router.delete('/:listenerID', authMiddleware.authorize({ ...P.listener.delete, paramKey: 'listenerID' }), listenerController.deleteListener);
+
+router.get('/:listenerID/export',
+  validate(listenerIdParamSchema, 'params'),
+  authMiddleware.authorize(P.listener.export),
+  bundleController.exportListener
+);
 
 router.post('/:listenerID/clone',
   listenerMiddleware.resolveListenerClonePermissionsFromDB,

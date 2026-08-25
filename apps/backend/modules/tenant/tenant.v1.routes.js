@@ -19,7 +19,7 @@ const upload = multer({
 });
 
 
-let 
+let
   datasourceRouter,
   dataQueryRouter,
   widgetRouter,
@@ -31,7 +31,10 @@ let
   auditLogRouter,
   aiRouter,
   workflowRouter,
-  listenerRouter;
+  listenerRouter,
+  bundleRouter,
+  folderRouter,
+  widgetLibraryTenantRouter;
 const { isModuleEnabled } = require("../../config/module.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
@@ -102,6 +105,10 @@ if (isModuleEnabled(constants.MODULES.CRONJOB)) {
 }
 
 auditLogRouter = require("../audit/audit.v1.routes");
+
+bundleRouter = require("../bundle/bundle.v1.routes");
+folderRouter = require("../folder/folder.v1.routes");
+widgetLibraryTenantRouter = require("../widgetLibrary/widgetLibrary.tenant.v1.routes");
 
 // Tenant routes
 router.use(authMiddleware.authProvider);
@@ -281,6 +288,27 @@ if (isModuleEnabled(constants.MODULES.APP_PAGE)) {
     appPageRouter
   );
 }
+
+// Nested bundle (export/import) routes
+router.use(
+  "/:tenantID/import",
+    validate(tenantIdParamSchema, "params"),
+  bundleRouter
+);
+
+// Nested folder routes
+router.use(
+  "/:tenantID/folders",
+    validate(tenantIdParamSchema, "params"),
+  folderRouter
+);
+
+// Nested shared widget library routes (tenant-scoped preview/install)
+router.use(
+  "/:tenantID/widget-library",
+    validate(tenantIdParamSchema, "params"),
+  widgetLibraryTenantRouter
+);
 
 // Nested audit log routes
 router.use(

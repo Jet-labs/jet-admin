@@ -42,6 +42,17 @@ const roleIdParamSchema = z.object({
   roleID: schemas.uuidSchema,
 }).passthrough();
 
+const createPermissionSchema = z.object({
+  permissionTitle: z
+    .string()
+    .regex(
+      /^tenant:[a-z0-9_-]+:[a-z0-9_-]+$/,
+      'permissionTitle must have the form "tenant:<resource>:<action>" (lowercase)'
+    ),
+  permissionDescription: z.string().optional(),
+  mapToAdmin: z.boolean().optional(),
+}).passthrough();
+
 // ============================================================
 // Exports
 // ============================================================
@@ -50,4 +61,5 @@ module.exports = {
   createRoleSchema,
   updateRoleSchema,
   roleIdParamSchema,
+  createPermissionSchema,
 };

@@ -10,7 +10,7 @@ const widgetService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-widgetService.getAllWidgets = async ({ authContext, tenantID, search, page, pageSize }) => {
+widgetService.getAllWidgets = async ({ authContext, tenantID, search, page, pageSize, folderID }) => {
   Logger.log("info", {
     message: "widgetService:getAllWidgets:params",
     params: {
@@ -26,6 +26,10 @@ widgetService.getAllWidgets = async ({ authContext, tenantID, search, page, page
     const where = {
       tenantID: tenantID,
     };
+
+    if (folderID) {
+      where.folderID = folderID;
+    }
 
     if (search) {
       where.OR = [

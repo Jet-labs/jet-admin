@@ -10,7 +10,7 @@ const _getHeaders = async () => {
   return { Authorization: `Bearer ${bearerToken}` };
 };
 
-export const getAllListenersAPI = async ({ tenantID, search, page, pageSize }) => {
+export const getAllListenersAPI = async ({ tenantID, search, page, pageSize, folderID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -22,6 +22,7 @@ export const getAllListenersAPI = async ({ tenantID, search, page, pageSize }) =
         search,
         page,
         pageSize,
+        folderID,
       },
     });
     if (response.data && response.data.success === true) {

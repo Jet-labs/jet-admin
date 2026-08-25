@@ -43,14 +43,6 @@ jest.mock('../../../modules/vault/vault.service', () => ({
   },
 }));
 
-// Mock Webhook Receiver Server
-jest.mock('../../../modules/listener/listenerEngine/webhookReceiverServer', () => ({
-  webhookReceiverServer: {
-    start: jest.fn().mockResolvedValue(true),
-    stop: jest.fn().mockResolvedValue(true),
-  },
-}));
-
 // Mock DataSource instance & DataSourceRegistry
 const mockUnsubscribe = jest.fn().mockResolvedValue(true);
 const mockSubscribeHandle = { id: 'handle-1' };

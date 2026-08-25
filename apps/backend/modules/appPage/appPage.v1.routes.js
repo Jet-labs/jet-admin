@@ -11,6 +11,7 @@ const {
   listAppPagesQuerySchema,
 } = require("./appPage.validator");
 const { P } = require("../../config/permissions");
+const { bundleController } = require("../bundle/bundle.controller");
 
 // Schemas
 router.get(
@@ -45,6 +46,13 @@ router.get(
   validate(appPageIdParamSchema, "params"),
   authMiddleware.authorize({ ...P.appPage.read, paramKey: "appPageID" }),
   appPageController.getAppPageByID
+);
+
+router.get(
+  "/:appPageID/export",
+  validate(appPageIdParamSchema, "params"),
+  authMiddleware.authorize(P.appPage.export),
+  bundleController.exportAppPage
 );
 
 router.post(

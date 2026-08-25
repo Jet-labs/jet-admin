@@ -10,6 +10,7 @@ const {
   listWidgetsQuerySchema,
 } = require("./widget.validator");
 const { P } = require("../../config/permissions");
+const { bundleController } = require("../bundle/bundle.controller");
 
 const serveFileQuerySchema = z.object({
   path: z.string().trim().min(1, "Path parameter is required"),
@@ -70,6 +71,13 @@ router.get(
   validate(widgetIdParamSchema, "params"),
   authMiddleware.authorize({ ...P.widget.read, paramKey: "widgetID" }),
   widgetController.getWidgetByID
+);
+
+router.get(
+  "/:widgetID/export",
+  validate(widgetIdParamSchema, "params"),
+  authMiddleware.authorize(P.widget.export),
+  bundleController.exportWidget
 );
 
 router.post(

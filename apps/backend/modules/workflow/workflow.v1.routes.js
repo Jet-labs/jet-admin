@@ -18,6 +18,7 @@ const {
   listInstancesQuerySchema,
 } = require("./workflow.validator");
 const { P } = require("../../config/permissions");
+const { bundleController } = require("../bundle/bundle.controller");
 const dataCollectionRoutes = require("./dataCollection/dataCollection.v1.routes");
 
 // Schemas
@@ -86,6 +87,14 @@ router.delete(
   validate(workflowIdParamSchema, "params"),
   authMiddleware.authorize({ ...P.workflow.delete, paramKey: "workflowID" }),
   workflowController.deleteWorkflow
+);
+
+// Export workflow bundle
+router.get(
+  "/:workflowID/export",
+  validate(workflowIdParamSchema, "params"),
+  authMiddleware.authorize(P.workflow.export),
+  bundleController.exportWorkflow
 );
 
 // Clone workflow

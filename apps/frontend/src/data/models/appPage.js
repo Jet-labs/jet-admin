@@ -8,6 +8,7 @@ export class AppPage {
     appPageTitle,
     appPageDescription,
     appPageConfig,
+    folderID,
   }) {
     this.appPageID = appPageID;
     this.createdAt = createdAt;
@@ -17,6 +18,7 @@ export class AppPage {
     this.appPageTitle = appPageTitle;
     this.appPageDescription = appPageDescription;
     this.appPageConfig = appPageConfig;
+    this.folderID = folderID ?? null;
   }
   static toList(data) {
     if (Array.isArray(data)) {

@@ -26,6 +26,8 @@ const authRoutes = require("./modules/auth/auth.v1.routes");
 const tenantRoutes = require("./modules/tenant/tenant.v1.routes");
 const aiRoutes = require("./modules/ai/ai.v1.routes");
 const oauthRoutes = require("./modules/oauth/oauth.v1.routes");
+const operatorAuthRoutes = require("./modules/operatorAuth/operatorAuth.v1.routes");
+const operatorAdminRoutes = require("./modules/operatorAdmin/operatorAdmin.v1.routes");
 const { webhookRouter } = require("@jet-admin/datasources-logic");
 
 // Middleware setup
@@ -51,6 +53,10 @@ if (isModuleEnabled(constants.MODULES.TENANT)) {
     tenantRoutes
   );
 }
+
+// Platform admin console (operator auth — separate identity realm from end users)
+expressApp.use("/api/v1/operator/auth", operatorAuthRoutes);
+expressApp.use("/api/v1/operator", operatorAdminRoutes);
 
 // AI Agent routes (tenant-scoped)
 expressApp.use(

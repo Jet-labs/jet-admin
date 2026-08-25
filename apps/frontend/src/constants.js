@@ -993,6 +993,38 @@ export const CONSTANTS = {
       submitDataCollectionAPI: (tenantID, collectionRequestID) =>
         `/api/v1/tenants/${tenantID}/workflows/data-collection/${collectionRequestID}/submit`,
     },
+    BUNDLE: {
+      exportAppPageAPI: (tenantID, appPageID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/${appPageID}/export`,
+      exportWorkflowAPI: (tenantID, workflowID) =>
+        `/api/v1/tenants/${tenantID}/workflows/${workflowID}/export`,
+      exportDataQueryAPI: (tenantID, dataQueryID) =>
+        `/api/v1/tenants/${tenantID}/queries/${dataQueryID}/export`,
+      exportWidgetAPI: (tenantID, widgetID) =>
+        `/api/v1/tenants/${tenantID}/widgets/${widgetID}/export`,
+      exportListenerAPI: (tenantID, listenerID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}/export`,
+      previewImportAPI: (tenantID) => `/api/v1/tenants/${tenantID}/import/preview`,
+      executeImportAPI: (tenantID) => `/api/v1/tenants/${tenantID}/import/execute`,
+    },
+    FOLDER: {
+      getAllFoldersAPI: (tenantID, entityType) =>
+        `/api/v1/tenants/${tenantID}/folders?entityType=${entityType}`,
+      createFolderAPI: (tenantID) => `/api/v1/tenants/${tenantID}/folders`,
+      updateFolderAPI: (tenantID, folderID) => `/api/v1/tenants/${tenantID}/folders/${folderID}`,
+      deleteFolderAPI: (tenantID, folderID) => `/api/v1/tenants/${tenantID}/folders/${folderID}`,
+      moveEntitiesAPI: (tenantID) => `/api/v1/tenants/${tenantID}/folders/move`,
+    },
+    WIDGET_LIBRARY: {
+      getAllWidgetsAPI: (tenantID) => `/api/v1/tenants/${tenantID}/widget-library`,
+      publishWidgetAPI: (tenantID) => `/api/v1/tenants/${tenantID}/widget-library`,
+      unpublishWidgetAPI: (tenantID, libraryEntryID) =>
+        `/api/v1/tenants/${tenantID}/widget-library/${libraryEntryID}`,
+      previewInstallAPI: (tenantID, libraryEntryID) =>
+        `/api/v1/tenants/${tenantID}/widget-library/${libraryEntryID}/preview`,
+      installWidgetAPI: (tenantID, libraryEntryID) =>
+        `/api/v1/tenants/${tenantID}/widget-library/${libraryEntryID}/install`,
+    },
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",
       getUserConfigAPI: (tenantID) => `/api/v1/auth/config/${tenantID}`,
@@ -1263,6 +1295,8 @@ export const CONSTANTS = {
     DATABASE_API_KEYS: (tenantID) => `${tenantID}-DATABASE_API_KEYS`,
     DATABASE_CRON_JOBS: (tenantID) => `${tenantID}-DATABASE_CRON_JOBS`,
     AUDIT_LOGS: (tenantID) => `${tenantID}-AUDIT_LOGS`,
+    FOLDERS: (tenantID, entityType) => `${tenantID}-FOLDERS-${entityType}`,
+    WIDGET_LIBRARY: "WIDGET_LIBRARY",
   },
 
   DATA_TYPES: {

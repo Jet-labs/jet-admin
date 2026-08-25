@@ -11,7 +11,7 @@ const appPageService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-appPageService.getAllAppPages = async ({ userID, tenantID, search, page, pageSize }) => {
+appPageService.getAllAppPages = async ({ userID, tenantID, search, page, pageSize, folderID }) => {
   Logger.log("info", {
     message: "appPageService:getAllAppPages:params",
     params: {
@@ -27,6 +27,10 @@ appPageService.getAllAppPages = async ({ userID, tenantID, search, page, pageSiz
     const where = {
       tenantID: tenantID,
     };
+
+    if (folderID) {
+      where.folderID = folderID;
+    }
 
     if (search) {
       where.OR = [

@@ -22,6 +22,8 @@ import { WidgetConfigEditor } from "./widgetConfigEditor";
 import { WidgetPreview } from "./widgetPreview";
 
 import { PageHeader } from "@jet-admin/ui";
+import { BundleExportButton } from "../bundleComponents/bundleExportButton";
+import { PublishToLibraryButton } from "../widgetLibraryComponents/publishToLibraryButton";
 
 const EMPTY_INITIAL_VALUES = {
   widgetTitle: "",
@@ -130,6 +132,12 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
           tenantID={tenantID}
           widgetID={widgetID}
         />
+        <BundleExportButton
+          tenantID={tenantID}
+          entityType="widget"
+          entityID={widgetID}
+        />
+        <PublishToLibraryButton tenantID={tenantID} widgetID={widgetID} />
 
       </PageHeader>
 

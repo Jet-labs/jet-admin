@@ -156,7 +156,8 @@ const instanceIdParamSchema = z.object({
 
 const listWorkflowsQuerySchema = z.object({
   search: z.string().optional(),
-}).merge(schemas.paginationSchema).passthrough();
+  folderID: schemas.uuidSchema.optional(),
+}).merge(schemas.explorerPaginationSchema).passthrough();
 
 const listInstancesQuerySchema = z.object({
   workflowID: schemas.uuidSchema.optional(),

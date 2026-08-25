@@ -13,13 +13,17 @@ const listenerService = {
 
   // ─── Listener CRUD ────────────────────────────────────────────────────────
 
-  async getAllListeners({ tenantID, search, page, pageSize }) {
+  async getAllListeners({ tenantID, search, page, pageSize, folderID }) {
     Logger.log("info", {
       message: "listenerService:getAllListeners:params",
       params: { tenantID, search, page, pageSize },
     });
     try {
       const where = { tenantID };
+
+      if (folderID) {
+        where.folderID = folderID;
+      }
 
       if (search) {
         where.OR = [

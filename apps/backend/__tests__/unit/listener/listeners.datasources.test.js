@@ -455,15 +455,17 @@ describe('Listener Datasources (All 13 Listener Types)', () => {
 
   // 8. Webhook Listener
   describe('Webhook Listener', () => {
-    it('should return active handle on subscribe', async () => {
+    it('should return registered route keys as the subscribe handle', async () => {
       const WebhookDataSource = dataSourceRegistry.getDataSource('webhook');
       const instance = new WebhookDataSource({ datasourceID: 'ds-wh' });
 
       await expect(instance.execute({})).rejects.toThrow('Webhook is a listener-only datasource.');
       const handle = await instance.subscribe({}, jest.fn());
-      expect(handle).toEqual(
-        expect.objectContaining({ type: 'webhook', active: true })
-      );
+      // Fallback id-route only — no tenantID/pathSuffix provided
+      expect(handle).toEqual({ routeKeys: ['id:ds-wh'] });
+
+      // Cleanup shared router state
+      await instance.unsubscribe(handle);
     });
   });
 

@@ -12,6 +12,7 @@ import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapp
 import { useGlobalUI } from "../../../logic/stores/useUIStore";
 
 import { PageHeader } from "@jet-admin/ui";
+import { BundleExportButton } from "../bundleComponents/bundleExportButton";
 import { WorkflowCloneForm } from "./workflowCloneForm";
 import { WorkflowDeletionForm } from "./workflowDeletionForm";
 
@@ -114,6 +115,11 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
       >
         <WorkflowDeletionForm tenantID={tenantID} workflowID={workflowID} />
         <WorkflowCloneForm tenantID={tenantID} workflowID={workflowID} />
+        <BundleExportButton
+          tenantID={tenantID}
+          entityType="workflow"
+          entityID={workflowID}
+        />
       </PageHeader>
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingWorkflow}

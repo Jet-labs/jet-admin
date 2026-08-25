@@ -14,6 +14,7 @@ export class Listener {
     updatedAt,
     tblListenerActions,
     tblDatasources,
+    folderID,
   }) {
     this.listenerID = listenerID;
     this.tenantID = tenantID;
@@ -29,6 +30,7 @@ export class Listener {
     this.updatedAt = updatedAt;
     this.actions = tblListenerActions || [];
     this.datasource = tblDatasources || null;
+    this.folderID = folderID ?? null;
   }
 
   static toList(data) {

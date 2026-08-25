@@ -67,7 +67,8 @@ const dataQueryIdParamSchema = z.object({
 
 const listDataQueriesQuerySchema = z.object({
   search: z.string().optional(),
-}).merge(schemas.paginationSchema).passthrough();
+  folderID: schemas.uuidSchema.optional(),
+}).merge(schemas.explorerPaginationSchema).passthrough();
 
 // ============================================================
 // Exports

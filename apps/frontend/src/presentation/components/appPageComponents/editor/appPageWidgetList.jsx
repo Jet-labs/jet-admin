@@ -4,7 +4,8 @@ import PropTypes from "prop-types";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useInfiniteWidgets } from "../../../../logic/hooks/useWidgets";
+import { useEntityItems } from "../../../../logic/hooks/useEntityItems";
+import { WidgetSelectionTree } from "./widgetSelectionTree";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../../ui/reactQueryLoadingErrorWrapper";
 import { Button, Input } from "@jet-admin/ui";
@@ -24,25 +25,18 @@ export const AppPageWidgetList = ({
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const {
-    widgets,
-    isLoadingWidgets,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-    loadWidgetsError,
-  } = useInfiniteWidgets(tenantID, debouncedSearchQuery);
+    items: widgets,
+    isLoading: isLoadingWidgets,
+    error: loadWidgetsError,
+  } = useEntityItems({
+    tenantID,
+    entityType: "widget",
+    search: debouncedSearchQuery,
+  });
 
-  const _handleScroll = (e) => {
-    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-    if (scrollHeight - scrollTop - clientHeight < 30) {
-      if (hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    }
-  };
-
-  const _handleDragStart = (e, widgetKey) => {
+  const _handleWidgetDragStart = (e, widget) => {
     // Extract the widget ID and create a unique instance key
+    const widgetKey = `widget_${widget.widgetID}`;
     const widgetID = parseWidgetKey(widgetKey);
     const instanceKey = createWidgetInstanceKey(widgetID, placedWidgets || []);
     e.dataTransfer.setData("widget", instanceKey);
@@ -135,6 +129,55 @@ export const AppPageWidgetList = ({
     );
   };
 
+  const _renderWidgetCard = (widget, dragProps = {}) => {
+    const key = `widget_${widget.widgetID}`;
+    const widgetLabel = WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType;
+    const widgetDesc = WIDGETS_MAP[widget.widgetType]?.description || "Custom component";
+
+    return (
+      <div
+        key={key}
+        id={key}
+        className="flex items-center justify-between gap-2 rounded border border-border bg-card p-2 shadow-sm hover:border-border/80 transition-all duration-200 group"
+      >
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <div
+            {...dragProps}
+            className={`cursor-grab text-muted-foreground/30 hover:text-foreground active:cursor-grabbing shrink-0 ${
+              dragProps.draggable ? "" : "opacity-60"
+            }`}
+          >
+            <GripVertical className="h-4 w-4" />
+          </div>
+
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-muted border border-border/50 shadow-inner">
+            {_renderWidgetIcon(widget.widgetType)}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <span className="truncate text-sm font-medium text-foreground block">
+              {widget.widgetTitle}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground/60 shrink-0">
+                {widgetLabel}
+              </span>
+              <span className="text-[9px] text-muted-foreground/30 select-none shrink-0">•</span>
+              <span className="text-[9px] text-muted-foreground truncate">
+                {widgetDesc}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0">
+          {_renderWidgetEditIcon(widget.widgetID)}
+          {_renderWidgetLinkIcon(widget.widgetID)}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 bg-background overflow-hidden">
       <div className="flex items-center justify-between p-2 pb-0">
@@ -170,10 +213,7 @@ export const AppPageWidgetList = ({
         </div>
       </div>
 
-      <div
-        onScroll={_handleScroll}
-        className="flex w-full flex-1 flex-col gap-2 min-h-0 overflow-y-auto p-2"
-      >
+      <div className="flex w-full min-h-0 flex-1 flex-col gap-2 p-2 pt-0">
         {(() => {
           const layoutItems = [
             { type: "row", label: "Grid Row", desc: "12-column grid row", icon: <Grid2X2 className="h-4 w-4 text-muted-foreground" /> },
@@ -224,69 +264,37 @@ export const AppPageWidgetList = ({
           isLoading={isLoadingWidgets}
           error={loadWidgetsError}
         >
-          {widgets?.length > 0 ? (
-            <>
-              {widgets.map((widget) => {
-                const key = `widget_${widget.widgetID}`;
-                const widgetLabel = WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType;
-                const widgetDesc = WIDGETS_MAP[widget.widgetType]?.description || "Custom component";
-
-                return (
-                  <div
-                    key={key}
-                    id={key}
-                    className="flex items-center justify-between gap-2 rounded border border-border bg-card p-2 shadow-sm hover:border-border/80 transition-all duration-200 group"
-                  >
-                    <div className="flex min-w-0 flex-1 items-center gap-2">
-                      <div
-                        draggable
-                        onDragStart={(e) => _handleDragStart(e, key)}
-                        className="cursor-grab text-muted-foreground/30 hover:text-foreground active:cursor-grabbing shrink-0"
-                      >
-                        <GripVertical className="h-4 w-4" />
-                      </div>
-
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-muted border border-border/50 shadow-inner">
-                        {_renderWidgetIcon(widget.widgetType)}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <span className="truncate text-sm font-medium text-foreground block">
-                          {widget.widgetTitle}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground/60 shrink-0">
-                            {widgetLabel}
-                          </span>
-                          <span className="text-[9px] text-muted-foreground/30 select-none shrink-0">•</span>
-                          <span className="text-[9px] text-muted-foreground truncate">
-                            {widgetDesc}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0">
-                      {_renderWidgetEditIcon(widget.widgetID)}
-                      {_renderWidgetLinkIcon(widget.widgetID)}
-                    </div>
-                  </div>
-                );
-              })}
-              {isFetchingNextPage && (
-                <div className="flex justify-center p-2 text-xs text-muted-foreground animate-pulse">
-                  Loading more...
-                </div>
-              )}
-            </>
+          {debouncedSearchQuery ? (
+            widgets?.length > 0 ? (
+              <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-2">
+                {widgets.map((widget) =>
+                  _renderWidgetCard(widget, {
+                    draggable: true,
+                    onDragStart: (e) => _handleWidgetDragStart(e, widget),
+                  })
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-1 items-center justify-center">
+                <NoEntityUI message="No matching widgets found" />
+              </div>
+            )
+          ) : widgets?.length > 0 ? (
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-2">
+              <WidgetSelectionTree
+                tenantID={tenantID}
+                entityType="widget"
+                items={widgets}
+                renderItemRow={(widget) => _renderWidgetCard(widget)}
+                onItemDragStart={(e, widget) => _handleWidgetDragStart(e, widget)}
+              />
+            </div>
           ) : (
-            <NoEntityUI
-              message={
-                searchQuery
-                  ? "No matching widgets found"
-                  : CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET
-              }
-            />
+            <div className="flex flex-1 items-center justify-center">
+              <NoEntityUI
+                message={CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET}
+              />
+            </div>
           )}
         </ReactQueryLoadingErrorWrapper>
       </div>

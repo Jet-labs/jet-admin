@@ -18,7 +18,7 @@ widgetController.getAllWidgets = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { search, page, pageSize } = req.query;
+    const { search, page, pageSize, folderID } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "widgetController:getAllWidgets:params",
@@ -38,6 +38,7 @@ widgetController.getAllWidgets = async (req, res) => {
       search,
       page,
       pageSize,
+      folderID,
       authContext,
     });
 

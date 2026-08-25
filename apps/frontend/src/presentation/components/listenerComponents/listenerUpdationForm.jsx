@@ -21,6 +21,7 @@ import {
 } from "../ui/resizable";
 
 import { Spinner, Tabs, TabsContent, TabsList, TabsTrigger, PageHeader } from "@jet-admin/ui";
+import { BundleExportButton } from "../bundleComponents/bundleExportButton";
 import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { useNavigate } from "react-router-dom";
 import { ListenerActionManager } from "./listenerActionManager";
@@ -112,6 +113,11 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
       >
         <ListenerDeletionForm tenantID={tenantID} listenerID={listenerID} />
         <ListenerCloneForm tenantID={tenantID} listenerID={listenerID} />
+        <BundleExportButton
+          tenantID={tenantID}
+          entityType="listener"
+          entityID={listenerID}
+        />
       </PageHeader>
 
       <ReactQueryLoadingErrorWrapper

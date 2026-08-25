@@ -87,8 +87,13 @@ tenantRoleService.createRole = async ({
       return role;
     });
 
-    // Sync policies to Casbin
-    await tenantRoleService.syncRolePolicies(createdRole.roleID, tenantID);
+    // Sync policies to Casbin. Global roles (no tenantID) must be synced
+    // across every tenant domain.
+    if (tenantID) {
+      await tenantRoleService.syncRolePolicies(createdRole.roleID, tenantID);
+    } else {
+      await tenantRoleService.syncAllRolePolicies();
+    }
 
     Logger.log("success", {
       message: "tenantRoleService:createRole:success",
@@ -141,6 +146,7 @@ tenantRoleService.updateTenantRoleByID = async ({
   }
 
   try {
+    let roleScope = null; // the role's own tenantID, resolved inside the transaction
     const updatedRole = await prisma.$transaction(async (tx) => {
       // Check if role exists
       const existingRole = await tx.tblRoles.findFirst({
@@ -149,12 +155,10 @@ tenantRoleService.updateTenantRoleByID = async ({
       if (!existingRole) {
         throw new Error(`Role with ID ${roleID} not found`);
       }
-      if (!existingRole.tenantID) {
-        throw new Error(
-          `Role with ID ${roleID} is a global role and cannot be updated`
-        );
-      }
-      if (existingRole.tenantID !== tenantID) {
+      roleScope = existingRole.tenantID;
+      // When called without a tenantID (operator console / global surface),
+      // any role may be edited. With a tenantID, ownership is enforced.
+      if (tenantID && existingRole.tenantID !== tenantID) {
         throw new Error(
           `Role with ID ${roleID} does not belong to tenant with ID ${tenantID}`
         );
@@ -223,8 +227,14 @@ tenantRoleService.updateTenantRoleByID = async ({
       return updated;
     });
 
-    // Sync policies to Casbin
-    await tenantRoleService.syncRolePolicies(roleID, tenantID);
+    // Sync policies to Casbin in every domain this role lives in.
+    if (tenantID) {
+      await tenantRoleService.syncRolePolicies(roleID, tenantID);
+    } else if (roleScope) {
+      await tenantRoleService.syncRolePolicies(roleID, roleScope);
+    } else {
+      await tenantRoleService.syncAllRolePolicies();
+    }
 
     Logger.log("success", {
       message: "tenantRoleService:updateTenantRoleByID:success",
@@ -258,13 +268,13 @@ tenantRoleService.getAllTenantRoles = async ({ userID, tenantID }) => {
       params: { userID, tenantID },
     });
     const roles = await prisma.tblRoles.findMany({
-      where: {
-        OR: [
-          { tenantID: tenantID },
-          { tenantID: null },
-          { tenantID: undefined },
-        ],
-      },
+      // With a tenantID: that tenant's roles plus global ones. Without:
+      // the full registry (operator console treats roles as global).
+      where: tenantID
+        ? {
+            OR: [{ tenantID: tenantID }, { tenantID: null }],
+          }
+        : {},
       include: {
         tblRolePermissionMappings: {
           include: {
@@ -375,12 +385,9 @@ tenantRoleService.deleteTenantRoleByID = async ({ tenantID, roleID }) => {
       if (!existingRole) {
         throw new Error(`Role with ID ${roleID} not found`);
       }
-      if (!existingRole.tenantID) {
-        throw new Error(
-          `Role with ID ${roleID} is a global role and cannot be updated`
-        );
-      }
-      if (existingRole.tenantID !== tenantID) {
+      // When called without a tenantID (operator console / global surface),
+      // any role may be deleted. With a tenantID, ownership is enforced.
+      if (tenantID && existingRole.tenantID !== tenantID) {
         throw new Error(
           `Role with ID ${roleID} does not belong to tenant with ID ${tenantID}`
         );
@@ -398,8 +405,19 @@ tenantRoleService.deleteTenantRoleByID = async ({ tenantID, roleID }) => {
       return true;
     });
 
-    // Remove Casbin policies
-    await removePoliciesForRole(`role:${roleID}`, tenantID);
+    // Remove Casbin policies for this role. Without a tenantID (global
+    // surface), purge the role's policies from every tenant domain.
+    const roleName = `role:${roleID}`;
+    if (tenantID) {
+      await removePoliciesForRole(roleName, tenantID);
+    } else {
+      const tenants = await prisma.tblTenants.findMany({
+        select: { tenantID: true },
+      });
+      for (const tenant of tenants) {
+        await removePoliciesForRole(roleName, tenant.tenantID);
+      }
+    }
     await reloadPolicies();
 
     Logger.log("success", {
@@ -452,6 +470,21 @@ tenantRoleService.syncRolePolicies = async (roleID, tenantID) => {
       const mapping = PERMISSION_MAP[permTitle];
       if (mapping) {
         await addPolicy(roleName, tenantID, `${mapping.resource}:*`, mapping.action, "allow");
+      } else {
+        // Manually registered permission (created outside permissions.json):
+        // derive the Casbin policy from its well-formed title
+        // ("tenant:<resource>:<action>" → "<resource>:*" + action) so it is
+        // enforceable without a config entry.
+        const generalParts = permTitle.split(":");
+        if (generalParts.length === 3 && generalParts[0] === "tenant") {
+          await addPolicy(
+            roleName,
+            tenantID,
+            `${generalParts[1]}:*`,
+            generalParts[2],
+            "allow"
+          );
+        }
       }
     }
   }
@@ -509,6 +542,98 @@ tenantRoleService.syncAllRolePolicies = async () => {
     });
     throw error;
   }
+};
+
+/**
+ * Creates a permission manually (operator console / recovery path for
+ * missing seeds).
+ *
+ * - Validates the "tenant:<resource>:<action>" title format so
+ *   syncRolePolicies can derive an enforceable Casbin policy from it.
+ * - Optionally maps the new permission onto the global ADMIN role and
+ *   resyncs all Casbin policies (same convention as
+ *   scripts/collect-and-seed-permissions.js).
+ *
+ * @param {object} param0
+ * @param {string} param0.permissionTitle
+ * @param {string} [param0.permissionDescription]
+ * @param {boolean} [param0.mapToAdmin=true]
+ * @returns {Promise<{permission: object, adminMapped: boolean}>}
+ */
+tenantRoleService.createPermission = async ({
+  permissionTitle,
+  permissionDescription,
+  mapToAdmin = true,
+}) => {
+  const title = String(permissionTitle || "").trim().toLowerCase();
+  const parts = title.split(":");
+  if (
+    parts.length !== 3 ||
+    parts[0] !== "tenant" ||
+    !parts[1] ||
+    !parts[2] ||
+    !/^[a-z0-9_-]+$/.test(parts[1]) ||
+    !/^[a-z0-9_-]+$/.test(parts[2])
+  ) {
+    throw new Error(
+      'permissionTitle must have the form "tenant:<resource>:<action>" using lowercase letters, digits, "-" or "_"'
+    );
+  }
+
+  Logger.log("info", {
+    message: "tenantRoleService:createPermission:params",
+    params: { permissionTitle: title, mapToAdmin },
+  });
+
+  const existing = await prisma.tblPermissions.findFirst({
+    where: { permissionTitle: title },
+  });
+  if (existing) {
+    throw new Error(`Permission "${title}" already exists.`);
+  }
+
+  const permission = await prisma.tblPermissions.create({
+    data: {
+      permissionTitle: title,
+      permissionDescription:
+        permissionDescription && String(permissionDescription).trim()
+          ? String(permissionDescription).trim()
+          : null,
+    },
+  });
+
+  let adminMapped = false;
+  if (mapToAdmin) {
+    // House convention (collect-and-seed-permissions.js): new registry
+    // entries are granted to the global ADMIN role.
+    const adminRole = await prisma.tblRoles.findFirst({
+      where: { roleTitle: "ADMIN" },
+    });
+    if (adminRole) {
+      await prisma.tblRolePermissionMappings.upsert({
+        where: {
+          roleID_permissionID: {
+            roleID: adminRole.roleID,
+            permissionID: permission.permissionID,
+          },
+        },
+        update: {},
+        create: {
+          roleID: adminRole.roleID,
+          permissionID: permission.permissionID,
+        },
+      });
+      await tenantRoleService.syncAllRolePolicies();
+      adminMapped = true;
+    }
+  }
+
+  Logger.log("success", {
+    message: "tenantRoleService:createPermission:success",
+    params: { permissionID: permission.permissionID, adminMapped },
+  });
+
+  return { permission, adminMapped };
 };
 
 module.exports = { tenantRoleService };

@@ -32,7 +32,12 @@ const updateListenerActionSchema = z.object({
 
 const listListenersQuerySchema = z.object({
   search: z.string().optional(),
-}).merge(schemas.paginationSchema).passthrough();
+  folderID: schemas.uuidSchema.optional(),
+}).merge(schemas.explorerPaginationSchema).passthrough();
+
+const listenerIdParamSchema = z.object({
+  listenerID: schemas.uuidSchema,
+});
 
 module.exports = {
   createListenerSchema,
@@ -40,4 +45,5 @@ module.exports = {
   addListenerActionSchema,
   updateListenerActionSchema,
   listListenersQuerySchema,
+  listenerIdParamSchema,
 };

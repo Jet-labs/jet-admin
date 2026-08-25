@@ -15,7 +15,7 @@ const listenerController = {
     try {
       const { user } = req;
       const { tenantID } = req.params;
-      const { search, page, pageSize } = req.query;
+      const { search, page, pageSize, folderID } = req.query;
       const authContext = getServiceAuthContext(req);
 
       Logger.log("info", {
@@ -28,6 +28,7 @@ const listenerController = {
         search,
         page,
         pageSize,
+        folderID,
       });
 
       Logger.log("success", {

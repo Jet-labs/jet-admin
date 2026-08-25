@@ -21,7 +21,7 @@ workflowController.getAllWorkflows = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { search, page, pageSize } = req.query;
+    const { search, page, pageSize, folderID } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", { message: "WorkflowController:getAllWorkflows:params", params: { userID: user.userID, tenantID, search, page, pageSize, authContext } });
     
@@ -31,6 +31,7 @@ workflowController.getAllWorkflows = async (req, res) => {
       search,
       page,
       pageSize,
+      folderID,
       authContext
     });
     

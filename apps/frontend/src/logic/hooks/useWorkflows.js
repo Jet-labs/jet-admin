@@ -36,7 +36,7 @@ export const useWorkflows = (tenantID, options = {}) => {
 };
 
 export const useInfiniteWorkflows = (tenantID, searchQuery = "", options = {}) => {
-  const { enabled = true } = options;
+  const { enabled = true, folderID } = options;
   const {
     data,
     fetchNextPage,
@@ -46,13 +46,14 @@ export const useInfiniteWorkflows = (tenantID, searchQuery = "", options = {}) =
     error: loadWorkflowsError,
     refetch: refetchWorkflows,
   } = useInfiniteQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "infinite", searchQuery],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "infinite", searchQuery, folderID ?? null],
     queryFn: ({ pageParam = 1 }) =>
       getAllWorkflowsAPI({
         tenantID,
         search: searchQuery,
         page: pageParam,
         pageSize: 50,
+        folderID,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

@@ -130,7 +130,7 @@ cronJobService.createCronJob = async ({
  * @param {number} [param0.tenantID] - Page number for pagination
  * @returns {Promise<Array<object>>} A list of cron job objects
  */
-cronJobService.getAllCronJobs = async ({ userID, tenantID, search, page, pageSize }) => {
+cronJobService.getAllCronJobs = async ({ userID, tenantID, search, page, pageSize, folderID }) => {
   Logger.log("info", {
     message: "cronJobService:getAllCronJobs:params",
     params: { userID, tenantID, search, page, pageSize },
@@ -140,6 +140,10 @@ cronJobService.getAllCronJobs = async ({ userID, tenantID, search, page, pageSiz
     const where = {
       tenantID: tenantID,
     };
+
+    if (folderID) {
+      where.folderID = folderID;
+    }
 
     if (search) {
       where.OR = [

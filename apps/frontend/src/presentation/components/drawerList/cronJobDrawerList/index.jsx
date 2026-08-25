@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { CalendarClock, Plus, Search } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useInfiniteCronJobs } from "../../../../logic/hooks/useCronJobs";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import { Button, Input } from "@jet-admin/ui";
 import { useDebounce } from "@uidotdev/usehooks";
+import { EntityFolderTree } from "../../folderComponents/entityFolderTree";
+import { useEntityItems } from "../../../../logic/hooks/useEntityItems";
 
 export const CronJobDrawerList = () => {
   const { tenantID } = useParams();
@@ -14,25 +15,41 @@ export const CronJobDrawerList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  const {
-    cronJobs,
-    isLoadingCronJobs,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useInfiniteCronJobs(tenantID, debouncedSearchQuery);
+  const { items: cronJobs, isLoading: isLoadingCronJobs } = useEntityItems({
+    tenantID,
+    entityType: "cronJob",
+    search: debouncedSearchQuery,
+  });
 
   const _navigateToAddNotification = () => {
     navigate(CONSTANTS.ROUTES.ADD_CRON_JOB.path(tenantID));
   };
 
-  const _handleScroll = (e) => {
-    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-    if (scrollHeight - scrollTop - clientHeight < 30) {
-      if (hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    }
+  const _renderItemRow = (cronJob) => {
+    const isActive = routeParam?.cronJobID == cronJob.cronJobID;
+    return (
+      <Link
+        to={CONSTANTS.ROUTES.UPDATE_CRON_JOB_BY_ID.path(tenantID, cronJob.cronJobID)}
+        key={cronJob.cronJobID} className="block focus:outline-none"
+      >
+        <div
+          className={`flex items-center gap-2 rounded px-2 py-1.5 transition-colors ${isActive
+            ? "bg-primary/5 text-primary"
+            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          }`}
+        >
+          <div className="flex-shrink-0">
+            <CalendarClock className="h-4 w-4" />
+          </div>
+
+          <span
+            className={`truncate text-sm ${isActive ? "font-semibold" : "font-medium"}`}
+          >
+            {cronJob.cronJobTitle}
+          </span>
+        </div>
+      </Link>
+    );
   };
 
   return (
@@ -63,66 +80,24 @@ export const CronJobDrawerList = () => {
         </div>
       </div>
 
-      {isLoadingCronJobs ? (
-        <div role="status" className="animate-pulse w-full space-y-2 p-2">
-          <div className="h-9 rounded bg-muted" />
-          <div className="h-9 rounded bg-muted" />
-          <div className="h-9 rounded bg-muted" />
-        </div>
-      ) : cronJobs && cronJobs.length > 0 ? (
-        <div 
-          onScroll={_handleScroll}
-            className="flex-1 w-full overflow-y-auto p-2 pt-0 pb-10 space-y-2"
-        >
-          {cronJobs.map((cronJob) => {
-            const key = `cronJob_${cronJob.cronJobID}`;
-            const isActive = routeParam?.cronJobID == cronJob.cronJobID;
-
-            return (
-              <Link
-                to={CONSTANTS.ROUTES.UPDATE_CRON_JOB_BY_ID.path(
-                  tenantID,
-                  cronJob.cronJobID
-                )}
-                key={key}
-                className="block focus:outline-none"
-              >
-                <div
-                  className={`flex items-center gap-2 rounded px-2 py-1.5 transition-colors ${isActive
-                    ? "bg-primary/5 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-                >
-                  <div className="flex-shrink-0">
-                    <CalendarClock className="h-4 w-4" />
-                  </div>
-
-                  <span
-                    className={`truncate text-sm ${isActive ? "font-semibold" : "font-medium"
-                      }`}
-                  >
-                    {cronJob.cronJobTitle}
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-          {isFetchingNextPage && (
-            <div className="flex justify-center p-2 text-xs text-muted-foreground animate-pulse">
-              Loading more...
-            </div>
-          )}
-        </div>
+      {debouncedSearchQuery ? (
+        cronJobs && cronJobs.length > 0 ? (
+          <div className="flex-1 w-full overflow-y-auto p-2 pt-0 pb-10 space-y-2">
+            {cronJobs.map(_renderItemRow)}
+          </div>
+        ) : (
+          <div className="flex flex-1 items-center justify-center p-4 text-muted-foreground">
+            <NoEntityUI message="No matching cron jobs found" />
+          </div>
+        )
       ) : (
-        <div className="flex flex-1 items-center justify-center p-4 text-muted-foreground">
-          <NoEntityUI
-            message={
-              searchQuery
-                ? "No matching cron jobs found"
-                : CONSTANTS.STRINGS.CRON_JOB_DRAWER_LIST_NO_CRON_JOB_FOUND
-            }
-          />
-        </div>
+        <EntityFolderTree
+          tenantID={tenantID}
+          entityType="cronJob"
+          items={cronJobs}
+          isLoadingItems={isLoadingCronJobs}
+          renderItemRow={_renderItemRow}
+        />
       )}
     </div>
   );

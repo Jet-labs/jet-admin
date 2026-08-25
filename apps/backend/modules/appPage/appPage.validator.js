@@ -30,7 +30,8 @@ const appPageIdParamSchema = z.object({
 
 const listAppPagesQuerySchema = z.object({
   search: z.string().optional(),
-}).merge(schemas.paginationSchema).passthrough();
+  folderID: schemas.uuidSchema.optional(),
+}).merge(schemas.explorerPaginationSchema).passthrough();
 
 // ============================================================
 // Exports

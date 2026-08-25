@@ -13,6 +13,7 @@ const constants = {
     CRONJOB: "cronJob",
     WORKFLOW: "workflow",
     LISTENER: "listener",
+    OPERATOR_AUTH: "operatorAuth",
   },
   STRINGS: {
     USER_TENANT_ADDITION_NOTIFICATION_TITLE: "Tenant addition notification",
@@ -118,6 +119,18 @@ const constants = {
     INVALID_LOGIN: {
       code: "INVALID_LOGIN",
       message: "User login invalid",
+    },
+    INVALID_OPERATOR_CREDENTIALS: {
+      code: "INVALID_OPERATOR_CREDENTIALS",
+      message: "Invalid operator email or password",
+    },
+    OPERATOR_DISABLED: {
+      code: "OPERATOR_DISABLED",
+      message: "This operator account is disabled",
+    },
+    OPERATOR_SESSION_INVALID: {
+      code: "OPERATOR_SESSION_INVALID",
+      message: "Operator session is invalid or expired",
     },
     INVALID_REQUEST: {
       code: "INVALID_REQUEST",

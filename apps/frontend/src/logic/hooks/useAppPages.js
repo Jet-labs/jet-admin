@@ -36,7 +36,7 @@ export const useAppPages = (tenantID, options = {}) => {
 };
 
 export const useInfiniteAppPages = (tenantID, searchQuery = "", options = {}) => {
-  const { enabled = true } = options;
+  const { enabled = true, folderID } = options;
   const {
     data,
     fetchNextPage,
@@ -46,13 +46,14 @@ export const useInfiniteAppPages = (tenantID, searchQuery = "", options = {}) =>
     error: loadAppPagesError,
     refetch: refetchAppPages,
   } = useInfiniteQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID), "infinite", searchQuery],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID), "infinite", searchQuery, folderID ?? null],
     queryFn: ({ pageParam = 1 }) =>
       getAllAppPagesAPI({
         tenantID,
         search: searchQuery,
         page: pageParam,
         pageSize: 50,
+        folderID,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

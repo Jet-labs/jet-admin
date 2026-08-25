@@ -1,0 +1,376 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 9%;
+    --foreground: 0 0% 98%;
+    --input-foreground-default: 0deg 0% 100%;
+      --border-control: 0deg 0% 22.4%;
+    
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 237 100% 74%;
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 98%;
+    
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 54%;
+    
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 98%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 0 0% 18%;
+    --input: 0 0% 21%;
+    --ring: 237 100% 74%;
+    
+    --radius: 6px;
+    
+    /* Custom brand properties */
+    --brand-primary: #7582ff;
+      --brand-primary-rgb: 117 130 255;
+      --brand-primary-link: #3e71cf;
+    --brand-primary-border: rgba(117, 130, 255, 0.3);
+    
+    --brand-black: #0f0f0f;
+    --brand-dark: #171717;
+    --brand-dark-card: #1F1F1F;
+    --brand-border-dark: #242424;
+    --brand-border: #2e2e2e;
+    --brand-border-mid: #363636;
+    --brand-border-light: #393939;
+    
+    --brand-text-dark: #4d4d4d;
+    --brand-text-muted: #898989;
+    --brand-text-secondary: #b4b4b4;
+    --brand-text-primary: #fafafa;
+    
+    --shadow-whisper: none;
+    --shadow-card: none;
+    --shadow-deep: none;
+/* Terminal Console Panel Tokens */
+  --terminal-bg: #0a0a0a;
+  --terminal-border: #27272a;
+  /* zinc-800 */
+  --terminal-text: #d4d4d8;
+  /* zinc-300 */
+  --terminal-success: #4ade80;
+  /* green-400 */
+  --terminal-info: #818cf8;
+  /* indigo-400 */
+  --terminal-error: hsl(var(--destructive));
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--brand-border);
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    place-items: center;
+    min-width: 320px;
+    font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    line-height: 1.5;
+    font-weight: 400;
+    color-scheme: dark;
+    color: var(--brand-text-primary);
+    background-color: var(--brand-dark);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition: background-color 0s 600000s, color 0s 600000s !important;
+}
+
+a {
+  font-weight: 500;
+  color: var(--brand-primary-link);
+  text-decoration: none;
+  transition: color 0.15s ease-in-out;
+}
+
+a:hover {
+  color: var(--brand-primary);
+}
+
+.link-lime {
+  color: var(--brand-primary-link);
+  text-decoration: none;
+}
+.link-lime:hover {
+  color: var(--brand-primary);
+}
+
+.link-purple {
+  color: var(--brand-text-primary);
+  text-decoration: none;
+}
+.link-purple:hover {
+  color: var(--brand-text-secondary);
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+button:focus {
+  outline: 0 !important;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--brand-primary-border);
+}
+
+/* MUI overrides to match Supabase Font */
+.MuiTypography-root,
+.MuiButtonBase-root,
+.MuiDataGrid-root,
+.MuiButton-root,
+.MuiInputBase-root,
+.MuiInputLabel-root,
+.MuiFormControlLabel-label,
+.MuiListItemText-primary,
+.MuiListItemText-secondary {
+  font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  color: var(--brand-text-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--brand-text-primary);
+  font-family: "Circular", "Helvetica Neue", Helvetica, sans-serif !important;
+  font-weight: 400;
+}
+
+h1 {
+  line-height: 1.00 !important;
+  letter-spacing: normal;
+}
+
+h2 {
+  line-height: 1.25 !important;
+  letter-spacing: normal;
+}
+
+h3 {
+  line-height: 1.33 !important;
+  letter-spacing: -0.16px;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.cm-focused {
+  outline-style: solid !important;
+  outline-color: var(--brand-border-mid) !important;
+}
+.non-focusable-code-editor {
+  & .cm-focused {
+    outline: none !important;
+  }
+}
+
+/* Scrollbar styling */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--brand-border-mid) transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--brand-border-mid);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--brand-text-dark);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* System-wide labels */
+.label-caps {
+  font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-size: 12px;
+}
+/* Custom Input Styling */
+.bg-input-custom {
+  background-color: hsl(var(--foreground) / 0.026);
+}
+
+.border-input-custom {
+  border-color: hsl(var(--border-control));
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+  .bg-input-custom {
+    background-color: color-mix(in oklab, hsl(var(--input-foreground-default)) 2.6%, transparent);
+  }
+}
+
+/* React Flow Premium Dark Styles */
+.react-flow__minimap {
+  background-color: hsl(var(--card) / 0.7) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.react-flow__minimap-mask {
+  fill: hsl(var(--foreground) / 0.04) !important;
+  stroke: hsl(var(--foreground) / 0.15) !important;
+  stroke-width: 1px !important;
+}
+
+.react-flow__minimap-node {
+  fill: hsl(var(--muted-foreground) / 0.25) !important;
+  stroke: none !important;
+}
+
+.react-flow__controls {
+  background-color: hsl(var(--card) / 0.7) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  display: flex !important;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  padding: 2px !important;
+}
+
+.react-flow__controls-button {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: none !important;
+  color: var(--brand-text-secondary) !important;
+  fill: currentColor !important;
+  transition: all 0.15s ease-in-out !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+}
+
+.react-flow__controls-button:hover {
+  background-color: hsl(var(--foreground) / 0.08) !important;
+  color: var(--brand-text-primary) !important;
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.react-flow__controls-button path {
+  fill: currentColor !important;
+}
+
+/* Toastify Overrides to match UI Guidelines */
+:root {
+  --toastify-toast-width: 320px;
+  --toastify-color-dark: hsl(var(--card));
+  --toastify-color-info: hsl(var(--primary));
+  --toastify-color-success: hsl(var(--primary));
+  --toastify-color-warning: #f59e0b;
+  --toastify-color-error: hsl(var(--destructive));
+  --toastify-toast-background: hsl(var(--card));
+  --toastify-text-color-dark: hsl(var(--foreground));
+  --toastify-font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+
+.Toastify__toast {
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px !important; /* rounded-lg */
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12) !important; /* shadow-lg */
+  font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--card)) !important;
+}
+
+.Toastify__close-button {
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 0.7;
+  transition: 0.15s ease-in-out;
+}
+.Toastify__close-button:hover {
+  color: hsl(var(--foreground)) !important;
+  opacity: 1;
+}
+
+.Toastify__progress-bar--success,
+.Toastify__progress-bar--info {
+  background: hsl(var(--primary));
+}
+
+.Toastify__progress-bar--error {
+  background: hsl(var(--destructive));
+}
+
+.lab-bg::before {
+  overflow: hidden;
+  max-width: 100vw;
+  max-height: 100vh;
+  box-sizing: border-box;
+}

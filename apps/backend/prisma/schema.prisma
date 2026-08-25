@@ -97,13 +97,16 @@ model tblCronJobs {
   workflowConfig     Json?
   creatorID          String?             @db.Uuid
   createdByApiKeyID  String?             @db.Uuid
+  folderID           String?             @db.Uuid
   tblCronJobHistory  tblCronJobHistory[]
   tblAPIKeys         tblAPIKeys?         @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblCronJobsCreatedByApiKeyID")
   tblUsers           tblUsers?           @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblCronJobsCreatorID")
+  tblFolders         tblFolders?         @relation(fields: [folderID], references: [folderID], onUpdate: NoAction, map: "fkTblCronJobsFolderID")
   tblTenants         tblTenants          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
   tblWorkflows       tblWorkflows?       @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsWorkflowID")
 
   @@index([createdByApiKeyID], map: "idx_tblCronJobs_createdByApiKeyID")
+  @@index([folderID], map: "idx_tblCronJobs_folderID")
 }
 
 model tblDataQueries {
@@ -122,12 +125,15 @@ model tblDataQueries {
   datasourceID          String?         @db.Uuid
   datasourceType        String          @default("postgresql") @db.VarChar
   createdByApiKeyID     String?         @db.Uuid
+  folderID              String?         @db.Uuid
   tblDatasources        tblDatasources? @relation(fields: [datasourceID], references: [datasourceID], onDelete: Cascade, onUpdate: NoAction, map: "fkDatasourceIDDatasourceID")
   tblAPIKeys            tblAPIKeys?     @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblDataQueriesCreatedByApiKeyID")
   tblUsers              tblUsers?       @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDataQueriesCreatorID")
+  tblFolders            tblFolders?     @relation(fields: [folderID], references: [folderID], onUpdate: NoAction, map: "fkTblDataQueriesFolderID")
   tblTenants            tblTenants      @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
 
   @@index([createdByApiKeyID], map: "idx_tblDataQueries_createdByApiKeyID")
+  @@index([folderID], map: "idx_tblDataQueries_folderID")
 }
 
 model tblDatasources {
@@ -197,6 +203,7 @@ model tblTenants {
   tblCronJobs                                         tblCronJobs[]
   tblDataQueries                                      tblDataQueries[]
   tblDatasources                                      tblDatasources[]
+  tblFolders                                          tblFolders[]
   tblListeners                                        tblListeners[]
   tblRoles                                            tblRoles[]
   tblAPIKeys_tblTenants_createdByApiKeyIDTotblAPIKeys tblAPIKeys?                   @relation("tblTenants_createdByApiKeyIDTotblAPIKeys", fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblTenantsCreatedByApiKeyID")
@@ -210,6 +217,30 @@ model tblTenants {
   tblWorkflows                                        tblWorkflows[]
 
   @@index([createdByApiKeyID], map: "idx_tblTenants_createdByApiKeyID")
+}
+
+model tblFolders {
+  folderID       String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  folderTitle    String           @db.VarChar(255)
+  tenantID       String           @db.Uuid
+  entityType     String           @db.VarChar(50)
+  parentFolderID String?          @db.Uuid
+  createdAt      DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime         @default(now()) @db.Timestamptz(6)
+  creatorID      String?          @db.Uuid
+  tblAppPages    tblAppPages[]
+  tblCronJobs    tblCronJobs[]
+  tblDataQueries tblDataQueries[]
+  tblUsers       tblUsers?        @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblFoldersCreatorID")
+  parent         tblFolders?      @relation("tblFoldersParentFolder", fields: [parentFolderID], references: [folderID], onUpdate: NoAction, map: "fkTblFoldersParentFolderID")
+  children       tblFolders[]     @relation("tblFoldersParentFolder")
+  tblTenants     tblTenants       @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction, map: "fkTblFoldersTenantID")
+  tblListeners   tblListeners[]
+  tblWidgets     tblWidgets[]
+  tblWorkflows   tblWorkflows[]
+
+  @@index([tenantID, entityType], map: "idx_tblFolders_tenantID_entityType")
+  @@index([parentFolderID], map: "idx_tblFolders_parentFolderID")
 }
 
 model tblUserNotifications {
@@ -268,6 +299,7 @@ model tblUsers {
   tblCronJobs                 tblCronJobs[]
   tblDataQueries              tblDataQueries[]
   tblDatasources              tblDatasources[]
+  tblFolders                  tblFolders[]
   tblListeners                tblListeners[]
   tblTenants                  tblTenants[]
   tblUserNotifications        tblUserNotifications[]
@@ -304,11 +336,14 @@ model tblWidgets {
   creatorID         String?     @db.Uuid
   refreshInterval   Int?
   createdByApiKeyID String?     @db.Uuid
+  folderID          String?     @db.Uuid
   tblAPIKeys        tblAPIKeys? @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblWidgetsCreatedByApiKeyID")
   tblUsers          tblUsers?   @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblWidgetsCreatorID")
+  tblFolders        tblFolders? @relation(fields: [folderID], references: [folderID], onUpdate: NoAction, map: "fkTblWidgetsFolderID")
   tblTenants        tblTenants  @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblWidgetsTenantIDTenantID")
 
   @@index([createdByApiKeyID], map: "idx_tblWidgets_createdByApiKeyID")
+  @@index([folderID], map: "idx_tblWidgets_folderID")
 }
 
 model tblTenantConfig {
@@ -385,15 +420,18 @@ model tblWorkflows {
   updatedAt            DateTime               @default(now()) @db.Timestamptz(6)
   workflowOptions      Json?                  @default("{}")
   createdByApiKeyID    String?                @db.Uuid
+  folderID             String?                @db.Uuid
   tblCronJobs          tblCronJobs[]
   tblWorkflowEdge      tblWorkflowEdge[]
   tblWorkflowInstances tblWorkflowInstances[]
   tblWorkflowNodes     tblWorkflowNodes[]
   tblAPIKeys           tblAPIKeys?            @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblWorkflowsCreatedByApiKeyID")
+  tblFolders           tblFolders?            @relation(fields: [folderID], references: [folderID], onUpdate: NoAction, map: "fkTblWorkflowsFolderID")
   tblUsers             tblUsers?              @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsCreatorID")
   tblTenants           tblTenants             @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsTenantID")
 
   @@index([createdByApiKeyID], map: "idx_tblWorkflows_createdByApiKeyID")
+  @@index([folderID], map: "idx_tblWorkflows_folderID")
 }
 
 model tblWorkflowInstanceLogs {
@@ -478,10 +516,12 @@ model tblListeners {
   updatedAt           DateTime             @default(now()) @db.Timestamptz(6)
   creatorID           String?              @db.Uuid
   createdByApiKeyID   String?              @db.Uuid
+  folderID            String?              @db.Uuid
   tblListenerActions  tblListenerActions[]
   tblListenerEvents   tblListenerEvents[]
   tblAPIKeys          tblAPIKeys?          @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblListenersCreatedByApiKeyID")
   tblUsers            tblUsers?            @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblListenersCreatorID")
+  tblFolders          tblFolders?          @relation(fields: [folderID], references: [folderID], onUpdate: NoAction, map: "fkTblListenersFolderID")
   tblDatasources      tblDatasources       @relation(fields: [datasourceID], references: [datasourceID], onDelete: Cascade, onUpdate: NoAction)
   tblTenants          tblTenants           @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction)
 
@@ -490,6 +530,7 @@ model tblListeners {
   @@index([status], map: "idx_tblListeners_status")
   @@index([tenantID], map: "idx_tblListeners_tenantID")
   @@index([createdByApiKeyID], map: "idx_tblListeners_createdByApiKeyID")
+  @@index([folderID], map: "idx_tblListeners_folderID")
 }
 
 model tblAppPages {
@@ -502,11 +543,14 @@ model tblAppPages {
   appPageConfig      Json?
   appPageTitle       String      @db.VarChar
   createdByApiKeyID  String?     @db.Uuid
+  folderID           String?     @db.Uuid
   tblUsers           tblUsers?   @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAppPageCreatorID")
   tblAPIKeys         tblAPIKeys? @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblAppPagesCreatedByApiKeyID")
+  tblFolders         tblFolders? @relation(fields: [folderID], references: [folderID], onUpdate: NoAction, map: "fkTblAppPagesFolderID")
   tblTenants         tblTenants  @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction, map: "fkTblAppPagesTenantIDTenantID")
 
   @@index([createdByApiKeyID], map: "idx_tblAppPages_createdByApiKeyID")
+  @@index([folderID], map: "idx_tblAppPages_folderID")
 }
 
 model tblVaultCredentials {
@@ -526,6 +570,48 @@ model tblVaultCredentials {
   @@index([createdByApiKeyID], map: "idx_tblVaultCredentials_createdByApiKeyID")
 }
 
+model tblWidgetLibrary {
+  libraryEntryID    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  widgetTitle       String   @db.VarChar
+  widgetType        String   @db.VarChar
+  widgetDescription String?  @db.VarChar
+  bundle            Json
+  sourceTenantID    String?  @db.Uuid
+  publishedByUserID String?  @db.Uuid
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([widgetType], map: "idx_tblWidgetLibrary_widgetType")
+}
+
+model tblOperators {
+  operatorID          String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email               String                @unique @db.VarChar
+  passwordHash        String                @db.VarChar
+  passwordSalt        String                @db.VarChar
+  operatorTitle       String?               @db.VarChar
+  isDisabled          Boolean?              @default(false)
+  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime?             @default(now()) @db.Timestamptz(6)
+  tblOperatorSessions tblOperatorSessions[]
+
+  @@map("tblOperators")
+}
+
+model tblOperatorSessions {
+  sessionID    String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tokenHash    String       @unique @db.VarChar
+  operatorID   String       @db.Uuid
+  userAgent    String?      @db.VarChar
+  ipAddress    String?      @db.VarChar
+  expiresAt    DateTime     @db.Timestamptz(6)
+  revokedAt    DateTime?    @db.Timestamptz(6)
+  createdAt    DateTime     @default(now()) @db.Timestamptz(6)
+  tblOperators tblOperators @relation(fields: [operatorID], references: [operatorID], onDelete: Cascade)
+
+  @@index([operatorID], map: "idx_tblOperatorSessions_operatorID")
+}
+
 model casbin_rule {
   id    Int     @id @default(autoincrement())
   ptype String  @db.VarChar(255)
@@ -535,4 +621,11 @@ model casbin_rule {
   v3    String? @db.VarChar(255)
   v4    String? @db.VarChar(255)
   v5    String? @db.VarChar(255)
+}
+
+model manual_migrations {
+  filename  String   @id @db.VarChar(255)
+  appliedAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("_manual_migrations")
 }
