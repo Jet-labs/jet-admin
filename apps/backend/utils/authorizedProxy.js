@@ -31,7 +31,7 @@ const { isUUID } = require("validator");
 const { keyValueTypeArrayToObject } = require("./json.util");
 const { resolveInputs, extractQueryDefinitions, extractWorkflowDefinitions } = require("./input.util");
 const { QueryEngine } = require("../modules/dataQuery/queryEngine/engine");
-const { startWorkflow } = require("../modules/workflow/workflowEngine/engine");
+const { startWorkflowTemporal: startWorkflow } = require("../modules/workflow/temporal/service");
 
 // ── Default Fetchers ──────────────────────────────────────────────────────────
 
@@ -105,6 +105,9 @@ function buildDataQueryExecutionInputs(inputDefinitions = [], inputValues = {}) 
  * @param {Array}   [params.inputDefinitions]  - Input definitions from the query
  * @param {object}  [params.inputValues]       - User-supplied input values
  * @param {object}  [params.executionInputs]   - Pre-resolved inputs (skips resolution)
+ * @param {number}  [params.timeoutSeconds]    - Per-node/per-workflow timeout
+ *        override (seconds). Falls through to the query's own
+ *        dataQueryOptions.timeoutSeconds, then the platform default.
  * @param {import("./executionContext").ExecutionContext} params.executionCtx
  *        REQUIRED. The execution context identifying who/what is running this query.
  *
@@ -118,6 +121,7 @@ async function authorizedExecuteDataQuery({
   inputValues,
   executionInputs,
   executionCtx,
+  timeoutSeconds,
 }) {
   // ── Gate: context is mandatory ──────────────────────────────────────────
   if (!executionCtx) {
@@ -229,7 +233,7 @@ async function authorizedExecuteDataQuery({
       finalRuntimeInputs = resolved;
     }
 
-    return await activeEngine.executeQuery(dataQueryID, finalRuntimeInputs);
+    return await activeEngine.executeQuery(dataQueryID, finalRuntimeInputs, { timeoutSeconds });
   } catch (error) {
     Logger.log("error", {
       message: "authorizedProxy:dataQuery:executionError",

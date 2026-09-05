@@ -1,6 +1,13 @@
 import DataSource from "../datasource.js";
-import EventSource from "eventsource";
+import * as EventSourceNs from "eventsource";
 import { Logger } from "../../utils/logger.js";
+
+// eventsource@4 exports { EventSource, ErrorEvent } with an __esModule flag
+// (so a default import compiles to `.default` which does NOT exist).
+// Older versions export the class directly. A namespace import keeps member
+// access intact through esbuild external interop; resolve both shapes here.
+const EventSource =
+  EventSourceNs?.EventSource || EventSourceNs?.default || EventSourceNs;
 
 export default class SSEDataSource extends DataSource {
   async execute(dataQueryOptions, context) {
@@ -9,13 +16,18 @@ export default class SSEDataSource extends DataSource {
 
   async subscribe(config, onEvent) {
     const datasourceOptions = this.config.datasourceOptions || {};
-    const { endpoint, headers } = datasourceOptions;
-    
+    // Accept both `endpoint` (engine) and `url` (formConfig) keys.
+    const endpoint = datasourceOptions.endpoint || datasourceOptions.url;
+    const rawHeaders = datasourceOptions.headers;
+
     if (!endpoint) {
-      throw new Error("SSE endpoint is required");
+      throw new Error("SSE endpoint is required (provide datasourceOptions.endpoint or datasourceOptions.url)");
     }
 
-    const eventNames = (config.eventNames || "").split(",").map(e => e.trim()).filter(Boolean);
+    // Accept both `eventNames` (legacy) and `eventTypes` (listenerConfig form) keys.
+    const eventFilterRaw = config.eventNames ?? config.eventTypes ?? "";
+    const eventNames = String(eventFilterRaw).split(",").map(e => e.trim()).filter(Boolean);
+    const parseAsJSON = config.parseAsJSON !== false;
 
     Logger.log("info", {
       message: "sse:subscribe:start",
@@ -23,35 +35,34 @@ export default class SSEDataSource extends DataSource {
     });
 
     const options = {};
-    if (headers && Array.isArray(headers)) {
-      options.headers = {};
-      headers.forEach(h => {
-        if (h.key && h.value) options.headers[h.key] = h.value;
-      });
+    const normalizedHeaders = normalizeHeaders(rawHeaders);
+    if (Object.keys(normalizedHeaders).length > 0) {
+      options.headers = normalizedHeaders;
+    }
+
+    if (typeof EventSource !== 'function') {
+      throw new Error('SSE EventSource client is unavailable (eventsource package shape mismatch)');
     }
 
     const es = new EventSource(endpoint, options);
 
-    es.onmessage = (event) => {
-      let payload = event.data;
+    const parsePayload = (data) => {
+      if (!parseAsJSON) return data;
       try {
-        payload = JSON.parse(payload);
+        return JSON.parse(data);
       } catch (e) {
-        // keep as string
+        return data;
       }
-      onEvent({ eventName: "message", payload });
+    };
+
+    es.onmessage = (event) => {
+      onEvent({ eventName: "message", payload: parsePayload(event.data) });
     };
 
     for (const eventName of eventNames) {
       if (eventName === "message") continue;
       es.addEventListener(eventName, (event) => {
-        let payload = event.data;
-        try {
-          payload = JSON.parse(payload);
-        } catch (e) {
-          // keep as string
-        }
-        onEvent({ eventName, payload });
+        onEvent({ eventName, payload: parsePayload(event.data) });
       });
     }
 
@@ -67,7 +78,6 @@ export default class SSEDataSource extends DataSource {
 
   async unsubscribe(handle) {
     if (!handle || !handle.es) return;
-    
     Logger.log("info", {
       message: "sse:unsubscribe",
       params: { datasourceID: this.config.datasourceID },
@@ -82,4 +92,28 @@ export default class SSEDataSource extends DataSource {
       });
     }
   }
+}
+
+function normalizeHeaders(rawHeaders) {
+  if (!rawHeaders) return {};
+  if (Array.isArray(rawHeaders)) {
+    const out = {};
+    for (const h of rawHeaders) {
+      if (h && h.key && h.value !== undefined) out[h.key] = h.value;
+    }
+    return out;
+  }
+  if (typeof rawHeaders === "string") {
+    const trimmed = rawHeaders.trim();
+    if (!trimmed) return {};
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+    } catch {
+      return {};
+    }
+    return {};
+  }
+  if (typeof rawHeaders === "object") return { ...rawHeaders };
+  return {};
 }

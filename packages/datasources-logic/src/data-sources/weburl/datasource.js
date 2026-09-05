@@ -10,13 +10,18 @@ export default class WebURLDataSource extends DataSource {
     });
     const { action, args } = dataQueryOptions;
     const { url, timeout } = this.config.datasourceOptions;
+    if (!url) {
+      throw new Error("Web URL datasource requires datasourceOptions.url");
+    }
     try {
+      // datasourceOptions.timeout is in seconds (per formConfig); node-fetch expects ms.
+      const timeoutMs = (Number(timeout) > 0 ? Number(timeout) : 10) * 1000;
       // Fetch options
       const opts = {
         method: action || "GET",
         headers: {},
         redirect: "follow",
-        timeout: timeout,
+        timeout: timeoutMs,
       };
 
       // Execute request

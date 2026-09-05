@@ -1,0 +1,15 @@
+{
+  "widgetType": "progress",
+  "description": "Progress widget. Bar or ring showing completion, quota usage or SLA. Value 0-100.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "valueTemplate": { "type": "string", "description": "Numeric 0-100 template" },
+      "variant": { "type": "string", "enum": ["bar", "ring"], "default": "bar" },
+      "label": { "type": "string" },
+      "showValue": { "type": "boolean", "default": true },
+      "status": { "type": "string", "enum": ["default", "success", "warning", "error"], "default": "default" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

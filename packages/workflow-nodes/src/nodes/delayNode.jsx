@@ -234,11 +234,45 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
 // ============================================================================
 // DelayNode - Minimalist flat landscape design
 // ============================================================================
-export const DelayNode = memo(({ data, isConnectable }) => {
-  const { strings } = useWorkflowNodes();
+export const DelayNode = memo(({ id, data, isConnectable }) => {
+  const { strings, nodeExecutionStatus } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || 'idle';
 
   const isDisabled = data?.isDisabled ?? false;
   const delayType = data?.delayType || 'fixed';
+
+  const getStatusStyles = () => {
+    switch (executionStatus) {
+      case 'running': return 'border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse';
+      case 'completed': return 'border-green-400 ring-2 ring-green-300 ring-opacity-50';
+      case 'failed': return 'border-red-400 ring-2 ring-red-300 ring-opacity-50';
+      case 'skipped': return 'border-orange-300 opacity-60';
+      default: return 'border-brand-border hover:border-amber-400 hover:shadow-md';
+    }
+  };
+
+  const StatusIndicator = () => {
+    if (executionStatus === 'running') return (
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10">
+        <Clock className="w-3 h-3 text-foreground" />
+      </div>
+    );
+    if (executionStatus === 'completed') return (
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+    );
+    if (executionStatus === 'failed') return (
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+    );
+    return null;
+  };
 
   // Calculate total delay for display
   const getDelayDisplay = () => {
@@ -264,14 +298,15 @@ export const DelayNode = memo(({ data, isConnectable }) => {
 
   return (
     <div className={`
-      bg-brand-black border rounded
+      relative bg-brand-black border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${isDisabled
         ? 'border-brand-border opacity-50'
-        : 'border-brand-border hover:border-amber-400 hover:shadow-md'
+        : getStatusStyles()
       }
     `}>
+      <StatusIndicator />
       {/* Main content - horizontal layout */}
       <div className="flex items-stretch">
 
@@ -284,9 +319,13 @@ export const DelayNode = memo(({ data, isConnectable }) => {
                   }} 
                   className={`
           flex flex-col items-center justify-center px-3 py-3 border-r
-          ${isDisabled ? 'bg-brand-dark border-brand-border' : 'bg-amber-950/40 border-amber-100'}
+          ${isDisabled ? 'bg-brand-dark border-brand-border' :
+            executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+            executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
+            executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
+            'bg-amber-950/40 border-amber-100'}
         `}>
-          <Clock className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : 'text-amber-500'}`} />
+          <Clock className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : executionStatus === 'running' ? 'text-blue-600' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-amber-500'}`} />
         </div>
 
         {/* Center: Main info */}

@@ -15,8 +15,10 @@ export default class NatsDataSource extends DataSource {
       throw new Error("NATS servers are required");
     }
 
-    const subject = config.subject || ">";
-    const queue = config.queue;
+    const rawSubject = config.subject || config.subjects || ">";
+    const subjects = String(rawSubject).split(",").map((s) => s.trim()).filter(Boolean);
+    const subject = subjects[0] || ">";
+    const queue = config.queue || config.queueGroup || undefined;
 
     Logger.log("info", {
       message: "nats:subscribe:start",
@@ -36,26 +38,32 @@ export default class NatsDataSource extends DataSource {
     const subOptions = {};
     if (queue) subOptions.queue = queue;
 
-    const sub = nc.subscribe(subject, subOptions);
+    const subs = [];
+    for (const subj of subjects.length ? subjects : [subject]) {
+      subs.push(nc.subscribe(subj, subOptions));
+    }
+    const sub = subs[0];
 
-    (async () => {
-      for await (const msg of sub) {
-        let payload = sc.decode(msg.data);
-        try {
-          payload = JSON.parse(payload);
-        } catch (e) {
-          // keep as string
+    for (const activeSub of subs) {
+      (async (iterSub) => {
+        for await (const msg of iterSub) {
+          let payload = sc.decode(msg.data);
+          try {
+            payload = JSON.parse(payload);
+          } catch (e) {
+            // keep as string
+          }
+          onEvent({ subject: msg.subject, payload });
         }
-        onEvent({ subject: msg.subject, payload });
-      }
-    })().catch((error) => {
-      Logger.log("error", {
-        message: "nats:subscribe:error",
-        params: { error: error.message },
+      })(activeSub).catch((error) => {
+        Logger.log("error", {
+          message: "nats:subscribe:error",
+          params: { error: error.message },
+        });
       });
-    });
+    }
 
-    return { nc, sub };
+    return { nc, sub, subs };
   }
 
   async unsubscribe(handle) {
@@ -67,8 +75,9 @@ export default class NatsDataSource extends DataSource {
     });
 
     try {
-      if (handle.sub) {
-        handle.sub.unsubscribe();
+      const allSubs = handle.subs && handle.subs.length ? handle.subs : [handle.sub].filter(Boolean);
+      for (const s of allSubs) {
+        try { s.unsubscribe(); } catch { /* ignore per-sub errors */ }
       }
       if (handle.nc) {
         await handle.nc.close();

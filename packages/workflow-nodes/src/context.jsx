@@ -8,6 +8,10 @@ const WorkflowNodesContext = createContext(null);
 export const WorkflowNodesProvider = ({
   children,
   dataQueries,
+  workflows,
+  currentWorkflowID,
+  workflowSearch,
+  setWorkflowSearch,
   datasources,
   strings = {},
   onRefreshDataQueries,
@@ -38,6 +42,10 @@ export const WorkflowNodesProvider = ({
   return (
     <WorkflowNodesContext.Provider value={{
       dataQueries,
+      workflows,
+      currentWorkflowID,
+      workflowSearch,
+      setWorkflowSearch,
       datasources,
       strings,
       onRefreshDataQueries,

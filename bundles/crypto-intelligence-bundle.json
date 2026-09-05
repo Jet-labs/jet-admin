@@ -1,0 +1,916 @@
+{
+  "bundleVersion": 1,
+  "generator": "jet-admin",
+  "exportedAt": "2026-09-03T16:56:59.728Z",
+  "items": [
+    {
+      "type": "datasource",
+      "id": "a5922cfe-1e4f-43fd-aef2-d5d794f1c248",
+      "payload": {
+        "datasourceTitle": "CoinGecko Markets",
+        "datasourceType": "restapi",
+        "datasourceDescription": "CoinGecko free public crypto market API, no key required",
+        "datasourceTags": [
+          "crypto",
+          "public",
+          "markets"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://api.coingecko.com/api/v3",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "add3b789-ce16-43d5-a580-1d9013517212",
+      "payload": {
+        "datasourceTitle": "Open Exchange Rates",
+        "datasourceType": "restapi",
+        "datasourceDescription": "Free foreign-exchange rates API, no key required",
+        "datasourceTags": [
+          "fx",
+          "public",
+          "rates"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://open.er-api.com",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "af39d89d-866f-4dec-8d07-de6e1a78db7a",
+      "payload": {
+        "datasourceTitle": "Binance BTC Trades WS",
+        "datasourceType": "websocket",
+        "datasourceDescription": "Binance public trade stream for BTCUSDT, no key required",
+        "datasourceTags": [
+          "crypto",
+          "websocket",
+          "public"
+        ],
+        "datasourceOptions": {
+          "connectionName": "BinanceBTC",
+          "url": "wss://stream.binance.com:9443/ws/btcusdt@trade",
+          "endpoint": "wss://stream.binance.com:9443/ws/btcusdt@trade",
+          "headers": "{}",
+          "reconnect": true,
+          "reconnectIntervalMs": 5000
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "99eebd53-c89d-4875-941c-71dffcb0117f",
+      "payload": {
+        "datasourceTitle": "HiveMQ Public MQTT",
+        "datasourceType": "mqtt",
+        "datasourceDescription": "Public HiveMQ MQTT broker for sensor/telemetry demo traffic",
+        "datasourceTags": [
+          "mqtt",
+          "public",
+          "iot"
+        ],
+        "datasourceOptions": {
+          "connectionName": "HiveMQPublic",
+          "brokerUrl": "mqtt://broker.hivemq.com:1883",
+          "clientId": "jet-admin-crypto",
+          "username": "",
+          "password": "",
+          "useTLS": false,
+          "keepAlive": 60
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "dataQuery",
+      "id": "af1e44a9-cc86-4015-a613-6e0c69bdae89",
+      "payload": {
+        "dataQueryTitle": "BTC Spot Price",
+        "dataQueryDescription": "BTC spot price in USD with 24h change from CoinGecko",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/simple/price",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "ids",
+              "value": "bitcoin"
+            },
+            {
+              "key": "vs_currencies",
+              "value": "usd"
+            },
+            {
+              "key": "include_24hr_change",
+              "value": "true"
+            }
+          ],
+          "contentType": "application/json"
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "a5922cfe-1e4f-43fd-aef2-d5d794f1c248",
+          "name": "CoinGecko Markets",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "f6659a81-8391-4974-8d57-b90ad3b41405",
+      "payload": {
+        "dataQueryTitle": "Coin Prices By IDs",
+        "dataQueryDescription": "Parameterized coin prices: ids CSV plus vs currency",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/simple/price",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "ids",
+              "value": "{{inputs.ids}}"
+            },
+            {
+              "key": "vs_currencies",
+              "value": "{{inputs.vs}}"
+            },
+            {
+              "key": "include_24hr_change",
+              "value": "true"
+            }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "ids",
+              "type": "string"
+            },
+            {
+              "key": "vs",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "a5922cfe-1e4f-43fd-aef2-d5d794f1c248",
+          "name": "CoinGecko Markets",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "faa42cd4-0d18-4327-8ef8-cdea50fcc968",
+      "payload": {
+        "dataQueryTitle": "Top Coin Markets",
+        "dataQueryDescription": "Top N coins by market cap with 24h change",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/coins/markets",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "vs_currency",
+              "value": "{{inputs.vs}}"
+            },
+            {
+              "key": "order",
+              "value": "market_cap_desc"
+            },
+            {
+              "key": "per_page",
+              "value": "{{inputs.limit}}"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "price_change_percentage",
+              "value": "24h"
+            }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "vs",
+              "type": "string"
+            },
+            {
+              "key": "limit",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "a5922cfe-1e4f-43fd-aef2-d5d794f1c248",
+          "name": "CoinGecko Markets",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "669f23d6-ecd1-467a-93b9-68d4e894a1f0",
+      "payload": {
+        "dataQueryTitle": "FX Rates USD Base",
+        "dataQueryDescription": "Latest FX rates with USD base",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/v6/latest/USD",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json"
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "add3b789-ce16-43d5-a580-1d9013517212",
+          "name": "Open Exchange Rates",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "fb4337ed-e3fd-4f64-b507-419a85b8bedd",
+      "payload": {
+        "dataQueryTitle": "FX Rates By Base",
+        "dataQueryDescription": "Latest FX rates for a parameterized base currency",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/v6/latest/{{inputs.base}}",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "base",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "add3b789-ce16-43d5-a580-1d9013517212",
+          "name": "Open Exchange Rates",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "workflow",
+      "id": "b5d40945-565b-46ec-86ef-97bdfbf1e403",
+      "payload": {
+        "title": "Crypto Intelligence Pipeline",
+        "workflowOptions": {
+          "inputDefinitions": [
+            {
+              "key": "vs",
+              "type": "string"
+            },
+            {
+              "key": "limit",
+              "type": "number"
+            }
+          ],
+          "defaultRetryLimit": 1,
+          "defaultNodeTimeoutSeconds": 60,
+          "nodeDefaults": {
+            "dataQuery": {
+              "timeoutSeconds": 45,
+              "retryLimit": 1
+            },
+            "javascript": {
+              "timeoutSeconds": 20
+            }
+          }
+        },
+        "nodes": [
+          {
+            "nodeID": "n_start",
+            "nodeType": "start",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Start",
+              "description": "Pipeline entry point"
+            }
+          },
+          {
+            "nodeID": "n_btc",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Fetch BTC spot",
+              "dataQueryID": "af1e44a9-cc86-4015-a613-6e0c69bdae89",
+              "inputValues": {},
+              "outputVariable": "btcSpot",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_markets",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 2,
+            "nodeConfig": {
+              "title": "Fetch top markets",
+              "dataQueryID": "faa42cd4-0d18-4327-8ef8-cdea50fcc968",
+              "inputValues": {
+                "vs": "usd",
+                "limit": 5
+              },
+              "outputVariable": "markets",
+              "errorHandling": "retry_then_fail"
+            }
+          },
+          {
+            "nodeID": "n_fx",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Fetch FX rates",
+              "dataQueryID": "fb4337ed-e3fd-4f64-b507-419a85b8bedd",
+              "inputValues": {
+                "base": "USD"
+              },
+              "outputVariable": "fx",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_summarize",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Summarize market",
+              "code": "var spot = ctx.btcSpot || {};\nvar btc = spot.bitcoin || {};\nvar markets = Array.isArray(ctx.markets) ? ctx.markets : [];\nvar fx = ctx.fx || {};\nvar rates = fx.rates || {};\nvar top = markets.slice(0, 5).map(function(m) { return { id: m.id, symbol: m.symbol, price: m.current_price, change: m.price_change_percentage_24h }; });\nreturn { btcPrice: Number(btc.usd), btcChange24h: Number(btc.usd_24h_change), topCoins: top, inrRate: Number(rates.INR) || null, eurRate: Number(rates.EUR) || null, cooldownMs: 1500, nextCheckAt: new Date(Date.now() + 2000).toISOString(), checkedAt: new Date().toISOString() };",
+              "outputVariable": "marketSummary",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_check_trend",
+            "nodeType": "condition",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Trend check",
+              "branches": [
+                {
+                  "id": "bull",
+                  "name": "Bull market",
+                  "conditionType": "expression",
+                  "expression": "ctx.marketSummary && ctx.marketSummary.btcChange24h > 2"
+                },
+                {
+                  "id": "bear",
+                  "name": "Bear market",
+                  "conditionType": "expression",
+                  "expression": "ctx.marketSummary && ctx.marketSummary.btcChange24h < -2"
+                }
+              ],
+              "evaluationMode": "first_match",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_pause_bull",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Bull pause",
+              "delayType": "fixed",
+              "delayMinutes": 0,
+              "delaySeconds": 2,
+              "delayMs": 0
+            }
+          },
+          {
+            "nodeID": "n_bull_msg",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Build bull alert",
+              "code": "var s = ctx.marketSummary || {};\nreturn 'BULL: BTC $' + s.btcPrice + ' (' + s.btcChange24h + '% 24h). Top: ' + s.topCoins.map(function(c){return c.symbol;}).join(', ') + '. Checked ' + s.checkedAt;",
+              "outputVariable": "bullAlert",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_review",
+            "nodeType": "dataCollection",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Human review bull signal",
+              "description": "Approve the bull signal before alerting",
+              "collectionType": "form",
+              "formSchema": {
+                "type": "object",
+                "properties": {
+                  "approved": {
+                    "type": "boolean",
+                    "title": "Approved"
+                  },
+                  "note": {
+                    "type": "string",
+                    "title": "Note"
+                  }
+                },
+                "required": [
+                  "approved"
+                ]
+              },
+              "formUischema": {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/approved"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/note"
+                  }
+                ]
+              },
+              "outputVariable": "humanReview",
+              "expiryMinutes": 60
+            }
+          },
+          {
+            "nodeID": "n_end_bull",
+            "nodeType": "end",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "End (bull)",
+              "status": "success",
+              "outputParameters": [
+                {
+                  "id": "p1",
+                  "name": "summary",
+                  "sourceVariable": "{{ctx.marketSummary}}"
+                },
+                {
+                  "id": "p2",
+                  "name": "alert",
+                  "sourceVariable": "{{ctx.bullAlert}}"
+                },
+                {
+                  "id": "p3",
+                  "name": "review",
+                  "sourceVariable": "{{ctx.humanReview}}"
+                }
+              ]
+            }
+          },
+          {
+            "nodeID": "n_cooldown",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Bear cooldown",
+              "delayType": "dynamic",
+              "delayMinutes": 0,
+              "delaySeconds": 0,
+              "delayMs": 0,
+              "delayVariable": "{{ctx.marketSummary.cooldownMs}}"
+            }
+          },
+          {
+            "nodeID": "n_bear_msg",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Build bear alert",
+              "code": "var s = ctx.marketSummary || {};\nreturn 'BEAR: BTC $' + s.btcPrice + ' (' + s.btcChange24h + '% 24h). Consider hedging. Checked ' + s.checkedAt;",
+              "outputVariable": "bearAlert",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_end_bear",
+            "nodeType": "end",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "End (bear)",
+              "status": "success",
+              "outputParameters": [
+                {
+                  "id": "p1",
+                  "name": "summary",
+                  "sourceVariable": "{{ctx.marketSummary}}"
+                },
+                {
+                  "id": "p2",
+                  "name": "alert",
+                  "sourceVariable": "{{ctx.bearAlert}}"
+                }
+              ]
+            }
+          },
+          {
+            "nodeID": "n_flat_note",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Build flat note",
+              "code": "var s = ctx.marketSummary || {};\nreturn 'FLAT: BTC $' + s.btcPrice + ' (' + s.btcChange24h + '% 24h). INR/USD ' + s.inrRate + '. Showing top coins.';",
+              "outputVariable": "flatNote",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_top_coins",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Take top 3 coins",
+              "code": "var s = ctx.marketSummary || {};\nreturn (s.topCoins || []).slice(0, 3);",
+              "outputVariable": "topCoins",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_check_inr",
+            "nodeType": "condition",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "INR check",
+              "branches": [
+                {
+                  "id": "high_inr",
+                  "name": "INR weak",
+                  "conditions": [
+                    {
+                      "leftValue": "{{ctx.marketSummary.inrRate}}",
+                      "operator": "greater_than",
+                      "rightValue": "80"
+                    }
+                  ],
+                  "conditionLogic": "AND"
+                }
+              ],
+              "evaluationMode": "first_match",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_high_msg",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Build INR note",
+              "code": "var s = ctx.marketSummary || {};\nreturn 'INR note: 1 USD = ' + s.inrRate + ' INR. Imported crypto looks expensive.';",
+              "outputVariable": "inrNote",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_loop_coins",
+            "nodeType": "loop",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Loop top coins",
+              "sourceVariable": "{{ctx.topCoins}}",
+              "itemVariable": "coin",
+              "indexVariable": "idx",
+              "outputVariable": "coinLines",
+              "maxIterations": 10,
+              "delayBetweenItems": 0,
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_coin_line",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Format coin line",
+              "code": "var c = ctx.coin || {};\nreturn '#' + (ctx.idx + 1) + ' ' + c.symbol + ' $' + c.price + ' (' + c.change + '% 24h)';",
+              "outputVariable": "coinLine",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_until",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Wait next check",
+              "delayType": "until",
+              "delayMinutes": 0,
+              "delaySeconds": 0,
+              "delayMs": 0,
+              "untilTime": "{{ctx.marketSummary.nextCheckAt}}"
+            }
+          },
+          {
+            "nodeID": "n_end_flat",
+            "nodeType": "end",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "End (flat)",
+              "status": "success",
+              "outputParameters": [
+                {
+                  "id": "p1",
+                  "name": "summary",
+                  "sourceVariable": "{{ctx.marketSummary}}"
+                },
+                {
+                  "id": "p2",
+                  "name": "note",
+                  "sourceVariable": "{{ctx.flatNote}}"
+                },
+                {
+                  "id": "p3",
+                  "name": "inrNote",
+                  "sourceVariable": "{{ctx.inrNote}}"
+                },
+                {
+                  "id": "p4",
+                  "name": "coinLines",
+                  "sourceVariable": "{{ctx.coinLines}}"
+                }
+              ]
+            }
+          }
+        ],
+        "edges": [
+          {
+            "upstreamNodeID": "n_start",
+            "downstreamNodeID": "n_btc",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_btc",
+            "downstreamNodeID": "n_markets",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_markets",
+            "downstreamNodeID": "n_fx",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_fx",
+            "downstreamNodeID": "n_summarize",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_fx",
+            "downstreamNodeID": "n_summarize",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_summarize",
+            "downstreamNodeID": "n_check_trend",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_check_trend",
+            "downstreamNodeID": "n_pause_bull",
+            "sourceHandle": "bull",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_check_trend",
+            "downstreamNodeID": "n_cooldown",
+            "sourceHandle": "bear",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_check_trend",
+            "downstreamNodeID": "n_flat_note",
+            "sourceHandle": "default",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_pause_bull",
+            "downstreamNodeID": "n_bull_msg",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_bull_msg",
+            "downstreamNodeID": "n_review",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_review",
+            "downstreamNodeID": "n_end_bull",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_cooldown",
+            "downstreamNodeID": "n_bear_msg",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_bear_msg",
+            "downstreamNodeID": "n_end_bear",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_flat_note",
+            "downstreamNodeID": "n_top_coins",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_top_coins",
+            "downstreamNodeID": "n_check_inr",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_check_inr",
+            "downstreamNodeID": "n_high_msg",
+            "sourceHandle": "high_inr",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_check_inr",
+            "downstreamNodeID": "n_loop_coins",
+            "sourceHandle": "default",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_high_msg",
+            "downstreamNodeID": "n_loop_coins",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_loop_coins",
+            "downstreamNodeID": "n_coin_line",
+            "sourceHandle": "loop",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_loop_coins",
+            "downstreamNodeID": "n_until",
+            "sourceHandle": "completed",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_until",
+            "downstreamNodeID": "n_end_flat",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          }
+        ]
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "a5922cfe-1e4f-43fd-aef2-d5d794f1c248",
+          "name": "CoinGecko Markets",
+          "bundled": true
+        },
+        {
+          "type": "datasource",
+          "id": "add3b789-ce16-43d5-a580-1d9013517212",
+          "name": "Open Exchange Rates",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "af1e44a9-cc86-4015-a613-6e0c69bdae89",
+          "name": "BTC Spot Price",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "faa42cd4-0d18-4327-8ef8-cdea50fcc968",
+          "name": "Top Coin Markets",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "fb4337ed-e3fd-4f64-b507-419a85b8bedd",
+          "name": "FX Rates By Base",
+          "bundled": true
+        }
+      ]
+    }
+  ]
+}

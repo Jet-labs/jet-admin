@@ -7,12 +7,25 @@ import { jetFormsRenderers } from "@jet-admin/json-forms-renderers";
 import { getTenantAIConfigAPI, updateTenantAIConfigAPI } from "../../../data/apis/tenant";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
+const JET_FREE_PRESET = {
+  provider: "openrouter",
+  model: "minimax/minimax-m3:free",
+  baseURL: "https://openrouter.ai/api/v1",
+};
+
+const FREE_MODEL_OPTIONS = [
+  "minimax/minimax-m3:free",
+  "nvidia/nemotron-3-ultra-550b-a55b:free",
+  "nvidia/nemotron-3-super-120b-a12b:free",
+  "z-ai/glm-5.2:free",
+];
+
 const schema = {
   type: "object",
   properties: {
     provider: {
       type: "string",
-      enum: ["openai", "google"],
+      enum: ["openai", "openrouter", "google"],
       title: "Provider",
     },
     model: {
@@ -25,7 +38,7 @@ const schema = {
     },
     apiKey: {
       type: "string",
-      title: "API Key",
+      title: "API Key (leave empty to use the workspace Jet key)",
     },
   },
   required: ["provider", "model"],
@@ -119,8 +132,32 @@ export const TenantAIConfigEditor = ({ tenantID }) => {
   );
 
   return (
-    <Section title="AI Configuration" description="Configure the AI provider for this tenant.">
+    <Section title="AI Configuration" description="Configure the AI provider for this tenant. Jet works out of the box on the workspace free key — only set this to override it per tenant.">
       <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2 rounded border border-border bg-muted/20 p-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-foreground">Jet Free Agent (Recommended)</p>
+            <p className="text-[11px] text-muted-foreground truncate">
+              OpenRouter · {JET_FREE_PRESET.model} · 1M context · tool-calling verified
+            </p>
+          </div>
+          <Button type="button" size="sm" onClick={() => setFormData((prev) => ({ ...prev, ...JET_FREE_PRESET }))}>
+            Use Jet Free
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {FREE_MODEL_OPTIONS.map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setFormData((prev) => ({ ...prev, model: m }))}
+              className="text-[11px] font-mono px-2 py-1 rounded border border-border bg-background hover:border-primary/50 hover:text-primary transition-colors"
+              title={`Use ${m}`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
         <JsonForms
           schema={schema}
           uischema={uischema}

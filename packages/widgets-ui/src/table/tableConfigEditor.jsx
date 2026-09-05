@@ -92,7 +92,7 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
   const handleAddColumn = useCallback(() => {
     widgetEditorForm.setFieldValue("widgetConfig.columns", [
       ...columns,
-      { label: "New Column", key: "" },
+      { label: "New Column", key: "", type: "text", sortable: true },
     ]);
   }, [widgetEditorForm, columns]);
 
@@ -101,6 +101,8 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
     const newColumns = discoveredColumns.map((col) => ({
       label: col.label,
       key: col.key,
+      type: "text",
+      sortable: true,
     }));
     widgetEditorForm.setFieldValue("widgetConfig.columns", newColumns);
   }, [widgetEditorForm, discoveredColumns]);
@@ -375,17 +377,76 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
                   <Trash2 className="h-4 w-4" />
                 </Button>
                 </div>
-                {/* Editable toggle */}
-                <div className="flex items-center pl-8">
-                  <Checkbox
-                    id={`col-edit-${idx}`}
-                    checked={!!col.editable}
-                    onCheckedChange={(val) => handleUpdateColumn(idx, "editable", !!val)}
-                    className="h-3.5 w-3.5"
-                  />
-                  <Label htmlFor={`col-edit-${idx}`} className="text-xs ml-1.5 text-muted-foreground cursor-pointer">
-                    Editable Column
-                  </Label>
+                {/* Editable + visibility toggles */}
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pl-8">
+                  <div className="flex items-center">
+                    <Checkbox
+                      id={`col-edit-${idx}`}
+                      checked={!!col.editable}
+                      onCheckedChange={(val) => handleUpdateColumn(idx, "editable", !!val)}
+                      className="h-3.5 w-3.5"
+                    />
+                    <Label htmlFor={`col-edit-${idx}`} className="text-xs ml-1.5 text-muted-foreground cursor-pointer">
+                      Editable
+                    </Label>
+                  </div>
+                  <div className="flex items-center">
+                    <Checkbox
+                      id={`col-sort-${idx}`}
+                      checked={col.sortable !== false}
+                      onCheckedChange={(val) => handleUpdateColumn(idx, "sortable", !!val)}
+                      className="h-3.5 w-3.5"
+                    />
+                    <Label htmlFor={`col-sort-${idx}`} className="text-xs ml-1.5 text-muted-foreground cursor-pointer">
+                      Sortable
+                    </Label>
+                  </div>
+                  <div className="flex items-center">
+                    <Checkbox
+                      id={`col-hide-${idx}`}
+                      checked={!!col.hidden}
+                      onCheckedChange={(val) => handleUpdateColumn(idx, "hidden", !!val)}
+                      className="h-3.5 w-3.5"
+                    />
+                    <Label htmlFor={`col-hide-${idx}`} className="text-xs ml-1.5 text-muted-foreground cursor-pointer">
+                      Hidden
+                    </Label>
+                  </div>
+                </div>
+                {/* Type + width */}
+                <div className="flex items-end gap-1.5 pl-8">
+                  <div className="flex-1 space-y-1">
+                    <Label className="text-[0.65rem]">Type</Label>
+                    <Select
+                      value={col.type || "text"}
+                      onValueChange={(val) => handleUpdateColumn(idx, "type", val)}
+                    >
+                      <SelectTrigger className="h-7 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="text">Text</SelectItem>
+                        <SelectItem value="number">Number</SelectItem>
+                        <SelectItem value="boolean">Boolean</SelectItem>
+                        <SelectItem value="date">Date</SelectItem>
+                        <SelectItem value="link">Link</SelectItem>
+                        <SelectItem value="image">Image</SelectItem>
+                        <SelectItem value="badge">Badge</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="w-20 space-y-1">
+                    <Label className="text-[0.65rem]">Width</Label>
+                    <Input
+                      type="number"
+                      value={col.width ?? ""}
+                      onChange={(e) =>
+                        handleUpdateColumn(idx, "width", e.target.value === "" ? undefined : Number(e.target.value))
+                      }
+                      className="h-7 text-xs font-mono"
+                      placeholder="auto"
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -407,6 +468,17 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
 
         {pagination.enabled && (
           <div className="space-y-2 bg-muted/30 p-2 rounded border mt-1">
+            <div className="space-y-1">
+              <Label className="text-xs">Rows per page</Label>
+              <Input
+                type="number"
+                value={pagination.pageSize ?? 10}
+                onChange={(e) => handlePaginationChange("pageSize", Number(e.target.value))}
+                className="h-7 text-xs"
+                min={1}
+                max={500}
+              />
+            </div>
             <p className="text-[0.6rem] text-muted-foreground">
               Configure pagination actions in the <strong>Events</strong> tab
               using the <strong>On Page Change</strong> event.
@@ -416,6 +488,60 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
             </p>
           </div>
         )}
+      </div>
+
+      {/* ═══ Display ═══ */}
+      <div className="space-y-2 border-t pt-2 mt-2">
+        <Label className="text-xs font-medium text-foreground">Display</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <Label className="text-xs">Empty Text</Label>
+            <Input
+              value={config.emptyText || ""}
+              onChange={(e) => handleConfigChange("emptyText", e.target.value)}
+              placeholder="No data available."
+              className="h-7 text-xs"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Empty Hint</Label>
+            <Input
+              value={config.emptyHint || ""}
+              onChange={(e) => handleConfigChange("emptyHint", e.target.value)}
+              placeholder="Helper line under empty state"
+              className="h-7 text-xs"
+            />
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <Checkbox
+              id="tbl-striped"
+              checked={config.striped !== false}
+              onCheckedChange={(v) => handleConfigChange("striped", !!v)}
+              className="h-3.5 w-3.5"
+            />
+            <Label htmlFor="tbl-striped" className="text-xs cursor-pointer text-muted-foreground">Zebra stripes</Label>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Checkbox
+              id="tbl-dense"
+              checked={!!config.dense}
+              onCheckedChange={(v) => handleConfigChange("dense", !!v)}
+              className="h-3.5 w-3.5"
+            />
+            <Label htmlFor="tbl-dense" className="text-xs cursor-pointer text-muted-foreground">Compact rows</Label>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Checkbox
+              id="tbl-sticky"
+              checked={config.stickyHeader !== false}
+              onCheckedChange={(v) => handleConfigChange("stickyHeader", !!v)}
+              className="h-3.5 w-3.5"
+            />
+            <Label htmlFor="tbl-sticky" className="text-xs cursor-pointer text-muted-foreground">Sticky header</Label>
+          </div>
+        </div>
       </div>
 
       {/* ═══ Search & Export ═══ */}

@@ -52,6 +52,9 @@ bundleController.exportWidget = (req, res) =>
 bundleController.exportListener = (req, res) =>
   handleExport(req, res, { type: "listener", id: "listenerID" });
 
+bundleController.exportDatasource = (req, res) =>
+  handleExport(req, res, { type: "datasource", id: "datasourceID" });
+
 // ─── Import ──────────────────────────────────────────────────────────────
 
 bundleController.previewImport = async (req, res) => {

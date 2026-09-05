@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import {
@@ -41,25 +41,54 @@ const CONTEXT_PILLS = [
   { icon: GitBranch, label: "sales-workflow", color: "text-muted-foreground" },
 ];
 
-function WelcomeScreen({ onSuggestionClick }) {
+function WelcomeScreen({ onSuggestionClick, route = '' }) {
+  const suggestions = useMemo(() => {
+    const r = (route || '').toLowerCase();
+    if (r.includes('workflow')) {
+      return [
+        { icon: GitBranch, text: 'Summarize the workflows in this tenant and flag any inactive ones' },
+        { icon: Zap, text: 'Build a workflow that notifies Slack on new orders' },
+        { icon: Database, text: 'Show revenue by region for the last 30 days' },
+        { icon: BarChart3, text: 'Create a dashboard for user activity metrics' },
+      ];
+    }
+    if (r.includes('app-page') || r.includes('pages')) {
+      return [
+        { icon: BarChart3, text: 'Create a dashboard page for user activity metrics' },
+        { icon: Database, text: 'Show revenue by region for the last 30 days' },
+        { icon: GitBranch, text: 'Build a workflow to notify Slack on new orders' },
+        { icon: Database, text: 'Explore the schema of the PostgreSQL datasource' },
+      ];
+    }
+    if (r.includes('quer') || r.includes('datasource')) {
+      return [
+        { icon: Database, text: 'Explore the schema of the PostgreSQL datasource' },
+        { icon: Database, text: 'Show revenue by region for the last 30 days' },
+        { icon: BarChart3, text: 'Create a dashboard for user activity metrics' },
+        { icon: GitBranch, text: 'Build a workflow to notify Slack on new orders' },
+      ];
+    }
+    return [
+      { icon: Database, text: 'Show revenue by region for last 30 days' },
+      { icon: GitBranch, text: 'Build a workflow to notify Slack on new orders' },
+      { icon: BarChart3, text: 'Create a dashboard for user activity metrics' },
+      { icon: Database, text: 'Explore schema of the PostgreSQL datasource' },
+    ];
+  }, [route]);
+
   return (
     <div className="flex flex-col items-center justify-center h-full text-center px-6 py-12">
       <div className="w-12 h-12 rounded bg-primary/10 border border-primary/30 flex items-center justify-center mb-4 shadow-sm shadow-primary/5">
         <Zap className="w-6 h-6 text-primary" strokeWidth={2} />
       </div>
       <h2 className="text-lg font-medium text-foreground mb-1 tracking-tight">
-        Jet AI Assistant
+        Meet Jet — your Jet Admin operator
       </h2>
       <p className="text-sm text-muted-foreground mb-6 max-w-xs leading-relaxed">
-        Ask me to query your data sources, build automation workflows, or create dashboards.
+        I can see your datasources, queries, workflows, widgets, and pages — and act on them for you. Ask me to query data, automate work, or build dashboards.
       </p>
       <div className="grid grid-cols-2 gap-2 w-full max-w-sm">
-        {[
-          { icon: Database, text: "Show revenue by region for last 30 days" },
-          { icon: GitBranch, text: "Build a workflow to notify Slack on new orders" },
-          { icon: BarChart3, text: "Create a dashboard for user activity metrics" },
-          { icon: Database, text: "Explore schema of the PostgreSQL datasource" },
-        ].map(({ icon: Icon, text }, i) => (
+        {suggestions.map(({ icon: Icon, text }, i) => (
           <div
             key={i}
             onClick={() => onSuggestionClick(text)}
@@ -74,7 +103,7 @@ function WelcomeScreen({ onSuggestionClick }) {
   );
 }
 
-export function ChatInput({ onSend, disabled }) {
+export function ChatInput({ onSend, disabled, busy, onStop }) {
   const [value, setValue] = useState("");
   const textareaRef = useRef(null);
 
@@ -129,16 +158,27 @@ export function ChatInput({ onSend, disabled }) {
             <div className="flex items-center gap-1" />
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground/50 hidden sm:block">
-                Enter to send
+                {busy ? 'Jet is working…' : 'Enter to send · Shift+Enter for new line'}
               </span>
-              <button
-                type="button"
-                onClick={handleSend}
-                disabled={!value.trim() || disabled}
-                className="h-7 w-7 p-0 flex items-center justify-center rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <Send className="w-3.5 h-3.5" />
-              </button>
+              {busy && onStop ? (
+                <button
+                  type="button"
+                  onClick={onStop}
+                  className="h-7 px-2.5 flex items-center gap-1.5 rounded bg-muted border border-border text-foreground hover:bg-muted/70 transition-colors text-xs font-medium"
+                >
+                  <span className="w-2.5 h-2.5 rounded-[3px] bg-current" />
+                  Stop
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSend}
+                  disabled={!value.trim() || disabled}
+                  className="h-7 w-7 p-0 flex items-center justify-center rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1020,7 +1060,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
       </div>
       <div className="flex-1 min-w-0 space-y-2">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-medium text-foreground">Jet AI</span>
+          <span className="text-xs font-medium text-foreground">Jet</span>
           <span className="text-xs text-muted-foreground">
             {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
           </span>
@@ -1041,7 +1081,7 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
                   />
                 );
               }
-              if (inv.toolName === 'createPlan') {
+              if (inv.toolName === 'createPlan' || inv.toolName === 'updatePlan') {
                 return (
                   <CreatePlanToolStep
                     key={inv.toolCallId || inv.id}
@@ -1081,30 +1121,71 @@ function MessageBubble({ message, onA2UIAction, onAppend, isStreaming, addToolRe
 }
 
 // ─── Main panel ───────────────────────────────────────────────────────────────
+// Jet — persistent, context-aware agent panel. Sends the user's current
+// location (route / appPage / widget) and a stable conversation ID with every
+// request so the backend can build localized context and cache it.
 export const AIChatPanel = () => {
   const { tenantID } = useParams();
-  const { isOpen } = useAIStore();
+  const location = useLocation();
+  const { isOpen, pendingMessage, clearPendingMessage } = useAIStore();
   const [isExpanded, setIsExpanded] = useState(false);
   const bottomRef = useRef(null);
 
   const [inputText, setInputText] = useState('');
-  
+
+  // ── Stable conversation ID per tenant (survives reloads, reset on clear) ──
+  const [conversationID, setConversationID] = useState(() => {
+    try {
+      const key = `jet-ai-conv-${tenantID}`;
+      let id = localStorage.getItem(key);
+      if (!id) {
+        id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : `conv-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        localStorage.setItem(key, id);
+      }
+      return id;
+    } catch (_) {
+      return `conv-${Date.now()}`;
+    }
+  });
+
+  // ── Client context: where is the user standing right now? ────────────────
+  const clientContext = useMemo(() => {
+    const pathname = location?.pathname || (typeof window !== 'undefined' ? window.location.pathname : '');
+    const ctx = { route: pathname };
+    const pageMatch = pathname.match(/app-?pages?\/([^/?#]+)/i);
+    if (pageMatch && pageMatch[1] && !pageMatch[1].startsWith(':')) ctx.appPageID = decodeURIComponent(pageMatch[1]);
+    const widgetMatch = pathname.match(/widgets?\/([^/?#]+)/i);
+    if (widgetMatch && widgetMatch[1] && !widgetMatch[1].startsWith(':') && widgetMatch[1] !== 'new') {
+      ctx.widgetID = decodeURIComponent(widgetMatch[1]);
+    }
+    return ctx;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location?.pathname]);
+
+  const clientContextKey = JSON.stringify(clientContext);
+
+  // ── Transport (recreated when context/conversation changes) ──────────────
+  const transport = useMemo(() => new DefaultChatTransport({
+    api: getAIChatStreamURL(tenantID),
+    body: { clientContext: JSON.parse(clientContextKey), conversationID },
+    // Use a fetch override so we always get a fresh Firebase token per request
+    fetch: async (url, options) => {
+      const token = await getAIBearerToken();
+      return fetch(url, {
+        ...options,
+        headers: { ...options.headers, Authorization: `Bearer ${token}` },
+      });
+    },
+  }), [tenantID, clientContextKey, conversationID]);
+
   // ── useChat — the AI SDK hook that manages everything ──────────────────
-  const { messages, status, sendMessage: sdkSendMessage, setMessages, error, addToolResult } = useChat({
-    transport: new DefaultChatTransport({
-      api: getAIChatStreamURL(tenantID),
-      // Use a fetch override so we always get a fresh Firebase token per request
-      fetch: async (url, options) => {
-        const token = await getAIBearerToken();
-        return fetch(url, {
-          ...options,
-          headers: { ...options.headers, Authorization: `Bearer ${token}` },
-        });
-      },
-    }),
+  const { messages, status, sendMessage: sdkSendMessage, setMessages, error, addToolResult, stop: sdkStop } = useChat({
+    transport,
     onError: (err) => {
       // useChat surfaces errors — we log but don't crash
-      console.error('[AI] stream error:', err?.message);
+      console.error('[Jet] stream error:', err?.message);
     },
   });
 
@@ -1114,6 +1195,13 @@ export const AIChatPanel = () => {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  // ── Send / A2UI actions ─────────────────────────────────────────────────
+  const handleSend = useCallback((text) => {
+    if (!text?.trim() || isLoading) return;
+    sdkSendMessage({ role: 'user', content: text.trim() });
+    setInputText('');
+  }, [sdkSendMessage, isLoading]);
 
   // ── A2UI button actions — append as user message to continue the chat ─
   const handleA2UIAction = useCallback(({ action, params, actionLabel }) => {
@@ -1125,9 +1213,39 @@ export const AIChatPanel = () => {
     sdkSendMessage({ role: 'user', content });
   }, [sdkSendMessage]);
 
-  // ── Clear chat ──────────────────────────────────────────────────────────
+  // ── Deep-link into the agent: openWithMessage("...") sends on open ──────
+  useEffect(() => {
+    if (isOpen && pendingMessage) {
+      sdkSendMessage({ role: 'user', content: String(pendingMessage).trim() });
+      clearPendingMessage();
+    }
+  }, [isOpen, pendingMessage, sdkSendMessage, clearPendingMessage]);
+
+  // ── Keyboard: Ctrl/Cmd+K toggles Jet, Esc closes ────────────────────────
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        useAIStore.getState().togglePanel();
+      } else if (e.key === 'Escape' && useAIStore.getState().isOpen) {
+        useAIStore.getState().closePanel();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // ── Clear chat (fresh conversation ID) ──────────────────────────────────
   const handleClear = async () => {
     setMessages([]);
+    try {
+      const key = `jet-ai-conv-${tenantID}`;
+      const next = (typeof crypto !== 'undefined' && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : `conv-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem(key, next);
+      setConversationID(next);
+    } catch (_) { /* storage unavailable — conversation stays in memory */ }
     if (tenantID) {
       clearAISessionAPI({ tenantID }).catch(() => {
         // Server clear is best-effort — client state is already cleared
@@ -1135,12 +1253,9 @@ export const AIChatPanel = () => {
     }
   };
 
-  const handleSend = useCallback((text) => {
-    console.log("SEND_MESSAGE CALLED WITH", text);
-    if (!text?.trim() || isLoading) return;
-    sdkSendMessage({ role: 'user', content: text.trim() });
-    setInputText('');
-  }, [sdkSendMessage, isLoading]);
+  const handleStop = useCallback(() => {
+    try { sdkStop?.(); } catch (_) { /* stop unsupported — ignore */ }
+  }, [sdkStop]);
 
   if (!isOpen) return null;
 
@@ -1169,9 +1284,15 @@ export const AIChatPanel = () => {
           <div className="w-7 h-7 rounded bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-primary/20 shadow-sm shadow-primary/10">
             <Sparkles className="w-3.5 h-3.5 text-primary drop-shadow-sm" />
           </div>
-          <div className="flex-1 min-w-0 space-y-2">
-            <p className="text-sm font-medium text-foreground">AI Agent</p>
-
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium text-foreground">Jet</p>
+              <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground border border-border rounded-full px-2 py-0.5 bg-muted/30">
+                <span className={`w-1.5 h-1.5 rounded-full ${busy ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+                {busy ? 'working…' : 'MiniMax M3 · free'}
+              </span>
+            </div>
+            <p className="text-[11px] text-muted-foreground truncate">Your Jet Admin operator — Ctrl+K to toggle</p>
           </div>
 
           <button type="button" onClick={() => setIsExpanded(!isExpanded)}
@@ -1195,7 +1316,7 @@ export const AIChatPanel = () => {
         <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2 min-h-0 bg-background">
           {messages.length === 0 && !busy ? (
             <div className="flex items-center justify-center min-h-full w-full">
-              <WelcomeScreen onSuggestionClick={(text) => handleSend(text)} />
+              <WelcomeScreen onSuggestionClick={(text) => handleSend(text)} route={clientContext.route} />
             </div>
           ) : (
             <>
@@ -1229,6 +1350,19 @@ export const AIChatPanel = () => {
                       <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
                       <span>{error.message || 'An error occurred. Please try again.'}</span>
                     </div>
+                    {(() => {
+                      const m = error.message || '';
+                      if (/403|disabled|not configured/i.test(m)) {
+                        return <p className="text-xs text-muted-foreground">Jet has no API key. A workspace admin should set <span className="font-mono">OPENROUTER_API_KEY</span> on the backend, or configure one in Tenant Settings → AI Configuration.</p>;
+                      }
+                      if (/429|rate-limit|rate_limited/i.test(m)) {
+                        return <p className="text-xs text-muted-foreground">The free model is rate-limited right now. Wait about a minute and retry — your chat history is preserved.</p>;
+                      }
+                      if (/503|mcp|tools/i.test(m)) {
+                        return <p className="text-xs text-muted-foreground">Jet's tools are unreachable. Make sure the MCP server is running (<span className="font-mono">npm run start:mcp</span>) and retry.</p>;
+                      }
+                      return null;
+                    })()}
                     <details className="text-xs text-red-400/85 cursor-pointer">
                       <summary className="hover:text-red-300 transition-colors select-none font-mono">
                         Error Details
@@ -1250,7 +1384,7 @@ export const AIChatPanel = () => {
 
         {/* Input box */}
         <div className="shrink-0 w-full">
-          <ChatInput onSend={handleSend} disabled={busy} />
+          <ChatInput onSend={handleSend} disabled={false} busy={busy} onStop={handleStop} />
         </div>
       </div>
     </>

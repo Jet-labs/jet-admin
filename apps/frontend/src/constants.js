@@ -1004,6 +1004,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/widgets/${widgetID}/export`,
       exportListenerAPI: (tenantID, listenerID) =>
         `/api/v1/tenants/${tenantID}/listeners/${listenerID}/export`,
+      exportDatasourceAPI: (tenantID, datasourceID) =>
+        `/api/v1/tenants/${tenantID}/datasources/${datasourceID}/export`,
       previewImportAPI: (tenantID) => `/api/v1/tenants/${tenantID}/import/preview`,
       executeImportAPI: (tenantID) => `/api/v1/tenants/${tenantID}/import/execute`,
     },

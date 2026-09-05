@@ -1,0 +1,14 @@
+{
+  "widgetType": "code-block",
+  "description": "Code Block widget. Displays SQL, JSON or logs with copy button. Ideal for ops and debugging panels.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "code": { "type": "string", "description": "Code content. Supports templates." },
+      "language": { "type": "string", "default": "sql", "description": "Language label e.g. sql, json, bash, javascript" },
+      "showCopy": { "type": "boolean", "default": true },
+      "maxHeight": { "type": "number", "description": "Max height in px before scrolling" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

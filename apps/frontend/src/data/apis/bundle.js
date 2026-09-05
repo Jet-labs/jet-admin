@@ -14,6 +14,7 @@ const EXPORT_API_BY_TYPE = {
   dataQuery: (tenantID, id) => CONSTANTS.APIS.BUNDLE.exportDataQueryAPI(tenantID, id),
   widget: (tenantID, id) => CONSTANTS.APIS.BUNDLE.exportWidgetAPI(tenantID, id),
   listener: (tenantID, id) => CONSTANTS.APIS.BUNDLE.exportListenerAPI(tenantID, id),
+  datasource: (tenantID, id) => CONSTANTS.APIS.BUNDLE.exportDatasourceAPI(tenantID, id),
 };
 
 export const exportEntityBundleAPI = async ({ tenantID, entityType, entityID }) => {

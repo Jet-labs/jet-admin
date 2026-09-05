@@ -23,6 +23,7 @@ import { DatasourceDeletionForm } from "./datasourceDeletionForm";
 import { DatasourceCloneForm } from "./datasourceCloneForm";
 
 import { PageHeader } from "@jet-admin/ui";
+import { BundleExportButton } from "../bundleComponents/bundleExportButton";
 // --- Original Metadata (only for datasourceOptions) ---
 const datasourceOptionsMetadata =
   DATASOURCE_TYPES.POSTGRESQL.formConfig;
@@ -124,6 +125,11 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
         <DatasourceCloneForm
           tenantID={tenantID}
           datasourceID={datasourceID}
+        />
+        <BundleExportButton
+          tenantID={tenantID}
+          entityType="datasource"
+          entityID={datasourceID}
         />
         <DatasourceTestingForm
           tenantID={tenantID}

@@ -1,0 +1,17 @@
+{
+  "widgetType": "list",
+  "description": "List / Card Grid widget. Renders an array as rows or cards with title, subtitle and meta lines.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "dataTemplate": { "type": "string", "description": "Template resolving to an array" },
+      "titleKey": { "type": "string", "default": "title" },
+      "subtitleKey": { "type": "string", "default": "subtitle" },
+      "metaKeys": { "type": "array", "items": { "type": "string" }, "description": "Extra keys to show as meta line" },
+      "layout": { "type": "string", "enum": ["rows", "cards"], "default": "rows" },
+      "emptyText": { "type": "string", "default": "No items" },
+      "searchable": { "type": "boolean", "default": false }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onItemClick", "onSearch"]
+}

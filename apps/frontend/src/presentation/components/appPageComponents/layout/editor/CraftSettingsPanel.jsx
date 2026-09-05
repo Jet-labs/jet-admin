@@ -12,7 +12,7 @@
  */
 import { useEditor } from "@craftjs/core";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import {
+import { resolveValue } from "../../../../../logic/evaluationEngine";import {
   ArrowDown,
   ArrowUp,
   Box,
@@ -76,11 +76,100 @@ function moveNodeInCraft(actions, nodeId, parentId, direction, siblings) {
   }
 }
 
+/**
+ * Live preview badge for a visibility condition, evaluated against the
+ * editor-time state tree (variable defaults + data-source aliases).
+ * Mirrors LayoutRenderer's `!!resolveValue(condition, stateTree)` semantics.
+ */
+function ConditionPreviewBadge({ condition, editorLiveStateTree }) {
+  const { label, tone } = useMemo(() => {
+    if (!condition?.trim()) return { label: "always", tone: "text-muted-foreground bg-muted/50 border-border/50" };
+    try {
+      const inner = editorLiveStateTree?.state || {};
+      const result = resolveValue(condition, inner);
+      return result
+        ? { label: "shown", tone: "text-emerald-600 bg-emerald-500/10 border-emerald-500/30" }
+        : { label: "hidden", tone: "text-amber-600 bg-amber-500/10 border-amber-500/30" };
+    } catch {
+      return { label: "error", tone: "text-destructive bg-destructive/10 border-destructive/30" };
+    }
+  }, [condition, editorLiveStateTree]);
+
+  return (
+    <span className={`ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${tone}`} title="Evaluated against variable defaults + data-source aliases">
+      {label}
+    </span>
+  );
+}
+
+/**
+ * Quick-insert chips for common visibility patterns (variables, queries,
+ * && / || combinators). Appends snippets to the condition input.
+ */
+function ConditionQuickInserts({ editorLiveStateTree, onInsert, onClear }) {
+  const inner = editorLiveStateTree?.state || {};
+  const varKeys = Object.keys(inner.variables || {}).slice(0, 8);
+  const queryKeys = [...Object.keys(inner.queries || {}), ...Object.keys(inner.workflows || {})].slice(0, 6);
+  if (varKeys.length === 0 && queryKeys.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      {varKeys.map((k) => (
+        <button
+          key={`var-${k}`}
+          type="button"
+          onClick={() => onInsert(`{{ state.variables.${k} }}`)}
+          className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-border/60 bg-muted/40 text-foreground hover:bg-muted hover:border-border"
+          title={`Insert {{ state.variables.${k} }}`}
+        >
+          {k}
+        </button>
+      ))}
+      {queryKeys.map((k) => (
+        <button
+          key={`q-${k}`}
+          type="button"
+          onClick={() => onInsert(`{{ state.queries.${k}.data.length }}`)}
+          className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20"
+          title={`Insert {{ state.queries.${k}.data.length }}`}
+        >
+          {k}.len
+        </button>
+      ))}
+      <button
+        type="button"
+        onClick={() => onInsert("&&")}
+        className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-border/60 text-muted-foreground hover:text-foreground"
+        title="AND combinator"
+      >
+        &&
+      </button>
+      <button
+        type="button"
+        onClick={() => onInsert("||")}
+        className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-border/60 text-muted-foreground hover:text-foreground"
+        title="OR combinator"
+      >
+        ||
+      </button>
+      <button
+        type="button"
+        onClick={onClear}
+        className="text-[9px] px-1.5 py-0.5 rounded text-muted-foreground hover:text-destructive"
+        title="Clear condition (always show)"
+      >
+        clear
+      </button>
+    </div>
+  );
+}
+
 export default function CraftSettingsPanel({
   onChangeLayout,
   widgets,
   setWidgets,
   onEditWidget,
+  editorLiveStateTree,
 }) {
   const [activeTab, setActiveTab] = useState("settings");
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -1037,15 +1126,29 @@ export default function CraftSettingsPanel({
                 <div className="flex items-center gap-2 text-[11px] text-foreground">
                   <Eye className="h-3 w-3 text-amber-500" />
                   <span>Show Condition (If)</span>
+                  <ConditionPreviewBadge
+                    condition={nodeProps.condition}
+                    editorLiveStateTree={editorLiveStateTree}
+                  />
                 </div>
                 <div className="bg-background/50 border border-border/80 rounded p-2">
                   <TemplateAutocompleteInput
                     id={`condition_${selectedNodeId}`}
                     value={nodeProps.condition || ""}
                     onChange={handleUpdateCondition}
-                    placeholder="{{ user.isAdmin }}"
+                    placeholder="{{ state.variables.isAdmin }}"
+                    liveStateTree={editorLiveStateTree}
                   />
                 </div>
+                <ConditionQuickInserts
+                  editorLiveStateTree={editorLiveStateTree}
+                  onInsert={(snippet) =>
+                    handleUpdateCondition(
+                      nodeProps.condition ? `${nodeProps.condition} ${snippet}` : snippet
+                    )
+                  }
+                  onClear={() => handleUpdateCondition("")}
+                />
                 <span className="text-[9px] text-muted-foreground/60 leading-tight">
                   Enter JavaScript expression. Renders component only if truthy.
                 </span>
@@ -1068,7 +1171,8 @@ export default function CraftSettingsPanel({
                         itemAlias: nodeProps.repeat?.itemAlias || "item",
                       })
                     }
-                    placeholder="{{ queryGetUsers.data }}"
+                    placeholder="{{ state.queries.my_query.data }}"
+                    liveStateTree={editorLiveStateTree}
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col gap-2">

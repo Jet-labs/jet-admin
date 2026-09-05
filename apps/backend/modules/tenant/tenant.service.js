@@ -340,6 +340,24 @@ tenantService.createTenant = async ({
       return newTenant;
     });
 
+    // Grant creator admin wildcard via Casbin (so authorize:user:list etc. pass)
+    try {
+      const { addPolicy } = require("../../config/casbin.config");
+      // user creator
+      if (userID && newTenant.tenantID) {
+        await addPolicy(userID, newTenant.tenantID, "*", "*", "allow");
+        Logger.log("success", { message: "tenantService:createTenant:casbinAdminGranted", params: { userID, tenantID: newTenant.tenantID } });
+      }
+      const apiKeyCreator = createdByApiKeyID;
+      if (apiKeyCreator && newTenant.tenantID) {
+        const { addPolicy: addPolicy2 } = require("../../config/casbin.config");
+        await addPolicy2(apiKeyCreator, newTenant.tenantID, "*", "*", "allow");
+      }
+    } catch (casbinErr) {
+      Logger.log("warning", { message: "tenantService:createTenant:casbinFailed", params: { error: casbinErr.message } });
+      // don't fail tenant creation if casbin fails
+    }
+
     Logger.log("success", {
       message: "tenantService:createTenant:newTenantCreated",
       params: { newTenant },

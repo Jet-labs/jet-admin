@@ -60,6 +60,9 @@ export const getWidgetByIDAPI = async ({ tenantID, widgetID }) => {
         },
       });
       if (response.data && response.data.success === true) {
+        if (!response.data.widget) {
+          throw new Error(`Widget not found (ID: ${widgetID})`);
+        }
         return new Widget(response.data.widget);
       } else if (response.data.error) {
         throw response.data.error;

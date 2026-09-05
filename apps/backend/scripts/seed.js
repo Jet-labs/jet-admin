@@ -40,7 +40,7 @@ const rolePermissionsMap = {
   QueryRunner: [P.dataquery.execute.title, P.dataquery.list.title, P.dataquery.read.title],
   WorkflowManager: [P.workflow.list.title, P.workflow.create.title, P.workflow.read.title, P.workflow.update.title, P.workflow.delete.title, P.workflow.execute.title, P.workflow.test.title],
   WidgetManager: [P.widget.list.title, P.widget.create.title, P.widget.read.title, P.widget.update.title, P.widget.delete.title, P.widget.execute.title],
-  DatasourceManager: [P.datasource.list.title, P.datasource.create.title, P.datasource.read.title, P.datasource.update.title, P.datasource.delete.title, P.datasource.test.title],
+  DatasourceManager: [P.datasource.list.title, P.datasource.create.title, P.datasource.read.title, P.datasource.update.title, P.datasource.delete.title, P.datasource.test.title, P.datasource.export.title],
   AppPageManager: [P.appPage.list.title, P.appPage.create.title, P.appPage.read.title, P.appPage.update.title, P.appPage.delete.title],
   ListenerManager: [P.listener.list.title, P.listener.create.title, P.listener.read.title, P.listener.update.title, P.listener.delete.title, P.listener.execute.title],
   CronJobManager: [P.cronjob.list.title, P.cronjob.create.title, P.cronjob.read.title, P.cronjob.update.title, P.cronjob.delete.title],

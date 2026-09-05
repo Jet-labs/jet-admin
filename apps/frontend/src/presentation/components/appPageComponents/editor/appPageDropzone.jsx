@@ -66,6 +66,43 @@ export const AppPageDropzone = ({
     }
   };
 
+  // Lightweight editor-time state tree for autocomplete in layout settings
+  // (visibility condition + repeat collection). Uses variable defaults,
+  // data-source aliases + any fetched previews, and placed widget keys so
+  // TemplateAutocompleteInput can suggest real paths without a live runtime.
+  const editorLiveStateTree = useMemo(() => {
+    const cfg = appPageEditorForm?.values?.appPageConfig || migratedConfig || {};
+    const previews = appPageEditorForm?.values?.fetchedDataPreview || {};
+    const variables = {};
+    for (const v of cfg.variables || []) {
+      if (v?.key) variables[v.key] = v.defaultValue ?? null;
+    }
+    const queries = {};
+    const workflows = {};
+    for (const ds of cfg.dataSources || []) {
+      if (!ds?.alias) continue;
+      const previewData = previews?.[ds.alias]?.data;
+      const entry = {
+        data: previewData !== undefined ? previewData : [],
+        isLoading: false,
+        error: null,
+      };
+      if (ds.type === "workflow") workflows[ds.alias] = entry;
+      else queries[ds.alias] = entry;
+    }
+    const widgets = {};
+    for (const w of cfg.widgets || []) {
+      const key = typeof w === "string" ? w : w?.widgetKey || w?.widgetID;
+      if (key) widgets[key] = {};
+    }
+    return { state: { variables, queries, workflows, widgets, globals: { tenantID } } };
+  }, [
+    appPageEditorForm?.values?.appPageConfig,
+    appPageEditorForm?.values?.fetchedDataPreview,
+    migratedConfig,
+    tenantID,
+  ]);
+
   const renderWidget = React.useCallback(
     (widgetKey, sizing) => (
       <AppPageWidgetSlot
@@ -90,6 +127,7 @@ export const AppPageDropzone = ({
           widgets={widgets}
           setWidgets={setWidgets}
           onEditWidget={handleEditWidget}
+          editorLiveStateTree={editorLiveStateTree}
         />
       )}
 

@@ -21,7 +21,7 @@ class QueryEngine {
     this.dataSourceCache = new BoundedCache(100);
   }
 
-  async executeQuery(dataQueryID, runtimeInputs) {
+  async executeQuery(dataQueryID, runtimeInputs, opts = {}) {
     const cacheKey = `${dataQueryID}|${JSON.stringify(runtimeInputs)}`;
     Logger.log("info", {
       message: "QueryEngine:executeQuery:start",
@@ -61,7 +61,12 @@ class QueryEngine {
     });
 
     const datasource = await this.getDataSource(query, dataQueryID);
-    const timeoutSeconds = query.dataQueryOptions?.timeoutSeconds || constants.DEFAULTS.QUERY_TIMEOUT_SECONDS;
+    // Timeout precedence: per-node/per-workflow override (workflow node) >
+    // the query's own dataQueryOptions.timeoutSeconds > platform default.
+    const overrideSeconds = Number(opts?.timeoutSeconds);
+    const timeoutSeconds = (Number.isFinite(overrideSeconds) && overrideSeconds > 0)
+      ? Math.trunc(overrideSeconds)
+      : (query.dataQueryOptions?.timeoutSeconds || constants.DEFAULTS.QUERY_TIMEOUT_SECONDS);
     const timeoutMs = timeoutSeconds * 1000;
 
     const timeoutPromise = new Promise((_, reject) => {

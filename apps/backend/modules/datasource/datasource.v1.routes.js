@@ -12,6 +12,7 @@ const {
     listDatasourcesQuerySchema,
 } = require("./datasource.validator");
 const { P } = require("../../config/permissions");
+const { bundleController } = require("../bundle/bundle.controller");
 
 const multer = require("multer");
 const upload = multer({
@@ -79,6 +80,13 @@ router.patch(
     paramKey: "datasourceID",
   }),
   datasourceController.updateDatasourceByID
+);
+
+router.get(
+  "/:datasourceID/export",
+  validate(datasourceIdParamSchema, "params"),
+  authMiddleware.authorize(P.datasource.export),
+  bundleController.exportDatasource
 );
 
 router.post(

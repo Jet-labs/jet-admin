@@ -1,0 +1,15 @@
+# Temporal development dynamic config for SQL visibility (minimal)
+# Mounted to /etc/temporal/config/dynamicconfig/development-sql.yaml
+frontend.enableClientVersionCheck:
+  - value: false
+    constraints: {}
+frontend.enableUpdateWorkflowExecution:
+  - value: true
+    constraints: {}
+history.defaultWorkflowRetryPolicy:
+  - value:
+      initialInterval: "1s"
+      backoffCoefficient: 2.0
+      maximumInterval: "100s"
+      maximumAttempts: 0
+    constraints: {}

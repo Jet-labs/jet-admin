@@ -8,6 +8,7 @@ import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { DatasourceIcon } from "../../datasourceComponents/datasourceIcon";
 import { Button, Input } from "@jet-admin/ui";
 import { useDebounce } from "@uidotdev/usehooks";
+import { BundleImportDialog } from "../../bundleComponents/bundleImportDialog";
 
 export const DatasourceDrawerList = () => {
   const { tenantID } = useParams();
@@ -40,7 +41,7 @@ export const DatasourceDrawerList = () => {
 
   return (
     <div className="bg-background flex h-full w-full flex-col gap-2 overflow-hidden">
-      <div className="p-2 pb-0">
+      <div className="p-2 pb-0 flex items-center gap-2">
         <Button
           onClick={_navigateToAddMoreDatasource}
           variant="secondary"
@@ -49,6 +50,7 @@ export const DatasourceDrawerList = () => {
           <Plus className="w-4 h-4 mr-2" />
           {CONSTANTS.STRINGS.ADD_DATASOURCE_BUTTON_TEXT}
         </Button>
+        <BundleImportDialog tenantID={tenantID} />
       </div>
 
       {/* Search Input - Small Size (size="sm") per Section 29 */}

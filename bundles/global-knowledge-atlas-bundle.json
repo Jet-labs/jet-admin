@@ -1,0 +1,1560 @@
+{
+  "bundleVersion": 1,
+  "generator": "jet-admin",
+  "exportedAt": "2026-09-03T16:56:59.729Z",
+  "items": [
+    {
+      "type": "datasource",
+      "id": "4e30ec40-1d12-4edb-8d5e-5f912c9d8efb",
+      "payload": {
+        "datasourceTitle": "OpenLibrary Search",
+        "datasourceType": "restapi",
+        "datasourceDescription": "OpenLibrary free book search API, no key required",
+        "datasourceTags": [
+          "books",
+          "public"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://openlibrary.org",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "632e1378-3cf1-43e8-af8d-96ce01c3a8f5",
+      "payload": {
+        "datasourceTitle": "Agify Age Guess",
+        "datasourceType": "restapi",
+        "datasourceDescription": "Agify free age-by-name API, no key required",
+        "datasourceTags": [
+          "people",
+          "public"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://api.agify.io",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "4fc883cd-2443-4488-8a61-c2b806ce9ef2",
+      "payload": {
+        "datasourceTitle": "Genderize Guess",
+        "datasourceType": "restapi",
+        "datasourceDescription": "Genderize free gender-by-name API, no key required",
+        "datasourceTags": [
+          "people",
+          "public"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://api.genderize.io",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "b5c12961-482c-4a6f-9f6f-d731993b8420",
+      "payload": {
+        "datasourceTitle": "Nationalize Guess",
+        "datasourceType": "restapi",
+        "datasourceDescription": "Nationalize free nationality-by-name API, no key required",
+        "datasourceTags": [
+          "people",
+          "public"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://api.nationalize.io",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "1a6368e2-83ba-492c-b725-b9cb163eb458",
+      "payload": {
+        "datasourceTitle": "Zippopotam Zip",
+        "datasourceType": "restapi",
+        "datasourceDescription": "Zippopotam free postal-code lookup, no key required",
+        "datasourceTags": [
+          "geo",
+          "public"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://api.zippopotam.us",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "6a72d9d2-67e1-4b2e-a24c-4c8742799ff1",
+      "payload": {
+        "datasourceTitle": "Cat Facts",
+        "datasourceType": "restapi",
+        "datasourceDescription": "CatFact free random cat facts, no key required",
+        "datasourceTags": [
+          "fun",
+          "public"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://catfact.ninja",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "17e28af1-5653-446a-a933-b6b823792480",
+      "payload": {
+        "datasourceTitle": "JokeAPI Official",
+        "datasourceType": "restapi",
+        "datasourceDescription": "Official Joke API, random jokes, no key required",
+        "datasourceTags": [
+          "fun",
+          "public"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://official-joke-api.appspot.com",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "1b5844c9-1702-43a8-b43b-7f4abea40e00",
+      "payload": {
+        "datasourceTitle": "GitHub Public",
+        "datasourceType": "restapi",
+        "datasourceDescription": "GitHub public REST API, unauthenticated rate limit",
+        "datasourceTags": [
+          "dev",
+          "public"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://api.github.com",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "ff34406b-9e7b-46a0-84dd-735cbed3279d",
+      "payload": {
+        "datasourceTitle": "Countries GraphQL",
+        "datasourceType": "graphql",
+        "datasourceDescription": "Public Countries GraphQL API, no key required",
+        "datasourceTags": [
+          "geo",
+          "graphql",
+          "public"
+        ],
+        "datasourceOptions": {
+          "connectionName": "CountriesGQL",
+          "endpoint": "https://countries.trevorblades.com/",
+          "authType": "none",
+          "headers": [],
+          "timeout": 30
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "b17b26e3-bce8-4a30-a740-0947f7841f19",
+      "payload": {
+        "datasourceTitle": "Example Web Page",
+        "datasourceType": "weburl",
+        "datasourceDescription": "Example.com static page for WebURL fetch demo",
+        "datasourceTags": [
+          "web",
+          "public"
+        ],
+        "datasourceOptions": {
+          "url": "https://example.com",
+          "timeout": 10
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "dataQuery",
+      "id": "1d03be57-1a5d-4404-8bf6-b4ab02da4b9c",
+      "payload": {
+        "dataQueryTitle": "Search Books",
+        "dataQueryDescription": "Search OpenLibrary books by query with limit",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/search.json",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "q",
+              "value": "{{inputs.q}}"
+            },
+            {
+              "key": "limit",
+              "value": "{{inputs.limit}}"
+            }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "q",
+              "type": "string"
+            },
+            {
+              "key": "limit",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "4e30ec40-1d12-4edb-8d5e-5f912c9d8efb",
+          "name": "OpenLibrary Search",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "c0f63838-f2a8-4ce7-ad28-3dc681825a07",
+      "payload": {
+        "dataQueryTitle": "Book By Title",
+        "dataQueryDescription": "Single OpenLibrary result by title",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/search.json",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "title",
+              "value": "{{inputs.title}}"
+            },
+            {
+              "key": "limit",
+              "value": "1"
+            }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "title",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "4e30ec40-1d12-4edb-8d5e-5f912c9d8efb",
+          "name": "OpenLibrary Search",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "63d803cc-95a9-4ae7-bdb4-3a127fb8b49e",
+      "payload": {
+        "dataQueryTitle": "Guess Age",
+        "dataQueryDescription": "Agify age guess for a name",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "name",
+              "value": "{{inputs.name}}"
+            }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "name",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "632e1378-3cf1-43e8-af8d-96ce01c3a8f5",
+          "name": "Agify Age Guess",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "0eaba168-9901-4901-88d7-e4426fb2748a",
+      "payload": {
+        "dataQueryTitle": "Guess Gender",
+        "dataQueryDescription": "Genderize gender guess for a name",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "name",
+              "value": "{{inputs.name}}"
+            }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "name",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "4fc883cd-2443-4488-8a61-c2b806ce9ef2",
+          "name": "Genderize Guess",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "a1fd67b2-cb00-4946-86f2-a7d9428c4fa2",
+      "payload": {
+        "dataQueryTitle": "Guess Nationality",
+        "dataQueryDescription": "Nationalize country guess for a name",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "name",
+              "value": "{{inputs.name}}"
+            }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "name",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "b5c12961-482c-4a6f-9f6f-d731993b8420",
+          "name": "Nationalize Guess",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "e7646b55-749c-4e3c-9eb2-53662561150c",
+      "payload": {
+        "dataQueryTitle": "Lookup Zip",
+        "dataQueryDescription": "Zippopotam US zip lookup",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/us/{{inputs.zip}}",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "zip",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "1a6368e2-83ba-492c-b725-b9cb163eb458",
+          "name": "Zippopotam Zip",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "488663ba-19ea-44d9-b221-76ca06422c09",
+      "payload": {
+        "dataQueryTitle": "Random Cat Fact",
+        "dataQueryDescription": "Random cat fact",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/fact",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json"
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "6a72d9d2-67e1-4b2e-a24c-4c8742799ff1",
+          "name": "Cat Facts",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "3cf73379-111e-4fa6-ae33-2637c90c7610",
+      "payload": {
+        "dataQueryTitle": "Random Joke",
+        "dataQueryDescription": "Random joke with setup and punchline",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/random_joke",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json"
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "17e28af1-5653-446a-a933-b6b823792480",
+          "name": "JokeAPI Official",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "7fbf3fca-008d-4953-929a-821637459357",
+      "payload": {
+        "dataQueryTitle": "GitHub Repo",
+        "dataQueryDescription": "Public GitHub repo metadata by owner and repo",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/repos/{{inputs.owner}}/{{inputs.repo}}",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "owner",
+              "type": "string"
+            },
+            {
+              "key": "repo",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "1b5844c9-1702-43a8-b43b-7f4abea40e00",
+          "name": "GitHub Public",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "9c1d6fb1-8092-44be-83a2-e7ed4dd029e6",
+      "payload": {
+        "dataQueryTitle": "Country By Code",
+        "dataQueryDescription": "Countries GraphQL: single country by code",
+        "datasourceType": "graphql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "operationType": "query",
+          "query": "query Country($code: ID!) { country(code: $code) { code name capital currency languages { name } } }",
+          "variables": "{\n  \"code\": \"{{inputs.code}}\"\n}",
+          "operationName": "",
+          "inputDefinitions": [
+            {
+              "key": "code",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "ff34406b-9e7b-46a0-84dd-735cbed3279d",
+          "name": "Countries GraphQL",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "51a1a5ca-bd8a-4d37-b78f-0ea0009f4cc7",
+      "payload": {
+        "dataQueryTitle": "All Countries",
+        "dataQueryDescription": "Countries GraphQL: first page of countries",
+        "datasourceType": "graphql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "operationType": "query",
+          "query": "query { countries { code name capital currency } }",
+          "variables": "{}",
+          "operationName": ""
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "ff34406b-9e7b-46a0-84dd-735cbed3279d",
+          "name": "Countries GraphQL",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "bddfefc6-a9c9-4e68-8779-781207cc8786",
+      "payload": {
+        "dataQueryTitle": "Fetch Example Page",
+        "dataQueryDescription": "Fetch example.com HTML via WebURL",
+        "datasourceType": "weburl",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "action": "GET"
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "b17b26e3-bce8-4a30-a740-0947f7841f19",
+          "name": "Example Web Page",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "workflow",
+      "id": "74d9ad26-ae25-4793-ad5c-7f522d2dc3a9",
+      "payload": {
+        "title": "Global Knowledge Atlas",
+        "workflowOptions": {
+          "inputDefinitions": [
+            {
+              "key": "name",
+              "type": "string"
+            },
+            {
+              "key": "q",
+              "type": "string"
+            },
+            {
+              "key": "zip",
+              "type": "string"
+            },
+            {
+              "key": "owner",
+              "type": "string"
+            },
+            {
+              "key": "repo",
+              "type": "string"
+            },
+            {
+              "key": "countryCode",
+              "type": "string"
+            }
+          ],
+          "defaultRetryLimit": 1,
+          "defaultNodeTimeoutSeconds": 60
+        },
+        "nodes": [
+          {
+            "nodeID": "n_start",
+            "nodeType": "start",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Start",
+              "description": "Atlas entry"
+            }
+          },
+          {
+            "nodeID": "n_books",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Search books",
+              "dataQueryID": "1d03be57-1a5d-4404-8bf6-b4ab02da4b9c",
+              "inputValues": {
+                "q": "{{ctx.q}}",
+                "limit": 6
+              },
+              "outputVariable": "books",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_age",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Guess age",
+              "dataQueryID": "63d803cc-95a9-4ae7-bdb4-3a127fb8b49e",
+              "inputValues": {
+                "name": "{{ctx.name}}"
+              },
+              "outputVariable": "age",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_gender",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Guess gender",
+              "dataQueryID": "0eaba168-9901-4901-88d7-e4426fb2748a",
+              "inputValues": {
+                "name": "{{ctx.name}}"
+              },
+              "outputVariable": "gender",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_cat",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Cat fact",
+              "dataQueryID": "488663ba-19ea-44d9-b221-76ca06422c09",
+              "inputValues": {},
+              "outputVariable": "catFact",
+              "errorHandling": "continue_default"
+            }
+          },
+          {
+            "nodeID": "n_join",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Join person context",
+              "code": "var books = ctx.books || {};\nvar docs = books.docs || [];\nvar titles = docs.slice(0, 6).map(function(d){ return d.title; });\nvar age = ctx.age || {};\nvar gender = ctx.gender || {};\nvar cat = ctx.catFact || {};\nreturn { titles: titles, bookCount: books.numFound || 0, age: Number(age.age) || null, ageCount: age.count || 0, gender: gender.gender || null, genderProb: gender.probability || null, catFact: cat.fact || null, joinedAt: new Date().toISOString(), coolMs: 1200, followUpAt: new Date(Date.now() + 2000).toISOString() };",
+              "outputVariable": "person",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_nat",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Guess nationality",
+              "dataQueryID": "a1fd67b2-cb00-4946-86f2-a7d9428c4fa2",
+              "inputValues": {
+                "name": "{{ctx.name}}"
+              },
+              "outputVariable": "nat",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_zip",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Lookup zip",
+              "dataQueryID": "e7646b55-749c-4e3c-9eb2-53662561150c",
+              "inputValues": {
+                "zip": "{{ctx.zip}}"
+              },
+              "outputVariable": "zipInfo",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_enrich",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Enrich person",
+              "code": "var p = ctx.person || {};\nvar nat = ctx.nat || {};\nvar countries = nat.country || [];\nvar top = countries.length ? countries[0].country_id : null;\nvar zip = ctx.zipInfo || {};\nvar places = zip.places || [];\np.name = ctx.name;\np.topCountry = top;\np.zipPlace = places.length ? places[0]['place name'] : null;\np.zipState = places.length ? places[0].state : null;\nreturn p;",
+              "outputVariable": "person",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_check_age",
+            "nodeType": "condition",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Age band",
+              "branches": [
+                {
+                  "id": "senior",
+                  "name": "Senior",
+                  "conditions": [
+                    {
+                      "leftValue": "{{ctx.person.age}}",
+                      "operator": "greater_than",
+                      "rightValue": "50"
+                    }
+                  ],
+                  "conditionLogic": "AND"
+                },
+                {
+                  "id": "young",
+                  "name": "Young",
+                  "conditionType": "expression",
+                  "expression": "ctx.person && ctx.person.age != null && ctx.person.age < 30"
+                }
+              ],
+              "evaluationMode": "first_match",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_profile",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Build profile line",
+              "code": "var p = ctx.person || {};\nvar senior = (p.age || 0) >= 50;\nreturn (senior ? 'SENIOR' : 'STANDARD') + ' profile: ' + (p.name || 'unknown') + ' age ' + p.age + ' (' + p.gender + '/' + Math.round((p.genderProb||0)*100) + '%) nat=' + p.topCountry + '. Books found: ' + p.bookCount + '. Cat: ' + (ctx.catFact && ctx.catFact.fact ? 'yes' : 'no');",
+              "outputVariable": "profileLine",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_pause",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Brief pause",
+              "delayType": "fixed",
+              "delayMinutes": 0,
+              "delaySeconds": 1,
+              "delayMs": 0
+            }
+          },
+          {
+            "nodeID": "n_gh",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "GitHub repo",
+              "dataQueryID": "7fbf3fca-008d-4953-929a-821637459357",
+              "inputValues": {
+                "owner": "{{ctx.owner}}",
+                "repo": "{{ctx.repo}}"
+              },
+              "outputVariable": "repo",
+              "errorHandling": "retry_then_continue"
+            }
+          },
+          {
+            "nodeID": "n_country",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Country detail",
+              "dataQueryID": "9c1d6fb1-8092-44be-83a2-e7ed4dd029e6",
+              "inputValues": {
+                "code": "{{ctx.countryCode}}"
+              },
+              "outputVariable": "country",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_joke",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Random joke",
+              "dataQueryID": "3cf73379-111e-4fa6-ae33-2637c90c7610",
+              "inputValues": {},
+              "outputVariable": "joke",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_web",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Fetch example page",
+              "dataQueryID": "bddfefc6-a9c9-4e68-8779-781207cc8786",
+              "inputValues": {},
+              "outputVariable": "examplePage",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_combine",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Combine extras",
+              "code": "var r = ctx.repo || {};\nvar c = ctx.country || {};\nvar j = ctx.joke || {};\nvar pg = ctx.examplePage;\nreturn { stars: r.stargazers_count || 0, forks: r.forks_count || 0, repoFull: r.full_name || null, countryName: (c.country && c.country.name) || null, capital: (c.country && c.country.capital) || null, joke: j.setup ? (j.setup + ' / ' + j.punchline) : null, pageType: typeof pg, pageLen: (typeof pg === 'string' ? pg.length : JSON.stringify(pg || '').length) };",
+              "outputVariable": "extras",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_cool",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Dynamic cool",
+              "delayType": "dynamic",
+              "delayMinutes": 0,
+              "delaySeconds": 0,
+              "delayMs": 0,
+              "delayVariable": "{{ctx.person.coolMs}}"
+            }
+          },
+          {
+            "nodeID": "n_books_loop",
+            "nodeType": "loop",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Loop book titles",
+              "sourceVariable": "{{ctx.person.titles}}",
+              "itemVariable": "bookTitle",
+              "indexVariable": "bidx",
+              "outputVariable": "bookLines",
+              "maxIterations": 10,
+              "delayBetweenItems": 10,
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_title_check",
+            "nodeType": "condition",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Long title?",
+              "branches": [
+                {
+                  "id": "long",
+                  "name": "Long title",
+                  "conditions": [
+                    {
+                      "leftValue": "{{ctx.bookTitle}}",
+                      "operator": "contains",
+                      "rightValue": " "
+                    }
+                  ],
+                  "conditionLogic": "AND"
+                }
+              ],
+              "evaluationMode": "first_match",
+              "errorHandling": "continue_default"
+            }
+          },
+          {
+            "nodeID": "n_long_line",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Long title line",
+              "code": "return 'LONG #' + (ctx.bidx + 1) + ': ' + ctx.bookTitle;",
+              "outputVariable": "bookLine",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_short_line",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Short title line",
+              "code": "return 'SHORT #' + (ctx.bidx + 1) + ': ' + ctx.bookTitle;",
+              "outputVariable": "bookLine",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_curate",
+            "nodeType": "dataCollection",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Curate atlas entry",
+              "description": "Human curates the final atlas entry",
+              "collectionType": "form",
+              "formSchema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "title": "Display title"
+                  },
+                  "rating": {
+                    "type": "number",
+                    "title": "Rating 1-5"
+                  },
+                  "publish": {
+                    "type": "boolean",
+                    "title": "Publish"
+                  }
+                },
+                "required": [
+                  "title",
+                  "publish"
+                ]
+              },
+              "formUischema": {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/title"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/rating"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/publish"
+                  }
+                ]
+              },
+              "outputVariable": "curation",
+              "expiryMinutes": 120
+            }
+          },
+          {
+            "nodeID": "n_wait",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Wait follow-up",
+              "delayType": "until",
+              "delayMinutes": 0,
+              "delaySeconds": 0,
+              "delayMs": 0,
+              "untilTime": "{{ctx.person.followUpAt}}"
+            }
+          },
+          {
+            "nodeID": "n_end",
+            "nodeType": "end",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "End atlas",
+              "status": "success",
+              "outputParameters": [
+                {
+                  "id": "p1",
+                  "name": "profile",
+                  "sourceVariable": "{{ctx.profileLine}}"
+                },
+                {
+                  "id": "p2",
+                  "name": "person",
+                  "sourceVariable": "{{ctx.person}}"
+                },
+                {
+                  "id": "p3",
+                  "name": "extras",
+                  "sourceVariable": "{{ctx.extras}}"
+                },
+                {
+                  "id": "p4",
+                  "name": "bookLines",
+                  "sourceVariable": "{{ctx.bookLines}}"
+                },
+                {
+                  "id": "p5",
+                  "name": "curation",
+                  "sourceVariable": "{{ctx.curation}}"
+                }
+              ]
+            }
+          },
+          {
+            "nodeID": "n_end_young",
+            "nodeType": "end",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "End young fast",
+              "status": "success",
+              "outputParameters": [
+                {
+                  "id": "p1",
+                  "name": "profile",
+                  "sourceVariable": "{{ctx.profileLine}}"
+                },
+                {
+                  "id": "p2",
+                  "name": "person",
+                  "sourceVariable": "{{ctx.person}}"
+                }
+              ]
+            }
+          }
+        ],
+        "edges": [
+          {
+            "upstreamNodeID": "n_start",
+            "downstreamNodeID": "n_books",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_start",
+            "downstreamNodeID": "n_age",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_start",
+            "downstreamNodeID": "n_gender",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_start",
+            "downstreamNodeID": "n_cat",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_books",
+            "downstreamNodeID": "n_join",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_age",
+            "downstreamNodeID": "n_join",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_age",
+            "downstreamNodeID": "n_join",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_gender",
+            "downstreamNodeID": "n_join",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_gender",
+            "downstreamNodeID": "n_join",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_cat",
+            "downstreamNodeID": "n_join",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_cat",
+            "downstreamNodeID": "n_join",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_join",
+            "downstreamNodeID": "n_nat",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_nat",
+            "downstreamNodeID": "n_zip",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_nat",
+            "downstreamNodeID": "n_zip",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_zip",
+            "downstreamNodeID": "n_enrich",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_zip",
+            "downstreamNodeID": "n_enrich",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_enrich",
+            "downstreamNodeID": "n_check_age",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_check_age",
+            "downstreamNodeID": "n_profile",
+            "sourceHandle": "senior",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_check_age",
+            "downstreamNodeID": "n_end_young",
+            "sourceHandle": "young",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_check_age",
+            "downstreamNodeID": "n_profile",
+            "sourceHandle": "default",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_profile",
+            "downstreamNodeID": "n_pause",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_pause",
+            "downstreamNodeID": "n_gh",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_gh",
+            "downstreamNodeID": "n_country",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_gh",
+            "downstreamNodeID": "n_country",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_country",
+            "downstreamNodeID": "n_joke",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_country",
+            "downstreamNodeID": "n_joke",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_joke",
+            "downstreamNodeID": "n_web",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_joke",
+            "downstreamNodeID": "n_web",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_web",
+            "downstreamNodeID": "n_combine",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_web",
+            "downstreamNodeID": "n_combine",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_combine",
+            "downstreamNodeID": "n_cool",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_cool",
+            "downstreamNodeID": "n_books_loop",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_books_loop",
+            "downstreamNodeID": "n_title_check",
+            "sourceHandle": "loop",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_books_loop",
+            "downstreamNodeID": "n_curate",
+            "sourceHandle": "completed",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_title_check",
+            "downstreamNodeID": "n_long_line",
+            "sourceHandle": "long",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_title_check",
+            "downstreamNodeID": "n_short_line",
+            "sourceHandle": "default",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_long_line",
+            "downstreamNodeID": "n_curate",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_short_line",
+            "downstreamNodeID": "n_curate",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_curate",
+            "downstreamNodeID": "n_wait",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_wait",
+            "downstreamNodeID": "n_end",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          }
+        ]
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "4e30ec40-1d12-4edb-8d5e-5f912c9d8efb",
+          "name": "OpenLibrary Search",
+          "bundled": true
+        },
+        {
+          "type": "datasource",
+          "id": "632e1378-3cf1-43e8-af8d-96ce01c3a8f5",
+          "name": "Agify Age Guess",
+          "bundled": true
+        },
+        {
+          "type": "datasource",
+          "id": "4fc883cd-2443-4488-8a61-c2b806ce9ef2",
+          "name": "Genderize Guess",
+          "bundled": true
+        },
+        {
+          "type": "datasource",
+          "id": "6a72d9d2-67e1-4b2e-a24c-4c8742799ff1",
+          "name": "Cat Facts",
+          "bundled": true
+        },
+        {
+          "type": "datasource",
+          "id": "b5c12961-482c-4a6f-9f6f-d731993b8420",
+          "name": "Nationalize Guess",
+          "bundled": true
+        },
+        {
+          "type": "datasource",
+          "id": "1a6368e2-83ba-492c-b725-b9cb163eb458",
+          "name": "Zippopotam Zip",
+          "bundled": true
+        },
+        {
+          "type": "datasource",
+          "id": "1b5844c9-1702-43a8-b43b-7f4abea40e00",
+          "name": "GitHub Public",
+          "bundled": true
+        },
+        {
+          "type": "datasource",
+          "id": "ff34406b-9e7b-46a0-84dd-735cbed3279d",
+          "name": "Countries GraphQL",
+          "bundled": true
+        },
+        {
+          "type": "datasource",
+          "id": "b17b26e3-bce8-4a30-a740-0947f7841f19",
+          "name": "Example Web Page",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "1d03be57-1a5d-4404-8bf6-b4ab02da4b9c",
+          "name": "Search Books",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "63d803cc-95a9-4ae7-bdb4-3a127fb8b49e",
+          "name": "Guess Age",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "0eaba168-9901-4901-88d7-e4426fb2748a",
+          "name": "Guess Gender",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "488663ba-19ea-44d9-b221-76ca06422c09",
+          "name": "Random Cat Fact",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "a1fd67b2-cb00-4946-86f2-a7d9428c4fa2",
+          "name": "Guess Nationality",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "e7646b55-749c-4e3c-9eb2-53662561150c",
+          "name": "Lookup Zip",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "7fbf3fca-008d-4953-929a-821637459357",
+          "name": "GitHub Repo",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "9c1d6fb1-8092-44be-83a2-e7ed4dd029e6",
+          "name": "Country By Code",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "3cf73379-111e-4fa6-ae33-2637c90c7610",
+          "name": "Random Joke",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "bddfefc6-a9c9-4e68-8779-781207cc8786",
+          "name": "Fetch Example Page",
+          "bundled": true
+        }
+      ]
+    }
+  ]
+}

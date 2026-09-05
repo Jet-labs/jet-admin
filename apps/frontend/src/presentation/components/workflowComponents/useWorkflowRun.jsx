@@ -1,7 +1,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { CONSTANTS } from "../../../constants";
-import { testWorkflowAPI, executeWorkflowAPI, stopTestWorkflowAPI } from "../../../data/apis/workflow";
+import { testWorkflowAPI, executeWorkflowAPI, stopTestWorkflowAPI, getWorkflowRunStatusAPI } from "../../../data/apis/workflow";
 import { extractError } from "../../../utils/error";
 import { submitDataCollectionAPI } from "../../../data/apis/workflow";
 
@@ -18,10 +18,10 @@ export const useWorkflowRun = ({ tenantID }) => {
     
     // Refs for cleanup and internal state
     const socketRef = useRef(null);
-    const timeoutRef = useRef(null);
     const instanceIdRef = useRef(null);
     const isTestRunRef = useRef(false);
     const isStoppingRef = useRef(false); // Guard to prevent race conditions when stopping
+    const pollRef = useRef(null); // Polling fallback when socket events are missed
     const [dataCollectionRequest, setDataCollectionRequest] = useState(null);
 
     // Helper to add log entry
@@ -50,6 +50,25 @@ export const useWorkflowRun = ({ tenantID }) => {
         setNodeExecutionStatus({});
     }, []);
 
+    const disconnectSocket = useCallback(() => {
+        if (pollRef.current) {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+        }
+        const sock = socketRef.current;
+        socketRef.current = null;
+        if (sock) {
+            // Detach first: intentional teardown must not trip the
+            // 'disconnect' warning handler (it would log a spurious
+            // "Connection Warning" on every clean completion).
+            try {
+                sock.off("disconnect");
+                sock.off("connect_error");
+            } catch (_) {}
+            sock.disconnect();
+        }
+    }, []);
+
     /**
      * Subscribe to a workflow instance via Socket.IO
      * Shared logic for both test and saved runs
@@ -69,11 +88,7 @@ export const useWorkflowRun = ({ tenantID }) => {
             // Store socket reference for cleanup
             socketRef.current = socket;
 
-            // Join the workflow run room
-            socket.emit("workflow_run_join", { runId: instanceID });
-            addLog('info', 'Connected', 'Joined workflow execution room');
-
-            // Helper to get node name
+            // Helper to get node name (defined before listeners use it)
             const getNodeName = (nodeId) => {
                 const node = nodes.find(n => n.id === nodeId);
                 return node?.data?.title || node?.type || nodeId;
@@ -81,13 +96,22 @@ export const useWorkflowRun = ({ tenantID }) => {
 
             // Listen for node updates from backend
             socket.on("workflow_node_update", (data) => {
+                try {
                 // Ignore events if we're stopping
                 if (isStoppingRef.current) return;
 
-                const nodeId = data.nodeID;
-                if (nodeId && data.status) {
+                const nodeId = data?.nodeID;
+                if (!nodeId || !data?.status) {
+                    addLog('node_error', 'Node update', `Malformed update (missing nodeID/status): ${JSON.stringify(data)?.substring(0, 200)}`);
+                    return;
+                }
+                {
                     const nodeName = getNodeName(nodeId);
-                    const status = data.status === 'success' ? 'completed' : 'failed';
+                    const statusLower = String(data.status).toLowerCase();
+                    const isSuccess = statusLower === 'success' || statusLower === 'completed';
+                    const isRunning = statusLower === 'running';
+                    const isSuspended = statusLower === 'suspended';
+                    const status = isSuccess ? 'completed' : isRunning ? 'running' : isSuspended ? 'suspended' : 'failed';
 
                     setNodeExecutionStatus(prev => ({
                         ...prev,
@@ -101,10 +125,18 @@ export const useWorkflowRun = ({ tenantID }) => {
                     }
 
                     // Log the node update
-                    if (data.status === 'success') {
+                    if (isSuccess) {
                         addLog('node_complete', `Node: ${nodeName}`, 'Completed successfully', {
                             nodeId,
                             output: data.output
+                        });
+                    } else if (isRunning) {
+                        addLog('node_start', `Node: ${nodeName}`, 'Running', {
+                            nodeId,
+                        });
+                    } else if (isSuspended) {
+                        addLog('info', `Node: ${nodeName}`, 'Waiting for input', {
+                            nodeId,
                         });
                     } else {
                         addLog('node_error', `Node: ${nodeName}`, 'Execution failed', {
@@ -116,7 +148,13 @@ export const useWorkflowRun = ({ tenantID }) => {
                     // Mark next nodes as running (visual feedback)
                     // Note: This matches the old logic but relies on passed 'nodes' and edges would need to be passed too for full accuracy.
                     // For now, we rely on the backend events mostly, but the old code had edge logic here.
-                    // Simplification: We will just update status based on events. 
+                    // Simplification: We will just update status based on events.
+                }
+                } catch (handlerErr) {
+                    // Never let one bad packet kill the stream — surface it visibly.
+                    addLog('node_error', 'Node update', `Handler failed: ${handlerErr?.message}`, {
+                        error: String(handlerErr?.stack || handlerErr).substring(0, 500),
+                    });
                 }
             });
 
@@ -128,6 +166,40 @@ export const useWorkflowRun = ({ tenantID }) => {
                 addLog('info', `Node: ${nodeName}`, 'Waiting for input');
                 setDataCollectionRequest(data);
             });
+
+            // Shared completion handler for socket + polling fallback.
+            // Polling covers the case where `workflow_status_update` is emitted
+            // before join or while the socket is disconnected (roomSize 0).
+            const finishFromStatus = (data) => {
+                if (isStoppingRef.current) return;
+                if (!data || data.status === "RUNNING") return;
+                if (data.contextData) {
+                    setContext(data.contextData);
+                }
+                if (data.status === "COMPLETED") {
+                    addLog('workflow_complete', 'Workflow Complete', 'All nodes executed successfully');
+                } else if (data.status === "FAILED") {
+                    addLog('workflow_error', 'Workflow Failed', data.error || data.errorMessage || 'Execution terminated with errors', {
+                        ...(data.error ? { error: data.error } : {}),
+                    });
+                    // Mark the currently-running (or suspended) node as failed
+                    // so its animation stops even if its node update was missed.
+                    setNodeExecutionStatus(prev => {
+                        const next = { ...prev };
+                        for (const [k, v] of Object.entries(next)) {
+                            if (v === 'running' || v === 'suspended') next[k] = 'failed';
+                        }
+                        return next;
+                    });
+                } else if (data.status === "STOPPED" || data.status === "CANCELLED") {
+                    addLog('info', 'Workflow Stopped', 'Execution was stopped');
+                } else {
+                    return;
+                }
+                setIsRunning(false);
+                setResult(data);
+                disconnectSocket();
+            };
 
             // Listen for workflow status update (completion/failure/stopped)
             socket.on("workflow_status_update", (data) => {
@@ -145,7 +217,16 @@ export const useWorkflowRun = ({ tenantID }) => {
                     setResult(data);
                     disconnectSocket();
                 } else if (data.status === "FAILED") {
-                    addLog('workflow_error', 'Workflow Failed', 'Execution terminated with errors');
+                    addLog('workflow_error', 'Workflow Failed', 'Execution terminated with errors', {
+                        ...(data.error ? { error: data.error } : {}),
+                    });
+                    setNodeExecutionStatus(prev => {
+                        const next = { ...prev };
+                        for (const [k, v] of Object.entries(next)) {
+                            if (v === 'running' || v === 'suspended') next[k] = 'failed';
+                        }
+                        return next;
+                    });
                     setIsRunning(false);
                     setResult(data);
                     disconnectSocket();
@@ -157,37 +238,56 @@ export const useWorkflowRun = ({ tenantID }) => {
                 }
             });
 
-            // Timeout after 2 minutes
-            timeoutRef.current = setTimeout(() => {
-                addLog('info', 'Timeout', 'Workflow execution timed out after 2 minutes');
-                setIsRunning(false);
-                disconnectSocket();
-            }, 120000);
-
-            // Cleanup on disconnect
-            socket.on("disconnect", () => {
-                if (timeoutRef.current) {
-                    clearTimeout(timeoutRef.current);
-                    timeoutRef.current = null;
-                }
+            // Socket dropped before completion -> don't hang on spinning
+            // animation; polling below will resolve the final state.
+            socket.on("disconnect", (reason) => {
+                if (isStoppingRef.current) return;
+                addLog('warning', 'Connection Warning', `Live updates disconnected (${reason}) — polling run status`);
             });
+            socket.on("connect_error", (err) => {
+                if (isStoppingRef.current) return;
+                addLog('warning', 'Connection Warning', `Live updates unavailable (${err?.message || 'connect_error'}) — polling run status`);
+            });
+
+            // Join AFTER listeners are registered and the transport is connected,
+            // so no event is missed and the join can never sit in a dead buffer.
+            await new Promise((resolve) => {
+                if (socket.connected) return resolve();
+                const timer = setTimeout(() => resolve(), 5000);
+                socket.once("connect", () => { clearTimeout(timer); resolve(); });
+                socket.once("connect_error", () => { clearTimeout(timer); resolve(); });
+            });
+            if (!socket.connected) {
+                addLog('workflow_error', 'Connection Error', 'Socket did not connect — live node updates will be missing');
+            }
+            socket.emit("workflow_run_join", { runId: instanceID });
+            addLog('info', 'Connected', 'Joined workflow execution room');
+
+            // Polling fallback: backend DB is source of truth. If the single
+            // `workflow_status_update` socket event is missed (join race or
+            // disconnect at completion time), polling still stops the animation.
+            if (pollRef.current) clearInterval(pollRef.current);
+            const pollStatus = async () => {
+                if (isStoppingRef.current) return;
+                try {
+                    const res = await getWorkflowRunStatusAPI({ tenantID, instanceID });
+                    const statusData = res?.data || res;
+                    if (statusData && statusData.status && statusData.status !== "RUNNING") {
+                        finishFromStatus(statusData);
+                    }
+                } catch (_) {
+                    // Best-effort only — socket remains primary channel.
+                }
+            };
+            pollRef.current = setInterval(pollStatus, 5000);
+            // Immediate check covers fast-failing runs that complete before join.
+            setTimeout(pollStatus, 2000);
 
         } catch (error) {
             addLog('workflow_error', 'Connection Error', error.message);
             setIsRunning(false);
         }
-    }, [addLog]);
-
-    const disconnectSocket = useCallback(() => {
-        if (socketRef.current) {
-            socketRef.current.disconnect();
-            socketRef.current = null;
-        }
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
-    }, []);
+    }, [addLog, tenantID, disconnectSocket]);
 
     const clearRunState = useCallback(() => {
         disconnectSocket();
@@ -205,7 +305,7 @@ export const useWorkflowRun = ({ tenantID }) => {
     /**
      * Start a Test Run (In-Memory)
      */
-    const startTestRun = useCallback(async ({ nodes, edges, inputValues }) => {
+    const startTestRun = useCallback(async ({ nodes, edges, inputValues, workflowOptions, workflowID }) => {
         // Reset stopping guard for new run
         isStoppingRef.current = false;
         clearRunState();
@@ -215,12 +315,15 @@ export const useWorkflowRun = ({ tenantID }) => {
         addLog('start', 'Test Run Started', `Running workflow with ${nodes.length} nodes`);
 
         try {
-            // Start test execution
+            // Start test execution (workflowID attributes the run to a saved
+            // workflow for history; omitted for unsaved graphs)
             const result = await testWorkflowAPI({
                 tenantID,
                 nodes,
                 edges,
                 inputValues,
+                workflowOptions,
+                ...(workflowID ? { workflowID } : {}),
             });
 
             const instanceID = result.instanceID;

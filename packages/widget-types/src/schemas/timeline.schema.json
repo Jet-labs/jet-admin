@@ -1,0 +1,15 @@
+{
+  "widgetType": "timeline",
+  "description": "Timeline / Activity Feed widget. Vertical event feed for audit logs, run history and comments.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "dataTemplate": { "type": "string", "description": "Template resolving to an event array" },
+      "titleKey": { "type": "string", "default": "title" },
+      "timeKey": { "type": "string", "default": "time" },
+      "descriptionKey": { "type": "string", "default": "description" },
+      "emptyText": { "type": "string", "default": "No activity yet" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onItemClick"]
+}

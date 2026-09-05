@@ -239,8 +239,19 @@ const constants = {
   },
 
   AI: {
-    DEFAULT_BASE_URL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-    DEFAULT_MODEL: "gemma-4-31b-it",
+    // Jet Agent default: best free OpenRouter agentic model (Sept 2026).
+    // MiniMax M3: 1M context, long-horizon agentic work + reliable tool calling.
+    DEFAULT_BASE_URL: "https://openrouter.ai/api/v1",
+    DEFAULT_MODEL: "minimax/minimax-m3:free",
+    DEFAULT_PROVIDER: "openrouter",
+    FALLBACK_MODELS: [
+      "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "nvidia/nemotron-3-super-120b-a12b:free",
+      "z-ai/glm-5.2:free",
+    ],
+    OPENROUTER_APP_TITLE: "Jet Admin",
+    MAX_STEPS: 25,
+    TEMPERATURE: 0.2,
   },
 };
 

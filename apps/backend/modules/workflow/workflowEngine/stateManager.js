@@ -115,26 +115,37 @@ stateManager.logEventBulk = async (events) => {
  * Returns { instance, initialContext } so the caller can pass initialContext
  * directly into the first job payload without a round-trip assembleContext call.
  *
- * @param {{ workflowID: string, tenantID: string, inputValues?: object, isTest?: boolean }}
+ * @param {{ workflowID: string, tenantID: string, inputValues?: object, isTest?: boolean, sourceWorkflowID?: string, parentInstanceID?: string, parentNodeID?: string, systemContext?: object }}
+ *   sourceWorkflowID — for test runs launched from a saved workflow editor:
+ *   stored on the instance so the run shows up in that workflow's history.
+ *   Still an isTest run; unsaved-graph tests omit it (stays null).
+ *   parentInstanceID/parentNodeID — for sub-workflow (child) runs: links the
+ *   child instance back to the parent node that spawned it (run history/audit).
+ *   systemContext — extra non-input keys (e.g. `{ __subDepth: 1 }`) merged into
+ *   the initial context AND recorded via SYSTEM_SET so live execution and
+ *   assembled history agree.
  * @returns {Promise<{ instance: object, initialContext: object }>}
  */
-stateManager.createInstance = async ({ workflowID, tenantID, inputValues = {}, isTest = false }) => {
+stateManager.createInstance = async ({ workflowID, tenantID, inputValues = {}, isTest = false, sourceWorkflowID, parentInstanceID, parentNodeID, systemContext = {} }) => {
   Logger.log('info', {
     message: 'stateManager:createInstance',
-    params: { workflowID, tenantID, isTest },
+    params: { workflowID, tenantID, isTest, sourceWorkflowID, parentInstanceID, parentNodeID },
   });
 
   const instance = await prisma.tblWorkflowInstances.create({
     data: {
-      workflowID: isTest ? null : workflowID,
+      workflowID: isTest ? (sourceWorkflowID ?? null) : workflowID,
       tenantID,
       status: constants.WORKFLOW_STATUS.RUNNING,
       startedAt: new Date(),
       isTest,
+      ...(parentInstanceID ? { parentInstanceID } : {}),
+      ...(parentNodeID ? { parentNodeID: String(parentNodeID) } : {}),
     },
   });
 
-  const inputPayload = { input: inputValues };
+  const systemEntries = systemContext && typeof systemContext === 'object' ? systemContext : {};
+  const inputPayload = { input: inputValues, ...systemEntries };
 
   // Use logEvent instead of raw Prisma so all writes go through one path
   await stateManager.logEvent({
@@ -144,6 +155,14 @@ stateManager.createInstance = async ({ workflowID, tenantID, inputValues = {}, i
     outputVariable: 'input',
     payload: inputPayload,
   });
+  if (Object.keys(systemEntries).length > 0) {
+    await stateManager.logEvent({
+      instanceID: instance.instanceID,
+      nodeID: null,
+      eventType: constants.WORKFLOW_LOG_EVENT_TYPES.SYSTEM_SET,
+      payload: { ...systemEntries, ...(parentInstanceID ? { __parentInstanceID: parentInstanceID } : {}) },
+    });
+  }
 
   return { instance, initialContext: inputPayload };
 };
@@ -284,7 +303,15 @@ stateManager.assembleContext = async (instanceID) => {
     select: { payload: true },
   });
 
-  return rows.reduce((acc, row) => ({ ...acc, ...row.payload }), {});
+  return rows.reduce((acc, row) => {
+    const payload = row.payload || {};
+    const { __deleteKeys, ...rest } = payload;
+    const next = { ...acc, ...rest };
+    if (Array.isArray(__deleteKeys)) {
+      for (const key of __deleteKeys) delete next[key];
+    }
+    return next;
+  }, {});
 };
 
 // ─── Barrier check ────────────────────────────────────────────────────────────

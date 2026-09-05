@@ -90,15 +90,35 @@ function inferType(val) {
   return typeof val;
 }
 
+// ─── Coerce any incoming value to a safe string for CodeMirror ──────────────
+// Callers sometimes pass numbers / booleans / objects via `value={x || ""}`
+// (e.g. `42 || ""` stays `42`), which used to crash extractTokens and the
+// editor sync below. Centralising the coercion here makes the component robust.
+function toDisplayString(value) {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  try {
+    return String(value);
+  } catch (e) {
+    return "";
+  }
+}
+
 // ─── Extract all {{tokens}} currently in value (for chip bar) ─────────────────
 function extractTokens(value) {
-  const matches = [...(value || "").matchAll(/\{\{([^}]+)\}\}/g)];
+  const str = toDisplayString(value);
+  if (!str || str.indexOf("{{") === -1) return [];
+  // NOTE: intentionally uses RegExp.exec loop instead of String.matchAll for
+  // broader runtime compat (matchAll is ES2020+ and missing on older browsers).
+  const re = /\{\{([^}]+)\}\}/g;
   const seen = new Set();
-  return matches.reduce((acc, m) => {
-    const key = m[1].trim();
-    if (!seen.has(key)) { seen.add(key); acc.push(key); }
-    return acc;
-  }, []);
+  const out = [];
+  let m;
+  while ((m = re.exec(str)) !== null) {
+    const key = (m[1] || "").trim();
+    if (key && !seen.has(key)) { seen.add(key); out.push(key); }
+  }
+  return out;
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -353,7 +373,7 @@ export const TemplateAutocompleteInput = ({
     containerRef.current.innerHTML = '';
 
     const state = EditorState.create({
-      doc: value || '',
+      doc: toDisplayString(value),
       extensions: [
         ...baseExtensions,
         cmPlaceholder(placeholder || ''),
@@ -382,7 +402,7 @@ export const TemplateAutocompleteInput = ({
     }
 
     const current = view.state.doc.toString();
-    const incoming = value || '';
+    const incoming = toDisplayString(value);
     if (current !== incoming) {
       view.dispatch({
         changes: { from: 0, to: current.length, insert: incoming },

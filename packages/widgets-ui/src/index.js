@@ -9,6 +9,7 @@ export { VegaConfigEditor } from "./vega/vegaConfigEditor";
 // Table widget
 export { TableWidget } from "./table/tableWidget";
 export { TableConfigEditor } from "./table/tableConfigEditor";
+export * from "./table/tableUtils";
 
 // Widget map and configuration
 export * from "./widget.map";
@@ -45,6 +46,29 @@ export * from "./date-range-picker";
 // HTML Widget
 export { HtmlWidget } from "./html/htmlWidget";
 export { HtmlConfigEditor } from "./html/htmlConfigEditor";
+
+// P0 — Input / Action / Layout
+export * from "./text-input";
+export * from "./select";
+export * from "./multi-select";
+export * from "./checkbox";
+export * from "./radio-group";
+export * from "./switch";
+export * from "./slider";
+export * from "./search-input";
+export * from "./file-upload";
+export * from "./divider";
+export * from "./tabs";
+
+// P1 — Display / Analytics
+export * from "./key-value";
+export * from "./json-viewer";
+export * from "./list";
+export * from "./badge";
+export * from "./progress";
+export * from "./timeline";
+export * from "./video";
+export * from "./code-block";
 
 // Shared components removed, TemplateAutocompleteInput moved to @jet-admin/ui
 export { WidgetEditorContext } from "./context/WidgetEditorContext";

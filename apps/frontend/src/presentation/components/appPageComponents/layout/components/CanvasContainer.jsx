@@ -5,13 +5,14 @@
  */
 import React from "react";
 import { useNode } from "@craftjs/core";
-import { useCraftEditorContext } from "./CraftEditorContext.js";
+import { useCraftEditorContext, useConditionHidden } from "./CraftEditorContext.js";
 import { LogicBadges } from "./LogicBadges.jsx";
 import LayoutResizeHandle from "../editor/LayoutResizeHandle.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
 
 export function CanvasContainer({ children, span, sizing, style, condition, repeat, fixedHeight }) {
-  const { previewMode } = useCraftEditorContext();
+  const { previewMode, editorLiveStateTree } = useCraftEditorContext();
+  const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
     connectors: { connect, drag },
     id,
@@ -43,10 +44,11 @@ export function CanvasContainer({ children, span, sizing, style, condition, repe
       ref={(ref) => !previewMode && connect(drag(ref))}
       className={`flex flex-col bg-background border border-border rounded ${previewMode ? "" : "p-2"} self-stretch min-h-0 box-border transition-all craft-node craft-node-container ${containerSpan} ${containerSizing} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
-      }`}
+      } ${hiddenByCondition && !previewMode ? "opacity-40 saturate-50" : ""}`}
       style={containerStyle}
       id={id}
       data-node-type="Container"
+      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
     >
       {!previewMode && (condition || repeat) && (
         <div className="absolute left-2 top-2 z-50 pointer-events-none">

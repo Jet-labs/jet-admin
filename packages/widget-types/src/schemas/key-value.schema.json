@@ -1,0 +1,24 @@
+{
+  "widgetType": "key-value",
+  "description": "Key-Value widget. Displays a single record as label/value rows. Ideal for detail panels.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "dataTemplate": { "type": "string", "description": "Template resolving to an object, e.g. {{state.queries.user.data[0]}}" },
+      "items": {
+        "type": "array",
+        "description": "Static rows (used when dataTemplate is empty)",
+        "items": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string" },
+            "value": { "type": "string" }
+          }
+        }
+      },
+      "columns": { "type": "number", "default": 1, "description": "Grid columns 1-3" },
+      "emptyText": { "type": "string", "default": "No data" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

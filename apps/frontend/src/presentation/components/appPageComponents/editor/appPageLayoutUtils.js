@@ -96,7 +96,7 @@ export const appendWidgetToAppPageConfig = (
     const nextLayout = cloneDeep(appPageConfig.layout);
 
     if (!nextLayout || nextLayout.children.length === 0) {
-      const newLayout = nextLayout || { id: "root", type: "column", children: [] };
+      const newLayout = nextLayout || { id: "ROOT", type: "column", children: [] };
       const newRow = createRowNode();
       newRow.children.push(createWidgetNode(widgetKey, 12, "fill"));
       newLayout.children.push(newRow);

@@ -56,6 +56,82 @@ export const WIDGET_TYPES = {
     name: "HTML Widget",
     value: "html",
   },
+  TEXT_INPUT: {
+    name: "Text Input",
+    value: "text-input",
+  },
+  SELECT: {
+    name: "Select",
+    value: "select",
+  },
+  MULTI_SELECT: {
+    name: "Multi Select",
+    value: "multi-select",
+  },
+  CHECKBOX: {
+    name: "Checkbox",
+    value: "checkbox",
+  },
+  RADIO_GROUP: {
+    name: "Radio Group",
+    value: "radio-group",
+  },
+  SWITCH: {
+    name: "Switch",
+    value: "switch",
+  },
+  SLIDER: {
+    name: "Slider",
+    value: "slider",
+  },
+  SEARCH_INPUT: {
+    name: "Search Input",
+    value: "search-input",
+  },
+  FILE_UPLOAD: {
+    name: "File Upload",
+    value: "file-upload",
+  },
+  DIVIDER: {
+    name: "Divider",
+    value: "divider",
+  },
+  TABS: {
+    name: "Tabs",
+    value: "tabs",
+  },
+  KEY_VALUE: {
+    name: "Key Value",
+    value: "key-value",
+  },
+  JSON_VIEWER: {
+    name: "JSON Viewer",
+    value: "json-viewer",
+  },
+  LIST: {
+    name: "List",
+    value: "list",
+  },
+  BADGE: {
+    name: "Badge",
+    value: "badge",
+  },
+  PROGRESS: {
+    name: "Progress",
+    value: "progress",
+  },
+  TIMELINE: {
+    name: "Timeline",
+    value: "timeline",
+  },
+  VIDEO: {
+    name: "Video",
+    value: "video",
+  },
+  CODE_BLOCK: {
+    name: "Code Block",
+    value: "code-block",
+  },
 };
 
 // Advanced options for Vega widgets (using JSON Schema + UI Schema for jsonforms)
@@ -135,8 +211,8 @@ export const WIDGET_DATASET_ADVANCED_OPTIONS = [];
 // Widget-specific keys (e.g. "table") add extra events on top of COMMON.
 //
 // Each event entry may include an `args` array describing the event payload
-// shape available in templates via {{ state.event.<key> }}.
-// Always-available keys: state.event.type, state.event.widgetID
+// shape available in templates via {{ event.<key> }}.
+// Always-available keys: event.type, event.widgetID
 
 /**
  * @type {Record<string, Array<{ value: string, label: string, desc: string, inputDefinitions?: Array<{ key: string, description: string }> }>>}
@@ -155,8 +231,7 @@ export const WIDGET_EVENT_TYPES = {
   ],
 
   /** Table-specific events */
-  table: [
-    {
+  table: [    {
       value: "onRowSelect", label: "On Row Select", desc: "Fires when a table row is selected",
       inputDefinitions: [
         { key: "event.row", description: "Selected row object" },
@@ -228,6 +303,36 @@ export const WIDGET_EVENT_TYPES = {
       value: "onSubmit", label: "On Submit", desc: "Fires when the button is submitted",
       inputDefinitions: [
         { key: "event.inputDefinitions[0]", description: "Submit payload" },
+      ],
+    },
+  ],
+
+  /** Vega chart drill-down events (vega + vega-lite) */
+  "vega-lite": [
+    {
+      value: "onMarkClick", label: "On Mark Click", desc: "Fires when a chart mark is clicked (drill-down)",
+      inputDefinitions: [
+        { key: "event.datum", description: "Clicked datum object (e.g. {{ event.datum.category }})" },
+      ],
+    },
+    {
+      value: "onBrush", label: "On Brush", desc: "Fires when an interval brush selection changes",
+      inputDefinitions: [
+        { key: "event.value", description: "Brush interval selection value" },
+      ],
+    },
+  ],
+  vega: [
+    {
+      value: "onMarkClick", label: "On Mark Click", desc: "Fires when a chart mark is clicked (drill-down)",
+      inputDefinitions: [
+        { key: "event.datum", description: "Clicked datum object (e.g. {{ event.datum.category }})" },
+      ],
+    },
+    {
+      value: "onBrush", label: "On Brush", desc: "Fires when an interval brush selection changes",
+      inputDefinitions: [
+        { key: "event.value", description: "Brush interval selection value" },
       ],
     },
   ],
@@ -308,6 +413,121 @@ export const WIDGET_EVENT_TYPES = {
       ],
     },
   ],
+  "text-input": [
+    {
+      value: "onChange", label: "On Change", desc: "Fires when the input value changes",
+      inputDefinitions: [{ key: "event.value", description: "Current input value" }],
+    },
+    { value: "onFocus", label: "On Focus", desc: "Fires when the input gains focus" },
+    { value: "onBlur", label: "On Blur", desc: "Fires when the input loses focus" },
+    {
+      value: "onClear", label: "On Clear", desc: "Fires when the input is cleared",
+      inputDefinitions: [{ key: "event.value", description: "Cleared value (empty string)" }],
+    },
+  ],
+  select: [
+    {
+      value: "onChange", label: "On Change", desc: "Fires when selection changes",
+      inputDefinitions: [{ key: "event.value", description: "Selected option value" }],
+    },
+    {
+      value: "onClear", label: "On Clear", desc: "Fires when selection is cleared",
+      inputDefinitions: [{ key: "event.value", description: "Cleared value" }],
+    },
+    { value: "onOpen", label: "On Open", desc: "Fires when dropdown opens" },
+    { value: "onClose", label: "On Close", desc: "Fires when dropdown closes" },
+  ],
+  "multi-select": [
+    {
+      value: "onChange", label: "On Change", desc: "Fires when selection changes",
+      inputDefinitions: [{ key: "event.value", description: "Array of selected values" }],
+    },
+    {
+      value: "onClear", label: "On Clear", desc: "Fires when selection is cleared",
+      inputDefinitions: [{ key: "event.value", description: "Empty array" }],
+    },
+  ],
+  checkbox: [
+    {
+      value: "onChange", label: "On Change", desc: "Fires when checked state changes",
+      inputDefinitions: [{ key: "event.value", description: "Boolean checked state" }],
+    },
+  ],
+  "radio-group": [
+    {
+      value: "onChange", label: "On Change", desc: "Fires when selection changes",
+      inputDefinitions: [{ key: "event.value", description: "Selected option value" }],
+    },
+  ],
+  switch: [
+    {
+      value: "onChange", label: "On Change", desc: "Fires when toggle state changes",
+      inputDefinitions: [{ key: "event.value", description: "Boolean toggle state" }],
+    },
+  ],
+  slider: [
+    {
+      value: "onChange", label: "On Change", desc: "Fires when slider value changes",
+      inputDefinitions: [{ key: "event.value", description: "Numeric slider value" }],
+    },
+  ],
+  "search-input": [
+    {
+      value: "onChange", label: "On Change", desc: "Fires instantly on each keystroke",
+      inputDefinitions: [{ key: "event.value", description: "Current search text" }],
+    },
+    {
+      value: "onSearch", label: "On Search", desc: "Fires debounced after typing pauses",
+      inputDefinitions: [{ key: "event.searchTerm", description: "Debounced search term" }],
+    },
+    {
+      value: "onClear", label: "On Clear", desc: "Fires when search is cleared",
+      inputDefinitions: [{ key: "event.value", description: "Cleared value" }],
+    },
+    { value: "onFocus", label: "On Focus", desc: "Fires when search gains focus" },
+    { value: "onBlur", label: "On Blur", desc: "Fires when search loses focus" },
+  ],
+  "file-upload": [
+    {
+      value: "onChange", label: "On Change", desc: "Fires when files are selected",
+      inputDefinitions: [
+        { key: "event.files", description: "Array of { name, size, type } file metadata" },
+        { key: "event.fileNames", description: "Array of file names" },
+      ],
+    },
+    {
+      value: "onClear", label: "On Clear", desc: "Fires when files are cleared",
+      inputDefinitions: [{ key: "event.files", description: "Empty array" }],
+    },
+  ],
+  tabs: [
+    {
+      value: "onChange", label: "On Change", desc: "Fires when active tab changes",
+      inputDefinitions: [{ key: "event.value", description: "Selected tab value" }],
+    },
+  ],
+  list: [
+    {
+      value: "onItemClick", label: "On Item Click", desc: "Fires when a list item is clicked",
+      inputDefinitions: [
+        { key: "event.item", description: "Clicked item object" },
+        { key: "event.index", description: "Clicked item index" },
+      ],
+    },
+    {
+      value: "onSearch", label: "On Search", desc: "Fires when list filter changes",
+      inputDefinitions: [{ key: "event.searchTerm", description: "Filter text" }],
+    },
+  ],
+  timeline: [
+    {
+      value: "onItemClick", label: "On Item Click", desc: "Fires when a timeline event is clicked",
+      inputDefinitions: [
+        { key: "event.item", description: "Clicked event object" },
+        { key: "event.index", description: "Clicked event index" },
+      ],
+    },
+  ],
 };
 
 /**
@@ -357,7 +577,7 @@ export const getEventInputDefinitions = (widgetType, eventType) => {
 export const WIDGET_METHODS = {
   table: [
     { name: "refresh", description: "Reload table data" },
-    { name: "setSelectedRow", description: "Select a row by index" },
+    { name: "setSelectedRow", description: "Select a row by index (fires onRowSelect)" },
     { name: "clearSelection", description: "Clear row selection" },
   ],
   "vega-lite": [
@@ -373,6 +593,48 @@ export const WIDGET_METHODS = {
   ],
   html: [
     { name: "refresh", description: "Reload iframe content" },
+  ],
+  "text-input": [
+    { name: "setValue", description: "Set input value" },
+    { name: "clear", description: "Clear input value" },
+    { name: "focus", description: "Focus the input" },
+  ],
+  select: [
+    { name: "setValue", description: "Set selected value" },
+    { name: "clear", description: "Clear selection" },
+  ],
+  "multi-select": [
+    { name: "setValue", description: "Set selected values array" },
+    { name: "clear", description: "Clear selection" },
+  ],
+  checkbox: [
+    { name: "setValue", description: "Set checked state" },
+    { name: "toggle", description: "Toggle checked state" },
+    { name: "clear", description: "Uncheck" },
+  ],
+  "radio-group": [
+    { name: "setValue", description: "Set selected value" },
+    { name: "clear", description: "Clear selection" },
+  ],
+  switch: [
+    { name: "setValue", description: "Set toggle state" },
+    { name: "toggle", description: "Toggle state" },
+    { name: "clear", description: "Turn off" },
+  ],
+  slider: [
+    { name: "setValue", description: "Set slider value" },
+    { name: "clear", description: "Reset to minimum" },
+  ],
+  "search-input": [
+    { name: "setValue", description: "Set search text" },
+    { name: "clear", description: "Clear search" },
+  ],
+  "file-upload": [
+    { name: "clear", description: "Clear selected files" },
+  ],
+  tabs: [
+    { name: "setTab", description: "Select tab by value" },
+    { name: "setValue", description: "Select tab by value" },
   ],
 };
 

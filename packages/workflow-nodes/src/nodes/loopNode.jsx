@@ -26,6 +26,7 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
     sourceVariable: data?.sourceVariable || '',
     itemVariable: data?.itemVariable || 'item',
     indexVariable: data?.indexVariable || 'index',
+    outputVariable: data?.outputVariable || 'loopResults',
     maxIterations: data?.maxIterations ?? 1000,
     delayBetweenItems: data?.delayBetweenItems ?? 0,
     errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW,
@@ -41,6 +42,7 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         sourceVariable: data.sourceVariable || '',
         itemVariable: data.itemVariable || 'item',
         indexVariable: data.indexVariable || 'index',
+        outputVariable: data.outputVariable || 'loopResults',
         maxIterations: data.maxIterations ?? 1000,
         delayBetweenItems: data.delayBetweenItems ?? 0,
         errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW,
@@ -89,6 +91,12 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
           type: 'string',
           title: 'Index Variable Name',
           description: 'Variable name for current index (accessible as ctx.{name})',
+          pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$',
+        },
+        outputVariable: {
+          type: 'string',
+          title: 'Output Variable Name',
+          description: 'Variable name to store collected loop results (accessible as ctx.{name})',
           pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$',
         },
         maxIterations: {
@@ -165,6 +173,17 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
               type: 'Control',
               scope: '#/properties/indexVariable',
               options: { placeholder: 'index' },
+            },
+          ],
+        },
+        {
+          type: 'Category',
+          label: 'Output',
+          elements: [
+            {
+              type: 'Control',
+              scope: '#/properties/outputVariable',
+              options: { placeholder: 'e.g., loopResults, processedItems' },
             },
           ],
         },

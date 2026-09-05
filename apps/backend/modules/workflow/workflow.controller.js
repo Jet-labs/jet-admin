@@ -216,15 +216,17 @@ workflowController.getRunStatus = async (req, res) => {
 workflowController.getWorkflowInstances = async (req, res) => {
   try {
     const { tenantID } = req.params;
-    const { workflowID, status, page, pageSize } = req.query;
+    const { workflowID, parentInstanceID, status, isTest, page, pageSize } = req.query;
     const authContext = getServiceAuthContext(req);
 
-    Logger.log("info", { message: "WorkflowController:getWorkflowInstances:params", params: { tenantID, workflowID, status, authContext } });
+    Logger.log("info", { message: "WorkflowController:getWorkflowInstances:params", params: { tenantID, workflowID, parentInstanceID, status, isTest, authContext } });
 
     const result = await workflowService.listInstances({
       tenantID,
       ...(workflowID ? { workflowID } : {}),
+      ...(parentInstanceID ? { parentInstanceID } : {}),
       ...(status ? { status } : {}),
+      ...(typeof isTest === "boolean" ? { isTest } : {}),
       page: page ? parseInt(page, 10) : 1,
       pageSize: pageSize ? parseInt(pageSize, 10) : 50,
     });
@@ -245,15 +247,17 @@ workflowController.testWorkflow = async (req, res) => {
     const { tenantID } = req.params;
     const { nodes, edges } = req.body;
     const inputValues = req.body.inputValues || {};
+    const workflowOptions = req.body.workflowOptions || {};
+    const { workflowID: sourceWorkflowID } = req.body;
     const authContext = getServiceAuthContext(req);
 
     if (!Array.isArray(nodes) || !Array.isArray(edges)) {
       return expressUtils.sendResponse(res, false, {}, { message: "nodes and edges are required" }, constants.HTTP_STATUS.BAD_REQUEST);
     }
 
-    Logger.log("info", { message: "WorkflowController:testWorkflow:params", params: { tenantID, nodeCount: nodes.length, authContext } });
+    Logger.log("info", { message: "WorkflowController:testWorkflow:params", params: { tenantID, nodeCount: nodes.length, sourceWorkflowID, authContext } });
 
-    const result = await workflowService.testWorkflow({ tenantID, nodes, edges, inputValues, authContext });
+    const result = await workflowService.testWorkflow({ tenantID, nodes, edges, inputValues, workflowOptions, sourceWorkflowID, authContext });
 
     Logger.log("success", { message: "WorkflowController:testWorkflow:success", params: { instanceID: result.instanceID } });
     expressUtils.sendResponse(res, true, result, null, constants.HTTP_STATUS.OK);

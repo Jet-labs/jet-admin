@@ -96,8 +96,18 @@ class ListenerEngine {
         throw new Error(`Missing datasource for listener ${listenerID}`);
       }
 
-      const DataSource = dataSourceRegistry.getDataSource(datasource.datasourceType);
-      const instance = new DataSource(datasource, {
+      // tblDatasources.datasourceOptions is stored encrypted (see encryptOptions
+      // in datasource.service). The query path decrypts in defaultDatasourceFetcher
+      // (authorizedProxy); the listener path must do the same — otherwise every
+      // subscribe() only sees the { __encrypted, iv, data, authTag } envelope and
+      // fails with "endpoint/host is required".
+      const datasourceForEngine = {
+        ...datasource,
+        datasourceOptions: decryptDatasourceOptions(datasource.datasourceOptions),
+      };
+
+      const DataSource = dataSourceRegistry.getDataSource(datasourceForEngine.datasourceType);
+      const instance = new DataSource(datasourceForEngine, {
         getCredential: async (vaultCredentialID) => {
           return await vaultService.getCredential({
             tenantID: listener.tenantID,
@@ -360,5 +370,31 @@ class ListenerEngine {
 
 // Singleton
 const listenerEngine = new ListenerEngine();
+
+/**
+ * Decrypt a stored datasourceOptions value.
+ * Plain (never-encrypted) objects pass through untouched; the
+ * { __encrypted, iv, data, authTag } envelope is decrypted via the
+ * vault encryption key. Throws on undecryptable envelopes so the
+ * listener lands in `error` status with a clear message instead of
+ * failing later with "endpoint/host is required".
+ */
+function decryptDatasourceOptions(options) {
+  if (!options || typeof options !== 'object' || !options.__encrypted) {
+    return options || {};
+  }
+  try {
+    const { decrypt } = require('../../../utils/encryption.util');
+    return JSON.parse(
+      decrypt({ iv: options.iv, data: options.data, authTag: options.authTag })
+    );
+  } catch (err) {
+    Logger.log('error', {
+      message: 'ListenerEngine:decryptOptions:failed',
+      params: { error: err.message },
+    });
+    throw new Error(`Unable to decrypt datasource options: ${err.message}`);
+  }
+}
 
 module.exports = { listenerEngine };

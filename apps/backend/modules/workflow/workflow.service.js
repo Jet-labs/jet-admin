@@ -574,6 +574,8 @@ workflowService.getRunStatus = async (instanceID) => {
       workflowTitle: tblWorkflows?.title,
       status: instanceData.status,
       isTest: instanceData.isTest,
+      parentInstanceID: instanceData.parentInstanceID ?? null,
+      parentNodeID: instanceData.parentNodeID ?? null,
       startedAt: instanceData.startedAt,
       completedAt: instanceData.completedAt,
       contextData,
@@ -604,6 +606,8 @@ workflowService.listInstances = async ({
   tenantID,
   workflowID,
   status,
+  isTest,
+  parentInstanceID,
   page = 1,
   pageSize = 50,
 }) => {
@@ -612,6 +616,8 @@ workflowService.listInstances = async ({
       tenantID,
       ...(workflowID ? { workflowID } : {}),
       ...(status ? { status } : {}),
+      ...(typeof isTest === "boolean" ? { isTest } : {}),
+      ...(parentInstanceID ? { parentInstanceID } : {}),
     };
 
     const skip = (page - 1) * pageSize;
@@ -636,6 +642,8 @@ workflowService.listInstances = async ({
         workflowTitle: instance.tblWorkflows?.title ?? null,
         status: instance.status,
         isTest: instance.isTest,
+        parentInstanceID: instance.parentInstanceID ?? null,
+        parentNodeID: instance.parentNodeID ?? null,
         startedAt: instance.startedAt,
         completedAt: instance.completedAt,
       })),
@@ -662,16 +670,27 @@ workflowService.listInstances = async ({
  * @param {object} param0.inputValues - Input parameters for workflow
  * @returns {Promise<{instanceID: string, isTest: boolean}>}
  */
-workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputValues = {} }) => {
-  const { startTestWorkflow } = require("./workflowEngine/engine");
+workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputValues = {}, workflowOptions = {}, sourceWorkflowID }) => {
+  const { startTestWorkflowTemporal: startTestWorkflow } = require("./temporal/service");
 
   Logger.log("info", {
     message: "workflowService:testWorkflow:params",
-    params: { tenantID, nodeCount: nodes.length, edgeCount: edges.length },
+    params: { tenantID, nodeCount: nodes.length, edgeCount: edges.length, sourceWorkflowID },
   });
 
   try {
-    const result = await startTestWorkflow({ nodes, edges, tenantID, inputValues });
+    // Attribute test runs launched from a saved workflow editor so they show
+    // up in that workflow's run history (still stored as isTest runs).
+    if (sourceWorkflowID) {
+      const source = await prisma.tblWorkflows.findFirst({
+        where: { workflowID: sourceWorkflowID, tenantID },
+        select: { workflowID: true },
+      });
+      if (!source) {
+        throw new Error("Source workflow not found");
+      }
+    }
+    const result = await startTestWorkflow({ nodes, edges, tenantID, inputValues, workflowOptions, sourceWorkflowID });
 
     Logger.log("success", {
       message: "workflowService:testWorkflow:started",
@@ -704,6 +723,8 @@ workflowService.stopTestWorkflow = async ({ instanceID }) => {
   });
 
   try {
+    const { terminateWorkflow } = require("./temporal/service");
+    await terminateWorkflow({ instanceID, reason: 'stopTestWorkflow' }).catch(() => { });
     await stateManager.deleteTestInstance(instanceID);
 
     Logger.log("success", {

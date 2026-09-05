@@ -1,0 +1,15 @@
+{
+  "widgetType": "file-upload",
+  "description": "File Upload widget. Pick files for upload workflows. Exposes file metadata (name, size, type) to widget state and events.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string" },
+      "accept": { "type": "string", "description": "Accepted MIME/extensions, e.g. '.csv,.json,image/*'" },
+      "multiple": { "type": "boolean", "default": false },
+      "maxSizeMB": { "type": "number", "description": "Max file size in MB" },
+      "buttonLabel": { "type": "string", "default": "Choose file" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onChange", "onClear"]
+}

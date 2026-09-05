@@ -102,6 +102,83 @@ workflowMiddleware.extractWorkflowDataQueryIDs = async (req, res, next) => {
 };
 
 /**
+ * Middleware to extract sub-workflow (child) IDs from workflow nodes in the
+ * request body for auth verification. A caller that can trigger a parent must
+ * also be allowed to execute each child it invokes.
+ */
+workflowMiddleware.extractWorkflowSubWorkflowIDs = async (req, res, next) => {
+  try {
+    const subWorkflowIDs = new Set();
+
+    if (Array.isArray(req.body.nodes)) {
+      for (const node of req.body.nodes) {
+        const nodeType = node?.type ?? node?.nodeType;
+        if (nodeType === "subWorkflow") {
+          const nodeData = node?.data ?? node?.nodeConfig ?? {};
+          const cid = nodeData?.childWorkflowID;
+          if (cid) {
+            subWorkflowIDs.add(cid);
+          }
+        }
+      }
+    }
+
+    if (subWorkflowIDs.size > 0) {
+      req.subWorkflowIDs = Array.from(subWorkflowIDs);
+    }
+    next();
+  } catch (error) {
+    Logger.log("error", {
+      message: "workflowMiddleware:extractWorkflowSubWorkflowIDs:error",
+      params: { error: error.message }
+    });
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+/**
+ * Middleware to extract sub-workflow (child) IDs from an existing workflow in
+ * the DB (for execute/clone checks where nodes come from storage, not body).
+ */
+workflowMiddleware.resolveWorkflowSubWorkflowIDsFromDB = async (req, res, next) => {
+  try {
+    const { workflowID } = req.params;
+    if (!workflowID) {
+      return next();
+    }
+    const workflow = await prisma.tblWorkflows.findUnique({
+      where: { workflowID },
+      include: {
+        tblWorkflowNodes: true
+      }
+    });
+
+    if (workflow && Array.isArray(workflow.tblWorkflowNodes)) {
+      const subWorkflowIDs = new Set();
+      for (const node of workflow.tblWorkflowNodes) {
+        if (node?.nodeType === "subWorkflow") {
+          const nodeData = node?.nodeConfig ?? {};
+          const cid = nodeData?.childWorkflowID;
+          if (cid) {
+            subWorkflowIDs.add(cid);
+          }
+        }
+      }
+      if (subWorkflowIDs.size > 0) {
+        req.subWorkflowIDs = Array.from(subWorkflowIDs);
+      }
+    }
+    next();
+  } catch (error) {
+    Logger.log("error", {
+      message: "workflowMiddleware:resolveWorkflowSubWorkflowIDsFromDB:error",
+      params: { error: error.message }
+    });
+    return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.SERVER_ERROR, constants.HTTP_STATUS.INTERNAL_SERVER_ERROR, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+/**
  * Middleware to extract dataQueryIDs from an existing workflow in the DB (for clone check)
  */
 workflowMiddleware.resolveWorkflowDataQueryIDsFromDB = async (req, res, next) => {

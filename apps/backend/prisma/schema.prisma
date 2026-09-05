@@ -383,6 +383,8 @@ model tblWorkflowInstances {
   createdAt                         DateTime                            @default(now()) @db.Timestamptz(6)
   updatedAt                         DateTime                            @default(now()) @db.Timestamptz(6)
   isTest                            Boolean                             @default(false)
+  parentInstanceID                  String?                             @db.Uuid
+  parentNodeID                      String?                             @db.VarChar
   tblWorkflowDataCollectionRequests tblWorkflowDataCollectionRequests[]
   tblWorkflowInstanceLogs           tblWorkflowInstanceLogs[]
   tblTenants                        tblTenants                          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction)
@@ -390,6 +392,7 @@ model tblWorkflowInstances {
 
   @@index([tenantID, status], map: "idx_tblWorkflowInstances_tenantID_status")
   @@index([workflowID], map: "idx_tblWorkflowInstances_workflowID")
+  @@index([parentInstanceID], map: "idx_tblWorkflowInstances_parentInstanceID")
 }
 
 model tblWorkflowNodes {

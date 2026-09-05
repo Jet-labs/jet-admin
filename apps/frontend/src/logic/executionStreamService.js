@@ -37,14 +37,16 @@ class ExecutionStreamService {
       });
 
       socket.on("workflow_node_update", (data) => {
-        const isSuccess = data.status === 'success';
+        const statusLower = String(data.status || '').toLowerCase();
+        const isSuccess = statusLower === 'success' || statusLower === 'completed';
+        const isRunning = statusLower === 'running';
         store.updateWorkflowExecution(instanceID, {
           newLog: {
-            type: isSuccess ? 'node_complete' : 'node_error',
+            type: isSuccess ? 'node_complete' : isRunning ? 'node_start' : 'node_error',
             label: `Node: ${data.nodeID}`,
-            message: isSuccess ? 'Completed successfully' : 'Execution failed',
+            message: isSuccess ? 'Completed successfully' : isRunning ? 'Running' : 'Execution failed',
             output: isSuccess ? data.output : undefined,
-            error: !isSuccess ? data.error : undefined,
+            error: !isSuccess && !isRunning ? data.error : undefined,
             timestamp: Date.now()
           }
         });

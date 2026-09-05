@@ -1,0 +1,16 @@
+{
+  "widgetType": "video",
+  "description": "Video widget. Embeds MP4/HLS video by URL for onboarding and catalog apps.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "src": { "type": "string", "description": "Video URL. Supports templates." },
+      "poster": { "type": "string" },
+      "autoplay": { "type": "boolean", "default": false },
+      "controls": { "type": "boolean", "default": true },
+      "loop": { "type": "boolean", "default": false },
+      "muted": { "type": "boolean", "default": false }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

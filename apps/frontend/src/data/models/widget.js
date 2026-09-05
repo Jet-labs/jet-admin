@@ -26,7 +26,7 @@ export class Widget {
   }
   static toList(data) {
     if (Array.isArray(data)) {
-      return data.map((item) => new Widget(item));
+      return data.filter((item) => item !== null && item !== undefined).map((item) => new Widget(item));
     }
     return [];
   }

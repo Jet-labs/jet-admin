@@ -243,6 +243,7 @@ export const getWorkflowRunHistoryAPI = async ({
   tenantID,
   workflowID,
   status,
+  isTest,
   page = 1,
   pageSize = 50,
 }) => {
@@ -256,6 +257,7 @@ export const getWorkflowRunHistoryAPI = async ({
         params: {
           ...(workflowID ? { workflowID } : {}),
           ...(status ? { status } : {}),
+          ...(typeof isTest === "boolean" ? { isTest } : {}),
           page,
           pageSize,
         },
@@ -281,7 +283,7 @@ export const getWorkflowRunHistoryAPI = async ({
 /**
  * Test run a workflow without saving (uses in-memory nodes/edges)
  */
-export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputValues = {} }) => {
+export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputValues = {}, workflowOptions, workflowID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -290,7 +292,7 @@ export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputValues = {}
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { nodes, edges, inputValues },
+        { nodes, edges, inputValues, ...(workflowOptions ? { workflowOptions } : {}), ...(workflowID ? { workflowID } : {}) },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,

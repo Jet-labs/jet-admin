@@ -50,6 +50,7 @@ export const WorkflowAdditionForm = ({ tenantID }) => {
       nodes: [],
       edges: [],
       workflowConfig: {},
+      workflowOptions: {},
     },
     validationSchema: formValidations.workflowAdditionFormValidationSchema,
     onSubmit: (values) => {

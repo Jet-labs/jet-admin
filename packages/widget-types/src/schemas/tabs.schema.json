@@ -1,0 +1,22 @@
+{
+  "widgetType": "tabs",
+  "description": "Tabs widget. Tab bar that writes the selected tab value to widget state for conditional filtering and navigation.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "tabs": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string" },
+            "value": { "type": "string" }
+          },
+          "required": ["label", "value"]
+        }
+      },
+      "defaultTab": { "type": "string", "description": "Initially selected tab value" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onChange"]
+}

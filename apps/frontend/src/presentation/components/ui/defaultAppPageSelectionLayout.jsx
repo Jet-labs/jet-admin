@@ -45,7 +45,7 @@ const DefaultPageViewerContent = ({ tenantID, pinnedAppPageID, migratedPageConfi
     <>
       <AppPageDataSourceBootstrapper />
       <div
-        className="w-full overflow-y-auto bg-muted h-full p-2"
+        className="w-full flex-1 min-h-0 overflow-y-auto bg-muted p-2"
         id={`printable-area-app-page-${pinnedAppPageID}`}
       >
         {migratedPageConfig.layout ? (
@@ -137,9 +137,9 @@ export const DefaultAppPageSelectionLayout = ({
   }, [appPage]);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full min-h-0">
       {pinnedAppPageID && appPage ? (
-        <div className="w-full flex flex-col justify-start items-center h-full">
+        <div className="w-full flex flex-col justify-start items-center h-full min-h-0">
           <div className="flex flex-row justify-between items-center w-full p-2 border-b border-border ">
             <div className="w-full flex flex-col justify-center items-start">
               {appPage && (
@@ -185,7 +185,7 @@ export const DefaultAppPageSelectionLayout = ({
               )}
             </div>
           </div>
-          <FullScreen handle={fullScreenHandle} className="w-full h-full">
+          <FullScreen handle={fullScreenHandle} className="w-full flex-1 min-h-0 flex flex-col">
             <ReactQueryLoadingErrorWrapper
               isLoading={isLoadingAppPage}
               isFetching={isFetchingAppPage}

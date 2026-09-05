@@ -1,0 +1,31 @@
+{
+  "widgetType": "select",
+  "description": "Select / Dropdown widget. Single-choice picker with static or template-bound options. Writes selected value to widget state.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string", "description": "Input label" },
+      "placeholder": { "type": "string", "default": "Select option..." },
+      "options": {
+        "type": "array",
+        "description": "Static options list",
+        "items": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string" },
+            "value": { "type": ["string", "number", "boolean"] }
+          },
+          "required": ["label", "value"]
+        }
+      },
+      "optionsTemplate": { "type": "string", "description": "Template resolving to an options array, e.g. {{state.queries.users.data}}" },
+      "labelKey": { "type": "string", "default": "label", "description": "Object key for option label when using optionsTemplate" },
+      "valueKey": { "type": "string", "default": "value", "description": "Object key for option value when using optionsTemplate" },
+      "defaultValue": { "type": ["string", "number", "boolean"], "description": "Default selected value" },
+      "required": { "type": "boolean", "default": false },
+      "disabled": { "type": ["boolean", "string"], "default": false },
+      "clearable": { "type": "boolean", "default": true }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onChange", "onClear", "onOpen", "onClose"]
+}

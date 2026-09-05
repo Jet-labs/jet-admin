@@ -1,0 +1,14 @@
+{
+  "widgetType": "checkbox",
+  "description": "Checkbox widget. Single boolean toggle with label. Writes boolean to widget state.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string", "description": "Checkbox label" },
+      "defaultChecked": { "type": ["boolean", "string"], "default": false, "description": "Default state. Supports template." },
+      "disabled": { "type": ["boolean", "string"], "default": false },
+      "description": { "type": "string", "description": "Helper text under the label" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onChange"]
+}

@@ -1,52 +1,62 @@
 {
-    "name":  "jet-admin",
-    "version":  "2.0.0",
-    "main":  "index.js",
-    "engines":  {
-                    "node":  "20.x"
-                },
-    "workspaces":  [
-                       "apps/*",
-                       "packages/*"
-                   ],
-    "scripts":  {
-                    "start:f":  "cd apps/frontend \u0026\u0026 npm run dev",
-                    "start:b":  "cd apps/backend \u0026\u0026 npm run dev-w",
-                    "start:mcp":  "cd apps/mcp-server \u0026\u0026 node index.js",
-                    "start:all":  "concurrently \"npm run start:f\" \"npm run start:b\" \"npm run start:mcp\"",
-                    "dev:expression-engine":  "cd packages/expression-engine \u0026\u0026 npm run dev",
-                    "dev:widgets-logic":  "cd packages/widgets-logic \u0026\u0026 npm run dev",
-                    "dev:widgets-ui":  "cd packages/widgets-ui \u0026\u0026 npm run dev",
-                    "dev:widget-types":  "cd packages/widget-types \u0026\u0026 npm run dev",
-                    "dev:datasources-logic":  "cd packages/datasources-logic \u0026\u0026 npm run dev",
-                    "dev:datasources-ui":  "cd packages/datasources-ui \u0026\u0026 npm run dev",
-                    "dev:datasource-types":  "cd packages/datasource-types \u0026\u0026 npm run dev",
-                    "dev:workflow-nodes":  "cd packages/workflow-nodes \u0026\u0026 npm run dev",
-                    "dev:workflow-edges":  "cd packages/workflow-edges \u0026\u0026 npm run dev",
-                    "dev:json-forms-renderers":  "cd packages/json-forms-renderers \u0026\u0026 npm run dev",
-                    "dev:ui":  "cd packages/ui \u0026\u0026 npm run dev",
-                    "dev:all-packages":  "concurrently \"npm run dev:expression-engine\" \"npm run dev:widgets-logic\" \"npm run dev:widgets-ui\" \"npm run dev:widget-types\" \"npm run dev:datasources-logic\" \"npm run dev:datasources-ui\" \"npm run dev:datasource-types\" \"npm run dev:workflow-nodes\" \"npm run dev:workflow-edges\" \"npm run dev:json-forms-renderers\"",
-                    "dev:all":  "concurrently \"npm run start:f\" \"npm run start:b\" \"npm run dev:all-packages\"",
-                    "seed":  "cd apps/backend \u0026\u0026 npm run seed",
-                    "test":  "echo \"Error: no test specified\" \u0026\u0026 exit 1",
-                    "start:a":  "cd apps/admin \u0026\u0026 npm run dev",
-                    "build:a":  "cd apps/admin \u0026\u0026 npm run build"
-                },
-    "author":  "",
-    "license":  "ISC",
-    "description":  "",
-    "devDependencies":  {
-                            "concurrently":  "^9.1.2"
-                        },
-    "dependencies":  {
-                         "@jet-admin/datasources-ui":  "^1.0.0",
-                         "@prisma/client":  "^7.2.0",
-                         "@tanstack/react-table":  "^8.21.3",
-                         "acorn":  "^8.14.1",
-                         "axios":  "^1.18.1",
-                         "dotenv":  "^17.2.3",
-                         "estree-walker":  "^3.0.3",
-                         "handlebars":  "^4.7.8",
-                         "pg":  "^8.16.3"
-                     }
+    "name": "jet-admin",
+    "version": "2.0.0",
+    "main": "index.js",
+    "engines": {
+        "node": "20.x"
+    },
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "start:f": "cd apps/frontend && npm run dev",
+        "start:b": "cd apps/backend && npm run dev-w",
+        "start:mcp": "cd apps/mcp-server && node index.js",
+        "start:all": "concurrently \"npm run start:f\" \"npm run start:b\" \"npm run start:mcp\"",
+        "temporal:up": "docker compose -f docker-compose.temporal.yml up -d",
+        "temporal:down": "docker compose -f docker-compose.temporal.yml down",
+        "temporal:logs": "docker compose -f docker-compose.temporal.yml logs -f",
+        "temporal:restart": "docker compose -f docker-compose.temporal.yml restart",
+        "temporal:clean": "docker compose -f docker-compose.temporal.yml down -v",
+        "temporal:ps": "docker compose -f docker-compose.temporal.yml ps",
+        "docker:temporal": "npm run temporal:up",
+        "docker:temporal:down": "npm run temporal:down",
+        "dev:expression-engine": "cd packages/expression-engine && npm run dev",
+        "dev:widgets-logic": "cd packages/widgets-logic && npm run dev",
+        "dev:widgets-ui": "cd packages/widgets-ui && npm run dev",
+        "dev:widget-types": "cd packages/widget-types && npm run dev",
+        "dev:datasources-logic": "cd packages/datasources-logic && npm run dev",
+        "dev:datasources-ui": "cd packages/datasources-ui && npm run dev",
+        "dev:datasource-types": "cd packages/datasource-types && npm run dev",
+        "dev:workflow-nodes": "cd packages/workflow-nodes && npm run dev",
+        "dev:workflow-nodes-logic": "cd packages/workflow-nodes-logic && npm run dev",
+        "dev:workflow-edges": "cd packages/workflow-edges && npm run dev",
+        "dev:json-forms-renderers": "cd packages/json-forms-renderers && npm run dev",
+        "dev:ui": "cd packages/ui && npm run dev",
+        "dev:all-packages": "concurrently \"npm run dev:expression-engine\" \"npm run dev:widgets-logic\" \"npm run dev:widgets-ui\" \"npm run dev:widget-types\" \"npm run dev:datasources-logic\" \"npm run dev:datasources-ui\" \"npm run dev:datasource-types\" \"npm run dev:workflow-nodes\" \"npm run dev:workflow-nodes-logic\" \"npm run dev:workflow-edges\" \"npm run dev:json-forms-renderers\"",
+        "dev:all": "npm run temporal:up && concurrently \"npm run start:f\" \"npm run start:b\" \"npm run dev:all-packages\"",
+        "dev": "npm run dev:all",
+        "seed": "cd apps/backend && npm run seed",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start:a": "cd apps/admin && npm run dev",
+        "build:a": "cd apps/admin && npm run build"
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "concurrently": "^9.1.2"
+    },
+    "dependencies": {
+        "@jet-admin/datasources-ui": "^1.0.0",
+        "@prisma/client": "^7.2.0",
+        "@tanstack/react-table": "^8.21.3",
+        "acorn": "^8.14.1",
+        "axios": "^1.18.1",
+        "dotenv": "^17.2.3",
+        "estree-walker": "^3.0.3",
+        "handlebars": "^4.7.8",
+        "pg": "^8.16.3"
+    }
 }

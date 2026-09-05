@@ -5,9 +5,12 @@
  * The ListenerEngine starts a single http.Server backed by this router's Express app
  * and tears it down on shutdown.
  *
- * Route matching priority:
+ * NOTE: this app is mounted at /webhooks by the backend (index.js), so the
+ * routes below are relative to that mount point. Full public paths:
  *   1. tenantID + pathSuffix  → /webhooks/v1/inbound/:tenantID/:pathSuffix
  *   2. listenerID             → /webhooks/v1/inbound/:listenerID
+ * (Defining the /webhooks prefix here as well would double it to
+ * /webhooks/webhooks/... and every inbound call would 404.)
  *
  * Each registered handler is a plain function:  (req, res) => void
  * The handler is responsible for auth validation, calling onEvent(), and responding.
@@ -34,8 +37,8 @@ class WebhookRouter {
       });
     });
 
-    // Route: tenantID + pathSuffix
-    this._app.all("/webhooks/v1/inbound/:tenantID/:pathSuffix", (req, res) => {
+    // Route: tenantID + pathSuffix (relative to the /webhooks mount point)
+    this._app.all("/v1/inbound/:tenantID/:pathSuffix", (req, res) => {
       const { tenantID, pathSuffix } = req.params;
       const key = `tenant:${tenantID}:${pathSuffix.replace(/^\//, "")}`;
       const handler = this._handlers.get(key);
@@ -46,8 +49,8 @@ class WebhookRouter {
       }
     });
 
-    // Route: bare listenerID
-    this._app.all("/webhooks/v1/inbound/:listenerID", (req, res) => {
+    // Route: bare listenerID (relative to the /webhooks mount point)
+    this._app.all("/v1/inbound/:listenerID", (req, res) => {
       const { listenerID } = req.params;
       const key = `id:${listenerID}`;
       const handler = this._handlers.get(key);

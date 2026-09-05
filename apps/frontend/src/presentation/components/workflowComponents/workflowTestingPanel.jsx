@@ -73,26 +73,31 @@ export const WorkflowTestingPanel = ({
         // Store socket reference for cleanup
         socketRef.current = socket;
 
-        // Join the workflow run room
-        socket.emit("workflow_run_join", { runId: instanceID });
-        addLog('info', 'Connected', 'Joined workflow execution room');
+        // NOTE: listeners are registered BEFORE joining (see bottom of this
+        // block) so no event is missed.
 
-        // Listen for node updates from backend
+        // Listen for node updates from backend (statuses are UPPERCASE: RUNNING/SUCCESS/FAILED)
         socket.on("workflow_node_update", (nodeData) => {
           const nodeId = nodeData.nodeID;
           if (nodeId && nodeData.status) {
-            if (nodeData.status === 'success') {
+            const statusLower = String(nodeData.status).toLowerCase();
+            if (statusLower === 'success' || statusLower === 'completed') {
               addLog('node_complete', `Node completed`, nodeData.nodeType || 'Node', {
                 nodeId,
                 output: nodeData.output
               });
-            } else if (nodeData.status === 'error' || nodeData.status === 'failed') {
+            } else if (statusLower === 'error' || statusLower === 'failed') {
               addLog('node_error', `Node failed`, nodeData.nodeType || 'Node', {
                 nodeId,
                 error: nodeData.error
               });
-            } else if (nodeData.status === 'running' || nodeData.status === 'started') {
+            } else if (statusLower === 'running' || statusLower === 'started') {
               addLog('node_start', `Node started`, nodeData.nodeType || 'Node', { nodeId });
+            } else {
+              addLog('node_error', `Node failed`, nodeData.nodeType || 'Node', {
+                nodeId,
+                error: nodeData.error || `Unknown status: ${nodeData.status}`
+              });
             }
           }
         });
@@ -117,20 +122,22 @@ export const WorkflowTestingPanel = ({
           }
         });
 
-        // Timeout after 2 minutes
-        const timeout = setTimeout(() => {
-          addLog('info', 'Timeout', 'Workflow execution timed out after 2 minutes');
-          setIsRunning(false);
-          if (socketRef.current) {
-            socketRef.current.disconnect();
-            socketRef.current = null;
-          }
-        }, 120000);
-
-        // Cleanup on disconnect
-        socket.on("disconnect", () => {
-          clearTimeout(timeout);
+        // Join AFTER listeners are registered and the transport is connected.
+        await new Promise((resolve) => {
+          if (socket.connected) return resolve();
+          const timer = setTimeout(() => resolve(), 5000);
+          socket.once("connect", () => { clearTimeout(timer); resolve(); });
+          socket.once("connect_error", () => { clearTimeout(timer); resolve(); });
         });
+        if (!socket.connected) {
+          addLog('workflow_error', 'Connection error', 'Socket did not connect — live node updates will be missing');
+        }
+        socket.emit("workflow_run_join", { runId: instanceID });
+        addLog('info', 'Connected', 'Joined workflow execution room');
+
+        // No client-side timeout — rely on `workflow_status_update` from backend
+        // (COMPLETED/FAILED). Removing the hard 2-minute disconnect that was
+        // masking real execution state and orphaning RUNNING instances.
 
       } catch (socketError) {
         addLog('workflow_error', 'Connection error', socketError.message || String(socketError));

@@ -197,6 +197,16 @@ widgetService.getWidgetByID = async ({ authContext, tenantID, widgetID }) => {
         widgetID: widgetID,
       },
     });
+    if (!widget) {
+      Logger.log("error", {
+        message: "widgetService:getWidgetByID:widget-not-found",
+        params: {
+          tenantID,
+          widgetID,
+        },
+      });
+      throw new Error("Database widget not found");
+    }
     Logger.log("success", {
       message: "widgetService:getWidgetByID:success",
       params: {

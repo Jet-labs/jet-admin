@@ -1,0 +1,14 @@
+{
+  "widgetType": "divider",
+  "description": "Divider / Spacer widget. Visual separator with optional label for section grouping.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string", "description": "Optional centered label" },
+      "orientation": { "type": "string", "enum": ["horizontal", "vertical"], "default": "horizontal" },
+      "thickness": { "type": "string", "enum": ["thin", "medium", "thick"], "default": "thin" },
+      "spacing": { "type": "string", "enum": ["sm", "md", "lg"], "default": "md" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

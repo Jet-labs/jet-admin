@@ -12,9 +12,14 @@
   - [Data Query Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#data-query-node)
   - [JavaScript Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#javascript-node)
   - [Condition Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#condition-node)
+  - [Switch Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#switch-node)
+  - [Fan-out Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#fan-out-node)
+  - [Join Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#join-node)
   - [Loop Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#loop-node)
   - [Delay Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#delay-node)
   - [Data Collection Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#data-collection-node)
+  - [Approval Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#approval-node)
+  - [Sub-Workflow Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#sub-workflow-node)
   - [End Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#end-node)
 5. [Edge Types](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#edge-types)
 6. [Context & Variable System](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#context-variable-system)
@@ -324,6 +329,65 @@ Each branch contains:
 
 * * *
 
+<a id="switch-node"></a>
+
+### Switch Node
+
+**Purpose:** Routes on a single value across many named cases — a cleaner fit than Condition when one variable decides between 3+ paths (e.g. `{{ctx.trend}}` → `bull` / `bear` / `flat`).
+
+The switch value (template or literal) is compared against each case in order; the first match wins, otherwise execution follows `default`.
+
+**Configuration:**
+
+| Field | Description |
+| --- | --- |
+| Switch Value | Template or literal to match (e.g. `{{ctx.status}}`) |
+| Cases | Ordered list of `{ label, operator, matchValue }`. Operators: `equals` (default), `not_equals`, `contains`, `greater_than`, `less_than`, `expression` (raw JS with `ctx` in scope, same convention as Condition) |
+| Error Behaviour | Behaviour on evaluation failure |
+
+**Output handles:** One handle per case (named by case id) + `default` + `error`.
+
+* * *
+
+<a id="fan-out-node"></a>
+
+### Fan-out Node
+
+**Purpose:** Fires **every** connected branch — the explicit way to split one path into parallel paths (e.g. refresh cache *and* send digest *and* update dashboard). Pair with a Join node to reconverge.
+
+Branches execute sequentially in sorted order (deterministic path parallelism, not threads — the shared-context model forbids concurrent mutation).
+
+**Configuration:**
+
+| Field | Description |
+| --- | --- |
+| Branches | Named branch handles; all fire, unconditionally |
+
+**Output handles:** One handle per branch + `error`.
+
+* * *
+
+<a id="join-node"></a>
+
+### Join Node
+
+**Purpose:** Barrier + merge for reconverging branches. Waits per its barrier mode, then collects the listed source variables into one object for downstream nodes.
+
+**Configuration:**
+
+| Field | Description |
+| --- | --- |
+| Barrier Mode | `all` (wait for every upstream, default) or `any` (fire on first upstream) |
+| Collect Variables | Upstream output variables to merge (checkbox list in the editor) |
+| Output Variable | The context key for the merged object (default: `joined`) |
+| Require all | Missing variable fails the node instead of resolving to `null` |
+
+**Output handles:** `output`, `error`.
+
+> Fan-out → N branches → Join(`all`) is the standard split/reconverge pattern. A join fires only when its barrier is satisfied; unconnected or never-completing upstreams stall it like any other join.
+
+* * *
+
 <a id="loop-node"></a>
 
 ### Loop Node
@@ -473,6 +537,53 @@ Each field in the form has the following properties:
 
 * * *
 
+<a id="approval-node"></a>
+
+### Approval Node
+
+**Purpose:** Human approve/reject decision step — a specialized Data Collection with three explicit buttons (Accept / Reject / Cancel) plus comment, decision routing, and expiry routing. The workflow suspends until someone decides; Cancel dismisses the dialog without deciding and the run stays paused.
+
+**Configuration:**
+
+| Field | Description |
+| --- | --- |
+| Approvers | Display-only hint of who should decide |
+| Require comment | Makes the comment field mandatory |
+| Accept / Reject / Cancel button text | Labels for the three modal buttons (defaults: Accept, Reject, Cancel) |
+| Expiry (minutes) | Wait limit (`0` = never expires) |
+| On Timeout | `expired` (route to the `expired` handle, default) or `fail` (fail the run like Data Collection) |
+| Output Variable | The context key for `{ approved, comment }` (default: `approval`) |
+
+**Output handles:** `approved`, `rejected`, `expired`, `error`.
+
+* * *
+
+<a id="sub-workflow-node"></a>
+
+### Sub-Workflow Node
+
+**Purpose:** Runs another saved workflow (a sub-playbook) synchronously and maps its result back into the parent context. Use this to compose reusable playbooks — e.g. a "Crypto Intelligence Pipeline" parent that calls a shared "FX Rates" child.
+
+**Context model (isolated):** The child sees **only** the mapped inputs as its `ctx.input` — never the parent context. On success the parent receives `{{ctx.outputVariable}}` (the child's End-node outputs), plus `childInstanceID` / `childStatus` for audit. With **Merge child outputs** enabled, the child's public top-level outputs are additionally spread into the parent context (child wins; `input` is never overwritten).
+
+**Configuration:**
+
+| Field | Description |
+| --- | --- |
+| Child Workflow | The saved workflow to run (current workflow excluded — self-calls are blocked) |
+| Child Inputs | Mapped values for the child's input parameters; supports `{{ctx.*}}` templates. Guided by the child's declared inputs |
+| Output Variable | The context key for the child result (default: `subResult`) |
+| Merge child outputs | Spread child outputs into the parent context (default: off) |
+| Max Nesting Depth | Recursion guard, 1–10 (default: 5). Depth is tracked via `__subDepth` |
+| Timeout (seconds) | Caps the total child wait (default: 300, max: 3600). Keep above the child's expected duration |
+| Retry Attempts / Delay / Error Behaviour / Skip | Same semantics as Data Query nodes |
+
+The child runs as a **real instance** with its own history, linked to the parent via `parentInstanceID` / `parentNodeID` (filterable in run history). Triggering a parent requires `workflow.execute` on each child. Bundle export/import follows `childWorkflowID` automatically.
+
+**Output handles:** `success`, `error`
+
+* * *
+
 <a id="end-node"></a>
 
 ### End Node
@@ -555,6 +666,18 @@ Edges can be given labels by clicking on the edge label area on the canvas. Labe
 | Delay | `error` | Delay configuration was invalid |
 | Data Collection | `output` | User submitted the form |
 | Data Collection | `error` | An error occurred creating or managing the request |
+| Approval | `approved` / `rejected` | Human approved / rejected |
+| Approval | `expired` | Wait timed out (`onTimeout: expired`) |
+| Approval | `error` | An error occurred creating or managing the request |
+| Switch | *(case id)* | First matching case |
+| Switch | `default` | No case matched |
+| Switch | `error` | Evaluation failed |
+| Fan-out | *(branch id)* | Every branch fires |
+| Fan-out | `error` | Fan-out configuration was invalid |
+| Join | `output` | Barrier satisfied, variables merged |
+| Join | `error` | A required variable was missing |
+| Sub-Workflow | `success` | Child workflow completed successfully |
+| Sub-Workflow | `error` | Child workflow failed |
 | End | *(none)* | Terminal node — no outgoing handles |
 
 * * *

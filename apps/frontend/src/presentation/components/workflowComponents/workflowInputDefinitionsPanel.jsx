@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Plus, Settings, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import PropTypes from "prop-types";
 
 
@@ -36,14 +36,11 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
   }, [inputDefinitions, workflowForm]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-row items-center gap-2">
-          <Settings className="text-foreground w-3 h-3" />
-          <span className="text-xs font-bold text-foreground tracking-wider">
-            Input Parameters
-          </span>
-        </div>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          Input Parameters{inputDefinitions.length > 0 ? ` (${inputDefinitions.length})` : ""}
+        </p>
         <Button
           type="button"
           variant="ghost"
@@ -57,47 +54,54 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
       </div>
 
       {inputDefinitions.length === 0 ? (
-        <p className="text-xs text-foreground italic">
+        <p className="text-xs text-muted-foreground italic">
           No input parameters defined.
         </p>
       ) : (
         <div className="space-y-2">
             {inputDefinitions.map((inputDef, index) => (
-            <div key={index} className="flex flex-col gap-1.5 p-2 bg-background rounded border border-border">
-              <div className="flex flex-row gap-2 items-center">
-                <Input
-                  type="text"
-                  placeholder="Name"
-                  className=""
-                  size="sm"
-                  value={inputDef.key || ""}
-                  onChange={(e) => _handleUpdateInputDef(index, "key", e.target.value)}
-                />
+            <div key={index} className="rounded border border-border bg-muted/20 p-2 space-y-2">
+              <div className="flex gap-2 items-center">
+                <div className="flex-1 min-w-0">
+                  <Label className="text-xs font-medium text-muted-foreground">Name</Label>
+                  <Input
+                    type="text"
+                    placeholder="parameter_name"
+                    size="sm"
+                    className="w-full text-xs font-mono"
+                    value={inputDef.key || ""}
+                    onChange={(e) => _handleUpdateInputDef(index, "key", e.target.value)}
+                  />
+                </div>
                 <Button
                   type="button"
-                  variant="outline"
-                  size="icon"
+                  variant="destructive-ghost"
+                  size="sm"
                   square
                   onClick={() => _handleRemoveInputDef(index)}
-                  className=""
+                  className="h-7 w-7 flex-shrink-0 self-end"
+                  title="Remove parameter"
                 >
                   <Trash2 className="w-2.5 h-2.5" />
                 </Button>
               </div>
-              <div className="flex flex-row gap-2 items-center">
-                <Select value={inputDef.type || "string"} onValueChange={(val) => _handleUpdateInputDef(index, "type", val)}>
-                  <SelectTrigger size="sm" className="text-xs flex-1 min-w-0">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="string">String</SelectItem>
-                    <SelectItem value="number">Number</SelectItem>
-                    <SelectItem value="boolean">Boolean</SelectItem>
-                    <SelectItem value="object">Object</SelectItem>
-                    <SelectItem value="array">Array</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Label className="flex items-center gap-1">
+              <div className="flex gap-2 items-center">
+                <div className="flex-1 min-w-0">
+                  <Label className="text-xs font-medium text-muted-foreground">Type</Label>
+                  <Select value={inputDef.type || "string"} onValueChange={(val) => _handleUpdateInputDef(index, "type", val)}>
+                    <SelectTrigger size="sm" className="w-full text-xs">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="string" className="text-xs">String</SelectItem>
+                      <SelectItem value="number" className="text-xs">Number</SelectItem>
+                      <SelectItem value="boolean" className="text-xs">Boolean</SelectItem>
+                      <SelectItem value="object" className="text-xs">Object</SelectItem>
+                      <SelectItem value="array" className="text-xs">Array</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Label className="flex items-center gap-1.5 text-xs shrink-0 self-end pb-1.5">
                   <Checkbox
                     checked={inputDef.required || false}
                     onCheckedChange={(checked) => _handleUpdateInputDef(index, "required", checked)}
@@ -105,11 +109,10 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
                   Required
                 </Label>
               </div>
-              {/* Default value input */}
               <div className="flex flex-col gap-1">
-                <span className="text-[9px] text-muted-foreground font-medium">Default value</span>
+                <Label className="text-xs font-medium text-muted-foreground">Default value</Label>
                 {(inputDef.type || "string") === "boolean" ? (
-                  <Label className="flex items-center gap-1.5">
+                  <Label className="flex items-center gap-1.5 text-xs">
                     <Checkbox
                       checked={inputDef.defaultValue === true}
                       onCheckedChange={(checked) => _handleUpdateInputDef(index, "defaultValue", checked)}
@@ -120,8 +123,8 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
                   <Input
                     type={(inputDef.type || "string") === "number" ? "number" : "text"}
                     placeholder={`Default ${inputDef.key || "value"}`}
-                        className="text-xs"
                     size="sm"
+                    className="w-full text-xs"
                     value={inputDef.defaultValue ?? ""}
                     onChange={(e) => _handleUpdateInputDef(
                       index,

@@ -47,6 +47,7 @@ export default function CraftLayoutEditorCanvas({
   widgets,
   setWidgets,
   onEditWidget,
+  editorLiveStateTree,
 }) {
   const [previewMode, setPreviewMode] = useState(false);
 
@@ -81,7 +82,7 @@ export default function CraftLayoutEditorCanvas({
 
   return (
     <div className="craft-editor-root">
-      <CraftEditorContext.Provider value={{ renderWidget: stableRenderWidget, previewMode }}>
+      <CraftEditorContext.Provider value={{ renderWidget: stableRenderWidget, previewMode, editorLiveStateTree }}>
         <Editor
           resolver={RESOLVER}
           enabled={true}
@@ -116,6 +117,7 @@ export default function CraftLayoutEditorCanvas({
                 widgets={widgets}
                 setWidgets={setWidgets}
                 onEditWidget={onEditWidget}
+                editorLiveStateTree={editorLiveStateTree}
               />
             )}
           </div>

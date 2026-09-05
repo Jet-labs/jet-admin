@@ -559,39 +559,90 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
 // ConditionNode — canvas card (unchanged)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export const ConditionNode = memo(({ data, isConnectable }) => {
+export const ConditionNode = memo(({ id, data, isConnectable }) => {
+  const { nodeExecutionStatus } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || 'idle';
+
   const isDisabled = data?.isDisabled ?? false;
   const branches = useMemo(() => migrateBranches(data?.branches || []), [data?.branches]);
 
   const totalSlots = branches.length + 2;
   const handleLeft = (i) => `${(100 / (totalSlots + 1)) * (i + 1)}%`;
 
+  const getStatusStyles = () => {
+    switch (executionStatus) {
+      case 'running': return 'border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse';
+      case 'completed': return 'border-green-400 ring-2 ring-green-300 ring-opacity-50';
+      case 'failed': return 'border-red-400 ring-2 ring-red-300 ring-opacity-50';
+      case 'skipped': return 'border-orange-300 opacity-60';
+      default: return 'border-brand-border hover:border-indigo-400 hover:shadow-md';
+    }
+  };
+
+  const StatusIndicator = () => {
+    if (executionStatus === 'running') return (
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center animate-spin z-10">
+        <svg className="w-3 h-3 text-foreground" viewBox="0 0 14 14" fill="currentColor">
+          <path d="M7 0 L14 7 L7 14 L0 7 Z" />
+        </svg>
+      </div>
+    );
+    if (executionStatus === 'completed') return (
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+    );
+    if (executionStatus === 'failed') return (
+      <div className="absolute -top-2 -right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10">
+        <svg className="w-3 h-3 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+    );
+    return null;
+  };
+
   return (
     <div
       className={`
-        bg-brand-black rounded border shadow-sm
+        relative bg-brand-black rounded border shadow-sm
         min-w-[260px] max-w-[340px]
         transition-all duration-150
         ${isDisabled
           ? 'border-brand-border opacity-50'
-        : 'border-brand-border hover:border-indigo-400 hover:shadow-md'
+        : getStatusStyles()
         }
       `}
     >
+      <StatusIndicator />
       <div
         className={`
           flex items-center gap-2.5 px-3 py-2.5 border-b rounded-t
-          ${isDisabled ? 'bg-brand-dark border-brand-border' : 'bg-indigo-950/40 border-indigo-800'}
+          ${isDisabled ? 'bg-brand-dark border-brand-border'
+            : executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800'
+            : executionStatus === 'completed' ? 'bg-green-950/40 border-green-800'
+            : executionStatus === 'failed' ? 'bg-red-950/40 border-red-800'
+            : 'bg-indigo-950/40 border-indigo-800'}
         `}
       >
         <svg
           width="14" height="14" viewBox="0 0 14 14"
-          className={`shrink-0 ${isDisabled ? 'text-brand-text-primary' : 'text-indigo-500'}`}
+          className={`shrink-0 ${isDisabled ? 'text-brand-text-primary'
+            : executionStatus === 'running' ? 'text-blue-600'
+            : executionStatus === 'completed' ? 'text-green-600'
+            : executionStatus === 'failed' ? 'text-red-600'
+            : 'text-indigo-500'}`}
           fill="currentColor"
         >
           <path d="M7 0 L14 7 L7 14 L0 7 Z" />
         </svg>
-        <span className={`text-xs font-semibold truncate flex-1 ${isDisabled ? 'text-brand-text-primary line-through' : 'text-indigo-300'}`}>
+        <span className={`text-xs font-semibold truncate flex-1 ${isDisabled ? 'text-brand-text-primary line-through'
+          : executionStatus === 'running' ? 'text-blue-300'
+          : executionStatus === 'completed' ? 'text-green-300'
+          : executionStatus === 'failed' ? 'text-red-300'
+          : 'text-indigo-300'}`}>
           {data?.title || 'Condition'}
         </span>
         {isDisabled && (

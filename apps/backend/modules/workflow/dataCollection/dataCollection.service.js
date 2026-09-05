@@ -1,11 +1,8 @@
 /**
- * Data Collection Service
- * Handles resuming a suspended workflow by injecting the user's submitted data
- * back into the results queue. The orchestrator then picks it up and advances
- * the DAG exactly as if the node had completed normally.
+ * Data Collection Service — Temporal-only
+ * Signals the DSL workflow via Temporal (replaces native queue injection).
  */
 
-const { addResult } = require("../../../config/queue.config");
 const { stateManager } = require('../workflowEngine/stateManager');
 const Logger = require("../../../utils/logger");
 
@@ -49,27 +46,19 @@ dataCollectionService.submitCollectionData = async ({ collectionRequestID, submi
     // ── 3. Persist the submitted data ─────────────────────────────────────────
     await stateManager.completeDataCollectionRequest(collectionRequestID, submittedData);
 
-    // ── 4. Re-inject into the results queue — this resumes the DAG ────────────
-    const outputVariable = request.collectionConfig?.outputVariable || 'collectedData';
-
-    await addResult({
+    // ── 4. Resume workflow via Temporal signal ───────────────────────────────
+    const { signalHumanInput } = require('../temporal/service');
+    await signalHumanInput({
         instanceID: request.instanceID,
         nodeID: request.nodeID,
-        nodeType: 'dataCollection',
-        outputVariable,
-        status: 'success',
-        output: { [outputVariable]: submittedData, success: true },
-        nextHandle: 'output',
-        queueDelay: 0,
-        nodeAttempt: request.nodeAttempt ?? 1,
+        data: submittedData,
+        collectionRequestID,
     });
-
     Logger.log('success', {
-        message: 'dataCollectionService:workflowResumed',
+        message: 'dataCollectionService:workflowResumed:temporal',
         params: { collectionRequestID, instanceID: request.instanceID, nodeID: request.nodeID },
     });
-
-    return { success: true, collectionRequestID };
+    return { success: true, collectionRequestID, driver: 'temporal' };
 };
 
 /**

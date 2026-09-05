@@ -1,0 +1,30 @@
+{
+  "name": "@jet-admin/workflow-nodes-logic",
+  "version": "1.0.0",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --format=esm --sourcemap --packages=external --platform=node && esbuild src/index.js --bundle --outfile=dist/index.cjs --format=cjs --sourcemap --packages=external --platform=node",
+    "dev": "npm run build -- --watch",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "dependencies": {
+    "isolated-vm": "^5.0.4"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.3",
+    "jest": "^29.7.0"
+  }
+}

@@ -18,6 +18,7 @@ export const DataFieldPanel = ({
   dataSource,
   onDataSourceChange,
   onFieldClick,
+  onTooltipAdd,
   workflow,
   className = '',
   compact = false,
@@ -137,12 +138,23 @@ export const DataFieldPanel = ({
         </div>
         <div className="flex flex-col gap-0.5">
           {groupFields.map((field) => (
-            <FieldPill
-              key={field.name}
-              field={field}
-              onClick={() => onFieldClick?.(field)}
-              className="w-full justify-start"
-            />
+            <div key={field.name} className="flex items-center gap-1 min-w-0">
+              <FieldPill
+                field={field}
+                onClick={() => onFieldClick?.(field)}
+                className="flex-1 min-w-0"
+              />
+              {onTooltipAdd && (
+                <button
+                  type="button"
+                  onClick={() => onTooltipAdd(field)}
+                  className="shrink-0 h-5 px-1 rounded border border-border/50 text-[9px] font-bold text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5"
+                  title={`Add ${field.name} to tooltip`}
+                >
+                  T+
+                </button>
+              )}
+            </div>
           ))}
         </div>
       </div>
@@ -285,6 +297,7 @@ DataFieldPanel.propTypes = {
   dataSource: PropTypes.string,
   onDataSourceChange: PropTypes.func,
   onFieldClick: PropTypes.func,
+  onTooltipAdd: PropTypes.func,
   workflow: PropTypes.object,
   className: PropTypes.string,
   compact: PropTypes.bool,

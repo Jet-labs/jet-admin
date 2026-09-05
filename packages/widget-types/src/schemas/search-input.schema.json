@@ -1,0 +1,15 @@
+{
+  "widgetType": "search-input",
+  "description": "Search Input widget. Text field with search icon, clear button and debounced onSearch event for filtering queries.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string" },
+      "placeholder": { "type": "string", "default": "Search..." },
+      "defaultValue": { "type": "string" },
+      "debounceMs": { "type": "number", "default": 300, "description": "Debounce delay for onSearch event" },
+      "disabled": { "type": ["boolean", "string"], "default": false }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onChange", "onSearch", "onClear", "onFocus", "onBlur"]
+}

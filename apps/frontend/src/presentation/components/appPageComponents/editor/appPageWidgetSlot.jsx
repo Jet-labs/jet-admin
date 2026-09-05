@@ -60,6 +60,19 @@ const WidgetContent = ({
     fireWidgetEvent("onRefresh");
   }, [refetchWidget, fireWidgetEvent]);
 
+  // Drill-down wiring for Vega charts: VegaWidget calls these with { datum } /
+  // { value } payloads. Route them through fireWidgetEvent with the same shape
+  // so actions can bind {{ event.datum.<field> }} / {{ event.value }}.
+  // These override the generic runtimeEventHandlers wrapper (which would nest
+  // the payload under { inputs }) for these two event types.
+  const drillHandlers = useMemo(() => {
+    if (widgetType !== "vega" && widgetType !== "vega-lite") return {};
+    return {
+      onMarkClick: (payload) => fireWidgetEvent("onMarkClick", payload || {}),
+      onBrush: (payload) => fireWidgetEvent("onBrush", payload || {}),
+    };
+  }, [widgetType, fireWidgetEvent]);
+
   return (
     <RenderedWidgetComponent
       widgetID={widgetID}
@@ -74,6 +87,7 @@ const WidgetContent = ({
       widgetState={widgetState}
       setWidgetState={setWidgetState}
       {...runtimeEventHandlers}
+      {...drillHandlers}
     />
   );
 };

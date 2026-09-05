@@ -1,0 +1,17 @@
+{
+  "widgetType": "slider",
+  "description": "Slider widget. Numeric range picker for thresholds and quantities.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string" },
+      "min": { "type": "number", "default": 0 },
+      "max": { "type": "number", "default": 100 },
+      "step": { "type": "number", "default": 1 },
+      "defaultValue": { "type": ["number", "string"], "default": 50 },
+      "showValue": { "type": "boolean", "default": true },
+      "disabled": { "type": ["boolean", "string"], "default": false }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onChange"]
+}

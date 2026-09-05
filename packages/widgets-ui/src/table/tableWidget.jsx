@@ -5,24 +5,28 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { Button, Input, Checkbox } from "@jet-admin/ui";
+import { Button, Input, Checkbox, Badge } from "@jet-admin/ui";
 import {
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  Search, Download, Pencil, Check, X, FileDown,
+  Search, Pencil, Check, X, FileDown, ArrowUp, ArrowDown, ChevronsUpDown,
 } from "lucide-react";
+import {
+  getNestedValue,
+  normalizeColumns,
+  formatCellValue,
+  buildCSVContent,
+  buildJSONContent,
+  coerceTotalRows,
+  resolvePageSize,
+  diffRowChanges,
+} from "./tableUtils";
 
-// ── CSV Export Utility ──
-const exportToCSV = (columns, rows, filename = "export.csv") => {
-  const headers = columns.map(c => `"${(c.label || c.key || c.id).replace(/"/g, '""')}"`).join(",");
-  const body = rows.map(r =>
-    columns.map(c => {
-      const val = r[c.key || c.id];
-      return `"${String(val ?? "").replace(/"/g, '""')}"`;
-    }).join(",")
-  ).join("\n");
-  const blob = new Blob([headers + "\n" + body], { type: "text/csv;charset=utf-8;" });
+// ── Download helpers (DOM side-effects isolated for testability) ──
+const downloadFile = (content, filename, mime) => {
+  const blob = new Blob([content], { type: mime });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = filename;
@@ -31,21 +35,11 @@ const exportToCSV = (columns, rows, filename = "export.csv") => {
   document.body.removeChild(a);
 };
 
-const exportToJSON = (columns, rows, filename = "export.json") => {
-  const keys = columns.map(c => c.key || c.id);
-  const data = rows.map(r => {
-    const obj = {};
-    keys.forEach(k => { obj[k] = r[k] ?? null; });
-    return obj;
-  });
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-};
+const downloadCSV = (columns, rows, filename) =>
+  downloadFile(buildCSVContent(columns, rows), filename || `export-${Date.now()}.csv`, "text/csv;charset=utf-8;");
+
+const downloadJSON = (columns, rows, filename) =>
+  downloadFile(buildJSONContent(columns, rows), filename || `export-${Date.now()}.json`, "application/json");
 
 // ── Editable Cell Component ──
 const EditableCell = ({ getValue, row, column, table }) => {
@@ -77,6 +71,40 @@ const EditableCell = ({ getValue, row, column, table }) => {
   );
 };
 
+// ── Typed cell renderer ──
+const TypedCellValue = ({ rawValue, col }) => {
+  const type = col.type || "text";
+  if (type === "link") {
+    const href = rawValue ? String(rawValue) : "";
+    if (!href) return <span className="text-muted-foreground">—</span>;
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2 hover:opacity-80 truncate inline-block max-w-[240px]">
+        {col.format || href}
+      </a>
+    );
+  }
+  if (type === "image") {
+    const src = rawValue ? String(rawValue) : "";
+    if (!src) return <span className="text-muted-foreground">—</span>;
+    return <img src={src} alt={col.label || "image"} className="h-8 w-8 rounded object-cover border border-border" loading="lazy" onClick={(e) => e.stopPropagation()} />;
+  }
+  if (type === "badge") {
+    const text = formatCellValue(rawValue, { type: "text" });
+    if (text === "—") return <span className="text-muted-foreground">—</span>;
+    return <Badge variant="secondary" className="text-[11px] whitespace-nowrap">{text}</Badge>;
+  }
+  if (type === "boolean") {
+    if (rawValue === true || rawValue === "true" || rawValue === 1 || rawValue === "1")
+      return <Badge variant="secondary" className="text-[11px] bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Yes</Badge>;
+    if (rawValue === false || rawValue === "false" || rawValue === 0 || rawValue === "0")
+      return <Badge variant="secondary" className="text-[11px] bg-muted text-muted-foreground">No</Badge>;
+    return <span className="text-muted-foreground">—</span>;
+  }
+  const display = formatCellValue(rawValue, col);
+  const align = type === "number" || type === "date" ? "text-right tabular-nums" : "";
+  return <span className={align}>{display}</span>;
+};
+
 // ── Main TableWidget ──
 export const TableWidget = ({
   widgetConfig,
@@ -97,7 +125,7 @@ export const TableWidget = ({
     return { data: [], columns: [], pagination: { enabled: false } };
   }, [processedData]);
 
-  const rows = tableData.data || [];
+  const rows = useMemo(() => (Array.isArray(tableData.data) ? tableData.data : []), [tableData.data]);
 
   const isLoading = useMemo(() => {
     if (tableData.isLoading !== undefined) {
@@ -109,51 +137,43 @@ export const TableWidget = ({
     return !!isLoadingWorkflows;
   }, [tableData.isLoading, widgetConfig?.isLoading, isLoadingWorkflows]);
 
-  // ── Resolve column definitions ──
+  // ── Resolve column definitions (normalized, hidden dropped, nested paths supported) ──
   const configColumns = useMemo(() => {
-    const rawCols = tableData.columns?.length ? tableData.columns
-      : widgetConfig?.columns?.length ? widgetConfig.columns : [];
-    
-    // Merge user configurations (like editable, custom label) from widgetConfig.columns
-    const mergedCols = rawCols.map(col => {
-      const colKey = col.key || col.id;
-      const userCol = widgetConfig?.columns?.find(c => {
-        const uKey = c.key || c.id;
-        return uKey && colKey && String(uKey).toLowerCase() === String(colKey).toLowerCase();
-      });
-      return userCol ? { key: colKey, id: colKey, ...col, ...userCol } : { key: colKey, id: colKey, ...col };
-    });
-
-    if (mergedCols.length > 0) return mergedCols;
-    if (rows.length > 0 && typeof rows[0] === "object" && rows[0] !== null) {
-      return Object.keys(rows[0]).map(k => {
-        const userCol = widgetConfig?.columns?.find(c => {
-          const uKey = c.key || c.id;
-          return uKey && String(uKey).toLowerCase() === String(k).toLowerCase();
-        });
-        return { key: k, id: k, label: k, ...userCol };
-      });
-    }
-    return [];
+    const resolved = Array.isArray(tableData.columns) && tableData.columns.length ? tableData.columns : null;
+    return normalizeColumns(resolved, widgetConfig?.columns, rows);
   }, [tableData.columns, widgetConfig?.columns, rows]);
 
   // ── Feature configs ──
   const paginationConfig = tableData.pagination?.enabled ? tableData.pagination : widgetConfig?.pagination?.enabled ? widgetConfig.pagination : null;
+  const serverMode = !!paginationConfig;
+  const pageSize = resolvePageSize(paginationConfig?.pageSize, widgetConfig?.pagination?.pageSize, 10);
   const searchConfig = tableData.search || widgetConfig?.search || { enabled: false };
   const exportConfig = tableData.export || widgetConfig?.export || { enabled: false };
   const editingConfig = tableData.editing || widgetConfig?.editing || { enabled: false };
   const multiSelectConfig = tableData.multiSelect || widgetConfig?.multiSelect || { enabled: false };
   const bulkEditConfig = tableData.bulkEdit || widgetConfig?.bulkEdit || { enabled: false };
+  const emptyText = tableData.emptyText || widgetConfig?.emptyText || "No data available.";
+  const emptyHint = widgetConfig?.emptyHint || "Ensure the data array template resolves to a non-empty array.";
+  const striped = widgetConfig?.striped !== false;
+  const dense = !!widgetConfig?.dense;
+  const stickyHeader = widgetConfig?.stickyHeader !== false;
+  const cellPad = dense ? "px-2 py-1" : "px-3 py-2";
 
   // ── Local state ──
   const [globalFilter, setGlobalFilter] = useState("");
+  const [sorting, setSorting] = useState([]);
   const [editingRowId, setEditingRowId] = useState(null);
   const [rowDraft, setRowDraft] = useState({});
   const [pendingEdits, setPendingEdits] = useState({});
   const [editingCell, setEditingCell] = useState(null); // { rowIdx, colId }
   const [rowSelection, setRowSelection] = useState({});
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize });
   const clickTimeoutRef = useRef(null);
+
+  // Keep pageSize in sync when config changes
+  useEffect(() => {
+    setPagination((p) => (p.pageSize === pageSize ? p : { ...p, pageSize, pageIndex: 0 }));
+  }, [pageSize]);
 
   // Clear click timeout on unmount
   useEffect(() => {
@@ -162,9 +182,26 @@ export const TableWidget = ({
     };
   }, []);
 
+  // Reset to first page when rows change identity (new query result)
+  const rowsKeyRef = useRef(null);
+  useEffect(() => {
+    const key = Array.isArray(rows) ? rows.length : 0;
+    if (rowsKeyRef.current !== null && rowsKeyRef.current !== key) {
+      setPagination((p) => ({ ...p, pageIndex: 0 }));
+    }
+    rowsKeyRef.current = key;
+  }, [rows]);
+
   // ── Server-side search debounce ──
+  // Skip the initial mount: page auto-fetch already loads the first page,
+  // and firing here would redundantly re-execute search queries on load.
+  const searchInitRef = useRef(true);
   useEffect(() => {
     if (!searchConfig.enabled || !searchConfig.serverSide) return;
+    if (searchInitRef.current) {
+      searchInitRef.current = false;
+      return;
+    }
     const timer = setTimeout(() => {
       if (fireWidgetEvent) fireWidgetEvent("onSearch", { searchTerm: globalFilter });
     }, 300);
@@ -172,9 +209,6 @@ export const TableWidget = ({
   }, [globalFilter, searchConfig.serverSide, searchConfig.enabled, fireWidgetEvent]);
 
   // ── Sync selection state to runtime ──
-  // Signature-guarded: without this, every dispatch here re-renders the slot
-  // with fresh prop identities, which re-fires this effect → dispatch → …
-  // ("Maximum update depth exceeded").
   const lastSyncSignatureRef = useRef(null);
   useEffect(() => {
     if (!setWidgetState) return;
@@ -226,15 +260,30 @@ export const TableWidget = ({
     configColumns.forEach(col => {
       defs.push({
         id: col.key,
-        accessorKey: col.key,
-        header: () => (
-          <span className="flex items-center gap-1">
-            {col.label || col.key}
-            {col.editable && (editingConfig.enabled || bulkEditConfig.enabled) && (
-              <Pencil className="w-3 h-3 opacity-40" />
-            )}
-          </span>
-        ),
+        accessorFn: (row) => getNestedValue(row, col.key),
+        header: ({ column }) => {
+          const sortable = col.sortable !== false;
+          const dir = column.getIsSorted();
+          const content = (
+            <span className="flex items-center gap-1">
+              {col.label || col.key}
+              {col.editable && (editingConfig.enabled || bulkEditConfig.enabled) && (
+                <Pencil className="w-3 h-3 opacity-40" />
+              )}
+              {sortable && (
+                dir === "asc" ? <ArrowUp className="w-3 h-3 text-primary" />
+                : dir === "desc" ? <ArrowDown className="w-3 h-3 text-primary" />
+                : <ChevronsUpDown className="w-3 h-3 opacity-40" />
+              )}
+            </span>
+          );
+          if (!sortable) return content;
+          return (
+            <button type="button" onClick={column.getToggleSortingHandler()} className="flex items-center gap-1 hover:text-foreground" title={`Sort by ${col.label || col.key}`}>
+              {content}
+            </button>
+          );
+        },
         cell: ({ getValue, row, column, table }) => {
           const rowIdx = row.index;
           const colId = column.id;
@@ -245,7 +294,7 @@ export const TableWidget = ({
           const hasPending = pendingVal !== undefined;
 
           // Inline row editing mode
-          if (isRowEditing && (col.editable === true || col.editable === "true")) {
+          if (isRowEditing && col.editable) {
             return (
               <Input
                 value={rowDraft[colId] ?? ""}
@@ -261,15 +310,20 @@ export const TableWidget = ({
             return <EditableCell getValue={getValue} row={row} column={column} table={table} />;
           }
 
-          const displayVal = hasPending ? pendingVal : getValue();
-          return (
-            <span className={hasPending ? "text-primary font-medium" : ""}>
-              {displayVal != null ? String(displayVal) : "—"}
-              {hasPending && <Pencil className="inline-block w-3 h-3 ml-1 text-primary/60" />}
-            </span>
-          );
+          if (hasPending) {
+            return (
+              <span className="text-primary font-medium">
+                {formatCellValue(pendingVal, col) === "—" ? "—" : String(formatCellValue(pendingVal, col))}
+                <Pencil className="inline-block w-3 h-3 ml-1 text-primary/60" />
+              </span>
+            );
+          }
+
+          return <TypedCellValue rawValue={getValue()} col={col} />;
         },
         meta: { editable: col.editable },
+        enableSorting: col.sortable !== false,
+        size: typeof col.width === "number" ? col.width : undefined,
       });
     });
 
@@ -290,7 +344,7 @@ export const TableWidget = ({
                   <Check className="h-3.5 w-3.5" />
                 </Button>
                 <Button size="icon" variant="ghost" className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                  onClick={() => setEditingRowId(null)}>
+                  onClick={() => { setEditingRowId(null); setRowDraft({}); }}>
                   <X className="h-3.5 w-3.5" />
                 </Button>
               </div>
@@ -321,15 +375,19 @@ export const TableWidget = ({
     state: {
       globalFilter: (searchConfig.enabled && !searchConfig.serverSide) ? globalFilter : undefined,
       rowSelection,
-      pagination: paginationConfig ? undefined : pagination,
+      pagination: serverMode ? undefined : pagination,
+      sorting,
     },
     onGlobalFilterChange: setGlobalFilter,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: (searchConfig.enabled && !searchConfig.serverSide) ? getFilteredRowModel() : undefined,
-    getPaginationRowModel: !paginationConfig ? getPaginationRowModel() : undefined,
+    getPaginationRowModel: !serverMode ? getPaginationRowModel() : undefined,
+    getSortedRowModel: getSortedRowModel(),
     enableRowSelection: multiSelectConfig.enabled,
+    autoResetPageIndex: false,
     meta: {
       updateCellData: (rowIdx, colId, value) => {
         setPendingEdits(prev => ({
@@ -350,9 +408,15 @@ export const TableWidget = ({
 
   // ── Server-side pagination handler ──
   const [serverPage, setServerPage] = useState(1);
-  const serverPageSize = paginationConfig && rows.length > 0 ? rows.length : 10;
-  const serverTotalRows = paginationConfig?.totalRows ?? rows.length;
-  const serverTotalPages = paginationConfig ? Math.max(1, Math.ceil(serverTotalRows / serverPageSize)) : 1;
+  const serverPageSize = resolvePageSize(paginationConfig?.pageSize, 10);
+  const serverTotalRows = coerceTotalRows(
+    paginationConfig?.totalRows ?? paginationConfig?.totalTemplate ?? tableData.pagination?.totalRows,
+    rows.length
+  );
+  const serverTotalPages = serverMode ? Math.max(1, Math.ceil(serverTotalRows / serverPageSize)) : 1;
+
+  // Reset server page when result set changes
+  useEffect(() => { setServerPage(1); }, [rows.length]);
 
   const handleServerPageChange = useCallback((newPage) => {
     if (newPage < 1 || newPage > serverTotalPages) return;
@@ -368,20 +432,22 @@ export const TableWidget = ({
       if (fireWidgetEvent) fireWidgetEvent("onExport", { format, rowCount: rows.length });
       return;
     }
-    const visibleRows = table.getFilteredRowModel().rows.map(r => r.original);
-    if (format === "json") exportToJSON(configColumns, visibleRows, `export-${Date.now()}.json`);
-    else exportToCSV(configColumns, visibleRows, `export-${Date.now()}.csv`);
+    let visibleRows;
+    try {
+      visibleRows = table.getFilteredRowModel().rows.map(r => r.original);
+    } catch {
+      visibleRows = table.getCoreRowModel().rows.map(r => r.original);
+    }
+    if (format === "json") downloadJSON(configColumns, visibleRows);
+    else downloadCSV(configColumns, visibleRows);
+    if (fireWidgetEvent) fireWidgetEvent("onExport", { format, rowCount: visibleRows.length });
   }, [exportConfig, fireWidgetEvent, rows, table, configColumns]);
 
   const handleSaveRow = useCallback((idx, originalRow) => {
-    const changes = {};
-    configColumns.forEach(c => {
-      if (c.editable && String(originalRow[c.key]) !== String(rowDraft[c.key])) {
-        changes[c.key] = rowDraft[c.key];
-      }
-    });
-    if (fireWidgetEvent) fireWidgetEvent("onRowSave", { rowIndex: idx, originalRow, updatedRow: { ...rowDraft }, changes });
+    const changes = diffRowChanges(originalRow, rowDraft, configColumns);
+    if (fireWidgetEvent) fireWidgetEvent("onRowSave", { rowIndex: idx, originalRow, updatedRow: { ...originalRow, ...rowDraft }, changes });
     setEditingRowId(null);
+    setRowDraft({});
   }, [configColumns, rowDraft, fireWidgetEvent]);
 
   const handleSaveBulkEdits = useCallback(() => {
@@ -410,25 +476,34 @@ export const TableWidget = ({
     if (fireWidgetEvent) fireWidgetEvent("onRowSelect", { row: rowOriginal, rowIndex: rowIdx });
   }, [setWidgetState, onRowSelect, fireWidgetEvent]);
 
-  // ── Widget init ──
-  // Register methods ONCE per mount. The handlers read live data through
-  // refs so the registration never needs to repeat (re-registering on every
-  // data change would dispatch new method objects into the page runtime in
-  // an infinite loop).
+  // ── Widget methods (registered once; live data via refs) ──
   const rowsRef = useRef(rows);
   useEffect(() => { rowsRef.current = rows; }, [rows]);
+  const runtimeRef = useRef({ setWidgetState, onRowSelect, fireWidgetEvent, runWorkflow, refreshData });
+  useEffect(() => { runtimeRef.current = { setWidgetState, onRowSelect, fireWidgetEvent, runWorkflow, refreshData }; });
 
   const widgetMethodsRef = useRef(null);
   if (!widgetMethodsRef.current) {
     widgetMethodsRef.current = {
-      refresh: () => { if (runWorkflow) runWorkflow(); if (refreshData) refreshData(); },
+      refresh: () => {
+        const rt = runtimeRef.current;
+        if (rt.runWorkflow) rt.runWorkflow();
+        if (rt.refreshData) rt.refreshData();
+      },
       setSelectedRow: (index) => {
         const i = Number(index);
         const currentRows = rowsRef.current;
-        if (!isNaN(i) && i >= 0 && i < currentRows.length) {
-          if (setWidgetState) setWidgetState(prev => ({ ...prev, selectedRowIndex: i, selectedRow: currentRows[i] }));
-          if (onRowSelect) onRowSelect(currentRows[i], i);
+        const rt = runtimeRef.current;
+        if (!Number.isNaN(i) && i >= 0 && i < currentRows.length) {
+          if (rt.setWidgetState) rt.setWidgetState(prev => ({ ...prev, selectedRowIndex: i, selectedRow: currentRows[i] }));
+          if (rt.onRowSelect) rt.onRowSelect(currentRows[i], i);
+          if (rt.fireWidgetEvent) rt.fireWidgetEvent("onRowSelect", { row: currentRows[i], rowIndex: i });
         }
+      },
+      clearSelection: () => {
+        const rt = runtimeRef.current;
+        setRowSelection({});
+        if (rt.setWidgetState) rt.setWidgetState(prev => ({ ...prev, selectedRowIndex: undefined, selectedRow: undefined, selectedRowIndices: [], selectedRows: [] }));
       },
     };
   }
@@ -445,7 +520,7 @@ export const TableWidget = ({
   const pendingEditCount = Object.values(pendingEdits).reduce((s, c) => s + Object.keys(c).length, 0);
 
   // Determine which rows to display and pagination info
-  const displayRowModels = paginationConfig ? table.getCoreRowModel().rows : table.getRowModel().rows;
+  const displayRowModels = serverMode ? table.getCoreRowModel().rows : table.getRowModel().rows;
 
   if (!rows.length) {
     return (
@@ -457,10 +532,19 @@ export const TableWidget = ({
           </div>
         ) : (
           <>
-            <p>No data available.</p>
-            <p className="text-xs mt-1">Ensure the data array template resolves to a non-empty array.</p>
+            <p>{emptyText}</p>
+            <p className="text-xs mt-1">{emptyHint}</p>
           </>
         )}
+      </div>
+    );
+  }
+
+  if (configColumns.length === 0) {
+    return (
+      <div className="flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6">
+        <p>No visible columns.</p>
+        <p className="text-xs mt-1">All columns are hidden — enable at least one column in Properties.</p>
       </div>
     );
   }
@@ -505,14 +589,14 @@ export const TableWidget = ({
       {/* Table */}
       <div className="flex-1 overflow-auto min-h-0">
         <table className="w-full text-sm border-collapse">
-          <thead className="sticky top-0 z-10 bg-muted/50 backdrop-blur-sm">
+          <thead className={stickyHeader ? "sticky top-0 z-10 bg-muted/50 backdrop-blur-sm" : "bg-muted/50"}>
             {table.getHeaderGroups().map(hg => (
               <tr key={hg.id}>
                 {hg.headers.map(header => (
                   <th
                     key={header.id}
-                    className="text-left px-3 py-2 text-xs font-medium text-muted-foreground border-b border-border whitespace-nowrap select-none"
-                    style={header.column.getSize() ? { width: header.column.getSize() } : undefined}
+                    className={`${cellPad} text-left text-xs font-medium text-muted-foreground border-b border-border whitespace-nowrap select-none`}
+                    style={header.column.getSize() ? { width: header.column.getSize(), minWidth: header.column.getSize() } : undefined}
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
@@ -521,7 +605,7 @@ export const TableWidget = ({
             ))}
           </thead>
           <tbody>
-            {displayRowModels.map(row => {
+            {displayRowModels.map((row, stripeIdx) => {
               const rowIdx = row.index;
               const isRowEditing = editingConfig.enabled && editingRowId === rowIdx;
               const hasPendingEdits = !!pendingEdits[rowIdx];
@@ -535,6 +619,7 @@ export const TableWidget = ({
                     isRowEditing ? "bg-primary/5" :
                     hasPendingEdits ? "bg-primary/[0.03]" :
                     widgetState?.selectedRowIndex === rowIdx ? "bg-primary/5 hover:bg-primary/10" :
+                    striped && stripeIdx % 2 === 1 ? "bg-muted/20 hover:bg-muted/30" :
                     "hover:bg-muted/30"
                   }`}
                 >
@@ -546,7 +631,7 @@ export const TableWidget = ({
                     return (
                       <td
                         key={cell.id}
-                        className="px-3 py-2 text-sm text-foreground whitespace-nowrap"
+                        className={`${cellPad} text-sm text-foreground whitespace-nowrap`}
                         onClick={(e) => {
                           if (isSpecialCol) return; // Special columns handle their own action clicks
 
@@ -627,7 +712,7 @@ export const TableWidget = ({
       </div>
 
       {/* Pagination */}
-      {paginationConfig ? (
+      {serverMode ? (
         <div className="flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0">
           <span className="text-xs text-muted-foreground">{serverTotalRows} total row{serverTotalRows !== 1 ? "s" : ""}</span>
           <div className="flex items-center gap-1">
@@ -638,14 +723,14 @@ export const TableWidget = ({
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleServerPageChange(serverTotalPages)} disabled={serverPage >= serverTotalPages || isLoading}><ChevronsRight className="h-4 w-4" /></Button>
           </div>
         </div>
-      ) : rows.length > 10 && (
+      ) : rows.length > pageSize && (
         <div className="flex items-center justify-between px-3 py-2 border-t border-border bg-muted/20 gap-4 flex-shrink-0">
           <span className="text-xs text-muted-foreground">
             {table.getFilteredRowModel().rows.length} total row{table.getFilteredRowModel().rows.length !== 1 ? "s" : ""}
           </span>
           <div className="flex items-center gap-1">
             <span className="text-xs text-muted-foreground mr-2">
-              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+              Page {table.getState().pagination.pageIndex + 1} of {Math.max(1, table.getPageCount())}
             </span>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}><ChevronsLeft className="h-4 w-4" /></Button>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}><ChevronLeft className="h-4 w-4" /></Button>

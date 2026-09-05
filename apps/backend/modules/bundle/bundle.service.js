@@ -83,6 +83,7 @@ const REF_KEY_TO_TYPE = {
   queryID: "dataQuery",
   dataQueryID: "dataQuery",
   workflowID: "workflow",
+  childWorkflowID: "workflow",
   listenerID: "listener",
   datasourceID: "datasource",
 };
@@ -231,6 +232,11 @@ function remapAppPageWidgetKeys(config, resolveWidgetID, depth = 0) {
       result[key] = v.map((wKey) => remapWidgetInstanceKey(wKey, resolveWidgetID));
     } else if (key === "widgetKey" && typeof v === "string") {
       result[key] = remapWidgetInstanceKey(v, resolveWidgetID);
+    } else if (key === "i" && typeof v === "string") {
+      // v1 react-grid-layout items store the widget instance key under `i`.
+      // Without this branch, imported v1 pages render slots that fetch stale
+      // bundle UUIDs (getWidgetByID -> null -> frontend destructure crash).
+      result[key] = remapWidgetInstanceKey(v, resolveWidgetID);
     } else {
       result[key] = remapAppPageWidgetKeys(v, resolveWidgetID, depth + 1);
     }
@@ -370,7 +376,11 @@ function orderItemsTopologically(items) {
     const deps = dedupeRefs([...extractItemDeps(item), ...declared])
       .map((r) => `${r.type}:${r.id}`)
       .filter((k) => bundleKeys.has(k) && k !== key);
-    inDegree.set(key, deps.size);
+    // NOTE: deps is an Array — use .length, not .size (Set API). Using .size
+    // stores `undefined` as the in-degree so no item ever enters the queue and
+    // the sort silently falls back to file order, importing dependents before
+    // their dependencies and leaving stale reference IDs behind.
+    inDegree.set(key, deps.length);
     for (const dep of deps) {
       if (!dependents.has(dep)) dependents.set(dep, []);
       dependents.get(dep).push(key);
@@ -481,6 +491,9 @@ bundleService.exportWidget = ({ tenantID, widgetID }) =>
 
 bundleService.exportListener = ({ tenantID, listenerID }) =>
   buildBundleFromRoot({ tenantID, type: ITEM_TYPES.LISTENER, id: listenerID });
+
+bundleService.exportDatasource = ({ tenantID, datasourceID }) =>
+  buildBundleFromRoot({ tenantID, type: ITEM_TYPES.DATASOURCE, id: datasourceID });
 
 // ─── Shared import validation ────────────────────────────────────────────
 
@@ -878,4 +891,4 @@ bundleService.executeImport = async ({ tenantID, userID, authContext, bundle }) 
   }
 };
 
-module.exports = { bundleService, BUNDLE_VERSION, assertImportableBundle };
+module.exports = { bundleService, BUNDLE_VERSION, assertImportableBundle, orderItemsTopologically, remapAppPageWidgetKeys };

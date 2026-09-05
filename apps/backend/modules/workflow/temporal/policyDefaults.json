@@ -1,0 +1,28 @@
+{
+  "_comment": "Single source of truth for policy defaults. Required by Node workflowConfig.js and mirrored in workflows/workflowPolicy.js (sandbox cannot require CJS with process.env). If you change values here, update both files — parity test enforces it.",
+  "PLATFORM_NODE_DEFAULTS": {
+    "dataQuery": { "timeoutSeconds": 120, "retryLimit": 0, "retryDelaySeconds": 5 },
+    "javascript": { "timeoutSeconds": 30, "retryLimit": 0, "retryDelaySeconds": 5 },
+    "subWorkflow": { "timeoutSeconds": 300, "retryLimit": 0, "retryDelaySeconds": 5 },
+    "switch": { "timeoutSeconds": 30, "retryLimit": 0, "retryDelaySeconds": 5 },
+    "fanout": { "timeoutSeconds": 30, "retryLimit": 0, "retryDelaySeconds": 5 },
+    "join": { "timeoutSeconds": 30, "retryLimit": 0, "retryDelaySeconds": 5 },
+    "approval": { "timeoutSeconds": 60, "retryLimit": 0, "retryDelaySeconds": 5 },
+    "default": { "timeoutSeconds": 60, "retryLimit": 0, "retryDelaySeconds": 5 }
+  },
+  "PLATFORM_WORKFLOW_DEFAULTS": {
+    "workflowRunTimeout": "7 days",
+    "workflowTaskTimeout": "30 seconds",
+    "humanInLoopTimeout": "24 hours",
+    "defaultNodeTimeoutSeconds": 120,
+    "defaultRetryLimit": 0,
+    "defaultRetryDelaySeconds": 5
+  },
+  "LIMITS": {
+    "timeoutSeconds": { "min": 1, "max": 3600 },
+    "retryLimit": { "min": 0, "max": 10 },
+    "retryDelaySeconds": { "min": 0, "max": 300 },
+    "maxIterations": { "min": 1, "max": 100000 },
+    "delayBetweenItemsMs": { "min": 0, "max": 60000 }
+  }
+}

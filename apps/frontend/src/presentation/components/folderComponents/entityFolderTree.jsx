@@ -259,7 +259,7 @@ export const EntityFolderTree = ({
   // ─── Render helpers ─────────────────────────────────────────────────────
 
   const _renderCreateInput = (indent) => (
-    <form onSubmit={_submitNewFolder} className="py-0.5 pr-2" style={{ paddingLeft: `${indent}px` }}>
+    <form onSubmit={_submitNewFolder} className="py-0.5" style={{ paddingLeft: `${indent}px` }}>
       <Input
         autoFocus
         size="sm"
@@ -405,11 +405,11 @@ export const EntityFolderTree = ({
         </div>
 
         {isExpanded && (
-          <>
+          <div className="flex flex-col gap-2">
             {(childrenByParent.get(folder.folderID) || []).map((child) => _renderFolder(child, depth + 1))}
             {_itemsIn(folder.folderID).map((item) => _renderItemLeaf(item, depth + 1))}
             {creatingParentID === folder.folderID && _renderCreateInput((depth + 1) * 14 + 22)}
-          </>
+          </div>
         )}
       </div>
     );
@@ -480,17 +480,19 @@ export const EntityFolderTree = ({
         </Button>
       </div>
 
-      {rootFolders.map((folder) => _renderFolder(folder, 0))}
-      {unfiledItems.map((item) => _renderItemLeaf(item, 0))}
-      {creatingParentID === null && _renderCreateInput(4)}
+      <div className="flex flex-col gap-2 p-2">
+        {rootFolders.map((folder) => _renderFolder(folder, 0))}
+        {unfiledItems.map((item) => _renderItemLeaf(item, 0))}
+        {creatingParentID === null && _renderCreateInput(4)}
 
-      {isLoadingItems && (
-        <div role="status" className="animate-pulse space-y-2 p-2">
-          <div className="h-6 w-full rounded bg-muted" />
-          <div className="h-6 w-full rounded bg-muted" />
-          <div className="h-6 w-full rounded bg-muted" />
-        </div>
-      )}
+        {isLoadingItems && (
+          <div role="status" className="animate-pulse space-y-2">
+            <div className="h-6 w-full rounded bg-muted" />
+            <div className="h-6 w-full rounded bg-muted" />
+            <div className="h-6 w-full rounded bg-muted" />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

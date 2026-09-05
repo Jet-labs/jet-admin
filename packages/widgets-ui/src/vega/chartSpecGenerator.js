@@ -53,6 +53,18 @@ export const AGGREGATE_TYPES = [
   'variance', 'stdev', 'distinct', 'valid', 'missing',
 ];
 
+export const TIME_UNITS = [
+  'year', 'quarter', 'month', 'week', 'day', 'dayofyear',
+  'date', 'hours', 'minutes', 'seconds', 'milliseconds',
+  'yearmonth', 'yearmonthdate', 'yearmonthdatehours',
+  'monthdate', 'hoursminutes', 'utcmonth', 'utcyearmonth',
+];
+
+export const INTERPOLATE_TYPES = [
+  'linear', 'monotone', 'step', 'step-before', 'step-after',
+  'basis', 'cardinal', 'catmull-rom',
+];
+
 export const COLOR_SCHEMES = [
   'tableau10', 'category10', 'category20', 'accent', 'dark2',
   'paired', 'set1', 'set2', 'set3', 'pastel1', 'pastel2',
@@ -140,14 +152,15 @@ export const generateVegaLiteSpec = (shelfSpec) => {
   const encoding = shelfSpec.encoding || {};
   const config = shelfSpec.config || {};
 
-  // Title
-  if (config.title) {
+  // Title (+ optional subtitle)
+  if (config.title || config.subtitle) {
     spec.title = {
-      text: config.title,
+      text: config.title || config.subtitle,
       anchor: 'start',
       fontSize: 14,
       fontWeight: 600,
       offset: 12,
+      ...(config.subtitle && config.title ? { subtitle: config.subtitle } : {}),
     };
   }
 
@@ -166,15 +179,60 @@ export const generateVegaLiteSpec = (shelfSpec) => {
 
   const markDef = MARK_TYPES[resolvedMark] || MARK_TYPES.bar;
 
-  // Special handling for donut
-  if (shelfSpec.mark === 'donut') {
-    spec.mark = { ...markDef, innerRadius: 50 };
-  } else {
-    spec.mark = { ...markDef };
+  // Merge user mark props (point overlay, interpolation, cornerRadius, opacity)
+  const markProps = shelfSpec.markProps || {};
+  const mergedMarkDef = { ...markDef };
+  if (markProps.point !== undefined) mergedMarkDef.point = markProps.point;
+  if (markProps.interpolate) mergedMarkDef.interpolate = markProps.interpolate;
+  if (markProps.cornerRadius !== undefined && markProps.cornerRadius !== '' && mergedMarkDef.type === 'bar') {
+    const cr = Number(markProps.cornerRadius);
+    if (!Number.isNaN(cr)) mergedMarkDef.cornerRadius = cr;
+  }
+  if (markProps.opacity !== undefined && markProps.opacity !== '' && !encoding.opacity?.field) {
+    const op = Number(markProps.opacity);
+    if (!Number.isNaN(op)) mergedMarkDef.opacity = Math.min(1, Math.max(0, op));
+  }
+  if (markProps.lineWidth !== undefined && markProps.lineWidth !== '') {
+    const lw = Number(markProps.lineWidth);
+    if (!Number.isNaN(lw)) mergedMarkDef.strokeWidth = lw;
   }
 
-  // Encoding
-  spec.encoding = buildEncoding(encoding, resolvedMark, config);
+  // Special handling for donut
+  if (shelfSpec.mark === 'donut') {
+    mergedMarkDef.innerRadius = 50;
+  }
+
+  // Base encoding (single-view shape; may move into layer[0] below)
+  const baseEncoding = buildEncoding(encoding, resolvedMark, config);
+  if (config.showLegend === false) {
+    for (const ch of Object.values(baseEncoding)) {
+      if (ch && typeof ch === 'object' && !Array.isArray(ch)) ch.legend = null;
+    }
+  }
+
+  // Chrome overlays that require layered specs: reference line, trend line,
+  // data labels. When none are active the spec stays single-view so raw-mode
+  // round-trips and downstream consumers are unaffected.
+  const extraLayers = buildChromeLayers({ encoding, resolvedMark, mark: shelfSpec.mark, config });
+
+  if (extraLayers.length > 0) {
+    spec.layer = [{ mark: { ...mergedMarkDef }, encoding: baseEncoding }, ...extraLayers];
+  } else {
+    spec.mark = { ...mergedMarkDef };
+    spec.encoding = baseEncoding;
+  }
+
+  // Interaction params for drill-down (point click select + interval brush).
+  // Emitted only when enabled so existing charts keep identical behavior.
+  const interaction = shelfSpec.interaction || {};
+  const params = [];
+  if (interaction.pointSelection) {
+    params.push({ name: 'pts_click', select: { type: 'point', on: 'click' } });
+  }
+  if (interaction.intervalBrush) {
+    params.push({ name: 'brush', select: { type: 'interval' } });
+  }
+  if (params.length > 0) spec.params = params;
 
   // Theme config
   spec.config = buildThemeConfig(config);
@@ -185,6 +243,92 @@ export const generateVegaLiteSpec = (shelfSpec) => {
 // ============================================================
 // Section builders
 // ============================================================
+
+// ============================================================
+// Chart-chrome overlays (reference line, trend line, data labels)
+// Each returns a Vega-Lite layer definition. Values may be raw numbers or
+// "{{ state.* }}" template strings — runtime resolveConfig evaluates them
+// before the spec reaches vega-embed, so templates are preserved as-is here.
+// ============================================================
+
+const coerceDatumValue = (value) => {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '') return null;
+    // Preserve live bindings for runtime resolution
+    if (trimmed.includes('{{')) return trimmed;
+    const num = Number(trimmed);
+    return Number.isNaN(num) ? trimmed : num;
+  }
+  return value ?? null;
+};
+
+const buildChromeLayers = ({ encoding, resolvedMark, mark, config }) => {
+  const layers = [];
+  const isArc = resolvedMark === 'arc';
+  const hasX = !!encoding?.x?.field;
+  const hasY = !!encoding?.y?.field;
+
+  // 1. Reference line (horizontal y=val or vertical x=val rule)
+  const ref = config?.referenceLine;
+  const refValue = coerceDatumValue(ref?.value);
+  if (ref && refValue !== null && refValue !== '') {
+    const axis = ref.axis === 'x' ? 'x' : 'y';
+    layers.push({
+      mark: {
+        type: 'rule',
+        color: ref.color || '#ef4444',
+        strokeWidth: 1.5,
+        strokeDash: [4, 4],
+        ...(ref.label ? { tooltip: true } : {}),
+      },
+      encoding: {
+        [axis]: { datum: refValue, ...(ref.label ? { title: ref.label } : {}) },
+        ...(ref.label ? { tooltip: { datum: ref.label } } : {}),
+      },
+    });
+  }
+
+  // 2. Trend (regression) line — needs x + y fields on a non-arc mark
+  if (config?.trendLine && !isArc && hasX && hasY) {
+    const xField = encoding.x.field;
+    const yField = encoding.y.field;
+    layers.push({
+      transform: [{ regression: yField, on: xField }],
+      mark: { type: 'line', color: '#f43f5e', strokeWidth: 2 },
+      encoding: {
+        x: { field: xField, type: encoding.x.type || 'quantitative' },
+        y: { field: yField, type: 'quantitative' },
+      },
+    });
+  }
+
+  // 3. Data labels — text layer reusing positional channels + y measure
+  if (config?.showDataLabels && !isArc && hasX && hasY) {
+    const yCh = encoding.y;
+    layers.push({
+      mark: {
+        type: 'text',
+        align: 'center',
+        baseline: (mark === 'bar' || resolvedMark === 'bar') ? 'bottom' : 'middle',
+        dy: (mark === 'bar' || resolvedMark === 'bar') ? -6 : 0,
+      },
+      encoding: {
+        x: buildChannel(encoding.x),
+        y: buildChannel(encoding.y),
+        text: {
+          field: yCh.field,
+          type: yCh.type || 'quantitative',
+          ...(yCh.aggregate && yCh.aggregate !== 'none' ? { aggregate: yCh.aggregate } : {}),
+          ...(yCh.format ? { format: yCh.format } : {}),
+        },
+      },
+    });
+  }
+
+  return layers;
+};
 
 const buildDataSection = (dataSource, inlineValues) => {
   if (inlineValues && Array.isArray(inlineValues) && inlineValues.length > 0) {
@@ -276,27 +420,35 @@ const buildChannel = (channel, colorScheme) => {
   if (channel.sort) enc.sort = channel.sort;
   if (channel.bin) enc.bin = channel.bin === true ? true : { maxbins: channel.bin };
   if (channel.timeUnit) enc.timeUnit = channel.timeUnit;
+  if (channel.format) enc.format = channel.format;
+  if (channel.formatType) enc.formatType = channel.formatType;
   if (channel.axis !== undefined) enc.axis = channel.axis;
   if (colorScheme) enc.scale = { scheme: colorScheme };
 
   return enc;
 };
 
-const buildThemeConfig = (config) => ({
-  background: 'transparent',
-  view: { stroke: 'transparent' },
-  axis: {
-    labelFontSize: 11,
-    titleFontSize: 12,
-    titlePadding: 8,
-    grid: true,
-    gridOpacity: 0.15,
-  },
-  legend: {
-    labelFontSize: 11,
-    titleFontSize: 12,
-  },
-});
+const buildThemeConfig = (config) => {
+  const showGrid = config?.showGrid !== false;
+  const showLegend = config?.showLegend !== false;
+  return {
+    background: 'transparent',
+    view: { stroke: 'transparent' },
+    axis: {
+      labelFontSize: 11,
+      titleFontSize: 12,
+      titlePadding: 8,
+      grid: showGrid,
+      gridOpacity: 0.15,
+    },
+    legend: {
+      labelFontSize: 11,
+      titleFontSize: 12,
+      ...(showLegend ? {} : { disable: true }),
+      ...(config?.legendPosition ? { orient: config.legendPosition } : {}),
+    },
+  };
+};
 
 export const getEmptySpec = () => ({
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -333,11 +485,29 @@ export const getDefaultShelfSpec = () => ({
     strokeDash: null,
     tooltip: [],
   },
+  markProps: {
+    point: undefined,
+    interpolate: undefined,
+    cornerRadius: undefined,
+    opacity: undefined,
+    lineWidth: undefined,
+  },
+  interaction: {
+    pointSelection: false,
+    intervalBrush: false,
+  },
   config: {
     title: '',
+    subtitle: '',
     colorScheme: 'tableau10',
     width: 'container',
     height: 300,
+    showGrid: true,
+    showLegend: true,
+    legendPosition: 'right',
+    showDataLabels: false,
+    trendLine: false,
+    referenceLine: null,
   },
 });
 

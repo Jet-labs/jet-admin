@@ -27,18 +27,25 @@ export class TableWidgetBuilder extends BaseWidgetBuilder {
       : [];
 
     // Extract total rows from pagination config
-    // totalTemplate may be a number or a numeric string (e.g. "30" from SQL COUNT)
-    const rawTotal = widgetConfig.pagination?.totalTemplate;
-    const parsedTotal = rawTotal != null ? Number(rawTotal) : NaN;
+    // totalTemplate may be a number or a numeric string (e.g. "30" from SQL COUNT).
+    // totalRows (already-resolved number) takes precedence when present.
+    const rawTotal = widgetConfig.pagination?.totalRows ?? widgetConfig.pagination?.totalTemplate;
+    const parsedTotal = rawTotal != null && rawTotal !== "" ? Number(rawTotal) : NaN;
     const totalRows = !isNaN(parsedTotal) && parsedTotal >= 0
-      ? parsedTotal
+      ? Math.floor(parsedTotal)
       : data.length;
+
+    const pageSizeRaw = Number(widgetConfig.pagination?.pageSize);
+    const pageSize = Number.isInteger(pageSizeRaw) && pageSizeRaw > 0 && pageSizeRaw <= 500
+      ? pageSizeRaw
+      : 10;
 
     return {
       data,
       columns: widgetConfig.columns || [],
       pagination: {
         enabled: widgetConfig.pagination?.enabled || false,
+        pageSize,
         totalRows,
       },
       search: widgetConfig.search || { enabled: false },
@@ -46,6 +53,11 @@ export class TableWidgetBuilder extends BaseWidgetBuilder {
       editing: widgetConfig.editing || { enabled: false },
       multiSelect: widgetConfig.multiSelect || { enabled: false },
       bulkEdit: widgetConfig.bulkEdit || { enabled: false },
+      emptyText: widgetConfig.emptyText,
+      emptyHint: widgetConfig.emptyHint,
+      striped: widgetConfig.striped,
+      dense: widgetConfig.dense,
+      stickyHeader: widgetConfig.stickyHeader,
       isLoading: widgetConfig.isLoading,
     };
   }

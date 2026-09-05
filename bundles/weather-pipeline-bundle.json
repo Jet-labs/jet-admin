@@ -1,0 +1,339 @@
+{
+  "bundleVersion": 1,
+  "generator": "jet-admin",
+  "exportedAt": "2026-09-04T00:00:00.000Z",
+  "items": [
+    {
+      "type": "datasource",
+      "id": "b3e1f2a4-5c6d-4e7f-8a9b-0c1d2e3f4a5b",
+      "payload": {
+        "datasourceTitle": "Open-Meteo Weather",
+        "datasourceType": "restapi",
+        "datasourceDescription": "Free weather API, no key required",
+        "datasourceTags": ["weather", "public"],
+        "datasourceOptions": {
+          "baseUrl": "https://api.open-meteo.com",
+          "timeout": 10,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "c4d2e3b5-6d7e-4f8a-9b0c-1d2e3f4a5b6c",
+      "payload": {
+        "datasourceTitle": "JSONPlaceholder",
+        "datasourceType": "restapi",
+        "datasourceDescription": "Fake posts API for testing, no key required",
+        "datasourceTags": ["testing", "public"],
+        "datasourceOptions": {
+          "baseUrl": "https://jsonplaceholder.typicode.com",
+          "timeout": 10,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "dataQuery",
+      "id": "e6f4a5d7-8f9a-4b0c-9d1e-3f4a5b6c7d8e",
+      "payload": {
+        "dataQueryTitle": "Current Weather - Delhi",
+        "dataQueryDescription": "Current temperature and weather code for Delhi",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/v1/forecast",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            { "key": "latitude", "value": "28.61" },
+            { "key": "longitude", "value": "77.20" },
+            { "key": "current", "value": "temperature_2m,weather_code" },
+            { "key": "timezone", "value": "auto" }
+          ],
+          "contentType": "application/json"
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "b3e1f2a4-5c6d-4e7f-8a9b-0c1d2e3f4a5b", "name": "Open-Meteo Weather", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "f7a5b6e8-9a0b-4c1d-8e2f-4a5b6c7d8e9f",
+      "payload": {
+        "dataQueryTitle": "Weather By Coordinates",
+        "dataQueryDescription": "Pass latitude and longitude as arguments",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/v1/forecast",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            { "key": "latitude", "value": "{{inputs.latitude}}" },
+            { "key": "longitude", "value": "{{inputs.longitude}}" },
+            { "key": "current", "value": "temperature_2m,weather_code" },
+            { "key": "timezone", "value": "auto" }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            { "key": "latitude", "type": "number" },
+            { "key": "longitude", "type": "number" }
+          ]
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "b3e1f2a4-5c6d-4e7f-8a9b-0c1d2e3f4a5b", "name": "Open-Meteo Weather", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "a8b6c7f9-0b1c-4d2e-9f3a-5b6c7d8e9f0a",
+      "payload": {
+        "dataQueryTitle": "List Posts",
+        "dataQueryDescription": "Fetch all 100 fake posts",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/posts",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json"
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "c4d2e3b5-6d7e-4f8a-9b0c-1d2e3f4a5b6c", "name": "JSONPlaceholder", "bundled": true }
+      ]
+    },
+    {
+      "type": "workflow",
+      "id": "e1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c",
+      "payload": {
+        "title": "Weather Intelligence Pipeline",
+        "workflowOptions": {},
+        "nodes": [
+          {
+            "nodeID": "n_start",
+            "nodeType": "start",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": { "title": "Start", "description": "Pipeline entry point" }
+          },
+          {
+            "nodeID": "n_fetch_delhi",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Fetch Delhi weather",
+              "dataQueryID": "e6f4a5d7-8f9a-4b0c-9d1e-3f4a5b6c7d8e",
+              "inputValues": {},
+              "outputVariable": "delhiWeather",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_fetch_london",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Fetch London weather",
+              "dataQueryID": "f7a5b6e8-9a0b-4c1d-8e2f-4a5b6c7d8e9f",
+              "inputValues": { "latitude": 51.5, "longitude": -0.12 },
+              "outputVariable": "londonWeather",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_summarize",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Summarize weather",
+              "code": "const delhi = (ctx.delhiWeather && ctx.delhiWeather.current) || {};\nconst london = (ctx.londonWeather && ctx.londonWeather.current) || {};\nconst delhiTemp = Number(delhi.temperature_2m);\nconst londonTemp = Number(london.temperature_2m);\nreturn {\n  delhiTemp: delhiTemp,\n  londonTemp: londonTemp,\n  hotInDelhi: delhiTemp > 30,\n  colderInLondon: londonTemp < delhiTemp,\n  checkedAt: new Date().toISOString()\n};",
+              "outputVariable": "weatherSummary",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_check_heat",
+            "nodeType": "condition",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Heatwave?",
+              "branches": [
+                {
+                  "id": "hot",
+                  "name": "Heatwave in Delhi",
+                  "conditionType": "expression",
+                  "expression": "ctx.weatherSummary && ctx.weatherSummary.hotInDelhi === true"
+                }
+              ],
+              "evaluationMode": "first_match",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_cooldown",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Cooldown pause",
+              "delayType": "fixed",
+              "delayMinutes": 0,
+              "delaySeconds": 3,
+              "delayMs": 0
+            }
+          },
+          {
+            "nodeID": "n_hot_alert",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Build heat alert",
+              "code": "const s = ctx.weatherSummary || {};\nreturn \"HEAT ALERT: Delhi is \" + s.delhiTemp + \" C (London \" + s.londonTemp + \" C). Stay hydrated! Checked at \" + s.checkedAt;",
+              "outputVariable": "hotAlert",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_end_hot",
+            "nodeType": "end",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "End (hot)",
+              "status": "success",
+              "outputParameters": [
+                { "id": "p1", "name": "summary", "sourceVariable": "{{ctx.weatherSummary}}" },
+                { "id": "p2", "name": "alert", "sourceVariable": "{{ctx.hotAlert}}" }
+              ]
+            }
+          },
+          {
+            "nodeID": "n_mild_note",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Build mild note",
+              "code": "const s = ctx.weatherSummary || {};\nreturn \"Delhi is pleasant at \" + s.delhiTemp + \" C vs London \" + s.londonTemp + \" C. Showing top posts instead.\";",
+              "outputVariable": "mildNote",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_fetch_posts",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Fetch posts",
+              "dataQueryID": "a8b6c7f9-0b1c-4d2e-9f3a-5b6c7d8e9f0a",
+              "inputValues": {},
+              "outputVariable": "posts",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_top_posts",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Take top 3 posts",
+              "code": "const posts = Array.isArray(ctx.posts) ? ctx.posts : [];\nreturn posts.slice(0, 3);",
+              "outputVariable": "topPosts",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_loop_posts",
+            "nodeType": "loop",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Loop top posts",
+              "sourceVariable": "{{ctx.topPosts}}",
+              "itemVariable": "post",
+              "indexVariable": "idx",
+              "outputVariable": "postLines",
+              "maxIterations": 10,
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_post_line",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Format post line",
+              "code": "const p = ctx.post || {};\nreturn \"#\" + (ctx.idx + 1) + \" \" + p.title + \" (post \" + p.id + \")\";",
+              "outputVariable": "postLine",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_end_mild",
+            "nodeType": "end",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "End (mild)",
+              "status": "success",
+              "outputParameters": [
+                { "id": "p1", "name": "summary", "sourceVariable": "{{ctx.weatherSummary}}" },
+                { "id": "p2", "name": "note", "sourceVariable": "{{ctx.mildNote}}" },
+                { "id": "p3", "name": "topPostLines", "sourceVariable": "{{ctx.postLines}}" }
+              ]
+            }
+          }
+        ],
+        "edges": [
+          { "upstreamNodeID": "n_start", "downstreamNodeID": "n_fetch_delhi", "sourceHandle": "output", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_fetch_delhi", "downstreamNodeID": "n_fetch_london", "sourceHandle": "success", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_fetch_london", "downstreamNodeID": "n_summarize", "sourceHandle": "success", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_summarize", "downstreamNodeID": "n_check_heat", "sourceHandle": "success", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_check_heat", "downstreamNodeID": "n_cooldown", "sourceHandle": "hot", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_cooldown", "downstreamNodeID": "n_hot_alert", "sourceHandle": "output", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_hot_alert", "downstreamNodeID": "n_end_hot", "sourceHandle": "success", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_check_heat", "downstreamNodeID": "n_mild_note", "sourceHandle": "default", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_mild_note", "downstreamNodeID": "n_fetch_posts", "sourceHandle": "success", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_fetch_posts", "downstreamNodeID": "n_top_posts", "sourceHandle": "success", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_top_posts", "downstreamNodeID": "n_loop_posts", "sourceHandle": "success", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_loop_posts", "downstreamNodeID": "n_post_line", "sourceHandle": "loop", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "n_loop_posts", "downstreamNodeID": "n_end_mild", "sourceHandle": "completed", "targetHandle": null, "edgeType": null, "edgeConfig": null }
+        ]
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "b3e1f2a4-5c6d-4e7f-8a9b-0c1d2e3f4a5b", "name": "Open-Meteo Weather", "bundled": true },
+        { "type": "datasource", "id": "c4d2e3b5-6d7e-4f8a-9b0c-1d2e3f4a5b6c", "name": "JSONPlaceholder", "bundled": true },
+        { "type": "dataQuery", "id": "e6f4a5d7-8f9a-4b0c-9d1e-3f4a5b6c7d8e", "name": "Current Weather - Delhi", "bundled": true },
+        { "type": "dataQuery", "id": "f7a5b6e8-9a0b-4c1d-8e2f-4a5b6c7d8e9f", "name": "Weather By Coordinates", "bundled": true },
+        { "type": "dataQuery", "id": "a8b6c7f9-0b1c-4d2e-9f3a-5b6c7d8e9f0a", "name": "List Posts", "bundled": true }
+      ]
+    }
+  ]
+}

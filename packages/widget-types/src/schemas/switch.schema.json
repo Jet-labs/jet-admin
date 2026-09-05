@@ -1,0 +1,14 @@
+{
+  "widgetType": "switch",
+  "description": "Switch / Toggle widget. Boolean on/off control, ideal for feature flags and filters.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string" },
+      "defaultChecked": { "type": ["boolean", "string"], "default": false },
+      "disabled": { "type": ["boolean", "string"], "default": false },
+      "description": { "type": "string" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onChange"]
+}

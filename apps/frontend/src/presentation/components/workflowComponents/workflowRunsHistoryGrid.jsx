@@ -197,6 +197,7 @@ export const WorkflowRunsHistoryGrid = ({ tenantID, workflowID }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("live");
 
   const {
     isLoading: isLoadingRuns,
@@ -208,6 +209,7 @@ export const WorkflowRunsHistoryGrid = ({ tenantID, workflowID }) => {
       CONSTANTS.REACT_QUERY_KEYS.WORKFLOW_RUNS(tenantID),
       workflowID ?? "all",
       statusFilter,
+      typeFilter,
       page,
       pageSize,
     ],
@@ -216,6 +218,7 @@ export const WorkflowRunsHistoryGrid = ({ tenantID, workflowID }) => {
         tenantID,
         ...(workflowID ? { workflowID } : {}),
         ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+        ...(typeFilter === "live" ? { isTest: false } : typeFilter === "test" ? { isTest: true } : {}),
         page,
         pageSize,
       }),
@@ -275,6 +278,27 @@ export const WorkflowRunsHistoryGrid = ({ tenantID, workflowID }) => {
                 <SelectItem value="RUNNING">Running</SelectItem>
                 <SelectItem value="CANCELLED">Cancelled</SelectItem>
                 <SelectItem value="PENDING">Pending</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+              Type
+            </span>
+            <Select
+              value={typeFilter}
+              onValueChange={(val) => {
+                setTypeFilter(val);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger size="sm" className="w-[130px] text-xs">
+                <SelectValue placeholder="Run type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="live">Live</SelectItem>
+                <SelectItem value="test">Test</SelectItem>
+                <SelectItem value="all">All types</SelectItem>
               </SelectContent>
             </Select>
           </div>

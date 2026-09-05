@@ -23,8 +23,33 @@ import { displaySuccess, displayError } from "../../utils/notification";
  *   disconnector for active workflow streams. Scoped to one provider so two
  *   open pages (or editor + viewer) never clobber each other's streams.
  */
+/**
+ * Normalize legacy `state.event.*` references to the runtime `event.*` form.
+ *
+ * The evaluator exposes the event payload as a TOP-LEVEL `event` identifier
+ * (see wrapStateContext in evaluationEngine.js), so `{{ state.event.x }}`
+ * always resolves to undefined while `{{ event.x }}` works. The older
+ * `state.event.*` spelling still appears in saved pages (and was previously
+ * suggested by editor placeholders), where it silently produced undefined —
+ * stuck pagination, empty detail panels, failed row-saves. Rewriting the
+ * prefix makes both spellings behave identically.
+ */
+const normalizeEventRefs = (value) => {
+  if (typeof value === "string") {
+    return value.includes("state.event.") ? value.split("state.event.").join("event.") : value;
+  }
+  if (Array.isArray(value)) return value.map(normalizeEventRefs);
+  if (value && typeof value === "object") {
+    const out = {};
+    for (const [k, v] of Object.entries(value)) out[k] = normalizeEventRefs(v);
+    return out;
+  }
+  return value;
+};
+
 const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowRegistry) => {
-  const { actionType, config: rawConfig } = action;
+  const { actionType, config: rawConfigOrig } = action;
+  const rawConfig = normalizeEventRefs(rawConfigOrig);
 
   // Resolve {{ }} expressions in action config against current state + event input
   const config = resolveConfig(rawConfig, stateTree);
@@ -72,9 +97,17 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
         return null;
       }
       try {
-        // Merge inputs: dataSource defaults → action config → event-level overrides
+        // Merge inputs: dataSource defaults → action config → event-level overrides.
+        // Templates are resolved against the live tree (which already includes
+        // SET_VARIABLE mutations from earlier chain steps). Without this, raw
+        // "{{ state.variables.x }}" strings reach the backend: string inputs
+        // silently become literals (wrong SQL, empty grids) and number inputs
+        // fail validation (400, query never runs).
         const eventInputValues = stateTree.event?.inputValues || {};
-        const mergedInputValues = { ...dataSource.inputValues, ...config.inputValues, ...eventInputValues };
+        const mergedInputValues = resolveConfig(
+          { ...dataSource.inputValues, ...config.inputValues, ...eventInputValues },
+          stateTree
+        );
 
         const isWorkflow = dataSource.type === "workflow";
         if (isWorkflow) {
@@ -126,7 +159,10 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
       }
       try {
         const eventInputValues = stateTree.event?.inputValues || {};
-        const mergedInputValues = { ...config.inputValues, ...eventInputValues };
+        const mergedInputValues = resolveConfig(
+          { ...config.inputValues, ...eventInputValues },
+          stateTree
+        );
 
         const result = await runDataQueryByIDAPI({
           tenantID: meta.tenantID,
@@ -148,7 +184,10 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
       }
       try {
         const eventInputValues = stateTree.event?.inputValues || {};
-        const mergedInputValues = { ...config.inputValues, ...eventInputValues };
+        const mergedInputValues = resolveConfig(
+          { ...config.inputValues, ...eventInputValues },
+          stateTree
+        );
 
         // Stable alias per target workflow: re-triggering replaces the active
         // stream instead of accumulating new reducer entries/disconnectors

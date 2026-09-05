@@ -1,0 +1,28 @@
+{
+  "widgetType": "radio-group",
+  "description": "Radio Group widget. Single-choice from a small set of mutually exclusive options.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "label": { "type": "string" },
+      "options": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string" },
+            "value": { "type": ["string", "number", "boolean"] }
+          },
+          "required": ["label", "value"]
+        }
+      },
+      "optionsTemplate": { "type": "string" },
+      "labelKey": { "type": "string", "default": "label" },
+      "valueKey": { "type": "string", "default": "value" },
+      "defaultValue": { "type": ["string", "number", "boolean"] },
+      "orientation": { "type": "string", "enum": ["horizontal", "vertical"], "default": "vertical" },
+      "disabled": { "type": ["boolean", "string"], "default": false }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad", "onChange"]
+}

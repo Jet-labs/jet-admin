@@ -51,9 +51,11 @@ router.post(
   "/",
   validate(createWorkflowSchema, "body"),
   workflowMiddleware.extractWorkflowDataQueryIDs,
+  workflowMiddleware.extractWorkflowSubWorkflowIDs,
   authMiddleware.authorize([
     P.workflow.create,
-    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true }
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true },
+    { ...P.workflow.execute, reqKey: "subWorkflowIDs", skipIfMissing: true }
   ]),
   workflowController.createWorkflow
 );
@@ -74,9 +76,11 @@ router.patch(
     body: updateWorkflowSchema,
   }),
   workflowMiddleware.extractWorkflowDataQueryIDs,
+  workflowMiddleware.extractWorkflowSubWorkflowIDs,
   authMiddleware.authorize([
     { ...P.workflow.update, paramKey: "workflowID" },
-    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true }
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true },
+    { ...P.workflow.execute, reqKey: "subWorkflowIDs", skipIfMissing: true }
   ]),
   workflowController.updateWorkflow
 );
@@ -102,10 +106,12 @@ router.post(
   "/:workflowID/clone",
   validate(workflowIdParamSchema, "params"),
   workflowMiddleware.resolveWorkflowDataQueryIDsFromDB,
+  workflowMiddleware.resolveWorkflowSubWorkflowIDsFromDB,
   authMiddleware.authorize([
     P.workflow.create,
     { ...P.workflow.read, paramKey: "workflowID" },
-    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true }
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true },
+    { ...P.workflow.execute, reqKey: "subWorkflowIDs", skipIfMissing: true }
   ]),
   workflowController.cloneWorkflow
 );
@@ -118,7 +124,11 @@ router.post(
     params: workflowIdParamSchema,
     body: executeWorkflowSchema,
   }),
-  authMiddleware.authorize({ ...P.workflow.execute, paramKey: "workflowID" }),
+  workflowMiddleware.resolveWorkflowSubWorkflowIDsFromDB,
+  authMiddleware.authorize([
+    { ...P.workflow.execute, paramKey: "workflowID" },
+    { ...P.workflow.execute, reqKey: "subWorkflowIDs", skipIfMissing: true }
+  ]),
   workflowController.executeWorkflow
 );
 
@@ -136,9 +146,11 @@ router.post(
   "/test",
   validate(testWorkflowSchema, "body"),
   workflowMiddleware.extractWorkflowDataQueryIDs,
+  workflowMiddleware.extractWorkflowSubWorkflowIDs,
   authMiddleware.authorize([
     P.workflow.test,
-    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true }
+    { ...P.dataquery.execute, reqKey: "dataQueryIDs", skipIfMissing: true },
+    { ...P.workflow.execute, reqKey: "subWorkflowIDs", skipIfMissing: true }
   ]),
   workflowController.testWorkflow
 );

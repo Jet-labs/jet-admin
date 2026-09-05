@@ -1,0 +1,1023 @@
+{
+  "bundleVersion": 1,
+  "generator": "jet-admin",
+  "exportedAt": "2026-09-03T16:56:59.730Z",
+  "items": [
+    {
+      "type": "datasource",
+      "id": "59f84380-ff8c-408b-a932-78990b8d5b88",
+      "payload": {
+        "datasourceTitle": "Order Webhook Ingress",
+        "datasourceType": "webhook",
+        "datasourceDescription": "Shared webhook ingress for order events",
+        "datasourceTags": [
+          "webhook",
+          "orders"
+        ],
+        "datasourceOptions": {
+          "connectionName": "OrderIngress",
+          "allowedMethods": "POST",
+          "authType": "none",
+          "username": "",
+          "password": "",
+          "bearerToken": "",
+          "authHeaderName": "",
+          "authSecret": ""
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "a7fb33e2-f145-4e76-b1bf-f56ac720315d",
+      "payload": {
+        "datasourceTitle": "Wikimedia RecentChange SSE",
+        "datasourceType": "sse",
+        "datasourceDescription": "Wikimedia public recent-change event stream",
+        "datasourceTags": [
+          "sse",
+          "wiki",
+          "public"
+        ],
+        "datasourceOptions": {
+          "connectionName": "WikimediaSSE",
+          "url": "https://stream.wikimedia.org/v2/stream/recentchange",
+          "endpoint": "https://stream.wikimedia.org/v2/stream/recentchange",
+          "headers": "{}"
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "01bbe887-10b5-4df3-bf45-b3d1a02c3e2d",
+      "payload": {
+        "datasourceTitle": "Binance ETH Trades WS",
+        "datasourceType": "websocket",
+        "datasourceDescription": "Binance public trade stream for ETHUSDT",
+        "datasourceTags": [
+          "crypto",
+          "websocket",
+          "public"
+        ],
+        "datasourceOptions": {
+          "connectionName": "BinanceETH",
+          "url": "wss://stream.binance.com:9443/ws/ethusdt@trade",
+          "endpoint": "wss://stream.binance.com:9443/ws/ethusdt@trade",
+          "headers": "{}",
+          "reconnect": true,
+          "reconnectIntervalMs": 5000
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "a9828488-f10c-4e52-9d87-890c7d3b8f59",
+      "payload": {
+        "datasourceTitle": "Telemetry MQTT",
+        "datasourceType": "mqtt",
+        "datasourceDescription": "Public MQTT broker for telemetry demo",
+        "datasourceTags": [
+          "mqtt",
+          "iot",
+          "public"
+        ],
+        "datasourceOptions": {
+          "connectionName": "TelemetryMQTT",
+          "brokerUrl": "mqtt://broker.hivemq.com:1883",
+          "clientId": "jet-admin-telemetry",
+          "username": "",
+          "password": "",
+          "useTLS": false,
+          "keepAlive": 60
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "datasource",
+      "id": "c2a6df0d-d135-4129-94e2-28266c8e4d50",
+      "payload": {
+        "datasourceTitle": "CoinGecko Lite",
+        "datasourceType": "restapi",
+        "datasourceDescription": "CoinGecko free API for listener enrichment",
+        "datasourceTags": [
+          "crypto",
+          "public"
+        ],
+        "datasourceOptions": {
+          "baseUrl": "https://api.coingecko.com/api/v3",
+          "timeout": 15,
+          "authType": "none",
+          "headers": [],
+          "queryParams": [],
+          "contentType": "application/json",
+          "followRedirects": true,
+          "sslVerify": true
+        },
+        "requiresReconnect": false
+      },
+      "dependencies": []
+    },
+    {
+      "type": "dataQuery",
+      "id": "bd48e667-36c8-4f89-8fbe-8590266d87c3",
+      "payload": {
+        "dataQueryTitle": "ETH Spot Price",
+        "dataQueryDescription": "ETH spot price for listener enrichment",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/simple/price",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "ids",
+              "value": "ethereum"
+            },
+            {
+              "key": "vs_currencies",
+              "value": "{{inputs.vs}}"
+            }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "vs",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "c2a6df0d-d135-4129-94e2-28266c8e4d50",
+          "name": "CoinGecko Lite",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "40aaa1e4-07f1-49dd-aa78-a0e7151055eb",
+      "payload": {
+        "dataQueryTitle": "BTC Cross Check",
+        "dataQueryDescription": "Second BTC lookup used by listener trigger_query demo",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/simple/price",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "ids",
+              "value": "bitcoin"
+            },
+            {
+              "key": "vs_currencies",
+              "value": "usd"
+            }
+          ],
+          "contentType": "application/json"
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "c2a6df0d-d135-4129-94e2-28266c8e4d50",
+          "name": "CoinGecko Lite",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "1c5dd216-528f-453b-b533-868319f0ad33",
+      "payload": {
+        "dataQueryTitle": "Coin Lite Lookup",
+        "dataQueryDescription": "Parameterized coin lookup for listener trigger_query",
+        "datasourceType": "restapi",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "apiEndpoint": "/simple/price",
+          "method": "GET",
+          "headers": [],
+          "queryParams": [
+            {
+              "key": "ids",
+              "value": "{{inputs.ids}}"
+            },
+            {
+              "key": "vs_currencies",
+              "value": "usd"
+            }
+          ],
+          "contentType": "application/json",
+          "inputDefinitions": [
+            {
+              "key": "ids",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "c2a6df0d-d135-4129-94e2-28266c8e4d50",
+          "name": "CoinGecko Lite",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "listener",
+      "id": "4db8927d-9476-47c6-bff2-37f03b4cd15a",
+      "payload": {
+        "listenerTitle": "Webhook Order Intake",
+        "listenerDescription": "Webhook listener for order events with full action chain",
+        "listenerType": "webhook",
+        "listenerConfig": {
+          "pathSuffix": "open-orders",
+          "responseStatusCode": 200,
+          "responseBody": "{\"ok\":true}"
+        },
+        "endpointPath": "open-orders",
+        "status": "inactive",
+        "actions": [
+          {
+            "actionType": "transform",
+            "actionConfig": {
+              "script": "if (!event || typeof event !== \"object\") return null;\nvar body = event.body || event;\nif (!body.orderId) return null;\nvar total = Number(body.total) || 0;\nif (total <= 0) return null;\nreturn { kind: \"webhook_order\", orderId: String(body.orderId), total: total, currency: body.currency || \"USD\", priority: total > 500 ? \"high\" : \"normal\", receivedAt: new Date().toISOString(), raw: event };"
+            },
+            "isEnabled": true,
+            "orderIndex": 0
+          },
+          {
+            "actionType": "save_to_buffer",
+            "actionConfig": {
+              "bufferName": "webhook-orders",
+              "retentionPolicy": "both",
+              "maxEvents": 500,
+              "maxAgeHours": 24
+            },
+            "isEnabled": true,
+            "orderIndex": 1
+          },
+          {
+            "actionType": "trigger_workflow",
+            "actionConfig": {
+              "workflowID": "012da836-3082-462a-a6b9-afde0a4812e7",
+              "inputValues": {
+                "event": "{{event}}"
+              }
+            },
+            "isEnabled": true,
+            "orderIndex": 2
+          },
+          {
+            "actionType": "trigger_query",
+            "actionConfig": {
+              "dataQueryID": "1c5dd216-528f-453b-b533-868319f0ad33",
+              "inputValues": {
+                "ids": "bitcoin"
+              }
+            },
+            "isEnabled": true,
+            "orderIndex": 3
+          },
+          {
+            "actionType": "push_to_app_page",
+            "actionConfig": {
+              "channelName": "listener:orders",
+              "mode": "append",
+              "maxArrayLength": 200
+            },
+            "isEnabled": true,
+            "orderIndex": 4
+          }
+        ]
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "59f84380-ff8c-408b-a932-78990b8d5b88",
+          "name": "Order Webhook Ingress",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "listener",
+      "id": "b2df8a8b-c27f-4845-91ce-2126d7e40474",
+      "payload": {
+        "listenerTitle": "Wikimedia Change Stream",
+        "listenerDescription": "SSE listener for Wikipedia recent changes",
+        "listenerType": "sse",
+        "listenerConfig": {
+          "eventTypes": "",
+          "parseAsJSON": true
+        },
+        "endpointPath": null,
+        "status": "inactive",
+        "actions": [
+          {
+            "actionType": "transform",
+            "actionConfig": {
+              "script": "if (!event || typeof event !== \"object\") return null;\nvar p = event.payload || event;\nif (p.bot === true) return null;\nvar meta = p.meta || {};\nvar domain = meta.domain || \"\";\nif (domain.indexOf(\"wikipedia.org\") === -1) return null;\nreturn { kind: \"wiki_change\", wiki: domain, title: p.title || null, user: p.user || null, type: p.type || null, at: new Date().toISOString() };"
+            },
+            "isEnabled": true,
+            "orderIndex": 0
+          },
+          {
+            "actionType": "save_to_buffer",
+            "actionConfig": {
+              "bufferName": "wikimedia",
+              "retentionPolicy": "count",
+              "maxEvents": 1000
+            },
+            "isEnabled": true,
+            "orderIndex": 1
+          },
+          {
+            "actionType": "trigger_workflow",
+            "actionConfig": {
+              "workflowID": "012da836-3082-462a-a6b9-afde0a4812e7",
+              "inputValues": {
+                "event": "{{event}}"
+              }
+            },
+            "isEnabled": false,
+            "orderIndex": 2
+          },
+          {
+            "actionType": "push_to_app_page",
+            "actionConfig": {
+              "channelName": "listener:wiki",
+              "mode": "replace",
+              "maxArrayLength": 100
+            },
+            "isEnabled": true,
+            "orderIndex": 3
+          }
+        ]
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "a7fb33e2-f145-4e76-b1bf-f56ac720315d",
+          "name": "Wikimedia RecentChange SSE",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "listener",
+      "id": "e663af3f-99fc-43a9-b021-fcafb9b6e4ec",
+      "payload": {
+        "listenerTitle": "Binance ETH Trades",
+        "listenerDescription": "WebSocket listener for ETHUSDT trades",
+        "listenerType": "websocket",
+        "listenerConfig": {
+          "messageFilter": "",
+          "parseAsJSON": true
+        },
+        "endpointPath": null,
+        "status": "inactive",
+        "actions": [
+          {
+            "actionType": "transform",
+            "actionConfig": {
+              "script": "if (!event || typeof event !== \"object\") return null;\nvar p = event.payload || event;\nvar price = Number(p.p);\nif (!Number.isFinite(price)) return null;\nvar qty = Number(p.q) || 0;\nif (qty < 0.001) return null;\nreturn { kind: \"eth_trade\", symbol: p.s || \"ETHUSDT\", price: price, qty: qty, notional: price * qty, at: new Date().toISOString() };"
+            },
+            "isEnabled": true,
+            "orderIndex": 0
+          },
+          {
+            "actionType": "save_to_buffer",
+            "actionConfig": {
+              "bufferName": "eth-trades",
+              "retentionPolicy": "both",
+              "maxEvents": 2000,
+              "maxAgeHours": 6
+            },
+            "isEnabled": true,
+            "orderIndex": 1
+          },
+          {
+            "actionType": "trigger_query",
+            "actionConfig": {
+              "dataQueryID": "bd48e667-36c8-4f89-8fbe-8590266d87c3",
+              "inputValues": {
+                "vs": "usd"
+              }
+            },
+            "isEnabled": true,
+            "orderIndex": 2
+          },
+          {
+            "actionType": "push_to_app_page",
+            "actionConfig": {
+              "channelName": "listener:eth",
+              "mode": "append",
+              "maxArrayLength": 300
+            },
+            "isEnabled": true,
+            "orderIndex": 3
+          }
+        ]
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "01bbe887-10b5-4df3-bf45-b3d1a02c3e2d",
+          "name": "Binance ETH Trades WS",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "listener",
+      "id": "0dcc2700-6fdf-456c-a88a-9194a850c095",
+      "payload": {
+        "listenerTitle": "Telemetry MQTT Sub",
+        "listenerDescription": "MQTT listener for sensor telemetry",
+        "listenerType": "mqtt",
+        "listenerConfig": {
+          "topics": "sensors/+/telemetry",
+          "qos": 0
+        },
+        "endpointPath": null,
+        "status": "inactive",
+        "actions": [
+          {
+            "actionType": "transform",
+            "actionConfig": {
+              "script": "if (!event || typeof event !== \"object\") return null;\nvar payload = event.payload;\nif (payload == null) return null;\nvar data = (typeof payload === \"object\") ? payload : { value: payload };\nif (data.temp != null && Number(data.temp) > 80) { data.overheat = true; }\nreturn { kind: \"telemetry\", topic: event.topic || null, data: data, at: new Date().toISOString() };"
+            },
+            "isEnabled": true,
+            "orderIndex": 0
+          },
+          {
+            "actionType": "save_to_buffer",
+            "actionConfig": {
+              "bufferName": "telemetry",
+              "retentionPolicy": "time",
+              "maxAgeHours": 12
+            },
+            "isEnabled": true,
+            "orderIndex": 1
+          },
+          {
+            "actionType": "trigger_workflow",
+            "actionConfig": {
+              "workflowID": "012da836-3082-462a-a6b9-afde0a4812e7",
+              "inputValues": {
+                "event": "{{event}}"
+              }
+            },
+            "isEnabled": true,
+            "orderIndex": 2
+          }
+        ]
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "a9828488-f10c-4e52-9d87-890c7d3b8f59",
+          "name": "Telemetry MQTT",
+          "bundled": true
+        }
+      ]
+    },
+    {
+      "type": "workflow",
+      "id": "012da836-3082-462a-a6b9-afde0a4812e7",
+      "payload": {
+        "title": "Realtime Event Processor",
+        "workflowOptions": {
+          "inputDefinitions": [
+            {
+              "key": "event",
+              "type": "object"
+            }
+          ],
+          "defaultRetryLimit": 1
+        },
+        "nodes": [
+          {
+            "nodeID": "n_start",
+            "nodeType": "start",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Start",
+              "description": "Listener event entry"
+            }
+          },
+          {
+            "nodeID": "n_parse",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Normalize event",
+              "code": "var e = ctx.event || {};\nvar kind = e.kind || \"unknown\";\nvar items = [];\nif (kind === \"webhook_order\") { items = [{ label: e.orderId, value: e.total }]; }\nelse if (kind === \"wiki_change\") { items = [{ label: e.title, value: 1 }]; }\nelse if (kind === \"eth_trade\") { items = [{ label: e.symbol, value: e.notional }]; }\nelse if (kind === \"telemetry\") { var d = e.data || {}; items = Object.keys(d).map(function(k){ return { label: k, value: d[k] }; }); }\nelse { items = [{ label: \"fallback\", value: 1 }]; }\nreturn { kind: kind, items: items, highValue: (e.total > 500) || (e.notional > 1000) || false, pauseMs: 800, reviewAt: new Date(Date.now() + 1500).toISOString() };",
+              "outputVariable": "norm",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_kind",
+            "nodeType": "condition",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Route by kind",
+              "branches": [
+                {
+                  "id": "order",
+                  "name": "Order",
+                  "conditions": [
+                    {
+                      "leftValue": "{{ctx.norm.kind}}",
+                      "operator": "equals",
+                      "rightValue": "webhook_order"
+                    }
+                  ],
+                  "conditionLogic": "AND"
+                },
+                {
+                  "id": "trade",
+                  "name": "Trade",
+                  "conditionType": "expression",
+                  "expression": "ctx.norm && ctx.norm.kind === 'eth_trade'"
+                },
+                {
+                  "id": "wiki",
+                  "name": "Wiki",
+                  "conditionType": "expression",
+                  "expression": "ctx.norm && ctx.norm.kind === 'wiki_change'"
+                }
+              ],
+              "evaluationMode": "first_match",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_order_enrich",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 1,
+            "nodeConfig": {
+              "title": "Enrich coin",
+              "dataQueryID": "1c5dd216-528f-453b-b533-868319f0ad33",
+              "inputValues": {
+                "ids": "ethereum"
+              },
+              "outputVariable": "enrich",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_order_msg",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Order message",
+              "code": "var n = ctx.norm || {};\nreturn 'ORDER ' + n.kind + ' items=' + n.items.length + ' high=' + n.highValue;",
+              "outputVariable": "msg",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_trade_msg",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Trade message",
+              "code": "var n = ctx.norm || {};\nreturn 'TRADE items=' + JSON.stringify(n.items).slice(0, 200);",
+              "outputVariable": "msg",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_wiki_msg",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Wiki message",
+              "code": "var n = ctx.norm || {};\nreturn 'WIKI ' + (n.items[0] ? n.items[0].label : 'unknown');",
+              "outputVariable": "msg",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_other_msg",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Other message",
+              "code": "return 'OTHER kind=' + ((ctx.norm && ctx.norm.kind) || 'unknown');",
+              "outputVariable": "msg",
+              "errorHandling": "continue"
+            }
+          },
+          {
+            "nodeID": "n_gate",
+            "nodeType": "condition",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "High value?",
+              "branches": [
+                {
+                  "id": "hot",
+                  "name": "Hot",
+                  "conditionType": "expression",
+                  "expression": "ctx.norm && ctx.norm.highValue === true"
+                }
+              ],
+              "evaluationMode": "first_match",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_pause",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Short pause",
+              "delayType": "fixed",
+              "delayMinutes": 0,
+              "delaySeconds": 1,
+              "delayMs": 0
+            }
+          },
+          {
+            "nodeID": "n_dyn",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Dynamic settle",
+              "delayType": "dynamic",
+              "delayMinutes": 0,
+              "delaySeconds": 0,
+              "delayMs": 0,
+              "delayVariable": "{{ctx.norm.pauseMs}}"
+            }
+          },
+          {
+            "nodeID": "n_items",
+            "nodeType": "loop",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Loop items",
+              "sourceVariable": "{{ctx.norm.items}}",
+              "itemVariable": "it",
+              "indexVariable": "i",
+              "outputVariable": "lines",
+              "maxIterations": 20,
+              "delayBetweenItems": 0,
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_line",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Format line",
+              "code": "var it = ctx.it || {};\nreturn (ctx.i + 1) + '. ' + it.label + ' = ' + it.value;",
+              "outputVariable": "line",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "n_review",
+            "nodeType": "dataCollection",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Review hot event",
+              "description": "Human reviews high-value events",
+              "collectionType": "form",
+              "formSchema": {
+                "type": "object",
+                "properties": {
+                  "approve": {
+                    "type": "boolean",
+                    "title": "Approve"
+                  },
+                  "comment": {
+                    "type": "string",
+                    "title": "Comment"
+                  }
+                },
+                "required": [
+                  "approve"
+                ]
+              },
+              "formUischema": {
+                "type": "VerticalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/approve"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/comment"
+                  }
+                ]
+              },
+              "outputVariable": "review",
+              "expiryMinutes": 60
+            }
+          },
+          {
+            "nodeID": "n_wait",
+            "nodeType": "delay",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Wait review time",
+              "delayType": "until",
+              "delayMinutes": 0,
+              "delaySeconds": 0,
+              "delayMs": 0,
+              "untilTime": "{{ctx.norm.reviewAt}}"
+            }
+          },
+          {
+            "nodeID": "n_end_hot",
+            "nodeType": "end",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "End hot",
+              "status": "success",
+              "outputParameters": [
+                {
+                  "id": "p1",
+                  "name": "kind",
+                  "sourceVariable": "{{ctx.norm.kind}}"
+                },
+                {
+                  "id": "p2",
+                  "name": "message",
+                  "sourceVariable": "{{ctx.msg}}"
+                },
+                {
+                  "id": "p3",
+                  "name": "lines",
+                  "sourceVariable": "{{ctx.lines}}"
+                },
+                {
+                  "id": "p4",
+                  "name": "review",
+                  "sourceVariable": "{{ctx.review}}"
+                }
+              ]
+            }
+          },
+          {
+            "nodeID": "n_end_cold",
+            "nodeType": "end",
+            "timeoutSeconds": 300,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "End cold",
+              "status": "success",
+              "outputParameters": [
+                {
+                  "id": "p1",
+                  "name": "kind",
+                  "sourceVariable": "{{ctx.norm.kind}}"
+                },
+                {
+                  "id": "p2",
+                  "name": "message",
+                  "sourceVariable": "{{ctx.msg}}"
+                },
+                {
+                  "id": "p3",
+                  "name": "lines",
+                  "sourceVariable": "{{ctx.lines}}"
+                }
+              ]
+            }
+          }
+        ],
+        "edges": [
+          {
+            "upstreamNodeID": "n_start",
+            "downstreamNodeID": "n_parse",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_parse",
+            "downstreamNodeID": "n_kind",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_kind",
+            "downstreamNodeID": "n_order_enrich",
+            "sourceHandle": "order",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_kind",
+            "downstreamNodeID": "n_trade_msg",
+            "sourceHandle": "trade",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_kind",
+            "downstreamNodeID": "n_wiki_msg",
+            "sourceHandle": "wiki",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_kind",
+            "downstreamNodeID": "n_other_msg",
+            "sourceHandle": "default",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_order_enrich",
+            "downstreamNodeID": "n_order_msg",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_order_enrich",
+            "downstreamNodeID": "n_order_msg",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_order_msg",
+            "downstreamNodeID": "n_gate",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_trade_msg",
+            "downstreamNodeID": "n_gate",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_wiki_msg",
+            "downstreamNodeID": "n_gate",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_other_msg",
+            "downstreamNodeID": "n_gate",
+            "sourceHandle": "success",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_gate",
+            "downstreamNodeID": "n_pause",
+            "sourceHandle": "hot",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_gate",
+            "downstreamNodeID": "n_dyn",
+            "sourceHandle": "default",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_pause",
+            "downstreamNodeID": "n_review",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_review",
+            "downstreamNodeID": "n_items",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_dyn",
+            "downstreamNodeID": "n_items",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_items",
+            "downstreamNodeID": "n_line",
+            "sourceHandle": "loop",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_items",
+            "downstreamNodeID": "n_wait",
+            "sourceHandle": "completed",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_wait",
+            "downstreamNodeID": "n_end_hot",
+            "sourceHandle": "output",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_gate",
+            "downstreamNodeID": "n_end_cold",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          },
+          {
+            "upstreamNodeID": "n_dyn",
+            "downstreamNodeID": "n_end_cold",
+            "sourceHandle": "error",
+            "targetHandle": null,
+            "edgeType": null,
+            "edgeConfig": null
+          }
+        ]
+      },
+      "dependencies": [
+        {
+          "type": "datasource",
+          "id": "c2a6df0d-d135-4129-94e2-28266c8e4d50",
+          "name": "CoinGecko Lite",
+          "bundled": true
+        },
+        {
+          "type": "dataQuery",
+          "id": "1c5dd216-528f-453b-b533-868319f0ad33",
+          "name": "Coin Lite Lookup",
+          "bundled": true
+        }
+      ]
+    }
+  ]
+}

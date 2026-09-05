@@ -138,6 +138,7 @@ function normalise(opts = {}) {
     // mode — "query" = raw SQL code editor, "gui" = visual builder
     queryType: opts.queryType ?? "query",
     query: opts.query ?? "",
+    inputDefinitions: Array.isArray(opts.inputDefinitions) ? opts.inputDefinitions : [],
     // visual builder state
     distinct: opts.distinct ?? false,
     columns: Array.isArray(opts.columns) ? opts.columns : [],
@@ -1209,6 +1210,74 @@ function CodeEditorPanel({ opts, update }) {
   );
 }
 
+// ─── Arguments ──────────────────────────────────────────────────────────────
+
+function ArgumentsEditor({ opts, update }) {
+  const defs = opts.inputDefinitions || [];
+  const addDef = () => update({ inputDefinitions: [...defs, { key: "", type: "string" }] });
+  const removeDef = (idx) => update({ inputDefinitions: defs.filter((_, i) => i !== idx) });
+  const patchDef = (idx, patch) => update({ inputDefinitions: defs.map((d, i) => (i === idx ? { ...d, ...patch } : d)) });
+  return (
+    <div className="rounded border border-border bg-background p-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">Arguments</Label>
+        <span className="text-[11px] text-muted-foreground">Inject via {"{{inputs.key}}"} in SQL</span>
+      </div>
+      {defs.length === 0 ? (
+        <EmptyState
+          icon={SlidersHorizontal}
+          message="No arguments — query will use static SQL."
+          action={
+            <Button type="button" variant="outline" size="sm" onClick={addDef}>
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              Add Argument
+            </Button>
+          }
+        />
+      ) : (
+        <div className="space-y-2">
+          {defs.map((def, idx) => (
+            <div key={idx} className="flex items-center gap-2 rounded border border-border bg-muted/20 px-3 py-2">
+              <Input
+                placeholder="key (e.g. limit)"
+                value={def.key}
+                onChange={(e) => patchDef(idx, { key: e.target.value })}
+                className="flex-1 h-7 text-xs font-mono"
+              />
+              <Select value={def.type} onValueChange={(val) => patchDef(idx, { type: val })}>
+                <SelectTrigger className="w-32 h-7 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="string" className="text-xs">String</SelectItem>
+                  <SelectItem value="number" className="text-xs">Number</SelectItem>
+                  <SelectItem value="boolean" className="text-xs">Boolean</SelectItem>
+                  <SelectItem value="array" className="text-xs">Array</SelectItem>
+                  <SelectItem value="object" className="text-xs">Object</SelectItem>
+                </SelectContent>
+              </Select>
+              <button
+                type="button"
+                onClick={() => removeDef(idx)}
+                className="flex items-center justify-center h-7 w-7 rounded border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+          <Button type="button" variant="outline" size="sm" onClick={addDef} className="w-full">
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            Add Argument
+          </Button>
+        </div>
+      )}
+      <p className="text-[11px] text-muted-foreground">
+        Use <code className="bg-muted px-1 rounded border border-border font-mono">{"{{inputs.limit}}"}</code> in query or Where values. Workflow passes via <code className="bg-muted px-1 rounded">{"{{ctx.input.xxx}}"}</code> → <code>inputs</code>.
+      </p>
+    </div>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 /**
@@ -1364,6 +1433,9 @@ export const PostgresQueryEditor = ({ queryEditorForm }) => {
           </TabsContent>
         </Tabs>
       )}
+
+      {/* ── Arguments (always visible) ── */}
+      <ArgumentsEditor opts={opts} update={update} />
     </div>
   );
 };

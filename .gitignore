@@ -1,48 +1,41 @@
 
 .agent
+.commandcode/
 
-apps/backend/node_modules
+# Dependencies - all node_modules anywhere (apps, packages, nested)
+**/node_modules/
+
+# Build outputs - all dist folders anywhere
+**/dist/
+apps/admin/dist/
+
+# Nested lockfiles (workspaces use root package-lock.json only)
+packages/*/package-lock.json
+
+# Env / secrets
 apps/backend/firebase-key.json
 apps/backend/production.env
 apps/backend/development.env
 apps/backend/.env
-apps/backend/logs
-
-apps/frontend/node_modules
 apps/frontend/.env
-
-apps/mcp-server/node_modules
+apps/admin/.env
 apps/mcp-server/.env
+**/.env
+**/.env.local
 
+# Logs - root logs/ was missing (only apps/backend/logs was ignored)
+logs/
+apps/backend/logs/
+apps/backend/scripts/logs/
+apps/backend/scripts/dev/logs/
+*.log
+test_output.txt
+build_output.log
+
+# Local docker compose (repo keeps docker-compose-sample.yml / cloud / temporal)
 docker-compose.yml
-node_modules
 
-# Ignore all package folders except the root node_modules
-packages/template-package/node_modules
-packages/template-package/dist
-
-packages/datasource-types/node_modules
-packages/datasource-types/dist
-
-packages/datasources-ui/node_modules
-packages/datasources-ui/dist
-
-packages/datasources-logic/node_modules
-packages/datasources-logic/dist
-
-packages/widget-types/node_modules
-packages/widget-types/dist
-
-packages/widgets/node_modules
-packages/widgets/dist
-
-packages/workflow-edges/node_modules
-packages/workflow-edges/dist
-
-packages/workflow-nodes/node_modules
-packages/workflow-nodes/dist
-
-packages/json-forms-renderers/node_modules
-packages/json-forms-renderers/dist
+# OS
+.DS_Store
 
 

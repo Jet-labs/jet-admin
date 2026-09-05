@@ -524,7 +524,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                   onChange={(val) =>
                                     handleActionConfigChange(eventType, actionIndex, "value", val)
                                   }
-                                  placeholder="e.g. {{ state.event.args[0].id }}"
+                                  placeholder="e.g. {{ event.row.id }}"
                                   liveStateTree={localStateTree}
                                 />
                               </div>

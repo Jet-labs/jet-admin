@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { FieldPill } from './fieldPill';
-import { FIELD_TYPES, AGGREGATE_TYPES } from './chartSpecGenerator';
-import { MoveHorizontal, MoveVertical, Palette, Circle, Diamond, Contrast, Rows, Columns, CircleDot, Type, Minus, ArrowUpDown } from 'lucide-react';
+import { FIELD_TYPES, AGGREGATE_TYPES, TIME_UNITS } from './chartSpecGenerator';
+import { MoveHorizontal, MoveVertical, Palette, Circle, Diamond, Contrast, Rows, Columns, CircleDot, Type, Minus, ArrowUpDown, Settings2 } from 'lucide-react';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from "@jet-admin/ui";
 
 const CHANNEL_CONFIG = {
   x:          { label: 'X',       Icon: MoveHorizontal },
@@ -18,6 +18,7 @@ const CHANNEL_CONFIG = {
   detail:     { label: 'Detail',  Icon: CircleDot },
   text:       { label: 'Text',    Icon: Type },
   strokeDash: { label: 'Dash',    Icon: Minus },
+  tooltip:    { label: 'Tip',     Icon: CircleDot },
 };
 
 /**
@@ -90,7 +91,33 @@ export const EncodingShelf = ({
     onChange({ ...value, sort: next });
   }, [value, onChange]);
 
+  const handleBinToggle = useCallback(() => {
+    if (!value) return;
+    // toggle between off and default 10 bins
+    onChange({ ...value, bin: value.bin ? undefined : 10 });
+  }, [value, onChange]);
+
+  const handleTimeUnitChange = useCallback((tu) => {
+    if (!value) return;
+    onChange({ ...value, timeUnit: tu === 'none' ? undefined : tu });
+  }, [value, onChange]);
+
+  const handleTitleChange = useCallback((e) => {
+    if (!value) return;
+    onChange({ ...value, title: e.target.value });
+  }, [value, onChange]);
+
+  const handleFormatChange = useCallback((e) => {
+    if (!value) return;
+    const v = e.target.value;
+    onChange({ ...value, format: v || undefined });
+  }, [value, onChange]);
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   const isEmpty = !value || !value.field;
+  const showBin = !isEmpty && value.type === 'quantitative';
+  const showTimeUnit = !isEmpty && value.type === 'temporal';
 
   return (
     <div
@@ -99,7 +126,7 @@ export const EncodingShelf = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={[
-        'flex items-center w-full min-h-[32px] rounded border transition-colors gap-1.5 px-2 py-1',
+        'flex flex-col w-full rounded border transition-colors gap-1 px-2 py-1',
         isEmpty
           ? 'border-dashed border-border/60 bg-muted/20'
           : 'border-border bg-card',
@@ -107,6 +134,7 @@ export const EncodingShelf = ({
         className,
       ].filter(Boolean).join(' ')}
     >
+      <div className="flex items-center w-full min-h-[32px] gap-1.5">
       {/* Channel icon + label */}
       <div className="flex items-center gap-1.5 w-14 shrink-0">
         <Icon className="w-3 h-3 text-muted-foreground shrink-0" />
@@ -165,9 +193,67 @@ export const EncodingShelf = ({
             >
               <ArrowUpDown className="w-3 h-3" />
             </button>
+
+            {/* Advanced toggle */}
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(v => !v)}
+              className={`h-5 w-5 flex items-center justify-center rounded transition-colors shrink-0 ${showAdvanced ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-primary hover:bg-primary/10'}`}
+              title="Bin / TimeUnit / Title / Format"
+            >
+              <Settings2 className="w-3 h-3" />
+            </button>
           </>
         )}
       </div>
+      </div>
+
+      {/* Advanced row: bin / timeUnit / title / format */}
+      {!isEmpty && showAdvanced && (
+        <div className="flex flex-col gap-1.5 pl-[68px] pr-1 pb-1">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {showBin && (
+              <button
+                type="button"
+                onClick={handleBinToggle}
+                className={`h-5 px-1.5 rounded text-[10px] font-medium border transition-colors ${value.bin ? 'bg-primary/15 text-primary border-primary/30' : 'text-muted-foreground border-border/50 hover:text-foreground'}`}
+                title="Bin quantitative values (histogram)"
+              >
+                {value.bin ? `binned (${value.bin === true ? 'auto' : value.bin})` : 'bin'}
+              </button>
+            )}
+            {showTimeUnit && (
+              <Select value={value.timeUnit || 'none'} onValueChange={handleTimeUnitChange}>
+                <SelectTrigger className="h-5 w-auto min-w-[90px] px-1 text-[10px] border-border/50" title="Time unit">
+                  <SelectValue placeholder="time unit" />
+                </SelectTrigger>
+                <SelectContent className="z-[200]">
+                  <SelectItem value="none" className="text-[11px]">no unit</SelectItem>
+                  {TIME_UNITS.map(tu => (
+                    <SelectItem key={tu} value={tu} className="text-[11px]">{tu}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            <Input
+              value={value.title || ''}
+              onChange={handleTitleChange}
+              placeholder="Axis title"
+              className="h-6 text-[11px]"
+              title="Axis / legend title override"
+            />
+            <Input
+              value={value.format || ''}
+              onChange={handleFormatChange}
+              placeholder={value.type === 'quantitative' ? 'format e.g. $.2f' : value.type === 'temporal' ? 'format e.g. %b %Y' : 'format'}
+              className="h-6 text-[11px] font-mono"
+              title="D3 / time format string"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -180,6 +266,10 @@ EncodingShelf.propTypes = {
     aggregate: PropTypes.string,
     sort: PropTypes.string,
     title: PropTypes.string,
+    bin: PropTypes.oneOfType([PropTypes.bool, PropTypes.number, PropTypes.object]),
+    timeUnit: PropTypes.string,
+    format: PropTypes.string,
+    formatType: PropTypes.string,
   }),
   onChange: PropTypes.func.isRequired,
   onRemove: PropTypes.func,

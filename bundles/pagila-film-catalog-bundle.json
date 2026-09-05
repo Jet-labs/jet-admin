@@ -1,0 +1,854 @@
+{
+  "bundleVersion": 1,
+  "generator": "jet-admin",
+  "exportedAt": "2026-09-05T00:00:00.000Z",
+  "description": "Pagila Film Catalog — full-featured table grid demo (server pagination, server search, typed columns, sorting, inline editing, multi-select bulk actions, bulk workflow, export, detail panel, related-titles feed, chart). Imports against your existing PagilaDB datasource when present.",
+  "items": [
+    {
+      "type": "datasource",
+      "id": "11111111-1111-4111-8111-111111111111",
+      "payload": {
+        "datasourceTitle": "PagilaDb",
+        "datasourceType": "postgresql",
+        "datasourceDescription": "Pagila DVD-rental sample database (PostgreSQL). Reconnect with your connection string after import.",
+        "datasourceTags": ["postgres", "pagila", "demo"],
+        "datasourceOptions": {
+          "connectionOption": "connectionString",
+          "connectionString": ""
+        },
+        "requiresReconnect": true
+      },
+      "dependencies": []
+    },
+    {
+      "type": "dataQuery",
+      "id": "22222222-2222-4222-8222-222222222222",
+      "payload": {
+        "dataQueryTitle": "Pagila — Film List (paged)",
+        "dataQueryDescription": "Server-paginated film grid with title search, rating, category and min-length filters.",
+        "datasourceType": "postgresql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "queryType": "query",
+          "query": "SELECT f.film_id, f.title, f.release_year, f.rating, f.rental_rate, f.length, f.rental_duration, f.replacement_cost, f.last_update, c.name AS category, TRIM(l.name) AS language FROM film f LEFT JOIN film_category fc ON fc.film_id = f.film_id LEFT JOIN category c ON c.category_id = fc.category_id JOIN language l ON l.language_id = f.language_id WHERE ('' = '{{ inputs.search }}' OR f.title ILIKE '%{{ inputs.search }}%' OR f.description ILIKE '%{{ inputs.search }}%') AND ('All' = '{{ inputs.rating }}' OR f.rating::text = '{{ inputs.rating }}') AND ('All Categories' = '{{ inputs.category }}' OR c.name = '{{ inputs.category }}') AND f.length >= {{ inputs.min_length }} ORDER BY f.title ASC LIMIT {{ inputs.pageSize }} OFFSET ({{ inputs.page }} - 1) * {{ inputs.pageSize }};",
+          "inputDefinitions": [
+            { "key": "page", "type": "number", "required": false, "default": 1 },
+            { "key": "pageSize", "type": "number", "required": false, "default": 10 },
+            { "key": "search", "type": "string", "required": false, "default": "" },
+            { "key": "rating", "type": "string", "required": false, "default": "All" },
+            { "key": "category", "type": "string", "required": false, "default": "All Categories" },
+            { "key": "min_length", "type": "number", "required": false, "default": 0 }
+          ]
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "11111111-1111-4111-8111-111111111111", "name": "PagilaDb", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "33333333-3333-4333-8333-333333333333",
+      "payload": {
+        "dataQueryTitle": "Pagila — Film Count",
+        "dataQueryDescription": "Total matching films for server-side pagination (same filters as the list).",
+        "datasourceType": "postgresql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "queryType": "query",
+          "query": "SELECT COUNT(DISTINCT f.film_id)::int AS film_count FROM film f LEFT JOIN film_category fc ON fc.film_id = f.film_id LEFT JOIN category c ON c.category_id = fc.category_id WHERE ('' = '{{ inputs.search }}' OR f.title ILIKE '%{{ inputs.search }}%' OR f.description ILIKE '%{{ inputs.search }}%') AND ('All' = '{{ inputs.rating }}' OR f.rating::text = '{{ inputs.rating }}') AND ('All Categories' = '{{ inputs.category }}' OR c.name = '{{ inputs.category }}') AND f.length >= {{ inputs.min_length }};",
+          "inputDefinitions": [
+            { "key": "search", "type": "string", "required": false, "default": "" },
+            { "key": "rating", "type": "string", "required": false, "default": "All" },
+            { "key": "category", "type": "string", "required": false, "default": "All Categories" },
+            { "key": "min_length", "type": "number", "required": false, "default": 0 }
+          ]
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "11111111-1111-4111-8111-111111111111", "name": "PagilaDb", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "44444444-4444-4444-8444-444444444444",
+      "payload": {
+        "dataQueryTitle": "Pagila — Categories",
+        "dataQueryDescription": "Category dropdown options (All Categories first).",
+        "datasourceType": "postgresql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "queryType": "query",
+          "query": "SELECT 'All Categories' AS name UNION ALL SELECT name FROM category ORDER BY name;",
+          "inputDefinitions": []
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "11111111-1111-4111-8111-111111111111", "name": "PagilaDb", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "55555555-5555-4555-8555-555555555555",
+      "payload": {
+        "dataQueryTitle": "Pagila — Catalog Stats",
+        "dataQueryDescription": "KPI row: average rental rate and average runtime across the catalog.",
+        "datasourceType": "postgresql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "queryType": "query",
+          "query": "SELECT COUNT(*)::int AS film_total, ROUND(AVG(rental_rate)::numeric, 2)::float AS avg_rate, ROUND(AVG(length)::numeric, 1)::float AS avg_length FROM film;",
+          "inputDefinitions": []
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "11111111-1111-4111-8111-111111111111", "name": "PagilaDb", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "66666666-6666-4666-8666-666666666666",
+      "payload": {
+        "dataQueryTitle": "Pagila — Film Detail",
+        "dataQueryDescription": "Single film record for the detail panel (reactive on selected_film_id).",
+        "datasourceType": "postgresql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "queryType": "query",
+          "query": "SELECT f.film_id, f.title, f.description, f.release_year, f.rating, f.rental_rate, f.length, f.rental_duration, f.replacement_cost, f.last_update, TRIM(l.name) AS language, c.name AS category FROM film f JOIN language l ON l.language_id = f.language_id LEFT JOIN film_category fc ON fc.film_id = f.film_id LEFT JOIN category c ON c.category_id = fc.category_id WHERE f.film_id = {{ inputs.film_id }};",
+          "inputDefinitions": [
+            { "key": "film_id", "type": "number", "required": false, "default": -1 }
+          ]
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "11111111-1111-4111-8111-111111111111", "name": "PagilaDb", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "77777777-7777-4777-8777-777777777777",
+      "payload": {
+        "dataQueryTitle": "Pagila — Related Films",
+        "dataQueryDescription": "10 longest films sharing a category with the selected film (detail feed).",
+        "datasourceType": "postgresql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "queryType": "query",
+          "query": "SELECT f2.title AS title, f2.release_year AS time, (COALESCE(c2.name, 'Uncategorised') || ' • ' || f2.rating::text || ' • ' || f2.length || ' min • $' || f2.rental_rate) AS description FROM film f2 LEFT JOIN film_category fc2 ON fc2.film_id = f2.film_id LEFT JOIN category c2 ON c2.category_id = fc2.category_id WHERE f2.film_id <> {{ inputs.film_id }} AND fc2.category_id IN (SELECT category_id FROM film_category WHERE film_id = {{ inputs.film_id }}) ORDER BY f2.length DESC LIMIT 10;",
+          "inputDefinitions": [
+            { "key": "film_id", "type": "number", "required": false, "default": -1 }
+          ]
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "11111111-1111-4111-8111-111111111111", "name": "PagilaDb", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "88888888-8888-4888-8888-888888888888",
+      "payload": {
+        "dataQueryTitle": "Pagila — Films by Category",
+        "dataQueryDescription": "Bar chart data: film count per category.",
+        "datasourceType": "postgresql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "queryType": "query",
+          "query": "SELECT c.name AS category, COUNT(fc.film_id)::int AS films FROM category c JOIN film_category fc ON fc.category_id = c.category_id GROUP BY c.name ORDER BY films DESC;",
+          "inputDefinitions": []
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "11111111-1111-4111-8111-111111111111", "name": "PagilaDb", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "99999999-9999-4999-8999-999999999999",
+      "payload": {
+        "dataQueryTitle": "Pagila — Update Film",
+        "dataQueryDescription": "Inline row-save target: updates title and rental rate for one film.",
+        "datasourceType": "postgresql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "queryType": "query",
+          "query": "UPDATE film SET title = '{{ inputs.title }}', rental_rate = {{ inputs.rental_rate }}, last_update = NOW() WHERE film_id = {{ inputs.film_id }} RETURNING film_id, title, rental_rate;",
+          "inputDefinitions": [
+            { "key": "film_id", "type": "number", "required": true },
+            { "key": "title", "type": "string", "required": true },
+            { "key": "rental_rate", "type": "number", "required": true }
+          ]
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "11111111-1111-4111-8111-111111111111", "name": "PagilaDb", "bundled": true }
+      ]
+    },
+    {
+      "type": "dataQuery",
+      "id": "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
+      "payload": {
+        "dataQueryTitle": "Pagila — Bulk Update Films",
+        "dataQueryDescription": "Bulk workflow target: discount or extend rental duration for many films at once.",
+        "datasourceType": "postgresql",
+        "runOnLoad": false,
+        "dataQueryOptions": {
+          "queryType": "query",
+          "query": "UPDATE film SET rental_rate = CASE WHEN '{{ inputs.action }}' = 'discount_10' THEN ROUND((rental_rate * 0.9)::numeric, 2) ELSE rental_rate END, rental_duration = CASE WHEN '{{ inputs.action }}' = 'extend_rental' THEN rental_duration + 2 ELSE rental_duration END, last_update = NOW() WHERE film_id IN ({{ inputs.film_ids }}) RETURNING film_id;",
+          "inputDefinitions": [
+            { "key": "film_ids", "type": "array", "required": true },
+            { "key": "action", "type": "string", "required": true }
+          ]
+        }
+      },
+      "dependencies": [
+        { "type": "datasource", "id": "11111111-1111-4111-8111-111111111111", "name": "PagilaDb", "bundled": true }
+      ]
+    },
+    {
+      "type": "workflow",
+      "id": "b0000000-0000-4000-8000-000000000000",
+      "payload": {
+        "title": "Pagila — Bulk Update Films",
+        "workflowOptions": {
+          "inputDefinitions": [
+            { "key": "rows", "type": "array", "required": true },
+            { "key": "action", "type": "string", "required": true }
+          ],
+          "description": "Maps selected table rows to film IDs, then runs the bulk update query."
+        },
+        "nodes": [
+          {
+            "nodeID": "nd-start-0001",
+            "nodeType": "start",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": { "title": "Start" }
+          },
+          {
+            "nodeID": "nd-js-0002",
+            "nodeType": "javascript",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Extract film IDs",
+              "code": "var rows = ctx.rows || (ctx.input && ctx.input.rows) || []; var ids = rows.map(function (r) { return Number(r.film_id); }).filter(function (n) { return n > 0; }); var action = ctx.action || (ctx.input && ctx.input.action) || ''; return { film_ids: ids.length ? ids : [-1], action: action };",
+              "outputVariable": "bulk",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "nd-query-0003",
+            "nodeType": "dataQuery",
+            "timeoutSeconds": 60,
+            "retryLimit": 0,
+            "nodeConfig": {
+              "title": "Run bulk update",
+              "dataQueryID": "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
+              "inputValues": {
+                "film_ids": "{{ctx.bulk.film_ids}}",
+                "action": "{{ctx.bulk.action}}"
+              },
+              "outputVariable": "updateResult",
+              "errorHandling": "fail_workflow"
+            }
+          },
+          {
+            "nodeID": "nd-end-0004",
+            "nodeType": "end",
+            "timeoutSeconds": 30,
+            "retryLimit": 0,
+            "nodeConfig": { "title": "End" }
+          }
+        ],
+        "edges": [
+          { "upstreamNodeID": "nd-start-0001", "downstreamNodeID": "nd-js-0002", "sourceHandle": "output", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "nd-js-0002", "downstreamNodeID": "nd-query-0003", "sourceHandle": "success", "targetHandle": null, "edgeType": null, "edgeConfig": null },
+          { "upstreamNodeID": "nd-query-0003", "downstreamNodeID": "nd-end-0004", "sourceHandle": "success", "targetHandle": null, "edgeType": null, "edgeConfig": null }
+        ]
+      },
+      "dependencies": [
+        { "type": "dataQuery", "id": "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa", "name": "Pagila — Bulk Update Films", "bundled": true }
+      ]
+    },
+    {
+      "type": "widget",
+      "id": "b1111111-1111-4111-8111-111111111111",
+      "payload": {
+        "widgetTitle": "Film Catalog",
+        "widgetDescription": "Page header",
+        "widgetType": "text",
+        "widgetConfig": {
+          "content": "# Film Catalog\nBrowse Pagila films — search, filter, sort, edit inline, bulk-update, and inspect related titles. Data: **PagilaDB** (PostgreSQL).",
+          "format": "markdown",
+          "textAlign": "left",
+          "fontSize": "md",
+          "isLoading": "",
+          "showHeader": false
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "b2222222-2222-4222-8222-222222222222",
+      "payload": {
+        "widgetTitle": "Total Films",
+        "widgetDescription": "KPI: matching films",
+        "widgetType": "stat",
+        "widgetConfig": {
+          "label": "Films in catalog",
+          "valueTemplate": "{{ state.queries.films_count.data[0].film_count }}",
+          "prefix": "",
+          "suffix": "films",
+          "trendTemplate": "",
+          "trendDirection": "up-is-good",
+          "textAlign": "center",
+          "isLoading": "{{ state.queries.films_count.isLoading }}",
+          "showHeader": false
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "b3333333-3333-4333-8333-333333333333",
+      "payload": {
+        "widgetTitle": "Avg Rate",
+        "widgetDescription": "KPI: average rental rate",
+        "widgetType": "stat",
+        "widgetConfig": {
+          "label": "Average rental rate",
+          "valueTemplate": "{{ state.queries.catalog_stats.data[0].avg_rate }}",
+          "prefix": "$",
+          "suffix": "/ day",
+          "trendTemplate": "",
+          "trendDirection": "up-is-good",
+          "textAlign": "center",
+          "isLoading": "{{ state.queries.catalog_stats.isLoading }}",
+          "showHeader": false
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "b4444444-4444-4444-8444-444444444444",
+      "payload": {
+        "widgetTitle": "Avg Length",
+        "widgetDescription": "KPI: average runtime",
+        "widgetType": "stat",
+        "widgetConfig": {
+          "label": "Average runtime",
+          "valueTemplate": "{{ state.queries.catalog_stats.data[0].avg_length }}",
+          "prefix": "",
+          "suffix": "min",
+          "trendTemplate": "",
+          "trendDirection": "up-is-good",
+          "textAlign": "center",
+          "isLoading": "{{ state.queries.catalog_stats.isLoading }}",
+          "showHeader": false
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "b5555555-5555-4555-8555-555555555555",
+      "payload": {
+        "widgetTitle": "Search films",
+        "widgetDescription": "Server-side title search",
+        "widgetType": "search-input",
+        "widgetConfig": {
+          "label": "Search",
+          "placeholder": "Title or keyword…",
+          "debounceMs": 350,
+          "defaultValue": "",
+          "isLoading": "",
+          "showHeader": false,
+          "events": {
+            "onSearch": [
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.search", "value": "{{ event.searchTerm }}" } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.page", "value": 1 } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films_count" } }
+            ],
+            "onClear": [
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.search", "value": "" } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.page", "value": 1 } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films_count" } }
+            ]
+          }
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "b6666666-6666-4666-8666-666666666666",
+      "payload": {
+        "widgetTitle": "Rating filter",
+        "widgetDescription": "MPAA rating filter",
+        "widgetType": "select",
+        "widgetConfig": {
+          "label": "Rating",
+          "placeholder": "All ratings…",
+          "options": [
+            { "label": "All", "value": "All" },
+            { "label": "G", "value": "G" },
+            { "label": "PG", "value": "PG" },
+            { "label": "PG-13", "value": "PG-13" },
+            { "label": "R", "value": "R" },
+            { "label": "NC-17", "value": "NC-17" }
+          ],
+          "defaultValue": "All",
+          "isLoading": "",
+          "showHeader": false,
+          "events": {
+            "onChange": [
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.rating", "value": "{{ event.value }}" } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.page", "value": 1 } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films_count" } }
+            ]
+          }
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "b7777777-7777-4777-8777-777777777777",
+      "payload": {
+        "widgetTitle": "Category filter",
+        "widgetDescription": "Category filter (query-backed)",
+        "widgetType": "select",
+        "widgetConfig": {
+          "label": "Category",
+          "placeholder": "All categories…",
+          "options": [{ "label": "All Categories", "value": "All Categories" }],
+          "optionsTemplate": "{{ state.queries.categories.data }}",
+          "labelKey": "name",
+          "valueKey": "name",
+          "defaultValue": "All Categories",
+          "isLoading": "{{ state.queries.categories.isLoading }}",
+          "showHeader": false,
+          "events": {
+            "onChange": [
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.category", "value": "{{ event.value }}" } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.page", "value": 1 } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films_count" } }
+            ]
+          }
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "b1212121-2121-4212-8212-121212121212",
+      "payload": {
+        "widgetTitle": "Min length",
+        "widgetDescription": "Minimum runtime filter (minutes)",
+        "widgetType": "slider",
+        "widgetConfig": {
+          "label": "Min length (min)",
+          "min": 0,
+          "max": 180,
+          "step": 5,
+          "defaultValue": 0,
+          "showValue": true,
+          "isLoading": "",
+          "showHeader": false,
+          "events": {
+            "onChange": [
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.min_length", "value": "{{ event.value }}" } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.page", "value": 1 } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films_count" } }
+            ]
+          }
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "b8888888-8888-4888-8888-888888888888",
+      "payload": {
+        "widgetTitle": "Reset",
+        "widgetDescription": "Reset all filters",
+        "widgetType": "button",
+        "widgetConfig": {
+          "text": "Reset Filters",
+          "variant": "outline",
+          "size": "default",
+          "isLoading": "",
+          "showHeader": false,
+          "events": {
+            "onClick": [
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.search", "value": "" } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.rating", "value": "All" } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.category", "value": "All Categories" } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.min_length", "value": 0 } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.page", "value": 1 } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films_count" } },
+              { "actionType": "SHOW_TOAST", "config": { "message": "Filters reset", "variant": "success" } }
+            ]
+          }
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "b9999999-9999-4999-8999-999999999999",
+      "payload": {
+        "widgetTitle": "Films",
+        "widgetDescription": "Full-featured Pagila film grid",
+        "widgetType": "table",
+        "widgetConfig": {
+          "dataArrayTemplate": "{{ state.queries.films.data }}",
+          "columns": [
+            { "key": "film_id", "label": "ID", "type": "number", "sortable": true, "width": 70 },
+            { "key": "title", "label": "Title", "type": "text", "sortable": true, "editable": true },
+            { "key": "category", "label": "Category", "type": "text", "sortable": true },
+            { "key": "rating", "label": "Rating", "type": "badge", "sortable": true, "width": 90 },
+            { "key": "rental_rate", "label": "Rate ($)", "type": "number", "sortable": true, "editable": true, "width": 90 },
+            { "key": "length", "label": "Length", "type": "number", "sortable": true, "width": 80 },
+            { "key": "release_year", "label": "Year", "type": "number", "sortable": true, "width": 80 },
+            { "key": "rental_duration", "label": "Days", "type": "number", "sortable": true, "width": 70 },
+            { "key": "language", "label": "Language", "type": "text", "sortable": true, "width": 100 },
+            { "key": "last_update", "label": "Updated", "type": "date", "sortable": true }
+          ],
+          "pagination": {
+            "enabled": true,
+            "pageSize": 10,
+            "pageParam": "page",
+            "pageSizeParam": "pageSize",
+            "totalTemplate": "{{ state.queries.films_count.data[0].film_count }}"
+          },
+          "search": { "enabled": true, "serverSide": true, "placeholder": "Filter loaded rows…" },
+          "export": { "enabled": true, "format": "csv", "serverSide": false, "buttonLabel": "Export" },
+          "editing": { "enabled": true },
+          "multiSelect": {
+            "enabled": true,
+            "showSelectAll": true,
+            "actions": [
+              { "label": "10% Discount", "actionKey": "discount_10", "variant": "default" },
+              { "label": "+2 Rental Days", "actionKey": "extend_rental", "variant": "outline" }
+            ]
+          },
+          "bulkEdit": { "enabled": false, "saveLabel": "Save All Changes" },
+          "emptyText": "No films match these filters.",
+          "emptyHint": "Widen the search or reset filters above.",
+          "striped": true,
+          "dense": false,
+          "stickyHeader": true,
+          "isLoading": "{{ state.queries.films.isLoading }}",
+          "showHeader": true,
+          "events": {
+            "onPageChange": [
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.page", "value": "{{ event.page }}" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } }
+            ],
+            "onSearch": [
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.search", "value": "{{ event.searchTerm }}" } },
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.page", "value": 1 } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films_count" } }
+            ],
+            "onRowSelect": [
+              { "actionType": "SET_VARIABLE", "config": { "key": "state.variables.selected_film_id", "value": "{{ event.row.film_id }}" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "film_detail" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "related_films" } }
+            ],
+            "onRowSave": [
+              { "actionType": "TRIGGER_QUERY", "config": { "queryID": "99999999-9999-4999-8999-999999999999", "inputValues": { "film_id": "{{ event.originalRow.film_id }}", "title": "{{ event.updatedRow.title }}", "rental_rate": "{{ event.updatedRow.rental_rate }}" } } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "film_detail" } },
+              { "actionType": "SHOW_TOAST", "config": { "message": "Film {{ event.originalRow.film_id }} saved", "variant": "success" } }
+            ],
+            "onBulkAction": [
+              { "actionType": "TRIGGER_WORKFLOW", "config": { "workflowID": "b0000000-0000-4000-8000-000000000000", "inputValues": { "rows": "{{ event.selectedRows }}", "action": "{{ event.actionKey }}" } } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films" } },
+              { "actionType": "EXECUTE_QUERY", "config": { "alias": "films_count" } },
+              { "actionType": "SHOW_TOAST", "config": { "message": "Bulk update started — grid will refresh", "variant": "success" } }
+            ],
+            "onBulkDelete": [
+              { "actionType": "SHOW_TOAST", "config": { "message": "Deletes are disabled in this demo — use a bulk action instead", "variant": "error" } }
+            ],
+            "onBulkExport": [
+              { "actionType": "SHOW_TOAST", "config": { "message": "{{ event.selectedRows.length }} selected rows ready — use Export for the CSV file", "variant": "success" } }
+            ],
+            "onExport": [
+              { "actionType": "SHOW_TOAST", "config": { "message": "Exported {{ event.rowCount }} rows as {{ event.format }}", "variant": "success" } }
+            ]
+          }
+        },
+        "refreshInterval": null
+      },
+      "dependencies": [
+        { "type": "dataQuery", "id": "99999999-9999-4999-8999-999999999999", "name": "Pagila — Update Film", "bundled": true },
+        { "type": "workflow", "id": "b0000000-0000-4000-8000-000000000000", "name": "Pagila — Bulk Update Films", "bundled": true }
+      ]
+    },
+    {
+      "type": "widget",
+      "id": "baaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
+      "payload": {
+        "widgetTitle": "Selected Film",
+        "widgetDescription": "Detail panel for the clicked row",
+        "widgetType": "key-value",
+        "widgetConfig": {
+          "dataTemplate": "{{ state.queries.film_detail.data[0] }}",
+          "columns": 2,
+          "emptyText": "Click a film row to inspect it here.",
+          "isLoading": "{{ state.queries.film_detail.isLoading }}",
+          "showHeader": true
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "bee11111-1111-4111-8111-111111111111",
+      "payload": {
+        "widgetTitle": "Rating",
+        "widgetDescription": "Selected film rating badge",
+        "widgetType": "badge",
+        "widgetConfig": {
+          "text": "{{ state.queries.film_detail.data[0].rating }}",
+          "variant": "secondary",
+          "size": "lg",
+          "isLoading": "{{ state.queries.film_detail.isLoading }}",
+          "showHeader": false
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb",
+      "payload": {
+        "widgetTitle": "More Like This",
+        "widgetDescription": "Longest films sharing a category with the selection",
+        "widgetType": "timeline",
+        "widgetConfig": {
+          "dataTemplate": "{{ state.queries.related_films.data }}",
+          "titleKey": "title",
+          "timeKey": "time",
+          "descriptionKey": "description",
+          "emptyText": "Select a film to see related titles.",
+          "isLoading": "{{ state.queries.related_films.isLoading }}",
+          "showHeader": true,
+          "events": {
+            "onItemClick": [
+              { "actionType": "SHOW_TOAST", "config": { "message": "{{ event.item.title }} — {{ event.item.description }}", "variant": "success" } }
+            ]
+          }
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "bccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "payload": {
+        "widgetTitle": "Films by Category",
+        "widgetDescription": "Bar chart of film count per category",
+        "widgetType": "vega-lite",
+        "widgetConfig": {
+          "vegaSpec": {
+            "mark": { "type": "bar", "tooltip": true },
+            "data": { "values": "{{ state.queries.films_by_category.data }}" },
+            "encoding": {
+              "x": { "field": "category", "type": "nominal", "sort": "-y", "axis": { "labelAngle": -30 } },
+              "y": { "field": "films", "type": "quantitative" },
+              "color": { "field": "category", "type": "nominal", "legend": null }
+            }
+          },
+          "options": { "showActions": false, "renderer": "svg" },
+          "isLoading": "{{ state.queries.films_by_category.isLoading }}",
+          "showHeader": true
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "widget",
+      "id": "bddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "payload": {
+        "widgetTitle": "Record JSON",
+        "widgetDescription": "Raw selected-film record for ops/debugging",
+        "widgetType": "json-viewer",
+        "widgetConfig": {
+          "dataTemplate": "{{ state.queries.film_detail.data[0] }}",
+          "collapsed": false,
+          "isLoading": "{{ state.queries.film_detail.isLoading }}",
+          "showHeader": true
+        },
+        "refreshInterval": null
+      },
+      "dependencies": []
+    },
+    {
+      "type": "appPage",
+      "id": "c0000000-0000-4000-8000-000000000000",
+      "payload": {
+        "appPageTitle": "Pagila Film Catalog",
+        "appPageDescription": "Full-featured Pagila film grid: server pagination + search, typed/sortable columns, inline editing, multi-select bulk workflow, export, detail panel, related-titles feed and category chart.",
+        "appPageConfig": {
+          "variables": [
+            { "key": "search", "type": "string", "defaultValue": "", "description": "Title keyword filter" },
+            { "key": "rating", "type": "string", "defaultValue": "All", "description": "MPAA rating filter" },
+            { "key": "category", "type": "string", "defaultValue": "All Categories", "description": "Category filter" },
+            { "key": "min_length", "type": "number", "defaultValue": 0, "description": "Minimum runtime in minutes" },
+            { "key": "page", "type": "number", "defaultValue": 1, "description": "Server page (1-based)" },
+            { "key": "pageSize", "type": "number", "defaultValue": 10, "description": "Rows per page" },
+            { "key": "selected_film_id", "type": "number", "defaultValue": null, "description": "Clicked film for the detail panel" }
+          ],
+          "dataSources": [
+            {
+              "alias": "films",
+              "type": "query",
+              "queryID": "22222222-2222-4222-8222-222222222222",
+              "triggerMode": "reactive",
+              "refreshOn": ["variables.search", "variables.rating", "variables.category", "variables.min_length", "variables.page"],
+              "inputValues": {
+                "page": "{{ state.variables.page }}",
+                "pageSize": "{{ state.variables.pageSize }}",
+                "search": "{{ state.variables.search }}",
+                "rating": "{{ state.variables.rating }}",
+                "category": "{{ state.variables.category }}",
+                "min_length": "{{ state.variables.min_length }}"
+              }
+            },
+            {
+              "alias": "films_count",
+              "type": "query",
+              "queryID": "33333333-3333-4333-8333-333333333333",
+              "triggerMode": "reactive",
+              "refreshOn": ["variables.search", "variables.rating", "variables.category", "variables.min_length"],
+              "inputValues": {
+                "search": "{{ state.variables.search }}",
+                "rating": "{{ state.variables.rating }}",
+                "category": "{{ state.variables.category }}",
+                "min_length": "{{ state.variables.min_length }}"
+              }
+            },
+            {
+              "alias": "categories",
+              "type": "query",
+              "queryID": "44444444-4444-4444-8444-444444444444",
+              "triggerMode": "auto",
+              "refreshOn": [],
+              "inputValues": {}
+            },
+            {
+              "alias": "catalog_stats",
+              "type": "query",
+              "queryID": "55555555-5555-4555-8555-555555555555",
+              "triggerMode": "auto",
+              "refreshOn": [],
+              "inputValues": {}
+            },
+            {
+              "alias": "film_detail",
+              "type": "query",
+              "queryID": "66666666-6666-4666-8666-666666666666",
+              "triggerMode": "reactive",
+              "refreshOn": ["variables.selected_film_id"],
+              "inputValues": { "film_id": "{{ state.variables.selected_film_id }}" }
+            },
+            {
+              "alias": "related_films",
+              "type": "query",
+              "queryID": "77777777-7777-4777-8777-777777777777",
+              "triggerMode": "reactive",
+              "refreshOn": ["variables.selected_film_id"],
+              "inputValues": { "film_id": "{{ state.variables.selected_film_id }}" }
+            },
+            {
+              "alias": "films_by_category",
+              "type": "query",
+              "queryID": "88888888-8888-4888-8888-888888888888",
+              "triggerMode": "auto",
+              "refreshOn": [],
+              "inputValues": {}
+            }
+          ],
+          "widgets": [
+            "widget_b1111111-1111-4111-8111-111111111111_1",
+            "widget_b2222222-2222-4222-8222-222222222222_1",
+            "widget_b3333333-3333-4333-8333-333333333333_1",
+            "widget_b4444444-4444-4444-8444-444444444444_1",
+            "widget_b5555555-5555-4555-8555-555555555555_1",
+            "widget_b6666666-6666-4666-8666-666666666666_1",
+            "widget_b7777777-7777-4777-8777-777777777777_1",
+            "widget_b1212121-2121-4212-8212-121212121212_1",
+            "widget_b8888888-8888-4888-8888-888888888888_1",
+            "widget_b9999999-9999-4999-8999-999999999999_1",
+            "widget_baaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa_1",
+            "widget_bee11111-1111-4111-8111-111111111111_1",
+            "widget_bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb_1",
+            "widget_bccccccc-cccc-4ccc-8ccc-cccccccccccc_1",
+            "widget_bddddddd-dddd-4ddd-8ddd-dddddddddddd_1"
+          ],
+          "layouts": {
+            "lg": [
+              { "i": "widget_b1111111-1111-4111-8111-111111111111_1", "x": 0, "y": 0, "w": 24, "h": 4 },
+              { "i": "widget_b2222222-2222-4222-8222-222222222222_1", "x": 0, "y": 4, "w": 8, "h": 6 },
+              { "i": "widget_b3333333-3333-4333-8333-333333333333_1", "x": 8, "y": 4, "w": 8, "h": 6 },
+              { "i": "widget_b4444444-4444-4444-8444-444444444444_1", "x": 16, "y": 4, "w": 8, "h": 6 },
+              { "i": "widget_b5555555-5555-4555-8555-555555555555_1", "x": 0, "y": 10, "w": 6, "h": 6 },
+              { "i": "widget_b6666666-6666-4666-8666-666666666666_1", "x": 6, "y": 10, "w": 4, "h": 6 },
+              { "i": "widget_b7777777-7777-4777-8777-777777777777_1", "x": 10, "y": 10, "w": 5, "h": 6 },
+              { "i": "widget_b1212121-2121-4212-8212-121212121212_1", "x": 15, "y": 10, "w": 5, "h": 6 },
+              { "i": "widget_b8888888-8888-4888-8888-888888888888_1", "x": 20, "y": 10, "w": 4, "h": 6 },
+              { "i": "widget_b9999999-9999-4999-8999-999999999999_1", "x": 0, "y": 16, "w": 24, "h": 16 },
+              { "i": "widget_baaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa_1", "x": 0, "y": 32, "w": 10, "h": 12 },
+              { "i": "widget_bee11111-1111-4111-8111-111111111111_1", "x": 10, "y": 32, "w": 4, "h": 12 },
+              { "i": "widget_bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb_1", "x": 14, "y": 32, "w": 10, "h": 12 },
+              { "i": "widget_bccccccc-cccc-4ccc-8ccc-cccccccccccc_1", "x": 0, "y": 44, "w": 14, "h": 12 },
+              { "i": "widget_bddddddd-dddd-4ddd-8ddd-dddddddddddd_1", "x": 14, "y": 44, "w": 10, "h": 12 }
+            ]
+          }
+        }
+      },
+      "dependencies": [
+        { "type": "widget", "id": "b1111111-1111-4111-8111-111111111111", "name": "Film Catalog", "bundled": true },
+        { "type": "widget", "id": "b2222222-2222-4222-8222-222222222222", "name": "Total Films", "bundled": true },
+        { "type": "widget", "id": "b3333333-3333-4333-8333-333333333333", "name": "Avg Rate", "bundled": true },
+        { "type": "widget", "id": "b4444444-4444-4444-8444-444444444444", "name": "Avg Length", "bundled": true },
+        { "type": "widget", "id": "b5555555-5555-4555-8555-555555555555", "name": "Search films", "bundled": true },
+        { "type": "widget", "id": "b6666666-6666-4666-8666-666666666666", "name": "Rating filter", "bundled": true },
+        { "type": "widget", "id": "b7777777-7777-4777-8777-777777777777", "name": "Category filter", "bundled": true },
+        { "type": "widget", "id": "b1212121-2121-4212-8212-121212121212", "name": "Min length", "bundled": true },
+        { "type": "widget", "id": "b8888888-8888-4888-8888-888888888888", "name": "Reset", "bundled": true },
+        { "type": "widget", "id": "b9999999-9999-4999-8999-999999999999", "name": "Films", "bundled": true },
+        { "type": "widget", "id": "baaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa", "name": "Selected Film", "bundled": true },
+        { "type": "widget", "id": "bee11111-1111-4111-8111-111111111111", "name": "Rating", "bundled": true },
+        { "type": "widget", "id": "bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb", "name": "More Like This", "bundled": true },
+        { "type": "widget", "id": "bccccccc-cccc-4ccc-8ccc-cccccccccccc", "name": "Films by Category", "bundled": true },
+        { "type": "widget", "id": "bddddddd-dddd-4ddd-8ddd-dddddddddddd", "name": "Record JSON", "bundled": true }
+      ]
+    }
+  ]
+}

@@ -11,7 +11,6 @@ const Logger = require("../../utils/logger");
 const { widgetWorkflowBridge } = require('./widgetWorkflowBridge');
 const { workflowService } = require('../workflow/workflow.service');
 const { stateManager } = require('../workflow/workflowEngine/stateManager');
-const orchestrator = require('../workflow/workflowEngine/engine');
 const constants = require("../../constants");
 
 /**

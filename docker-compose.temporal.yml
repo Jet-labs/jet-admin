@@ -1,0 +1,127 @@
+# ============================================
+# Jet Admin — Temporal Dev Stack
+# Strangler Fig Phase 1
+# ============================================
+
+services:
+
+  temporal-postgres:
+    image: postgres:15-alpine
+    container_name: jet-temporal-postgres
+
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_DB: temporal
+
+    volumes:
+      - temporal_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal -d temporal"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+    networks:
+      - jet-network
+
+    ports:
+      - "5433:5432"
+
+
+  temporal:
+    image: temporalio/auto-setup:1.23
+    container_name: jet-temporal-server
+
+    depends_on:
+      temporal-postgres:
+        condition: service_healthy
+
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+
+      POSTGRES_USER: temporal
+      POSTGRES_PWD: temporal
+      POSTGRES_SEEDS: temporal-postgres
+
+      DBNAME: temporal
+
+      VISIBILITY_DBNAME: temporal_visibility
+      VISIBILITY_POSTGRES_USER: temporal
+      VISIBILITY_POSTGRES_PWD: temporal
+      VISIBILITY_POSTGRES_SEEDS: temporal-postgres
+
+      ENABLE_ES: "false"
+
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
+
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CLI_ADDRESS: temporal:7233
+
+    volumes:
+      - ./temporal/dynamicconfig:/etc/temporal/config/dynamicconfig
+
+    ports:
+      - "7233:7233"
+
+    networks:
+      - jet-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "tctl --address temporal:7233 cluster health | grep SERVING"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+
+  temporal-admin-tools:
+    image: temporalio/admin-tools:1.23
+    container_name: jet-temporal-admin-tools
+
+    depends_on:
+      temporal:
+        condition: service_healthy
+
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CLI_ADDRESS: temporal:7233
+
+    networks:
+      - jet-network
+
+    stdin_open: true
+    tty: true
+
+
+  temporal-ui:
+    # Pinned to match server 1.23 era (2.28.x). Do not use :latest with old server.
+    image: temporalio/ui:2.28.0
+    container_name: jet-temporal-ui
+
+    depends_on:
+      temporal:
+        condition: service_healthy
+
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CORS_ORIGINS: http://localhost:3000
+
+    ports:
+      - "8088:8080"
+
+    networks:
+      - jet-network
+
+
+volumes:
+  temporal_postgres_data:
+    name: jet-temporal-postgres-data
+
+
+networks:
+  jet-network:
+    name: jet-admin-network
+    driver: bridge

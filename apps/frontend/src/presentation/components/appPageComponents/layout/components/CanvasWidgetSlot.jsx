@@ -14,7 +14,7 @@
 import React from "react";
 import { Lock } from "lucide-react";
 import { useNode, useEditor } from "@craftjs/core";
-import { useCraftEditorContext } from "./CraftEditorContext.js";
+import { useCraftEditorContext, useConditionHidden } from "./CraftEditorContext.js";
 import { LogicBadges } from "./LogicBadges.jsx";
 import WidgetResizeHandles from "../editor/WidgetResizeHandles.jsx";
 import LayoutResizeHandle from "../editor/LayoutResizeHandle.jsx";
@@ -77,7 +77,10 @@ export function CanvasWidgetSlot({
   repeat,
   locked,
 }) {
-  const { renderWidget, previewMode } = useCraftEditorContext();
+  const { renderWidget, previewMode, editorLiveStateTree } = useCraftEditorContext();
+  // Edit-canvas dimming: node stays visible for editing but shows its
+  // viewer-hidden state via reduced opacity (badge still explains why).
+  const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
 
   const {
     connectors: { connect, drag },
@@ -136,10 +139,11 @@ export function CanvasWidgetSlot({
       ref={(ref) => !previewMode && connect(locked ? ref : drag(ref))}
       className={`flex flex-col relative min-w-0 self-stretch min-h-0 box-border craft-node craft-node-widget ${sizingClass} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
-      } ${!previewMode ? "layout-widget-slot-edit" : ""} ${locked ? "layout-widget-locked" : ""}`}
+      } ${!previewMode ? "layout-widget-slot-edit" : ""} ${locked ? "layout-widget-locked" : ""} ${hiddenByCondition && !previewMode ? "opacity-40 saturate-50" : ""}`}
       style={slotStyle}
       id={id}
       data-node-type="Widget"
+      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
     >
       {!previewMode && (condition || repeat || locked) && (
         <div className="absolute left-2 top-2 z-50 pointer-events-none flex gap-1 items-center">

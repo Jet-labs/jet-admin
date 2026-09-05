@@ -1,0 +1,13 @@
+{
+  "widgetType": "badge",
+  "description": "Badge / Tag widget. Status pill with template-driven text and variant mapping.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "text": { "type": "string", "description": "Badge text. Supports templates." },
+      "variant": { "type": "string", "enum": ["default", "secondary", "success", "warning", "destructive", "outline"], "default": "default" },
+      "size": { "type": "string", "enum": ["sm", "default", "lg"], "default": "default" }
+    }
+  },
+  "events": ["onClick", "onRefresh", "onLoad"]
+}

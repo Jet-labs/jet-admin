@@ -8,11 +8,17 @@ export default class WebSocketDataSource extends DataSource {
   }
 
   async subscribe(config, onEvent) {
-    const { endpoint, headers, protocols } = this.config.datasourceOptions || {};
-    
+    const dsOptions = this.config.datasourceOptions || {};
+    // Accept both `endpoint` (engine) and `url` (formConfig) keys.
+    const endpoint = dsOptions.endpoint || dsOptions.url;
+    const protocols = dsOptions.protocols || [];
+
     if (!endpoint) {
-      throw new Error("WebSocket endpoint is required");
+      throw new Error("WebSocket endpoint is required (provide datasourceOptions.endpoint or datasourceOptions.url)");
     }
+
+    const messageFilter = (config.messageFilter ?? "").trim();
+    const parseAsJSON = config.parseAsJSON !== false;
 
     Logger.log("info", {
       message: "websocket:subscribe:start",
@@ -20,22 +26,30 @@ export default class WebSocketDataSource extends DataSource {
     });
 
     const options = {};
-    if (headers && Array.isArray(headers)) {
-      options.headers = {};
-      headers.forEach(h => {
-        if (h.key && h.value) options.headers[h.key] = h.value;
-      });
+    const normalizedHeaders = normalizeHeaders(dsOptions.headers);
+    if (Object.keys(normalizedHeaders).length > 0) {
+      options.headers = normalizedHeaders;
     }
 
     // Connect WebSocket
     const ws = new WebSocket(endpoint, protocols || [], options);
 
     ws.on("message", (data) => {
-      let payload = data.toString();
-      try {
-        payload = JSON.parse(payload);
-      } catch (e) {
-        // keep as string
+      const raw = data.toString();
+      if (messageFilter) {
+        try {
+          if (!new RegExp(messageFilter).test(raw)) return;
+        } catch {
+          // Invalid regex — do not filter, deliver the event.
+        }
+      }
+      let payload = raw;
+      if (parseAsJSON) {
+        try {
+          payload = JSON.parse(raw);
+        } catch (e) {
+          // keep as string
+        }
       }
       onEvent({ payload });
     });
@@ -67,4 +81,28 @@ export default class WebSocketDataSource extends DataSource {
       });
     }
   }
+}
+
+function normalizeHeaders(rawHeaders) {
+  if (!rawHeaders) return {};
+  if (Array.isArray(rawHeaders)) {
+    const out = {};
+    for (const h of rawHeaders) {
+      if (h && h.key && h.value !== undefined) out[h.key] = h.value;
+    }
+    return out;
+  }
+  if (typeof rawHeaders === "string") {
+    const trimmed = rawHeaders.trim();
+    if (!trimmed) return {};
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+    } catch {
+      return {};
+    }
+    return {};
+  }
+  if (typeof rawHeaders === "object") return { ...rawHeaders };
+  return {};
 }

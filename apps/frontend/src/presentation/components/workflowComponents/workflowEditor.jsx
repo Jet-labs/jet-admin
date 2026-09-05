@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useMemo, useRef } from "react";
-import { ArrowRightToLine, Braces, Clock, Code, Columns, Eraser, FileJson, GitBranch, Map as MapIcon, Play, Repeat, Square, Terminal, Zap } from 'lucide-react';
+import { ArrowRightToLine, Braces, Clock, Code, Columns, Eraser, FileJson, GitBranch, Layers, Map as MapIcon, Play, Repeat, Square, Terminal, User, Zap } from 'lucide-react';
 import ReactFlow, {
     ReactFlowProvider,
     Controls,
@@ -31,20 +31,22 @@ import {
 import { useInfiniteDataQueries } from "../../../logic/hooks/useDataQueries";
 import { useInfiniteDatasources } from "../../../logic/hooks/useDatasources";
 import { getDataQueryByIDAPI } from "../../../data/apis/dataQuery";
-import { useQueries } from "@tanstack/react-query";
+import { getAllWorkflowsAPI, getWorkflowByIDAPI } from "../../../data/apis/workflow";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import debounce from "lodash/debounce";
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
 import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
 import { WorkflowConsole } from "./workflowConsole";
 import { WorkflowContextPanel } from "./workflowContextPanel";
 import { WorkflowInputDefinitionsPanel } from "./workflowInputDefinitionsPanel";
+import { WorkflowExecutionPolicyPanel } from "./workflowExecutionPolicyPanel";
 import { WorkflowInputModal } from "./workflowInputModal";
 import { DataQueryTestingPanel } from "../dataQueryComponents/dataQueryTestingPanel";
 import { useParams } from "react-router-dom";
 import { useWorkflowRun } from "./useWorkflowRun";
 import { useEffect } from "react";
 
-import { Button, Checkbox, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator } from "@jet-admin/ui";
 // Dagre graph for auto-layout
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -103,6 +105,23 @@ const edgeTypes = Object.entries(WORKFLOW_EDGES_MAP).reduce((acc, [key, edge]) =
     return acc;
 }, {});
 
+// Sidebar node palette icons (single source for the Add-nodes grid)
+const NODE_PALETTE_ICONS = {
+    start: <Play className="size-3.5 mr-1.5 shrink-0 text-emerald-500" />,
+    dataQuery: <Zap className="size-3.5 mr-1.5 shrink-0 text-blue-500" />,
+    javascript: <Code className="size-3.5 mr-1.5 shrink-0 text-amber-500" />,
+    condition: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-indigo-500" />,
+    loop: <Repeat className="size-3.5 mr-1.5 shrink-0 text-cyan-500" />,
+    delay: <Clock className="size-3.5 mr-1.5 shrink-0 text-orange-500" />,
+    end: <Square className="size-3.5 mr-1.5 shrink-0 text-destructive" />,
+    dataCollection: <ArrowRightToLine className="size-3.5 mr-1.5 shrink-0 text-violet-500" />,
+    subWorkflow: <Layers className="size-3.5 mr-1.5 shrink-0 text-fuchsia-500" />,
+    switch: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-teal-500" />,
+    approval: <User className="size-3.5 mr-1.5 shrink-0 text-rose-500" />,
+    fanout: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-sky-500" />,
+    join: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-lime-500" />,
+};
+
 // Fit View Button Component (must be inside ReactFlow)
 const FitViewButton = () => {
     const { fitView } = useReactFlow();
@@ -124,7 +143,9 @@ const FitViewButton = () => {
 export const WorkflowEditor = ({ workflowEditorForm }) => {
     // Destructure for cleaner access
     const { values, setFieldValue, errors, handleChange, handleBlur } = workflowEditorForm;
-    const { tenantID } = useParams();
+    // workflowID is present on the update route only; test runs from there
+    // are attributed to the saved workflow so they appear in its history.
+    const { tenantID, workflowID } = useParams();
     
     // Infinite Search Hooks
     const [querySearch, setQuerySearch] = useState("");
@@ -190,6 +211,53 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         });
         return Array.from(map.values());
     }, [dataQueries, queryDetails]);
+
+    // Workflows for the Sub-Workflow node picker (searchable list + details
+    // for referenced children so the configurator can render guided inputs).
+    const [workflowSearch, setWorkflowSearch] = useState("");
+    const debouncedSetWorkflowSearch = useMemo(() => debounce(setWorkflowSearch, 300), []);
+    const workflowsQuery = useQuery({
+        queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "list", workflowSearch],
+        queryFn: () => getAllWorkflowsAPI({ tenantID, search: workflowSearch || undefined, page: 1, pageSize: 100 }),
+        staleTime: 30_000,
+        enabled: Boolean(tenantID),
+    });
+    const workflowsList = useMemo(() => {
+        const res = workflowsQuery.data;
+        if (!res) return [];
+        return Array.isArray(res) ? res : (res.workflows || []);
+    }, [workflowsQuery.data]);
+
+    // Collect child Workflow IDs from subWorkflow nodes to fetch details
+    const neededChildWorkflowIDs = useMemo(() => {
+        const ids = new Set();
+        values.nodes?.forEach((node) => {
+            if (node.type === "subWorkflow" && node.data?.childWorkflowID) {
+                ids.add(String(node.data.childWorkflowID));
+            }
+        });
+        return Array.from(ids).sort();
+    }, [values.nodes]);
+
+    const childWorkflowDetails = useQueries({
+        queries: neededChildWorkflowIDs.map((id) => ({
+            queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "detail", id],
+            queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID: id }),
+            staleTime: Infinity,
+        })),
+    });
+
+    // Union of list + details (details carry workflowOptions.inputDefinitions)
+    const unionWorkflows = useMemo(() => {
+        const map = new Map();
+        workflowsList.forEach(w => map.set(String(w.workflowID), w));
+        childWorkflowDetails.forEach(wRes => {
+            if (wRes.data && wRes.data.workflowID) {
+                map.set(String(wRes.data.workflowID), wRes.data);
+            }
+        });
+        return Array.from(map.values());
+    }, [workflowsList, childWorkflowDetails]);
 
     const [selectedNodeId, setSelectedNodeId] = useState(null);
     const [showSchemaPanel, setShowSchemaPanel] = useState(false);
@@ -396,9 +464,11 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         startTestRun({
             nodes: values.nodes,
             edges: values.edges,
-            inputValues
+            inputValues,
+            workflowOptions: values.workflowOptions,
+            ...(workflowID ? { workflowID } : {}),
         });
-    }, [startTestRun, values.nodes, values.edges]);
+    }, [startTestRun, values.nodes, values.edges, values.workflowOptions, workflowID]);
 
 
     // Handle Test Run button click - show modal if inputDefinitions exist
@@ -432,6 +502,10 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     return (
         <WorkflowNodesProvider
             dataQueries={unionDataQueries}
+            workflows={unionWorkflows}
+            currentWorkflowID={workflowID}
+            workflowSearch={workflowSearch}
+            setWorkflowSearch={debouncedSetWorkflowSearch}
             datasources={datasources}
             strings={CONSTANTS.STRINGS}
             onRefreshDataQueries={refetchDataQueries}
@@ -469,15 +543,16 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         {/* Sidebar Controls */}
                         <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.WORKFLOW_SIDEBAR_PANEL} defaultSize={20} className="flex flex-col h-full overflow-hidden">
 
-                                <div className="flex-1 overflow-y-auto space-y-2 p-2 flex flex-col justify-start items-stretch bg-background">
+                            <div className="flex-1 overflow-y-auto flex flex-col justify-start items-stretch bg-background p-2 space-y-2">
                                 <div className="space-y-1">
-                                        <Label htmlFor="title" className="block mb-1.5">
+                                    <Label htmlFor="title" className="text-xs font-medium text-muted-foreground">
                                         {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_LABEL}
-                                        </Label>
+                                    </Label>
                                     <Input
                                         type="text"
                                         name="title"
                                         id="title"
+                                        size="sm"
                                         className="w-full"
                                         placeholder={CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_PLACEHOLDER}
                                         onChange={handleChange}
@@ -485,13 +560,18 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         value={values.title}
                                     />
                                     {errors.title && (
-                                        <p className="text-destructive text-xs mt-1">{errors.title}</p>
+                                        <p className="text-destructive text-xs">{errors.title}</p>
                                     )}
                                 </div>
 
-                                <div className="space-y-1">
-                                    <Label>Nodes</Label>
-                                    <div className="flex flex-col gap-2">
+                                {/* <Separator /> */}
+
+                                {/* ── Node palette ──────────────────────────── */}
+                                <div className="space-y-2">
+                                    <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                                        Nodes
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-2">
                                     {Object.values(WORKFLOW_NODES_MAP)
                                         .filter(node => {
                                             return true;
@@ -503,57 +583,32 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => onAddNode(node.value)}
-                                                className="justify-start bg-background hover:bg-muted font-medium border-border"
+                                                title={`Add ${node.label}`}
+                                                className="justify-start min-w-0"
                                             >
-                                                {node.value === 'start' && <Play className="size-3.5 mr-2 text-emerald-500" />}
-                                                {node.value === 'dataQuery' && <Zap className="size-4 mr-2 text-blue-500" />}
-
-                                                {node.value === 'javascript' && <Code className="size-4 mr-2 text-amber-500" />}
-                                                {node.value === 'condition' && <GitBranch className="size-4 mr-2 text-indigo-500" />}
-                                                {node.value === 'loop' && <Repeat className="size-4 mr-2 text-cyan-500" />}
-                                                {node.value === 'delay' && <Clock className="size-4 mr-2 text-orange-500" />}
-                                                {node.value === 'end' && <Square className="size-3.5 mr-2 text-destructive" />}
-                                                {node.value === 'dataCollection' && <ArrowRightToLine className="size-4 mr-2 text-violet-500" />}
-                                                {node.label}
+                                                {NODE_PALETTE_ICONS[node.value]}
+                                                <span className="truncate">{node.label}</span>
                                             </Button>
                                         ))}
                                     </div>
                                 </div>
-                                <div className="space-y-1">
-                                    <Label className="mb-1 block">Edge Style</Label>
-                                    <Select
-                                        value={values.edgeType || 'smoothstep'}
-                                        onValueChange={(val) => {
-                                            setFieldValue("edgeType", val);
-                                            updateAllEdgesType(val);
-                                        }}
-                                    >
-                                        <SelectTrigger className="text-sm h-8">
-                                            <SelectValue placeholder="Select style" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="default">Bezier (Curved)</SelectItem>
-                                            <SelectItem value="straight">Straight</SelectItem>
-                                            <SelectItem value="step">Step (Sharp)</SelectItem>
-                                            <SelectItem value="smoothstep">Smooth Step</SelectItem>
-                                            <SelectItem value="simplebezier">Simple Bezier</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
 
-                                <div className="flex items-center justify-between">
-                                    <Label>Snap to Grid</Label>
-                                    <Checkbox
-                                        checked={values.snapToGrid ?? true}
-                                        onCheckedChange={(checked) => setFieldValue("snapToGrid", checked)}
-                                    />
-                                </div>
+                                {/* <Separator /> */}
 
                                 <WorkflowInputDefinitionsPanel workflowForm={workflowEditorForm} />
 
-                                <div className="space-y-1">
-                                    <Label >Actions</Label>
-                                    <div className="flex flex-row gap-2">
+                                <Separator />
+
+                                <WorkflowExecutionPolicyPanel workflowForm={workflowEditorForm} />
+
+                                {/* <Separator /> */}
+
+                                {/* ── Execution ─────────────────────────────── */}
+                                <div className="space-y-2">
+                                    <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                                        Run
+                                    </p>
+                                    <div className="flex items-center gap-2">
                                         <Button
                                             type="button"
                                             onClick={onTestRunClick}
@@ -586,8 +641,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         className="w-full"
                                         title="Clear test run state"
                                     >
-                                        <Eraser className="size-4 mr-2" />
-                                        Clear
+                                        <Eraser className="size-3.5 mr-2" />
+                                        Clear results
                                     </Button>
                                     {dataCollectionRequest && !isDataCollectionModalOpen && (
                                         <Button
@@ -603,7 +658,33 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                     )}
                                 </div>
 
-                                <div className="flex flex-row flex-wrap gap-1.5 mt-2">
+                                {/* <Separator /> */}
+
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-medium text-muted-foreground">Edge style</Label>
+                                    <Select
+                                        value={values.edgeType || 'smoothstep'}
+                                        onValueChange={(val) => {
+                                            setFieldValue("edgeType", val);
+                                            updateAllEdgesType(val);
+                                        }}
+                                    >
+                                        <SelectTrigger size="sm" className="w-full text-xs">
+                                            <SelectValue placeholder="Select style" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="default" className="text-xs">Bezier (Curved)</SelectItem>
+                                            <SelectItem value="straight" className="text-xs">Straight</SelectItem>
+                                            <SelectItem value="step" className="text-xs">Step (Sharp)</SelectItem>
+                                            <SelectItem value="smoothstep" className="text-xs">Smooth Step</SelectItem>
+                                            <SelectItem value="simplebezier" className="text-xs">Simple Bezier</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* <Separator /> */}
+
+                                <div className="grid grid-cols-2 gap-2">
                                     <Button
                                         type="button"
                                         onClick={() => onAutoLayout("TB")}
@@ -611,9 +692,10 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         title="Auto-layout"
                                         variant="outline"
                                         size="sm"
-                                        className="px-2 text-muted-foreground hover:text-foreground"
+                                        className="justify-start text-muted-foreground hover:text-foreground"
                                     >
-                                        <Columns className="size-4" />
+                                        <Columns className="size-3.5" />
+                                        Layout
                                     </Button>
                                     <Button
                                         type="button"
@@ -621,9 +703,10 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         title="View Schema"
                                         variant="outline"
                                         size="sm"
-                                        className="px-2 text-muted-foreground hover:text-foreground"
+                                        className={`justify-start ${showSchemaPanel ? 'border-primary/50 bg-primary/10 text-primary hover:text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                                     >
-                                        <FileJson className="size-4" />
+                                        <FileJson className="size-3.5" />
+                                        Schema
                                     </Button>
                                     <Button
                                         type="button"
@@ -631,11 +714,12 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         title={showConsole ? 'Hide Console' : 'Show Console'}
                                         variant="outline"
                                         size="sm"
-                                        className={`px-2 flex items-center gap-1.5 transition-colors ${showConsole ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
+                                        className={`justify-start ${showConsole ? 'border-primary/50 bg-primary/10 text-primary hover:text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                                     >
-                                        <Terminal className="size-4" />
+                                        <Terminal className="size-3.5" />
+                                        Console
                                         {consoleLogs.length > 0 && (
-                                            <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
+                                            <span className="ml-auto text-xs text-muted-foreground">
                                                 {consoleLogs.length}
                                             </span>
                                         )}
@@ -646,11 +730,12 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         title={showContextPanel ? 'Hide Context' : 'Show Context'}
                                         variant="outline"
                                         size="sm"
-                                        className={`px-2 flex items-center gap-1.5 transition-colors ${showContextPanel ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
+                                        className={`justify-start ${showContextPanel ? 'border-primary/50 bg-primary/10 text-primary hover:text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                                     >
-                                        <Braces className="size-4" />
+                                        <Braces className="size-3.5" />
+                                        Context
                                         {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length > 0 && (
-                                            <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
+                                            <span className="ml-auto text-xs text-muted-foreground">
                                                 {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length}
                                             </span>
                                         )}
