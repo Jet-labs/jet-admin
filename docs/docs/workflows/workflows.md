@@ -1,33 +1,39 @@
+---
+title: Workflows
+description: DAG workflow engine — node types, edges, execution context, triggers, error handling, and monitoring.
+sidebar_position: 6
+---
+
 # Workflows
 
 <a id="table-of-contents"></a>
 
 ## Table of Contents
 
-1. [Overview](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#overview)
-2. [Key Concepts](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#key-concepts)
-3. [Workflow Lifecycle](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#workflow-lifecycle)
-4. [Node Types](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#node-types)
-  - [Start Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#start-node)
-  - [Data Query Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#data-query-node)
-  - [JavaScript Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#javascript-node)
-  - [Condition Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#condition-node)
-  - [Switch Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#switch-node)
-  - [Fan-out Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#fan-out-node)
-  - [Join Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#join-node)
-  - [Loop Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#loop-node)
-  - [Delay Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#delay-node)
-  - [Data Collection Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#data-collection-node)
-  - [Approval Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#approval-node)
-  - [Sub-Workflow Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#sub-workflow-node)
-  - [End Node](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#end-node)
-5. [Edge Types](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#edge-types)
-6. [Context & Variable System](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#context-variable-system)
-7. [Error Handling](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#error-handling)
-8. [Execution Modes](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#execution-modes)
-9. [Real-Time Monitoring](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#real-time-monitoring)
-10. [Workflow Triggers](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#workflow-triggers)
-11. [Best Practices](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#best-practices)
+1. [Overview](#overview)
+2. [Key Concepts](#key-concepts)
+3. [Workflow Lifecycle](#workflow-lifecycle)
+4. [Node Types](#node-types)
+  - [Start Node](#start-node)
+  - [Data Query Node](#data-query-node)
+  - [JavaScript Node](#javascript-node)
+  - [Condition Node](#condition-node)
+  - [Switch Node](#switch-node)
+  - [Fan-out Node](#fan-out-node)
+  - [Join Node](#join-node)
+  - [Loop Node](#loop-node)
+  - [Delay Node](#delay-node)
+  - [Data Collection Node](#data-collection-node)
+  - [Approval Node](#approval-node)
+  - [Sub-Workflow Node](#sub-workflow-node)
+  - [End Node](#end-node)
+5. [Edge Types](#edge-types)
+6. [Context & Variable System](#context-variable-system)
+7. [Error Handling](#error-handling)
+8. [Execution Modes](#execution-modes)
+9. [Real-Time Monitoring](#real-time-monitoring)
+10. [Workflow Triggers](#workflow-triggers)
+11. [Best Practices](#best-practices)
 
 * * *
 
@@ -176,7 +182,7 @@ This node references an existing query that has been defined and saved elsewhere
 | Timeout (seconds) | Maximum time the query is allowed to run (default: 300, max: 3600) |
 | Retry Attempts | How many times to retry on failure (0–10) |
 | Retry Delay (seconds) | Wait time between retries (1–300) |
-| Error Behaviour | What to do if the node fails (see [Error Handling](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#error-handling)) |
+| Error Behaviour | What to do if the node fails (see [Error Handling](#error-handling)) |
 | Skip this node | If enabled, the node is bypassed entirely during execution |
 
 **Input binding examples:**
@@ -218,7 +224,7 @@ The code runs in an isolated environment. It has access to the full execution co
 | Timeout (seconds) | Execution time limit (default: 30, max: 300) |
 | Retry Attempts | Retries on failure (0–10) |
 | Retry Delay (seconds) | Wait between retries (1–300) |
-| Error Behaviour | Behaviour on failure (see [Error Handling](https://claude.ai/chat/cf478a4a-9d2c-4893-a616-91ed366edf25#error-handling)) |
+| Error Behaviour | Behaviour on failure (see [Error Handling](#error-handling)) |
 | Skip this node | Bypass this node during execution |
 
 **Accessing context in code:**
@@ -684,7 +690,7 @@ Edges can be given labels by clicking on the edge label area on the canvas. Labe
 
 <a id="context-variable-system"></a>
 
-## Context & Variable System
+## Context & Variable System {#context-variable-system}
 
 <a id="how-context-works"></a>
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { LayoutDashboard, Maximize2, PinOff } from 'lucide-react';
 import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../../constants";
@@ -12,66 +12,9 @@ import {
 } from "../../../logic/hooks/useAuth";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "./reactQueryLoadingErrorWrapper";
-import { AppPageWidgetSlot } from "../appPageComponents/editor/appPageWidgetSlot";
-import { AppPageRuntimeProvider } from "../../../logic/appPageRuntime/AppPageRuntimeProvider";
-import { AppPageDataSourceBootstrapper } from "../appPageComponents/editor/appPageDataSourceBootstrapper";
+import { AppPageView } from "../appPageComponents/viewer/AppPageView";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import { Button, Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SearchSelect, ErrorBoundary } from "@jet-admin/ui";
-import { migrateV1ToV2, LayoutRenderer } from "../appPageComponents/layout/index.js";
-import { useAppPageStateTree } from "../../../logic/appPageRuntime";
-import { resolveValue } from "../../../logic/evaluationEngine";
-
-/**
- * Inner component rendered inside AppPageRuntimeProvider.
- * Accesses the state tree via hooks and threads it to the layout renderer.
- */
-const DefaultPageViewerContent = ({ tenantID, pinnedAppPageID, migratedPageConfig }) => {
-  const stateTree = useAppPageStateTree();
-
-  const renderWidget = React.useCallback(
-    (widgetKey, sizing, scopedStateTree) => (
-      <AppPageWidgetSlot
-        tenantID={tenantID}
-        widgetKey={widgetKey}
-        editable={false}
-        sizing={sizing}
-        scopedStateTree={scopedStateTree}
-      />
-    ),
-    [tenantID]
-  );
-
-  return (
-    <>
-      <AppPageDataSourceBootstrapper />
-      <div
-        className="w-full flex-1 min-h-0 overflow-y-auto bg-muted p-2"
-        id={`printable-area-app-page-${pinnedAppPageID}`}
-      >
-        {migratedPageConfig.layout ? (
-          <ErrorBoundary title="Page layout error">
-            <LayoutRenderer
-              node={migratedPageConfig.layout}
-              renderWidget={renderWidget}
-              mode="view"
-              stateTree={stateTree}
-              resolveValue={resolveValue}
-            />
-          </ErrorBoundary>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center p-2">
-            <div className="rounded border border-dashed border-border bg-card p-4 text-center">
-              <p className="text-sm font-medium text-foreground">This page is empty</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Open this page in the editor and drag widgets onto the canvas.
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    </>
-  );
-};
+import { Button, Spinner, SearchSelect } from "@jet-admin/ui";
 
 export const DefaultAppPageSelectionLayout = ({
   tenantID,
@@ -131,10 +74,7 @@ export const DefaultAppPageSelectionLayout = ({
       value: appPageID,
     });
   };
-  const migratedPageConfig = React.useMemo(() => {
-    if (!appPage?.appPageConfig) return null;
-    return migrateV1ToV2(appPage.appPageConfig);
-  }, [appPage]);
+  const hasPageConfig = !!appPage?.appPageConfig;
 
   return (
     <div className="w-full h-full min-h-0">
@@ -193,19 +133,13 @@ export const DefaultAppPageSelectionLayout = ({
               refetch={refetchAppPage}
               isRefetching={isRefetchingAppPage}
             >
-              {migratedPageConfig && (
-                <AppPageRuntimeProvider
-                  pageID={pinnedAppPageID}
+              {hasPageConfig && (
+                <AppPageView
                   tenantID={tenantID}
-                  pageConfig={migratedPageConfig}
+                  pageID={pinnedAppPageID}
+                  pageConfig={appPage.appPageConfig}
                   syncVariablesToUrl={true}
-                >
-                  <DefaultPageViewerContent
-                    tenantID={tenantID}
-                    pinnedAppPageID={pinnedAppPageID}
-                    migratedPageConfig={migratedPageConfig}
-                  />
-                </AppPageRuntimeProvider>
+                />
               )}
             </ReactQueryLoadingErrorWrapper>
           </FullScreen>

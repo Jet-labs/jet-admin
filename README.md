@@ -164,7 +164,7 @@ jet-admin/
 │   ├── workflow-edges/        # Workflow edge connections
 │   └── workflow-nodes/        # Node type definitions
 │
-└── docker-compose.cloud.yml
+└── docker-compose.yml
 ```
 
 ---
@@ -575,11 +575,11 @@ Future:    Distributed workflow runners + execution snapshots
 ```bash
 git clone https://github.com/Jet-labs/jet-admin.git
 cd jet-admin
-cp .env.docker.example .env.docker
-docker-compose -f docker-compose.cloud.yml up -d
+cp .env.docker .env
+docker compose up -d --build
 ```
 
-Access: `http://localhost:3000`
+Access: `http://localhost:80` (app) · API: `http://localhost:8090`
 
 ### Manual Setup
 

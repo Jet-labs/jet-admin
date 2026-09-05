@@ -33,6 +33,14 @@ const listAppPagesQuerySchema = z.object({
   folderID: schemas.uuidSchema.optional(),
 }).merge(schemas.explorerPaginationSchema).passthrough();
 
+const appPageVersionIdParamSchema = z.object({
+  appPageID: schemas.uuidSchema,
+  versionID: schemas.uuidSchema,
+}).passthrough();
+
+const listAppPageVersionsQuerySchema = z.object({})
+  .merge(schemas.explorerPaginationSchema).passthrough();
+
 // ============================================================
 // Exports
 // ============================================================
@@ -42,4 +50,6 @@ module.exports = {
   updateAppPageSchema,
   appPageIdParamSchema,
   listAppPagesQuerySchema,
+  appPageVersionIdParamSchema,
+  listAppPageVersionsQuerySchema,
 };

@@ -1,3 +1,9 @@
+---
+title: Shared Widget Library
+description: Deployment-wide widget registry — publish via operator API, install per tenant.
+sidebar_position: 14
+---
+
 # Shared Widget Library
 
 A pragmatic "marketplace": a **deployment-scoped registry** of published
@@ -27,13 +33,17 @@ Migration: `prisma/migrations/manual/003-add-widget-library.sql`.
 
 ## Endpoints
 
-Global registry (`/api/v1/widget-library`, mounted in `index.js`):
+Operator registry (`/api/v1/operator/widget-library`, `requireOperator` — no Casbin, no tenant scope):
 
-| Method | Path | Permission |
-|---|---|---|
-| GET | `/` | `widgetLibrary.list` |
-| POST | `/` body: `{bundle}` | `widgetLibrary.publish` |
-| DELETE | `/:libraryEntryID` | `widgetLibrary.unpublish` |
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| GET | `/` | operator session | list entries |
+| POST | `/` body: `{bundle}` | operator session | publish; bundle must contain exactly one widget item |
+| DELETE | `/:libraryEntryID` | operator session | unpublish |
+
+:::warning
+Earlier drafts listed this registry at `/api/v1/widget-library`. That mount does not exist in `apps/backend/index.js` — use `/api/v1/operator/widget-library`.
+:::
 
 Tenant install (`/api/v1/tenants/:tenantID/widget-library`, nested in the
 tenant router):
@@ -47,7 +57,7 @@ tenant router):
 
 1. The client calls the existing widget export endpoint to build the bundle
    (`GET .../widgets/:widgetID/export`).
-2. The bundle is posted to `POST /api/v1/widget-library`.
+2. The bundle is posted to `POST /api/v1/operator/widget-library`.
 3. Server-side validation is identical to import validation
    (`assertImportableBundle`) and requires **exactly one widget item** in the
    bundle; its title/type/description become the registry metadata.

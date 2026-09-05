@@ -309,6 +309,7 @@ appPageService.updateAppPageByID = async ({
   appPageTitle,
   appPageDescription,
   appPageConfig,
+  changeNote,
 }) => {
   Logger.log("info", {
     message: "appPageService:updateAppPageByID:params",
@@ -347,6 +348,27 @@ appPageService.updateAppPageByID = async ({
         },
       });
     });
+
+    // Snapshot the pre-update state so every save is restorable.
+    // Fire-and-forget w.r.t. the update itself: a version failure must
+    // never fail the save. changeNote rides the update body (passthrough).
+    try {
+      await snapshotAppPageVersion({
+        tenantID,
+        appPageID,
+        appPageTitle: existingAppPage.appPageTitle,
+        appPageDescription: existingAppPage.appPageDescription,
+        appPageConfig: existingAppPage.appPageConfig,
+        changeNote: changeNote || null,
+        creatorID: userID || null,
+        createdByApiKeyID: null,
+      });
+    } catch (versionError) {
+      Logger.log("error", {
+        message: "appPageService:updateAppPageByID:version-snapshot-failed",
+        params: { appPageID, tenantID, error: versionError?.message },
+      });
+    }
 
     Logger.log("success", {
       message: "appPageService:updateAppPageByID:success",
@@ -401,6 +423,11 @@ appPageService.deleteAppPageByID = async ({
         appPageID: appPageID,
         tenantID: tenantID,
       },
+    });
+
+    // Versions are not FK-cascaded by design — clean them explicitly.
+    await prisma.tblAppPageVersions.deleteMany({
+      where: { appPageID, tenantID },
     });
 
     await removePoliciesForResource(tenantID, `appPage:${appPageID}`);
@@ -632,6 +659,174 @@ const APP_PAGE_CONFIG_SCHEMA = {
 appPageService.getAppPageSchema = async () => {
   Logger.log('info', { message: 'appPageService:getAppPageSchema:params' });
   return APP_PAGE_CONFIG_SCHEMA;
+};
+
+// ─── Version History ─────────────────────────────────────────────────────────
+
+/** Maximum snapshots retained per page. Oldest beyond the cap are pruned. */
+const MAX_VERSIONS_PER_PAGE = 50;
+
+/**
+ * Persists an immutable snapshot of a page revision. Internal helper —
+ * callers pass the state to preserve (pre-update on save, current on
+ * restore, explicit on demand).
+ */
+async function snapshotAppPageVersion({
+  tenantID,
+  appPageID,
+  appPageTitle,
+  appPageDescription,
+  appPageConfig,
+  changeNote,
+  creatorID,
+  createdByApiKeyID,
+}) {
+  return prisma.$transaction(async (tx) => {
+    const latest = await tx.tblAppPageVersions.findFirst({
+      where: { tenantID, appPageID },
+      orderBy: { versionNumber: "desc" },
+      select: { versionNumber: true },
+    });
+    const versionNumber = (latest?.versionNumber || 0) + 1;
+    const version = await tx.tblAppPageVersions.create({
+      data: {
+        tenantID,
+        appPageID,
+        versionNumber,
+        appPageTitle: appPageTitle ?? null,
+        appPageDescription: appPageDescription ?? null,
+        appPageConfig: appPageConfig ?? null,
+        changeNote: changeNote ?? null,
+        creatorID: creatorID ?? null,
+        createdByApiKeyID: createdByApiKeyID ?? null,
+      },
+    });
+    // Prune oldest beyond the cap, keeping versionNumber monotonic.
+    const overflow = await tx.tblAppPageVersions.count({ where: { tenantID, appPageID } });
+    if (overflow > MAX_VERSIONS_PER_PAGE) {
+      const stale = await tx.tblAppPageVersions.findMany({
+        where: { tenantID, appPageID },
+        orderBy: { versionNumber: "asc" },
+        take: overflow - MAX_VERSIONS_PER_PAGE,
+        select: { appPageVersionID: true },
+      });
+      await tx.tblAppPageVersions.deleteMany({
+        where: { appPageVersionID: { in: stale.map((s) => s.appPageVersionID) } },
+      });
+    }
+    return version;
+  });
+}
+
+appPageService.getAppPageVersions = async ({ userID, tenantID, appPageID, page, pageSize }) => {
+  Logger.log("info", {
+    message: "appPageService:getAppPageVersions:params",
+    params: { userID, tenantID, appPageID, page, pageSize },
+  });
+  try {
+    const where = { tenantID, appPageID };
+    const findManyOptions = {
+      where,
+      orderBy: { versionNumber: "desc" },
+      select: {
+        appPageVersionID: true,
+        versionNumber: true,
+        appPageTitle: true,
+        changeNote: true,
+        creatorID: true,
+        createdByApiKeyID: true,
+        createdAt: true,
+      },
+    };
+    if (page && pageSize) {
+      findManyOptions.skip = (page - 1) * pageSize;
+      findManyOptions.take = pageSize;
+    }
+    const [versions, totalCount] = await Promise.all([
+      prisma.tblAppPageVersions.findMany(findManyOptions),
+      prisma.tblAppPageVersions.count({ where }),
+    ]);
+    return {
+      versions,
+      totalCount,
+      page: page || 1,
+      pageSize: pageSize || versions.length,
+      totalPages: pageSize ? Math.ceil(totalCount / pageSize) : 1,
+    };
+  } catch (error) {
+    Logger.log("error", {
+      message: "appPageService:getAppPageVersions:failure",
+      params: { userID, error },
+    });
+    throw error;
+  }
+};
+
+appPageService.getAppPageVersionByID = async ({ userID, tenantID, appPageID, versionID }) => {
+  Logger.log("info", {
+    message: "appPageService:getAppPageVersionByID:params",
+    params: { userID, tenantID, appPageID, versionID },
+  });
+  try {
+    const version = await prisma.tblAppPageVersions.findFirst({
+      where: { tenantID, appPageID, appPageVersionID: versionID },
+    });
+    if (!version) throw new Error("App page version not found");
+    return version;
+  } catch (error) {
+    Logger.log("error", {
+      message: "appPageService:getAppPageVersionByID:failure",
+      params: { userID, error },
+    });
+    throw error;
+  }
+};
+
+appPageService.restoreAppPageVersion = async ({ userID, tenantID, appPageID, versionID, authContext }) => {
+  Logger.log("info", {
+    message: "appPageService:restoreAppPageVersion:params",
+    params: { userID, tenantID, appPageID, versionID },
+  });
+  try {
+    const [page, version] = await Promise.all([
+      prisma.tblAppPages.findFirst({ where: { tenantID, appPageID } }),
+      prisma.tblAppPageVersions.findFirst({ where: { tenantID, appPageID, appPageVersionID: versionID } }),
+    ]);
+    if (!page) throw new Error("App page not found");
+    if (!version) throw new Error("App page version not found");
+
+    const { creatorID, createdByApiKeyID } = authContext
+      ? getCreationContextFromAuthContext(authContext)
+      : { creatorID: userID, createdByApiKeyID: null };
+
+    // Snapshot current state first so the restore itself is undoable.
+    await snapshotAppPageVersion({
+      tenantID,
+      appPageID,
+      appPageTitle: page.appPageTitle,
+      appPageDescription: page.appPageDescription,
+      appPageConfig: page.appPageConfig,
+      changeNote: `Before restore to v${version.versionNumber}`,
+      creatorID: creatorID || userID || null,
+      createdByApiKeyID: createdByApiKeyID || null,
+    });
+
+    await prisma.tblAppPages.update({
+      where: { appPageID },
+      data: {
+        appPageTitle: version.appPageTitle ?? page.appPageTitle,
+        appPageDescription: version.appPageDescription,
+        appPageConfig: version.appPageConfig,
+      },
+    });
+    return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "appPageService:restoreAppPageVersion:failure",
+      params: { userID, error },
+    });
+    throw error;
+  }
 };
 
 module.exports = { appPageService };

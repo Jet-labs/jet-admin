@@ -1201,6 +1201,12 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/app-pages/${appPageID}`,
       deleteAppPageByID: (tenantID, appPageID) =>
         `/api/v1/tenants/${tenantID}/app-pages/${appPageID}`,
+      getAppPageVersionsAPI: (tenantID, appPageID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/${appPageID}/versions`,
+      getAppPageVersionByIDAPI: (tenantID, appPageID, versionID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/${appPageID}/versions/${versionID}`,
+      restoreAppPageVersionAPI: (tenantID, appPageID, versionID) =>
+        `/api/v1/tenants/${tenantID}/app-pages/${appPageID}/versions/${versionID}/restore`,
       getAllDatabaseNotificationsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/notifications`,
       getDatabaseNotificationByIDAPI: (tenantID, databaseNotificationID) =>

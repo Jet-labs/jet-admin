@@ -1,8 +1,12 @@
+---
+title: Identity & Access Management
+description: Authentication (Firebase, API keys, operators), Casbin RBAC, tenants, roles, permissions, and delegated execution identity.
+sidebar_position: 8
+---
+
 # Identity & Access Management
 
 <a id="identity-access-management"></a>
-
-# Identity & Access Management
 
 *Covers: Authentication, Tenants, Tenant Roles & Permissions, and Tenant User Management*
 
@@ -12,30 +16,30 @@
 
 ## Table of Contents
 
-1. [Overview](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#1-overview)
-2. [Key Concepts](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#2-key-concepts)
-3. [How It Works — End-to-End Flows](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#3-how-it-works-end-to-end-flows)
-  - 3.1 [User Sign-In and Account Provisioning](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#31-user-sign-in-and-account-provisioning)
-  - 3.2 [Tenant Creation](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#32-tenant-creation)
-  - 3.3 [Authorization Check on Every Request](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#33-authorization-check-on-every-request)
-  - 3.4 [Inviting and Managing Tenant Members](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#34-inviting-and-managing-tenant-members)
-  - 3.5 [Creating and Assigning Custom Roles](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#35-creating-and-assigning-custom-roles)
-4. [Authentication Methods](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#4-authentication-methods)
-5. [Configurable Entities](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#5-configurable-entities)
-  - 5.1 [Tenant](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#51-tenant)
-  - 5.2 [Tenant Role](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#52-tenant-role)
-  - 5.3 [General Permission](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#53-general-permission)
-  - 5.4 [Asset (Granular) Permission](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#54-asset-granular-permission)
-  - 5.5 [Tenant User (Membership)](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#55-tenant-user-membership)
-  - 5.6 [User-Level Tenant Configuration](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#56-user-level-tenant-configuration)
-6. [Supported Permission Types](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#6-supported-permission-types)
-7. [Input/Output Contracts](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#7-inputoutput-contracts)
-8. [Integration Points](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#8-integration-points)
-9. [Real-Time and Asynchronous Behaviour](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#9-real-time-and-asynchronous-behaviour)
-10. [Error States and Edge Cases](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#10-error-states-and-edge-cases)
-11. [Best Practices](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#11-best-practices)
-12. [Limitations and Constraints](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#12-limitations-and-constraints)
-13. [Related Modules](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#13-related-modules)
+1. [Overview](#1-overview)
+2. [Key Concepts](#2-key-concepts)
+3. [How It Works — End-to-End Flows](#3-how-it-works-end-to-end-flows)
+  - 3.1 [User Sign-In and Account Provisioning](#31-user-sign-in-and-account-provisioning)
+  - 3.2 [Tenant Creation](#32-tenant-creation)
+  - 3.3 [Authorization Check on Every Request](#33-authorization-check-on-every-request)
+  - 3.4 [Inviting and Managing Tenant Members](#34-inviting-and-managing-tenant-members)
+  - 3.5 [Creating and Assigning Custom Roles](#35-creating-and-assigning-custom-roles)
+4. [Authentication Methods](#4-authentication-methods)
+5. [Configurable Entities](#5-configurable-entities)
+  - 5.1 [Tenant](#51-tenant)
+  - 5.2 [Tenant Role](#52-tenant-role)
+  - 5.3 [General Permission](#53-general-permission)
+  - 5.4 [Asset (Granular) Permission](#54-asset-granular-permission)
+  - 5.5 [Tenant User (Membership)](#55-tenant-user-membership)
+  - 5.6 [User-Level Tenant Configuration](#56-user-level-tenant-configuration)
+6. [Supported Permission Types](#6-supported-permission-types)
+7. [Input/Output Contracts](#7-inputoutput-contracts)
+8. [Integration Points](#8-integration-points)
+9. [Real-Time and Asynchronous Behaviour](#9-real-time-and-asynchronous-behaviour)
+10. [Error States and Edge Cases](#10-error-states-and-edge-cases)
+11. [Best Practices](#11-best-practices)
+12. [Limitations and Constraints](#12-limitations-and-constraints)
+13. [Related Modules](#13-related-modules)
 
 * * *
 
@@ -91,7 +95,7 @@ Every other module in the platform (datasources, data queries, workflows, app pa
 
 <a id="3-how-it-works-end-to-end-flows"></a>
 
-## 3\. How It Works — End-to-End Flows
+## 3\. How It Works — End-to-End Flows {#3-how-it-works-end-to-end-flows}
 
 <a id="31-user-sign-in-and-account-provisioning"></a>
 
@@ -103,7 +107,7 @@ A user signs in through the platform's identity provider (Firebase). On their fi
 
 ### 3.2 Tenant Creation
 
-Any signed-in user can create a new tenant, subject to a maximum number of tenants they're allowed to own (see [Limitations](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#12-limitations-and-constraints)). When a tenant is created:
+Any signed-in user can create a new tenant, subject to a maximum number of tenants they're allowed to own (see [Limitations](#12-limitations-and-constraints)). When a tenant is created:
 
 1. The tenant record itself is created with a title and optional logo.
 2. An empty configuration entry is created for the creator within that tenant.
@@ -198,7 +202,7 @@ A tenant cannot be renamed by itself — title and logo are updated together via
 | Role Title | Display name of the role | Text (max 255 characters) | Yes | —   |
 | Role Description | Explanation of what the role is for | Text | No  | None |
 | General Permission IDs | List of catalogue permissions to grant | List of Permission references | No  | Empty list |
-| Asset Permissions | List of resource-specific grants (see [5.4](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#54-asset-granular-permission)) | List of Asset Permission objects | No  | Empty list |
+| Asset Permissions | List of resource-specific grants (see [5.4](#54-asset-granular-permission)) | List of Asset Permission objects | No  | Empty list |
 
 A role belongs to exactly one tenant (a "Custom Role") or to no tenant at all (a "Global Role," read-only from the tenant's perspective). Attempting to update or delete a Global Role, or a role that belongs to a different tenant than the one being managed, is rejected.
 
@@ -211,7 +215,7 @@ A role belongs to exactly one tenant (a "Custom Role") or to no tenant at all (a
 | Permission Title | A unique, system-defined identifier for the permission (e.g., `tenant:query:execute`) | Text |
 | Permission Description | Human-readable explanation of the permission | Text |
 
-General permissions are read from a fixed platform catalogue (see [Section 6](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#6-supported-permission-types)) — Admins choose from this catalogue when building a role rather than creating arbitrary new general permissions.
+General permissions are read from a fixed platform catalogue (see [Section 6](#6-supported-permission-types)) — Admins choose from this catalogue when building a role rather than creating arbitrary new general permissions.
 
 <a id="54-asset-granular-permission"></a>
 
@@ -275,7 +279,7 @@ The platform ships with a fixed catalogue of general permissions, grouped by the
 | **Roles & Permissions** | List Roles, Create Role, Read Role, Update Role, Delete Role, List Permissions |
 | **Tenant (general)** | Read, Update, Delete |
 
-In addition to these general, category-wide permissions, **Asset Permissions** (see [5.4](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#54-asset-granular-permission)) allow a permission to be scoped down to one specific resource instead of the whole category.
+In addition to these general, category-wide permissions, **Asset Permissions** (see [5.4](#54-asset-granular-permission)) allow a permission to be scoped down to one specific resource instead of the whole category.
 
 * * *
 
@@ -342,7 +346,7 @@ This section describes, conceptually, what each part of the module expects as in
 **Remove Tenant Member**
 
 - *Input:* The member to remove.
-- *Output:* Confirmation of removal, **unless** removing this member would leave the tenant with zero Admins, in which case the action is rejected (see [Error States](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#10-error-states-and-edge-cases)).
+- *Output:* Confirmation of removal, **unless** removing this member would leave the tenant with zero Admins, in which case the action is rejected (see [Error States](#10-error-states-and-edge-cases)).
 
 **List Tenant Members**
 
@@ -357,8 +361,8 @@ This section describes, conceptually, what each part of the module expects as in
 
 The IAM module is a dependency of nearly every other module in the platform. Specifically:
 
-- **Datasources, Data Queries, Workflows, App Pages, Widgets, Cron Jobs, Listeners, API Keys** — every one of these resources is created within a tenant and is subject to the same authorization checks described in [Section 3.3](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#33-authorization-check-on-every-request). Each of these modules' create actions also records which identity (user or API key) created the resource, for ownership and audit purposes.
-- **Workflow Engine** — when a workflow executes a step that itself runs a data query, the engine passes along the original caller's identity plus a reference to the workflow as the "originating resource," enabling the delegated authorization fallback described in [Section 2](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#2-key-concepts).
+- **Datasources, Data Queries, Workflows, App Pages, Widgets, Cron Jobs, Listeners, API Keys** — every one of these resources is created within a tenant and is subject to the same authorization checks described in [Section 3.3](#33-authorization-check-on-every-request). Each of these modules' create actions also records which identity (user or API key) created the resource, for ownership and audit purposes.
+- **Workflow Engine** — when a workflow executes a step that itself runs a data query, the engine passes along the original caller's identity plus a reference to the workflow as the "originating resource," enabling the delegated authorization fallback described in [Section 2](#2-key-concepts).
 - **Cron Jobs and Listeners** — these are system-triggered rather than user-triggered. When they execute a workflow or query, they are trusted automatically (no policy check is performed), but their actions are still logged with their origin (which cron job or listener triggered them) for traceability.
 - **Notifications** — new-member additions generate an in-app notification to the invited user, and a user's outstanding notifications are surfaced as part of their profile on sign-in.
 - **Audit Logging** — most authentication and tenant-management actions are recorded to the audit trail, capturing who performed the action, whether it succeeded, and relevant metadata.
@@ -426,7 +430,7 @@ Membership changes (adding a member, changing roles, promoting/demoting) similar
 - **A tenant cannot exist without at least one Admin.** The platform actively blocks both removal and demotion of the last Admin.
 - **Global Roles are read-only at the tenant level.** They can be assigned and viewed, but not modified or deleted through tenant role management.
 - **Tenant and member counts are capped.** Both the number of tenants a single user can create and the number of members a single tenant can hold are limited by the account's plan; both limits are enforced before the respective creation action completes.
-- **Asset Permission actions are fixed per resource type** — you cannot define a custom action name; you choose from the platform-defined set documented in [5.4](https://claude.ai/chat/48924637-8471-4085-9622-14af8f308579#54-asset-granular-permission).
+- **Asset Permission actions are fixed per resource type** — you cannot define a custom action name; you choose from the platform-defined set documented in [5.4](#54-asset-granular-permission).
 - **Role names are not required to be unique** within a tenant — the platform does not currently enforce uniqueness on role titles.
 - **Deleting a tenant is irreversible** and cascades through its dependent resources (roles, memberships, API keys, app pages, data queries, widgets); there is no soft-delete/recovery path for the tenant's resources beyond the tenant-level disable mechanism used for administrative deactivation.
 

@@ -1,3 +1,9 @@
+---
+title: Platform Architecture
+description: Monorepo layout, backend module pattern, entity reference graph, and runtime topology.
+sidebar_position: 10
+---
+
 # Platform Architecture
 
 Jet Admin is a monorepo with three main workspaces:
@@ -5,8 +11,10 @@ Jet Admin is a monorepo with three main workspaces:
 ```
 jet-admin/
 ├── apps/
-│   ├── backend/        Express + Prisma + PostgreSQL API
-│   └── frontend/       React 18 + Vite SPA
+│   ├── backend/        Express + Prisma + PostgreSQL API (`PORT`, default 8090)
+│   ├── frontend/       React 18 + Vite SPA
+│   ├── mcp-server/     Standalone Express MCP bridge (`PORT`, default 5001)
+│   └── admin/          Legacy Vite app (superseded by frontend)
 ├── packages/
 │   ├── ui/             @jet-admin/ui — Button, Input, Dialog, PageHeader, …
 │   ├── widgets-ui/     widget renderers (WIDGETS_MAP)
@@ -15,6 +23,19 @@ jet-admin/
 │   ├── workflow-nodes / workflow-edges
 │   └── …
 └── docs/               this documentation site (Docusaurus)
+```
+
+```mermaid
+graph TD
+    FE[Frontend React SPA] -->|REST / Socket.IO| API[Backend Express]
+    API --> MOD[Tenant-scoped modules]
+    MOD --> WF[Workflow engine native or Temporal]
+    WF --> Q[DataQuery engine]
+    Q --> DS[Datasource connectors]
+    DS --> EXT[(Postgres / SaaS / queues)]
+    MOD --> APP[App pages + widgets]
+    API --> PG[(PostgreSQL)]
+    MCP[MCP server] -->|REST + Firebase auth| API
 ```
 
 ## Backend module pattern
@@ -41,18 +62,35 @@ All entity routers are nested inside `modules/tenant/tenant.v1.routes.js`, which
 
 | Mount point | Router | Purpose |
 |---|---|---|
-| `/:tenantID/app-pages` | appPage | App page CRUD |
+| `/:tenantID/app-pages` | appPage | App page CRUD + versions |
 | `/:tenantID/queries` | dataQuery | Data query CRUD + execution |
-| `/:tenantID/widgets` | widget | Widget CRUD |
-| `/:tenantID/workflows` | workflow | Workflow CRUD + engine |
-| `/:tenantID/datasources` | datasource | Connections |
-| `/:tenantID/listeners` | listener | Event listeners |
-| `/:tenantID/cronjobs` | cronJob | Scheduled jobs |
-| `/:tenantID/import` | bundle | Export/import bundles |
-| `/:tenantID/folders` | folder | Folder organization |
-| `/:tenantID/widget-library` | widgetLibrary | Library preview/install |
+| `/:tenantID/widgets` | widget | Widget CRUD + file upload |
+| `/:tenantID/workflows` | workflow | Workflow CRUD + engine (+ `/data-collection`) |
+| `/:tenantID/datasources` | datasource | Connections + proxy + test |
+| `/:tenantID/listeners` | listener | Event listeners + actions |
+| `/:tenantID/cronjobs` | cronJob | Scheduled jobs + history |
+| `/:tenantID/users` | userManagement | Tenant members |
+| `/:tenantID/roles` | tenantRole | Custom roles + policy sync |
+| `/:tenantID/apikeys` | apiKey | API keys (+ clone) |
+| `/:tenantID/audit` | audit | Audit log list + CSV export |
+| `/:tenantID/import` | bundle | Export/import preview + execute |
+| `/:tenantID/folders` | folder | Folder organization + bulk move |
+| `/:tenantID/widget-library` | widgetLibrary | Library preview/install (tenant side) |
 
-The shared widget library registry is mounted globally at `/api/v1/widget-library` in `index.js`.
+Top-level (outside the tenant router, see `apps/backend/index.js`):
+
+| Mount point | Purpose |
+|---|---|
+| `GET /health` | Unauthenticated health probe (`{status:'ok', timestamp}`); Docker/Render healthchecks target this |
+| `/api/v1/auth` | Firebase session config endpoints |
+| `/api/v1/operator/auth`, `/api/v1/operator` | Operator realm (platform admins; PBKDF2 + opaque sessions; no Casbin). Widget-library publish/unpublish lives here (`GET\|POST /roles`, `/permissions`, `/widget-library`) |
+| `/api/v1/tenants/:tenantID/ai` | Jet Agent chat streaming (`POST /chat/stream`, `DELETE /session`) |
+| `/api/v1/oauth` | Google OAuth (`/google/auth/:tenantID`, `/google/callback`) |
+| `/webhooks` | Datasource webhook ingress (`/v1/inbound/:tenantID/:pathSuffix`, `/v1/inbound/:listenerID`; open CORS) |
+
+:::warning
+Earlier drafts placed the shared widget library registry at `GET /api/v1/widget-library`. That route does not exist — the registry is managed through the **operator** router (`/api/v1/operator/widget-library`), and tenants install through `/:tenantID/widget-library`. Corrected here against `apps/backend/index.js` and `modules/tenant/tenant.v1.routes.js`.
+:::
 
 ## Reference graph between entities
 

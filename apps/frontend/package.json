@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "jest --config jest.config.cjs",
     "preview": "vite preview",
     "deploy": "npm run build && firebase deploy --only hosting"
   },

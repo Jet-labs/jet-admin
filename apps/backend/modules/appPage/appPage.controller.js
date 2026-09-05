@@ -227,7 +227,7 @@ appPageController.updateAppPageByID = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, appPageID } = req.params;
-    const { appPageConfig, appPageDescription, appPageTitle } = req.body;
+    const { appPageConfig, appPageDescription, appPageTitle, changeNote } = req.body;
 
     Logger.log("info", {
       message: "appPageController:updateAppPageByID:params",
@@ -248,6 +248,7 @@ appPageController.updateAppPageByID = async (req, res) => {
       appPageConfig,
       appPageDescription,
       appPageTitle,
+      changeNote,
     });
 
     Logger.log("success", {
@@ -349,6 +350,94 @@ appPageController.getAppPageSchema = async (req, res) => {
   } catch (error) {
     Logger.log('error', {
       message: 'appPageController:getAppPageSchema:catch-1',
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+/**
+ * GET /app-pages/:appPageID/versions
+ * Paginated version history (newest first, config excluded for size).
+ */
+appPageController.getAppPageVersions = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, appPageID } = req.params;
+    const { page, pageSize } = req.query;
+    const result = await appPageService.getAppPageVersions({
+      userID: user.userID,
+      tenantID,
+      appPageID,
+      page: page ? Number(page) : undefined,
+      pageSize: pageSize ? Number(pageSize) : undefined,
+    });
+    return expressUtils.sendResponse(res, true, {
+      versions: result.versions,
+      totalCount: result.totalCount,
+      totalPages: result.totalPages,
+      page: result.page,
+      pageSize: result.pageSize,
+      message: "App page versions fetched successfully.",
+    }, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log("error", {
+      message: "appPageController:getAppPageVersions:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+/**
+ * GET /app-pages/:appPageID/versions/:versionID
+ * Full snapshot including config (for preview / restore flows).
+ */
+appPageController.getAppPageVersionByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, appPageID, versionID } = req.params;
+    const version = await appPageService.getAppPageVersionByID({
+      userID: user.userID,
+      tenantID,
+      appPageID,
+      versionID,
+    });
+    return expressUtils.sendResponse(res, true, {
+      version,
+      message: "App page version fetched successfully.",
+    }, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log("error", {
+      message: "appPageController:getAppPageVersionByID:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+/**
+ * POST /app-pages/:appPageID/versions/:versionID/restore
+ * Snapshots current state, then restores the version's title + config.
+ */
+appPageController.restoreAppPageVersion = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, appPageID, versionID } = req.params;
+    const authContext = getServiceAuthContext(req);
+    await appPageService.restoreAppPageVersion({
+      userID: user.userID,
+      tenantID,
+      appPageID,
+      versionID,
+      authContext,
+    });
+    return expressUtils.sendResponse(res, true, {
+      message: "App page version restored successfully.",
+    }, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log("error", {
+      message: "appPageController:restoreAppPageVersion:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);

@@ -9,6 +9,8 @@ const {
   updateAppPageSchema,
   appPageIdParamSchema,
   listAppPagesQuerySchema,
+  appPageVersionIdParamSchema,
+  listAppPageVersionsQuerySchema,
 } = require("./appPage.validator");
 const { P } = require("../../config/permissions");
 const { bundleController } = require("../bundle/bundle.controller");
@@ -92,6 +94,32 @@ router.delete(
   validate(appPageIdParamSchema, "params"),
   authMiddleware.authorize({ ...P.appPage.delete, paramKey: "appPageID" }),
   appPageController.deleteAppPageByID
+);
+
+// ---- Version history (scoped reads, update-gated restore) ----
+
+router.get(
+  "/:appPageID/versions",
+  validateAll({
+    params: appPageIdParamSchema,
+    query: listAppPageVersionsQuerySchema,
+  }),
+  authMiddleware.authorize({ ...P.appPage.read, paramKey: "appPageID" }),
+  appPageController.getAppPageVersions
+);
+
+router.get(
+  "/:appPageID/versions/:versionID",
+  validate(appPageVersionIdParamSchema, "params"),
+  authMiddleware.authorize({ ...P.appPage.read, paramKey: "appPageID" }),
+  appPageController.getAppPageVersionByID
+);
+
+router.post(
+  "/:appPageID/versions/:versionID/restore",
+  validate(appPageVersionIdParamSchema, "params"),
+  authMiddleware.authorize({ ...P.appPage.update, paramKey: "appPageID" }),
+  appPageController.restoreAppPageVersion
 );
 
 module.exports = router;

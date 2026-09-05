@@ -1,3 +1,9 @@
+---
+title: Folders
+description: Per-entity folder trees, bulk move semantics, and list filtering.
+sidebar_position: 12
+---
+
 # Folders
 
 Folders organize items per entity type. Implementation:
@@ -37,10 +43,10 @@ Mounted at `/api/v1/tenants/:tenantID/folders`:
 | Method | Path | Permission | Notes |
 |---|---|---|---|
 | GET | `/?entityType=widget` | `folder.list` | flat list; tree built client-side |
-| POST | `/` | `folder.create` | `{entityType, folderTitle, parentFolderID?}` |
+| POST | `/` | `folder.create` | body `entityType, folderTitle, parentFolderID?` |
 | PATCH | `/:folderID` | `folder.update` | rename and/or re-parent (cycle-checked) |
 | DELETE | `/:folderID` | `folder.delete` | child folders promoted to the grandparent; items un-filed |
-| POST | `/move` | `folder.update` + `<entity>.update` per item | `{entityType, entityIDs[], folderID|null}` — bulk move; `folderID: null` un-files |
+| POST | `/move` | `folder.update` + per-entity `.update` per item | body `entityType, entityIDs[], folderID|null` — bulk move; `folderID: null` un-files |
 
 ### Filtering entity lists
 

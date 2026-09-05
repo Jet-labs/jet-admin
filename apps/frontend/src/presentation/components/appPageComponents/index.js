@@ -26,6 +26,7 @@ export {
 
 // ─── Viewer ──────────────────────────────────────────────────────────────────
 export { AppPageViewer } from "./viewer/appPageViewer";
+export { AppPageView } from "./viewer/AppPageView";
 
 // ─── Layout Subsystem ────────────────────────────────────────────────────────
 export {

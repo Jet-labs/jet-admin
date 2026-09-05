@@ -1,3 +1,9 @@
+---
+title: Export & Import Bundles
+description: Bundle v1 format, dependency closure, sanitization, and preview/execute endpoints.
+sidebar_position: 13
+---
+
 # Export & Import Bundles
 
 Export/import moves fully-resolved configurations between tenants (or between

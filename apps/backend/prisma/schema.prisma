@@ -556,6 +556,23 @@ model tblAppPages {
   @@index([folderID], map: "idx_tblAppPages_folderID")
 }
 
+model tblAppPageVersions {
+  appPageVersionID   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appPageID          String    @db.Uuid
+  tenantID           String    @db.Uuid
+  versionNumber      Int
+  appPageTitle       String?   @db.VarChar
+  appPageDescription String?   @db.VarChar
+  appPageConfig      Json?
+  changeNote         String?   @db.VarChar
+  creatorID          String?   @db.Uuid
+  createdByApiKeyID  String?   @db.Uuid
+  createdAt          DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@unique([appPageID, versionNumber], map: "tblAppPageVersions_version_unique")
+  @@index([tenantID, appPageID, versionNumber(sort: Desc)], map: "idx_tblAppPageVersions_page")
+}
+
 model tblVaultCredentials {
   vaultCredentialID String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantID          String      @db.Uuid

@@ -1,31 +1,37 @@
+---
+title: App Pages & Widgets
+description: Canvas app-page model, widget types, layout, expression data-binding, events, and real-time runtime.
+sidebar_position: 7
+---
+
 # App Pages & Widgets
 
 <a id="table-of-contents"></a>
 
 # Table of Contents
 
-1. [Overview](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#overview)
-2. [Key Concepts](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#key-concepts)
-3. [How It Works — End-to-End Lifecycle](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#how-it-works)
-4. [App Pages](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#app-pages)
-  - [App Page Configuration Fields](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#app-page-configuration-fields)
-  - [Page Data Sources](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#page-data-sources)
-  - [Page Variables](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#page-variables)
-  - [Layout System](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#layout-system)
-5. [Widgets](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#widgets)
-  - [Widget Configuration Fields](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#widget-configuration-fields)
-  - [Widget Types Reference](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#widget-types-reference)
-  - [Widget Properties (Styling)](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#widget-properties-styling)
-  - [Widget Events System](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#widget-events-system)
-  - [Widget Methods](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#widget-methods)
-6. [Expression Engine & Data Binding](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#expression-engine-data-binding)
-7. [Real-Time & Async Behaviour](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#real-time-async-behaviour)
-8. [Integration Points](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#integration-points)
-9. [Access Control](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#access-control)
-10. [Error States & Edge Cases](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#error-states-edge-cases)
-11. [Best Practices](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#best-practices)
-12. [Limitations & Constraints](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#limitations-constraints)
-13. [Related Modules](https://claude.ai/chat/45a8e10d-1372-44d3-bef9-b698294f24d6#related-modules)
+1. [Overview](#overview)
+2. [Key Concepts](#key-concepts)
+3. [How It Works — End-to-End Lifecycle](#how-it-works)
+4. [App Pages](#app-pages)
+  - [App Page Configuration Fields](#app-page-configuration-fields)
+  - [Page Data Sources](#page-data-sources)
+  - [Page Variables](#page-variables)
+  - [Layout System](#layout-system)
+5. [Widgets](#widgets)
+  - [Widget Configuration Fields](#widget-configuration-fields)
+  - [Widget Types Reference](#widget-types-reference)
+  - [Widget Properties (Styling)](#widget-properties-styling)
+  - [Widget Events System](#widget-events-system)
+  - [Widget Methods](#widget-methods)
+6. [Expression Engine & Data Binding](#expression-engine-data-binding)
+7. [Real-Time & Async Behaviour](#real-time-async-behaviour)
+8. [Integration Points](#integration-points)
+9. [Access Control](#access-control)
+10. [Error States & Edge Cases](#error-states-edge-cases)
+11. [Best Practices](#best-practices)
+12. [Limitations & Constraints](#limitations-constraints)
+13. [Related Modules](#related-modules)
 
 * * *
 
@@ -69,7 +75,7 @@ Together, App Pages and Widgets implement the **Apps → Pages → Widgets** can
 
 <a id="how-it-works-end-to-end-lifecycle"></a>
 
-## How It Works — End-to-End Lifecycle
+## How It Works — End-to-End Lifecycle {#how-it-works}
 
 <a id="creating-and-editing-an-app-page"></a>
 
@@ -666,7 +672,7 @@ Some widget types expose programmatic methods that can be called from another wi
 
 <a id="expression-engine-data-binding"></a>
 
-## Expression Engine & Data Binding
+## Expression Engine & Data Binding {#expression-engine-data-binding}
 
 Widgets and data source inputs use `{{ }}` **expressions** to bind dynamic values from the page state tree. The expression engine supports full JavaScript within template expressions.
 
@@ -713,7 +719,7 @@ The expression editor provides live autocomplete when typing inside `{{ }}`. Sug
 
 <a id="real-time-async-behaviour"></a>
 
-## Real-Time & Async Behaviour
+## Real-Time & Async Behaviour {#real-time-async-behaviour}
 
 <a id="listener-data-sources"></a>
 
@@ -756,7 +762,7 @@ The layout editor automatically saves layout changes into the page config form. 
 | **Listeners** | Pages bind to Listeners to receive real-time push data over WebSockets, populating the state tree reactively. |
 | **File Storage** | Image widgets and the HTML widget support file uploads. Uploaded files are stored via the platform's file storage service and referenced by URL. |
 | **Access Control (Casbin)** | When an App Page or Widget is created, the creator is automatically granted full creator-level access. This determines who can read, update, delete, or clone the resource. Page-level data source binding also checks that the user has execute permission on each referenced Query, Workflow, Listener, and Widget. |
-| **WebSocket /** [http://Socket.IO](http://Socket.IO) | The Page Runtime uses the platform's [http://Socket.IO](http://Socket.IO) connection for listener subscriptions and workflow streaming. The same socket connection is used by the widget-workflow bridge for real-time context updates. |
+| **WebSocket /** Socket.IO | The Page Runtime uses the platform's Socket.IO connection for listener subscriptions and workflow streaming. The same socket connection is used by the widget-workflow bridge for real-time context updates. |
 
 * * *
 
@@ -774,7 +780,7 @@ Sharing access with other users or roles is managed through the platform's Role-
 
 <a id="error-states-edge-cases"></a>
 
-## Error States & Edge Cases
+## Error States & Edge Cases {#error-states-edge-cases}
 
 | Situation | User-Facing Behaviour |
 | --- | --- |
@@ -814,7 +820,7 @@ Sharing access with other users or roles is managed through the platform's Role-
 
 <a id="limitations-constraints"></a>
 
-## Limitations & Constraints
+## Limitations & Constraints {#limitations-constraints}
 
 | Limitation | Detail |
 | --- | --- |
@@ -824,7 +830,7 @@ Sharing access with other users or roles is managed through the platform's Role-
 | **Vega Visual Builder** | Only supported for Vega-Lite specs. Full Vega specs must be authored in Raw mode. |
 | **Vega Visual Builder spec parsing** | Specs with `layer`, `hconcat`, `vconcat`, `concat`, `repeat`, or `transform` clauses cannot be parsed back into the visual builder. Switching to visual mode in these cases will lose those features. |
 | **Layout undo depth** | Undo is limited to changes made within the current editing session. Navigating away and returning resets the undo history. |
-| **Listener subscriptions** | Listeners connect via the platform's shared [http://Socket.IO](http://Socket.IO) connection. Each listener data source subscribes to one channel. Multiple listeners on the same page each maintain their own subscription. |
+| **Listener subscriptions** | Listeners connect via the platform's shared Socket.IO connection. Each listener data source subscribes to one channel. Multiple listeners on the same page each maintain their own subscription. |
 | **Widget method calling** | The `Call Widget Method` action type is defined in the system but is not currently exposed as a selectable option in the event editor UI. |
 | **HTML Widget browser globals** | The HTML Widget's iframe sandbox does not grant `allow-same-origin`. Scripts running inside cannot access the parent page's DOM, cookies, or local storage by design. |
 | **Expression globals** | Only a curated set of JavaScript globals are available inside expressions: `JSON`, `Math`, `Array`, `Object`, `String`, `Number`, `Boolean`, `Date`, `RegExp`, `Map`, `Set`, `parseInt`, `parseFloat`, `isNaN`, `isFinite`, encode/decode URI functions. Browser APIs (`fetch`, `window`, `document`, `localStorage`, etc.) are not accessible. |

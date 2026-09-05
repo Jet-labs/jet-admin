@@ -177,6 +177,7 @@ export const updateAppPageByIDAPI = async ({
 };
 
 export const deleteAppPageByIDAPI = async ({ tenantID, appPageID }) => {
+
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -188,6 +189,98 @@ export const deleteAppPageByIDAPI = async ({ tenantID, appPageID }) => {
           authorization: `Bearer ${bearerToken}`,
         },
       });
+      if (response.data && response.data.success === true) {
+        return true;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAppPageVersionsAPI = async ({ tenantID, appPageID, page, pageSize }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.getAppPageVersionsAPI(tenantID, appPageID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        params: { page, pageSize },
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      if (response.data && response.data.success === true) {
+        return {
+          versions: response.data.versions || [],
+          totalCount: response.data.totalCount || 0,
+          totalPages: response.data.totalPages || 1,
+          page: response.data.page || 1,
+          pageSize: response.data.pageSize || 0,
+        };
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAppPageVersionByIDAPI = async ({ tenantID, appPageID, versionID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.getAppPageVersionByIDAPI(tenantID, appPageID, versionID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      if (response.data && response.data.success === true) {
+        return response.data.version;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const restoreAppPageVersionAPI = async ({ tenantID, appPageID, versionID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.restoreAppPageVersionAPI(tenantID, appPageID, versionID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
       if (response.data && response.data.success === true) {
         return true;
       } else if (response.data.error) {

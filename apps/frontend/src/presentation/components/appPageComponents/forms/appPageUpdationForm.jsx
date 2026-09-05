@@ -20,6 +20,7 @@ import {
 } from "../../ui/resizable";
 import { AppPageCloneForm } from "./appPageCloneForm";
 import { AppPageDeletionForm } from "./appPageDeletionForm";
+import { AppPageVersionHistory } from "./appPageVersionHistory";
 import { AppPageDropzone } from "../editor/appPageDropzone";
 import { AppPageEditor } from "../editor/appPageEditor";
 import { AppPageConsole } from "../editor/appPageConsole";
@@ -224,6 +225,11 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
             </Button>
           </div>
         )}
+        <AppPageVersionHistory
+          key={`appPageVersionHistory_${appPage?.appPageID}`}
+          tenantID={tenantID}
+          appPageID={appPageID}
+        />
         <AppPageDeletionForm
           key={`appPageDeletionForm_${appPage?.appPageID}`}
           tenantID={tenantID}

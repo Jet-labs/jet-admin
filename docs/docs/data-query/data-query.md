@@ -1,12 +1,18 @@
-# Data Query
+---
+title: Data Query
+description: Parameterized queries against any data source — create, test, variable binding, and execution.
+sidebar_position: 4
+---
 
-<a id="blue-starhttps-jet-labsatlassiannet-wiki-s-974593021-6452-9ceafe429056077b7b7258df893d02468b8922ed-_-images-icons-emoticons-72-1f50dpng-data-query-module-overview"></a>
+# Data Query
 
 ## Data Query Module Overview
 
 The **Data Query Module** lets users write and run queries or supported commands on configured Data Sources. Data Queries perform CRUD operations on any supported data source.
 
-<a id="contentemoticonpagehttps-jet-labsatlassiannet-wiki-s-974593021-6452-9ceafe429056077b7b7258df893d02468b8922ed-_-images-icons-emoticons-72-1f4c3png-create-a-data-query"></a>
+:::note
+Queries always run against a datasource in the same tenant (`datasourceID` FK). Execution from workflows, app pages, and listeners reuses the caller's identity plus an origin reference for delegated authorization — see [Identity & Access Management](../identity-access-management/identity-access-management.md).
+:::
 
 ## Create a Data Query
 
@@ -31,3 +37,24 @@ The **Data Query Module** lets users write and run queries or supported commands
   - Use the `{{inputs.variable}}` format to reference that variable anywhere in the query config (excluding title and description).
 
 ![image-20260618-095852.png](./attachments/image-20260618-095852.png)
+
+## Endpoints
+
+Mounted at `/api/v1/tenants/:tenantID/queries`:
+
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/schemas` | `dataquery.list` | per-datasource config JSON schemas for the query form |
+| GET | `/` | `dataquery.list` | list (supports `?folderID=`) |
+| POST | `/` | `dataquery.create` | create; grants creator access |
+| GET | `/:dataQueryID/export` | `dataquery.read` | export single query as bundle item |
+| POST | `/:dataQueryID/clone` | `dataquery.create` | deep copy with fresh ID |
+| PATCH | `/queryTest` | `dataquery.execute` | ad-hoc test without saving |
+| GET \| PATCH \| DELETE | `/:dataQueryID` | `dataquery.read/update/delete` | CRUD on one query |
+| POST | `/:dataQueryID/queryTest` | `dataquery.execute` | test saved query |
+| POST | `/:dataQueryID/run` | `dataquery.execute` | execute with `Args` variables |
+
+## Execution notes
+
+- `POST /run` and `/queryTest` resolve `{{inputs.*}}` server-side before dispatching to the connector in `@jet-admin/datasources-logic`. Secrets are resolved from vault/`datasourceOptions` and redacted in responses via `utils/sensitive.js`.
+- Workflows call queries through the `dataQuery` node (`nodeConfig.dataQueryID`); app pages through `TRIGGER_QUERY` widget actions. Both pass the original caller identity + origin for delegated authorization.

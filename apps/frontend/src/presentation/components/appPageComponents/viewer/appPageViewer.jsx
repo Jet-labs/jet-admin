@@ -1,11 +1,9 @@
 /**
  * AppPageViewer
  *
- * The top-level page viewer that:
- * 1. Fetches the page config via the appPage API
- * 2. Wraps children in AppPageRuntimeProvider
- * 3. Bootstraps the data source manager
- * 4. Renders the responsive grid layout with AppPageWidgetSlot instances
+ * The top-level standalone page viewer. Fetches the page config and renders
+ * it through the shared AppPageView (single view-mode implementation —
+ * see ./AppPageView.jsx). This component only owns the page header.
  */
 
 import React from "react";
@@ -13,76 +11,9 @@ import { useQuery } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../../constants";
 import { getAppPageByIDAPI } from "../../../../data/apis/appPage";
-import { AppPageRuntimeProvider } from "../../../../logic/appPageRuntime/AppPageRuntimeProvider";
 import { ReactQueryLoadingErrorWrapper } from "../../ui/reactQueryLoadingErrorWrapper";
-import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootstrapper";
-import { AppPageWidgetSlot } from "../editor/appPageWidgetSlot";
 import { AppPagePrintForm } from "../forms/appPagePrintForm";
-import { migrateV1ToV2, LayoutRenderer } from "../layout/index.js";
-import { useAppPageStateTree } from "../../../../logic/appPageRuntime";
-import { resolveValue } from "../../../../logic/evaluationEngine";
-import { ErrorBoundary } from "@jet-admin/ui";
-
-const EmptyPageState = () => (
-  <div className="flex h-full w-full items-center justify-center p-2">
-    <div className="rounded border border-dashed border-border bg-card p-4 text-center">
-      <p className="text-sm font-medium text-foreground">This page is empty</p>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Open this page in the editor and drag widgets onto the canvas.
-      </p>
-    </div>
-  </div>
-);
-
-const AppPageViewerContent = ({ tenantID, appPageID, migratedPageConfig }) => {
-  const stateTree = useAppPageStateTree();
-
-  const renderWidget = React.useCallback(
-    (widgetKey, sizing, scopedStateTree) => (
-      <AppPageWidgetSlot
-        tenantID={tenantID}
-        widgetKey={widgetKey}
-        editable={false}
-        sizing={sizing}
-        scopedStateTree={scopedStateTree}
-      />
-    ),
-    [tenantID]
-  );
-
-  return (
-    <>
-      <AppPageDataSourceBootstrapper />
-
-      <div
-        className="w-full overflow-y-auto bg-muted p-2"
-        id={`printable-area-app-page-${appPageID}`}
-      >
-        {migratedPageConfig.layout ? (
-          <ErrorBoundary title="Page layout error">
-            <LayoutRenderer
-              node={migratedPageConfig.layout}
-              renderWidget={renderWidget}
-              mode="view"
-              stateTree={stateTree}
-              resolveValue={resolveValue}
-            />
-          </ErrorBoundary>
-        ) : (
-          <EmptyPageState />
-        )}
-      </div>
-    </>
-  );
-};
-
-AppPageViewerContent.propTypes = {
-  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-    .isRequired,
-  appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-    .isRequired,
-  migratedPageConfig: PropTypes.object.isRequired,
-};
+import { AppPageView } from "./AppPageView";
 
 export const AppPageViewer = ({ tenantID, appPageID }) => {
   const {
@@ -101,11 +32,6 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
       }),
     refetchOnWindowFocus: false,
   });
-
-  const migratedPageConfig = React.useMemo(() => {
-    if (!appPage?.appPageConfig) return null;
-    return migrateV1ToV2(appPage.appPageConfig);
-  }, [appPage]);
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
@@ -133,19 +59,14 @@ export const AppPageViewer = ({ tenantID, appPageID }) => {
         refetch={refetchAppPage}
         isRefetching={isRefetchingAppPage}
       >
-        {appPage && migratedPageConfig && (
-          <AppPageRuntimeProvider
-            pageID={appPageID}
+        {appPage?.appPageConfig && (
+          <AppPageView
             tenantID={tenantID}
-            pageConfig={migratedPageConfig}
+            pageID={appPageID}
+            pageConfig={appPage.appPageConfig}
             syncVariablesToUrl={true}
-          >
-            <AppPageViewerContent
-              tenantID={tenantID}
-              appPageID={appPageID}
-              migratedPageConfig={migratedPageConfig}
-            />
-          </AppPageRuntimeProvider>
+            scrollerClassName="w-full overflow-y-auto bg-muted p-2"
+          />
         )}
       </ReactQueryLoadingErrorWrapper>
     </div>

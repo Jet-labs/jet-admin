@@ -1,3 +1,9 @@
+---
+title: Data Source
+description: Connection management for 35+ connectors — create, validate, proxy, and secure credentials.
+sidebar_position: 3
+---
+
 # Data Source
 
 The **Data Source Module** stores, validates, and manages connections for your connectors such as PostgreSQL, MySQL, REST APIs, Firebase, Google Sheets, Excel, and more.
@@ -56,3 +62,23 @@ Jet Admin supports various data sources listed below:
 - Webhook
 - WebSocket
 - Web URL (Web Scraping / URL Data Source)
+
+## Endpoints
+
+Mounted at `/api/v1/tenants/:tenantID/datasources`:
+
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/schemas` | `datasource.list` | per-type config JSON schemas driving the wizard |
+| GET | `/` | `datasource.list` | list (supports `?folderID=`) |
+| POST | `/test` | `datasource.execute` | validate a config without saving |
+| POST | `/upload` | `datasource.create` | file-backed sources (memory upload, 10 MB) |
+| GET | `/:datasourceID/export` | `datasource.read` | export single source as bundle item |
+| POST | `/:datasourceID/clone` | `datasource.create` | deep copy with fresh ID |
+| GET \| PATCH \| DELETE | `/:datasourceID` | `datasource.read/update/delete` | CRUD on one connection |
+| GET \| POST | `/:datasourceID/proxy` | `datasource.execute` | browser-safe proxied calls through the backend |
+| POST | `/` | `datasource.create` | create; credentials encrypted, creator access granted |
+
+## Credentials
+
+Connection secrets (`connectionString`, `webhookSecret`, OAuth tokens) are encrypted at rest — datasource rows via `datasourceOptions` and OAuth/Google tokens via `vaultService.storeCredential` (AES-256-GCM, `VAULT_ENCRYPTION_KEY`). They are masked (`●●●●●●●●`) in API responses and redacted in logs (`utils/sensitive.js`). Rotating `VAULT_ENCRYPTION_KEY` requires re-encrypting `tblVaultCredentials.encryptedData` — there is no automatic rotation; plan downtime. See [Configuration Reference](../operations/configuration-reference.md) and [Security](../operations/security.md).
