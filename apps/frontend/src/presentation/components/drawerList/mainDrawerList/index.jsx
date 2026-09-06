@@ -26,6 +26,7 @@ import {
   PanelTop,
   Radio,
   ShieldCheck,
+  Store,
   UserCog,
   Users,
   Workflow
@@ -211,6 +212,13 @@ export const MainDrawerList = () => {
       title: CONSTANTS.STRINGS.MAIN_DRAWER_APP_PAGES_TITLE,
       icon: LayoutDashboard,
       path: CONSTANTS.ROUTES.VIEW_APP_PAGES.path(tenantID),
+    },
+    {
+      type: "link",
+      activeKey: "marketplace",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_MARKETPLACE_TITLE,
+      icon: Store,
+      path: CONSTANTS.ROUTES.VIEW_MARKETPLACE.path(tenantID),
     },
     {
       type: "link",

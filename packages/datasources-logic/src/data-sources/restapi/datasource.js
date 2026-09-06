@@ -23,6 +23,28 @@ export default class RestAPIDataSource extends DataSource {
     const datasourceOptions = this.config.datasourceOptions || {};
     const finalUrl = `${datasourceOptions.baseUrl}${apiEndpoint}`;
 
+    // Fail fast on unresolved templates. An input that resolved to undefined
+    // (or a leftover {{ }}) would otherwise reach axios as a literal
+    // "https://undefined/..." and bury the cause in socket dumps.
+    // Only the hostname and leftover braces are checked — path segments are
+    // never inspected, so legitimate values are unaffected.
+    try {
+      const parsedHost = new URL(finalUrl).hostname;
+      if (
+        parsedHost === "undefined" ||
+        parsedHost === "" ||
+        (typeof apiEndpoint === "string" && apiEndpoint.includes("{{"))
+      ) {
+        throw new Error(
+          `Unresolved template in REST endpoint "${apiEndpoint}". ` +
+          `An input resolved to undefined — check the query's input values.`
+        );
+      }
+    } catch (e) {
+      if (e.message && e.message.startsWith("Unresolved template")) throw e;
+      // new URL threw (relative URL etc.) — leave validation to axios.
+    }
+
     // Helper to convert KV array to object
     const kvArrayToObject = (arr) => {
       if (!arr || !Array.isArray(arr)) return {};

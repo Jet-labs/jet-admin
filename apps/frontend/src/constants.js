@@ -93,6 +93,7 @@ export const CONSTANTS = {
     MAIN_DRAWER_QUERIES_TITLE: "Queries",
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
     MAIN_DRAWER_AUDIT_LOGS_TITLE: "Audit logs",
+    MAIN_DRAWER_MARKETPLACE_TITLE: "Marketplace",
     NO_TENANT_CREATED_TILL_NOW: "Please create a tenant",
     MAIN_DRAWER_LISTENERS_TITLE: "Listeners",
     ADD_LISTENER_BUTTON_TEXT: "Add listener",
@@ -631,6 +632,7 @@ export const CONSTANTS = {
     RAW_QUERY_EXCECUTOR_RESULT_PLACEHOLDER_ERROR: "Error executing query",
 
     VIEW_AUDIT_LOGS_TITLE: "Audit logs",
+    VIEW_MARKETPLACE_TITLE: "Marketplace",
 
     ADD_LISTENER_FORM_TITLE: "Create new listener",
     UPDATE_LISTENER_FORM_TITLE: "Update listener",
@@ -937,6 +939,11 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/engines",
       path: (tenantID) => `/tenants/${tenantID}/engines`,
       title: "Engines",
+    },
+    VIEW_MARKETPLACE: {
+      code: "/tenants/:tenantID/marketplace",
+      path: (tenantID) => `/tenants/${tenantID}/marketplace`,
+      title: "Marketplace",
     },
   },
 

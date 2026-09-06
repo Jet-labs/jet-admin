@@ -63,6 +63,7 @@ const CronJobLayoutLandingPage = lazy(() =>
   import("../../pages/cronJobLayoutLandingPage")
 );
 const ViewAuditLogsPage = lazy(() => import("../../pages/viewAuditLogsPage"));
+const MarketplacePage = lazy(() => import("../../pages/marketplacePage"));
 
 const DatasourceLayoutLandingPage = lazy(() =>
   import("../../pages/datasourceLayoutLandingPage")
@@ -274,6 +275,11 @@ const router = createBrowserRouter([
             path: CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.code,
             element: <ViewAuditLogsPage />,
             handle: { title: CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.title },
+          },
+          {
+            path: CONSTANTS.ROUTES.VIEW_MARKETPLACE.code,
+            element: <MarketplacePage />,
+            handle: { title: CONSTANTS.ROUTES.VIEW_MARKETPLACE.title },
           },
           {
             element: <AppPageLayout />,

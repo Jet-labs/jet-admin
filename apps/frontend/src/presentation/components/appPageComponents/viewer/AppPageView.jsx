@@ -15,9 +15,9 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import { AppPageRuntimeProvider } from "../../../logic/appPageRuntime/AppPageRuntimeProvider";
-import { useAppPageStateTree } from "../../../logic/appPageRuntime";
-import { resolveValue } from "../../../logic/evaluationEngine";
+import { AppPageRuntimeProvider } from "../../../../logic/appPageRuntime/AppPageRuntimeProvider";
+import { useAppPageStateTree } from "../../../../logic/appPageRuntime";
+import { resolveValue } from "../../../../logic/evaluationEngine";
 import { migrateV1ToV2, LayoutRenderer } from "../layout/index.js";
 import { AppPageWidgetSlot } from "../editor/appPageWidgetSlot";
 import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootstrapper";

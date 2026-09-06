@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   createListenerActionAPI,
@@ -14,7 +14,6 @@ import { getAppPageByIDAPI } from "../../../data/apis/appPage";
 import { useDebounce } from "@uidotdev/usehooks";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CONSTANTS } from "../../../constants";
-import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import {
   Button,
   Spinner,
@@ -29,12 +28,12 @@ import {
   Card,
   CodeEditor,
   InputValuesForm,
-  CardFooter,
-  CardTitle,
   SearchSelect,
+  Badge,
+  JsonViewer,
 } from "@jet-admin/ui";
 import { MODES } from "@jet-admin/expression-engine";
-import { Zap, Search, Save, Smartphone, Plus, Trash2, Edit2, Play, CircleSlash, ArrowRight, Wand2 } from "lucide-react";
+import { Zap, Plus, Trash2, Edit2, Play, CircleSlash, Wand2, ChevronUp, ChevronDown, ChevronRight, Code2, ListTree } from "lucide-react";
 import PropTypes from "prop-types";
 import { GitBranch, FileCode2, DatabaseZap, PanelTop } from "lucide-react";
 
@@ -50,21 +49,29 @@ const LISTENER_EVENT_STATE_TREE = {
   },
 };
 const ACTION_TYPES = [
-  { value: "transform", label: "Transform Event", icon: Wand2, color: "text-primary", bg: "bg-muted", border: "border-border" },
-  { value: "trigger_workflow", label: "Trigger Workflow", icon: GitBranch, color: "text-primary", bg: "bg-muted", border: "border-border" },
-  { value: "trigger_query", label: "Trigger Data Query", icon: FileCode2, color: "text-primary", bg: "bg-muted", border: "border-border" },
-  { value: "save_to_buffer", label: "Save to Buffer", icon: DatabaseZap, color: "text-primary", bg: "bg-muted", border: "border-border" },
-  { value: "push_to_app_page", label: "Push to AppPage", icon: PanelTop, color: "text-primary", bg: "bg-muted", border: "border-border" },
+  { value: "transform", label: "Transform Event", description: "Run JS over the event, filter or reshape it", icon: Wand2, iconClass: "bg-violet-500/10 text-violet-500 border-violet-500/20" },
+  { value: "trigger_workflow", label: "Trigger Workflow", description: "Start a workflow with event data", icon: GitBranch, iconClass: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
+  { value: "trigger_query", label: "Trigger Data Query", description: "Run a data query with event data", icon: FileCode2, iconClass: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
+  { value: "save_to_buffer", label: "Save to Buffer", description: "Persist events for replay / history", icon: DatabaseZap, iconClass: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+  { value: "push_to_app_page", label: "Push to App Page", description: "Push live data to an app page", icon: PanelTop, iconClass: "bg-pink-500/10 text-pink-500 border-pink-500/20" },
 ];
+
+const getActionTypeConfig = (actionType) =>
+  ACTION_TYPES.find((t) => t.value === actionType);
 
 export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) => {
   const queryClient = useQueryClient();
   const [editingAction, setEditingAction] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [expandedConfigs, setExpandedConfigs] = useState({});
+  const [reorderingID, setReorderingID] = useState(null);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: [CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID), listenerID] });
   };
+
+  const toggleExpanded = (actionID) =>
+    setExpandedConfigs((prev) => ({ ...prev, [actionID]: !prev[actionID] }));
 
 
 
@@ -109,12 +116,45 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
     }).catch(err => displayError(err));
   };
 
+  const handleMove = async (action, direction) => {
+    const sorted = [...actions].sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+    const idx = sorted.findIndex((a) => a.actionID === action.actionID);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (idx < 0 || swapIdx < 0 || swapIdx >= sorted.length) return;
+    const other = sorted[swapIdx];
+    setReorderingID(action.actionID);
+    try {
+      // Swap orderIndex values so execution order follows the visual order.
+      await updateListenerActionAPI({
+        tenantID,
+        listenerID,
+        actionID: action.actionID,
+        actionData: { ...action, orderIndex: other.orderIndex ?? swapIdx },
+      });
+      await updateListenerActionAPI({
+        tenantID,
+        listenerID,
+        actionID: other.actionID,
+        actionData: { ...other, orderIndex: action.orderIndex ?? idx },
+      });
+      invalidate();
+    } catch (err) {
+      displayError(err);
+    } finally {
+      setReorderingID(null);
+    }
+  };
+
   const allActions = [...actions].sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+  const nextOrderIndex = allActions.length > 0
+    ? Math.max(...allActions.map((a) => a.orderIndex ?? 0)) + 1
+    : 0;
 
   if (isAdding || editingAction) {
     return (
       <ActionForm
         action={editingAction}
+        nextOrderIndex={nextOrderIndex}
         isSaving={isSaving}
         onSave={(data) => saveAction(data)}
         onCancel={() => {
@@ -128,11 +168,13 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 min-w-0">
           <h3 className="text-sm font-semibold text-foreground">Pipeline Steps</h3>
-          <p className="text-[11px] text-muted-foreground">Steps execute sequentially on each incoming event.</p>
+          <Badge variant="secondary" className="text-xs font-medium">
+            {allActions.length}
+          </Badge>
         </div>
         {allActions.length > 0 && (
           <Button size="sm" variant="secondary" onClick={() => setIsAdding(true)}>
@@ -141,111 +183,427 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
           </Button>
         )}
       </div>
+      <p className="text-xs text-muted-foreground">
+        Steps run in order, top to bottom, on every incoming event. Disabled steps are skipped.
+      </p>
 
       {allActions.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center border-dashed border-border/60 bg-background/20 py-16 text-center transition-colors hover:bg-background/40 hover:border-border">
-          <div className="mb-4 rounded-full bg-brand-border/40 p-4 ring-1 ring-border shadow-inner">
-            <Play className="h-6 w-6 text-muted-foreground/80 pl-1" />
+        <Card className="flex flex-col items-center justify-center border-dashed py-10 text-center">
+          <div className="mb-3 rounded-full bg-muted p-3">
+            <ListTree className="h-5 w-5 text-muted-foreground" />
           </div>
-          <h4 className="text-sm font-semibold text-foreground">No pipeline steps configured</h4>
-          <p className="mt-2 text-xs text-muted-foreground max-w-sm">
-            Add your first step to start processing, transforming, and routing incoming data events.
+          <h4 className="text-sm font-semibold text-foreground">No pipeline steps yet</h4>
+          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+            Transform the event, trigger workflows or queries, buffer it, or push it to an app page.
           </p>
-          <Button size="sm" variant="secondary" className="mt-6" onClick={() => setIsAdding(true)}>
+          <Button size="sm" variant="secondary" className="mt-4" onClick={() => setIsAdding(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Step
+            Add your first step
           </Button>
         </Card>
       ) : (
-        <div className="relative space-y-4 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border/60 before:to-transparent">
-          {allActions.map((action, index) => {
-            const typeConfig = ACTION_TYPES.find(t => t.value === action.actionType);
-            const Icon = typeConfig?.icon || Zap;
-            const summaryText = action.actionType === 'transform'
-              ? (action.actionConfig?.script ? `${action.actionConfig.script.substring(0, 60)}...` : 'No script')
-              : Object.keys(action.actionConfig).length > 0
-                ? Object.entries(action.actionConfig).slice(0, 2).map(([k, v]) => `${k}: ${typeof v === 'object' ? '{...}' : String(v)}`).join(' · ')
-                : 'No configuration';
-            
-            return (
-              <div key={action.actionID} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border-[3px] border-brand-dark bg-brand-border/80 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 ring-1 ring-border/20 transition-all group-hover:ring-brand-primary/30 group-hover:border-brand-dark/90">
-                  <span className="text-[11px] font-bold text-muted-foreground group-hover:text-foreground">{index + 1}</span>
-                </div>
-
-                <Card className={`w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] p-4 transition-all duration-300 border shadow-sm hover:shadow-md ${!action.isEnabled ? 'opacity-60 grayscale-[0.3]' : 'hover:border-border/80 bg-background/60 backdrop-blur-sm'}`}>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3 min-w-0">
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded border ${typeConfig?.border || 'border-border'} ${typeConfig?.bg || 'bg-muted'} shadow-inner`}>
-                        <Icon className={`h-4 w-4 ${typeConfig?.color || 'text-muted-foreground'}`} />
-                      </div>
-                      <div className="min-w-0 flex-1 pt-0.5">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="text-sm font-semibold text-foreground truncate">
-                            {typeConfig?.label || action.actionType}
-                          </h4>
-                          {!action.isEnabled && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-2 py-0.5 text-xs font-medium text-zinc-400 ring-1 ring-inset ring-zinc-800">
-                              <CircleSlash className="h-3 w-3" />
-                              Disabled
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-[11px] text-muted-foreground font-mono truncate max-w-full opacity-80">
-                          {summaryText}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Switch
-                        checked={action.isEnabled}
-                        onCheckedChange={() => handleToggleEnable(action)}
-                        size="sm"
-                        className="scale-90 data-[state=checked]:bg-primary"
-                      />
-                      <div className="hidden sm:block w-px h-4 bg-border/60 mx-1"></div>
-                      <div className="flex">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-brand-border/40"
-                          onClick={() => setEditingAction(action)}
-                        >
-                          <Edit2 className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => {
-                             if (confirm("Are you sure you want to delete this step?")) {
-                               deleteAction(action.actionID);
-                             }
-                          }}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            );
-          })}
-        </div>
+        <ol className="space-y-2">
+          {allActions.map((action, index) => (
+            <PipelineStepCard
+              key={action.actionID}
+              action={action}
+              index={index}
+              isFirst={index === 0}
+              isLast={index === allActions.length - 1}
+              isExpanded={Boolean(expandedConfigs[action.actionID])}
+              isReordering={reorderingID === action.actionID}
+              tenantID={tenantID}
+              listenerID={listenerID}
+              onToggleExpand={() => toggleExpanded(action.actionID)}
+              onEdit={() => setEditingAction(action)}
+              onDelete={() => {
+                if (window.confirm(`Delete step ${index + 1}? This cannot be undone.`)) {
+                  deleteAction(action.actionID);
+                }
+              }}
+              onToggleEnable={() => handleToggleEnable(action)}
+              onMoveUp={() => handleMove(action, "up")}
+              onMoveDown={() => handleMove(action, "down")}
+            />
+          ))}
+        </ol>
       )}
     </div>
   );
 };
 
-const ActionForm = ({ action, onSave, onCancel, isSaving, tenantID, listenerID }) => {
+/* ------------------------------------------------------------------ */
+/* Pipeline step presentation                                          */
+/* ------------------------------------------------------------------ */
+
+const DetailRow = ({ label, children }) => (
+  <div className="grid grid-cols-[110px_1fr] items-start gap-2 py-1 text-xs">
+    <dt className="shrink-0 pt-px text-muted-foreground">{label}</dt>
+    <dd className="min-w-0 break-words text-foreground">{children}</dd>
+  </div>
+);
+
+DetailRow.propTypes = {
+  label: PropTypes.string.isRequired,
+  children: PropTypes.node,
+};
+
+const MonoID = ({ children }) => (
+  <code className="break-all rounded bg-muted px-1.5 py-0.5 font-mono text-[11px]" title={String(children ?? "")}>
+    {children}
+  </code>
+);
+
+MonoID.propTypes = { children: PropTypes.node };
+
+const WorkflowRef = ({ tenantID, workflowID }) => {
+  const { data, isLoading } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), "detail", workflowID],
+    queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID }),
+    enabled: Boolean(tenantID) && Boolean(workflowID),
+    refetchOnWindowFocus: false,
+  });
+  if (!workflowID) return <span className="text-muted-foreground">—</span>;
+  if (isLoading) return <span className="text-muted-foreground">Loading…</span>;
+  return (
+    <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+      <span className="truncate font-medium">{data?.title || data?.workflowTitle || workflowID}</span>
+      <MonoID>{workflowID}</MonoID>
+    </span>
+  );
+};
+
+WorkflowRef.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  workflowID: PropTypes.string,
+};
+
+const DataQueryRef = ({ tenantID, dataQueryID }) => {
+  const { data, isLoading } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), "detail", dataQueryID],
+    queryFn: () => getDataQueryByIDAPI({ tenantID, dataQueryID }),
+    enabled: Boolean(tenantID) && Boolean(dataQueryID),
+    refetchOnWindowFocus: false,
+  });
+  if (!dataQueryID) return <span className="text-muted-foreground">—</span>;
+  if (isLoading) return <span className="text-muted-foreground">Loading…</span>;
+  return (
+    <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+      <span className="truncate font-medium">{data?.dataQueryTitle || data?.title || dataQueryID}</span>
+      <MonoID>{dataQueryID}</MonoID>
+    </span>
+  );
+};
+
+DataQueryRef.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  dataQueryID: PropTypes.string,
+};
+
+const AppPageRef = ({ tenantID, appPageID }) => {
+  const { data, isLoading } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.APP_PAGES(tenantID), "detail", appPageID],
+    queryFn: () => getAppPageByIDAPI({ tenantID, appPageID }),
+    enabled: Boolean(tenantID) && Boolean(appPageID),
+    refetchOnWindowFocus: false,
+  });
+  if (!appPageID) return <span className="text-muted-foreground">—</span>;
+  if (isLoading) return <span className="text-muted-foreground">Loading…</span>;
+  return (
+    <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+      <span className="truncate font-medium">{data?.appPageTitle || data?.title || appPageID}</span>
+      <MonoID>{appPageID}</MonoID>
+    </span>
+  );
+};
+
+AppPageRef.propTypes = {
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  appPageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+const MappingPreview = ({ mapping }) => {
+  const entries = mapping && typeof mapping === "object" ? Object.entries(mapping) : [];
+  if (entries.length === 0) {
+    return <span className="text-muted-foreground">No mappings</span>;
+  }
+  return (
+    <ul className="space-y-1">
+      {entries.map(([key, value]) => (
+        <li key={key} className="flex min-w-0 items-start gap-2 font-mono text-[11px]">
+          <span className="shrink-0 font-semibold text-foreground">{key}:</span>
+          <span className="min-w-0 break-all text-muted-foreground" title={typeof value === "object" ? JSON.stringify(value) : String(value)}>
+            {typeof value === "object" ? JSON.stringify(value) : String(value)}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+MappingPreview.propTypes = { mapping: PropTypes.object };
+
+const StepDetails = ({ action, tenantID, listenerID }) => {
+  const config = action.actionConfig || {};
+
+  switch (action.actionType) {
+    case "transform": {
+      const script = config.script || "";
+      if (!script.trim()) {
+        return <p className="text-xs italic text-muted-foreground">No script — event passes through unchanged.</p>;
+      }
+      const lineCount = script.split("\n").length;
+      return (
+        <div className="space-y-1.5">
+          <DetailRow label="Script">
+            <span className="text-muted-foreground">{lineCount} line{lineCount === 1 ? "" : "s"}</span>
+          </DetailRow>
+          <pre className="max-h-32 overflow-auto whitespace-pre-wrap break-all rounded border border-border/60 bg-muted/40 p-2 font-mono text-[11px] leading-relaxed text-foreground">
+            {script}
+          </pre>
+          <p className="text-[11px] italic text-muted-foreground">
+            Return the transformed event. Return <code>null</code> to discard it.
+          </p>
+        </div>
+      );
+    }
+    case "trigger_workflow": {
+      if (!config.workflowID) return <p className="text-xs italic text-muted-foreground">No workflow selected.</p>;
+      const inputValues = typeof config.inputValues === "object" ? config.inputValues : {};
+      const inputCount = Object.keys(inputValues || {}).length;
+      return (
+        <dl className="divide-y divide-border/40">
+          <DetailRow label="Workflow">
+            <WorkflowRef tenantID={tenantID} workflowID={config.workflowID} />
+          </DetailRow>
+          <DetailRow label={`Inputs (${inputCount})`}>
+            <MappingPreview mapping={inputValues} />
+          </DetailRow>
+        </dl>
+      );
+    }
+    case "trigger_query": {
+      if (!config.dataQueryID) return <p className="text-xs italic text-muted-foreground">No data query selected.</p>;
+      const inputValues = typeof config.inputValues === "object" ? config.inputValues : {};
+      const argCount = Object.keys(inputValues || {}).length;
+      return (
+        <dl className="divide-y divide-border/40">
+          <DetailRow label="Data query">
+            <DataQueryRef tenantID={tenantID} dataQueryID={config.dataQueryID} />
+          </DetailRow>
+          <DetailRow label={`Arguments (${argCount})`}>
+            <MappingPreview mapping={inputValues} />
+          </DetailRow>
+        </dl>
+      );
+    }
+    case "save_to_buffer": {
+      return (
+        <dl className="divide-y divide-border/40">
+          <DetailRow label="Buffer">
+            <span className="font-medium">{config.bufferName || "default"}</span>
+          </DetailRow>
+          <DetailRow label="Retention">
+            {config.retentionPolicy === "time"
+              ? `Time based — keep ${config.maxAgeHours ?? 24}h`
+              : config.retentionPolicy === "both"
+                ? `Count + time — ${config.maxEvents ?? 1000} events / ${config.maxAgeHours ?? 24}h`
+                : `Count based — keep ${config.maxEvents ?? 1000} events`}
+          </DetailRow>
+        </dl>
+      );
+    }
+    case "push_to_app_page": {
+      if (!config.appPageID) return <p className="text-xs italic text-muted-foreground">No app page selected.</p>;
+      return (
+        <dl className="divide-y divide-border/40">
+          <DetailRow label="App page">
+            <AppPageRef tenantID={tenantID} appPageID={config.appPageID} />
+          </DetailRow>
+          <DetailRow label="Channel">
+            <MonoID>{config.channelName || `listener:${listenerID}`}</MonoID>
+          </DetailRow>
+          <DetailRow label="Update mode">
+            <span className="capitalize">{config.mode || "replace"}</span>
+            {(config.mode === "append" || config.mode === "prepend") && (
+              <span className="text-muted-foreground"> · max {config.maxArrayLength ?? 1000}</span>
+            )}
+          </DetailRow>
+        </dl>
+      );
+    }
+    default: {
+      if (Object.keys(config).length === 0) {
+        return <p className="text-xs italic text-muted-foreground">No configuration.</p>;
+      }
+      return <MappingPreview mapping={config} />;
+    }
+  }
+};
+
+StepDetails.propTypes = {
+  action: PropTypes.object.isRequired,
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  listenerID: PropTypes.string.isRequired,
+};
+
+const PipelineStepCard = ({
+  action,
+  index,
+  isFirst,
+  isLast,
+  isExpanded,
+  isReordering,
+  tenantID,
+  listenerID,
+  onToggleExpand,
+  onEdit,
+  onDelete,
+  onToggleEnable,
+  onMoveUp,
+  onMoveDown,
+}) => {
+  const typeConfig = getActionTypeConfig(action.actionType);
+  const Icon = typeConfig?.icon || Zap;
+
+  return (
+    <li className="relative flex gap-3">
+      {/* Step number rail */}
+      <div className="flex w-7 shrink-0 flex-col items-center" aria-hidden="true">
+        <span
+          className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-bold ${
+            action.isEnabled
+              ? "border-border bg-muted text-foreground"
+              : "border-dashed border-border bg-background text-muted-foreground"
+          }`}
+        >
+          {index + 1}
+        </span>
+        {!isLast && <span className="w-px flex-1 bg-border/70" />}
+      </div>
+
+      <Card className={`min-w-0 flex-1 p-3 ${!action.isEnabled ? "opacity-70" : ""}`}>
+        {/* Header — always-visible controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border ${typeConfig?.iconClass || "border-border bg-muted text-muted-foreground"}`}>
+            <Icon className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-sm font-semibold text-foreground">
+                {typeConfig?.label || action.actionType}
+              </span>
+              <Badge variant="secondary" className="px-1.5 py-0 text-[11px]">
+                Step {index + 1}
+              </Badge>
+              {action.isEnabled ? (
+                <Badge variant="success" className="px-1.5 py-0 text-[11px]">
+                  Enabled
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="px-1.5 py-0 text-[11px] text-muted-foreground">
+                  <CircleSlash className="mr-1 h-3 w-3" />
+                  Disabled
+                </Badge>
+              )}
+            </div>
+            {typeConfig?.description && (
+              <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{typeConfig.description}</p>
+            )}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              title="Move up"
+              disabled={isFirst || isReordering}
+              onClick={onMoveUp}
+            >
+              <ChevronUp className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              title="Move down"
+              disabled={isLast || isReordering}
+              onClick={onMoveDown}
+            >
+              <ChevronDown className="h-3.5 w-3.5" />
+            </Button>
+            <span className="mx-1 h-4 w-px bg-border/70" />
+            <Switch
+              checked={Boolean(action.isEnabled)}
+              onCheckedChange={onToggleEnable}
+              title={action.isEnabled ? "Disable step" : "Enable step"}
+              className="scale-90"
+            />
+            <Button variant="ghost" size="icon" className="h-7 w-7" title="Edit step" onClick={onEdit}>
+              <Edit2 className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              title="Delete step"
+              onClick={onDelete}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Details — full config, not truncated */}
+        <div className="mt-2 rounded-md border border-border/50 bg-background/40 p-2.5">
+          <StepDetails action={action} tenantID={tenantID} listenerID={listenerID} />
+        </div>
+
+        {/* Full JSON — collapsed by default */}
+        <button
+          type="button"
+          onClick={onToggleExpand}
+          className="mt-1.5 flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ChevronRight className={`h-3 w-3 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+          <Code2 className="h-3 w-3" />
+          {isExpanded ? "Hide full config" : "Show full config"}
+        </button>
+        {isExpanded && (
+          <div className="mt-1.5 rounded-md border border-border/50 bg-muted/20 p-2">
+            <JsonViewer data={action.actionConfig || {}} />
+          </div>
+        )}
+      </Card>
+    </li>
+  );
+};
+
+PipelineStepCard.propTypes = {
+  action: PropTypes.object.isRequired,
+  index: PropTypes.number.isRequired,
+  isFirst: PropTypes.bool.isRequired,
+  isLast: PropTypes.bool.isRequired,
+  isExpanded: PropTypes.bool.isRequired,
+  isReordering: PropTypes.bool.isRequired,
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  listenerID: PropTypes.string.isRequired,
+  onToggleExpand: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onToggleEnable: PropTypes.func.isRequired,
+  onMoveUp: PropTypes.func.isRequired,
+  onMoveDown: PropTypes.func.isRequired,
+};
+
+const ActionForm = ({ action, nextOrderIndex = 0, onSave, onCancel, isSaving, tenantID, listenerID }) => {
   const [formData, setFormData] = useState(
     action || {
       actionType: "transform",
       actionConfig: {},
       isEnabled: true,
-      orderIndex: 0,
+      orderIndex: nextOrderIndex,
     }
   );
 
@@ -258,22 +616,28 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, tenantID, listenerID }
     onSave(formData);
   };
 
-  const selectedType = ACTION_TYPES.find(t => t.value === formData.actionType);
+  const selectedType = getActionTypeConfig(formData.actionType);
+  const SelectedIcon = selectedType?.icon || Zap;
 
   return (
     <Card className="">
-      <div className="border-b rounded-t-md border-border/50 bg-background p-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-
+      <div className="border-b rounded-t-md border-border/50 bg-background p-3 flex items-center gap-2.5">
+        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border ${selectedType?.iconClass || "border-border bg-muted text-muted-foreground"}`}>
+          <SelectedIcon className="h-4 w-4" />
+        </div>
+        <div className="min-w-0">
           <h3 className="text-sm font-semibold text-foreground tracking-tight">
-            {action ? "Edit Pipeline Step" : "Add Pipeline Step"}
+            {action ? `Edit Step — ${selectedType?.label || formData.actionType}` : "Add Pipeline Step"}
           </h3>
+          {selectedType?.description && (
+            <p className="truncate text-[11px] text-muted-foreground">{selectedType.description}</p>
+          )}
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-2 space-y-2">
-        <div className="space-y-2">
-          <div className="space-y-1">
+      <form onSubmit={handleSubmit} className="p-3 space-y-3">
+        <div className="space-y-3">
+          <div className="space-y-1.5">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Step Type</Label>
             <Select
               value={formData.actionType}
@@ -288,8 +652,8 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, tenantID, listenerID }
                   return (
                     <SelectItem key={t.value} value={t.value}>
                       <span className="flex items-center gap-2">
-                        <Icon className={`h-4 w-4 shrink-0 ${t.color}`} />
-                        {t.label}
+                        <Icon className="h-4 w-4 shrink-0" />
+                        <span>{t.label}</span>
                       </span>
                     </SelectItem>
                   );
@@ -298,10 +662,10 @@ const ActionForm = ({ action, onSave, onCancel, isSaving, tenantID, listenerID }
             </Select>
           </div>
 
-          <div className="rounded border border-border/50 bg-background/40 p-2">
+          <div className="rounded-md border border-border/50 bg-background/40 p-2.5">
             <div className="flex items-center gap-2 mb-2">
-              <selectedType.icon className={`h-4 w-4 ${selectedType.color}`} />
-              <h4 className="text-sm font-medium text-foreground">Configuration Details</h4>
+              <SelectedIcon className="h-4 w-4 text-muted-foreground" />
+              <h4 className="text-sm font-medium text-foreground">{selectedType?.label || "Configuration"}</h4>
             </div>
              <ActionConfigEditor
               type={formData.actionType}
@@ -813,17 +1177,18 @@ const ActionConfigEditor = ({ type, config, onChange, tenantID, listenerID }) =>
 };
 
 ListenerActionManager.propTypes = {
-  tenantID: PropTypes.string.isRequired,
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   listenerID: PropTypes.string.isRequired,
   actions: PropTypes.array,
 };
 
 ActionForm.propTypes = {
   action: PropTypes.object,
+  nextOrderIndex: PropTypes.number,
   onSave: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   isSaving: PropTypes.bool,
-  tenantID: PropTypes.string.isRequired,
+  tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   listenerID: PropTypes.string.isRequired,
 };
 
