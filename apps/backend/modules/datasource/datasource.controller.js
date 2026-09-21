@@ -3,9 +3,6 @@ const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { datasourceService } = require("./datasource.service");
 const { getServiceAuthContext } = require("../../utils/auth.context.utils");
-const { createClient } = require("@supabase/supabase-js");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const environmentVariables = require("../../environment");
 const fileStorageUtil = require("../../utils/fileStorage.util");
 // Credentials are sent as-is to the frontend (display masking is handled by the UI
 // via HTML password inputs). Logging still redacts via logger.js / sensitive.js.
@@ -436,7 +433,7 @@ datasourceController.cloneDatasourceByID = async (req, res) => {
 };
 
 /**
- * Uploads a datasource file (Excel/CSV) to Supabase storage.
+ * Uploads a datasource file (Excel/CSV) to S3-compatible object storage.
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */

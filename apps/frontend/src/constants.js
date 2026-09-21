@@ -1,18 +1,36 @@
+// Runtime config injected by the Docker entrypoint via /config.js
+// (see docker-entrypoint.frontend.sh). Lets the same image point at any
+// backend without rebuilding: `docker run -e SERVER_HOST=...`.
+const getRuntimeConfig = (key) => {
+  if (typeof window !== "undefined" && window.__JET_ADMIN_CONFIG__) {
+    const value = window.__JET_ADMIN_CONFIG__[key];
+    if (value) return value;
+  }
+  return "";
+};
+
+// Default backend when nothing is configured. In production builds the
+// frontend is served by nginx, which proxies /api + /socket.io to the
+// backend — so same-origin works everywhere (local compose, Render, ...).
+const getDefaultHost = () => {
+  if (typeof window !== "undefined" && window.location?.origin) {
+    if (!import.meta.env.DEV) return window.location.origin;
+  }
+  return "http://localhost:8090";
+};
+
 export const CONSTANTS = {
   APP_NAME: "Jet Admin",
 
   SERVER_HOST:
+    getRuntimeConfig("SERVER_HOST") ||
     import.meta.env.VITE_SERVER_HOST ||
-    (import.meta.env.DEV ? "http://localhost:8090" : "https://jet-admin-1.onrender.com"),
+    (import.meta.env.DEV ? "http://localhost:8090" : getDefaultHost()),
 
   SOCKET_HOST:
+    getRuntimeConfig("SOCKET_HOST") ||
     import.meta.env.VITE_SOCKET_HOST ||
-    (import.meta.env.DEV ? "http://localhost:8090" : "https://jet-admin-1.onrender.com"),
-
-  SUPABASE: {
-    TENANT_ASSET_DIRECTORY: "tenant-assets",
-    TENANT_LOGO_DIRECTORY: "logos",
-  },
+    (import.meta.env.DEV ? "http://localhost:8090" : getDefaultHost()),
 
   ROLES: {
     PRIMARY: {

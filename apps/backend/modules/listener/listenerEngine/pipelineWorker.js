@@ -1,9 +1,9 @@
 /**
  * Pipeline Worker
- * Consumes events from the listener event queue, applies transforms,
+ * Consumes listener events (in-process fastq in embedded/memory mode,
+ * Redis Streams consumer group in proxy/redis mode), applies transforms,
  * and dispatches actions (trigger_workflow, trigger_query, save_to_buffer, push_to_app_page).
- *
- * Same pattern as workflow taskListener.js — registered as a fastq worker.
+ * Registered via queue.config.registerListenerEventWorker.
  *
  * Error policy (intentional):
  *   transform  → abort pipeline on error — downstream actions depend on clean data
@@ -37,15 +37,72 @@ async function startPipelineWorker() {
   Logger.log('success', { message: 'pipelineWorker:started' });
 }
 
+// ─── Action resolution ──────────────────────────────────────────────────────
+// Embedded (fastq) jobs carry an `actions` snapshot. Proxy (Redis) envelopes
+// carry raw events only — resolve fresh enabled actions from DB so action
+// CRUD never goes stale for in-flight messages (short TTL cache).
+
+const ACTIONS_CACHE_TTL_MS = 5000;
+const actionsCache = new Map(); // listenerID → { at, actions }
+
+async function resolveActions(job) {
+  // Embedded jobs always carry the snapshot (possibly empty = no-op).
+  if (Array.isArray(job.actions)) {
+    return job.actions;
+  }
+  const cached = actionsCache.get(job.listenerID);
+  if (cached && Date.now() - cached.at < ACTIONS_CACHE_TTL_MS) {
+    return cached.actions;
+  }
+  const actions = await prisma.tblListenerActions.findMany({
+    where: { listenerID: job.listenerID, isEnabled: true },
+    orderBy: { orderIndex: 'asc' },
+  });
+  actionsCache.set(job.listenerID, { at: Date.now(), actions });
+  return actions;
+}
+
+// Test-room preview for proxy envelopes. (Embedded mode previews at ingress
+// in engine.js; the proxy owns no sockets, so the consumer emits here.
+// Guarded by __viaRedis so embedded jobs never double-emit.)
+function maybeEmitTestPreview(job, actions) {
+  try {
+    if (!job || !job.__viaRedis) return;
+    const rooms = socketIO?.sockets?.adapter?.rooms;
+    if (!rooms) return;
+    const testRoom = `listener_test:${job.listenerID}`;
+    const room = rooms.get(testRoom);
+    if (!room || room.size === 0) return;
+    const transformAction = (actions || []).find((a) => a.actionType === 'transform' && a.isEnabled);
+    const script = transformAction?.actionConfig?.script;
+    let transformedEvent = job.rawEvent;
+    let transformError = null;
+    if (script && script.trim()) {
+      const res = ListenerTransformerVm.execute(script, job.rawEvent);
+      transformedEvent = res.output;
+      transformError = res.error;
+    }
+    socketIO.to(testRoom).emit('listener_test_event', {
+      listenerID: job.listenerID,
+      rawEvent: job.rawEvent,
+      transformedEvent,
+      transformError,
+      timestamp: Date.now(),
+    });
+  } catch (_) { /* best-effort only */ }
+}
+
 // ─── Event Processor ──────────────────────────────────────────────────────────
 
 async function _processEvent(job) {
-  const { listenerID, tenantID, rawEvent, actions } = job;
+  const { listenerID, tenantID, rawEvent } = job;
 
   // Track pipeline outcome to conditionally update metadata
   let eventProcessed = false;
 
   try {
+    const actions = await resolveActions(job);
+    maybeEmitTestPreview(job, actions);
     let currentEvent = rawEvent;
 
     // Dispatch each action in order
@@ -121,6 +178,12 @@ async function _processEvent(job) {
       message: 'pipelineWorker:processEvent:error',
       params: { listenerID, error: err.message },
     });
+    // Redis driver: propagate hard failures (e.g. action resolution against
+    // a down DB) so the consumer loop moves the envelope to the DLQ stream
+    // instead of silently dropping it. Memory driver keeps legacy swallow.
+    if (job && job.__viaRedis) {
+      throw err;
+    }
   }
 }
 

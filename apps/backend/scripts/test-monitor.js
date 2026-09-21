@@ -1,29 +1,28 @@
 const queue = require('../config/queue.config');
-const Logger = require('../utils/logger');
 
 async function run() {
     try {
-        console.log('Initializing in-memory queue...');
+        console.log('Initializing queue (memory driver)...');
         await queue.initializeQueue();
+        console.log('Healthy:', queue.isConnectionHealthy());
 
-        // Register a dummy task worker for testing
-        queue.registerTaskWorker(async (job) => {
-            console.log('Task worker received:', JSON.stringify(job, null, 2));
+        // Register a dummy listener-event worker for testing
+        queue.registerListenerEventWorker(async (job) => {
+            console.log('Listener worker received:', JSON.stringify(job, null, 2));
         });
 
-        console.log('Sending test message...');
-        await queue.addNodeJob({
-            instanceID: 'test-instance-' + Date.now(),
-            nodeID: 'test-node',
-            nodeType: 'TEST_NODE',
-            nodeConfig: { foo: 'bar' },
-            context: {}
+        console.log('Sending test listener event...');
+        await queue.addListenerEvent({
+            listenerID: 'test-listener-' + Date.now(),
+            tenantID: 'test-tenant',
+            rawEvent: { hello: 'world' },
+            actions: [],
         });
 
-        console.log('Message sent. Check monitor.');
+        console.log('Event sent.');
         setTimeout(async () => {
             await queue.closeQueue();
-             process.exit(0);
+            process.exit(0);
         }, 1000);
 
     } catch (e) {

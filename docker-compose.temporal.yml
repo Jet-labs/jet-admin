@@ -1,7 +1,17 @@
 # ============================================
-# Jet Admin — Temporal Dev Stack
+# Jet Admin — Temporal Dev Stack (standalone)
 # Strangler Fig Phase 1
 # ============================================
+# NOTE: The Temporal stack is now ALSO merged into the main
+# `docker-compose.yml` (services: temporal-postgres, temporal,
+# temporal-ui, temporal-worker) so a single
+#   docker compose up -d --build
+# starts app + Temporal together.
+#
+# This file is kept for standalone local dev (Temporal only):
+#   npm run temporal:up   # docker compose -f docker-compose.temporal.yml up -d
+# Do not run BOTH files at once — they share network name
+# `jet-admin-network` and host ports 7233/8088/5433.
 
 services:
 

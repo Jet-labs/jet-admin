@@ -1356,7 +1356,7 @@ export const AIChatPanel = () => {
                         return <p className="text-xs text-muted-foreground">Jet has no API key. A workspace admin should set <span className="font-mono">OPENROUTER_API_KEY</span> on the backend, or configure one in Tenant Settings → AI Configuration.</p>;
                       }
                       if (/429|rate-limit|rate_limited/i.test(m)) {
-                        return <p className="text-xs text-muted-foreground">The free model is rate-limited right now. Wait about a minute and retry — your chat history is preserved.</p>;
+                        return <p className="text-xs text-muted-foreground">The model is rate-limited right now. Wait about a minute and retry — your chat history is preserved.</p>;
                       }
                       if (/503|mcp|tools/i.test(m)) {
                         return <p className="text-xs text-muted-foreground">Jet's tools are unreachable. Make sure the MCP server is running (<span className="font-mono">npm run start:mcp</span>) and retry.</p>;

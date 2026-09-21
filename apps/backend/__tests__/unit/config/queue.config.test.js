@@ -1,11 +1,12 @@
 const {
   initializeQueue,
   closeQueue,
-  addNodeJob,
-  registerTaskWorker,
+  addListenerEvent,
+  registerListenerEventWorker,
+  isConnectionHealthy,
 } = require('../../../config/queue.config');
 
-const waitFor = async (assertion, timeoutMs = 200) => {
+const waitFor = async (assertion, timeoutMs = 500) => {
   const startedAt = Date.now();
 
   while (Date.now() - startedAt < timeoutMs) {
@@ -20,13 +21,13 @@ const waitFor = async (assertion, timeoutMs = 200) => {
   assertion();
 };
 
-describe('queue.config addNodeJob', () => {
+describe('queue.config listener events (memory driver)', () => {
   const processedJobs = [];
 
   beforeEach(async () => {
     processedJobs.length = 0;
     await initializeQueue();
-    registerTaskWorker(async (job) => {
+    registerListenerEventWorker(async (job) => {
       processedJobs.push(job);
     });
   });
@@ -35,13 +36,12 @@ describe('queue.config addNodeJob', () => {
     await closeQueue();
   });
 
-  it('preserves incoming retry metadata', async () => {
-    await addNodeJob({
-      instanceID: 'instance-1',
-      nodeID: 'node-1',
-      nodeType: 'dataQuery',
-      attempts: 2,
-      maxAttempts: 5,
+  it('delivers listener events to the registered worker', async () => {
+    await addListenerEvent({
+      listenerID: 'lst-1',
+      tenantID: 'tnt-1',
+      rawEvent: { id: 'evt-1' },
+      actions: [],
     });
 
     await waitFor(() => {
@@ -49,25 +49,20 @@ describe('queue.config addNodeJob', () => {
     });
 
     expect(processedJobs[0]).toMatchObject({
-      attempts: 2,
-      maxAttempts: 5,
+      listenerID: 'lst-1',
+      tenantID: 'tnt-1',
+      rawEvent: { id: 'evt-1' },
     });
   });
 
-  it('applies retry defaults when metadata is absent', async () => {
-    await addNodeJob({
-      instanceID: 'instance-2',
-      nodeID: 'node-2',
-      nodeType: 'code',
-    });
+  it('reports healthy once initialized', async () => {
+    expect(isConnectionHealthy()).toBe(true);
+  });
 
-    await waitFor(() => {
-      expect(processedJobs).toHaveLength(1);
-    });
-
-    expect(processedJobs[0]).toMatchObject({
-      attempts: 0,
-      maxAttempts: 3,
-    });
+  it('throws when publishing before initialization', async () => {
+    await closeQueue();
+    await expect(
+      addListenerEvent({ listenerID: 'lst-x', tenantID: 'tnt-x', rawEvent: {} })
+    ).rejects.toThrow('Queue not initialized');
   });
 });

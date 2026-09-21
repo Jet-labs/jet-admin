@@ -9,12 +9,12 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 
 const JET_FREE_PRESET = {
   provider: "openrouter",
-  model: "minimax/minimax-m3:free",
+  model: "minimax/minimax-m3",
   baseURL: "https://openrouter.ai/api/v1",
 };
 
 const FREE_MODEL_OPTIONS = [
-  "minimax/minimax-m3:free",
+  "minimax/minimax-m3",
   "nvidia/nemotron-3-ultra-550b-a55b:free",
   "nvidia/nemotron-3-super-120b-a12b:free",
   "z-ai/glm-5.2:free",
@@ -132,17 +132,17 @@ export const TenantAIConfigEditor = ({ tenantID }) => {
   );
 
   return (
-    <Section title="AI Configuration" description="Configure the AI provider for this tenant. Jet works out of the box on the workspace free key — only set this to override it per tenant.">
+    <Section title="AI Configuration" description="Configure the AI provider for this tenant. Jet works out of the box on the workspace key — only set this to override it per tenant.">
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2 rounded border border-border bg-muted/20 p-2">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-foreground">Jet Free Agent (Recommended)</p>
+            <p className="text-xs font-semibold text-foreground">Jet Agent (Recommended)</p>
             <p className="text-[11px] text-muted-foreground truncate">
               OpenRouter · {JET_FREE_PRESET.model} · 1M context · tool-calling verified
             </p>
           </div>
           <Button type="button" size="sm" onClick={() => setFormData((prev) => ({ ...prev, ...JET_FREE_PRESET }))}>
-            Use Jet Free
+            Use Jet Default
           </Button>
         </div>
         <div className="flex flex-wrap gap-1.5">

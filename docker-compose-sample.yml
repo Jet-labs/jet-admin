@@ -1,15 +1,25 @@
 # ============================================
 # Jet Admin - Ready-to-Run Docker Compose (Separated Services)
 # ============================================
-# 3 Services: frontend, backend, postgres
+# Services: frontend, backend, postgres + Temporal stack
+# (temporal-postgres, temporal, temporal-ui, temporal-worker)
 #
 # Usage:
-#   docker compose -f docker-compose.sample.yml up -d --build
+#   cp .env.docker .env  # configure secrets first
+#   docker compose -f docker-compose-sample.yml up -d --build
 #
 # Services:
-#   - frontend:  React app served by nginx (port 80)
-#   - backend:   Node.js API server (port 8090)
-#   - postgres:  PostgreSQL database
+#   - frontend:          React app served by nginx (port 80)
+#   - backend:           Node.js API server (port 8090)
+#   - postgres:          PostgreSQL database
+#   - temporal-postgres: PostgreSQL for Temporal persistence
+#   - temporal:          Temporal server (gRPC port 7233)
+#   - temporal-ui:       Temporal Web UI (port 8088)
+#   - temporal-worker:   Jet Admin workflow worker, built from THIS repo
+#                        (Dockerfile.temporal-worker, same code as backend)
+#
+# Optional (debug tools only):
+#   docker compose -f docker-compose-sample.yml --profile tools up -d temporal-admin-tools
 
 services:
   # ============================================
@@ -20,6 +30,10 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
       args:
+        # Backend URL baked into the bundle. Override per environment:
+        #   VITE_SERVER_HOST=https://api.example.com docker compose up -d --build frontend
+        - VITE_SERVER_HOST=${VITE_SERVER_HOST:-http://localhost:8090}
+        - VITE_SOCKET_HOST=${VITE_SOCKET_HOST:-http://localhost:8090}
         - VITE_FIREBASE_API_KEY=your_firebase_api_key
         - VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
         - VITE_FIREBASE_PROJECT_ID=your_project_id
@@ -27,8 +41,6 @@ services:
         - VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
         - VITE_FIREBASE_APP_ID=your_app_id
         - VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
-        - VITE_SUPABASE_URL=your_supabase_url
-        - VITE_SUPABASE_KEY=your_supabase_anon_key
     container_name: jet-admin-frontend
     ports:
       - "80:80"  # Main application access point
@@ -38,11 +50,16 @@ services:
     networks:
       - jet-network
     environment:
-      - VITE_SERVER_HOST=http://localhost:8090
-      - VITE_SOCKET_HOST=http://localhost:8090
+      # Runtime override (no rebuild needed) — read by
+      # docker-entrypoint.frontend.sh, which writes /config.js.
+      # Takes precedence over the baked-in VITE_* build args.
+      - SERVER_HOST=${VITE_SERVER_HOST:-http://localhost:8090}
+      - SOCKET_HOST=${VITE_SOCKET_HOST:-http://localhost:8090}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      # 127.0.0.1: busybox wget resolves `localhost` to ::1 first while
+      # nginx listens on IPv4 — `localhost` here flaps to unhealthy.
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -56,44 +73,121 @@ services:
       dockerfile: Dockerfile.backend
     container_name: jet-admin-backend
     ports:
-      - "8090:3000"  # API and Webhook access via internal NGINX
+      # Host 8090 -> container nginx :3000 -> Node 127.0.0.1:3001
+      - "8090:3000"  # API and Webhook access via backend nginx
     depends_on:
-      postgres:
+      temporal:
+        condition: service_started
+      redis:
         condition: service_healthy
+      # NOTE: deliberately no edge on `postgres` — the app DB is a standalone
+      # service (like `frontend`): a full `up` starts it, an explicit service
+      # list skips it. The entrypoint waits for DATABASE_URL itself (60s
+      # pg_isready), so no compose-level gating is needed.
+      # Optional: only takes effect with `--profile storage`.
+      # (mcp-server depends on backend, not vice versa — the backend
+      # degrades gracefully when MCP is absent, so no edge is needed here
+      # and adding one would create a dependency cycle.)
+      rustfs:
+        condition: service_healthy
+        required: false
     environment:
       # Server Configuration
+      # PORT is adopted as the nginx public port when NGINX_PORT is unset
+      # (Render injects PORT). The entrypoint then re-exports PORT=$NODE_PORT
+      # for Node, so Node binds 127.0.0.1:3001 behind nginx :3000.
       - NODE_ENV=production
       - PORT=3000
-      
-      # Database Configuration
-      - DATABASE_URL=postgresql://postgres:your_strong_password@postgres:5432/jet_admin_db
-      - SEED_DATABASE=true  # Set to false after first run
-      
-      # Authentication Secrets
-      - JWT_ACCESS_TOKEN_SECRET=your_super_secret_access_token_key_change_me
-      - JWT_REFRESH_TOKEN_SECRET=your_super_secret_refresh_token_key_change_me
-      - ACCESS_TOKEN_TIMEOUT=900
-      - REFRESH_TOKEN_TIMEOUT=100h
-      - SESSION_SECRET=your_session_secret_change_me
-      
-      # AI Configuration
-      - GEMINI_API_KEY=your_gemini_api_key
-      
+      - NGINX_PORT=3000
+      - NODE_PORT=3001
+      - CLIENT_MAX_BODY_SIZE=${CLIENT_MAX_BODY_SIZE:-10m}
+      # Public base URL of THIS backend (OAuth callbacks, AI referer header).
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:8090}
+
+      # Database Configuration — defaults to the bundled `postgres` service
+      # (started by a full `up`). To use your own database instead, set
+      # DATABASE_URL to it and leave `postgres` out of your `up` service
+      # list — nothing depends on it, so it simply never starts. E.g.:
+      #   DATABASE_URL=postgresql://user:pass@host:5432/jet_admin_db
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-your_strong_password}@postgres:5432/${POSTGRES_DB:-jet_admin_db}}
+      - SEED_DATABASE=${SEED_DATABASE:-true}  # Set to false after first run
+
+      # Secrets (generate with: openssl rand -hex 32)
+      # Vault key encrypts datasource credentials + OAuth secrets at rest.
+      - VAULT_ENCRYPTION_KEY=${VAULT_ENCRYPTION_KEY:-}
+      # Signs OAuth `state` tokens (Google login).
+      - OAUTH_STATE_SECRET=${OAUTH_STATE_SECRET:-}
+
+      # Google OAuth (optional — required only for Google sign-in)
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+
+      # Firebase Admin (optional — required for Firebase token verification)
+      - FIREBASE_CREDENTIALS=${FIREBASE_CREDENTIALS:-}
+
+      # AI Configuration — Jet Agent via OpenRouter (OpenAI-compatible).
+      # Optional; tenants can also bring their own key in Tenant Settings.
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - AI_BASE_URL=${AI_BASE_URL:-https://openrouter.ai/api/v1}
+      - AI_MODEL=${AI_MODEL:-minimax/minimax-m3}
+
       # Modules Configuration
-      - ENABLED_MODULES=auth,tenant,database,datasource,dataQuery,workflow,widget,dashboard,userManagement,role,apiKey,cronJob,audit,ai,notification,permission
+      - ENABLED_MODULES=${ENABLED_MODULES:-auth,tenant,database,datasource,dataQuery,workflow,widget,dashboard,userManagement,role,apiKey,cronJob,audit,ai,notification,permission}
       - NODE_ID=docker_node_1
-      
+
+      # AI tools (Jet Agent) — URL of the `mcp-server` service below.
+      # Only used when the agent runs; missing/unreachable server degrades
+      # gracefully to AI_TOOLS_UNAVAILABLE. Empty = code default
+      # (http://localhost:5001, correct only for non-Docker backends).
+      - MCP_SERVER_URL=${MCP_SERVER_URL:-http://mcp-server:5001}
+
+      # S3-compatible object storage (uploads: datasource files, widget
+      # files, tenant logos). Works with AWS S3, MinIO, RustFS (`--profile
+      # storage`), or anything S3-compatible.
+      # Server-side endpoint (must be reachable from this container).
+      - S3_ENDPOINT=${S3_ENDPOINT:-http://rustfs:9000}
+      - S3_REGION=${S3_REGION:-us-east-1}
+      # Must match RUSTFS_ACCESS_KEY / RUSTFS_SECRET_KEY below when using
+      # the bundled RustFS, or your AWS/MinIO credentials otherwise.
+      # Leave empty to disable file uploads.
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID:-rustfsadmin}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY:-rustfsadmin}
+      - S3_BUCKET=${S3_BUCKET:-jet-admin-datasource-file-uploads}
+      # Browser-facing base URL used to build public file URLs.
+      - S3_PUBLIC_BASE_URL=${S3_PUBLIC_BASE_URL:-http://localhost:9000}
+      - S3_FORCE_PATH_STYLE=${S3_FORCE_PATH_STYLE:-true}
+
+      # Temporal — points at the `temporal` service in this same compose file.
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_NAMESPACE=default
+      - TEMPORAL_TASK_QUEUE=jet-admin-workflows
+
+      # Listener pipeline — subscriptions + webhook ingress live in the
+      # dedicated `listener-proxy` service; this backend only consumes the
+      # Redis Stream and dispatches.
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - QUEUE_DRIVER=${QUEUE_DRIVER:-redis}
+      - LISTENER_INGRESS=${LISTENER_INGRESS:-proxy}
+
       # Logging
       - LOG_LEVEL=info
       - EXPRESS_REQUEST_SIZE_LIMIT=5mb
-      - CORS_WHITELIST=http://localhost,http://frontend,http://localhost:3000
+      # Browser origins allowed to call this API (exact match, comma
+      # separated). `http://localhost` covers the bundled frontend on
+      # port 80 (default ports are omitted from origins). Add your public
+      # frontend origin(s) when self-hosting, e.g.
+      # CORS_WHITELIST=https://app.example.com,https://admin.example.com
+      - CORS_WHITELIST=${CORS_WHITELIST:-http://localhost,http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000}
     volumes:
       - backend_logs:/app/apps/backend/logs
     networks:
       - jet-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090/health"]
+      # NOTE: runs INSIDE the container against nginx :3000, which proxies
+      # /health to Node 127.0.0.1:3001 — verifies the full proxy chain.
+      # (Not the host-mapped 8090.)
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       start_period: 30s
@@ -106,22 +200,325 @@ services:
     image: postgres:15-alpine
     container_name: jet-admin-postgres
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=your_strong_password
-      - POSTGRES_DB=jet_admin_db
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-your_strong_password}
+      - POSTGRES_DB=${POSTGRES_DB:-jet_admin_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"  # Exposed for debugging; remove in production
+      # Exposed for debugging; change POSTGRES_HOST_PORT on conflict.
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     networks:
       - jet-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d jet_admin_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  # ============================================
+  # Redis — shared by the listener bus (Streams: `listener:events` +
+  # DLQ, consumer group `listener-workers`, control pub/sub) and the
+  # Socket.IO adapter (pub/sub fan-out for push_to_app_page emits).
+  # Separate keyspaces; `noeviction` so queued events are never dropped.
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: jet-admin-redis
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - jet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ============================================
+  # Listener Proxy — stateless ingress node
+  # ============================================
+  # Owns ALL datasource subscriptions + webhook ingress (single subscriber,
+  # so broadcast sources never double-publish). Publishes raw envelopes to
+  # the Redis Stream; backend pods consume + dispatch. Same image as
+  # `backend`, different entrypoint — no nginx/pm2 here.
+  listener-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: jet-listener-proxy
+    working_dir: /app/apps/backend
+    entrypoint: ["node", "modules/listener/ingress/proxy.js"]
+    depends_on:
+      redis:
+        condition: service_healthy
+      temporal:
+        condition: service_started
+    ports:
+      - "${LISTENER_PROXY_PORT:-8095}:8095"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-your_strong_password}@postgres:5432/${POSTGRES_DB:-jet_admin_db}}
+      - VAULT_ENCRYPTION_KEY=${VAULT_ENCRYPTION_KEY:-}
+      - OAUTH_STATE_SECRET=${OAUTH_STATE_SECRET:-}
+      - REDIS_URL=redis://redis:6379
+      - QUEUE_DRIVER=redis
+      - LISTENER_PROXY_PORT=8095
+      - LISTENER_INGRESS=proxy
+      - LOG_LEVEL=info
+      - EXPRESS_REQUEST_SIZE_LIMIT=5mb
+    networks:
+      - jet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8095/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+  # ============================================
+  # Temporal Stack (same repo, same compose file)
+  # ============================================
+  temporal-postgres:
+    image: postgres:15-alpine
+    container_name: jet-temporal-postgres
+    environment:
+      - POSTGRES_USER=temporal
+      - POSTGRES_PASSWORD=temporal
+      - POSTGRES_DB=temporal
+    volumes:
+      - temporal_postgres_data:/var/lib/postgresql/data
+    networks:
+      - jet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal -d temporal"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "5433:5432"
+
+  temporal:
+    image: temporalio/auto-setup:1.23
+    container_name: jet-temporal-server
+    depends_on:
+      temporal-postgres:
+        condition: service_healthy
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=temporal-postgres
+      - DBNAME=temporal
+      - VISIBILITY_DBNAME=temporal_visibility
+      - VISIBILITY_POSTGRES_USER=temporal
+      - VISIBILITY_POSTGRES_PWD=temporal
+      - VISIBILITY_POSTGRES_SEEDS=temporal-postgres
+      - ENABLE_ES=false
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    volumes:
+      - ./temporal/dynamicconfig:/etc/temporal/config/dynamicconfig
+    ports:
+      - "7233:7233"
+    networks:
+      - jet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "tctl --address temporal:7233 cluster health | grep SERVING"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  temporal-ui:
+    image: temporalio/ui:2.28.0
+    container_name: jet-temporal-ui
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    ports:
+      - "8088:8080"
+    networks:
+      - jet-network
+    restart: unless-stopped
+
+  temporal-admin-tools:
+    image: temporalio/admin-tools:1.23
+    container_name: jet-temporal-admin-tools
+    profiles:
+      - tools
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    networks:
+      - jet-network
+    stdin_open: true
+    tty: true
+
+  temporal-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.temporal-worker
+    container_name: jet-admin-temporal-worker
+    depends_on:
+      temporal:
+        condition: service_healthy
+      # No edge on `postgres` (see backend above) — the worker reads the same
+      # DATABASE_URL and waits for it in its own entrypoint.
+      rustfs:
+        condition: service_healthy
+        required: false
+    environment:
+      - NODE_ENV=production
+      # Same app DB as backend — activities read/write via Prisma.
+      # Mirrors the backend default; override together via DATABASE_URL.
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-your_strong_password}@postgres:5432/${POSTGRES_DB:-jet_admin_db}}
+      # Same S3 storage as backend (workflow activities can read files).
+      - S3_ENDPOINT=${S3_ENDPOINT:-http://rustfs:9000}
+      - S3_REGION=${S3_REGION:-us-east-1}
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID:-rustfsadmin}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY:-rustfsadmin}
+      - S3_BUCKET=${S3_BUCKET:-jet-admin-datasource-file-uploads}
+      - S3_PUBLIC_BASE_URL=${S3_PUBLIC_BASE_URL:-http://localhost:9000}
+      - S3_FORCE_PATH_STYLE=${S3_FORCE_PATH_STYLE:-true}
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_NAMESPACE=default
+      - TEMPORAL_TASK_QUEUE=jet-admin-workflows
+      - TEMPORAL_WORKER_START_MAX_ATTEMPTS=0
+      - TEMPORAL_WORKER_START_BASE_DELAY_MS=1000
+      - TEMPORAL_WORKER_START_MAX_DELAY_MS=30000
+      - TEMPORAL_WORKER_RESTART_ON_CRASH=true
+      - LOG_LEVEL=info
+    networks:
+      - jet-network
+    restart: unless-stopped
+
+  # ============================================
+  # Object Storage (optional, S3-compatible)
+  # ============================================
+  # RustFS — self-hosted S3-compatible storage for file uploads
+  # (datasource files, widget files, tenant logos). Alternative to
+  # AWS S3 / MinIO: just point S3_ENDPOINT + keys above
+  # anywhere instead.
+  #
+  # Start with:
+  #   docker compose -f docker-compose-sample.yml --profile storage up -d
+  # Console: http://localhost:9001 (default login below — change it!)
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: jet-rustfs
+    profiles:
+      - storage
+    # Single-node layout rooted at /data.
+    command: /data
+    environment:
+      # CHANGE THESE before exposing beyond localhost.
+      - RUSTFS_ACCESS_KEY=${RUSTFS_ACCESS_KEY:-rustfsadmin}
+      - RUSTFS_SECRET_KEY=${RUSTFS_SECRET_KEY:-rustfsadmin}
+      - RUSTFS_ADDRESS=:9000
+      - RUSTFS_CONSOLE_ADDRESS=:9001
+      - RUSTFS_CONSOLE_ENABLE=true
+    volumes:
+      - rustfs_data:/data
+    ports:
+      - "${RUSTFS_S3_PORT:-9000}:9000"      # S3 API
+      - "${RUSTFS_CONSOLE_PORT:-9001}:9001"  # Web console
+    networks:
+      - jet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://127.0.0.1:9000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # One-shot bucket setup: creates the upload buckets and makes them
+  # publicly readable (so S3_PUBLIC_BASE_URL links work in browsers).
+  # Runs automatically with `--profile storage`, then exits.
+  # Reuses the backend image (already has @aws-sdk/client-s3) — no extra
+  # tooling image needed.
+  storage-init:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: jet-storage-init
+    profiles:
+      - storage
+    depends_on:
+      rustfs:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - S3_ENDPOINT=${S3_ENDPOINT:-http://rustfs:9000}
+      - S3_REGION=${S3_REGION:-us-east-1}
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID:-rustfsadmin}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY:-rustfsadmin}
+      - S3_BUCKET=${S3_BUCKET:-jet-admin-datasource-file-uploads}
+      - S3_FORCE_PATH_STYLE=${S3_FORCE_PATH_STYLE:-true}
+    networks:
+      - jet-network
+    entrypoint: ["node", "scripts/storage-init.js"]
+    restart: "no"
+
+  # ============================================
+  # MCP Server — AI agent tools (optional)
+  # ============================================
+  # Streamable-HTTP MCP server exposing Jet Admin tools (datasources,
+  # queries, workflows, …) to the backend Jet Agent. Every tool call is
+  # authorized per-request with the caller's Firebase token.
+  #
+  # Start with:
+  #   docker compose -f docker-compose-sample.yml --profile mcp up -d
+  # Requires FIREBASE_CREDENTIALS (same service-account JSON as the
+  # backend) — the container exits otherwise. Endpoint:
+  #   POST http://localhost:5001/tenants/<tenantID>/mcp
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: jet-mcp-server
+    profiles:
+      - mcp
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - PORT=${MCP_PORT:-5001}
+      # Backend as seen from INSIDE the docker network (container port).
+      - JET_ADMIN_BACKEND_URL=${JET_ADMIN_BACKEND_URL:-http://backend:3000}
+      # Same Firebase service-account JSON as the backend (required).
+      - FIREBASE_CREDENTIALS=${FIREBASE_CREDENTIALS:-}
+      - DEBUG=${MCP_DEBUG:-false}
+    ports:
+      # Host access for external MCP clients (Claude Desktop, Inspector…).
+      - "${MCP_HOST_PORT:-5001}:${MCP_PORT:-5001}"
+    networks:
+      - jet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${MCP_PORT:-5001}/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 20s
+      retries: 3
 
 # ============================================
 # Volumes
@@ -129,8 +526,14 @@ services:
 volumes:
   postgres_data:
     name: jet-admin-postgres-data
+  redis_data:
+    name: jet-admin-redis-data
   backend_logs:
     name: jet-admin-backend-logs
+  temporal_postgres_data:
+    name: jet-temporal-postgres-data
+  rustfs_data:
+    name: jet-rustfs-data
 
 # ============================================
 # Networks

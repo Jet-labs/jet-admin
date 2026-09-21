@@ -40,11 +40,11 @@ Membership: `checkTenantMembership` (`tblUsersTenantsRelationship`) gates all te
 
 - CORS strict whitelist (`CORS_WHITELIST` + chrome-extension, `credentials:true`, `trust proxy`) — except `/webhooks` (`origin:true`, open by design) and Socket.IO origins from the same list.
 - Body limits: `EXPRESS_REQUEST_SIZE_LIMIT` (default `5mb`) for JSON/urlencoded (+`rawBody` retained); 10 MB `multer.memoryStorage` on tenant logo, datasource upload, widget upload. Every route validates `body|params|query` via Zod (`validation.utils.js`).
-- File storage: Supabase S3-compatible (`SUPABASE_S3_*`, `forcePathStyle:true`) with SDK→axios fallback; bucket names in `constants.STORAGE.BUCKETS` (`tenant-assets`, `jet-admin-datasource-file-uploads`).
+- File storage: S3-only (`S3_*`: AWS / MinIO / RustFS, `forcePathStyle` configurable) with axios fallback for foreign public URLs; bucket names in `constants.STORAGE.BUCKETS` (`tenant-assets`, `jet-admin-datasource-file-uploads`).
 
 ## Known gaps (do not present as mitigated)
 
 1. **No `helmet`, no `express-rate-limit`** — explicitly flagged in `BACKEND_CODE_GUIDELINE.md`; neither is in `package.json`. Add before internet exposure.
 2. OAuth `postMessage(..., '*')` — narrow to explicit origin.
 3. `pg_isready`-exposed Postgres `:5432` in compose — close in production.
-4. `JWT_*` / `SESSION_SECRET` / `RABBITMQ_*` envs are **unread no-ops** — sessions are Firebase/opaque-operator, not JWT; do not claim JWT rotation procedures.
+4. Former `JWT_*` / `SESSION_SECRET` / `RABBITMQ_*` envs were **removed** (unread no-ops) — sessions are Firebase/opaque-operator, not JWT; do not claim JWT rotation procedures. `jsonwebtoken` remains only for short-lived OAuth `state` tokens (`OAUTH_STATE_SECRET`).

@@ -4,7 +4,6 @@ const Logger = require("../../utils/logger");
 const { widgetService } = require("./widget.service");
 const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 const fileStorageUtil = require("../../utils/fileStorage.util");
-const environmentVariables = require("../../environment");
 const { GetObjectCommand } = require("@aws-sdk/client-s3");
 
 const widgetController = {};
@@ -345,7 +344,7 @@ widgetController.deleteWidgetByID = async (req, res) => {
 };
 
 /**
- * Uploads a widget file (Image/Document) to Supabase storage.
+ * Uploads a widget file (Image/Document) to S3-compatible object storage.
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
@@ -435,7 +434,7 @@ widgetController.serveFile = async (req, res) => {
       return expressUtils.sendResponse(res, false, {}, { code: "PERMISSION_DENIED", message: "Forbidden: Invalid file path for this tenant" }, constants.HTTP_STATUS.BAD_REQUEST);
     }
 
-    const bucketName = environmentVariables.SUPABASE_S3_BUCKET || constants.STORAGE.BUCKETS.DATASOURCE_FILE_UPLOADS;
+    const bucketName = fileStorageUtil.getDefaultBucket();
     const s3 = fileStorageUtil.getS3Client();
 
     const command = new GetObjectCommand({ Bucket: bucketName, Key: filePath });

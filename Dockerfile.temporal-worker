@@ -1,0 +1,64 @@
+# ============================================
+# Jet Admin - Temporal Worker Container
+# ============================================
+# Sidecar worker that hosts Temporal DSL workflows + activities.
+# Built from the SAME repo / SAME context as the backend —
+# no separate repo needed. Shares backend code + node_modules.
+#
+# Build:
+#   docker build -f Dockerfile.temporal-worker -t jet-admin-temporal-worker .
+# Run (via compose):
+#   docker compose up -d --build temporal-worker
+#
+# The worker connects to `temporal:7233` (see docker-compose.yml)
+# and uses the same DATABASE_URL as the backend for activities.
+
+FROM node:20-slim
+
+# System deps: openssl (Prisma), wget (healthcheck), netcat (wait-for), procps (pgrep)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    wget \
+    netcat-openbsd \
+    procps \
+    python3 \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy root package files (for workspace resolution)
+COPY package*.json ./
+
+# Copy workspace package.json files (same set as Dockerfile.backend
+# so the worker image stays in sync with the backend image)
+COPY apps/backend/package*.json ./apps/backend/
+COPY packages/datasource-types/package*.json ./packages/datasource-types/
+COPY packages/datasources-logic/package*.json ./packages/datasources-logic/
+COPY packages/expression-engine/package*.json ./packages/expression-engine/
+COPY packages/widget-types/package*.json ./packages/widget-types/
+COPY packages/widgets-logic/package*.json ./packages/widgets-logic/
+
+# Install dependencies (worker needs @temporalio/worker + backend deps)
+RUN npm install --legacy-peer-deps
+
+# Copy source files (backend + shared packages contain worker + activities)
+COPY apps/backend/ ./apps/backend/
+COPY packages/ ./packages/
+
+# Generate Prisma client (activities touch the DB via Prisma)
+WORKDIR /app/apps/backend
+RUN npx prisma generate
+
+# Copy entrypoint script
+COPY docker-entrypoint.temporal-worker.sh /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
+
+# No exposed ports — worker only makes outbound gRPC to temporal:7233
+
+# Health check: worker process must be alive
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD pgrep -f "modules/workflow/temporal/worker.js" > /dev/null || exit 1
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["node", "modules/workflow/temporal/worker.js"]

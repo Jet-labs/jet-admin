@@ -68,6 +68,6 @@ Set `WORKFLOW_ENGINE_DRIVER=temporal` + `TEMPORAL_ADDRESS=localhost:7233`, then 
 
 ## Scaling knobs
 
-- Backend: stateless except in-process `fastq` queues (`workflow.tasks/results` 10/10, `listener.events` 20) and audit buffer — run one writer or accept per-replica queues. `pm2` single process in image; scale via replicas + sticky Socket.IO or external queue (RabbitMQ vars exist but no consumer — future work per README scaling strategy).
+- Backend: stateless except the audit buffer — listener ingress lives in the dedicated `listener-proxy` service (single subscriber, raw events → Redis Stream `listener:events`, group `listener-workers`, DLQ `listener:events:dlq`), consumed by backend pipeline workers (`QUEUE_DRIVER=redis`, `LISTENER_INGRESS=proxy`). Local dev default stays embedded (`QUEUE_DRIVER=memory`, `LISTENER_INGRESS=embedded`, in-process `fastq` `listener.events` 20). Socket.IO uses the Redis adapter when `REDIS_URL` is set so `push_to_app_page` emits fan out across replicas. `pm2` single process in image; scale via replicas. Redis: `redis:7-alpine`, `noeviction` + AOF, persistent `redis_data` volume.
 - Temporal: `TEMPORAL_MAX_CONCURRENT_ACTIVITIES/WORKFLOWS` (20/20), worker restart policy envs.
 - Frontend: static nginx; cache-bust via hashed assets. `client_max_body_size` 50 M only in legacy `nginx.conf`; active `nginx.frontend.conf` inherits nginx default — large uploads should go direct to backend (10 MB multer cap) or Supabase.

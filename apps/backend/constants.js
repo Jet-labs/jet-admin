@@ -170,10 +170,8 @@ const constants = {
     INPUT_SET: 'INPUT_SET',       // workflow input params — nodeID null
     NODE_COMPLETED: 'NODE_COMPLETED',  // node ran successfully — carries output payload
     NODE_FAILED: 'NODE_FAILED',     // node execution failed — carries errorMessage
-    NODE_DISPATCHED: 'NODE_DISPATCHED', // orchestrator queued this node — no payload
-    // written by the CAS winner before addNodeJob
-    // loser checks this on retry to avoid re-dispatch
-    SYSTEM_SET: 'SYSTEM_SET',      // orchestrator metadata — nodeID null
+    NODE_DISPATCHED: 'NODE_DISPATCHED', // node execution dispatched (legacy native engine) — no payload
+    SYSTEM_SET: 'SYSTEM_SET',      // workflow metadata — nodeID null
     NODE_SUSPENDED: 'NODE_SUSPENDED', // node is suspended — carries payload
   },
 
@@ -239,10 +237,11 @@ const constants = {
   },
 
   AI: {
-    // Jet Agent default: best free OpenRouter agentic model (Sept 2026).
+    // Jet Agent default: MiniMax M3 via OpenRouter (Sept 2026).
     // MiniMax M3: 1M context, long-horizon agentic work + reliable tool calling.
+    // NOTE: the `:free` variant was retired by OpenRouter — use the paid slug.
     DEFAULT_BASE_URL: "https://openrouter.ai/api/v1",
-    DEFAULT_MODEL: "minimax/minimax-m3:free",
+    DEFAULT_MODEL: "minimax/minimax-m3",
     DEFAULT_PROVIDER: "openrouter",
     FALLBACK_MODELS: [
       "nvidia/nemotron-3-ultra-550b-a55b:free",

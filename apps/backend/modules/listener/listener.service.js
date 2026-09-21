@@ -6,8 +6,30 @@
 const { prisma } = require('../../config/prisma.config');
 const { listenerEngine } = require('./listenerEngine/engine');
 const Logger = require('../../utils/logger');
+const environment = require('../../environment');
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
+
+function isProxyIngress() {
+  return environment.LISTENER_INGRESS === 'proxy' && !!environment.REDIS_URL;
+}
+
+/**
+ * Notify the ingress proxy about a listener change (proxy mode only).
+ * Returns true when handled (caller must skip direct engine calls —
+ * the backend holds no subscriptions in proxy mode).
+ */
+async function syncIngressProxy(action, listenerID) {
+  if (!isProxyIngress()) return false;
+  try {
+    const { publishControl } = require('../../config/listenerBus.config');
+    await publishControl({ type: action, listenerID });
+    Logger.log('info', { message: 'listenerService:ingress:notified', params: { action, listenerID } });
+  } catch (err) {
+    Logger.log('warning', { message: 'listenerService:ingress:notify:failed', params: { action, listenerID, error: err.message } });
+  }
+  return true;
+}
 
 const listenerService = {
 
@@ -183,7 +205,9 @@ const listenerService = {
 
       // If created as active, start it
       if (listener.status === 'active') {
-        await listenerEngine.startOne(listener);
+        if (!(await syncIngressProxy('LISTENER_RELOAD', listener.listenerID))) {
+          await listenerEngine.startOne(listener);
+        }
       }
 
       return listener;
@@ -268,10 +292,14 @@ const listenerService = {
 
       // Hot-reload: restart if config changed and listener is active
       if (listener.status === 'active') {
-        await listenerEngine.restartOne(listenerID);
+        if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
+          await listenerEngine.restartOne(listenerID);
+        }
       } else {
         // If set to inactive, stop it
-        await listenerEngine.stopOne(listenerID);
+        if (!(await syncIngressProxy('LISTENER_REMOVE', listenerID))) {
+          await listenerEngine.stopOne(listenerID);
+        }
       }
 
       return listener;
@@ -296,7 +324,9 @@ const listenerService = {
       if (!existing) return null;
 
       // Stop the listener if active
-      await listenerEngine.stopOne(listenerID);
+      if (!(await syncIngressProxy('LISTENER_REMOVE', listenerID))) {
+        await listenerEngine.stopOne(listenerID);
+      }
 
       // CASCADE will delete actions and events
       await prisma.tblListeners.delete({
@@ -415,7 +445,9 @@ const listenerService = {
       });
 
       if (listener.status === 'active') {
-        await listenerEngine.restartOne(listenerID);
+        if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
+          await listenerEngine.restartOne(listenerID);
+        }
       }
 
       return action;
@@ -461,7 +493,9 @@ const listenerService = {
       });
 
       if (listener.status === 'active') {
-        await listenerEngine.restartOne(listenerID);
+        if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
+          await listenerEngine.restartOne(listenerID);
+        }
       }
 
       return action;
@@ -501,7 +535,9 @@ const listenerService = {
       });
 
       if (listener.status === 'active') {
-        await listenerEngine.restartOne(listenerID);
+        if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
+          await listenerEngine.restartOne(listenerID);
+        }
       }
 
       return { actionID };

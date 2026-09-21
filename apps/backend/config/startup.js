@@ -62,13 +62,23 @@ async function startAllListeners() {
       Logger.log('warning', { message: 'startup:workflows:recoverySkipped', params: { error: recoveryErr.message } });
     }
 
-    // 4. Listener pipeline worker (processes listener events from queue)
+    // 4. Listener pipeline worker (processes listener events from queue —
+    //    fastq in embedded/memory mode, Redis Streams consumer group otherwise)
     const { startPipelineWorker } = require('../modules/listener/listenerEngine/pipelineWorker');
     await startPipelineWorker();
 
-    // 5. Listener engine (bootstraps all active listeners & shared webhook ingress server)
-    const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
-    await listenerEngine.startAll();
+    // 5. Listener ingress (subscriptions + webhook handlers).
+    //    Proxy mode: a dedicated listener-proxy node owns all subscriptions
+    //    and webhook ingress — this backend only consumes + dispatches, so it
+    //    must NOT subscribe (that would double-publish every event).
+    const isProxyIngress =
+      environmentVariables.LISTENER_INGRESS === 'proxy' && !!environmentVariables.REDIS_URL;
+    if (isProxyIngress) {
+      Logger.log('info', { message: 'startup:listenerIngress:proxy (subscriptions owned by listener-proxy)' });
+    } else {
+      const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
+      await listenerEngine.startAll();
+    }
 
     // 6. Audit log flusher (buffers and batch-saves audit logs)
     const { auditService } = require('../modules/audit/audit.service');
@@ -88,10 +98,14 @@ async function stopAllListeners() {
   Logger.log('info', { message: 'startup:stopAllListeners:init' });
   temporalEnsureStopped = true;
 
-  try {
-    const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
-    await listenerEngine.stopAll();
-  } catch (e) { /* ignore */ }
+  const isProxyIngress =
+    environmentVariables.LISTENER_INGRESS === 'proxy' && !!environmentVariables.REDIS_URL;
+  if (!isProxyIngress) {
+    try {
+      const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
+      await listenerEngine.stopAll();
+    } catch (e) { /* ignore */ }
+  }
 
   try {
     const { auditService } = require('../modules/audit/audit.service');

@@ -1,53 +1,40 @@
 /**
- * Queue Configuration (In-Memory using fastq)
- * Drop-in replacement for rabbitmq.config.js
- * All queues are in-process — no external broker needed.
+ * Queue Configuration — listener events only.
+ * (The old workflow task/result queues were removed: workflows execute on
+ * Temporal — see modules/workflow/temporal. The monitor bus was a no-op.)
+ *
+ *   QUEUE_DRIVER=memory (default) — in-process fastq, single-node dev.
+ *   QUEUE_DRIVER=redis (+ REDIS_URL) — Redis Streams (`listener:events`,
+ *     consumer group `listener-workers`, DLQ `listener:events:dlq`).
+ *     Published by the ingress proxy (or embedded engine), consumed by
+ *     backend pipeline workers across replicas.
  */
 const fastq = require('fastq');
-const { EventEmitter } = require('events');
+const { v4: uuidv4 } = require('uuid');
 const Logger = require('../utils/logger');
+const environmentVariables = require('../environment');
 
-// Queue names (kept for compatibility)
-const QUEUE_NAMES = {
-  TASK: 'workflow.tasks',
-  RESULTS: 'workflow.results',
-  TASK_DLQ: 'workflow.tasks.dlq',
-  LISTENER_EVENTS: 'listener.events',
-  LISTENER_EVENTS_DLQ: 'listener.events.dlq',
-};
-
-const MONITOR_EXCHANGE = 'monitor.exchange';
-
-// Monitor event bus — replaces RabbitMQ topic exchange
-const monitorBus = new EventEmitter();
-monitorBus.setMaxListeners(50);
-
-// Worker callbacks registered by taskWorker / orchestrator
-let taskWorkerFn = null;
-let resultsWorkerFn = null;
+// Registered listener-event worker (pipelineWorker._processEvent)
 let listenerEventWorkerFn = null;
 
-// fastq instances
-let taskQueue = null;
-let resultsQueue = null;
+// fastq instance (memory driver)
 let listenerEventQueue = null;
 
-// --- Internal workers that fastq calls ---
+// Redis consumer loop state (redis driver)
+let redisConsumerRunning = false;
+let redisConsumerStarted = false;
 
-async function _processTask(job) {
-  if (!taskWorkerFn) {
-    Logger.log('warning', { message: 'queue.config:no task worker registered, dropping job' });
-    return;
-  }
-  await taskWorkerFn(job);
+function isRedisDriver() {
+  return (environmentVariables.QUEUE_DRIVER || 'memory') === 'redis'
+    && !!environmentVariables.REDIS_URL;
 }
 
-async function _processResult(result) {
-  if (!resultsWorkerFn) {
-    Logger.log('warning', { message: 'queue.config:no results worker registered, dropping result' });
-    return;
-  }
-  await resultsWorkerFn(result);
+function getConsumerName() {
+  return `${environmentVariables.NODE_ID || 'node'}-${process.pid}`;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function _processListenerEvent(job) {
@@ -58,62 +45,160 @@ async function _processListenerEvent(job) {
   await listenerEventWorkerFn(job);
 }
 
-// --- Public API (mirrors rabbitmq.config.js exports) ---
-
 function isConnectionHealthy() {
-  return taskQueue !== null && resultsQueue !== null;
+  if (isRedisDriver()) {
+    try {
+      const { isClientReady } = require('./redis.config');
+      return isClientReady('bus') || isClientReady('consumer');
+    } catch (_) {
+      return false;
+    }
+  }
+  return listenerEventQueue !== null;
 }
 
 /**
- * Initialize in-memory queues
+ * Initialize queues.
+ * Memory driver: in-process fastq. Redis driver: ensure the consumer group
+ * (non-fatal — the consumer loop retries in the background so the API stays
+ * up when Redis boots later).
  */
 async function initializeQueue() {
-  if (taskQueue && resultsQueue) {
+  if (isRedisDriver()) {
+    Logger.log('info', { message: 'queue.config:initializing redis bus' });
+    try {
+      const { getRedisClient } = require('./redis.config');
+      const { ensureConsumerGroup } = require('./listenerBus.config');
+      await ensureConsumerGroup(getRedisClient('bus'));
+      Logger.log('success', { message: 'queue.config:redis bus ready' });
+    } catch (err) {
+      Logger.log('warning', {
+        message: 'queue.config:redis:deferred',
+        params: { error: err.message, hint: 'Redis not reachable yet — consumer retries in background' },
+      });
+    }
     return;
   }
 
-  Logger.log('info', { message: 'queue.config:initializing in-memory queues' });
+  if (listenerEventQueue) {
+    return;
+  }
 
-  // concurrency of 10 matches the prefetch used in taskWorker
-  taskQueue = fastq.promise(_processTask, 10);
-  resultsQueue = fastq.promise(_processResult, 10);
-  listenerEventQueue = fastq.promise(_processListenerEvent, 20);  // higher concurrency for events
+  Logger.log('info', { message: 'queue.config:initializing in-memory listener queue' });
 
-  Logger.log('success', { message: 'queue.config:in-memory queues ready' });
+  listenerEventQueue = fastq.promise(_processListenerEvent, 20);
+
+  Logger.log('success', { message: 'queue.config:in-memory listener queue ready' });
 }
 
 /**
- * Register the task worker function (called by taskWorker.js)
- * @param {Function} fn - async (jobData) => void
- */
-function registerTaskWorker(fn) {
-  taskWorkerFn = fn;
-  Logger.log('info', { message: 'queue.config:task worker registered' });
-}
-
-/**
- * Register the results worker function (called by orchestrator.js)
- * @param {Function} fn - async (result) => void
- */
-function registerResultsWorker(fn) {
-  resultsWorkerFn = fn;
-  Logger.log('info', { message: 'queue.config:results worker registered' });
-}
-
-/**
- * Register the listener event worker function
+ * Register the listener event worker function.
+ * Memory driver: called inline by fastq. Redis driver: starts the
+ * Streams consumer-group loop (single loop per process) that invokes fn
+ * per envelope and ACKs; unexpected throws go to the DLQ stream.
  * @param {Function} fn - async (eventJob) => void
  */
 function registerListenerEventWorker(fn) {
   listenerEventWorkerFn = fn;
   Logger.log('info', { message: 'queue.config:listener event worker registered' });
+  if (isRedisDriver()) {
+    startRedisConsumerLoop().catch((err) => {
+      Logger.log('error', { message: 'queue.config:redis:loop:failed', params: { error: err.message } });
+    });
+  }
 }
 
 /**
- * Add a listener event to the processing queue
- * @param {Object} eventJob - { listenerID, tenantID, rawEvent, transformScript, actions }
+ * Background competing-consumer loop over the Redis Stream.
+ * Retries forever on connection errors (shared-Redis outage must not kill
+ * the process); each message is ACKed exactly once — business outcomes
+ * (transform error / filtered) are success, unexpected throws land in DLQ.
+ */
+async function startRedisConsumerLoop() {
+  if (redisConsumerStarted) return;
+  redisConsumerStarted = true;
+  redisConsumerRunning = true;
+
+  const { getRedisClient } = require('./redis.config');
+  const bus = require('./listenerBus.config');
+  const consumerName = getConsumerName();
+
+  Logger.log('info', {
+    message: 'queue.config:redis:consumer:starting',
+    params: { group: bus.getBusConfig().group, consumer: consumerName },
+  });
+
+  while (redisConsumerRunning) {
+    try {
+      const client = getRedisClient('consumer');
+      await bus.ensureConsumerGroup(client);
+      const { stream, group, prefetch } = bus.getBusConfig();
+      const count = Number.isFinite(prefetch) && prefetch > 0 ? prefetch : 20;
+
+      const res = await client.xreadgroup(
+        'GROUP', group, consumerName,
+        'COUNT', count,
+        'BLOCK', 5000,
+        'STREAMS', stream, '>'
+      );
+      if (!res) continue;
+
+      const messages = (res[0] && res[0][1]) || [];
+      await Promise.all(messages.map(([msgId, fields]) => handleRedisMessage(client, bus, msgId, fields)));
+    } catch (err) {
+      Logger.log('warning', { message: 'queue.config:redis:consumer:error', params: { error: err.message } });
+      await sleep(2000);
+    }
+  }
+}
+
+async function handleRedisMessage(client, bus, msgId, fields) {
+  const { stream, group } = bus.getBusConfig();
+  let envelope = null;
+  try {
+    ({ envelope } = bus.parseStreamMessage(msgId, fields));
+  } catch (parseErr) {
+    Logger.log('error', { message: 'queue.config:redis:badEnvelope', params: { error: parseErr.message } });
+    try { await client.xack(stream, group, msgId); } catch (_) { /* ignore */ }
+    return;
+  }
+
+  if (!listenerEventWorkerFn) {
+    Logger.log('warning', { message: 'queue.config:no listener event worker registered, dropping event' });
+    try { await client.xack(stream, group, msgId); } catch (_) { /* ignore */ }
+    return;
+  }
+
+  try {
+    // __viaRedis marks proxy envelopes: actions are resolved fresh downstream
+    // and hard failures must propagate so they land in the DLQ (not vanish).
+    await listenerEventWorkerFn({ ...envelope, __viaRedis: true });
+    await client.xack(stream, group, msgId);
+  } catch (err) {
+    Logger.log('error', { message: 'queue.config:redis:process:failed', params: { listenerID: envelope.listenerID, error: err.message } });
+    await bus.moveToDlq(client, envelope, err);
+    try { await client.xack(stream, group, msgId); } catch (_) { /* ignore */ }
+  }
+}
+
+/**
+ * Add a listener event to the processing queue.
+ * Redis driver publishes a durable envelope (actions intentionally omitted —
+ * the consumer resolves fresh enabled actions from DB).
+ * @param {Object} eventJob - { listenerID, tenantID, rawEvent, actions?, eventID? }
  */
 async function addListenerEvent(eventJob) {
+  if (isRedisDriver()) {
+    const { publishListenerEvent } = require('./listenerBus.config');
+    await publishListenerEvent({
+      listenerID: eventJob.listenerID,
+      tenantID: eventJob.tenantID,
+      rawEvent: eventJob.rawEvent,
+      eventID: eventJob.eventID || uuidv4(),
+    });
+    return;
+  }
+
   if (!listenerEventQueue) {
     throw new Error('Queue not initialized. Call initializeQueue() first.');
   }
@@ -121,80 +206,15 @@ async function addListenerEvent(eventJob) {
   listenerEventQueue.push(eventJob).catch((err) => {
     Logger.log('error', { message: 'queue.config:listener event push failed', params: { error: err.message } });
   });
-  publishToMonitor(QUEUE_NAMES.LISTENER_EVENTS, { listenerID: eventJob.listenerID });
 }
 
 /**
- * Helper to safely publish to monitor bus (replaces AMQP exchange)
- */
-function publishToMonitor(routingKey, content) {
-  // No-op: monitor module removed
-}
-
-/**
- * Add a node execution job to the task queue
- * @param {Object} jobData - { instanceID, nodeID, nodeType, nodeConfig, context }
- * @param {Object} options - { delay }
- */
-async function addNodeJob(jobData, options = {}) {
-  if (!taskQueue) {
-    throw new Error('Queue not initialized. Call initializeQueue() first.');
-  }
-
-  const message = {
-    ...jobData,
-    timestamp: Date.now(),
-    attempts: jobData.attempts ?? 0,
-    maxAttempts: jobData.maxAttempts ?? 3,
-  };
-
-  Logger.log('info', {
-    message: 'queue.config:addNodeJob',
-    params: { nodeType: jobData.nodeType, instanceID: jobData.instanceID, delay: options.delay },
-  });
-
-  if (options.delay && options.delay > 0) {
-    // Delayed push via setTimeout
-    setTimeout(() => {
-      taskQueue.push(message).catch((err) => {
-        Logger.log('error', { message: 'queue.config:delayed job push failed', params: { error: err.message } });
-      });
-      publishToMonitor(`${QUEUE_NAMES.TASK}_delayed_${options.delay}`, message);
-    }, options.delay);
-  } else {
-    taskQueue.push(message).catch((err) => {
-      Logger.log('error', { message: 'queue.config:job push failed', params: { error: err.message } });
-    });
-    publishToMonitor(QUEUE_NAMES.TASK, message);
-  }
-}
-
-/**
- * Add a result to the results queue
- * @param {Object} result - { instanceID, nodeID, status, output, nextHandle, queueDelay }
- */
-async function addResult(result) {
-  if (!resultsQueue) {
-    throw new Error('Queue not initialized. Call initializeQueue() first.');
-  }
-
-  resultsQueue.push(result).catch((err) => {
-    Logger.log('error', { message: 'queue.config:result push failed', params: { error: err.message } });
-  });
-  publishToMonitor(QUEUE_NAMES.RESULTS, result);
-}
-
-/**
- * Close / drain in-memory queues
+ * Close / drain queues (memory fastq + redis consumer loop + clients)
  */
 async function closeQueue() {
+  redisConsumerRunning = false;
+  redisConsumerStarted = false;
   try {
-    if (taskQueue) {
-      taskQueue.kill();
-    }
-    if (resultsQueue) {
-      resultsQueue.kill();
-    }
     if (listenerEventQueue) {
       listenerEventQueue.kill();
     }
@@ -202,27 +222,19 @@ async function closeQueue() {
   } catch (error) {
     Logger.log('error', { message: 'queue.config:error closing queues', params: { error: error.message } });
   } finally {
-    taskQueue = null;
-    resultsQueue = null;
     listenerEventQueue = null;
-    taskWorkerFn = null;
-    resultsWorkerFn = null;
     listenerEventWorkerFn = null;
   }
+  try {
+    const { closeRedis } = require('./redis.config');
+    await closeRedis();
+  } catch (_) { /* ignore — redis optional */ }
 }
 
 module.exports = {
   initializeQueue,
   closeQueue,
-  addNodeJob,
-  addResult,
   addListenerEvent,
-  registerTaskWorker,
-  registerResultsWorker,
   registerListenerEventWorker,
   isConnectionHealthy,
-  publishToMonitor,
-  monitorBus,
-  QUEUE_NAMES,
-  MONITOR_EXCHANGE,
 };

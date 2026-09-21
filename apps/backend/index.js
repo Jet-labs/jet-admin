@@ -67,10 +67,17 @@ expressApp.use(
 // OAuth integration routes
 expressApp.use("/api/v1/oauth", oauthRoutes);
 
-// Webhook ingress routes (served inline — no separate port or nginx routing needed)
+// Webhook ingress routes.
+// Embedded mode: served inline (no separate port or nginx routing needed).
+// Proxy mode (LISTENER_INGRESS=proxy): the listener-proxy owns /webhooks —
+// mounting here too would 404 (empty in-process router) or double-handle.
 // These handle: /webhooks/v1/inbound/:tenantID/:pathSuffix
 //               /webhooks/v1/inbound/:listenerID
-expressApp.use("/webhooks", webhookRouter.getApp());
+if (environment.LISTENER_INGRESS === 'proxy' && environment.REDIS_URL) {
+  Logger.log("info", { message: "webhook ingress served by listener-proxy, skipping local mount" });
+} else {
+  expressApp.use("/webhooks", webhookRouter.getApp());
+}
 
 // Global error-handling middleware
 expressApp.use((err, req, res, next) => {

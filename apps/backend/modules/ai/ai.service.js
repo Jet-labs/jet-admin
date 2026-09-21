@@ -9,7 +9,7 @@
  *                → Firebase token verified → tool.handler() → Jet Admin REST API
  *
  * Model strategy (Sept 2026):
- *   Primary: minimax/minimax-m3:free via OpenRouter (1M context, long-horizon
+ *   Primary: minimax/minimax-m3 via OpenRouter (1M context, long-horizon
  *   agentic work, verified reliable tool_calls). Fallbacks tried in order on
  *   retryable errors (429 / 5xx / provider overload):
  *     nvidia/nemotron-3-ultra-550b-a55b:free → nvidia/nemotron-3-super-120b-a12b:free
@@ -810,7 +810,7 @@ aiService.streamChat = async ({ messages, tenantID, bearerToken, clientContext, 
     });
     res.status(rateLimited ? 429 : 502).json({
       error: rateLimited
-        ? 'The free Jet AI model is rate-limited right now. Please wait a minute and retry — your chat history is preserved.'
+        ? 'The Jet AI model is rate-limited right now. Please wait a minute and retry — your chat history is preserved.'
         : `Jet AI could not generate a response (${lastModelError?.message || 'model error'}). Please retry.`,
       code: rateLimited ? 'AI_RATE_LIMITED' : 'AI_MODEL_FAILED',
       modelsTried,

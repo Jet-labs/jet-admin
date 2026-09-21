@@ -17,8 +17,8 @@ Exact commands verified against `package.json`, `docker-compose.yml`, `Dockerfil
 | PostgreSQL | **14+** (compose pins `postgres:15-alpine`) | System store; Prisma `DATABASE_URL` only |
 | Docker + Compose | any recent | Recommended path: frontend + backend + postgres |
 | Firebase project | project + client config | Backend verifies ID tokens (`FIREBASE_CREDENTIALS`); frontend `VITE_FIREBASE_*` init has no fallback |
-| Supabase (optional) | URL + anon key (+ S3 keys for uploads) | File storage; app runs without it but uploads fail |
-| AI keys (optional) | `OPENROUTER_API_KEY` or `GEMINI_API_KEY`/`NVIDIA_API_KEY` | Jet Agent only; tenant vault `ai_config` overrides workspace env |
+| Object storage (optional) | `S3_*` keys, or `docker compose --profile storage up -d` for bundled RustFS | File uploads (MinIO / RustFS / AWS S3); app runs without it but uploads fail |
+| AI keys (optional) | `OPENROUTER_API_KEY` | Jet Agent only; tenant vault `ai_config` overrides workspace env |
 
 ## Path A — Docker (recommended)
 
@@ -68,7 +68,7 @@ Docs site (separate): `cd docs && npm ci && npm start` (dev) / `npm run build` (
 |---|---|---|
 | Backend exits waiting for DB | `DATABASE_URL` host wrong outside compose | Use `localhost:5432` manually, `postgres:5432` inside compose |
 | Frontend blank + console Firebase error | `VITE_FIREBASE_*` missing (no fallback in `src/config/firebase.js`) | Provide all 7 vars; rebuild (`vite build` bakes them) |
-| Supabase storage calls fail in Docker | Compose passes `VITE_SUPABASE_KEY`, code reads `VITE_SUPABASE_ANON_KEY` | Set `VITE_SUPABASE_ANON_KEY` (naming mismatch, see Configuration Reference) |
+| File uploads fail (`Object storage is not configured`) | `S3_ENDPOINT` / keys unset | Set `S3_*` or run `docker compose --profile storage up -d` for bundled RustFS |
 | Backend healthcheck never healthy in compose | Probe hits `:8090` but container listens on `:3000` (`PORT=3000` in compose) | Probe the container port (`:3000`) or set `PORT=8090`; tracked as known compose bug |
 | `npm run dev` hangs on Temporal | `temporal:up` pulls `temporalio/auto-setup:1.23` first run | `npm run temporal:logs`; UI at `:8088` once `SERVING` |
 | Port conflicts | `:80` (frontend), `:8090` (backend), `:5432`/`:5433` (postgres) | Stop conflicting services or remap ports in compose |

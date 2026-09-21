@@ -599,19 +599,29 @@ npm run dev:all
 
 ### Environment Variables
 
-**Backend `.env`:**
+**Backend `.env`** (see `apps/backend/environment.js` + `.env.docker`):
 ```env
 DATABASE_URL=postgresql://user:pass@localhost:5432/jetadmin
-JWT_SECRET=your_jwt_secret
-FIREBASE_PROJECT_ID=your_project_id
-RABBITMQ_URL=amqp://localhost
-API_PORT=4000
+PORT=8090
+VAULT_ENCRYPTION_KEY=your_32_byte_hex_key      # openssl rand -hex 32
+OAUTH_STATE_SECRET=your_random_secret
+FIREBASE_CREDENTIALS='<service-account-json>'
+# File uploads (any S3-compatible backend: AWS, MinIO, RustFS, Supabase S3)
+S3_ENDPOINT=http://localhost:9000
+S3_ACCESS_KEY_ID=...
+S3_SECRET_ACCESS_KEY=...
+S3_BUCKET=jet-admin-datasource-file-uploads
+S3_PUBLIC_BASE_URL=http://localhost:9000
+# AI agent (or set per-tenant in Tenant Settings)
+OPENROUTER_API_KEY=sk-or-...
 ```
 
 **Frontend `.env`:**
 ```env
-VITE_API_URL=http://localhost:4000
-VITE_FIREBASE_CONFIG={"apiKey":"..."}
+VITE_SERVER_HOST=http://localhost:8090
+VITE_SOCKET_HOST=http://localhost:8090
+VITE_FIREBASE_API_KEY=...
+# (full list: VITE_FIREBASE_*, VITE_SUPABASE_URL — see .env.docker)
 ```
 
 ---

@@ -8,7 +8,7 @@ sidebar_position: 11
 
 Source of truth: `apps/backend/environment.js` (sole sanctioned `process.env` reader), `apps/frontend/src/{constants.js,config/*}`, `apps/mcp-server/environment.js`, `packages/mcp-server/src/{config.js,index.js}`, and the `docker-compose*.yml` environment sections. Where compose/`.env.docker` and code disagree, **code wins** and the drift is flagged.
 
-All backend changes require process restart. All `VITE_*` changes require frontend rebuild (`vite build` statically replaces them at build time). `docker-entrypoint.frontend.sh` only starts nginx — there is no runtime config override.
+All backend changes require process restart. All `VITE_*` changes require frontend rebuild (`vite build` statically replaces them at build time) — except `SERVER_HOST` / `SOCKET_HOST`, which `docker-entrypoint.frontend.sh` writes to `/config.js` at container startup (runtime `SERVER_HOST`/`SOCKET_HOST` env wins, no rebuild).
 
 ## Backend (`apps/backend`, read via `environment.js`)
 
@@ -19,8 +19,7 @@ All backend changes require process restart. All `VITE_*` changes require fronte
 | `NODE_ENV` | no | `development` | `development`/`production`/`test` | everything (`NODE_ID` derivation, logging) | `test` enables `authProviderTest` bypass — never set in prod |
 | `NODE_ID` | no | `dev_node_1` / `prod_node_1` | string | `winston.config.js` (log filename `logs/<NODE_ID>-<date>.log`) | Log files collide across nodes if duplicated |
 | `PORT` | no | `8090` | int | `http-server.config.js` | Compose sets `3000`; Render injects `$PORT`. Healthchecks must target the effective port |
-| `DATABASE_URL` | **yes** | — | Prisma Postgres URL | Prisma (`schema.prisma` `env("DATABASE_URL")`), `run-manual-migrations.js` | Boot fails; nothing works |
-| `UNPOOLED_DATABASE_URL` | no | — | direct Postgres URL | scripts requiring non-pooled connection | Pool timeouts under migration load if unset (uses pooled) |
+| `DATABASE_URL` | **yes** | — | Prisma Postgres URL | Prisma (`schema.prisma` `env("DATABASE_URL")`), `run-manual-migrations.js` | Boot fails; nothing works. Compose defaults to bundled postgres; set `DATABASE_URL` to your own DB and leave `postgres` out of the `up` service list to skip it (nothing depends on it) |
 | `ENABLED_MODULES` | no | `auth,tenant` only | comma list, no spaces | `config/module.config.js` `isModuleEnabled()` (missing key = enabled) | Compose enables 16 modules; minimal default disables datasource/query/workflow/widget — most UI 404s |
 | `EXPRESS_REQUEST_SIZE_LIMIT` | no | `5mb` | bytes string (`5mb`, `10mb`) | `express-app.config.js` (`json`+`urlencoded`) | Large bundle imports rejected; uploads use separate 10 MB multer cap |
 | `CORS_WHITELIST` | no | `http://localhost:3000,5173,3001,127.0.0.1:3000,3001` | comma URLs | `express-app.config.js`, `socket.io.js` | Browsers blocked; `/webhooks` stays open (`origin:true`) regardless |
@@ -32,8 +31,7 @@ All backend changes require process restart. All `VITE_*` changes require fronte
 | `FIREBASE_CREDENTIALS` | **yes** (any user auth) | — | JSON service-account blob | `config/firebase.config.js` (`verifyIdToken`) | All `Bearer` logins fail |
 | `VAULT_ENCRYPTION_KEY` | **yes** (vault/OAuth/datasources) | — | 32-byte hex | `utils/encryption.util.js` (AES-256-GCM) | Decrypt throws; datasource tests, OAuth callback, AI tools fail. No auto-rotation |
 | `OAUTH_STATE_SECRET` | yes (Google OAuth) | — | JWT secret | `modules/oauth/oauth.controller.js` (10-min state) | OAuth handshake fails signature check |
-| `JET_ADMIN_INTERNAL_API_KEY` | yes (AI tools → backend) | — | opaque string | `modules/ai/*` | Agent tool calls rejected |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | yes (Google OAuth) | — | OAuth client pair | `modules/oauth/*` | `/oauth/google/*` 500s |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | yes (Google OAuth) | — | OAuth client pair | `modules/oauth/*`, `modules/vault/vault.service.js` | `/oauth/google/*` 500s |
 | `BACKEND_URL` | no | — | public backend URL | OAuth callback + `OPENROUTER_HTTP_REFERER` fallback | OAuth redirect + OpenRouter referer header wrong behind proxies |
 
 ### AI (Jet Agent, OpenRouter-compatible)
@@ -42,20 +40,25 @@ All backend changes require process restart. All `VITE_*` changes require fronte
 |---|---|---|---|---|
 | `OPENROUTER_API_KEY` | yes (agent) | — | `sk-or-…` | Workspace fallback; tenant vault `ai_config` wins when set |
 | `AI_BASE_URL` | no | `https://openrouter.ai/api/v1` | URL | OpenAI-compatible endpoint |
-| `AI_MODEL` | no | `minimax/minimax-m3:free` | model slug | Primary model |
+| `AI_MODEL` | no | `minimax/minimax-m3` | model slug | Primary model |
 | `AI_FALLBACK_MODELS` | no | 3 free models (Nemotron Ultra/Super, GLM 5.2) | comma slugs | Tried in order |
 | `OPENROUTER_HTTP_REFERER` | no | `BACKEND_URL` → `http://localhost:8090` | URL | Required by OpenRouter rankings |
 | `OPENROUTER_APP_TITLE` | no | `Jet Admin` | string | OpenRouter dashboard label |
 | `AI_MAX_STEPS` | no | `25` | int | Agent tool-call ceiling |
 | `AI_TEMPERATURE` | no | `0.2` | float | Generation temperature |
-| `GEMINI_API_KEY` / `NVIDIA_API_KEY` | no | — | provider keys | Legacy/alternate providers; `GEMINI_API_KEY` also in compose + scratch scripts |
+| ~~`GEMINI_API_KEY` / `NVIDIA_API_KEY`~~ | — | — | — | **Removed**: nothing in production code consumed them (`GEMINI_API_KEY` only in `scratch/` dev scripts, which read `process.env` directly) |
 
-### Storage / files
+### Storage / files (S3 only — AWS, MinIO, RustFS)
 
 | Key | Required | Default | Format | Read by |
 |---|---|---|---|---|
-| `SUPABASE_URL` / `SUPABASE_ANON_KEY` | yes (uploads) | — | URL + JWT | `utils/fileStorage.util.js` (S3 → Supabase-JS → axios fallback, `forcePathStyle:true`) |
-| `SUPABASE_S3_ENDPOINT` / `SUPABASE_S3_REGION` / `SUPABASE_S3_ACCESS_KEY_ID` / `SUPABASE_S3_SECRET_ACCESS_KEY` / `SUPABASE_S3_BUCKET` | yes (S3 path) | — | S3 fields | Same; missing fields fall through to next strategy |
+| `S3_ENDPOINT` | yes (uploads) | — | URL (server-side, reachable from backend) | `utils/fileStorage.util.js` (`S3 → axios` fallback for foreign URLs) |
+| `S3_REGION` | no | `us-east-1` | string | Same |
+| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | yes (uploads) | — | credentials | Same; unset = uploads throw a clear error |
+| `S3_BUCKET` | no | `jet-admin-datasource-file-uploads` | bucket name | Same; `tenant-assets` bucket for logos is fixed in `constants.STORAGE` |
+| `S3_PUBLIC_BASE_URL` | yes (uploads) | — | browser-facing base URL | Public file URLs (`<base>/<bucket>/<key>`) |
+| `S3_FORCE_PATH_STYLE` | no | `"true"` | `"true"`/`"false"` | `false` for AWS virtual-hosted style |
+| `RUSTFS_ACCESS_KEY` / `RUSTFS_SECRET_KEY` | storage profile | `rustfsadmin` | credentials | Bundled `rustfs` service (`--profile storage`); must match `S3_*` keys |
 
 ### Logging
 
@@ -90,20 +93,22 @@ All backend changes require process restart. All `VITE_*` changes require fronte
 | Key | Required | Default | Format | Notes |
 |---|---|---|---|---|
 | `MCP_SERVER_PORT` | no | `5001` | int | Standalone `apps/mcp-server` listen port |
-| `MCP_SERVER_URL` | no | `http://localhost:<MCP_SERVER_PORT>` | URL | Advertised URL |
+| `MCP_SERVER_URL` | no | `http://localhost:<MCP_SERVER_PORT>` | URL | Advertised URL (backend → MCP; compose sets `http://mcp-server:5001`) |
+
+Docker: `mcp-server` service runs under `--profile mcp` (`docker compose --profile mcp up -d`), needs `FIREBASE_CREDENTIALS`, talks to the backend at `JET_ADMIN_BACKEND_URL` (default `http://backend:3000` in compose). Backend degrades to `AI_TOOLS_UNAVAILABLE` when MCP is absent.
 
 ### Drift: set in Docker but unread by backend
 
 :::warning
-These keys appear in `docker-compose.yml` / `.env.docker` but have **zero** consumers in `apps/backend` (`environment.js` + `process.env` grep). They are currently no-ops; do not rely on them: `JWT_ACCESS_TOKEN_SECRET`, `JWT_REFRESH_TOKEN_SECRET`, `ACCESS_TOKEN_TIMEOUT`, `REFRESH_TOKEN_TIMEOUT`, `SESSION_SECRET`, `RABBITMQ_URL`, `RABBITMQ_USER`, `RABBITMQ_PASS`, `SEED_DATABASE` (read only by `docker-entrypoint.backend.sh`, not Node), `POSTGRES_*` (postgres image only), `SSL_CERT_CN`.
+`SEED_DATABASE` is read only by `docker-entrypoint.backend.sh` (not Node) and `POSTGRES_*` only by the postgres image — both intentional. The former no-ops (`JWT_ACCESS_TOKEN_SECRET`, `JWT_REFRESH_TOKEN_SECRET`, `ACCESS_TOKEN_TIMEOUT`, `REFRESH_TOKEN_TIMEOUT`, `SESSION_SECRET`, `RABBITMQ_URL`/`USER`/`PASS`, `GEMINI_API_KEY`, `SSL_CERT_CN`, `UNPOOLED_DATABASE_URL`, `JET_ADMIN_INTERNAL_API_KEY`) were removed from compose / `.env.docker` / `environment.js` — do not re-add them. `amqplib` stays as a dependency: `RabbitMQDataSource` uses per-datasource user URLs, not env.
 :::
 
 ## Frontend (`apps/frontend`, `import.meta.env`)
 
 | Key | Required | Default | Format | Read by | What breaks if wrong |
 |---|---|---|---|---|---|
-| `VITE_SERVER_HOST` | yes | dev `http://localhost:8090`, prod `https://jet-admin-1.onrender.com` | URL, no trailing slash | `src/constants.js` → all `src/data/apis/*.js` (axios base) | Every REST call fails |
-| `VITE_SOCKET_HOST` | yes | same as above | URL | `executionStreamService.js`, `useSocketStore.js` | No realtime (workflows, listeners, widgets) |
+| `VITE_SERVER_HOST` / `SERVER_HOST` | yes | build default `http://localhost:8090`; runtime `/config.js` wins; final fallback `window.location.origin` | URL, no trailing slash | `src/constants.js` → all `src/data/apis/*.js` (axios base). `SERVER_HOST` container env is written to `/config.js` by `docker-entrypoint.frontend.sh` (runtime, no rebuild); `VITE_SERVER_HOST` build arg is the baked-in fallback | Every REST call fails |
+| `VITE_SOCKET_HOST` / `SOCKET_HOST` | yes | same as above | URL | `executionStreamService.js`, `useSocketStore.js` | No realtime (workflows, listeners, widgets) |
 | `VITE_FIREBASE_API_KEY` / `VITE_FIREBASE_AUTH_DOMAIN` / `VITE_FIREBASE_PROJECT_ID` / `VITE_FIREBASE_STORAGE_BUCKET` / `VITE_FIREBASE_MESSAGING_SENDER_ID` / `VITE_FIREBASE_APP_ID` / `VITE_FIREBASE_MEASUREMENT_ID` | **yes** | none (hard fail) | Firebase web config | `src/config/firebase.js` | `initializeApp` throws; blank app |
 | `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` | uploads only | — | URL + anon JWT | `src/config/supabase.js` | Storage features fail. Compose passes `VITE_SUPABASE_KEY` (no `_ANON`) — **mismatch, ignored by code** |
 | `VITE_WEBHOOK_PORT` | no | `8095` | int | `realtimeListenerGuidanceBox.jsx` (display only) | Test-URL hint shows wrong port; ingestion unaffected |

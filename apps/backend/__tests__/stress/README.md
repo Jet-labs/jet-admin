@@ -1,5 +1,10 @@
 # Workflow Engine Stress Test Suite
 
+> NOTE: this doc describes the retired native orchestrator (`handleTaskResult`,
+> `_dispatchNextNodes`, `addNodeJob` — all removed; workflows run on Temporal
+> now, see `modules/workflow/temporal`). Kept for the race-condition analysis
+> only; the harness files it names no longer exist.
+
 ## Structure
 
 ```

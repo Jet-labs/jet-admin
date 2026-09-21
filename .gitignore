@@ -34,6 +34,10 @@ build_output.log
 
 # Local docker compose (repo keeps docker-compose-sample.yml / cloud / temporal)
 docker-compose.yml
+# Local docker env with real secrets (used via --env-file, never committed)
+.env.docker.local
+# Local database backups (may contain production data)
+backups/
 
 # OS
 .DS_Store

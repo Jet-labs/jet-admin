@@ -18,6 +18,33 @@ RUN npm install
 # Copy source code (respects .dockerignore)
 COPY apps/frontend ./apps/frontend
 
+# Build-time config (Vite bakes import.meta.env.* into the bundle).
+# Pass via compose `build.args` or `docker build --build-arg`.
+# SERVER/SOCKET hosts can ALSO be overridden at runtime via the
+# SERVER_HOST / SOCKET_HOST container env vars (see
+# docker-entrypoint.frontend.sh -> /config.js), which take precedence.
+ARG VITE_SERVER_HOST=http://localhost:8090
+ARG VITE_SOCKET_HOST=http://localhost:8090
+ARG VITE_FIREBASE_API_KEY=""
+ARG VITE_FIREBASE_AUTH_DOMAIN=""
+ARG VITE_FIREBASE_PROJECT_ID=""
+ARG VITE_FIREBASE_STORAGE_BUCKET=""
+ARG VITE_FIREBASE_MESSAGING_SENDER_ID=""
+ARG VITE_FIREBASE_APP_ID=""
+ARG VITE_FIREBASE_MEASUREMENT_ID=""
+ARG VITE_WEBHOOK_PORT=8095
+
+ENV VITE_SERVER_HOST=$VITE_SERVER_HOST \
+    VITE_SOCKET_HOST=$VITE_SOCKET_HOST \
+    VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY \
+    VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN \
+    VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID \
+    VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET \
+    VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID \
+    VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID \
+    VITE_FIREBASE_MEASUREMENT_ID=$VITE_FIREBASE_MEASUREMENT_ID \
+    VITE_WEBHOOK_PORT=$VITE_WEBHOOK_PORT
+
 # Build frontend
 WORKDIR /app/apps/frontend
 RUN npm run build
@@ -34,9 +61,10 @@ COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html
 # Expose port
 EXPOSE 80
 
-# Health check
+# Health check (127.0.0.1: busybox wget resolves `localhost` to ::1 first while
+# nginx listens on IPv4 — `localhost` here would flap to unhealthy)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1/health || exit 1
 
 # Copy entrypoint script for runtime config
 COPY docker-entrypoint.frontend.sh /

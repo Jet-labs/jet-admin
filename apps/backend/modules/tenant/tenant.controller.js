@@ -185,7 +185,7 @@ tenantController.updateTenant = async (req, res) => {
 };
 
 /**
- * Uploads a tenant logo file to Supabase storage.
+ * Uploads a tenant logo file to S3-compatible object storage.
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
