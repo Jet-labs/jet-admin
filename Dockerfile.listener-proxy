@@ -1,0 +1,66 @@
+# ============================================
+# Jet Admin - Listener Proxy Container
+# ============================================
+# Stateless ingress node: owns datasource subscriptions + webhook ingress,
+# publishes raw envelopes to the Redis Stream (`listener:events`).
+# Backend pods consume + dispatch via the pipeline worker.
+#
+# Built from the SAME repo / SAME context as the backend —
+# no separate repo needed. App entrypoint lives in
+# apps/listener-proxy/; engine/queue/bus/redis/prisma are reused
+# from apps/backend + packages/ (backend stays the source of truth).
+#
+# Build:
+#   docker build -f Dockerfile.listener-proxy -t jet-admin-listener-proxy .
+# Run (via compose):
+#   docker compose up -d --build listener-proxy
+
+FROM node:20-slim
+
+# System deps: openssl (Prisma), wget (healthcheck), netcat (wait-for), procps (pgrep)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    wget \
+    netcat-openbsd \
+    procps \
+    python3 \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy root package files (for workspace resolution)
+COPY package*.json ./
+
+# Copy workspace package.json files (same backend set so the proxy image
+# stays in sync with the backend image, plus the proxy app itself)
+COPY apps/backend/package*.json ./apps/backend/
+COPY apps/listener-proxy/package*.json ./apps/listener-proxy/
+COPY packages/datasource-types/package*.json ./packages/datasource-types/
+COPY packages/datasources-logic/package*.json ./packages/datasources-logic/
+COPY packages/expression-engine/package*.json ./packages/expression-engine/
+COPY packages/widget-types/package*.json ./packages/widget-types/
+COPY packages/widgets-logic/package*.json ./packages/widgets-logic/
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
+
+# Copy source files (proxy app + backend tree it reuses + shared packages)
+COPY apps/listener-proxy/ ./apps/listener-proxy/
+COPY apps/backend/ ./apps/backend/
+COPY packages/ ./packages/
+
+# Generate Prisma client (engine loads listener configs from DB via Prisma)
+WORKDIR /app/apps/backend
+RUN npx prisma generate
+
+WORKDIR /app/apps/listener-proxy
+
+# Proxy HTTP: webhooks + /health + control fallback (compose maps host port)
+EXPOSE 8095
+
+# Health check: liveness (active count, redis) via the proxy itself
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${LISTENER_PROXY_PORT:-8095}/health || exit 1
+
+CMD ["node", "index.js"]

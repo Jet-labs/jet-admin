@@ -1,6 +1,6 @@
 /**
- * Listener Ingress Proxy — stateless entrypoint.
- * Run: `node modules/listener/ingress/proxy.js` (own container/process).
+ * Listener Proxy — stateless ingress app.
+ * Run: `npm run dev` (local) or via Dockerfile.listener-proxy (compose).
  *
  * Owns ALL datasource subscriptions + webhook ingress. Publishes raw
  * envelopes to the Redis Stream (`listener:events`); backend pods consume
@@ -17,11 +17,27 @@
  *   /webhooks/*                               — datasource webhook ingress
  *   POST /internal/listeners/reload/:listenerID — HTTP fallback for control
  *     (cluster-internal; requires PROXY_CONTROL_TOKEN when set)
+ *
+ * Shared code (listenerEngine, queue, listenerBus, redis, prisma, vault,
+ * datasources-logic) is reused from apps/backend + packages/ — this app
+ * only owns the ingress wiring + lifecycle. Keep backend as the source of
+ * truth for engine/queue/bus logic.
+ *
+ * Two modes:
+ *   standalone (main) — `npm start` / compose: owns subscriptions + webhooks
+ *     on its own port, requires REDIS_URL + DATABASE_URL.
+ *   embedded (startEmbedded) — the backend calls this in-process for local
+ *     dev: subscriptions run inside the backend process on the memory queue,
+ *     no Redis, no extra port. The backend mounts getWebhookApp() itself.
  */
+
+// ─── 1. Environment (must be first — loads .env before backend modules read it) ─
+const { environment, isProxyMode, requireDatabase, requireRedis } = require('./environment');
+
+// ─── 2. Shared backend modules (resolved via the backend workspace tree) ───
 const express = require('express');
 const cors = require('cors');
-const environment = require('../../../environment');
-const Logger = require('../../../utils/logger');
+const Logger = require('../backend/utils/logger');
 
 let httpServer = null;
 let shuttingDown = false;
@@ -31,7 +47,7 @@ function sleep(ms) {
 }
 
 async function waitForRedis() {
-  const { getRedisClient } = require('../../../config/redis.config');
+  const { getRedisClient } = require('../backend/config/redis.config');
   let attempt = 0;
   for (;;) {
     attempt += 1;
@@ -53,7 +69,7 @@ async function waitForRedis() {
 }
 
 async function handleControlMessage(msg) {
-  const { listenerEngine } = require('../listenerEngine/engine');
+  const { listenerEngine } = require('../backend/modules/listener/listenerEngine/engine');
   const { type, listenerID } = msg || {};
   Logger.log('info', { message: 'proxy:control:received', params: { type, listenerID } });
   switch (type) {
@@ -80,8 +96,8 @@ function buildApp() {
 
   app.get('/health', async (req, res) => {
     try {
-      const { listenerEngine } = require('../listenerEngine/engine');
-      const { isClientReady } = require('../../../config/redis.config');
+      const { listenerEngine } = require('../backend/modules/listener/listenerEngine/engine');
+      const { isClientReady } = require('../backend/config/redis.config');
       res.status(200).json({
         status: 'ok',
         service: 'listener-proxy',
@@ -118,30 +134,102 @@ function buildApp() {
   return app;
 }
 
+// ─── Embedded ingress API (used in-process by the backend in dev) ──────────
+// All engine requires are lazy so requiring this module never pulls the
+// backend tree at load time (avoids backend ↔ proxy require cycles).
+
+function getEngine() {
+  // eslint-disable-next-line global-require
+  return require('../backend/modules/listener/listenerEngine/engine').listenerEngine;
+}
+
+/** Shared webhook ingress middleware (datasource subscribe() registers into the same router). */
+function getWebhookApp() {
+  // eslint-disable-next-line global-require
+  return require('@jet-admin/datasources-logic').webhookRouter.getApp();
+}
+
+/**
+ * Start subscriptions in-process (dev embedded mode: memory queue, no Redis,
+ * no extra HTTP server). The host process mounts getWebhookApp() itself and
+ * owns queue init + the pipeline consumer.
+ */
+async function startEmbedded() {
+  requireDatabase();
+  Logger.log('info', { message: 'proxy:embedded:start:init' });
+  await getEngine().startAll();
+  Logger.log('success', { message: 'proxy:embedded:started' });
+}
+
+async function stopEmbedded() {
+  Logger.log('info', { message: 'proxy:embedded:stop:init' });
+  await getEngine().stopAll();
+}
+
+/** Direct engine lifecycle (embedded only — proxy mode uses notifyListenerChange). */
+async function startOne(listener) {
+  await getEngine().startOne(listener);
+}
+
+async function restartOne(listenerID) {
+  await getEngine().restartOne(listenerID);
+}
+
+async function stopOne(listenerID) {
+  await getEngine().stopOne(listenerID);
+}
+
+async function startAll() {
+  await getEngine().startAll();
+}
+
+async function stopAll() {
+  await getEngine().stopAll();
+}
+
+function getStatus() {
+  return getEngine().getStatus();
+}
+
+/**
+ * Notify the standalone proxy about a listener change (proxy mode only).
+ * Best-effort control publish — the proxy reloads config from DB.
+ */
+async function notifyListenerChange(action, listenerID) {
+  try {
+    // eslint-disable-next-line global-require
+    const { publishControl } = require('../backend/config/listenerBus.config');
+    await publishControl({ type: action, listenerID });
+    Logger.log('info', { message: 'proxy:ingress:notified', params: { action, listenerID } });
+  } catch (err) {
+    Logger.log('warning', { message: 'proxy:ingress:notify:failed', params: { action, listenerID, error: err.message } });
+  }
+}
+
 async function main() {
   Logger.log('info', { message: 'proxy:boot:init' });
 
-  if (!environment.REDIS_URL) {
-    throw new Error('REDIS_URL is required for the listener-proxy (QUEUE_DRIVER=redis).');
-  }
+  // Standalone proxy requires both: DB for listener configs, Redis for the bus.
+  requireDatabase();
+  requireRedis();
 
   await waitForRedis();
 
-  const { initializeQueue, closeQueue } = require('../../../config/queue.config');
+  const { initializeQueue, closeQueue } = require('../backend/config/queue.config');
   await initializeQueue();
 
-  const { subscribeControl } = require('../../../config/listenerBus.config');
+  const { subscribeControl } = require('../backend/config/listenerBus.config');
   try {
     await subscribeControl(handleControlMessage);
   } catch (err) {
     Logger.log('warning', { message: 'proxy:control:subscribe:failed', params: { error: err.message } });
   }
 
-  const { listenerEngine } = require('../listenerEngine/engine');
+  const { listenerEngine } = require('../backend/modules/listener/listenerEngine/engine');
   await listenerEngine.startAll();
 
   const app = buildApp();
-  const port = Number(environment.LISTENER_PROXY_PORT || 8095);
+  const port = Number(environment.LISTENER_PROXY_PORT || environment.PORT || 8095);
   await new Promise((resolve) => {
     httpServer = app.listen(port, () => {
       Logger.log('success', { message: 'proxy:listening', params: { port } });
@@ -159,7 +247,7 @@ async function main() {
       }
     } catch (_) { /* ignore */ }
     try {
-      const { listenerEngine: engine } = require('../listenerEngine/engine');
+      const { listenerEngine: engine } = require('../backend/modules/listener/listenerEngine/engine');
       await engine.stopAll();
     } catch (_) { /* ignore */ }
     try {
@@ -178,4 +266,20 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main, handleControlMessage };
+module.exports = {
+  main,
+  handleControlMessage,
+  buildApp,
+  // Embedded ingress API (backend dev uses these in-process)
+  isProxyMode,
+  startEmbedded,
+  stopEmbedded,
+  startOne,
+  restartOne,
+  stopOne,
+  startAll,
+  stopAll,
+  getStatus,
+  getWebhookApp,
+  notifyListenerChange,
+};

@@ -245,15 +245,14 @@ services:
   # ============================================
   # Owns ALL datasource subscriptions + webhook ingress (single subscriber,
   # so broadcast sources never double-publish). Publishes raw envelopes to
-  # the Redis Stream; backend pods consume + dispatch. Same image as
-  # `backend`, different entrypoint — no nginx/pm2 here.
+  # the Redis Stream; backend pods consume + dispatch. Own image
+  # (Dockerfile.listener-proxy) running apps/listener-proxy — engine,
+  # queue/bus/redis/prisma are reused from apps/backend (source of truth).
   listener-proxy:
     build:
       context: .
-      dockerfile: Dockerfile.backend
+      dockerfile: Dockerfile.listener-proxy
     container_name: jet-listener-proxy
-    working_dir: /app/apps/backend
-    entrypoint: ["node", "modules/listener/ingress/proxy.js"]
     depends_on:
       redis:
         condition: service_healthy

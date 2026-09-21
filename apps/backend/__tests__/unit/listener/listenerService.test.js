@@ -28,18 +28,19 @@ jest.mock('../../../config/prisma.config', () => ({
   prisma: mockPrisma,
 }));
 
-// Mock Listener Engine
+// Mock Listener Proxy app (backend routes all ingress through it;
+// dev embedded lifecycle delegates to the engine inside the proxy app)
 const mockListenerEngine = {
+  isProxyMode: jest.fn().mockReturnValue(false),
   startOne: jest.fn().mockResolvedValue(true),
   stopOne: jest.fn().mockResolvedValue(true),
   restartOne: jest.fn().mockResolvedValue(true),
   startAll: jest.fn().mockResolvedValue(true),
   stopAll: jest.fn().mockResolvedValue(true),
   getStatus: jest.fn().mockReturnValue({ 'lst-1': { state: 'running' } }),
+  notifyListenerChange: jest.fn().mockResolvedValue(undefined),
 };
-jest.mock('../../../modules/listener/listenerEngine/engine', () => ({
-  listenerEngine: mockListenerEngine,
-}));
+jest.mock('../../../../listener-proxy', () => mockListenerEngine);
 
 // Mock Casbin
 const mockGrantCreatorAccess = jest.fn().mockResolvedValue(true);

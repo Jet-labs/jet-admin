@@ -67,17 +67,17 @@ async function startAllListeners() {
     const { startPipelineWorker } = require('../modules/listener/listenerEngine/pipelineWorker');
     await startPipelineWorker();
 
-    // 5. Listener ingress (subscriptions + webhook handlers).
-    //    Proxy mode: a dedicated listener-proxy node owns all subscriptions
-    //    and webhook ingress — this backend only consumes + dispatches, so it
-    //    must NOT subscribe (that would double-publish every event).
-    const isProxyIngress =
-      environmentVariables.LISTENER_INGRESS === 'proxy' && !!environmentVariables.REDIS_URL;
-    if (isProxyIngress) {
+    // 5. Listener ingress (subscriptions + webhook handlers) — owned by the
+    //    standalone listener-proxy app. Dev: runs embedded in this process
+    //    (startEmbedded). Prod proxy mode: a dedicated node owns it, so this
+    //    backend only consumes + dispatches and must NOT subscribe (that
+    //    would double-publish every event).
+    //    eslint-disable-next-line global-require
+    const proxyApp = require('../../listener-proxy');
+    if (proxyApp.isProxyMode()) {
       Logger.log('info', { message: 'startup:listenerIngress:proxy (subscriptions owned by listener-proxy)' });
     } else {
-      const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
-      await listenerEngine.startAll();
+      await proxyApp.startEmbedded();
     }
 
     // 6. Audit log flusher (buffers and batch-saves audit logs)
@@ -98,12 +98,11 @@ async function stopAllListeners() {
   Logger.log('info', { message: 'startup:stopAllListeners:init' });
   temporalEnsureStopped = true;
 
-  const isProxyIngress =
-    environmentVariables.LISTENER_INGRESS === 'proxy' && !!environmentVariables.REDIS_URL;
-  if (!isProxyIngress) {
+  // eslint-disable-next-line global-require
+  const proxyApp = require('../../listener-proxy');
+  if (!proxyApp.isProxyMode()) {
     try {
-      const { listenerEngine } = require('../modules/listener/listenerEngine/engine');
-      await listenerEngine.stopAll();
+      await proxyApp.stopEmbedded();
     } catch (e) { /* ignore */ }
   }
 

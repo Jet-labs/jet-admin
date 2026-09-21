@@ -4,30 +4,31 @@
  * Also handles hot-reload integration with the ConnectionManager.
  */
 const { prisma } = require('../../config/prisma.config');
-const { listenerEngine } = require('./listenerEngine/engine');
 const Logger = require('../../utils/logger');
-const environment = require('../../environment');
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
-function isProxyIngress() {
-  return environment.LISTENER_INGRESS === 'proxy' && !!environment.REDIS_URL;
+/**
+ * All listener ingress (subscriptions + webhook ownership + hot-reload)
+ * lives in the standalone `listener-proxy` app. It is required lazily so
+ * backend ↔ proxy never form a load-time cycle. In dev the proxy runs
+ * embedded in this process; in prod it is a dedicated node and the backend
+ * only notifies it (holding no subscriptions itself).
+ */
+function getProxyApp() {
+  // eslint-disable-next-line global-require
+  return require('../../../listener-proxy');
 }
 
 /**
- * Notify the ingress proxy about a listener change (proxy mode only).
- * Returns true when handled (caller must skip direct engine calls —
+ * Notify the standalone ingress proxy about a listener change (proxy mode only).
+ * Returns true when handled (caller must skip embedded lifecycle calls —
  * the backend holds no subscriptions in proxy mode).
  */
 async function syncIngressProxy(action, listenerID) {
-  if (!isProxyIngress()) return false;
-  try {
-    const { publishControl } = require('../../config/listenerBus.config');
-    await publishControl({ type: action, listenerID });
-    Logger.log('info', { message: 'listenerService:ingress:notified', params: { action, listenerID } });
-  } catch (err) {
-    Logger.log('warning', { message: 'listenerService:ingress:notify:failed', params: { action, listenerID, error: err.message } });
-  }
+  const proxyApp = getProxyApp();
+  if (!proxyApp.isProxyMode()) return false;
+  await proxyApp.notifyListenerChange(action, listenerID);
   return true;
 }
 
@@ -206,7 +207,7 @@ const listenerService = {
       // If created as active, start it
       if (listener.status === 'active') {
         if (!(await syncIngressProxy('LISTENER_RELOAD', listener.listenerID))) {
-          await listenerEngine.startOne(listener);
+          await getProxyApp().startOne(listener);
         }
       }
 
@@ -293,12 +294,12 @@ const listenerService = {
       // Hot-reload: restart if config changed and listener is active
       if (listener.status === 'active') {
         if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
-          await listenerEngine.restartOne(listenerID);
+          await getProxyApp().restartOne(listenerID);
         }
       } else {
         // If set to inactive, stop it
         if (!(await syncIngressProxy('LISTENER_REMOVE', listenerID))) {
-          await listenerEngine.stopOne(listenerID);
+          await getProxyApp().stopOne(listenerID);
         }
       }
 
@@ -325,7 +326,7 @@ const listenerService = {
 
       // Stop the listener if active
       if (!(await syncIngressProxy('LISTENER_REMOVE', listenerID))) {
-        await listenerEngine.stopOne(listenerID);
+        await getProxyApp().stopOne(listenerID);
       }
 
       // CASCADE will delete actions and events
@@ -446,7 +447,7 @@ const listenerService = {
 
       if (listener.status === 'active') {
         if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
-          await listenerEngine.restartOne(listenerID);
+          await getProxyApp().restartOne(listenerID);
         }
       }
 
@@ -494,7 +495,7 @@ const listenerService = {
 
       if (listener.status === 'active') {
         if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
-          await listenerEngine.restartOne(listenerID);
+          await getProxyApp().restartOne(listenerID);
         }
       }
 
@@ -536,7 +537,7 @@ const listenerService = {
 
       if (listener.status === 'active') {
         if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
-          await listenerEngine.restartOne(listenerID);
+          await getProxyApp().restartOne(listenerID);
         }
       }
 
@@ -563,7 +564,7 @@ const listenerService = {
   // ─── Status ─────────────────────────────────────────────────────────────
 
   getConnectionStatus() {
-    return listenerEngine.getStatus();
+    return getProxyApp().getStatus();
   },
 
   // ─── Boot (called from startup.js) ──────────────────────────────────────
@@ -571,7 +572,7 @@ const listenerService = {
   async startAllServerListeners() {
     Logger.log("info", { message: "listenerService:startAllServerListeners:init" });
     try {
-      await listenerEngine.startAll();
+      await getProxyApp().startAll();
       Logger.log("success", { message: "listenerService:startAllServerListeners:done" });
     } catch (error) {
       Logger.log("error", { message: "listenerService:startAllServerListeners:error", params: { error } });
@@ -581,7 +582,7 @@ const listenerService = {
   async stopAllServerListeners() {
     Logger.log("info", { message: "listenerService:stopAllServerListeners:init" });
     try {
-      await listenerEngine.stopAll();
+      await getProxyApp().stopAll();
       Logger.log("success", { message: "listenerService:stopAllServerListeners:done" });
     } catch (error) {
       Logger.log("error", { message: "listenerService:stopAllServerListeners:error", params: { error } });

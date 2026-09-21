@@ -28,7 +28,7 @@ const aiRoutes = require("./modules/ai/ai.v1.routes");
 const oauthRoutes = require("./modules/oauth/oauth.v1.routes");
 const operatorAuthRoutes = require("./modules/operatorAuth/operatorAuth.v1.routes");
 const operatorAdminRoutes = require("./modules/operatorAdmin/operatorAdmin.v1.routes");
-const { webhookRouter } = require("@jet-admin/datasources-logic");
+
 
 // Middleware setup
 expressApp.use(cookieParser());
@@ -67,16 +67,19 @@ expressApp.use(
 // OAuth integration routes
 expressApp.use("/api/v1/oauth", oauthRoutes);
 
-// Webhook ingress routes.
-// Embedded mode: served inline (no separate port or nginx routing needed).
-// Proxy mode (LISTENER_INGRESS=proxy): the listener-proxy owns /webhooks —
-// mounting here too would 404 (empty in-process router) or double-handle.
+// Webhook ingress routes — owned by the standalone listener-proxy app.
+// Embedded (dev) mode: the proxy runs in-process, so its router is mounted
+// here inline (no separate port or nginx routing needed).
+// Proxy mode: the dedicated node owns /webhooks — mounting here too would
+// 404 (empty in-process router) or double-handle.
 // These handle: /webhooks/v1/inbound/:tenantID/:pathSuffix
 //               /webhooks/v1/inbound/:listenerID
-if (environment.LISTENER_INGRESS === 'proxy' && environment.REDIS_URL) {
+// eslint-disable-next-line global-require
+const proxyApp = require("../listener-proxy");
+if (proxyApp.isProxyMode()) {
   Logger.log("info", { message: "webhook ingress served by listener-proxy, skipping local mount" });
 } else {
-  expressApp.use("/webhooks", webhookRouter.getApp());
+  expressApp.use("/webhooks", proxyApp.getWebhookApp());
 }
 
 // Global error-handling middleware
