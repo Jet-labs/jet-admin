@@ -90,5 +90,5 @@ Mounted at `/api/v1/tenants/:tenantID/listeners`:
 
 ## Runtime
 
-- `startAllListeners()` runs at boot (`config/startup.js`); events flow through the in-process `fastq` queue `listener.events` (+ `.dlq`), consumed by `pipelineWorker`. Pre-processing transforms run in `isolated-vm`.
+- `startAllListeners()` runs at boot (`config/startup.js`); the standalone `listener-proxy` publishes raw events to the Redis Stream `listener:events` (+ DLQ `listener:events:dlq`), consumed by `pipelineWorker` via the `listener-workers` consumer group. Pre-processing transforms run in `isolated-vm`.
 - Live delivery is Socket.IO (`join_room`/`leave_room` on `listener:<id>`); app pages subscribe per listener data source. Test consoles use `VITE_WEBHOOK_PORT` (default 8095) for the displayed URL — see [Configuration Reference](../operations/configuration-reference.md).

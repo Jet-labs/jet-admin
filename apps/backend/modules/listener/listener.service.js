@@ -7,13 +7,14 @@ const { prisma } = require('../../config/prisma.config');
 const Logger = require('../../utils/logger');
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
+const { getListenerIngressInfo } = require("./listenerIngress.util");
 
 /**
  * All listener ingress (subscriptions + webhook ownership + hot-reload)
  * lives in the standalone `listener-proxy` app. It is required lazily so
- * backend ↔ proxy never form a load-time cycle. In dev the proxy runs
- * embedded in this process; in prod it is a dedicated node and the backend
- * only notifies it (holding no subscriptions itself).
+ * backend ↔ proxy never form a load-time cycle. The backend holds no
+ * subscriptions itself — every change is forwarded to the proxy, which
+ * reloads the listener config from DB.
  */
 function getProxyApp() {
   // eslint-disable-next-line global-require
@@ -21,15 +22,28 @@ function getProxyApp() {
 }
 
 /**
- * Notify the standalone ingress proxy about a listener change (proxy mode only).
- * Returns true when handled (caller must skip embedded lifecycle calls —
- * the backend holds no subscriptions in proxy mode).
+ * Forward a listener change to the standalone ingress proxy fleet.
+ * 1. Notify (global CRUD fan-out — the owning proxy reloads from DB).
+ * 2. Reconcile placement (covers brand-new listeners no proxy owns yet,
+ *    and any drift). Best-effort throughout — never throws, never blocks CRUD.
  */
 async function syncIngressProxy(action, listenerID) {
-  const proxyApp = getProxyApp();
-  if (!proxyApp.isProxyMode()) return false;
-  await proxyApp.notifyListenerChange(action, listenerID);
-  return true;
+  await getProxyApp().notifyListenerChange(action, listenerID);
+  try {
+    // eslint-disable-next-line global-require
+    const registry = require('../../modules/proxyRegistry/proxyRegistry.service');
+    await registry.reconcileAndAnnounce({ fetchActiveIDs });
+  } catch (err) {
+    Logger.log('warning', { message: 'listenerService:reconcile:skipped', params: { error: err.message } });
+  }
+}
+
+async function fetchActiveIDs() {
+  const rows = await prisma.tblListeners.findMany({
+    where: { status: 'active' },
+    select: { listenerID: true },
+  });
+  return (rows || []).map((r) => r.listenerID).filter(Boolean);
 }
 
 const listenerService = {
@@ -93,6 +107,7 @@ const listenerService = {
       for (const listener of listeners) {
         const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
         listener.transformScript = transformAction?.actionConfig?.script || null;
+        listener.ingress = getListenerIngressInfo(listener);
       }
 
       Logger.log("success", {
@@ -133,6 +148,7 @@ const listenerService = {
       if (listener) {
         const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
         listener.transformScript = transformAction?.actionConfig?.script || null;
+        listener.ingress = getListenerIngressInfo(listener);
       }
 
       Logger.log("success", {
@@ -204,13 +220,12 @@ const listenerService = {
         params: { listenerID: listener.listenerID, type: listener.listenerType },
       });
 
-      // If created as active, start it
+      // If created as active, tell the proxy to subscribe it
       if (listener.status === 'active') {
-        if (!(await syncIngressProxy('LISTENER_RELOAD', listener.listenerID))) {
-          await getProxyApp().startOne(listener);
-        }
+        await syncIngressProxy('LISTENER_RELOAD', listener.listenerID);
       }
 
+      listener.ingress = getListenerIngressInfo(listener);
       return listener;
     } catch (error) {
       Logger.log("error", {
@@ -285,6 +300,7 @@ const listenerService = {
 
       const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
       listener.transformScript = transformAction?.actionConfig?.script || null;
+      listener.ingress = getListenerIngressInfo(listener);
 
       Logger.log("success", {
         message: "listenerService:updateListener:success",
@@ -293,14 +309,10 @@ const listenerService = {
 
       // Hot-reload: restart if config changed and listener is active
       if (listener.status === 'active') {
-        if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
-          await getProxyApp().restartOne(listenerID);
-        }
+        await syncIngressProxy('LISTENER_RELOAD', listenerID);
       } else {
         // If set to inactive, stop it
-        if (!(await syncIngressProxy('LISTENER_REMOVE', listenerID))) {
-          await getProxyApp().stopOne(listenerID);
-        }
+        await syncIngressProxy('LISTENER_REMOVE', listenerID);
       }
 
       return listener;
@@ -325,9 +337,7 @@ const listenerService = {
       if (!existing) return null;
 
       // Stop the listener if active
-      if (!(await syncIngressProxy('LISTENER_REMOVE', listenerID))) {
-        await getProxyApp().stopOne(listenerID);
-      }
+      await syncIngressProxy('LISTENER_REMOVE', listenerID);
 
       // CASCADE will delete actions and events
       await prisma.tblListeners.delete({
@@ -446,9 +456,7 @@ const listenerService = {
       });
 
       if (listener.status === 'active') {
-        if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
-          await getProxyApp().restartOne(listenerID);
-        }
+        await syncIngressProxy('LISTENER_RELOAD', listenerID);
       }
 
       return action;
@@ -494,9 +502,7 @@ const listenerService = {
       });
 
       if (listener.status === 'active') {
-        if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
-          await getProxyApp().restartOne(listenerID);
-        }
+        await syncIngressProxy('LISTENER_RELOAD', listenerID);
       }
 
       return action;
@@ -536,9 +542,7 @@ const listenerService = {
       });
 
       if (listener.status === 'active') {
-        if (!(await syncIngressProxy('LISTENER_RELOAD', listenerID))) {
-          await getProxyApp().restartOne(listenerID);
-        }
+        await syncIngressProxy('LISTENER_RELOAD', listenerID);
       }
 
       return { actionID };
@@ -562,30 +566,34 @@ const listenerService = {
   },
 
   // ─── Status ─────────────────────────────────────────────────────────────
+  // Live placement from the proxy registry (which proxy owns which
+  // listener). Degrades to a static descriptor when Redis is unreachable.
 
-  getConnectionStatus() {
-    return getProxyApp().getStatus();
-  },
-
-  // ─── Boot (called from startup.js) ──────────────────────────────────────
-
-  async startAllServerListeners() {
-    Logger.log("info", { message: "listenerService:startAllServerListeners:init" });
+  async getConnectionStatus() {
     try {
-      await getProxyApp().startAll();
-      Logger.log("success", { message: "listenerService:startAllServerListeners:done" });
-    } catch (error) {
-      Logger.log("error", { message: "listenerService:startAllServerListeners:error", params: { error } });
-    }
-  },
-
-  async stopAllServerListeners() {
-    Logger.log("info", { message: "listenerService:stopAllServerListeners:init" });
-    try {
-      await getProxyApp().stopAll();
-      Logger.log("success", { message: "listenerService:stopAllServerListeners:done" });
-    } catch (error) {
-      Logger.log("error", { message: "listenerService:stopAllServerListeners:error", params: { error } });
+      // eslint-disable-next-line global-require
+      const registry = require('../../modules/proxyRegistry/proxyRegistry.service');
+      const [live, version] = await Promise.all([
+        registry.listLiveProxies(),
+        registry.getVersion(),
+      ]);
+      const proxies = [];
+      for (const proxy of live) {
+        // eslint-disable-next-line no-await-in-loop
+        const shard = await registry.getShard(proxy.proxyID);
+        proxies.push({
+          proxyID: proxy.proxyID,
+          baseUrl: proxy.baseUrl || null,
+          weight: proxy.weight,
+          version: proxy.version || null,
+          status: proxy.status || 'active',
+          assignedListeners: shard,
+        });
+      }
+      return { mode: 'proxy', assignmentVersion: version, proxies };
+    } catch (err) {
+      Logger.log('warning', { message: 'listenerService:placement:unavailable', params: { error: err.message } });
+      return { mode: 'proxy', ingress: 'listener-proxy', placement: 'unavailable' };
     }
   },
 };

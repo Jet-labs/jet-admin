@@ -28,19 +28,24 @@ jest.mock('../../../config/prisma.config', () => ({
   prisma: mockPrisma,
 }));
 
-// Mock Listener Proxy app (backend routes all ingress through it;
-// dev embedded lifecycle delegates to the engine inside the proxy app)
-const mockListenerEngine = {
-  isProxyMode: jest.fn().mockReturnValue(false),
-  startOne: jest.fn().mockResolvedValue(true),
-  stopOne: jest.fn().mockResolvedValue(true),
-  restartOne: jest.fn().mockResolvedValue(true),
-  startAll: jest.fn().mockResolvedValue(true),
-  stopAll: jest.fn().mockResolvedValue(true),
-  getStatus: jest.fn().mockReturnValue({ 'lst-1': { state: 'running' } }),
+// Mock Listener Proxy app (backend routes all ingress through it —
+// subscriptions live in the standalone proxy, the backend only notifies)
+const mockProxyApp = {
   notifyListenerChange: jest.fn().mockResolvedValue(undefined),
 };
-jest.mock('../../../../listener-proxy', () => mockListenerEngine);
+jest.mock('../../../../listener-proxy', () => mockProxyApp);
+
+// Mock Proxy Registry (placement reconcile on CRUD + live status)
+const mockReconcile = jest.fn().mockResolvedValue({ moved: 0, version: 1 });
+const mockListLive = jest.fn().mockResolvedValue([]);
+const mockGetVersion = jest.fn().mockResolvedValue(0);
+const mockGetShard = jest.fn().mockResolvedValue([]);
+jest.mock('../../../modules/proxyRegistry/proxyRegistry.service', () => ({
+  reconcileAndAnnounce: (...args) => mockReconcile(...args),
+  listLiveProxies: (...args) => mockListLive(...args),
+  getVersion: (...args) => mockGetVersion(...args),
+  getShard: (...args) => mockGetShard(...args),
+}));
 
 // Mock Casbin
 const mockGrantCreatorAccess = jest.fn().mockResolvedValue(true);
@@ -128,7 +133,7 @@ describe('ListenerService', () => {
 
     expect(mockPrisma.tblListeners.create).toHaveBeenCalled();
     expect(mockGrantCreatorAccess).toHaveBeenCalledWith(tenantID, 'listener', 'lst-200', {}, userID);
-    expect(mockListenerEngine.startOne).toHaveBeenCalledWith(result);
+    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_RELOAD', 'lst-200');
   });
 
   it('should update listener and trigger hot reload if active', async () => {
@@ -145,7 +150,10 @@ describe('ListenerService', () => {
     });
 
     expect(result.listenerTitle).toBe('Updated Stream');
-    expect(mockListenerEngine.restartOne).toHaveBeenCalledWith('lst-100');
+    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_RELOAD', 'lst-100');
+    expect(mockReconcile).toHaveBeenCalledWith(
+      expect.objectContaining({ fetchActiveIDs: expect.any(Function) })
+    );
   });
 
   it('should stop listener and remove Casbin policies on deleteListener', async () => {
@@ -154,7 +162,7 @@ describe('ListenerService', () => {
 
     const result = await listenerService.deleteListener({ tenantID, listenerID: 'lst-100' });
 
-    expect(mockListenerEngine.stopOne).toHaveBeenCalledWith('lst-100');
+    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_REMOVE', 'lst-100');
     expect(mockPrisma.tblListeners.delete).toHaveBeenCalledWith({ where: { listenerID: 'lst-100' } });
     expect(mockRemovePoliciesForResource).toHaveBeenCalledWith(tenantID, 'listener:lst-100');
     expect(result).toEqual({ listenerID: 'lst-100' });
@@ -185,7 +193,7 @@ describe('ListenerService', () => {
     });
 
     expect(action.actionID).toBe('act-2');
-    expect(mockListenerEngine.restartOne).toHaveBeenCalledWith('lst-100');
+    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_RELOAD', 'lst-100');
   });
 
   it('should update listener action and delete action', async () => {
@@ -200,10 +208,42 @@ describe('ListenerService', () => {
       data: { isEnabled: false },
     });
 
-    expect(mockListenerEngine.restartOne).toHaveBeenCalledWith('lst-100');
+    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_RELOAD', 'lst-100');
 
     await listenerService.deleteAction({ tenantID, listenerID: 'lst-100', actionID: 'act-1' });
     expect(mockPrisma.tblListenerActions.delete).toHaveBeenCalledWith({ where: { actionID: 'act-1' } });
+  });
+
+  it('should return live proxy placement from getConnectionStatus', async () => {
+    mockListLive.mockResolvedValue([
+      { proxyID: 'p-1', baseUrl: 'https://hooks.example.com', weight: 100, version: '1.0.0', status: 'active' },
+    ]);
+    mockGetVersion.mockResolvedValue(7);
+    mockGetShard.mockResolvedValue(['lst-100']);
+
+    const status = await listenerService.getConnectionStatus();
+
+    expect(status.mode).toBe('proxy');
+    expect(status.assignmentVersion).toBe(7);
+    expect(status.proxies).toEqual([
+      {
+        proxyID: 'p-1',
+        baseUrl: 'https://hooks.example.com',
+        weight: 100,
+        version: '1.0.0',
+        status: 'active',
+        assignedListeners: ['lst-100'],
+      },
+    ]);
+  });
+
+  it('should degrade getConnectionStatus when the registry is unreachable', async () => {
+    mockListLive.mockRejectedValue(new Error('redis down'));
+
+    const status = await listenerService.getConnectionStatus();
+
+    expect(status.mode).toBe('proxy');
+    expect(status.placement).toBe('unavailable');
   });
 
   it('should activate and deactivate listener', async () => {
@@ -217,7 +257,7 @@ describe('ListenerService', () => {
 
     mockPrisma.tblListeners.update.mockResolvedValue({ ...sampleListener, status: 'inactive' });
     await listenerService.deactivateListener({ tenantID, listenerID: 'lst-100' });
-    expect(mockListenerEngine.stopOne).toHaveBeenCalledWith('lst-100');
+    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_REMOVE', 'lst-100');
   });
 
 });

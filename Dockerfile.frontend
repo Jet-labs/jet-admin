@@ -2,7 +2,7 @@
 # Jet Admin - Frontend Container (Multi-Stage)
 # ============================================
 # Stage 1: Build
-FROM node:18-slim AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
 
 # Copy dependency definitions
@@ -11,9 +11,15 @@ COPY apps/frontend/package*.json ./apps/frontend/
 COPY apps/backend/package*.json ./apps/backend/
 # Copy all workspace packages
 COPY packages/ ./packages/
+COPY scripts/build-packages.js ./scripts/build-packages.js
 
-# Install dependencies
-RUN npm install
+# Install dependencies (legacy peer deps, same as every other image)
+RUN npm install --legacy-peer-deps
+
+# Build workspace packages first: the frontend bundle resolves
+# @jet-admin/* entry points to dist/, which is excluded from the build
+# context via .dockerignore and never committed to git.
+RUN npm run build:packages
 
 # Copy source code (respects .dockerignore)
 COPY apps/frontend ./apps/frontend

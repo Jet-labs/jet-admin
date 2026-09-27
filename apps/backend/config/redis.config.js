@@ -23,9 +23,9 @@ function isRedisEnabled() {
 function getRedisClient(name = 'default') {
   if (clients[name]) return clients[name];
   if (!environmentVariables.REDIS_URL) {
-    throw new Error('REDIS_URL is not set. Set REDIS_URL or use QUEUE_DRIVER=memory.');
+    throw new Error('REDIS_URL is not set. Redis is required for the listener pipeline.');
   }
-  // Lazy-require so unit tests / memory-mode boots never touch ioredis.
+  // Lazy-require so unit tests never touch ioredis unless REDIS_URL is set.
   let Redis;
   try {
     Redis = require('ioredis');

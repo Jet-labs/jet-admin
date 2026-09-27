@@ -36,10 +36,11 @@ const getListenerCapableDatasources = () => {
   );
 };
 
-export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
+export const ListenerEditor = ({ listenerEditorForm, tenantID, ingress = null }) => {
   ListenerEditor.propTypes = {
     listenerEditorForm: PropTypes.object.isRequired,
     tenantID: PropTypes.string.isRequired,
+    ingress: PropTypes.object,
   };
 
   const [datasourceSearch, setDatasourceSearch] = useState("");
@@ -274,6 +275,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID }) => {
           listenerConfig={listenerEditorForm.values.listenerConfig}
           datasourceOptions={selectedDatasource?.datasourceOptions}
           typeConfig={datasourceTypeConfig}
+          ingress={ingress}
         />
       )}
     </div>

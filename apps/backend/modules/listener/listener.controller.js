@@ -389,7 +389,7 @@ const listenerController = {
 
   async getConnectionStatus(req, res) {
     try {
-      const status = listenerService.getConnectionStatus();
+      const status = await listenerService.getConnectionStatus();
       
       Logger.log("success", {
         message: "listenerController:getConnectionStatus:success",

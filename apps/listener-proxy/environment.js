@@ -57,34 +57,22 @@ const environment = {
   /** Redis — the proxy publishes raw envelopes to the `listener:events` Stream. */
   REDIS_URL: optionalEnv('REDIS_URL', ''),
 
-  /** Queue tuning (mirrors apps/backend/environment.js defaults). */
-  QUEUE_DRIVER: optionalEnv('QUEUE_DRIVER', 'redis'),
-  LISTENER_STREAM: optionalEnv('LISTENER_STREAM', 'listener:events'),
-  LISTENER_GROUP: optionalEnv('LISTENER_GROUP', 'listener-workers'),
-  LISTENER_DLQ_STREAM: optionalEnv('LISTENER_DLQ_STREAM', 'listener:events:dlq'),
-  LISTENER_CONTROL_CHANNEL: optionalEnv('LISTENER_CONTROL_CHANNEL', 'listener:control'),
-  LISTENER_PREFETCH: optionalInt('LISTENER_PREFETCH', 20),
-  LISTENER_STREAM_MAXLEN: optionalInt('LISTENER_STREAM_MAXLEN', 10000),
-
   /** Shared secret for the cluster-internal control fallback endpoint (optional). */
   PROXY_CONTROL_TOKEN: optionalEnv('PROXY_CONTROL_TOKEN', null),
+
+  /**
+   * Public base URL of THIS proxy node, advertised at registry registration
+   * (status/observability only — envelope routing never uses it), e.g.
+   * https://hooks-1.example.com. Empty = unadvertised (fine for dev).
+   */
+  LISTENER_PROXY_PUBLIC_URL: optionalEnv('LISTENER_PROXY_PUBLIC_URL', ''),
+
+  /** Registry weight for shard assignment (higher = larger share). */
+  LISTENER_PROXY_WEIGHT: optionalInt('LISTENER_PROXY_WEIGHT', 100),
 
   EXPRESS_REQUEST_SIZE_LIMIT: optionalEnv('EXPRESS_REQUEST_SIZE_LIMIT', '5mb'),
   LOG_LEVEL: optionalEnv('LOG_LEVEL', 'info'),
 };
-
-/**
- * Proxy mode = a dedicated node owns subscriptions + webhook ingress and the
- * backend only consumes the Redis Stream. Single source of truth for the
- * mode check — the backend routes all ingress decisions through this.
- * (Reads the backend environment module per the repo convention that only
- * environment.js modules touch process.env.)
- */
-function isProxyMode() {
-  // eslint-disable-next-line global-require
-  const backendEnv = require('../backend/environment');
-  return backendEnv.LISTENER_INGRESS === 'proxy' && !!backendEnv.REDIS_URL;
-}
 
 function requireDatabase() {
   return requiredValue('DATABASE_URL');
@@ -94,4 +82,4 @@ function requireRedis() {
   return requiredValue('REDIS_URL');
 }
 
-module.exports = { environment, isProxyMode, requireDatabase, requireRedis };
+module.exports = { environment, requireDatabase, requireRedis };

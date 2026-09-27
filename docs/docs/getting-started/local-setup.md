@@ -26,14 +26,14 @@ Exact commands verified against `package.json`, `docker-compose.yml`, `Dockerfil
 git clone https://github.com/Jet-labs/jet-admin.git
 cd jet-admin
 cp .env.docker .env
-docker compose up -d --build
+docker compose -f docker-compose-sample.yml up -d --build
 ```
 
 What you get:
 
 | Endpoint | URL | Notes |
 |---|---|---|
-| App | `http://localhost:80` | nginx serves SPA; proxies `/api`, `/socket.io`, `/webhooks` → `backend:3000` |
+| App | `http://localhost:80` | nginx serves SPA; proxies `/api`, `/socket.io` → `backend:3000`, `/webhooks` → `listener-proxy:8095` |
 | API | `http://localhost:8090` | host-mapped to container `:3000` |
 | Postgres | `localhost:5432` | `POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB`; exposed for debugging, remove in production |
 

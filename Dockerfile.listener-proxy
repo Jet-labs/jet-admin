@@ -33,22 +33,39 @@ WORKDIR /app
 COPY package*.json ./
 
 # Copy workspace package.json files (same backend set so the proxy image
-# stays in sync with the backend image, plus the proxy app itself)
+# stays in sync with the backend image, plus the proxy app itself).
+# ALL packages, not just imported ones: npm only installs (and links bins
+# for) workspace members visible at install time; packages built later via
+# build:packages need their own nested binaries (esbuild versions differ per
+# package, so npm nests instead of hoisting — no usable root .bin/esbuild).
 COPY apps/backend/package*.json ./apps/backend/
 COPY apps/listener-proxy/package*.json ./apps/listener-proxy/
 COPY packages/datasource-types/package*.json ./packages/datasource-types/
 COPY packages/datasources-logic/package*.json ./packages/datasources-logic/
+COPY packages/datasources-ui/package*.json ./packages/datasources-ui/
 COPY packages/expression-engine/package*.json ./packages/expression-engine/
+COPY packages/json-forms-renderers/package*.json ./packages/json-forms-renderers/
+COPY packages/mcp-server/package*.json ./packages/mcp-server/
+COPY packages/ui/package*.json ./packages/ui/
 COPY packages/widget-types/package*.json ./packages/widget-types/
 COPY packages/widgets-logic/package*.json ./packages/widgets-logic/
+COPY packages/widgets-ui/package*.json ./packages/widgets-ui/
+COPY packages/workflow-edges/package*.json ./packages/workflow-edges/
+COPY packages/workflow-nodes/package*.json ./packages/workflow-nodes/
+COPY packages/workflow-nodes-logic/package*.json ./packages/workflow-nodes-logic/
 
-# Install dependencies
+# Install dependencies (includes devDependencies — package builds need esbuild)
 RUN npm install --legacy-peer-deps
 
 # Copy source files (proxy app + backend tree it reuses + shared packages)
 COPY apps/listener-proxy/ ./apps/listener-proxy/
 COPY apps/backend/ ./apps/backend/
 COPY packages/ ./packages/
+COPY scripts/build-packages.js ./scripts/build-packages.js
+
+# Build workspace packages (entry points resolve to dist/, which is excluded
+# from the build context via .dockerignore and never committed to git)
+RUN npm run build:packages
 
 # Generate Prisma client (engine loads listener configs from DB via Prisma)
 WORKDIR /app/apps/backend

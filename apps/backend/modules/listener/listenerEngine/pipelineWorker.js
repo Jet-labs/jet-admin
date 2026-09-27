@@ -1,8 +1,8 @@
 /**
  * Pipeline Worker
- * Consumes listener events (in-process fastq in embedded/memory mode,
- * Redis Streams consumer group in proxy/redis mode), applies transforms,
- * and dispatches actions (trigger_workflow, trigger_query, save_to_buffer, push_to_app_page).
+ * Consumes listener events from the Redis Streams consumer group, applies
+ * transforms, and dispatches actions (trigger_workflow, trigger_query,
+ * save_to_buffer, push_to_app_page).
  * Registered via queue.config.registerListenerEventWorker.
  *
  * Error policy (intentional):
@@ -38,18 +38,13 @@ async function startPipelineWorker() {
 }
 
 // ─── Action resolution ──────────────────────────────────────────────────────
-// Embedded (fastq) jobs carry an `actions` snapshot. Proxy (Redis) envelopes
-// carry raw events only — resolve fresh enabled actions from DB so action
-// CRUD never goes stale for in-flight messages (short TTL cache).
+// Envelopes carry raw events only — resolve fresh enabled actions from DB
+// so action CRUD never goes stale for in-flight messages (short TTL cache).
 
 const ACTIONS_CACHE_TTL_MS = 5000;
 const actionsCache = new Map(); // listenerID → { at, actions }
 
 async function resolveActions(job) {
-  // Embedded jobs always carry the snapshot (possibly empty = no-op).
-  if (Array.isArray(job.actions)) {
-    return job.actions;
-  }
   const cached = actionsCache.get(job.listenerID);
   if (cached && Date.now() - cached.at < ACTIONS_CACHE_TTL_MS) {
     return cached.actions;
@@ -62,12 +57,11 @@ async function resolveActions(job) {
   return actions;
 }
 
-// Test-room preview for proxy envelopes. (Embedded mode previews at ingress
-// in engine.js; the proxy owns no sockets, so the consumer emits here.
-// Guarded by __viaRedis so embedded jobs never double-emit.)
+// Test-room preview for envelopes. (The standalone proxy owns no sockets,
+// so the consumer emits here for clients in `listener_test:<listenerID>`.)
 function maybeEmitTestPreview(job, actions) {
   try {
-    if (!job || !job.__viaRedis) return;
+    if (!job) return;
     const rooms = socketIO?.sockets?.adapter?.rooms;
     if (!rooms) return;
     const testRoom = `listener_test:${job.listenerID}`;
@@ -178,12 +172,10 @@ async function _processEvent(job) {
       message: 'pipelineWorker:processEvent:error',
       params: { listenerID, error: err.message },
     });
-    // Redis driver: propagate hard failures (e.g. action resolution against
-    // a down DB) so the consumer loop moves the envelope to the DLQ stream
-    // instead of silently dropping it. Memory driver keeps legacy swallow.
-    if (job && job.__viaRedis) {
-      throw err;
-    }
+    // Propagate hard failures (e.g. action resolution against a down DB)
+    // so the consumer loop moves the envelope to the DLQ stream instead of
+    // silently dropping it.
+    throw err;
   }
 }
 

@@ -13,6 +13,9 @@ const mockPrisma = {
   tblListeners: {
     update: jest.fn().mockReturnValue({ catch: jest.fn() }),
   },
+  tblListenerActions: {
+    findMany: jest.fn(),
+  },
   tblListenerEvents: {
     create: jest.fn().mockResolvedValue({ eventID: 'evt-1' }),
     findFirst: jest.fn().mockResolvedValue({ seqNo: 10 }),
@@ -38,14 +41,16 @@ jest.mock('../../../utils/authorizedProxy', () => ({
   authorizedExecuteDataQuery: (...args) => mockAuthorizedExecuteDataQuery(...args),
 }));
 
-const { startPipelineWorker } = require('../../../modules/listener/listenerEngine/pipelineWorker');
-
 describe('PipelineWorker', () => {
 
   let processEventFn = null;
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    // Fresh module per test: resets the actions cache (5s TTL keyed by
+    // listenerID would otherwise leak actions across tests reusing lst-100).
+    jest.resetModules();
+    const { startPipelineWorker } = require('../../../modules/listener/listenerEngine/pipelineWorker');
     await startPipelineWorker();
     expect(mockRegisterWorker).toHaveBeenCalled();
     processEventFn = mockRegisterWorker.mock.calls[0][0];
@@ -71,6 +76,9 @@ describe('PipelineWorker', () => {
         },
       ],
     };
+
+    // Jobs are envelopes now (no actions snapshot) — actions resolve from DB.
+    mockPrisma.tblListenerActions.findMany.mockResolvedValue(job.actions);
 
     await processEventFn(job);
 
@@ -114,6 +122,9 @@ describe('PipelineWorker', () => {
       ],
     };
 
+    // Jobs are envelopes now (no actions snapshot) — actions resolve from DB.
+    mockPrisma.tblListenerActions.findMany.mockResolvedValue(job.actions);
+
     await processEventFn(job);
 
     expect(mockAuthorizedExecuteWorkflow).not.toHaveBeenCalled();
@@ -141,6 +152,9 @@ describe('PipelineWorker', () => {
       ],
     };
 
+    // Jobs are envelopes now (no actions snapshot) — actions resolve from DB.
+    mockPrisma.tblListenerActions.findMany.mockResolvedValue(job.actions);
+
     await processEventFn(job);
 
     expect(mockPrisma.tblListenerEvents.create).not.toHaveBeenCalled();
@@ -166,6 +180,9 @@ describe('PipelineWorker', () => {
         },
       ],
     };
+
+    // Jobs are envelopes now (no actions snapshot) — actions resolve from DB.
+    mockPrisma.tblListenerActions.findMany.mockResolvedValue(job.actions);
 
     await processEventFn(job);
 
@@ -197,6 +214,9 @@ describe('PipelineWorker', () => {
       ],
     };
 
+    // Jobs are envelopes now (no actions snapshot) — actions resolve from DB.
+    mockPrisma.tblListenerActions.findMany.mockResolvedValue(job.actions);
+
     await processEventFn(job);
 
     expect(mockAuthorizedExecuteDataQuery).toHaveBeenCalledWith({
@@ -225,6 +245,9 @@ describe('PipelineWorker', () => {
         },
       ],
     };
+
+    // Jobs are envelopes now (no actions snapshot) — actions resolve from DB.
+    mockPrisma.tblListenerActions.findMany.mockResolvedValue(job.actions);
 
     await processEventFn(job);
 
@@ -256,6 +279,9 @@ describe('PipelineWorker', () => {
         },
       ],
     };
+
+    // Jobs are envelopes now (no actions snapshot) — actions resolve from DB.
+    mockPrisma.tblListenerActions.findMany.mockResolvedValue(job.actions);
 
     await processEventFn(job);
 

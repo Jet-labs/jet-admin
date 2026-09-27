@@ -24,20 +24,37 @@ WORKDIR /app
 # Copy root package files (for workspace resolution)
 COPY package*.json ./
 
-# Copy workspace package.json files
+# Copy workspace package.json files — ALL packages, not just the ones the
+# backend imports. npm only installs (and links bins for) workspace members
+# visible at install time; packages built later via build:packages need
+# their own nested binaries (esbuild versions differ per package, so npm
+# nests instead of hoisting — there is no usable root .bin/esbuild).
 COPY apps/backend/package*.json ./apps/backend/
 COPY packages/datasource-types/package*.json ./packages/datasource-types/
 COPY packages/datasources-logic/package*.json ./packages/datasources-logic/
+COPY packages/datasources-ui/package*.json ./packages/datasources-ui/
 COPY packages/expression-engine/package*.json ./packages/expression-engine/
+COPY packages/json-forms-renderers/package*.json ./packages/json-forms-renderers/
+COPY packages/mcp-server/package*.json ./packages/mcp-server/
+COPY packages/ui/package*.json ./packages/ui/
 COPY packages/widget-types/package*.json ./packages/widget-types/
 COPY packages/widgets-logic/package*.json ./packages/widgets-logic/
+COPY packages/widgets-ui/package*.json ./packages/widgets-ui/
+COPY packages/workflow-edges/package*.json ./packages/workflow-edges/
+COPY packages/workflow-nodes/package*.json ./packages/workflow-nodes/
+COPY packages/workflow-nodes-logic/package*.json ./packages/workflow-nodes-logic/
 
-# Install dependencies
+# Install dependencies (includes devDependencies — package builds need esbuild)
 RUN npm install --legacy-peer-deps
 
 # Copy source files
 COPY apps/backend/ ./apps/backend/
 COPY packages/ ./packages/
+COPY scripts/build-packages.js ./scripts/build-packages.js
+
+# Build workspace packages (entry points resolve to dist/, which is excluded
+# from the build context via .dockerignore and never committed to git)
+RUN npm run build:packages
 
 # Backend nginx reverse-proxy template (rendered by the entrypoint via
 # envsubst into /etc/nginx/nginx.conf; see docker-entrypoint.backend.sh).
@@ -63,10 +80,11 @@ RUN mkdir -p /app/apps/backend/logs /var/cache/nginx /var/log/nginx \
 # Render injects $PORT at runtime — the entrypoint remaps it to $NGINX_PORT.
 EXPOSE 3000
 
-# Health check — hits nginx ($NGINX_PORT), which proxies /health to Node.
-# Verifies the full proxy chain, not just the Node process.
+# Health check — hits nginx (public port resolved by the entrypoint into
+# /tmp/nginx_port; falls back to NGINX_PORT/3000), which proxies /health to
+# Node. Verifies the full proxy chain, not just the Node process.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${NGINX_PORT:-3000}/health || exit 1
+    CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:$(cat /tmp/nginx_port 2>/dev/null || echo ${NGINX_PORT:-3000})/health || exit 1'
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["npm", "run", "pm2"]

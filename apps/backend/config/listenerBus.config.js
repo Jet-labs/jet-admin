@@ -2,8 +2,8 @@
  * Listener Bus — Redis Streams transport for listener events.
  *
  * Topology (single Redis instance, separate keyspaces):
- *   STREAM   `listener:events`      — raw envelopes published by the ingress
- *                                     proxy (or embedded engine in memory mode)
+ *   STREAM   `listener:events`      — raw envelopes published by the
+ *                                     standalone ingress proxy
  *   GROUP    `listener-workers`     — backend consumer group (competing
  *                                     consumers across replicas)
  *   DLQ      `listener:events:dlq`  — poison / infra-failed envelopes (manual replay)
@@ -111,16 +111,26 @@ async function publishControl(message) {
 }
 
 /**
- * Subscribe to the control channel. Returns the subscriber client.
- * ioredis auto-resubscribes on reconnect.
+ * Per-proxy targeted control channel: `listener:control:<proxyID>`.
+ * Used for assignment/shard signals meant for exactly one proxy node.
  */
-async function subscribeControl(onMessage) {
+function getProxyControlChannel(proxyID) {
+  return `${getBusConfig().controlChannel}:${proxyID}`;
+}
+
+/**
+ * Subscribe to a control channel (global by default, or a proxy-targeted
+ * one). Returns the subscriber client. ioredis auto-resubscribes on
+ * reconnect. The same shared client may back several subscriptions — each
+ * handler filters on its own channel.
+ */
+async function subscribeControl(onMessage, channel) {
   const { getRedisClient } = require('./redis.config');
-  const { controlChannel } = getBusConfig();
+  const target = channel || getBusConfig().controlChannel;
   const sub = getRedisClient('control-sub');
-  await sub.subscribe(controlChannel);
-  sub.on('message', (channel, raw) => {
-    if (channel !== controlChannel) return;
+  await sub.subscribe(target);
+  sub.on('message', (received, raw) => {
+    if (received !== target) return;
     try {
       const msg = JSON.parse(raw);
       Promise.resolve(onMessage(msg)).catch((err) => {
@@ -130,12 +140,13 @@ async function subscribeControl(onMessage) {
       Logger.log('warning', { message: 'listenerBus:control:badMessage', params: { error: err.message } });
     }
   });
-  Logger.log('info', { message: 'listenerBus:control:subscribed', params: { channel: controlChannel } });
+  Logger.log('info', { message: 'listenerBus:control:subscribed', params: { channel: target } });
   return sub;
 }
 
 module.exports = {
   getBusConfig,
+  getProxyControlChannel,
   buildEnvelope,
   publishListenerEvent,
   ensureConsumerGroup,

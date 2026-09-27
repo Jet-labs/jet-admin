@@ -26,6 +26,10 @@ NODE_PORT=${NODE_PORT:-3001}
 CLIENT_MAX_BODY_SIZE=${CLIENT_MAX_BODY_SIZE:-10m}
 export NGINX_PORT NODE_PORT CLIENT_MAX_BODY_SIZE
 export PORT=$NODE_PORT
+# Persist the resolved public port for the Docker HEALTHCHECK, which runs
+# with the image/container env only (entrypoint exports are invisible to
+# it). Matters on Render, where PORT is injected and NGINX_PORT is unset.
+echo "$NGINX_PORT" > /tmp/nginx_port 2>/dev/null || true
 
 # Render nginx config from the template baked into the image.
 # envsubst is restricted to our three vars so nginx variables

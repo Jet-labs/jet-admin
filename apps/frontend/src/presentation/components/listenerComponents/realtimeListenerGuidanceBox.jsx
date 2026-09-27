@@ -10,6 +10,10 @@ export const RealtimeListenerGuidanceBox = ({
   listenerConfig = {},
   datasourceOptions = {},
   typeConfig,
+  // Server-provided ingress truth (listener API `ingress` block). When present,
+  // all URLs + the allowlist panel use the real public proxy address instead
+  // of guessing from the browser host.
+  ingress = null,
 }) => {
   const [copiedKey, setCopiedKey] = useState(null);
 
@@ -21,12 +25,28 @@ export const RealtimeListenerGuidanceBox = ({
 
   if (!datasourceType || !typeConfig) return null;
 
+  // Prefer the server-provided public proxy address (correct in every
+  // deployment). Fall back to the legacy browser-host guess (dev only).
   const envPort =
     (typeof import.meta !== "undefined" && import.meta.env && (import.meta.env.VITE_WEBHOOK_PORT || import.meta.env.REACT_APP_WEBHOOK_PORT)) ||
     (typeof process !== "undefined" && process.env && (process.env.REACT_APP_WEBHOOK_PORT || process.env.WEBHOOK_PORT)) ||
     "8095";
   const port = envPort;
-  const baseUrl = `${window.location.protocol}//${window.location.hostname}:${port}`;
+  const baseUrl = (ingress && ingress.baseUrl) ||
+    `${window.location.protocol}//${window.location.hostname}:${port}`;
+
+  // Host the connector owner must allowlist + health URL to verify it.
+  let allowlistHost = "";
+  try {
+    if (ingress && ingress.baseUrl) {
+      allowlistHost = new URL(ingress.baseUrl).hostname;
+    }
+  } catch (_) {
+    allowlistHost = "";
+  }
+  const showAllowlist = Boolean(
+    ingress && ingress.webhookUrls && ingress.webhookUrls.length > 0 && allowlistHost
+  );
 
   // Call the dedicated per-datasource guidance generator function from typeConfig.listenerGuidance
   const guidanceFn = typeConfig.listenerGuidance;
@@ -104,6 +124,41 @@ export const RealtimeListenerGuidanceBox = ({
           </div>
         )}
 
+        {/* Connector allowlist — what to whitelist at the connector's end */}
+        {showAllowlist && (
+          <div className="p-2 bg-muted/30 rounded border border-border space-y-2">
+            <div className="font-semibold text-xs text-foreground flex items-center gap-1.5">
+              <TbInfoCircle className="w-4 h-4 text-primary" /> Connector allowlist
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Register the URLs above in your connector (Stripe, GitHub, Shopify, …).
+              Webhook traffic must reach the <span className="font-semibold text-foreground">listener-proxy</span> — allowlist host{" "}
+              <code className="font-mono text-primary">{allowlistHost}</code> (with port, if shown in the URL) in your firewall — not the API/backend host.
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+                Proxy health check
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs flex items-center gap-1 text-primary hover:text-primary/80"
+                onClick={(e) => { e.preventDefault(); handleCopy(ingress.healthUrl, "allowlist_health"); }}
+              >
+                {copiedKey === "allowlist_health" ? <TbCheck className="w-3.5 h-3.5 text-primary" /> : <TbCopy className="w-3.5 h-3.5" />}
+                {copiedKey === "allowlist_health" ? "Copied!" : "Copy URL"}
+              </Button>
+            </div>
+            <code className="block p-2 bg-background rounded border border-border text-xs font-mono text-primary break-all">
+              {ingress.healthUrl}
+            </code>
+            <p className="text-[11px] text-muted-foreground">
+              Open this URL from the connector&apos;s network — a status-ok response proves the proxy is reachable before you send real events.
+            </p>
+          </div>
+        )}
+
         {/* Dynamic Code & CLI Snippets */}
         {guidance.snippets && guidance.snippets.length > 0 && (
           <div className="space-y-2">
@@ -155,4 +210,5 @@ RealtimeListenerGuidanceBox.propTypes = {
   listenerConfig: PropTypes.object,
   datasourceOptions: PropTypes.object,
   typeConfig: PropTypes.object,
+  ingress: PropTypes.object,
 };

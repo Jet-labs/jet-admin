@@ -12,24 +12,24 @@ sidebar_position: 15
 
 | Service | Build | Ports | Depends | Healthcheck |
 |---|---|---|---|---|
-| `frontend` (`jet-admin-frontend`) | `Dockerfile.frontend` (Node 18 build → `nginx:alpine`, `nginx.frontend.conf`, SPA fallback) | `80:80` | `backend` healthy | `wget --spider http://localhost/health` 30 s |
-| `backend` (`jet-admin-backend`) | `Dockerfile.backend` (Node 20-slim, `prisma generate`, `ENTRYPOINT entrypoint.sh`, `CMD npm run pm2`) | `8090:3000` | `postgres` healthy | `wget --spider http://localhost:8090/health` — **wrong port** (container listens on `3000` via `PORT=3000`; probe the container port) |
+| `frontend` (`jet-admin-frontend`) | `Dockerfile.frontend` (Node 20 build → `nginx:alpine`, `nginx.frontend.conf`, SPA fallback, workspace packages built in-image) | `80:80` | `backend` healthy | `wget --spider http://127.0.0.1/health` 30 s |
+| `backend` (`jet-admin-backend`) | `Dockerfile.backend` (Node 20-slim, workspace packages built in-image, `prisma generate`, `ENTRYPOINT entrypoint.sh`, `CMD npm run pm2`) | `8090:3000` | `postgres` healthy (entrypoint also waits on `DATABASE_URL` itself) | `wget --spider http://localhost:<nginx-port>/health` (port resolved via `/tmp/nginx_port`, correct on Render too) |
 | `postgres` (`jet-admin-postgres`) | `postgres:15-alpine` | `5432:5432` | — | `pg_isready -U postgres -d jet_admin_db` 10 s |
 
 ```bash
 cp .env.docker .env
-docker compose up -d --build
-docker compose ps
-docker compose logs -f backend
+docker compose -f docker-compose-sample.yml up -d --build
+docker compose -f docker-compose-sample.yml ps
+docker compose -f docker-compose-sample.yml logs -f backend
 ```
 
 Volumes: `jet-admin-postgres-data` (`/var/lib/postgresql/data`), `jet-admin-backend-logs` (`/app/apps/backend/logs`). Networks: `jet-admin-network` (bridge).
 
 :::warning
-Compose `args:` pass `VITE_FIREBASE_*` + `VITE_SUPABASE_URL/KEY` as build args, but `Dockerfile.frontend` declares no `ARG VITE_*`, so they are ignored unless added. Bake frontend env via shell/`apps/frontend/.env` before `vite build` — all `VITE_*` values are statically replaced at build time, so changing them requires a rebuild. `VITE_SUPABASE_KEY` never reaches code (`VITE_SUPABASE_ANON_KEY` expected).
+`VITE_SERVER_HOST` / `VITE_SOCKET_HOST` are baked at build time (overridable per build via compose `args:`) AND at runtime via `/config.js` (runtime wins, no rebuild). `VITE_FIREBASE_*` values are build-time only — rebuild (or set compose `args:`) to change them; the placeholders baked by default mean Firebase auth stays disabled until you do.
 :::
 
-Rollback: `docker compose down && docker compose up -d --build <previous-tag>`; data persists in `postgres_data` unless `-v` is passed. `postgres:5432` is exposed for debugging — close it in production.
+Rollback: `docker compose -f docker-compose-sample.yml down && docker compose -f docker-compose-sample.yml up -d --build <previous-tag>`; data persists in `postgres_data` unless `-v` is passed. `postgres:5432` is exposed for debugging — close it in production.
 
 ## Render (backend + MCP)
 
@@ -68,6 +68,6 @@ Set `WORKFLOW_ENGINE_DRIVER=temporal` + `TEMPORAL_ADDRESS=localhost:7233`, then 
 
 ## Scaling knobs
 
-- Backend: stateless except the audit buffer — listener ingress lives in the dedicated `listener-proxy` service (single subscriber, raw events → Redis Stream `listener:events`, group `listener-workers`, DLQ `listener:events:dlq`), consumed by backend pipeline workers (`QUEUE_DRIVER=redis`, `LISTENER_INGRESS=proxy`). Local dev default stays embedded (`QUEUE_DRIVER=memory`, `LISTENER_INGRESS=embedded`, in-process `fastq` `listener.events` 20). Socket.IO uses the Redis adapter when `REDIS_URL` is set so `push_to_app_page` emits fan out across replicas. `pm2` single process in image; scale via replicas. Redis: `redis:7-alpine`, `noeviction` + AOF, persistent `redis_data` volume.
+- Backend: stateless except the audit buffer — listener ingress lives in the dedicated `listener-proxy` service (single subscriber, raw events → Redis Stream `listener:events`, group `listener-workers`, DLQ `listener:events:dlq`), consumed by backend pipeline workers over Redis Streams (`REDIS_URL` required — there is no embedded mode). Socket.IO uses the Redis adapter when `REDIS_URL` is set so `push_to_app_page` emits fan out across replicas. `pm2` single process in image; scale via replicas. Redis: `redis:7-alpine`, `noeviction` + AOF, persistent `redis_data` volume.
 - Temporal: `TEMPORAL_MAX_CONCURRENT_ACTIVITIES/WORKFLOWS` (20/20), worker restart policy envs.
 - Frontend: static nginx; cache-bust via hashed assets. `client_max_body_size` 50 M only in legacy `nginx.conf`; active `nginx.frontend.conf` inherits nginx default — large uploads should go direct to backend (10 MB multer cap) or Supabase.

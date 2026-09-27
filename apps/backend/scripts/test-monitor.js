@@ -2,7 +2,7 @@ const queue = require('../config/queue.config');
 
 async function run() {
     try {
-        console.log('Initializing queue (memory driver)...');
+        console.log('Initializing queue (Redis Streams, REDIS_URL required)...');
         await queue.initializeQueue();
         console.log('Healthy:', queue.isConnectionHealthy());
 

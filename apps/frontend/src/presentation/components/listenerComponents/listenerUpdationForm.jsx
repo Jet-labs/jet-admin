@@ -149,7 +149,7 @@ export const ListenerUpdationForm = ({ tenantID, listenerID }) => {
                     onSubmit={listenerUpdationForm.handleSubmit}
                     noValidate
                   >
-                    <ListenerEditor listenerEditorForm={listenerUpdationForm} tenantID={tenantID} />
+                    <ListenerEditor listenerEditorForm={listenerUpdationForm} tenantID={tenantID} ingress={listener?.ingress} />
                   </form>
                 </TabsContent>
 

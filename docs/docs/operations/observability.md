@@ -44,7 +44,7 @@ Boot recovery: `startup.js` marks `RUNNING` workflow instances older than `WORKF
 
 ### API 5xx spike
 
-1. `docker compose logs --tail=200 backend` (or `logs/<NODE_ID>-*.log`); filter `error`.
+1. App logs live in files, not stdout (pm2 runs Node): `docker exec <backend> tail -n 200 /root/.pm2/logs/index-out.log`, or the `backend_logs` volume at `apps/backend/logs/<NODE_ID>-*.log`; `docker compose logs backend` shows only entrypoint/pm2 lines. Filter `error`.
 2. Check `DATABASE_URL` connectivity: `pg_isready -h <host>`; Prisma pool exhaustion shows as query timeouts.
 3. Check `GET /health`; if 200 but routes 500, suspect `FIREBASE_CREDENTIALS` (auth) or `VAULT_ENCRYPTION_KEY` (decrypt throws on datasource/OAuth/AI paths).
 4. Roll back image tag; data volume untouched.

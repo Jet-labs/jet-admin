@@ -1,15 +1,13 @@
 /**
- * Queue Configuration — listener events only.
+ * Queue Configuration — listener events over Redis Streams.
  * (The old workflow task/result queues were removed: workflows execute on
  * Temporal — see modules/workflow/temporal. The monitor bus was a no-op.)
  *
- *   QUEUE_DRIVER=memory (default) — in-process fastq, single-node dev.
- *   QUEUE_DRIVER=redis (+ REDIS_URL) — Redis Streams (`listener:events`,
- *     consumer group `listener-workers`, DLQ `listener:events:dlq`).
- *     Published by the ingress proxy (or embedded engine), consumed by
- *     backend pipeline workers across replicas.
+ * Single mode: Redis Streams (`listener:events`, consumer group
+ * `listener-workers`, DLQ `listener:events:dlq`). The standalone
+ * listener-proxy publishes raw envelopes; backend pipeline workers consume
+ * them across replicas as competing consumers. REDIS_URL is required.
  */
-const fastq = require('fastq');
 const { v4: uuidv4 } = require('uuid');
 const Logger = require('../utils/logger');
 const environmentVariables = require('../environment');
@@ -17,16 +15,14 @@ const environmentVariables = require('../environment');
 // Registered listener-event worker (pipelineWorker._processEvent)
 let listenerEventWorkerFn = null;
 
-// fastq instance (memory driver)
-let listenerEventQueue = null;
-
-// Redis consumer loop state (redis driver)
+// Redis consumer loop state
 let redisConsumerRunning = false;
 let redisConsumerStarted = false;
 
-function isRedisDriver() {
-  return (environmentVariables.QUEUE_DRIVER || 'memory') === 'redis'
-    && !!environmentVariables.REDIS_URL;
+function requireRedisUrl() {
+  if (!environmentVariables.REDIS_URL) {
+    throw new Error('REDIS_URL is required for the listener pipeline (standalone listener-proxy + Redis Streams).');
+  }
 }
 
 function getConsumerName() {
@@ -37,75 +33,52 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function _processListenerEvent(job) {
-  if (!listenerEventWorkerFn) {
-    Logger.log('warning', { message: 'queue.config:no listener event worker registered, dropping event' });
-    return;
-  }
-  await listenerEventWorkerFn(job);
-}
-
 function isConnectionHealthy() {
-  if (isRedisDriver()) {
-    try {
-      const { isClientReady } = require('./redis.config');
-      return isClientReady('bus') || isClientReady('consumer');
-    } catch (_) {
-      return false;
-    }
+  try {
+    const { isClientReady } = require('./redis.config');
+    return isClientReady('bus') || isClientReady('consumer');
+  } catch (_) {
+    return false;
   }
-  return listenerEventQueue !== null;
 }
 
 /**
- * Initialize queues.
- * Memory driver: in-process fastq. Redis driver: ensure the consumer group
- * (non-fatal — the consumer loop retries in the background so the API stays
- * up when Redis boots later).
+ * Initialize the queue.
+ * Ensures the consumer group (non-fatal — the consumer loop retries in the
+ * background so the API stays up when Redis boots later). Throws when
+ * REDIS_URL is missing (misconfiguration must fail fast, not silently
+ * fall back to a mode that no longer exists).
  */
 async function initializeQueue() {
-  if (isRedisDriver()) {
-    Logger.log('info', { message: 'queue.config:initializing redis bus' });
-    try {
-      const { getRedisClient } = require('./redis.config');
-      const { ensureConsumerGroup } = require('./listenerBus.config');
-      await ensureConsumerGroup(getRedisClient('bus'));
-      Logger.log('success', { message: 'queue.config:redis bus ready' });
-    } catch (err) {
-      Logger.log('warning', {
-        message: 'queue.config:redis:deferred',
-        params: { error: err.message, hint: 'Redis not reachable yet — consumer retries in background' },
-      });
-    }
-    return;
+  requireRedisUrl();
+  Logger.log('info', { message: 'queue.config:initializing redis bus' });
+  try {
+    const { getRedisClient } = require('./redis.config');
+    const { ensureConsumerGroup } = require('./listenerBus.config');
+    await ensureConsumerGroup(getRedisClient('bus'));
+    Logger.log('success', { message: 'queue.config:redis bus ready' });
+  } catch (err) {
+    Logger.log('warning', {
+      message: 'queue.config:redis:deferred',
+      params: { error: err.message, hint: 'Redis not reachable yet — consumer retries in background' },
+    });
   }
-
-  if (listenerEventQueue) {
-    return;
-  }
-
-  Logger.log('info', { message: 'queue.config:initializing in-memory listener queue' });
-
-  listenerEventQueue = fastq.promise(_processListenerEvent, 20);
-
-  Logger.log('success', { message: 'queue.config:in-memory listener queue ready' });
 }
 
 /**
- * Register the listener event worker function.
- * Memory driver: called inline by fastq. Redis driver: starts the
- * Streams consumer-group loop (single loop per process) that invokes fn
- * per envelope and ACKs; unexpected throws go to the DLQ stream.
+ * Register the listener event worker function and start the Streams
+ * consumer-group loop (single loop per process). Each envelope is ACKed
+ * exactly once — business outcomes (transform error / filtered) are
+ * success; unexpected throws go to the DLQ stream.
  * @param {Function} fn - async (eventJob) => void
  */
 function registerListenerEventWorker(fn) {
+  requireRedisUrl();
   listenerEventWorkerFn = fn;
   Logger.log('info', { message: 'queue.config:listener event worker registered' });
-  if (isRedisDriver()) {
-    startRedisConsumerLoop().catch((err) => {
-      Logger.log('error', { message: 'queue.config:redis:loop:failed', params: { error: err.message } });
-    });
-  }
+  startRedisConsumerLoop().catch((err) => {
+    Logger.log('error', { message: 'queue.config:redis:loop:failed', params: { error: err.message } });
+  });
 }
 
 /**
@@ -170,9 +143,9 @@ async function handleRedisMessage(client, bus, msgId, fields) {
   }
 
   try {
-    // __viaRedis marks proxy envelopes: actions are resolved fresh downstream
+    // Envelopes carry raw events only: actions are resolved fresh downstream
     // and hard failures must propagate so they land in the DLQ (not vanish).
-    await listenerEventWorkerFn({ ...envelope, __viaRedis: true });
+    await listenerEventWorkerFn({ ...envelope });
     await client.xack(stream, group, msgId);
   } catch (err) {
     Logger.log('error', { message: 'queue.config:redis:process:failed', params: { listenerID: envelope.listenerID, error: err.message } });
@@ -182,53 +155,34 @@ async function handleRedisMessage(client, bus, msgId, fields) {
 }
 
 /**
- * Add a listener event to the processing queue.
- * Redis driver publishes a durable envelope (actions intentionally omitted —
- * the consumer resolves fresh enabled actions from DB).
- * @param {Object} eventJob - { listenerID, tenantID, rawEvent, actions?, eventID? }
+ * Publish a listener event for pipeline processing.
+ * Publishes a durable envelope (actions intentionally omitted — the
+ * consumer resolves fresh enabled actions from DB).
+ * @param {Object} eventJob - { listenerID, tenantID, rawEvent, eventID? }
  */
 async function addListenerEvent(eventJob) {
-  if (isRedisDriver()) {
-    const { publishListenerEvent } = require('./listenerBus.config');
-    await publishListenerEvent({
-      listenerID: eventJob.listenerID,
-      tenantID: eventJob.tenantID,
-      rawEvent: eventJob.rawEvent,
-      eventID: eventJob.eventID || uuidv4(),
-    });
-    return;
-  }
-
-  if (!listenerEventQueue) {
-    throw new Error('Queue not initialized. Call initializeQueue() first.');
-  }
-
-  listenerEventQueue.push(eventJob).catch((err) => {
-    Logger.log('error', { message: 'queue.config:listener event push failed', params: { error: err.message } });
+  requireRedisUrl();
+  const { publishListenerEvent } = require('./listenerBus.config');
+  await publishListenerEvent({
+    listenerID: eventJob.listenerID,
+    tenantID: eventJob.tenantID,
+    rawEvent: eventJob.rawEvent,
+    eventID: eventJob.eventID || uuidv4(),
   });
 }
 
 /**
- * Close / drain queues (memory fastq + redis consumer loop + clients)
+ * Stop the consumer loop and close Redis clients.
  */
 async function closeQueue() {
   redisConsumerRunning = false;
   redisConsumerStarted = false;
   try {
-    if (listenerEventQueue) {
-      listenerEventQueue.kill();
-    }
-    Logger.log('info', { message: 'queue.config:queues closed' });
-  } catch (error) {
-    Logger.log('error', { message: 'queue.config:error closing queues', params: { error: error.message } });
-  } finally {
-    listenerEventQueue = null;
-    listenerEventWorkerFn = null;
-  }
-  try {
     const { closeRedis } = require('./redis.config');
     await closeRedis();
-  } catch (_) { /* ignore — redis optional */ }
+  } catch (_) { /* ignore */ }
+  listenerEventWorkerFn = null;
+  Logger.log('info', { message: 'queue.config:queues closed' });
 }
 
 module.exports = {

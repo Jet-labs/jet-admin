@@ -75,15 +75,19 @@ const environmentVariables = {
   VAULT_ENCRYPTION_KEY: process.env.VAULT_ENCRYPTION_KEY,
   OAUTH_STATE_SECRET: process.env.OAUTH_STATE_SECRET,
   FIREBASE_CREDENTIALS: process.env.FIREBASE_CREDENTIALS,
-  // ── Listener ingress + queue (Redis) ────────────────────────────────────
-  // QUEUE_DRIVER: 'memory' (in-process fastq, default) or 'redis' (Redis Streams).
-  // LISTENER_INGRESS: 'embedded' (backend subscribes itself, default) or
-  //   'proxy' (a dedicated listener-proxy node subscribes + publishes raw
-  //   events to Redis; this backend only consumes + dispatches).
-  QUEUE_DRIVER: process.env.QUEUE_DRIVER || 'memory',
-  LISTENER_INGRESS: process.env.LISTENER_INGRESS || 'embedded',
+  // ── Listener pipeline (proxy-only, Redis Streams) ─────────────────────────
+  // The backend never subscribes: the standalone listener-proxy owns all
+  // subscriptions + webhook ingress and publishes raw events to the Redis
+  // Stream; this backend only consumes + dispatches. REDIS_URL is required.
   REDIS_URL: process.env.REDIS_URL || '',
   LISTENER_PROXY_PORT: parseInt(process.env.LISTENER_PROXY_PORT || '8095', 10),
+  // Public base URL of the listener-proxy ingress (what users register in
+  // third-party connectors and allowlist in their firewalls), e.g.
+  //   https://hooks.example.com  (prod, proxy exposed directly or via LB)
+  //   http://localhost:8095      (local dev default — derived from the port)
+  // Shown in the listener UI guidance + returned by the listener API as
+  // `ingress`. The backend API host is NOT correct here (separate service).
+  LISTENER_PROXY_PUBLIC_URL: process.env.LISTENER_PROXY_PUBLIC_URL || '',
   LISTENER_STREAM: process.env.LISTENER_STREAM || 'listener:events',
   LISTENER_GROUP: process.env.LISTENER_GROUP || 'listener-workers',
   LISTENER_DLQ_STREAM: process.env.LISTENER_DLQ_STREAM || 'listener:events:dlq',

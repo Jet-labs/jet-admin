@@ -39,6 +39,9 @@ docker-compose.yml
 # Local database backups (may contain production data)
 backups/
 
+# Media (promo videos / post assets — never committed)
+videos/
+
 # OS
 .DS_Store
 

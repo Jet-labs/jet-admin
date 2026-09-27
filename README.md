@@ -576,7 +576,7 @@ Future:    Distributed workflow runners + execution snapshots
 git clone https://github.com/Jet-labs/jet-admin.git
 cd jet-admin
 cp .env.docker .env
-docker compose up -d --build
+docker compose -f docker-compose-sample.yml up -d --build
 ```
 
 Access: `http://localhost:80` (app) · API: `http://localhost:8090`

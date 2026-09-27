@@ -9,6 +9,35 @@ const environmentVariables = require('../environment');
 
 let temporalEnsureStopped = false;
 
+// Second failover trigger for proxy placement (the first is each proxy's
+// own watch loop): periodically reconcile desired vs stored assignment so
+// dead proxies' shards migrate and drift heals even if every proxy missed
+// its tick. Idempotent — a converged state performs reads only.
+const PROXY_SWEEP_INTERVAL_MS = 30 * 1000;
+let proxySweepTimer = null;
+
+async function sweepProxyPlacements() {
+  try {
+    // eslint-disable-next-line global-require
+    const registry = require('../modules/proxyRegistry/proxyRegistry.service');
+    // eslint-disable-next-line global-require
+    const { prisma } = require('./prisma.config');
+    const { moved, version, proxies } = await registry.reconcileAndAnnounce({
+      fetchActiveIDs: async () => (
+        await prisma.tblListeners.findMany({
+          where: { status: 'active' },
+          select: { listenerID: true },
+        })
+      ).map((r) => r.listenerID).filter(Boolean),
+    });
+    if (moved > 0) {
+      Logger.log('info', { message: 'startup:proxySweep:rebalanced', params: { moved, version, proxies } });
+    }
+  } catch (err) {
+    Logger.log('warning', { message: 'startup:proxySweep:skipped', params: { error: err.message } });
+  }
+}
+
 function ensureTemporalWorkerInBackground() {
   if (temporalEnsureStopped) return;
   let workerModule;
@@ -62,25 +91,24 @@ async function startAllListeners() {
       Logger.log('warning', { message: 'startup:workflows:recoverySkipped', params: { error: recoveryErr.message } });
     }
 
-    // 4. Listener pipeline worker (processes listener events from queue —
-    //    fastq in embedded/memory mode, Redis Streams consumer group otherwise)
+    // 4. Listener pipeline worker — consumes raw envelopes from the Redis
+    //    Streams consumer group and dispatches actions.
     const { startPipelineWorker } = require('../modules/listener/listenerEngine/pipelineWorker');
     await startPipelineWorker();
 
-    // 5. Listener ingress (subscriptions + webhook handlers) — owned by the
-    //    standalone listener-proxy app. Dev: runs embedded in this process
-    //    (startEmbedded). Prod proxy mode: a dedicated node owns it, so this
-    //    backend only consumes + dispatches and must NOT subscribe (that
-    //    would double-publish every event).
-    //    eslint-disable-next-line global-require
-    const proxyApp = require('../../listener-proxy');
-    if (proxyApp.isProxyMode()) {
-      Logger.log('info', { message: 'startup:listenerIngress:proxy (subscriptions owned by listener-proxy)' });
-    } else {
-      await proxyApp.startEmbedded();
-    }
+    // 5. Listener ingress (subscriptions + webhook handlers) is owned by the
+    //    standalone listener-proxy app — this backend only consumes +
+    //    dispatches and must NOT subscribe (that would double-publish).
+    Logger.log('info', { message: 'startup:listenerIngress:proxy (subscriptions owned by listener-proxy)' });
 
-    // 6. Audit log flusher (buffers and batch-saves audit logs)
+    // 6. Proxy placement sweeper (see above) — first pass now, then interval.
+    await sweepProxyPlacements();
+    proxySweepTimer = setInterval(() => {
+      sweepProxyPlacements().catch(() => { /* never throws, belt-and-braces */ });
+    }, PROXY_SWEEP_INTERVAL_MS);
+    if (typeof proxySweepTimer.unref === 'function') proxySweepTimer.unref();
+
+    // 7. Audit log flusher (buffers and batch-saves audit logs)
     const { auditService } = require('../modules/audit/audit.service');
     auditService.startFlusher();
 
@@ -98,13 +126,12 @@ async function stopAllListeners() {
   Logger.log('info', { message: 'startup:stopAllListeners:init' });
   temporalEnsureStopped = true;
 
-  // eslint-disable-next-line global-require
-  const proxyApp = require('../../listener-proxy');
-  if (!proxyApp.isProxyMode()) {
-    try {
-      await proxyApp.stopEmbedded();
-    } catch (e) { /* ignore */ }
-  }
+  // No ingress to stop here — subscriptions live in the listener-proxy node.
+
+  try {
+    if (proxySweepTimer) clearInterval(proxySweepTimer);
+  } catch (e) { /* ignore */ }
+  proxySweepTimer = null;
 
   try {
     const { auditService } = require('../modules/audit/audit.service');

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jet Admin — Architecture Flowchart</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --panel: #131a33;
+    --panel-2: #0f1530;
+    --line: #26305c;
+    --text: #e8ecf8;
+    --muted: #9aa3c7;
+    --accent: #6c8cff;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --rose: #fb7185;
+    --cyan: #22d3ee;
+    --violet: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 50% -10%, #1a2450 0%, var(--bg) 55%) fixed, var(--bg);
+    color: var(--text); padding: 40px 28px 80px;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  header.hero { text-align: center; margin-bottom: 8px; }
+  header.hero h1 { font-size: 34px; margin: 0 0 6px; letter-spacing: .5px; }
+  header.hero h1 span { background: linear-gradient(90deg, var(--cyan), var(--accent), var(--violet));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  header.hero p { color: var(--muted); margin: 0 0 18px; }
+  .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; }
+  .badge { background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 18px; font-size: 14px; }
+  .badge b { font-size: 18px; margin-right: 6px; }
+  .b-apps b { color: var(--cyan); } .b-pkgs b { color: var(--violet); }
+  .b-mods b { color: var(--green); } .b-svc b { color: var(--amber); }
+  .b-img b { color: var(--rose); }
+
+  .layer { background: rgba(19,26,51,.75); border: 1px solid var(--line); border-radius: 18px;
+    padding: 20px 22px; margin: 0 auto 8px; backdrop-filter: blur(4px); }
+  .layer > .layer-title { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .layer-num { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center;
+    justify-content: center; font-size: 13px; font-weight: 700; background: var(--accent); color: #0b1020; flex: none; }
+  .layer-title h2 { font-size: 17px; margin: 0; }
+  .layer-title small { color: var(--muted); font-weight: 400; }
+  .layer p.desc { color: var(--muted); font-size: 13px; margin: 2px 0 14px; }
+  .grid { display: grid; gap: 12px; }
+  .g5 { grid-template-columns: repeat(5, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 14px 14px 12px;
+    position: relative; transition: transform .15s ease, border-color .15s ease; }
+  .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .card h3 { margin: 0 0 4px; font-size: 14.5px; }
+  .card h3 .port { font-weight: 400; font-size: 12px; color: var(--muted); }
+  .card p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+  .card code { font-size: 11.5px; color: var(--cyan); }
+  .tag { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase;
+    border-radius: 6px; padding: 2px 8px; margin-bottom: 8px; }
+  .t-cyan { background: rgba(34,211,238,.14); color: var(--cyan); }
+  .t-green { background: rgba(52,211,153,.14); color: var(--green); }
+  .t-amber { background: rgba(251,191,36,.14); color: var(--amber); }
+  .t-rose { background: rgba(251,113,133,.14); color: var(--rose); }
+  .t-violet { background: rgba(167,139,250,.16); color: var(--violet); }
+  .t-blue { background: rgba(108,140,255,.16); color: #9db4ff; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 12.5px; background: var(--panel-2); border: 1px solid var(--line);
+    padding: 6px 12px; border-radius: 999px; }
+  .chip:hover { border-color: var(--green); }
+  .chips.pkgs .chip:hover { border-color: var(--violet); }
+
+  .arrow { text-align: center; color: var(--accent); font-size: 22px; line-height: 1;
+    margin: 2px 0; font-weight: 700; }
+  .arrow small { display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+
+  .flows { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .flow { border-left: 4px solid var(--accent); }
+  .flow.f1 { border-color: var(--cyan); } .flow.f2 { border-color: var(--green); }
+  .flow.f3 { border-color: var(--amber); } .flow.f4 { border-color: var(--violet); }
+  .flow ol { margin: 8px 0 0; padding-left: 20px; font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+  .flow ol b, .flow ol code { color: var(--text); }
+  .flow ol code { font-size: 11.5px; color: var(--cyan); }
+
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 26px; }
+  @media (max-width: 900px) { .g5,.g4,.g3,.flows { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .g5,.g4,.g3,.flows { grid-template-columns: 1fr; } body { padding: 24px 14px 60px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Jet Admin — <span>Architecture Flowchart</span></h1>
+    <p>Internal tool builder · monorepo (npm workspaces) · Docker Compose · Temporal · Redis Streams</p>
+  </header>
+
+  <div class="badges">
+    <div class="badge b-apps"><b>5</b> apps</div>
+    <div class="badge b-pkgs"><b>13</b> shared packages</div>
+    <div class="badge b-mods"><b>22</b> backend modules</div>
+    <div class="badge b-svc"><b>13</b> compose services</div>
+    <div class="badge b-img"><b>5</b> docker images</div>
+  </div>
+
+  <!-- LAYER 1 -->
+  <section class="layer">
+    <div class="layer-title"><span class="layer-num">1</span><h2>Clients &amp; Sources <small>— who talks to the system</small></h2></div>
+    <p class="desc">Everything enters through the edge layer below.</p>
+    <div class="grid g4">
+      <div class="card"><span class="tag t-cyan">browser</span><h3>End users</h3><p>Built apps, dashboards, widgets over HTTPS + Socket.IO realtime.</p></div>
+      <div class="card"><span class="tag t-amber">browser</span><h3>Operators</h3><p>Platform admin console (separate operator auth realm).</p></div>
+      <div class="card"><span class="tag t-green">inbound</span><h3>External sources</h3><p>Webhooks, MQTT, WebSocket, SSE, Syslog, NATS datasource events.</p></div>
+      <div class="card"><span class="tag t-violet">AI</span><h3>AI clients</h3><p>Jet Agent + external MCP clients (Claude Desktop, Inspector).</p></div>
+    </div>
+  </section>
+  <div class="arrow">▼<small>HTTPS · WebSocket · webhooks</small></div>
+
+  <!-- LAYER 2 -->
+  <section class="layer">
+    <div class="layer-title"><span class="layer-num">2</span><h2>Edge &amp; Apps <small>— 5 deployables</small></h2></div>
+    <p class="desc">Each app has its own Dockerfile and compose service. Dev runs a subset via npm scripts.</p>
+    <div class="grid g5">
+      <div class="card"><span class="tag t-cyan">app · :80</span><h3>frontend <span class="port">React + nginx</span></h3><p>End-user runtime. <code>/config.js</code> points it at any backend — no rebuild.</p></div>
+      <div class="card"><span class="tag t-amber">app · vite</span><h3>admin <span class="port">operator console</span></h3><p>Platform administration on the operator API realm.</p></div>
+      <div class="card"><span class="tag t-blue">app · :8090</span><h3>backend <span class="port">Node + nginx + Socket.IO</span></h3><p>REST API, CRUD, pipeline dispatch, cron, audit, AI agent.</p></div>
+      <div class="card"><span class="tag t-green">app · :8095</span><h3>listener-proxy</h3><p>Owns ALL subscriptions + <code>/webhooks</code>. Publishes raw envelopes to Redis. Embedded in-process for dev.</p></div>
+      <div class="card"><span class="tag t-violet">app · :5001</span><h3>mcp-server</h3><p>Streamable-HTTP MCP tools, per-request Firebase auth + Casbin.</p></div>
+    </div>
+  </section>
+  <div class="arrow">▼<small>REST · rooms &amp; emits · control signals</small></div>
+
+  <!-- LAYER 3 -->
+  <section class="layer">
+    <div class="layer-title"><span class="layer-num">3</span><h2>Backend domain modules <small>— 22 modules</small></h2></div>
+    <p class="desc">Feature-vertical slices (routes → service → Prisma). Gated by <code>ENABLED_MODULES</code>. Cross-cutting: <b>vault</b> (secrets), <b>audit</b> (buffered flusher), <b>auth/casbin</b> (enforcement).</p>
+    <div class="chips">
+      <span class="chip">auth</span><span class="chip">tenant / tenantRole</span><span class="chip">userManagement</span>
+      <span class="chip">operatorAuth / operatorAdmin</span><span class="chip">datasource</span><span class="chip">dataQuery</span>
+      <span class="chip">workflow (+ temporal driver)</span><span class="chip">listener (+ engine / pipeline)</span>
+      <span class="chip">widget / widgetLibrary / appPage</span><span class="chip">dashboard</span><span class="chip">bundle</span>
+      <span class="chip">folder</span><span class="chip">cronJob</span><span class="chip">apiKey</span>
+      <span class="chip">ai (Jet Agent)</span><span class="chip">notification</span><span class="chip">oauth</span>
+      <span class="chip">vault</span><span class="chip">audit</span>
+    </div>
+  </section>
+  <div class="arrow">▼<small>imports (backend is source of truth for engine · queue · bus)</small></div>
+
+  <!-- LAYER 4 -->
+  <section class="layer">
+    <div class="layer-title"><span class="layer-num">4</span><h2>Shared packages <small>— 13 workspace libraries</small></h2></div>
+    <p class="desc">Used by apps on both sides of the stack; versioned together in the monorepo.</p>
+    <div class="chips pkgs">
+      <span class="chip">datasources-logic</span><span class="chip">datasource-types</span><span class="chip">datasources-ui</span>
+      <span class="chip">expression-engine</span><span class="chip">workflow-nodes / -logic / -edges</span>
+      <span class="chip">widgets-logic / widget-types / widgets-ui</span><span class="chip">json-forms-renderers</span>
+      <span class="chip">ui</span><span class="chip">mcp-server (tools)</span>
+    </div>
+  </section>
+  <div class="arrow">▼<small>streams · pub/sub · gRPC · Prisma</small></div>
+
+  <!-- LAYER 5 -->
+  <section class="layer">
+    <div class="layer-title"><span class="layer-num">5</span><h2>Event &amp; execution backbone</h2></div>
+    <p class="desc">One Redis instance, separate keyspaces — plus the Temporal stack for durable workflows.</p>
+    <div class="grid g3">
+      <div class="card"><span class="tag t-rose">redis :6379</span><h3>Listener bus</h3><p>Stream <code>listener:events</code> · group <code>listener-workers</code> · DLQ <code>…:dlq</code> · control channel <code>listener:control</code>. Socket.IO adapter fan-out lives here too.</p></div>
+      <div class="card"><span class="tag t-amber">temporal :7233</span><h3>Workflow runtime</h3><p>Temporal server + <code>temporal-worker</code> sidecar (DSL workflows/activities) + Web UI <code>:8088</code>. Backend falls back gracefully when unreachable.</p></div>
+      <div class="card"><span class="tag t-blue">prisma</span><h3>Data access</h3><p>Single Prisma schema (app DB). Engine resolves fresh actions per envelope; pipeline updates counts/metadata.</p></div>
+    </div>
+  </section>
+  <div class="arrow">▼<small>SQL · S3 API</small></div>
+
+  <!-- LAYER 6 -->
+  <section class="layer">
+    <div class="layer-title"><span class="layer-num">6</span><h2>State &amp; storage</h2></div>
+    <div class="grid g3">
+      <div class="card"><span class="tag t-blue">postgres :5432</span><h3>App database</h3><p>Tenants, listeners, actions, events, workflows, vault refs. <code>SEED_DATABASE</code> on first boot.</p></div>
+      <div class="card"><span class="tag t-amber">postgres :5433</span><h3>Temporal database</h3><p>Isolated persistence for the Temporal server — never touches app data.</p></div>
+      <div class="card"><span class="tag t-green">S3 :9000</span><h3>Object storage</h3><p>S3-compatible (bundled RustFS <code>--profile storage</code>, MinIO, or AWS) for file uploads; <code>storage-init</code> bootstraps buckets.</p></div>
+    </div>
+  </section>
+
+  <div class="arrow">▼<small>how it flows</small></div>
+
+  <!-- FLOWS -->
+  <section class="layer">
+    <div class="layer-title"><span class="layer-num">✦</span><h2>Key flows</h2></div>
+    <p class="desc">The four paths that exercise the whole diagram.</p>
+    <div class="flows">
+      <div class="card flow f1"><span class="tag t-green">flow 1 · realtime ingest</span><h3>Webhook → listener → action</h3>
+        <ol><li>Source hits <code>listener-proxy :8095/webhooks/…</code> (or backend inline in dev)</li>
+        <li>Engine routes raw event → Redis Stream <code>listener:events</code></li><li>Backend pipeline worker consumes, transforms, dispatches: <code>trigger_workflow · trigger_query · save_to_buffer · push_to_app_page</code></li><li>Browser updates via Socket.IO rooms</li></ol></div>
+      <div class="card flow f2"><span class="tag t-cyan">flow 2 · app request</span><h3>Browser → backend → DB</h3>
+        <ol><li><code>frontend :80</code> → <code>backend :8090</code> REST (Firebase / API-key auth, Casbin)</li><li>Module service → Prisma → <code>postgres</code></li><li>Listener CRUD also publishes <code>listener:control</code> → proxy hot-reloads</li></ol></div>
+      <div class="card flow f3"><span class="tag t-amber">flow 3 · durable work</span><h3>Workflow execution</h3>
+        <ol><li>Trigger (API, listener action, cron) starts run via Temporal client</li><li><code>temporal :7233</code> orchestrates; <code>temporal-worker</code> runs activities (DB/file access)</li><li>Progress streams back over Socket.IO; Temporal UI <code>:8088</code> for ops</li></ol></div>
+      <div class="card flow f4"><span class="tag t-violet">flow 4 · AI agent</span><h3>Jet Agent tool call</h3>
+        <ol><li>Backend agent (OpenRouter) decides a tool is needed</li><li>Calls <code>mcp-server :5001/tenants/&lt;id&gt;/mcp</code> with the user token</li><li>Tool executes against the backend under the caller's own permissions</li></ol></div>
+    </div>
+  </section>
+
+  <footer>Generated from the repo — apps (5) · packages (13) · backend modules (22) · compose services (13: 9 default + mcp / rustfs / storage-init / admin-tools via profiles) · images (5). Listener pipeline is proxy-only: the backend never subscribes — it consumes the Redis Stream and notifies the proxy on CRUD.</footer>
+</div>
+</body>
+</html>

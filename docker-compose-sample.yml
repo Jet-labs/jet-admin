@@ -7,6 +7,9 @@
 # Usage:
 #   cp .env.docker .env  # configure secrets first
 #   docker compose -f docker-compose-sample.yml up -d --build
+# (npm run docker:up does exactly this.)
+# Local overrides: copy this file to `docker-compose.yml` (gitignored) and
+# edit it — plain `docker compose ...` then picks up your local file.
 #
 # Services:
 #   - frontend:          React app served by nginx (port 80)
@@ -162,12 +165,10 @@ services:
       - TEMPORAL_NAMESPACE=default
       - TEMPORAL_TASK_QUEUE=jet-admin-workflows
 
-      # Listener pipeline — subscriptions + webhook ingress live in the
-      # dedicated `listener-proxy` service; this backend only consumes the
-      # Redis Stream and dispatches.
+      # Listener pipeline (proxy-only) — subscriptions + webhook ingress live
+      # in the dedicated `listener-proxy` service; this backend only consumes
+      # the Redis Stream and dispatches. REDIS_URL is required.
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
-      - QUEUE_DRIVER=${QUEUE_DRIVER:-redis}
-      - LISTENER_INGRESS=${LISTENER_INGRESS:-proxy}
 
       # Logging
       - LOG_LEVEL=info
@@ -256,8 +257,13 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-      temporal:
-        condition: service_started
+      # Bundled postgres when it is part of the `up` list (skipped with
+      # `required: false` when DATABASE_URL points at an external DB).
+      # The proxy loads listener configs from DB on boot, so starting
+      # before postgres is ready would boot it with zero subscriptions.
+      postgres:
+        condition: service_healthy
+        required: false
     ports:
       - "${LISTENER_PROXY_PORT:-8095}:8095"
     environment:
@@ -266,9 +272,7 @@ services:
       - VAULT_ENCRYPTION_KEY=${VAULT_ENCRYPTION_KEY:-}
       - OAUTH_STATE_SECRET=${OAUTH_STATE_SECRET:-}
       - REDIS_URL=redis://redis:6379
-      - QUEUE_DRIVER=redis
       - LISTENER_PROXY_PORT=8095
-      - LISTENER_INGRESS=proxy
       - LOG_LEVEL=info
       - EXPRESS_REQUEST_SIZE_LIMIT=5mb
     networks:
