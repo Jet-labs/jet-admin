@@ -37,9 +37,9 @@ cp .env.example .env
 Edit `.env`:
 
 ```env
-JET_ADMIN_MCP_BASE_URL=http://localhost:5000 # Your Jet Admin backend URL
-JET_ADMIN_API_KEY=your_api_key_here         # From Settings → API Keys in Jet Admin
-JET_ADMIN_TENANT_ID=your_tenant_id_here     # From the URL: /tenants/<tenantID>/...
+JET_ADMIN_BACKEND_URL=http://localhost:5000  # Your Jet Admin backend URL
+JET_ADMIN_API_KEY=your_api_key_here          # From Settings → API Keys in Jet Admin
+JET_ADMIN_TENANT_ID=your_tenant_id_here      # From the URL: /tenants/<tenantID>/...
 ```
 
 **Getting an API key:**
@@ -57,17 +57,18 @@ node src/index.js
 
 You should see:
 ```
+[jet-admin-mcp] Registered 52 tools:
+  • get_tenant_resource_summary
+  • search_resources
+  • get_widget_schemas
+  • list_datasources
+  ...
 [jet-admin-mcp] Starting server...
   Base URL  : http://localhost:5000
   Tenant ID : abc-123
   API Key   : api_key_...
-  Tools     : 35
+  Tools     : 52
   Transport : stdio
-[jet-admin-mcp] Registered 35 tools:
-  • get_tenant_resource_summary
-  • search_resources
-  • list_datasources
-  ...
 [jet-admin-mcp] Server connected and ready.
 ```
 
@@ -86,7 +87,7 @@ In your Antigravity/Claude Desktop config file, add:
       "command": "node",
       "args": ["d:/PROJECTS/PERSONAL/jet-admin/packages/mcp-server/src/index.js"],
       "env": {
-        "JET_ADMIN_MCP_BASE_URL": "http://localhost:5000",
+        "JET_ADMIN_BACKEND_URL": "http://localhost:5000",
         "JET_ADMIN_API_KEY": "your_api_key_here",
         "JET_ADMIN_TENANT_ID": "your_tenant_id_here"
       }
@@ -110,12 +111,18 @@ In your Antigravity/Claude Desktop config file, add:
 
 ## Tool Reference
 
-### 🔎 Discovery (call these first)
+### 🔎 Discovery & Schemas (call these first)
 
 | Tool | Description |
 |------|-------------|
-| `get_tenant_resource_summary` | Get all resources in one parallel call |
-| `search_resources` | Fuzzy search across all resource types |
+| `get_tenant_resource_summary` | Full inventory of all 6 resource types in one call — the mandatory first step of any task |
+| `search_resources` | Substring search across all resource types, returns IDs for any resource by name |
+| `get_widget_schemas` | Authoritative JSON schemas for widget configs (table, chart, stat, form...) |
+| `get_data_query_schemas` | Authoritative JSON schemas for query options per datasource type |
+| `get_datasource_schemas` | Authoritative JSON schemas for datasource connection options |
+| `get_listener_schemas` | Authoritative JSON schemas for listener configs and pipelines |
+| `get_workflow_schema` | Authoritative JSON schema for workflow nodes and edges |
+| `get_app_page_schema` | Authoritative JSON schema for app page configs |
 
 ### 📦 Datasource Tools
 
@@ -198,6 +205,35 @@ In your Antigravity/Claude Desktop config file, add:
 
 ---
 
+## Tool Documentation for Agents
+
+Every tool description is written to be self-sufficient: it states the purpose, when to use it (and when
+not to), the exact return shape, one or more **example calls with realistic arguments**, common pitfalls
+(what causes errors), and related tools to call next. Parameter descriptions carry their own examples and
+constraints. An agent should be able to complete a full build task using tool descriptions alone — no
+external documentation needed.
+
+**The canonical build flow** (each tool's description references its place in this sequence):
+
+```
+get_tenant_resource_summary        ← always first: dedupe + reuse
+        ↓
+get_datasource_schema → get_datasource_sample_data   ← real table/column names, real data shapes
+        ↓
+test_query_by_data (iterate) → create_query → test_query   ← validate before persisting
+        ↓
+get_widget_schemas → create_widget                        ← visual elements
+        ↓
+create_app_page → get_app_page_preview_url                ← assemble page, share link
+```
+
+**Destructive tools** (`delete_*`) state their cascade effects in the description and require explicit
+user confirmation before the agent calls them. **Full-replacement updates** (`update_app_page`,
+`update_widget`, `update_query` options) warn in their descriptions to read current state with the
+matching `get_*` tool first — partial sends silently drop existing fields.
+
+---
+
 ## Architecture
 
 ```
@@ -221,7 +257,9 @@ All requests are authenticated with the configured API key. The server acts as a
 
 - **API Key**: Create a scoped API key with only the permissions the AI needs. Read-only keys for read-only agents.
 - **Tenant Isolation**: The server is configured for a single tenant ID. Each tenant needs its own server instance.
-- **No secrets exposed**: The API key and datasource credentials are never returned in tool responses.
+- **Credentials in tool output**: `get_datasource` and the fallback responses of `get_datasource_schema` /
+  `get_datasource_sample_data` return the datasource `options` object, which may contain connection
+  credentials. Use a scoped API key and be aware the agent may see these values.
 - **IAM tools are read-only**: Write operations (invite user, promote role) require human confirmation in the UI.
 
 ---
@@ -231,7 +269,7 @@ All requests are authenticated with the configured API key. The server acts as a
 | Problem | Solution |
 |---------|----------|
 | `Missing required env var` | Copy `.env.example` to `.env` and fill in values |
-| `Jet Admin API unreachable` | Ensure backend is running at `JET_ADMIN_MCP_BASE_URL` |
+| `Jet Admin API unreachable` | Ensure backend is running at `JET_ADMIN_BACKEND_URL` |
 | `Authentication failed (401)` | Check `JET_ADMIN_API_KEY` is valid and not disabled |
 | `Permission denied (403)` | The API key lacks the required permission for that operation |
 | `Resource not found (404)` | Verify the ID belongs to `JET_ADMIN_TENANT_ID` |

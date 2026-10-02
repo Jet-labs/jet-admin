@@ -1,3 +1,4 @@
+// File: packages/mcp-server/src/tools/iam.tools.js (javascript)
 /**
  * iam.tools.js — context-aware, multi-tenant ready
  * Handler signature: async (args, context) where context = { tenantId, apiKey }
@@ -11,9 +12,14 @@ export const iamTools = [
   {
     name: "list_tenant_members",
     description:
-      "List all members of this Jet Admin tenant. " +
-      "Returns user IDs, emails, primary roles (ADMIN/MEMBER), and custom role assignments. " +
-      "Useful for understanding who has access and what permissions they hold.",
+      "List all members of this Jet Admin tenant.\n\n" +
+      "Returns: { members: [{ userID, email, username, role, joinedAt }], totalCount } where role is\n" +
+      "'ADMIN', 'MEMBER', or a custom role title.\n\n" +
+      "Use this to answer questions like 'who has access to this tenant?', to check whether a specific\n" +
+      "user is a member before discussing permissions, or to see who holds ADMIN. Read-only — this tool\n" +
+      "cannot modify members or roles; invite/role changes happen in the Jet Admin UI.\n\n" +
+      "Example call: {} (no arguments)\n\n" +
+      "Related: list_tenant_roles, get_tenant_info.",
     inputSchema: { type: "object", properties: {} },
     handler: async (_args, context) => {
       const { iamAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
@@ -35,9 +41,15 @@ export const iamTools = [
   {
     name: "list_tenant_roles",
     description:
-      "List all custom roles defined in this Jet Admin tenant. " +
-      "Each role has a set of permissions that control what resources members can access. " +
-      "Use this to understand the permission model before suggesting access changes.",
+      "List all custom roles defined in this Jet Admin tenant.\n\n" +
+      "Returns: { roles: [{ roleID, title, description, createdAt }], totalCount }. Built-in roles\n" +
+      "(ADMIN, MEMBER) may not appear here — this lists the tenant's CUSTOM roles with their permission\n" +
+      "summaries.\n\n" +
+      "Use this before discussing access changes, to check whether a suitable custom role exists, or to\n" +
+      "understand the tenant's permission model. Read-only — role creation/assignment happens in the\n" +
+      "Jet Admin UI.\n\n" +
+      "Example call: {} (no arguments)\n\n" +
+      "Related: list_tenant_members, get_tenant_info.",
     inputSchema: { type: "object", properties: {} },
     handler: async (_args, context) => {
       const { iamAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
@@ -58,9 +70,16 @@ export const iamTools = [
   {
     name: "get_tenant_info",
     description:
-      "Get metadata about this Jet Admin tenant including its title, logo, member count, " +
-      "and counts of all resources (datasources, queries, widgets, pages, workflows, listeners). " +
-      "Use this to understand the scope of the tenant at the start of a session.",
+      "Get metadata about this Jet Admin tenant: title, logo, member count, and resource counts.\n\n" +
+      "Returns: { tenantID, title, logoUrl, memberCount,\n" +
+      "  resourceCounts: { datasources, dataQueries, widgets, appPages, workflows, listeners, cronJobs,\n" +
+      "  apiKeys } }.\n\n" +
+      "Use this for a fast, cheap orientation at the start of a session — it tells you the tenant's name\n" +
+      "and roughly how much is in it WITHOUT fetching full resource lists. When you need actual resource\n" +
+      "IDs and titles, follow up with get_tenant_resource_summary (heavier but complete).\n" +
+      "This tool also confirms authentication works — a 401 here means the API key is invalid.\n\n" +
+      "Example call: {} (no arguments)\n\n" +
+      "Related: get_tenant_resource_summary, list_tenant_members.",
     inputSchema: { type: "object", properties: {} },
     handler: async (_args, context) => {
       const { iamAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
