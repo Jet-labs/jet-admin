@@ -75,11 +75,14 @@ export function CanvasWidgetSlot({
   style,
   condition,
   repeat,
+  hideMode,
+  keepMounted,
   locked,
 }) {
   const { renderWidget, previewMode, editorLiveStateTree } = useCraftEditorContext();
   // Edit-canvas dimming: node stays visible for editing but shows its
   // viewer-hidden state via reduced opacity (badge still explains why).
+  // Preview mimics viewer: collapse unmounts, preserve/keepMounted hide via CSS.
   const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
 
   const {
@@ -101,6 +104,9 @@ export function CanvasWidgetSlot({
       parentDisplayName: pNode?.data?.displayName ?? null,
     };
   });
+  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+    return null;
+  }
 
   const isInRow = parentDisplayName === "CanvasRow";
   const isFixedPx = width != null && width !== "grow" && !(typeof width === "string" && width.endsWith("%"));
@@ -123,6 +129,11 @@ export function CanvasWidgetSlot({
     ...(style || {}),
     ...resolveWidthStyle(width, isInRow),
     ...resolveHeightStyle(height, sizing, fixedHeight),
+    ...(previewMode && hiddenByCondition
+      ? hideMode === "preserve-space"
+        ? { visibility: "hidden", pointerEvents: "none" }
+        : { display: "none", pointerEvents: "none" }
+      : {}),
   };
 
   // Grid placement: use inline style for guaranteed 12-column grid participation.
@@ -210,6 +221,8 @@ CanvasWidgetSlot.craft = {
     style: {},
     condition: null,
     repeat: null,
+    hideMode: null,
+    keepMounted: false,
     locked: false,
   },
   rules: {

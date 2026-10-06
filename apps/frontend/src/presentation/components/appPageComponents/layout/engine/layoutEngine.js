@@ -508,6 +508,29 @@ export const setNodeCondition = (root, nodeId, condition) => {
 };
 
 /**
+ * Sets hidden behavior on a layout node.
+ * behavior: 'collapse' (default, unmount) | 'preserve-space' (visibility:hidden)
+ *           | 'collapse-keep-state' (display:none, stays mounted)
+ */
+export const setNodeHiddenBehavior = (root, nodeId, behavior) => {
+  const newRoot = cloneDeep(root);
+  const node = findNodeById(newRoot, nodeId);
+  if (node) {
+    if (behavior === "preserve-space") {
+      node.hideMode = "preserve-space";
+      delete node.keepMounted;
+    } else if (behavior === "collapse-keep-state") {
+      delete node.hideMode;
+      node.keepMounted = true;
+    } else {
+      delete node.hideMode;
+      delete node.keepMounted;
+    }
+  }
+  return newRoot;
+};
+
+/**
  * Sets or clears repeat (iteration) configuration on a layout node.
  */
 export const setNodeRepeat = (root, nodeId, repeat) => {

@@ -5,7 +5,7 @@
  */
 import React from "react";
 import { useNode, useEditor } from "@craftjs/core";
-import { useCraftEditorContext } from "./CraftEditorContext.js";
+import { useCraftEditorContext, useConditionHidden } from "./CraftEditorContext.js";
 import { LogicBadges } from "./LogicBadges.jsx";
 import LayoutResizeHandle from "../editor/LayoutResizeHandle.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
@@ -21,9 +21,12 @@ export function CanvasStack({
   style,
   condition,
   repeat,
+  hideMode,
+  keepMounted,
   fixedHeight,
 }) {
-  const { previewMode } = useCraftEditorContext();
+  const { previewMode, editorLiveStateTree } = useCraftEditorContext();
+  const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
     connectors: { connect, drag },
     id,
@@ -50,6 +53,9 @@ export function CanvasStack({
   const isZStackLayer = parentDisplayName === "CanvasZStack";
   const layerIdx = isZStackLayer ? childNodeIdsOfParent.indexOf(id) : -1;
   const isLayerActive = !isZStackLayer || layerIdx === activeLayerIndex;
+  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+    return null;
+  }
 
   const handleResize = (nodeId, newSpan) => {
     setProp((props) => { props.span = Math.max(1, Math.min(12, newSpan)); });
@@ -74,6 +80,11 @@ export function CanvasStack({
   const stackStyle = {
     ...(style || {}),
     gap: typeof gap === "number" ? `${gap}px` : gap,
+    ...(previewMode && hiddenByCondition
+      ? hideMode === "preserve-space"
+        ? { visibility: "hidden", pointerEvents: "none" }
+        : { display: "none", pointerEvents: "none" }
+      : {}),
   };
   if (sizing === "fixed" && fixedHeight) {
     stackStyle["--fixed-height"] = `${fixedHeight}px`;
@@ -104,10 +115,11 @@ export function CanvasStack({
       ref={(ref) => !previewMode && connect(drag(ref))}
       className={`flex ${stackDirection} ${stackWrap} ${stackAlign} ${previewMode ? "" : "p-2"} self-stretch min-h-0 box-border craft-node craft-node-stack ${stackSpan} ${stackSizing} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
-      }`}
+      } ${hiddenByCondition && !previewMode ? "opacity-40 saturate-50" : ""}`}
       style={stackStyle}
       id={id}
       data-node-type="Stack"
+      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
     >
       {!previewMode && isZStackLayer && (
         <span className="layout-z-stack-layer-badge">
@@ -155,6 +167,8 @@ CanvasStack.craft = {
     style: {},
     condition: null,
     repeat: null,
+    hideMode: null,
+    keepMounted: false,
   },
   isCanvas: true,
   rules: {

@@ -18,8 +18,8 @@ const HomePage = lazy(() => import("../../pages/homePage"));
 const AccountPage = lazy(() => import("../../pages/accountPage"));
 const AddTenantPage = lazy(() => import("../../pages/addTenantPage"));
 const UpdateTenantPage = lazy(() => import("../../pages/updateTenantPage"));
-const TenantLayoutLandingPage = lazy(() =>
-  import("../../pages/tenantLayoutLandingPage")
+const DashboardLandingPage = lazy(() =>
+  import("../../pages/dashboardLandingPage")
 );
 const AddDataQueryPage = lazy(() => import("../../pages/addDataQueryPage"));
 const UpdateDataQueryPage = lazy(() =>
@@ -127,7 +127,7 @@ const router = createBrowserRouter([
           },
           {
             path: CONSTANTS.ROUTES.VIEW_TENANT.code,
-            element: <TenantLayoutLandingPage />,
+            element: <DashboardLandingPage />,
             handle: { title: CONSTANTS.ROUTES.VIEW_TENANT.title },
           },
           {

@@ -83,23 +83,21 @@ export const listenerTools = [
       "Returns: the created listener object including its new listenerID.\n" +
       "Creation does NOT start the listener — call activate_listener afterwards. The pipeline runs only\n" +
       "while the listener is active.\n\n" +
-      "listenerConfig shape by listenerType:\n" +
-      "  websocket: { url: 'wss://...', headers?: {...} }\n" +
-      "  webhook:   { path: '/my-hook' } — Jet Admin generates the inbound URL; get it from get_listener\n" +
-      "             after creation to give to the event source\n" +
-      "  sse:       { url: 'https://...', headers?: {...} }\n" +
-      "  kafka / mqtt: call get_listener_schemas for the authoritative required fields.\n" +
-      "If unsure of any config shape, call get_listener_schemas FIRST.\n\n" +
-      "Example call — WebSocket listener with a transform pipeline:\n" +
-      '  { "listenerTitle": "Live payments stream",\n' +
-      '    "listenerType": "websocket",\n' +
-      '    "listenerConfig": { "url": "wss://payments.example.com/feed",\n' +
-      '                        "headers": { "Authorization": "Bearer xyz" } },\n' +
-      '    "pipelineSteps": [\n' +
-      '      { "type": "filter", "config": { "condition": "event.type == \'payment.succeeded\'" } },\n' +
-      '      { "type": "transform", "config": { "mapping": { "amount": "event.amount", "id": "event.charge_id" } } } ] }\n' +
-      "Example call — inbound webhook:\n" +
+      "A datasourceID (a datasource of matching type, e.g. a webhook datasource for\n" +
+      "webhook listeners) is REQUIRED — find one via get_tenant_resource_summary first.\n" +
+      "Creation does NOT start the listener — call activate_listener afterwards.\n\n" +
+      "listenerConfig shape by listenerType (call get_listener_schemas FIRST for the\n" +
+      "authoritative fields; backend also accepts legacy aliases):\n" +
+      "  websocket: { parseAsJSON: true, messageFilter?: '' } (connection URL lives on the datasource)\n" +
+      "  webhook:   { path: '/my-hook' } (alias: pathSuffix) — Jet Admin generates the inbound URL;\n" +
+      "             get it from get_listener after creation to give to the event source\n" +
+      "  sse:       { eventTypes?: '', parseAsJSON: true }\n" +
+      "  mqtt:      { topics: 'sensors/#', qos: 0 } | kafka: { topic: '...', consumerGroup?: 'jet-listener' }\n" +
+      "Pipeline: get_listener returns tblListenerActions (transform/save_to_buffer/\n" +
+      "trigger_query/push_to_app_page). Pass pipelineSteps on create when supported.\n\n" +
+      "Example call — inbound webhook (datasourceID required):\n" +
       '  { "listenerTitle": "Stripe events", "listenerType": "webhook",\n' +
+      '    "datasourceID": "<webhook-datasource-UUID>",\n' +
       '    "listenerConfig": { "path": "/stripe-events" } }\n\n' +
       "After creating: activate_listener → get_listener (to read the generated webhook URL if applicable).\n\n" +
       "Related: get_listener_schemas, activate_listener, update_listener, get_listener.",
@@ -112,8 +110,9 @@ export const listenerTools = [
         },
         listenerType: {
           type: "string",
-          enum: ["websocket", "webhook", "sse", "kafka", "mqtt"],
-          description: "Protocol type. Pick 'webhook' for event sources that call you (Stripe, GitHub...), " +
+          description: "Listener-capable type from list_listener_types (13 values: postgresql, firestore, mongodb, " +
+            "graphql, rabbitmq, kafka, redis, webhook, mqtt, websocket, sse, syslog, nats). " +
+            "Pick 'webhook' for event sources that call you (Stripe, GitHub...), " +
             "'websocket'/'sse' to consume an upstream stream. Example: 'websocket'.",
         },
         datasourceID: {

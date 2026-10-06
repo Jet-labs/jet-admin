@@ -89,7 +89,7 @@ const datasourceService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-datasourceService.getAllDatasources = async ({ userID, tenantID, search, page, pageSize }) => {
+datasourceService.getAllDatasources = async ({ userID, tenantID, search, page, pageSize, folderID }) => {
   Logger.log("info", {
     message: "datasourceService:getAllDatasources:params",
     params: {
@@ -98,12 +98,17 @@ datasourceService.getAllDatasources = async ({ userID, tenantID, search, page, p
       search,
       page,
       pageSize,
+      folderID,
     },
   });
   try {
     const where = {
       tenantID: tenantID,
     };
+
+    if (folderID) {
+      where.folderID = folderID;
+    }
 
     if (search) {
       where.OR = [
@@ -237,7 +242,22 @@ datasourceService.testDatasourceConnection = async ({
           connectionResult,
         },
       });
-      throw new Error(connectionResult?.error || "Connection test failed");
+      // Surface HTTP details when the tester returned them (e.g. restapi returns
+      // {ok:false,status,statusText,body} without an `error` string for non-2xx).
+      const details = connectionResult && typeof connectionResult === "object"
+        ? [
+            connectionResult.error,
+            connectionResult.status !== undefined
+              ? `HTTP ${connectionResult.status}${connectionResult.statusText ? ` ${connectionResult.statusText}` : ""}`
+              : null,
+            typeof connectionResult.body === "string"
+              ? connectionResult.body.slice(0, 200)
+              : connectionResult.body !== undefined && connectionResult.body !== null
+                ? JSON.stringify(connectionResult.body).slice(0, 200)
+                : null,
+          ].filter(Boolean).join(" | ")
+        : null;
+      throw new Error(details || "Connection test failed");
     }
 
     Logger.log("success", {
@@ -255,6 +275,123 @@ datasourceService.testDatasourceConnection = async ({
         userID,
         error: error.message || error,
       },
+    });
+    throw error;
+  }
+};
+
+/**
+ * Validates that a restapi baseUrl + testPath serves parseable JSON.
+ *
+ * This is SEPARATE from testDatasourceConnection (which only checks host
+ * reachability and is intentionally untouched): it performs a GET against
+ * baseUrl+testPath with the datasource's headers/auth and then validates
+ * the response is JSON rather than an SPA HTML shell.
+ *
+ * @param {object} param0
+ * @param {string} param0.userID
+ * @param {string} param0.tenantID
+ * @param {string} param0.datasourceType - must be restapi (others rejected)
+ * @param {object} param0.datasourceOptions - restapi connection options
+ * @param {string} param0.testPath - API path appended to baseUrl (e.g. "/health")
+ * @param {string} [param0.testMethod] - HTTP method override (default GET)
+ * @returns {Promise<object>} { ok, validatedJson, status, contentType, bodyPreview, topLevelKeys }
+ */
+datasourceService.testDatasourceJsonEndpoint = async ({
+  userID,
+  tenantID,
+  datasourceType,
+  datasourceOptions,
+  testPath,
+  testMethod,
+}) => {
+  Logger.log("info", {
+    message: "datasourceService:testDatasourceJsonEndpoint:params",
+    params: { userID, tenantID, datasourceType, testPath, testMethod },
+  });
+  try {
+    if (datasourceType !== "restapi") {
+      throw new Error(
+        `JSON endpoint validation currently supports datasourceType 'restapi' only (got '${datasourceType}').`
+      );
+    }
+    if (!datasourceOptions?.baseUrl?.trim()) {
+      throw new Error("datasourceOptions.baseUrl is required.");
+    }
+    if (!testPath?.trim()) {
+      throw new Error("testPath is required (e.g. '/health').");
+    }
+    const base = String(datasourceOptions.baseUrl).replace(/\/+$/, "");
+    const path = testPath.startsWith("/") ? testPath : `/${testPath}`;
+    const method = (testMethod || datasourceOptions.method || "GET").toUpperCase();
+    if (!["GET", "HEAD"].includes(method)) {
+      throw new Error(`testMethod must be GET or HEAD for validation (got '${method}').`);
+    }
+
+    const component = DATASOURCE_LOGIC_COMPONENTS[datasourceType];
+    if (!component || typeof component.testConnection !== "function") {
+      throw new Error(`Connection test for datasource type '${datasourceType}' is not supported.`);
+    }
+
+    const connectionResult = await component.testConnection({
+      datasourceOptions: { ...datasourceOptions, baseUrl: `${base}${path}`, method },
+      helpers: {
+        fileStorage: fileStorageUtil,
+        getCredential: async (vaultCredentialID) => {
+          return await vaultService.getCredential({ tenantID, vaultCredentialID });
+        },
+      },
+    });
+
+    const body = connectionResult?.body;
+    const bodyStr = typeof body === "string" ? body : "";
+    const isHtml = /<\s*html|<!doctype html/i.test(bodyStr.slice(0, 2048));
+    const isJsonBody = body !== null && typeof body === "object";
+    let parsed = null;
+    let parseError = null;
+    if (!isJsonBody && bodyStr) {
+      try {
+        parsed = JSON.parse(bodyStr);
+      } catch (e) {
+        parseError = e.message;
+      }
+    }
+    const validatedJson = Boolean(connectionResult?.ok) && !isHtml && (isJsonBody || parsed !== null);
+    const effectiveBody = isJsonBody ? body : parsed;
+    const topLevelKeys =
+      effectiveBody && typeof effectiveBody === "object"
+        ? (Array.isArray(effectiveBody) ? [`array[${effectiveBody.length}]`] : Object.keys(effectiveBody).slice(0, 20))
+        : [];
+    const bodyPreview =
+      effectiveBody !== null && effectiveBody !== undefined
+        ? JSON.stringify(effectiveBody).slice(0, 2000)
+        : String(bodyStr).slice(0, 2000);
+
+    const result = {
+      ok: Boolean(connectionResult?.ok),
+      validatedJson,
+      status: connectionResult?.status,
+      statusText: connectionResult?.statusText,
+      url: `${base}${path}`,
+      method,
+      contentType: isJsonBody || parsed !== null ? "application/json" : (isHtml ? "text/html" : "unknown"),
+      topLevelKeys,
+      bodyPreview,
+      warning: validatedJson
+        ? null
+        : "Endpoint did not return parseable JSON — check the path, auth, and that it is a JSON API (not an SPA shell).",
+      parseError,
+    };
+
+    Logger.log("success", {
+      message: "datasourceService:testDatasourceJsonEndpoint:success",
+      params: { userID, validatedJson, status: result.status },
+    });
+    return result;
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceService:testDatasourceJsonEndpoint:error",
+      params: { userID, error: error.message || error },
     });
     throw error;
   }
@@ -657,9 +794,23 @@ datasourceService.proxyDatasourceAction = async ({
     );
 
     // 3. Validate the action method against allowlist
+    // NOTE: keys must match canonical datasourceType values from
+    // @jet-admin/datasource-types (e.g. 'postgresql', NOT 'postgres';
+    // 'restapi', NOT 'rest_api'). See packages/datasources-logic/src/data-sources/index.js.
+    const SQL_INTROSPECTION = ["getSchema", "getSampleData", "testConnection", "runQuery", "execute"];
     const ALLOWED_ACTIONS = {
-      postgres: ["runQuery", "getSchema", "testConnection"],
-      mysql: ["runQuery", "getSchema", "testConnection"],
+      postgresql: SQL_INTROSPECTION,
+      mysql: SQL_INTROSPECTION,
+      mssql: SQL_INTROSPECTION,
+      sqlite: SQL_INTROSPECTION,
+      cockroachdb: SQL_INTROSPECTION,
+      oracle: SQL_INTROSPECTION,
+      mongodb: ["getSchema", "getSampleData", "testConnection", "execute"],
+      googlesheets: ["listSpreadsheets", "listSheets", "previewData", "readSheet", "testConnection"],
+      excelcsv: ["previewData", "getColumns", "testConnection"],
+      restapi: ["testConnection", "execute"],
+      // Back-compat aliases for callers still using legacy type keys
+      postgres: SQL_INTROSPECTION,
       google_sheets: ["listSpreadsheets", "listSheets", "previewData", "readSheet", "testConnection"],
       excel_csv: ["previewData", "getColumns", "testConnection"],
       rest_api: ["testConnection", "execute"],

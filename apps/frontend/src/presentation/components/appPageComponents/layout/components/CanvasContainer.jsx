@@ -10,7 +10,7 @@ import { LogicBadges } from "./LogicBadges.jsx";
 import LayoutResizeHandle from "../editor/LayoutResizeHandle.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
 
-export function CanvasContainer({ children, span, sizing, style, condition, repeat, fixedHeight }) {
+export function CanvasContainer({ children, span, sizing, style, condition, repeat, fixedHeight, hideMode, keepMounted }) {
   const { previewMode, editorLiveStateTree } = useCraftEditorContext();
   const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
@@ -21,6 +21,10 @@ export function CanvasContainer({ children, span, sizing, style, condition, repe
   } = useNode((node) => ({
     isSelected: node.events.selected,
   }));
+  // Preview mimics viewer: collapse unmounts, preserve-space/keepMounted hide via CSS.
+  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+    return null;
+  }
 
   const handleResize = (nodeId, newSpan) => {
     setProp((props) => { props.span = Math.max(1, Math.min(12, newSpan)); });
@@ -28,12 +32,18 @@ export function CanvasContainer({ children, span, sizing, style, condition, repe
 
   const containerSpan = `col-span-${span || 12}`;
   const containerSizing = `sizing-${sizing || "auto"}`;
+  const previewHiddenStyle = previewMode && hiddenByCondition
+    ? hideMode === "preserve-space"
+      ? { visibility: "hidden", pointerEvents: "none" }
+      : { display: "none", pointerEvents: "none" }
+    : {};
   const containerStyle = {
     padding: style?.padding,
     margin: style?.margin,
     borderRadius: style?.borderRadius,
     overflow: style?.borderRadius ? "hidden" : undefined,
     ...(style || {}),
+    ...previewHiddenStyle,
   };
   if (sizing === "fixed" && fixedHeight) {
     containerStyle["--fixed-height"] = `${fixedHeight}px`;
@@ -79,6 +89,8 @@ CanvasContainer.craft = {
     style: {},
     condition: null,
     repeat: null,
+    hideMode: null,
+    keepMounted: false,
   },
   isCanvas: true,
   rules: {

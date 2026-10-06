@@ -30,6 +30,7 @@ const MOVE_REQ_KEY_BY_TYPE = {
   cronJob: "cronJobIDs",
   appPage: "appPageIDs",
   listener: "listenerIDs",
+  datasource: "datasourceIDs",
 };
 
 /**
@@ -67,8 +68,11 @@ router.post(
   resolveMoveTargets,
   authMiddleware.authorize([
     P.folder.update,
+    // NOTE: each entry must SPREAD the P.* descriptor ({resource, action}) — authorize()
+    // destructures check.resource/check.action, so a nested {permission: ...} wrapper yields
+    // resource:undefined and denies every move (was the cause of 403 on all entity types).
     ...FOLDER_ENTITY_TYPES.map((type) => ({
-      permission: P[
+      ...P[
         {
           widget: "widget",
           workflow: "workflow",
@@ -76,6 +80,7 @@ router.post(
           cronJob: "cronjob",
           appPage: "appPage",
           listener: "listener",
+          datasource: "datasource",
         }[type]
       ].update,
       reqKey: MOVE_REQ_KEY_BY_TYPE[type],

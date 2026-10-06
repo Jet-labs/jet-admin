@@ -18,7 +18,7 @@ datasourceController.getAllDatasources = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { search, page, pageSize } = req.query;
+    const { search, page, pageSize, folderID } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "datasourceController:getAllDatasources:params",
@@ -38,6 +38,7 @@ datasourceController.getAllDatasources = async (req, res) => {
       search,
       page,
       pageSize,
+      folderID,
       authContext,
     });
 
@@ -124,6 +125,51 @@ datasourceController.testDatasourceConnection = async (req, res) => {
       params: {
         error: error.message || error,
       },
+    });
+    return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+/**
+ * POST /datasources/test-json — validates a restapi endpoint returns JSON.
+ * Separate from testDatasourceConnection (host reachability), which is untouched.
+ */
+datasourceController.testDatasourceJsonEndpoint = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+    const { datasourceType, datasourceOptions, testPath, testMethod } = req.body;
+
+    Logger.log("info", {
+      message: "datasourceController:testDatasourceJsonEndpoint:params",
+      params: { userID: user.userID, tenantID, datasourceType, testPath, testMethod },
+    });
+
+    const validationResult = await datasourceService.testDatasourceJsonEndpoint({
+      userID: user.userID,
+      tenantID,
+      datasourceType,
+      datasourceOptions,
+      testPath,
+      testMethod,
+    });
+
+    Logger.log("success", {
+      message: "datasourceController:testDatasourceJsonEndpoint:success",
+      params: { validationResult },
+    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        validationResult,
+        message: "Datasource JSON endpoint validated successfully.",
+      }, null, constants.HTTP_STATUS.OK
+    );
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:testDatasourceJsonEndpoint:error",
+      params: { error: error.message || error },
     });
     return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
   }

@@ -560,7 +560,9 @@ const APP_PAGE_CONFIG_SCHEMA = {
           id: { type: 'string', description: 'Unique node ID' },
           type: { type: 'string', enum: ['column'] },
           children: { type: 'array', items: { '$ref': '#/definitions/layoutNode' } },
-          condition: { type: 'string', description: 'Optional mustache expression. Node renders only when truthy.' },
+          condition: { type: 'string', description: 'Optional mustache expression, e.g. "{{ state.variables.dnsType === \'Domain\' }}". Empty = always show. Error = hidden (fail-closed).' },
+          hideMode: { type: 'string', enum: ['collapse', 'preserve-space'], description: 'Hidden behavior: "collapse" (default, unmounts, no space) or "preserve-space" (visibility:hidden, keeps space + state).' },
+          keepMounted: { type: 'boolean', description: 'When true with hideMode != preserve-space, hidden nodes stay mounted with display:none (preserves form/table state, collapses layout). Default false.' },
           style: { type: 'object', description: 'Optional inline CSS styles.' }
         },
         required: ['id', 'type', 'children']

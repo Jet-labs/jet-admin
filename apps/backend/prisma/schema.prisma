@@ -151,13 +151,16 @@ model tblDatasources {
   webhookToken          String?          @unique @db.VarChar(128)
   webhookSecret         String?          @db.VarChar(255)
   datasourceDescription String?
+  folderID            String?           @db.Uuid
   tblDataQueries        tblDataQueries[]
   tblTenants            tblTenants       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblTenantsTenantID")
   tblUsers              tblUsers?        @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblDatasourceTblUsersCreatorID")
   tblAPIKeys            tblAPIKeys?      @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblDatasourcesCreatedByApiKeyID")
+  tblFolders            tblFolders?      @relation(fields: [folderID], references: [folderID], onUpdate: NoAction, map: "fkTblDatasourcesFolderID")
   tblListeners          tblListeners[]
 
   @@index([createdByApiKeyID], map: "idx_tblDatasources_createdByApiKeyID")
+  @@index([folderID], map: "idx_tblDatasources_folderID")
 }
 
 model tblPermissions {
@@ -231,6 +234,7 @@ model tblFolders {
   tblAppPages    tblAppPages[]
   tblCronJobs    tblCronJobs[]
   tblDataQueries tblDataQueries[]
+  tblDatasources tblDatasources[]
   tblUsers       tblUsers?        @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblFoldersCreatorID")
   parent         tblFolders?      @relation("tblFoldersParentFolder", fields: [parentFolderID], references: [folderID], onUpdate: NoAction, map: "fkTblFoldersParentFolderID")
   children       tblFolders[]     @relation("tblFoldersParentFolder")

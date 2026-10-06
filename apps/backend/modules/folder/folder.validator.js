@@ -1,6 +1,6 @@
 const { z, schemas } = require("../../utils/validation.utils");
 
-const FOLDER_ENTITY_TYPES = ["widget", "workflow", "dataQuery", "cronJob", "appPage", "listener"];
+const FOLDER_ENTITY_TYPES = ["widget", "workflow", "dataQuery", "cronJob", "appPage", "listener", "datasource"];
 
 const listFoldersQuerySchema = z.object({
   entityType: z.enum(FOLDER_ENTITY_TYPES),

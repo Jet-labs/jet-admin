@@ -92,34 +92,65 @@ export const widgetTools = [
       "A widget alone does nothing until it is placed on a page and bound to data (a query, listener, or\n" +
       "workflow configured in the page's dataSources). Create the query first (create_query), then the\n" +
       "widget, then the page.\n\n" +
-      "Widget types and typical use cases:\n" +
+      "Widget types and typical use cases (full list via list_widget_types, 32 types):\n" +
       "  'table'  — show records/rows/lists of data\n" +
-      "  'chart'  — visualize data (bar, line, pie)\n" +
+      "  'vega-lite'/'vega' — visualize data (bar, line, pie; 'chart' is NOT a valid type)\n" +
       "  'stat'   — display a single KPI metric value\n" +
       "  'form'   — let users submit or edit data\n" +
       "  'text'   — display static or dynamic text/markdown\n" +
       "  'button' — trigger queries or workflows on click\n" +
       "For the authoritative, backend-validated config shape, call get_widget_schemas.\n\n" +
-      "widgetConfig quick reference:\n" +
-      "  table: { columns: [{ field, label, width }], pagination? }\n" +
-      "  chart: { chartType: 'bar'|'line'|'pie', xAxis, yAxis }\n" +
-      "  stat:  { label, valueBinding, format? }\n" +
-      "  form:  { fields: [{ name, type, label, required? }], submitAction? }\n\n" +
-      "Example call 1 — table of orders:\n" +
+      "DATA BINDING (required for live widgets — a widget alone shows nothing until bound):\n" +
+      "  Page dataSources are exposed as {{ state.queries.<alias>.data }},\n" +
+      "  {{ state.listeners.<alias>.data }}, {{ state.workflows.<alias>.data }}\n" +
+      "  plus {{ state.variables.<key> }} and {{ state.queries.<alias>.isLoading }}.\n" +
+      "  BINDING-KEY MATRIX (per widgetType — using the wrong key renders blank with NO error):\n" +
+      "  table:      dataArrayTemplate (array) | text: content | key-value/list/json-viewer: dataTemplate\n" +
+      "  stat:       value AND valueTemplate (SET BOTH to the same template — frontend reads valueTemplate,\n" +
+      "              schema historically listed only value; blank stat = these diverged)\n" +
+      "  progress:   valueTemplate (0-100) | badge: text | alert: message | vega/vega-lite: spec+vegaSpec\n" +
+      "  table:    { columns: [{key,label,type,width,sortable}], dataArrayTemplate: '{{ state.queries.<alias>.data }}', isLoading?, pagination?, search?, export? }\n" +
+      "  stat:     { value: '{{ ... }}', valueTemplate: '{{ ... SAME ... }}', label, prefix?, suffix?,\n" +
+      "              trendTemplate?, trendDirection? ('up-is-good'|'down-is-good'), textAlign?, isLoading? }\n" +
+      "  text:     { content: '... {{ state.queries.<alias>.data.field }} ...', format: 'markdown' }\n" +
+      "  vega-lite:{ vegaSpec: { data: { values: '{{ state.queries.<alias>.data }}' }, mark, encoding },\n" +
+      "              spec: { ...same... }, options?: {renderer, showActions}, showHeader? }\n" +
+      "            NOTE: production charts use vegaSpec (not just spec) — set BOTH spec and vegaSpec\n" +
+      "            with data.values bound, or the chart renders empty.\n" +
+      "  key-value:{ dataTemplate: '{{state.queries.<alias>.data.<object>}}', columns? }\n" +
+      "  list:     { dataTemplate: '{{state.queries.<alias>.data.<array>}}', titleKey, subtitleKey }\n" +
+      "  badge:    { text: '{{ ... }}', variant? } | alert: { message: '... {{...}} ...', variant? }\n" +
+      "  json-viewer: { dataTemplate: '{{...}}' } | select: { label?, options:[{label,value}], defaultValue? }\n" +
+      "  TEMPLATE SUBSET (blank render instead of error on violation — keep expressions simple):\n" +
+      "  SAFE: a ? b : c | a || b | arr.length | arr[0] | obj?.field | Math.round/JSON.stringify | encodeURIComponent(x)\n" +
+      "  RISKY/BLANK: a && b | x != null | nested ternary | statements/loops | fetch/window/eval (shadowed).\n" +
+      "  URL path params: wrap with encodeURIComponent, e.g. /indicators/url/{{encodeURIComponent(state.variables.url)}}/general.\n" +
+      "  Always call get_widget on a working widget of the same type and copy its config shape.\n" +
+      "EVENTS (widgetConfig.events — page interactivity, verified against frontend\n" +
+      "  useWidgetEventHandlers.js / widgetEventsEditor.jsx):\n" +
+      "  onClick/onRowSelect/onSearch/onPageChange etc. map to action lists:\n" +
+      "  { events: { onClick: [ { config, actionType }, ... ] } }.\n" +
+      "  Action types: SET_VARIABLE {key (bare, not state.variables.x), value},\n" +
+      "  EXECUTE_QUERY {alias} — runs ANY page dataSource by alias (query, workflow\n" +
+      "  with streaming, or listener refresh), SHOW_TOAST {message, variant},\n" +
+      "  TRIGGER_WORKFLOW / TRIGGER_QUERY (direct, not page-bound).\n" +
+      "  Example button → run page workflow alias 'nightly_digest':\n" +
+      '  { events: { onClick: [ { config: { alias: \'nightly_digest\' },\n' +
+      "    actionType: 'EXECUTE_QUERY' } ] } }.\n\n" +
+      "Example call 1 — table bound to a page query alias 'orders_list':\n" +
       '  { "widgetTitle": "Recent Orders", "widgetType": "table",\n' +
       '    "widgetConfig": { "columns": [\n' +
-      '      { "field": "id", "label": "Order ID", "width": 120 },\n' +
-      '      { "field": "customer_name", "label": "Customer", "width": 200 },\n' +
-      '      { "field": "status", "label": "Status", "width": 100 },\n' +
-      '      { "field": "total", "label": "Total", "width": 100 } ],\n' +
-      '      "pagination": true } }\n' +
-      "Example call 2 — revenue stat:\n" +
+      '      { "key": "id", "label": "Order ID", "width": 120 },\n' +
+      '      { "key": "customer_name", "label": "Customer", "width": 200 },\n' +
+      '      { "key": "status", "label": "Status", "width": 100 },\n' +
+      '      { "key": "total", "label": "Total", "width": 100 } ],\n' +
+      '      "dataArrayTemplate": "{{ state.queries.orders_list.data }}",\n' +
+      '      "isLoading": "{{ state.queries.orders_list.isLoading }}" } }\n' +
+      "Example call 2 — stat bound to first row (SET BOTH value + valueTemplate):\n" +
       '  { "widgetTitle": "Total Revenue", "widgetType": "stat",\n' +
-      '    "widgetConfig": { "label": "Revenue", "valueBinding": "orders_summary.0.total_revenue",\n' +
-      '                      "format": "currency" } }\n' +
-      "Example call 3 — monthly revenue chart:\n" +
-      '  { "widgetTitle": "Revenue by Month", "widgetType": "chart",\n' +
-      '    "widgetConfig": { "chartType": "bar", "xAxis": "month", "yAxis": "revenue" } }\n\n' +
+      '    "widgetConfig": { "label": "Revenue", "prefix": "$",\n' +
+      '      "value": "{{ (state.queries.orders_summary.data || [])[0]?.total_revenue }}",\n' +
+      '      "valueTemplate": "{{ (state.queries.orders_summary.data || [])[0]?.total_revenue }}" } }\n\n' +
       "Typical flow: create_query → create_widget → create_app_page (or update_app_page to add it).\n\n" +
       "Related: get_widget_schemas, update_widget, create_app_page, update_app_page.",
     inputSchema: {
@@ -131,7 +162,7 @@ export const widgetTools = [
         },
         widgetType: {
           type: "string",
-          description: "Widget type: 'table', 'chart', 'stat', 'form', 'text', 'button', etc. " +
+          description: "Widget type from list_widget_types (32 values, e.g. 'table', 'vega-lite', 'stat', 'form', 'text', 'button'). " +
             "Example: 'table'.",
         },
         widgetConfig: {
@@ -155,8 +186,10 @@ export const widgetTools = [
     description:
       "Update a widget's title or configuration.\n\n" +
       "Returns: { success: true, widgetID }.\n\n" +
-      "IMPORTANT: widgetConfig replaces the widget's config — call get_widget first, modify the returned\n" +
-      "config, and send the complete object. Sending a partial config loses the fields you omit.\n\n" +
+      "FULL-REPLACE (destructive on omission): widgetConfig REPLACES the entire config. You MUST:\n" +
+      "  1. get_widget to read the current config\n" +
+      "  2. copy ALL existing keys (esp. stat value+valueTemplate, table dataArrayTemplate/columns)\n" +
+      "  3. send the COMPLETE object. A partial send silently drops binding keys and blanks the widget.\n\n" +
       "Example call — add a column to an existing table widget:\n" +
       '  { "widgetID": "3d4e5f6a-7b8c-4d9e-0f1a-2b3c4d5e6f7a",\n' +
       '    "widgetConfig": { "columns": [\n' +

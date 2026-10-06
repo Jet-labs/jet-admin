@@ -113,12 +113,72 @@ export const evaluateExpression = (expression, stateTree) => {
  *   resolveValue("Hello {{ state.variables.name }}!", stateTree)        // → "Hello Alice!"
  *   resolveValue("{{ state.queries.users.data.length > 0 ? state.queries.users.data[0].name : 'none' }}", stateTree)
  */
-export const resolveValue = (value, stateTree) => {
+export const resolveValue = (value, stateTree, opts = {}) => {
   if (typeof value !== "string") return value;
   return evaluate(value, wrapStateContext(stateTree), {
     mode: MODES.JS_TEMPLATE,
     preserveSingleExpressionType: true,
+    ...(opts.errors ? { errors: opts.errors } : {}),
+    ...(opts.throwOnError !== undefined ? { throwOnError: opts.throwOnError } : {}),
+    ...(opts.extraGlobals ? { extraGlobals: opts.extraGlobals } : {}),
   });
+};
+
+/**
+ * Evaluate a layout-node visibility condition.
+ *
+ * Contract (industry standard):
+ *   - empty/missing condition => visible (no gating)
+ *   - valid expression => visible = !!rawValue
+ *   - evaluation error (syntax, TypeError, sandbox) => hidden (fail-closed) + logged
+ *   - truthy non-boolean (e.g. "false", [], {}) => visible but flagged for lint
+ *   - missing {{ }} wrapper => flagged (bare JS is not evaluated as template)
+ *
+ * @param {string|null} condition - e.g. "{{ state.variables.dnsType === 'Domain' }}"
+ * @param {object} stateTree - live state tree (unwrapped, without `state` key)
+ * @param {object} [opts] - { nodeId?: string, silent?: boolean }
+ * @returns {{ visible: boolean, rawValue: *, hasError: boolean, isEmpty: boolean, isNonBoolean: boolean, missingMustaches: boolean, errors: Array }}
+ */
+export const evaluateVisibilityCondition = (condition, stateTree, opts = {}) => {
+  const empty = (v) => ({ visible: true, rawValue: undefined, hasError: false, isEmpty: true, isNonBoolean: false, missingMustaches: false, errors: [] });
+  if (typeof condition !== "string" || !condition.trim()) return empty();
+  if (!stateTree) return empty();
+
+  const trimmed = condition.trim();
+  const missingMustaches = !containsExpression(trimmed);
+
+  const errors = [];
+  let rawValue;
+  try {
+    rawValue = resolveValue(trimmed, stateTree, { errors });
+  } catch (err) {
+    errors.push(err);
+  }
+
+  if (errors.length > 0) {
+    if (!opts.silent) {
+      console.warn(
+        `[visibility] condition error on node ${opts.nodeId || "<unknown>"}: ${trimmed}`,
+        errors
+      );
+    }
+    return { visible: false, rawValue: undefined, hasError: true, isEmpty: false, isNonBoolean: false, missingMustaches, errors };
+  }
+
+  const visible = !!rawValue;
+  // Only flag truthy non-booleans — falsy non-booleans (0, '', null, undefined)
+  // are expected hide cases, not authoring mistakes.
+  const isNonBoolean = visible && typeof rawValue !== "boolean";
+
+  if ((isNonBoolean || missingMustaches) && !opts.silent && visible) {
+    console.warn(
+      `[visibility] non-boolean truthy condition on node ${opts.nodeId || "<unknown>"}: ${trimmed} =>`,
+      rawValue,
+      missingMustaches ? "(missing {{ }}?)" : "(expected boolean)"
+    );
+  }
+
+  return { visible, rawValue, hasError: false, isEmpty: false, isNonBoolean, missingMustaches, errors };
 };
 
 /**

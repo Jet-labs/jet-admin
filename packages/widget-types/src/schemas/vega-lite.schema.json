@@ -1,17 +1,17 @@
 {
   "widgetType": "vega-lite",
-  "description": "Vega-Lite chart widget. widgetConfig.spec is the full Vega-Lite JSON specification.",
+  "description": "Vega-Lite chart widget. Bind live data via vegaSpec.data.values (and spec.data.values) using {{ state.queries.<alias>.data }}. Production pages use vegaSpec — set BOTH spec and vegaSpec or the chart renders empty.",
   "schema": {
     "type": "object",
     "properties": {
       "spec": {
         "type": "object",
-        "description": "Vega-Lite JSON specification (https://vega.github.io/vega-lite/docs/spec.html)",
+        "description": "Vega-Lite JSON specification (https://vega.github.io/vega-lite/docs/spec.html). Set data.values to '{{ state.queries.<alias>.data }}' for live binding.",
         "properties": {
           "$schema": { "type": "string" },
           "mark": { "description": "Mark type: bar, line, point, area, arc, rect, rule, text, tick, trail, circle, square, geoshape, boxplot, errorband, errorbar" },
           "encoding": { "type": "object" },
-          "data": { "type": "object" },
+          "data": { "type": "object", "description": "Use { values: '{{ state.queries.<alias>.data }}' }" },
           "transform": { "type": "array" },
           "width": { "type": ["number", "string"] },
           "height": { "type": ["number", "string"] },
@@ -19,6 +19,29 @@
           "config": { "type": "object" }
         }
       },
+      "vegaSpec": {
+        "type": "object",
+        "description": "Runtime Vega-Lite spec used by production pages (same shape as spec). Must include data.values bound to '{{ state.queries.<alias>.data }}'.",
+        "properties": {
+          "$schema": { "type": "string" },
+          "mark": { "type": "object" },
+          "encoding": { "type": "object" },
+          "data": { "type": "object" },
+          "width": { "type": ["number", "string"] },
+          "height": { "type": ["number", "string"] },
+          "autosize": { "type": "object" }
+        }
+      },
+      "options": {
+        "type": "object",
+        "description": "Runtime options wrapper (alternative to top-level showActions/renderer).",
+        "properties": {
+          "renderer": { "type": "string", "enum": ["svg", "canvas"], "default": "svg" },
+          "showActions": { "type": "boolean", "default": false }
+        }
+      },
+      "showHeader": { "type": "boolean", "default": true },
+      "isLoading": { "type": "string", "description": "Template, e.g. '{{ state.queries.<alias>.isLoading }}'" },
       "showActions": {
         "type": "boolean",
         "title": "Show Actions",

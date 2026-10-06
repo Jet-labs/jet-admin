@@ -92,25 +92,36 @@ export const workflowTools = [
       "Returns: the created workflow object including its new workflowID.\n" +
       "The workflow is saved but NOT executed — call execute_workflow to run it.\n\n" +
       "Structure:\n" +
-      "  nodes: [{ id: 'n1', type: '<nodeType>', data: { ...typeSpecificConfig } }, ...]\n" +
-      "  edges: [{ id: 'e1', source: 'n1', target: 'n2', ... }, ...] — execution flows source → target.\n\n" +
+      "  nodes: [{ id: '<UUID>', type: '<nodeType>', data: { ...typeSpecificConfig } }, ...]\n" +
+      "  edges: [{ id: '<UUID>', source: '<nodeUUID>', target: '<nodeUUID>', ... }, ...] — execution flows source → target.\n" +
+      "  IDs MUST be valid UUIDs (backend prisma stores nodeID/edgeID as UUID — 'n1'/'e1' are rejected).\n" +
+      "  Accepts both {id,type,data} and {nodeID,nodeType,nodeConfig} shapes; {id,type,data} is preferred.\n\n" +
       "IMPORTANT:\n" +
       "  - Call get_workflow_schema FIRST to get the valid node types and each node's data shape —\n" +
       "    guessing node structures is the most common cause of validation errors.\n" +
-      "  - To run a query as a step, a 'runQuery'-style node references a saved query's dataQueryID —\n" +
-      "    create the query first with create_query.\n" +
-      "  - A linear workflow needs one node plus edges chaining each node to the next.\n\n" +
-      "Example call — run a saved query, then notify via HTTP:\n" +
+      "  - Valid nodeType values include: start, end, dataQuery, javascript, condition, switch, loop,\n" +
+      "    delay, dataCollection, approval, fanout, join, subWorkflow.\n" +
+      "  - To run a query as a step, a 'dataQuery' node references a saved query's dataQueryID —\n" +
+      "    create the query first with create_query. Always set outputVariable (a JS identifier)\n" +
+      "    so later nodes can use {{ctx.<outputVariable>}}.\n" +
+      "  - A linear workflow needs a 'start' node, your steps, and an 'end' node, with edges\n" +
+      "    chaining each node to the next. Condition/switch edges must use sourceHandle matching\n" +
+      "    a branch/case id (plus 'default'); loop edges use 'loop'/'completed'.\n\n" +
+      "Example call — run a saved query, then summarize via JS:\n" +
       '  { "workflowTitle": "Notify on new refunds",\n' +
-      '    "workflowDescription": "Runs hourly: fetches new refunds and posts to Slack.",\n' +
+      '    "workflowDescription": "Fetches refunds and builds a digest.",\n' +
       '    "nodes": [\n' +
-      '      { "id": "n1", "type": "runQuery",\n' +
-      '        "data": { "dataQueryID": "9f8b7a6c-5d4e-4f3a-2b1c-0d9e8f7a6b5c",\n' +
-      '                  "inputValues": { "status": "refunded" } } },\n' +
-      '      { "id": "n2", "type": "httpRequest",\n' +
-      '        "data": { "method": "POST", "url": "https://hooks.slack.com/services/XXX",\n' +
-      '                  "body": { "text": "New refunds detected" } } } ],\n' +
-      '    "edges": [ { "id": "e1", "source": "n1", "target": "n2" } ] }\n\n' +
+      '      { "id": "a1111111-1111-4111-a111-111111111111", "type": "start",\n' +
+      '        "data": { "title": "Start" } },\n' +
+      '      { "id": "a2222222-2222-4222-a222-222222222222", "type": "dataQuery",\n' +
+      '        "data": { "title": "Fetch refunds", "dataQueryID": "9f8b7a6c-5d4e-4f3a-2b1c-0d9e8f7a6b5c",\n' +
+      '                  "inputValues": { "status": "refunded" }, "outputVariable": "refunds",\n' +
+      '                  "errorHandling": "fail_workflow" } },\n' +
+      '      { "id": "a3333333-3333-4333-a333-333333333333", "type": "end",\n' +
+      '        "data": { "title": "End" } } ],\n' +
+      '    "edges": [\n' +
+      '      { "id": "b1111111-1111-4111-a111-111111111111", "source": "a1111111-1111-4111-a111-111111111111", "target": "a2222222-2222-4222-a222-222222222222" },\n' +
+      '      { "id": "b2222222-2222-4222-a222-222222222222", "source": "a2222222-2222-4222-a222-222222222222", "target": "a3333333-3333-4333-a333-333333333333" } ] }\n\n' +
       "Typical flow: create_query (if needed) → create_workflow → execute_workflow → get_workflow_instance.\n\n" +
       "Related: get_workflow_schema, execute_workflow, get_workflow, update_workflow, delete_workflow.",
     inputSchema: {
@@ -129,13 +140,13 @@ export const workflowTools = [
           type: "array",
           items: { type: "object" },
           description: "Workflow steps. Each node: { id, type, data }. Get valid types and data shapes from " +
-            "get_workflow_schema. Example: [{ id: 'n1', type: 'runQuery', data: { dataQueryID: '...' } }].",
+            "get_workflow_schema or list_workflow_node_types. Example: [{ id: '...', type: 'dataQuery', data: { dataQueryID: '...' } }].",
         },
         edges: {
           type: "array",
           items: { type: "object" },
           description: "Execution order between nodes. Each edge: { id, source, target }. " +
-            "Example: [{ id: 'e1', source: 'n1', target: 'n2' }].",
+            "Example: [{ id: '...', source: '...', target: '...' }].",
         },
         inputParams: {
           type: "array",
@@ -169,12 +180,12 @@ export const workflowTools = [
       "Returns: { success: true, workflowID }.\n\n" +
       "When changing the DAG, send the COMPLETE nodes and edges arrays (modified version of what\n" +
       "get_workflow returns) — nodes/edges are replaced, not merged. Call get_workflow_schema for valid\n" +
-      "node shapes before constructing new nodes.\n\n" +
-      "Example call — append a second step:\n" +
+      "node shapes before constructing new nodes. Title/description-only updates leave the graph untouched.\n\n" +
+      "Example call — append a dataQuery step (real node types: dataQuery, javascript, condition, etc.):\n" +
       '  { "workflowID": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",\n' +
-      '    "nodes": [ { "id": "n1", "type": "runQuery", "data": { "dataQueryID": "9f8b..." } },\n' +
-      '               { "id": "n2", "type": "httpRequest", "data": { "method": "POST", "url": "..." } } ],\n' +
-      '    "edges": [ { "id": "e1", "source": "n1", "target": "n2" } ] }\n\n' +
+      '    "nodes": [ { "id": "a1111111-1111-4111-a111-111111111111", "type": "dataQuery", "data": { "dataQueryID": "9f8b..." } },\n' +
+      '               { "id": "a2222222-2222-4222-a222-222222222222", "type": "javascript", "data": { "code": "return ctx;" } } ],\n' +
+      '    "edges": [ { "id": "b1111111-1111-4111-a111-111111111111", "source": "a1111111-1111-4111-a111-111111111111", "target": "a2222222-2222-4222-a222-222222222222" } ] }\n\n' +
       "Related: get_workflow (read current definition first), get_workflow_schema, execute_workflow.",
     inputSchema: {
       type: "object",

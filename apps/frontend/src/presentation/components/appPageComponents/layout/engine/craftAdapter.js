@@ -32,6 +32,8 @@ export function treeNodeToCraft(node, parentId, out) {
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
+        hideMode: node.hideMode || null,
+        keepMounted: !!node.keepMounted,
       }, childIds, parentId);
       break;
     }
@@ -44,6 +46,8 @@ export function treeNodeToCraft(node, parentId, out) {
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
+        hideMode: node.hideMode || null,
+        keepMounted: !!node.keepMounted,
       }, childIds, parentId);
       break;
     }
@@ -59,6 +63,8 @@ export function treeNodeToCraft(node, parentId, out) {
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
+        hideMode: node.hideMode || null,
+        keepMounted: !!node.keepMounted,
         locked: false,
       }, [], parentId);
       break;
@@ -79,6 +85,8 @@ export function treeNodeToCraft(node, parentId, out) {
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
+        hideMode: node.hideMode || null,
+        keepMounted: !!node.keepMounted,
       }, [innerColId], parentId);
       break;
     }
@@ -95,6 +103,8 @@ export function treeNodeToCraft(node, parentId, out) {
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
+        hideMode: node.hideMode || null,
+        keepMounted: !!node.keepMounted,
       }, childIds, parentId);
       break;
     }
@@ -107,6 +117,8 @@ export function treeNodeToCraft(node, parentId, out) {
         style: node.style || {},
         condition: node.condition || null,
         repeat: node.repeat || null,
+        hideMode: node.hideMode || null,
+        keepMounted: !!node.keepMounted,
         activeLayerIndex: 0,
         layerOpacities: node.layerOpacities || [],
       }, childIds, parentId);
@@ -137,6 +149,8 @@ export function treeToCraft(treeRoot) {
     style: treeRoot?.style || {},
     condition: treeRoot?.condition || null,
     repeat: treeRoot?.repeat || null,
+    hideMode: treeRoot?.hideMode || null,
+    keepMounted: !!treeRoot?.keepMounted,
   }, childIds, null);
   out["ROOT"].parent = null;
   out["ROOT"].id = "ROOT";
@@ -164,6 +178,8 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
+        ...(props.hideMode ? { hideMode: props.hideMode } : {}),
+        ...(props.keepMounted ? { keepMounted: true } : {}),
       };
 
     case "CanvasRow":
@@ -176,6 +192,8 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
+        ...(props.hideMode ? { hideMode: props.hideMode } : {}),
+        ...(props.keepMounted ? { keepMounted: true } : {}),
       };
 
     case "CanvasWidgetSlot":
@@ -191,6 +209,8 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
+        ...(props.hideMode ? { hideMode: props.hideMode } : {}),
+        ...(props.keepMounted ? { keepMounted: true } : {}),
       };
 
     case "CanvasContainer": {
@@ -205,6 +225,8 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
+        ...(props.hideMode ? { hideMode: props.hideMode } : {}),
+        ...(props.keepMounted ? { keepMounted: true } : {}),
       };
     }
 
@@ -222,6 +244,8 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
+        ...(props.hideMode ? { hideMode: props.hideMode } : {}),
+        ...(props.keepMounted ? { keepMounted: true } : {}),
       };
 
     case "CanvasZStack":
@@ -235,6 +259,8 @@ export function craftToTree(craftNodes, nodeId = "ROOT") {
         ...(props.style && Object.keys(props.style).length ? { style: props.style } : {}),
         ...(props.condition ? { condition: props.condition } : {}),
         ...(props.repeat ? { repeat: props.repeat } : {}),
+        ...(props.hideMode ? { hideMode: props.hideMode } : {}),
+        ...(props.keepMounted ? { keepMounted: true } : {}),
       };
 
     default:

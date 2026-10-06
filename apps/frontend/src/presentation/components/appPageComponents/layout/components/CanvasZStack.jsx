@@ -11,7 +11,7 @@
  */
 import React from "react";
 import { useNode, useEditor, Element } from "@craftjs/core";
-import { useCraftEditorContext } from "./CraftEditorContext.js";
+import { useCraftEditorContext, useConditionHidden } from "./CraftEditorContext.js";
 import { LogicBadges } from "./LogicBadges.jsx";
 import LayoutResizeHandle from "../editor/LayoutResizeHandle.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
@@ -24,11 +24,14 @@ export function CanvasZStack({
   style,
   condition,
   repeat,
+  hideMode,
+  keepMounted,
   fixedHeight,
   activeLayerIndex: activeLayerIndexProp,
   layerOpacities: layerOpacitiesProp,
 }) {
-  const { previewMode } = useCraftEditorContext();
+  const { previewMode, editorLiveStateTree } = useCraftEditorContext();
+  const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
     connectors: { connect, drag },
     id,
@@ -41,6 +44,9 @@ export function CanvasZStack({
   }));
 
   const { actions: editorActions, query } = useEditor();
+  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+    return null;
+  }
 
   const handleResize = (nodeId, newSpan) => {
     setProp((props) => { props.span = Math.max(1, Math.min(12, newSpan)); });
@@ -82,6 +88,11 @@ export function CanvasZStack({
   const zStackSizing = `sizing-${sizing || "fill"}`;
   const zStackStyle = {
     ...(style || {}),
+    ...(previewMode && hiddenByCondition
+      ? hideMode === "preserve-space"
+        ? { visibility: "hidden", pointerEvents: "none" }
+        : { display: "none", pointerEvents: "none" }
+      : {}),
   };
   if (sizing === "fixed" && fixedHeight) {
     zStackStyle["--fixed-height"] = `${fixedHeight}px`;
@@ -92,10 +103,11 @@ export function CanvasZStack({
       ref={(ref) => !previewMode && connect(drag(ref))}
       className={`relative box-border craft-node craft-node-zstack ${zStackSpan} ${zStackSizing} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
-      }`}
+      } ${hiddenByCondition && !previewMode ? "opacity-40 saturate-50" : ""}`}
       style={zStackStyle}
       id={id}
       data-node-type="Z-Stack"
+      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
     >
       {!previewMode && (condition || repeat) && (
         <div className="absolute right-2 top-2 z-50 pointer-events-none">
@@ -196,6 +208,8 @@ CanvasZStack.craft = {
     style: {},
     condition: null,
     repeat: null,
+    hideMode: null,
+    keepMounted: false,
     activeLayerIndex: 0,
     layerOpacities: [],
   },

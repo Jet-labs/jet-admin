@@ -113,36 +113,48 @@ export const appPageTools = [
       "  1. create_query (and/or create_workflow, create_listener) for the data\n" +
       "  2. create_widget for each visual element\n" +
       "  3. create_app_page referencing the widget IDs\n\n" +
-      "appPageConfig structure (call get_app_page_schema for the authoritative schema):\n" +
+      "appPageConfig structure (V2 layout tree — get_app_page_schema is authoritative; layouts.lg is LEGACY):\n" +
       "  {\n" +
       "    widgets: [ 'widget_<widgetID>_1' ],        // instance keys: 'widget_' + widgetID + '_' + index\n" +
-      "    layouts: {                                  // grid positions per breakpoint (lg, md, sm, xs, xxs)\n" +
-      "      lg: [ { i: 'widget_<widgetID>_1', x: 0, y: 0, w: 12, h: 6 } ]  // 12-column grid\n" +
-      "    },\n" +
+      "    layout: { type: 'grid', children: [        // V2 tree of row/widget nodes (NOT layouts.lg)\n" +
+      "      { id: 'row_1', type: 'row', sizing: 'auto', children:\n" +
+      "        [{ id: 'slot_1', type: 'widget', span: 12, sizing: 'fill', widgetKey: 'widget_<widgetID>_1' }] } ] },\n" +
+      "    layouts: {},                                // MUST stay {} on V2 — legacy lg/md grids are ignored\n" +
       "    dataSources: [                              // data bindings used by the widgets\n" +
-      "      { alias: 'orders', type: 'query', queryID: '<dataQueryID>', triggerMode: 'auto' },\n" +
-      "      { alias: 'notify', type: 'workflow', workflowID: '<workflowID>', triggerMode: 'manual' },\n" +
-      "      { alias: 'live', type: 'listener', listenerID: '<listenerID>' } ],\n" +
+      "      { alias: 'orders', type: 'query', queryID: '<dataQueryID>', triggerMode: 'auto', refreshOn: [] },\n" +
+      "      { alias: 'notify', type: 'workflow', workflowID: '<workflowID>', triggerMode: 'manual', refreshOn: [] },\n" +
+      "      { alias: 'live', type: 'listener', listenerID: '<listenerID>', triggerMode: 'reactive', refreshOn: ['searchText'] } ],\n" +
       "    variables: [ { key: 'statusFilter', type: 'string', defaultValue: 'all' } ]\n" +
       "  }\n" +
-      "triggerMode: 'auto' (run when page loads) or 'manual' (run on user action).\n\n" +
-      "Layout strategy by use case (grid is 12 columns wide):\n" +
-      "  Single metric: 1 stat widget (w: 12, h: 6)\n" +
-      "  Chart + table: chart (x: 0, y: 0, w: 12, h: 6) above table (x: 0, y: 6, w: 12, h: 10)\n" +
-      "  KPI dashboard: 3-4 stat widgets in a row (w: 3-4, h: 6) + chart below (y: 6)\n\n" +
-      "Example call — dashboard with a KPI, a chart, and a table:\n" +
+      "DATA LOADING MODEL (query runOnLoad vs page triggerMode/refreshOn — set BOTH consistently):\n" +
+      "  query runOnLoad:true  = default when the query SHOULD load with the page (KPIs, tables).\n" +
+      "  page triggerMode: 'auto' (load on open) | 'manual' (only via EXECUTE_QUERY/button) | 'reactive' (re-run when refreshOn vars change).\n" +
+      "  refreshOn: variable keys that re-trigger a reactive source. One auto query per intent; put search-driven\n" +
+      "  queries on manual/reactive + explicit EXECUTE_QUERY {alias} from the search widget.\n" +
+      "  RACE WARNING: firing EXECUTE_QUERY per keystroke lets a late 404 overwrite good data (no debounce in the\n" +
+      "  page runtime). Debounce at the widget/event layer or gate on submit; never share one auto variable\n" +
+      "  across 6 competing queries.\n\n" +
+      "Layout strategy by use case (V2 spans are 12 columns wide):\n" +
+      "  Single metric: 1 stat widget (span: 12)\n" +
+      "  Chart + table: vega-lite chart row above table row\n" +
+      "  KPI dashboard: 3-4 stat widgets in one row (span: 3-4 each) + chart below\n\n" +
+      "Example call — dashboard with a KPI, a vega-lite chart, and a table (V2 layout):\n" +
       '  { "appPageTitle": "Orders Dashboard",\n' +
       '    "appPageDescription": "KPIs, revenue trend, and recent orders.",\n' +
       '    "appPageConfig": {\n' +
       '      "widgets": ["widget_11111111-aaaa-4bbb-8ccc-000000000001_1",\n' +
       '                  "widget_22222222-bbbb-4ccc-8ddd-000000000002_1",\n' +
       '                  "widget_33333333-cccc-4ddd-8eee-000000000003_1"],\n' +
-      '      "layouts": { "lg": [\n' +
-      '        { "i": "widget_11111111-aaaa-4bbb-8ccc-000000000001_1", "x": 0, "y": 0, "w": 12, "h": 6 },\n' +
-      '        { "i": "widget_22222222-bbbb-4ccc-8ddd-000000000002_1", "x": 0, "y": 6, "w": 12, "h": 6 },\n' +
-      '        { "i": "widget_33333333-cccc-4ddd-8eee-000000000003_1", "x": 0, "y": 12, "w": 12, "h": 10 } ] },\n' +
+      '      "layout": { "type": "grid", "children": [\n' +
+      '        { "id": "row_1", "type": "row", "sizing": "auto", "children": [\n' +
+      '          { "id": "slot_1", "type": "widget", "span": 12, "sizing": "fill", "widgetKey": "widget_11111111-aaaa-4bbb-8ccc-000000000001_1" } ] },\n' +
+      '        { "id": "row_2", "type": "row", "sizing": "auto", "children": [\n' +
+      '          { "id": "slot_2", "type": "widget", "span": 12, "sizing": "fill", "widgetKey": "widget_22222222-bbbb-4ccc-8ddd-000000000002_1" } ] },\n' +
+      '        { "id": "row_3", "type": "row", "sizing": "auto", "children": [\n' +
+      '          { "id": "slot_3", "type": "widget", "span": 12, "sizing": "fill", "widgetKey": "widget_33333333-cccc-4ddd-8eee-000000000003_1" } ] } ] },\n' +
+      '      "layouts": {},\n' +
       '      "dataSources": [\n' +
-      '        { "alias": "orders_summary", "type": "query", "queryID": "9f8b7a6c-5d4e-4f3a-2b1c-0d9e8f7a6b5c", "triggerMode": "auto" } ],\n' +
+      '        { "alias": "orders_summary", "type": "query", "queryID": "9f8b7a6c-5d4e-4f3a-2b1c-0d9e8f7a6b5c", "triggerMode": "auto", "refreshOn": [] } ],\n' +
       '      "variables": [] } }\n\n' +
       "Related: create_widget, create_query, update_app_page, get_app_page_preview_url, get_app_page_schema.",
     inputSchema: {
@@ -193,17 +205,26 @@ export const appPageTools = [
       "  2. Add/modify what you need\n" +
       "  3. Send the COMPLETE config back. Sending only the new widget drops every existing widget,\n" +
       "     layout entry, and data source binding.\n\n" +
-      "When adding a widget, update BOTH arrays consistently:\n" +
-      "  - widgets: append 'widget_<widgetID>_1'\n" +
-      "  - layouts.lg: append { i: 'widget_<widgetID>_1', x, y, w, h } (pick y below existing content)\n" +
-      "The widget itself must already exist (create_widget).\n\n" +
-      "Example call — add a stat widget below existing content (y: 12 is free):\n" +
+      "When adding a widget (V2 layout), update BOTH consistently:\n" +
+      "  - widgets: append 'widget_<widgetID>_<suffix>' (suffix unique per page, e.g. _1)\n" +
+      "  - layout.children: append a row node containing a widget leaf:\n" +
+      '    { id: \'row_x\', type: \'row\', sizing: \'auto\', children:\n' +
+      '      [{ id: \'slot_x\', type: \'widget\', span: 12, sizing: \'fill\',\n' +
+      '         widgetKey: \'widget_<widgetID>_<suffix>\' }] }\n' +
+      "  (Do NOT use legacy layouts.lg — V2 pages use the layout tree; layouts must stay {}.)\n" +
+      "The widget itself must already exist (create_widget).\n" +
+      "NOTE: the backend requires appPageTitle on update — if you omit it, this tool\n" +
+      "re-sends the page's current title automatically.\n\n" +
+      "Example call — append a stat widget row to existing V2 layout (read get_app_page first):\n" +
       '  { "appPageID": "7e8f9a0b-1c2d-4e3f-a4b5-c6d7e8f9a0b1",\n' +
       '    "appPageConfig": {\n' +
       '      "widgets": [ ...existing keys..., "widget_44444444-dddd-4eee-8fff-000000000004_1" ],\n' +
-      '      "layouts": { "lg": [ ...existing entries...,\n' +
-      '        { "i": "widget_44444444-dddd-4eee-8fff-000000000004_1", "x": 0, "y": 12, "w": 12, "h": 6 } ] },\n' +
-      '      "dataSources": [ ...existing bindings... ],\n' +
+      '      "layout": { "type": "grid", "children": [ ...existing rows...,\n' +
+      '        { "id": "row_new", "type": "row", "sizing": "auto", "children": [\n' +
+      '          { "id": "slot_new", "type": "widget", "span": 12, "sizing": "fill",\n' +
+      '            "widgetKey": "widget_44444444-dddd-4eee-8fff-000000000004_1" } ] } ] },\n' +
+      '      "layouts": {},\n' +
+      '      "dataSources": [ ...existing bindings (preserve triggerMode/refreshOn!)... ],\n' +
       '      "variables": [ ...existing variables... ] } }\n\n' +
       "Related: get_app_page (always read first), create_widget, get_app_page_preview_url.",
     inputSchema: {
@@ -229,6 +250,12 @@ export const appPageTools = [
     handler: async ({ appPageID, ...updates }, context) => {
       const { appPageAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const id = trimId(appPageID, "appPageID");
+      // Backend rejects updates without appPageTitle — backfill from current page.
+      if (updates.appPageTitle === undefined) {
+        const current = await appPageAPI.getById(id);
+        const page = current?.appPage || current;
+        if (page?.appPageTitle) updates.appPageTitle = page.appPageTitle;
+      }
       await appPageAPI.update(id, updates);
       return { success: true, appPageID: id };
     },
