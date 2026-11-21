@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from "@jet-admin/ui";
-// const PrivacyPolicy = () => {
+
+const PrivacyPolicy = () => {
   const [expandedSections, setExpandedSections] = useState({});
 
   const toggleSection = (sectionId) => {
@@ -29,7 +29,7 @@ import { Button } from "@jet-admin/ui";
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
+      <h1 className="mb-6 text-3xl font-medium tracking-tight">Privacy Policy</h1>
       <p className="mb-4">
         <strong>Effective Date:</strong> 10/09/2024
       </p>

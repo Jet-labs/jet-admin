@@ -270,28 +270,34 @@ export const introspectionTools = [
     name: "get_widget_schemas",
     description:
       "Fetch the JSON schema(s) defining how a widget's widgetConfig object must be structured.\n\n" +
-      "Returns: schema object(s) with required properties and structure per widget type.\n" +
-      "Call WITHOUT widgetType to get schemas for every widget type at once (recommended — one call covers all).\n\n" +
+      "TRUNCATION WARNING: omitting widgetType returns all 32 schemas and WILL be truncated into a file.\n" +
+      "PREFERRED: call list_widget_types first, then request ONE type per call (e.g. { \"widgetType\": \"stat\" }).\n" +
+      "Each entry carries its JSON schema plus a canonical descriptor (aliases, defaults, example, supported events/methods).\n" +
+      "Author the canonical fields (stat valueTemplate, vega vegaSpec, iframe url, text textAlign); legacy aliases are migrated server-side.\n\n" +
       "Use this when create_widget or update_widget returns a validation error, or BEFORE constructing a\n" +
-      "complex widgetConfig you are unsure about. The built-in quick reference in create_widget's description\n" +
-      "covers simple cases (table, chart, stat, form) — come here for the authoritative, backend-validated shape.\n\n" +
-      "Example call 1 — all widget schemas:\n" +
-      "  {}\n" +
-      "Example call 2 — just the chart schema:\n" +
-      '  { "widgetType": "chart" }\n\n' +
-      "Related: create_widget, update_widget.",
+      "complex widgetConfig you are unsure about.\n\n" +
+      "Example call 1 — one type (recommended):\n" +
+      '  { "widgetType": "stat" }\n' +
+      "Example call 2 — all types (truncates; avoid):\n" +
+      "  {}\n\n" +
+      "Related: list_widget_types, create_widget, update_widget.",
     inputSchema: {
       type: "object",
       properties: {
         widgetType: {
           type: "string",
           description:
-            "Optional. Widget type to fetch the schema for (e.g. 'table', 'chart', 'stat', 'form', 'text', 'button'). " +
-            "Omit to receive schemas for ALL widget types.",
+            "Widget type from list_widget_types (e.g. 'table', 'stat', 'vega-lite', 'form', 'text'). " +
+            "Strongly recommended — omitting returns all 32 and truncates.",
         },
       },
     },
     handler: async ({ widgetType }, context) => {
+      if (!widgetType) {
+        process.stderr.write(
+          "[jet-admin-mcp] get_widget_schemas: no widgetType — returning all 32 schemas (may truncate; prefer per-type calls).\n"
+        );
+      }
       const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const res = await client.widgetAPI.getSchemas({ widgetType });
       return res?.schemas || res;
@@ -316,7 +322,7 @@ export const introspectionTools = [
         datasourceType: {
           type: "string",
           description:
-            "Optional. Datasource type to fetch query-option schemas for (e.g. 'postgresql', 'mysql', 'mssql', 'restapi'). " +
+            "Optional. Datasource type from list_datasource_types (35 values, e.g. 'postgresql', 'mongodb', 'stripe'). " +
             "Omit to receive all.",
         },
       },
@@ -347,7 +353,7 @@ export const introspectionTools = [
         datasourceType: {
           type: "string",
           description:
-            "Optional. Datasource type to fetch the connection schema for (e.g. 'postgresql', 'mysql', 'mssql', 'restapi'). " +
+            "Optional. Datasource type from list_datasource_types (35 values, e.g. 'postgresql', 'mongodb', 'stripe'). " +
             "Omit to receive all.",
         },
       },
@@ -378,7 +384,7 @@ export const introspectionTools = [
         datasourceType: {
           type: "string",
           description:
-            "Optional. Listener type/datasource to fetch schemas for (e.g. 'websocket', 'webhook', 'sse', 'kafka', 'mqtt'). " +
+            "Optional. Listener type from list_listener_types (13 values, e.g. 'websocket', 'webhook', 'postgresql'). " +
             "Omit to receive all.",
         },
       },
@@ -401,7 +407,7 @@ export const introspectionTools = [
       "Example call 1 — full workflow schema with all node types:\n" +
       "  {}\n" +
       "Example call 2 — schema for a single node type:\n" +
-      '  { "nodeType": "runQuery" }\n\n' +
+      '  { "nodeType": "dataQuery" }\n\n' +
       "Related: create_workflow, update_workflow, get_workflow (inspect an existing workflow as a working example).",
     inputSchema: {
       type: "object",
@@ -409,7 +415,7 @@ export const introspectionTools = [
         nodeType: {
           type: "string",
           description:
-            "Optional. Workflow node type to fetch the schema for (e.g. 'runQuery', 'condition', 'httpRequest'). " +
+            "Optional. Workflow node type from list_workflow_node_types (e.g. 'dataQuery', 'condition', 'javascript'). " +
             "Omit to receive the complete workflow schema with all node types.",
         },
       },

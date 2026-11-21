@@ -9,6 +9,7 @@ const {
   getCreationContextFromAuthContext,
 } = require("../../utils/auth.context.utils");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
+const { validateWorkflowGraph, findWorkflowReferences } = require("./workflow.references");
 
 function mapWorkflowNodeForPersistence(node, workflowID) {
   return {
@@ -181,6 +182,9 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges,
     if (!finalCreatorID && !createdByApiKeyID) {
       throw new Error("Creator ID or Created By API Key ID is required");
     }
+
+    await validateWorkflowGraph({ tenantID, nodes });
+
     const workflowCreationTransaction = await prisma.$transaction(async (tx) => {
       const workflow = await tx.tblWorkflows.create({
         data: {
@@ -262,15 +266,22 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
   });
 
   try {
+    // Validate references before mutating: a rejected PATCH must leave the
+    // existing graph untouched.
+    await validateWorkflowGraph({ tenantID, nodes });
+
     const workflowUpdateTransaction = await prisma.$transaction(async (tx) => {
-      // Update workflow title and options
+      // A PATCH must only change the fields that were sent. In particular a
+      // title-only update must not clear workflowOptions.
+      const updateData = { updatedAt: new Date() };
+      if (title !== undefined) updateData.title = title;
+      if (workflowOptions !== undefined) {
+        updateData.workflowOptions = workflowOptions;
+      }
+
       const updated = await tx.tblWorkflows.updateMany({
         where: { workflowID, tenantID },
-        data: {
-          title,
-          workflowOptions: workflowOptions || {},
-          updatedAt: new Date(),
-        },
+        data: updateData,
       });
 
       if (updated.count === 0) {
@@ -279,32 +290,44 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
 
       const workflow = { workflowID, tenantID, title, workflowOptions };
 
-      // Delete existing nodes and edges
-      await tx.tblWorkflowNodes.deleteMany({
-        where: { workflowID: workflowID },
-      });
-      await tx.tblWorkflowEdge.deleteMany({
-        where: { workflowID: workflowID },
-      });
-
-      const { nodeCreateManyData, edgeCreateManyData } = buildWorkflowGraphPersistencePayload({
-        workflowID: workflow.workflowID,
-        nodes,
-        edges,
-      });
-
-      // Create new nodes
-      if (nodeCreateManyData.length > 0) {
-        await tx.tblWorkflowNodes.createMany({
-          data: nodeCreateManyData,
-        });
+      // Only replace the graph when nodes/edges are explicitly provided, and
+      // require both together so a partial payload cannot silently delete one
+      // side of the graph.
+      const hasNodes = nodes !== undefined;
+      const hasEdges = edges !== undefined;
+      if (hasNodes !== hasEdges) {
+        throw new Error("nodes and edges must be provided together");
       }
 
-      // Create new edges
-      if (edgeCreateManyData.length > 0) {
-        await tx.tblWorkflowEdge.createMany({
-          data: edgeCreateManyData,
+      // A title-only update must NOT wipe the existing nodes/edges.
+      if (hasNodes && hasEdges) {
+        // Delete existing nodes and edges
+        await tx.tblWorkflowNodes.deleteMany({
+          where: { workflowID: workflowID },
         });
+        await tx.tblWorkflowEdge.deleteMany({
+          where: { workflowID: workflowID },
+        });
+
+        const { nodeCreateManyData, edgeCreateManyData } = buildWorkflowGraphPersistencePayload({
+          workflowID: workflow.workflowID,
+          nodes: nodes || [],
+          edges: edges || [],
+        });
+
+        // Create new nodes
+        if (nodeCreateManyData.length > 0) {
+          await tx.tblWorkflowNodes.createMany({
+            data: nodeCreateManyData,
+          });
+        }
+
+        // Create new edges
+        if (edgeCreateManyData.length > 0) {
+          await tx.tblWorkflowEdge.createMany({
+            data: edgeCreateManyData,
+          });
+        }
       }
 
       return workflow;
@@ -350,6 +373,38 @@ workflowService.deleteWorkflow = async ({ userID, tenantID, workflowID, authCont
   });
 
   try {
+    const references = await findWorkflowReferences({ tenantID, workflowID });
+    if (references.total > 0) {
+      const error = new Error(
+        "Workflow is still referenced by other resources. Remove those references before deleting it."
+      );
+      error.name = "WorkflowInUseError";
+      error.code = "WORKFLOW_IN_USE";
+      error.statusCode = 409;
+      error.details = {
+        cronJobs: references.cronJobs,
+        appPages: references.appPages.map((page) => ({
+          appPageID: page.appPageID,
+          appPageTitle: page.appPageTitle,
+        })),
+        widgets: references.widgets.map((widget) => ({
+          widgetID: widget.widgetID,
+          widgetTitle: widget.widgetTitle,
+        })),
+        listenerActions: references.listenerActions.map((action) => ({
+          actionID: action.actionID,
+          listenerID: action.listenerID,
+          listenerTitle: action.tblListeners?.listenerTitle,
+        })),
+        workflows: references.workflows.map((node) => ({
+          workflowID: node.workflowID,
+          workflowTitle: node.tblWorkflows?.title,
+          nodeID: node.nodeID,
+        })),
+      };
+      throw error;
+    }
+
     await prisma.$transaction(async (tx) => {
       // Delete nodes and edges first (foreign key constraints)
       await tx.tblWorkflowNodes.deleteMany({
@@ -560,6 +615,7 @@ workflowService.getRunStatus = async (instanceID) => {
       errorMessage: log.errorMessage,
       nodeAttempt: log.nodeAttempt,
       createdAt: log.createdAt,
+      eventSequence: log.eventSequence?.toString(),
     }));
 
     // Assemble context from unified log and strip internal keys
@@ -567,6 +623,7 @@ workflowService.getRunStatus = async (instanceID) => {
     const contextData = Object.fromEntries(
       Object.entries(fullContext).filter(([key]) => !key.startsWith('__'))
     );
+    const pendingDataCollectionRequests = await sm.getPendingDataCollectionRequests(instanceID);
 
     return {
       instanceID: instanceData.instanceID,
@@ -578,8 +635,10 @@ workflowService.getRunStatus = async (instanceID) => {
       parentNodeID: instanceData.parentNodeID ?? null,
       startedAt: instanceData.startedAt,
       completedAt: instanceData.completedAt,
+      output: instanceData.workflowOutput ?? null,
       contextData,
       logs,
+      pendingDataCollectionRequests,
     };
   }
   catch (error) {
@@ -679,6 +738,8 @@ workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputValues = {}
   });
 
   try {
+    await validateWorkflowGraph({ tenantID, nodes });
+
     // Attribute test runs launched from a saved workflow editor so they show
     // up in that workflow's run history (still stored as isTest runs).
     if (sourceWorkflowID) {
@@ -714,6 +775,16 @@ workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputValues = {}
  * @param {string} param0.instanceID - The test instance ID to stop and delete
  * @returns {Promise<{success: boolean}>}
  */
+workflowService.cancelRun = async ({ instanceID, tenantID }) => {
+  if (!tenantID) { const error = new Error('Tenant is required'); error.statusCode = 403; throw error; }
+  const instance = await prisma.tblWorkflowInstances.findFirst({ where: { instanceID, tenantID } });
+  if (!instance) {
+    const error = new Error('Run not found'); error.statusCode = 404; throw error;
+  }
+  if (['COMPLETED', 'FAILED', 'CANCELLED'].includes(instance.status)) return { cancellationRequested: false, status: instance.status };
+  return require('./temporal/service').cancelWorkflow({ instanceID });
+};
+
 workflowService.stopTestWorkflow = async ({ instanceID }) => {
   const { stateManager } = require("./workflowEngine/stateManager");
 
@@ -723,6 +794,24 @@ workflowService.stopTestWorkflow = async ({ instanceID }) => {
   });
 
   try {
+    // Validate BEFORE terminating anything. The previous order terminated the
+    // Temporal workflow first and then rejected non-test instances, leaving a
+    // real workflow killed with a stale DB status.
+    const instance = await prisma.tblWorkflowInstances.findUnique({
+      where: { instanceID },
+      select: { instanceID: true, isTest: true, status: true },
+    });
+    if (!instance) {
+      const error = new Error(`Workflow instance ${instanceID} not found`);
+      error.statusCode = 404;
+      throw error;
+    }
+    if (!instance.isTest) {
+      const error = new Error("Only test workflow instances can be stopped and deleted through this endpoint");
+      error.statusCode = 400;
+      throw error;
+    }
+
     const { terminateWorkflow } = require("./temporal/service");
     await terminateWorkflow({ instanceID, reason: 'stopTestWorkflow' }).catch(() => { });
     await stateManager.deleteTestInstance(instanceID);
@@ -780,10 +869,121 @@ workflowService.getRunStatusForWidget = async ({ instanceID }) => {
 /** @type {Record<string, object>|null} — in-process singleton */
 let _workflowNodeSchemas = null;
 
+function buildFallbackWorkflowNodeSchemas() {
+  // Backend-safe minimal schemas for the core node types. Mirrors the shapes
+  // observed in production workflows (see get_workflow output) and the
+  // validator in workflow.validator.js. Used when the UI package
+  // '@jet-admin/workflow-nodes' cannot be imported in backend (it requires
+  // React/reactflow and a built dist). Node/edge IDs must be UUIDs.
+  const base = (nodeType, label, properties, required = []) => ({
+    nodeType,
+    label,
+    schema: { type: 'object', properties, required },
+    uischema: { type: 'VerticalLayout', elements: Object.keys(properties).map((k) => ({ type: 'Control', scope: `#/properties/${k}` })) },
+    defaultValue: { title: label },
+  });
+  return {
+    start: base('start', 'Start', { title: { type: 'string' } }),
+    end: base('end', 'End', {
+      title: { type: 'string' },
+      status: { type: 'string', enum: ['success', 'failure'] },
+      outputParameters: { type: 'array' },
+    }),
+    dataQuery: base('dataQuery', 'Data Query', {
+      title: { type: 'string' },
+      dataQueryID: { type: 'string', format: 'uuid', description: 'UUID of a saved query (see list_queries)' },
+      inputValues: { type: 'object', description: 'Map of query input args; values support {{ctx.*}} and {{inputs.*}} templates' },
+      outputVariable: { type: 'string', description: 'JS identifier to store the result in ctx' },
+      errorHandling: { type: 'string', enum: ['continue', 'continue_default', 'fail_workflow', 'skip_item', 'retry_then_fail', 'retry_then_continue'] },
+    }, ['dataQueryID']),
+    javascript: base('javascript', 'Javascript', {
+      title: { type: 'string' },
+      code: { type: 'string', description: 'JS run in sandbox with ctx; return value stored in outputVariable' },
+      outputVariable: { type: 'string' },
+      errorHandling: { type: 'string', enum: ['continue', 'continue_default', 'fail_workflow', 'skip_item', 'retry_then_fail', 'retry_then_continue'] },
+    }, ['code']),
+    condition: base('condition', 'Condition', {
+      title: { type: 'string' },
+      branches: { type: 'array', description: 'Each {id, name, expression} — edge sourceHandle must match a branch id, plus default' },
+      evaluationMode: { type: 'string', enum: ['first_match'] },
+    }),
+    switch: base('switch', 'Switch', {
+      title: { type: 'string' },
+      switchValue: { type: 'string' },
+      cases: { type: 'array', description: 'Each {id, ...} — edge sourceHandle must match a case id, plus default' },
+    }),
+    loop: base('loop', 'Loop', {
+      title: { type: 'string' },
+      sourceVariable: { type: 'string', description: 'Mustache template resolving to an array, e.g. {{ctx.topCoins}}' },
+      itemVariable: { type: 'string' },
+      indexVariable: { type: 'string' },
+      maxIterations: { type: 'number' },
+      outputVariable: { type: 'string' },
+    }, ['sourceVariable']),
+    delay: base('delay', 'Delay', {
+      title: { type: 'string' },
+      delayType: { type: 'string', enum: ['fixed', 'dynamic', 'until'] },
+      delaySeconds: { type: 'number' },
+      delayMinutes: { type: 'number' },
+      delayVariable: { type: 'string' },
+      untilTime: { type: 'string' },
+    }),
+    dataCollection: base('dataCollection', 'Data Collection', {
+      title: { type: 'string' },
+      collectionType: { type: 'string', enum: ['form'] },
+      formSchema: { type: 'object' },
+      outputVariable: { type: 'string' },
+      expiryMinutes: { type: 'number' },
+    }),
+    approval: base('approval', 'Approval', {
+      title: { type: 'string' },
+      outputVariable: { type: 'string' },
+      expiryMinutes: { type: 'number' },
+    }),
+    fanout: base('fanout', 'Fan-out', {
+      title: { type: 'string' },
+      branches: { type: 'array', description: 'Each {id, ...}' },
+    }),
+    join: base('join', 'Join', {
+      title: { type: 'string' },
+      joinMode: { type: 'string', enum: ['all', 'any'] },
+      outputVariable: { type: 'string' },
+    }),
+    subWorkflow: base('subWorkflow', 'Sub-Workflow', {
+      title: { type: 'string' },
+      childWorkflowID: { type: 'string', format: 'uuid' },
+      inputMapping: { type: 'object' },
+      outputVariable: { type: 'string' },
+    }),
+  };
+}
+
 async function loadWorkflowNodeSchemas() {
   if (_workflowNodeSchemas) return _workflowNodeSchemas;
-  const mod = await import('@jet-admin/workflow-nodes');
-  _workflowNodeSchemas = mod.WORKFLOW_NODE_SCHEMAS;
+  // 1. Prefer the UI package when it is built/linked (richest schemas).
+  try {
+    const mod = await import('@jet-admin/workflow-nodes');
+    if (mod?.WORKFLOW_NODE_SCHEMAS && Object.keys(mod.WORKFLOW_NODE_SCHEMAS).length) {
+      _workflowNodeSchemas = mod.WORKFLOW_NODE_SCHEMAS;
+      return _workflowNodeSchemas;
+    }
+  } catch (e) {
+    Logger.log('info', {
+      message: 'workflowService:loadWorkflowNodeSchemas:ui-package-unavailable',
+      params: { error: e.message },
+    });
+  }
+  // 2. Logic package is backend-safe but currently exports no schemas —
+  //    attempt it anyway so future schema exports are picked up.
+  try {
+    const logic = await import('@jet-admin/workflow-nodes-logic');
+    if (logic?.WORKFLOW_NODE_SCHEMAS && Object.keys(logic.WORKFLOW_NODE_SCHEMAS).length) {
+      _workflowNodeSchemas = logic.WORKFLOW_NODE_SCHEMAS;
+      return _workflowNodeSchemas;
+    }
+  } catch {}
+  // 3. Static backend-safe fallback — never throws.
+  _workflowNodeSchemas = buildFallbackWorkflowNodeSchemas();
   return _workflowNodeSchemas;
 }
 

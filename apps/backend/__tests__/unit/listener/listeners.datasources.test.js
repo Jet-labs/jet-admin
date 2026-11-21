@@ -228,7 +228,12 @@ jest.mock('nats', () => ({
   }),
 }), { virtual: true });
 
-// Import registered dataSources from `@jet-admin/datasources-logic`
+// Import registered dataSources from `@jet-admin/datasources-logic`.
+// Reset the registry first: workspace packages are transformed once and can
+// stay cached across test files in a single-process (--runInBand) run, which
+// would otherwise evaluate the bundle with another file's dependency graph
+// and bypass the mocks declared above.
+jest.resetModules();
 const { dataSourceRegistry } = require('@jet-admin/datasources-logic');
 
 describe('Listener Datasources (All 13 Listener Types)', () => {

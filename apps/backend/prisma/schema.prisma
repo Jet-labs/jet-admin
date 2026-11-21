@@ -87,6 +87,7 @@ model tblCronJobs {
   cronJobSchedule    String              @db.VarChar
   isDisabled         Boolean             @default(false)
   nextRunAt          DateTime?           @db.Timestamptz(6)
+  lastScheduledAt    DateTime?           @db.Timestamptz(6)
   timeoutSeconds     Int?                @default(300)
   retryAttempts      Int                 @default(0)
   retryDelaySeconds  Int                 @default(60)
@@ -151,13 +152,16 @@ model tblDatasources {
   webhookToken          String?          @unique @db.VarChar(128)
   webhookSecret         String?          @db.VarChar(255)
   datasourceDescription String?
+  folderID            String?           @db.Uuid
   tblDataQueries        tblDataQueries[]
   tblTenants            tblTenants       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblTenantsTenantID")
   tblUsers              tblUsers?        @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblDatasourceTblUsersCreatorID")
   tblAPIKeys            tblAPIKeys?      @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblDatasourcesCreatedByApiKeyID")
+  tblFolders            tblFolders?      @relation(fields: [folderID], references: [folderID], onUpdate: NoAction, map: "fkTblDatasourcesFolderID")
   tblListeners          tblListeners[]
 
   @@index([createdByApiKeyID], map: "idx_tblDatasources_createdByApiKeyID")
+  @@index([folderID], map: "idx_tblDatasources_folderID")
 }
 
 model tblPermissions {
@@ -231,6 +235,7 @@ model tblFolders {
   tblAppPages    tblAppPages[]
   tblCronJobs    tblCronJobs[]
   tblDataQueries tblDataQueries[]
+  tblDatasources tblDatasources[]
   tblUsers       tblUsers?        @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblFoldersCreatorID")
   parent         tblFolders?      @relation("tblFoldersParentFolder", fields: [parentFolderID], references: [folderID], onUpdate: NoAction, map: "fkTblFoldersParentFolderID")
   children       tblFolders[]     @relation("tblFoldersParentFolder")
@@ -385,6 +390,12 @@ model tblWorkflowInstances {
   isTest                            Boolean                             @default(false)
   parentInstanceID                  String?                             @db.Uuid
   parentNodeID                      String?                             @db.VarChar
+  finalContext                      Json?
+  workflowOutput                    Json?
+  contextProjection                 Json?
+  projectionSequence                BigInt?
+  executionKey                      String?                             @db.VarChar
+  executionDefinition               Json?
   tblWorkflowDataCollectionRequests tblWorkflowDataCollectionRequests[]
   tblWorkflowInstanceLogs           tblWorkflowInstanceLogs[]
   tblTenants                        tblTenants                          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction)
@@ -393,6 +404,7 @@ model tblWorkflowInstances {
   @@index([tenantID, status], map: "idx_tblWorkflowInstances_tenantID_status")
   @@index([workflowID], map: "idx_tblWorkflowInstances_workflowID")
   @@index([parentInstanceID], map: "idx_tblWorkflowInstances_parentInstanceID")
+  @@unique([tenantID, executionKey])
 }
 
 model tblWorkflowNodes {
@@ -404,7 +416,6 @@ model tblWorkflowNodes {
   createdAt                                                          DateTime                            @default(now()) @db.Timestamptz(6)
   updatedAt                                                          DateTime                            @default(now()) @db.Timestamptz(6)
   nodeConfig                                                         Json?
-  tblWorkflowDataCollectionRequests                                  tblWorkflowDataCollectionRequests[]
   tblWorkflowEdge_tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes tblWorkflowEdge[]                   @relation("tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes")
   tblWorkflowEdge_tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes   tblWorkflowEdge[]                   @relation("tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes")
   tblWorkflows                                                       tblWorkflows                        @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction)
@@ -440,7 +451,7 @@ model tblWorkflows {
 model tblWorkflowInstanceLogs {
   logID                String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   instanceID           String               @db.Uuid
-  nodeID               String?              @db.Uuid
+  nodeID               String?              @db.VarChar
   eventType            String               @db.VarChar
   nodeStatus           String?              @db.VarChar
   outputVariable       String?              @db.VarChar
@@ -448,16 +459,23 @@ model tblWorkflowInstanceLogs {
   errorMessage         String?              @db.VarChar
   createdAt            DateTime             @default(now()) @db.Timestamptz(6)
   nodeAttempt          Int?
+  eventSequence        BigInt               @unique @default(autoincrement())
+  eventKey             String?              @db.VarChar
   tblWorkflowInstances tblWorkflowInstances @relation(fields: [instanceID], references: [instanceID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWorkflowInstanceLogs_instanceID")
 
   @@index([instanceID, eventType, nodeID], map: "idx_tblWorkflowInstanceLogs_barrier")
-  @@index([instanceID, logID], map: "idx_tblWorkflowInstanceLogs_instance_seq")
+  @@index([instanceID, eventSequence], map: "idx_tblWorkflowInstanceLogs_instance_seq")
+  @@unique([instanceID, eventKey])
 }
 
 model tblWorkflowDataCollectionRequests {
   collectionRequestID  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   instanceID           String               @db.Uuid
-  nodeID               String               @db.Uuid
+  nodeID               String               @db.VarChar
+  waitID               String?              @db.VarChar
+  deliveredAt          DateTime?            @db.Timestamptz(6)
+  deliveryToken        String?              @db.Uuid
+  deliveryLeaseUntil   DateTime?            @db.Timestamptz(6)
   nodeAttempt          Int?
   status               String               @default("PENDING") @db.VarChar(50)
   collectionType       String               @default("form") @db.VarChar(50)
@@ -466,11 +484,11 @@ model tblWorkflowDataCollectionRequests {
   expiresAt            DateTime?            @db.Timestamptz(6)
   createdAt            DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt            DateTime             @default(now()) @db.Timestamptz(6)
-  tblWorkflowNodes     tblWorkflowNodes     @relation(fields: [nodeID], references: [nodeID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWorkflowDataCollectionRequests_nodeID")
   tblWorkflowInstances tblWorkflowInstances @relation(fields: [instanceID], references: [instanceID], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([instanceID, status], map: "idx_tblWfDataCollection_instance_status")
   @@index([status, expiresAt], map: "idx_tblWfDataCollection_status_expiry")
+  @@unique([instanceID, waitID])
 }
 
 model tblListenerActions {
@@ -602,6 +620,31 @@ model tblWidgetLibrary {
   updatedAt         DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([widgetType], map: "idx_tblWidgetLibrary_widgetType")
+}
+
+model tblMarketplaceItem {
+  itemID            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug              String   @unique @db.VarChar
+  itemType          String   @db.VarChar
+  title             String   @db.VarChar
+  description       String?  @db.VarChar
+  category          String?  @db.VarChar
+  tags              Json
+  icon              String?  @db.VarChar
+  iconColor         String?  @db.VarChar
+  publisher         String?  @db.VarChar
+  version           String   @default("1.0.0") @db.VarChar
+  payload           Json
+  isVerified        Boolean  @default(false)
+  installCount      Int      @default(0)
+  sourceFamily      String?  @db.VarChar
+  publishedByUserID String?  @db.Uuid
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([itemType], map: "idx_tblMarketplaceItem_itemType")
+  @@index([category], map: "idx_tblMarketplaceItem_category")
+  @@index([sourceFamily], map: "idx_tblMarketplaceItem_sourceFamily")
 }
 
 model tblOperators {

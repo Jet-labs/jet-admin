@@ -28,6 +28,15 @@ export default function EditorSyncBridge({ onChangeLayout }) {
   const lastSerializedRef = useRef(null);
   const isSyncingRef = useRef(false);
 
+  // Seed the "last synced" snapshot with the tree Craft just mounted. The
+  // scheduling effect below runs after this one, so the initial mount cannot
+  // be mistaken for a user edit. Previously this ref started null and the
+  // first 150ms sync emitted the seeded tree, which normalized a V1 page to
+  // V2 and showed a false "1 unsaved change" immediately after loading.
+  useEffect(() => {
+    lastSerializedRef.current = query.serialize();
+  }, [query]);
+
   const sync = useCallback(() => {
     if (isSyncingRef.current) return;
     isSyncingRef.current = true;

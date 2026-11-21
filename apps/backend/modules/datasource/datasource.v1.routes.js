@@ -7,6 +7,7 @@ const {
     createDatasourceSchema,
     updateDatasourceSchema,
     testConnectionSchema,
+    testJsonEndpointSchema,
     proxyActionSchema,
     datasourceIdParamSchema,
     listDatasourcesQuerySchema,
@@ -43,6 +44,15 @@ router.post(
   validate(testConnectionSchema, "body"),
   authMiddleware.authorize(P.datasource.test),
   datasourceController.testDatasourceConnection
+);
+
+// Separate JSON-endpoint validation (does NOT alter /test behavior).
+// POST /test-json { datasourceType: 'restapi', datasourceOptions, testPath, testMethod? }
+router.post(
+  "/test-json",
+  validate(testJsonEndpointSchema, "body"),
+  authMiddleware.authorize(P.datasource.test),
+  datasourceController.testDatasourceJsonEndpoint
 );
 
 router.post(

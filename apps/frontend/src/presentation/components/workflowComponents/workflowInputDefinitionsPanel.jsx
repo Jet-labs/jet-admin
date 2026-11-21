@@ -1,9 +1,73 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Plus, Trash2 } from 'lucide-react';
 import PropTypes from "prop-types";
 
 
-import { Button, Checkbox, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Button, Checkbox, CodeEditor, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+
+function stringifyJsonDefault(value) {
+  if (value === undefined || value === null) return "";
+  if (typeof value === "string") return value;
+  return JSON.stringify(value, null, 2);
+}
+
+/**
+ * JSON editor for object/array defaults. Keeps a draft string so invalid JSON
+ * can be corrected in place, and only writes parsed values to the form.
+ */
+function JsonDefaultEditor({ inputDef, onChange }) {
+  const [text, setText] = useState(() => stringifyJsonDefault(inputDef.defaultValue));
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const next = stringifyJsonDefault(inputDef.defaultValue);
+    setText((current) => {
+      if (current === next) return current;
+      try {
+        if (JSON.stringify(JSON.parse(current)) === JSON.stringify(inputDef.defaultValue ?? null)) {
+          return current;
+        }
+      } catch {
+        // Keep the user's in-progress invalid draft.
+      }
+      return next;
+    });
+  }, [inputDef.defaultValue]);
+
+  const handleChange = useCallback((value) => {
+    setText(value);
+    if (!value.trim()) {
+      setError("");
+      onChange(undefined);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(value);
+      setError("");
+      onChange(parsed);
+    } catch {
+      setError("Invalid JSON");
+    }
+  }, [onChange]);
+
+  return (
+    <div className="space-y-1">
+      <CodeEditor
+        language="json"
+        height={130}
+        title={inputDef.type === "array" ? "JSON Array" : "JSON Object"}
+        value={text}
+        onChange={handleChange}
+      />
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  );
+}
+
+JsonDefaultEditor.propTypes = {
+  inputDef: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 /**
  * Panel for editing workflow input parameter schema (workflowOptions.inputDefinitions).
  * Allows users to define the expected input parameters for a workflow.
@@ -15,25 +79,34 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
 
   const inputDefinitions = workflowForm.values.workflowOptions?.inputDefinitions || [];
 
+  // Formik's setValues(function) evaluates against the current render before
+  // dispatch. Use its queued state updater so back-to-back editor callbacks
+  // cannot replace a sibling's freshly entered default with an old snapshot.
+  const updateDefinitions = useCallback(update => {
+    workflowForm.setFormikState(previous => ({
+      ...previous,
+      values: {
+        ...previous.values,
+        workflowOptions: {
+          ...previous.values.workflowOptions,
+          inputDefinitions: update(previous.values.workflowOptions?.inputDefinitions || []),
+        },
+      },
+    }));
+  }, [workflowForm.setFormikState]);
+
   const _handleAddInputDef = useCallback(() => {
-    const newInputDefs = [
-      ...inputDefinitions,
-      { key: "", type: "string", required: false },
-    ];
-    workflowForm.setFieldValue("workflowOptions.inputDefinitions", newInputDefs);
-  }, [inputDefinitions, workflowForm]);
+    updateDefinitions(previous => [...previous, { key: "", type: "string", required: false }]);
+  }, [updateDefinitions]);
 
   const _handleRemoveInputDef = useCallback((index) => {
-    const newInputDefs = [...inputDefinitions];
-    newInputDefs.splice(index, 1);
-    workflowForm.setFieldValue("workflowOptions.inputDefinitions", newInputDefs);
-  }, [inputDefinitions, workflowForm]);
+    updateDefinitions(previous => previous.filter((_, position) => position !== index));
+  }, [updateDefinitions]);
 
   const _handleUpdateInputDef = useCallback((index, field, value) => {
-    const newInputDefs = [...inputDefinitions];
-    newInputDefs[index] = { ...newInputDefs[index], [field]: value };
-    workflowForm.setFieldValue("workflowOptions.inputDefinitions", newInputDefs);
-  }, [inputDefinitions, workflowForm]);
+    updateDefinitions(previous => previous.map((definition, position) =>
+      position === index ? { ...definition, [field]: value } : definition));
+  }, [updateDefinitions]);
 
   return (
     <div className="space-y-2">
@@ -119,6 +192,11 @@ export const WorkflowInputDefinitionsPanel = ({ workflowForm }) => {
                     />
                     {inputDef.defaultValue === true ? "true" : "false"}
                   </Label>
+                ) : ["object", "array"].includes(inputDef.type || "string") ? (
+                  <JsonDefaultEditor
+                    inputDef={inputDef}
+                    onChange={(value) => _handleUpdateInputDef(index, "defaultValue", value)}
+                  />
                 ) : (
                   <Input
                     type={(inputDef.type || "string") === "number" ? "number" : "text"}

@@ -1,11 +1,12 @@
 import React from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Boxes, KeyRound, LibraryBig, LogOut, ShieldCheck } from "lucide-react";
+import { Boxes, KeyRound, LibraryBig, LogOut, ShieldCheck, Store } from "lucide-react";
 import { operatorLogoutAPI } from "../../../data/apis/auth";
 import { useAdminStore } from "../../../logic/stores/useAdminStore";
 
 const NAV_ITEMS = [
   { to: "/library", label: "Widget library", icon: LibraryBig },
+  { to: "/marketplace", label: "Marketplace", icon: Store },
   { to: "/roles", label: "Roles", icon: ShieldCheck },
   { to: "/permissions", label: "Permissions", icon: KeyRound },
 ];

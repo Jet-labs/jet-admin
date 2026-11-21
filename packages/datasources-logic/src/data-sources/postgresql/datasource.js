@@ -2,6 +2,50 @@ import { Client } from "pg";
 import { Logger } from "../../utils/logger.js";
 import DataSource from "../datasource.js";
 
+/**
+ * Normalize the two supported PostgreSQL configuration shapes.
+ *
+ * The form writes `connectionDetails`; older API clients and the listener
+ * tests use `connectionData`; the connection-string option is separate.
+ * Every pg consumer must use this helper so the form, tester, executor, and
+ * listener all resolve the same credentials.
+ */
+export function buildPostgresClientConfig(datasourceOptions = {}) {
+  const options = datasourceOptions || {};
+  const details = options.connectionDetails || options.connectionData || {};
+  const option = options.connectionOption;
+
+  if (option !== "connectionDetails" && options.connectionString) {
+    return { connectionString: options.connectionString };
+  }
+
+  const config = {};
+  if (details.host) config.host = details.host;
+  if (details.port !== undefined && details.port !== null && details.port !== "") {
+    config.port = Number(details.port);
+  }
+  if (details.database) config.database = details.database;
+  if (details.user) config.user = details.user;
+  if (details.password !== undefined) config.password = details.password;
+
+  const sslMode = details.sslMode || options.sslMode;
+  if (sslMode && sslMode !== "disable") {
+    config.ssl = {
+      rejectUnauthorized: sslMode === "verify-ca" || sslMode === "verify-full",
+    };
+  }
+
+  const additional = details.additionalOptions || {};
+  if (Number(additional.connectTimeout) > 0) {
+    config.connectionTimeoutMillis = Number(additional.connectTimeout) * 1000;
+  }
+  if (additional.applicationName) {
+    config.application_name = additional.applicationName;
+  }
+
+  return config;
+}
+
 export default class PostgreSQLDataSource extends DataSource {
   async execute(dataQueryOptions, context) {
     Logger.log("info", {
@@ -9,15 +53,12 @@ export default class PostgreSQLDataSource extends DataSource {
       params: { dataQueryOptions, config: this.config },
     });
     const { query } = dataQueryOptions;
-    const client = new Client({
-      connectionString: this.config.datasourceOptions?.connectionString,
-      ...this.config.datasourceOptions?.connectionData,
-    });
+    const client = new Client(buildPostgresClientConfig(this.config.datasourceOptions));
     try {
       await client.connect();
       Logger.log("info", {
         message: "postgresql:PostgreSQLDataSource:execute:connected",
-        params: { connectionString: this.config.connectionString },
+        params: { datasourceID: this.config.datasourceID },
       });
       const result = await client.query(query);
       return result.rows;
@@ -44,10 +85,7 @@ export default class PostgreSQLDataSource extends DataSource {
       params: { channels, datasourceID: this.config.datasourceID },
     });
 
-    const client = new Client({
-      connectionString: this.config.datasourceOptions?.connectionString,
-      ...this.config.datasourceOptions?.connectionData,
-    });
+    const client = new Client(buildPostgresClientConfig(this.config.datasourceOptions));
     
     await client.connect();
 
@@ -101,10 +139,7 @@ export default class PostgreSQLDataSource extends DataSource {
   }
 
   async getSchema(params, context) {
-    const client = new Client({
-      connectionString: this.config.datasourceOptions?.connectionString,
-      ...this.config.datasourceOptions?.connectionData,
-    });
+    const client = new Client(buildPostgresClientConfig(this.config.datasourceOptions));
     try {
       await client.connect();
       const query = `
@@ -162,10 +197,7 @@ export default class PostgreSQLDataSource extends DataSource {
     if (!table || typeof table !== 'string' || !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(table)) {
       throw new Error("Invalid table name");
     }
-    const client = new Client({
-      connectionString: this.config.datasourceOptions?.connectionString,
-      ...this.config.datasourceOptions?.connectionData,
-    });
+    const client = new Client(buildPostgresClientConfig(this.config.datasourceOptions));
     try {
       await client.connect();
       const query = `SELECT * FROM "${table}" LIMIT ${parseInt(limit, 10)};`;

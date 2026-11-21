@@ -55,15 +55,19 @@ export default class SSEDataSource extends DataSource {
       }
     };
 
-    es.onmessage = (event) => {
-      onEvent({ eventName: "message", payload: parsePayload(event.data) });
+    const deliver = (eventName, event) => {
+      // EventSource reconnects internally; enqueue failures are logged rather
+      // than becoming unhandled rejections in this callback context.
+      Promise.resolve(onEvent({ eventName, payload: parsePayload(event.data) })).catch((error) => {
+        Logger.log("error", { message: "sse:event:rejected", params: { error: error.message } });
+      });
     };
+
+    es.onmessage = (event) => deliver("message", event);
 
     for (const eventName of eventNames) {
       if (eventName === "message") continue;
-      es.addEventListener(eventName, (event) => {
-        onEvent({ eventName, payload: parsePayload(event.data) });
-      });
+      es.addEventListener(eventName, (event) => deliver(eventName, event));
     }
 
     es.onerror = (err) => {
@@ -74,6 +78,10 @@ export default class SSEDataSource extends DataSource {
     };
 
     return { es };
+  }
+
+  get recoveryMode() {
+    return "plugin"; // EventSource reconnects automatically
   }
 
   async unsubscribe(handle) {

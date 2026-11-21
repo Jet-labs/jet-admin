@@ -4,6 +4,7 @@ import { AdminLayout } from "../layouts/adminLayout";
 import { ProtectedLayout } from "../layouts/protectedLayout";
 import SignInPage from "../../pages/signInPage";
 import WidgetLibraryPage from "../widgetLibrary/widgetLibraryPage";
+import MarketplacePage from "../marketplace/marketplacePage";
 import RolesPage from "../taxonomy/rolesPage";
 import PermissionsPage from "../taxonomy/permissionsPage";
 
@@ -21,6 +22,7 @@ export const rootRouter = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/library" replace /> },
           { path: "library", element: <WidgetLibraryPage /> },
+          { path: "marketplace", element: <MarketplacePage /> },
           { path: "roles", element: <RolesPage /> },
           { path: "permissions", element: <PermissionsPage /> },
         ],

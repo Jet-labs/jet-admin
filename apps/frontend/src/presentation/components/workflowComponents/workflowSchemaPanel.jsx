@@ -55,8 +55,8 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
             {/* Header */}
             <div className="flex justify-between items-center p-2 border-b border-border bg-muted/30">
                 <div className="flex items-center gap-3">
-                    <h3 className="font-semibold text-foreground tracking-tight">Workflow Schema</h3>
-                    <span className="text-xs text-muted-foreground bg-muted font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-border/50">
+                    <h3 className="font-medium text-foreground tracking-tight">Workflow Schema</h3>
+                    <span className="rounded-full border border-border/50 bg-muted px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         JSON
                     </span>
                 </div>
@@ -93,13 +93,13 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
             {/* Stats Bar */}
             <div className="flex items-center gap-6 px-4 py-2 bg-muted/20 border-b border-border text-xs text-muted-foreground font-medium uppercase tracking-wide">
                 <span>
-                    <strong className="text-foreground font-extrabold">{values.nodes?.length || 0}</strong> Nodes
+                    <strong className="text-foreground font-medium">{values.nodes?.length || 0}</strong> Nodes
                 </span>
                 <span>
-                    <strong className="text-foreground font-extrabold">{values.edges?.length || 0}</strong> Edges
+                    <strong className="text-foreground font-medium">{values.edges?.length || 0}</strong> Edges
                 </span>
                 <span>
-                    <strong className="text-foreground font-extrabold">{formattedJson.length}</strong> Characters
+                    <strong className="text-foreground font-medium">{formattedJson.length}</strong> Characters
                 </span>
             </div>
 

@@ -4,26 +4,76 @@
   "schema": {
     "type": "object",
     "properties": {
-      "label": { "type": "string" },
-      "placeholder": { "type": "string", "default": "Select options..." },
+      "label": {
+        "type": "string"
+      },
+      "placeholder": {
+        "type": "string",
+        "default": "Select options..."
+      },
       "options": {
         "type": "array",
         "items": {
           "type": "object",
           "properties": {
-            "label": { "type": "string" },
-            "value": { "type": ["string", "number", "boolean"] }
+            "label": {
+              "type": "string"
+            },
+            "value": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            }
           },
-          "required": ["label", "value"]
+          "required": [
+            "label",
+            "value"
+          ]
         }
       },
-      "optionsTemplate": { "type": "string", "description": "Template resolving to an options array" },
-      "labelKey": { "type": "string", "default": "label" },
-      "valueKey": { "type": "string", "default": "value" },
-      "defaultValue": { "type": "array", "description": "Default selected values array" },
-      "maxSelected": { "type": "number", "description": "Maximum selectable options" },
-      "disabled": { "type": ["boolean", "string"], "default": false }
+      "optionsTemplate": {
+        "type": "string",
+        "description": "Template resolving to an options array"
+      },
+      "labelKey": {
+        "type": "string",
+        "default": "label"
+      },
+      "valueKey": {
+        "type": "string",
+        "default": "value"
+      },
+      "defaultValue": {
+        "type": "array",
+        "description": "Default selected values array"
+      },
+      "maxSelected": {
+        "type": "number",
+        "description": "Maximum selectable options"
+      },
+      "disabled": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "default": false
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onChange", "onClear"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onChange",
+    "onClear"
+  ]
 }

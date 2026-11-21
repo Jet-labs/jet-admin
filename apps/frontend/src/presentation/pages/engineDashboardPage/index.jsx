@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { CONSTANTS } from "../../../constants";
 import { Card, CardContent, CardHeader, CardTitle, Badge } from "@jet-admin/ui";
 import { Activity, Clock, Radio } from "lucide-react";
 import { getListenerConnectionStatusAPI } from "../../../data/apis/listener";
 import { getCronJobConnectionStatusAPI } from "../../../data/apis/cronJob";
+
+const ACTIVE_BADGE_CLASS =
+  "bg-primary/10 text-primary hover:bg-primary/20 border-primary/30";
+const INACTIVE_BADGE_CLASS =
+  "bg-destructive/10 text-destructive hover:bg-destructive/20 border-destructive/30";
 
 const EngineDashboardPage = () => {
   const { tenantID } = useParams();
@@ -35,38 +39,102 @@ const EngineDashboardPage = () => {
   }, [tenantID]);
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="px-6 py-4 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <h1 className="text-2xl font-bold tracking-tight flex items-center">
-          <Activity className="w-6 h-6 mr-2 text-primary" />
+    <div className="flex h-full flex-col bg-background">
+      <div className="border-b border-border bg-background px-6 py-4">
+        <h1 className="flex items-center text-2xl font-medium tracking-tight text-foreground">
+          <Activity className="mr-2 h-6 w-6 text-primary" aria-hidden="true" />
           Engine Management
         </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Live listener proxy and scheduled-job status for this workspace.
+        </p>
       </div>
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="grid gap-6 md:grid-cols-2">
+      <div className="flex-1 overflow-auto p-6">
+        <div className="grid gap-2 md:grid-cols-2">
           {/* Listeners Card */}
-          <Card className="hover:shadow-lg transition-all duration-300 border-primary/10">
+          <Card className="border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Radio className="w-4 h-4 mr-2 text-primary animate-pulse" />
+              <CardTitle className="flex items-center text-sm font-medium">
+                <Radio className="mr-2 h-4 w-4 text-primary" aria-hidden="true" />
                 Listener Engine
               </CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="text-sm text-muted-foreground">Loading...</div>
+                <div className="text-sm text-muted-foreground">Loading…</div>
+              ) : listenerStatuses.mode === "proxy" ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between border-b border-border pb-2">
+                    <span className="text-sm font-medium">Ingress mode</span>
+                    <Badge variant="outline" className={ACTIVE_BADGE_CLASS}>
+                      {listenerStatuses.mode}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-border pb-2">
+                    <span className="text-sm font-medium">Assignment version</span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {listenerStatuses.assignmentVersion ?? "—"}
+                    </span>
+                  </div>
+                  {(listenerStatuses.proxies || []).length === 0 ? (
+                    <div className="text-sm text-muted-foreground">
+                      {listenerStatuses.placement === "unavailable"
+                        ? "Listener proxy placement is unavailable."
+                        : "No active listener proxies."}
+                    </div>
+                  ) : (
+                    listenerStatuses.proxies.map((proxy) => (
+                      <div
+                        key={proxy.proxyID}
+                        className="flex items-center justify-between border-b border-border pb-2 last:border-0 last:pb-0"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">{proxy.proxyID}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {proxy.version || "unknown version"} ·{" "}
+                            {(proxy.assignedListeners || []).length} listener(s)
+                          </span>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className={
+                            proxy.status === "active"
+                              ? ACTIVE_BADGE_CLASS
+                              : INACTIVE_BADGE_CLASS
+                          }
+                        >
+                          {proxy.status || "unknown"}
+                        </Badge>
+                      </div>
+                    ))
+                  )}
+                </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {Object.keys(listenerStatuses).length === 0 ? (
                     <div className="text-sm text-muted-foreground">No active listeners.</div>
                   ) : (
                     Object.entries(listenerStatuses).map(([id, status]) => (
-                      <div key={id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
+                      <div
+                        key={id}
+                        className="flex items-center justify-between border-b border-border pb-2 last:border-0 last:pb-0"
+                      >
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium group-hover:text-primary transition-colors">{status.title || `Listener ${id}`}</span>
-                          <span className="text-xs text-muted-foreground">{status.type || 'Unknown'}</span>
+                          <span className="text-sm font-medium">
+                            {status.title || `Listener ${id}`}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {status.type || "Unknown"}
+                          </span>
                         </div>
-                        <Badge variant={status.state === 'running' ? 'default' : 'destructive'} className={status.state === 'running' ? "bg-green-500/10 text-green-500 hover:bg-green-500/20 border-green-500/20" : ""}>
+                        <Badge
+                          variant="outline"
+                          className={
+                            status.state === "running"
+                              ? ACTIVE_BADGE_CLASS
+                              : INACTIVE_BADGE_CLASS
+                          }
+                        >
                           {status.state}
                         </Badge>
                       </div>
@@ -78,27 +146,34 @@ const EngineDashboardPage = () => {
           </Card>
 
           {/* Cron Jobs Card */}
-          <Card className="hover:shadow-lg transition-all duration-300 border-primary/10">
+          <Card className="border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Clock className="w-4 h-4 mr-2 text-primary animate-pulse" />
+              <CardTitle className="flex items-center text-sm font-medium">
+                <Clock className="mr-2 h-4 w-4 text-primary" aria-hidden="true" />
                 Cron Job Engine
               </CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="text-sm text-muted-foreground">Loading...</div>
+                <div className="text-sm text-muted-foreground">Loading…</div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {Object.keys(cronJobStatuses).length === 0 ? (
-                    <div className="text-sm text-muted-foreground">No scheduled cron jobs.</div>
+                    <div className="text-sm text-muted-foreground">
+                      No scheduled cron jobs.
+                    </div>
                   ) : (
                     Object.entries(cronJobStatuses).map(([id, status]) => (
-                      <div key={id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
+                      <div
+                        key={id}
+                        className="flex items-center justify-between border-b border-border pb-2 last:border-0 last:pb-0"
+                      >
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium group-hover:text-primary transition-colors">Cron Job {id}</span>
+                          <span className="text-sm font-medium">Cron Job {id}</span>
                         </div>
-                        <Badge variant="default" className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 border-blue-500/20">{status.state}</Badge>
+                        <Badge variant="outline" className={ACTIVE_BADGE_CLASS}>
+                          {status.state}
+                        </Badge>
                       </div>
                     ))
                   )}

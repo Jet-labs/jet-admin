@@ -11,18 +11,19 @@ const workflowMiddleware = {};
  */
 workflowMiddleware.resolveWorkflowIDFromInstance = async (req, res, next) => {
   try {
-    const { instanceID } = req.params;
+    const { instanceID, tenantID } = req.params;
     if (!instanceID) {
       return next();
     }
-    const instance = await prisma.tblWorkflowInstances.findUnique({
-      where: { instanceID },
+    if (!tenantID) return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.PERMISSION_DENIED, constants.HTTP_STATUS.FORBIDDEN);
+    const instance = await prisma.tblWorkflowInstances.findFirst({
+      where: { instanceID, tenantID },
       select: { workflowID: true }
     });
     if (instance) {
       req.workflowID = instance.workflowID || "*";
     } else {
-      req.workflowID = "*";
+      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" }, constants.HTTP_STATUS.NOT_FOUND);
     }
     next();
   } catch (error) {
@@ -40,12 +41,13 @@ workflowMiddleware.resolveWorkflowIDFromInstance = async (req, res, next) => {
  */
 workflowMiddleware.resolveWorkflowIDFromCollectionRequest = async (req, res, next) => {
   try {
-    const { collectionRequestID } = req.params;
+    const { collectionRequestID, tenantID } = req.params;
     if (!collectionRequestID) {
       return next();
     }
-    const request = await prisma.tblWorkflowDataCollectionRequests.findUnique({
-      where: { collectionRequestID },
+    if (!tenantID) return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.PERMISSION_DENIED, constants.HTTP_STATUS.FORBIDDEN);
+    const request = await prisma.tblWorkflowDataCollectionRequests.findFirst({
+      where: { collectionRequestID, tblWorkflowInstances: { tenantID } },
       include: {
         tblWorkflowInstances: {
           select: { workflowID: true }
@@ -55,7 +57,7 @@ workflowMiddleware.resolveWorkflowIDFromCollectionRequest = async (req, res, nex
     if (request && request.tblWorkflowInstances) {
       req.workflowID = request.tblWorkflowInstances.workflowID || "*";
     } else {
-      req.workflowID = "*";
+      return expressUtils.sendResponse(res, false, {}, { message: "Request not found" }, constants.HTTP_STATUS.NOT_FOUND);
     }
     next();
   } catch (error) {
@@ -221,4 +223,3 @@ workflowMiddleware.resolveWorkflowDataQueryIDsFromDB = async (req, res, next) =>
 };
 
 module.exports = { workflowMiddleware };
-

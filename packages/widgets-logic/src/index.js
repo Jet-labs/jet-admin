@@ -70,7 +70,7 @@ export const resolveWidgetData = ({ widgetType, widgetConfig, dataSourceResults 
 
   const processor = WIDGET_PROCESSORS_MAP[widgetType];
   if (processor && typeof processor.resolveData === 'function') {
-    return processor.resolveData(widgetConfig, dataSourceResults);
+    return processor.resolveData(widgetConfig, dataSourceResults, widgetType);
   }
 
   return null;

@@ -152,13 +152,21 @@ describe('QueryEngine', () => {
 
     it('should return cached result for same query and args', async () => {
       const mockResult = { rows: [{ id: 1, name: 'Test' }] };
-      const cacheKey = 'query-123|{}';
-      queryEngine.cache.set(cacheKey, mockResult);
+      mockQueryFetcher.mockResolvedValue({
+        dataQueryID: 'query-123',
+        datasourceType: 'postgresql',
+        updatedAt: null,
+        dataQueryOptions: { query: 'SELECT 1' },
+      });
+      const cacheKey = '|query-123||{}';
+      queryEngine.cache.set(cacheKey, {
+        value: mockResult,
+        expiresAt: Date.now() + 10000,
+      });
 
       const result = await queryEngine.executeQuery('query-123', {});
 
       expect(result).toEqual(mockResult);
-      expect(mockQueryFetcher).not.toHaveBeenCalled();
     });
 
     it('should execute query and cache result', async () => {
@@ -198,13 +206,44 @@ describe('QueryEngine', () => {
     });
   });
 
+  describe('cache policy', () => {
+    const { isQueryResultCacheable } = require('../../../modules/dataQuery/queryEngine/engine');
+
+    it('caches read-only SQL and never caches mutations', () => {
+      expect(isQueryResultCacheable({ datasourceType: 'postgresql', dataQueryOptions: { query: 'SELECT * FROM t' } })).toBe(true);
+      expect(isQueryResultCacheable({ datasourceType: 'postgresql', dataQueryOptions: { query: '  -- comment\n SELECT 1' } })).toBe(true);
+      expect(isQueryResultCacheable({ datasourceType: 'postgresql', dataQueryOptions: { query: 'INSERT INTO t VALUES (1)' } })).toBe(false);
+      expect(isQueryResultCacheable({ datasourceType: 'postgresql', dataQueryOptions: { query: 'WITH x AS (SELECT 1) DELETE FROM t' } })).toBe(false);
+    });
+
+    it('caches only read operations for HTTP, Redis, Kafka, S3 and Mongo', () => {
+      expect(isQueryResultCacheable({ datasourceType: 'restapi', dataQueryOptions: { method: 'GET' } })).toBe(true);
+      expect(isQueryResultCacheable({ datasourceType: 'restapi', dataQueryOptions: { method: 'POST' } })).toBe(false);
+      expect(isQueryResultCacheable({ datasourceType: 'redis', dataQueryOptions: { operation: 'get' } })).toBe(true);
+      expect(isQueryResultCacheable({ datasourceType: 'redis', dataQueryOptions: { operation: 'set' } })).toBe(false);
+      expect(isQueryResultCacheable({ datasourceType: 'kafka', dataQueryOptions: { operation: 'consume' } })).toBe(false);
+      expect(isQueryResultCacheable({ datasourceType: 'kafka', dataQueryOptions: { operation: 'listTopics' } })).toBe(true);
+      expect(isQueryResultCacheable({ datasourceType: 's3', dataQueryOptions: { operation: 'putObject' } })).toBe(false);
+      expect(isQueryResultCacheable({ datasourceType: 's3', dataQueryOptions: { operation: 'getObject' } })).toBe(true);
+      expect(isQueryResultCacheable({ datasourceType: 'mongodb', dataQueryOptions: { operation: 'find' } })).toBe(true);
+      expect(isQueryResultCacheable({ datasourceType: 'mongodb', dataQueryOptions: { operation: 'insertOne' } })).toBe(false);
+    });
+
+    it('does not cache unknown datasource types', () => {
+      expect(isQueryResultCacheable({ datasourceType: 'some-new-db', dataQueryOptions: { operation: 'read' } })).toBe(false);
+    });
+  });
+
   describe('getDataSource', () => {
     it('should return cached datasource if available', async () => {
       const mockDataSource = { execute: jest.fn() };
       const query = { datasourceType: 'postgresql', datasourceID: 'ds-123' };
-      const cacheKey = 'postgresql_ds-123';
-      
-      queryEngine.dataSourceCache.set(cacheKey, mockDataSource);
+      const cacheKey = 'postgresql_ds-123_';
+
+      queryEngine.dataSourceCache.set(cacheKey, {
+        value: mockDataSource,
+        expiresAt: Date.now() + 10000,
+      });
 
       const result = await queryEngine.getDataSource(query, 'query-id');
 

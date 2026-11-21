@@ -94,12 +94,50 @@ function isRetryableError(err) {
   // Network codes
   if (["ECONNRESET", "ETIMEDOUT", "ECONNREFUSED", "EPIPE"].includes(err.code)) return true;
   // HTTP 5xx server errors and 429 rate limit
-  if (err.status >= 500 || err.status === 429) return true;
+  // Axios carries the status on err.response.status; normalized errors carry err.status.
+  const status = err.status ?? err.response?.status;
+  if (status >= 500 || status === 429) return true;
   return false;
 }
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// ─── Result shaping (large payloads) ────────────────────────────────────────
+
+/**
+ * Truncates an array result to maxRows with a summary envelope.
+ * Prevents MCP tool-output truncation (e.g. 284KB EICAR-style payloads) by
+ * returning { totalCount, truncated, maxRows, rows } instead of the full array.
+ *
+ * @param {any} data - Raw backend result (array or { data: [...] } or object)
+ * @param {number} [maxRows] - Cap rows returned (1-1000). Omit/0 = no truncation.
+ * @returns {any} Possibly wrapped result.
+ */
+export function summarizeRows(data, maxRows) {
+  const cap = Number(maxRows);
+  if (!Number.isFinite(cap) || cap <= 0) return data;
+  const limit = Math.min(Math.floor(cap), 1000);
+  const pickArray = (d) => {
+    if (Array.isArray(d)) return { arr: d, set: (v) => v };
+    // Backend wraps run/test results as { success, dataQueryResult } — most common shape.
+    if (Array.isArray(d?.dataQueryResult)) return { arr: d.dataQueryResult, set: (v) => ({ ...d, dataQueryResult: v }) };
+    if (Array.isArray(d?.data)) return { arr: d.data, set: (v) => ({ ...d, data: v }) };
+    if (Array.isArray(d?.rows)) return { arr: d.rows, set: (v) => ({ ...d, rows: v }) };
+    if (Array.isArray(d?.result)) return { arr: d.result, set: (v) => ({ ...d, result: v }) };
+    return null;
+  };
+  const found = pickArray(data);
+  if (!found) return data;
+  if (found.arr.length <= limit) return data;
+  return {
+    totalCount: found.arr.length,
+    truncated: true,
+    maxRows: limit,
+    rows: found.arr.slice(0, limit),
+    hint: "Result truncated client-side. Narrow the query (lower limit, filter, or summary aggregation) for full data.",
+  };
 }
 
 // ─── Logging ──────────────────────────────────────────────────────────────────

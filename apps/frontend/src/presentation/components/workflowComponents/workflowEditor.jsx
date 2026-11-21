@@ -44,6 +44,7 @@ import { WorkflowInputModal } from "./workflowInputModal";
 import { DataQueryTestingPanel } from "../dataQueryComponents/dataQueryTestingPanel";
 import { useParams } from "react-router-dom";
 import { useWorkflowRun } from "./useWorkflowRun";
+import { getWorkflowEdgeType } from "../../../logic/workflowEditorState";
 import { useEffect } from "react";
 
 import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator } from "@jet-admin/ui";
@@ -107,19 +108,19 @@ const edgeTypes = Object.entries(WORKFLOW_EDGES_MAP).reduce((acc, [key, edge]) =
 
 // Sidebar node palette icons (single source for the Add-nodes grid)
 const NODE_PALETTE_ICONS = {
-    start: <Play className="size-3.5 mr-1.5 shrink-0 text-emerald-500" />,
-    dataQuery: <Zap className="size-3.5 mr-1.5 shrink-0 text-blue-500" />,
-    javascript: <Code className="size-3.5 mr-1.5 shrink-0 text-amber-500" />,
-    condition: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-indigo-500" />,
-    loop: <Repeat className="size-3.5 mr-1.5 shrink-0 text-cyan-500" />,
-    delay: <Clock className="size-3.5 mr-1.5 shrink-0 text-orange-500" />,
+    start: <Play className="size-3.5 mr-1.5 shrink-0 text-primary" />,
+    dataQuery: <Zap className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
+    javascript: <Code className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
+    condition: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
+    loop: <Repeat className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
+    delay: <Clock className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
     end: <Square className="size-3.5 mr-1.5 shrink-0 text-destructive" />,
-    dataCollection: <ArrowRightToLine className="size-3.5 mr-1.5 shrink-0 text-violet-500" />,
-    subWorkflow: <Layers className="size-3.5 mr-1.5 shrink-0 text-fuchsia-500" />,
-    switch: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-teal-500" />,
-    approval: <User className="size-3.5 mr-1.5 shrink-0 text-rose-500" />,
-    fanout: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-sky-500" />,
-    join: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-lime-500" />,
+    dataCollection: <ArrowRightToLine className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
+    subWorkflow: <Layers className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
+    switch: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
+    approval: <User className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
+    fanout: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
+    join: <GitBranch className="size-3.5 mr-1.5 shrink-0 text-muted-foreground" />,
 };
 
 // Fit View Button Component (must be inside ReactFlow)
@@ -143,6 +144,7 @@ const FitViewButton = () => {
 export const WorkflowEditor = ({ workflowEditorForm }) => {
     // Destructure for cleaner access
     const { values, setFieldValue, errors, handleChange, handleBlur } = workflowEditorForm;
+    const edgeType = getWorkflowEdgeType(values);
     // workflowID is present on the update route only; test runs from there
     // are attributed to the saved workflow so they appear in its history.
     const { tenantID, workflowID } = useParams();
@@ -334,7 +336,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const onConnect = useCallback(
         (connection) => {
             const isErrorEdge = connection.sourceHandle === 'error';
-            const currentEdgeType = values.edgeType || 'smoothstep';
+            const currentEdgeType = edgeType;
             const newEdge = {
                 ...connection,
                 type: isErrorEdge ? 'error' : currentEdgeType,
@@ -346,7 +348,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             const updatedEdges = addEdge(newEdge, values.edges);
             setFieldValue("edges", updatedEdges);
         },
-        [values.edges, values.edgeType, setFieldValue]
+        [values.edges, edgeType, setFieldValue]
     );
 
     // 4. Add New Node logic
@@ -440,12 +442,15 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
     // Update all existing edges when edge type changes
     const updateAllEdgesType = useCallback((newType) => {
-        const updatedEdges = values.edges.map(edge => ({
-            ...edge,
-            type: edge.sourceHandle === 'error' ? 'error' : newType,
+        workflowEditorForm.setValues(previous => ({
+            ...previous,
+            workflowOptions: { ...previous.workflowOptions, edgeType: newType },
+            edges: previous.edges.map(edge => ({
+                ...edge,
+                type: edge.sourceHandle === 'error' ? 'error' : newType,
+            })),
         }));
-        setFieldValue("edges", updatedEdges);
-    }, [values.edges, setFieldValue]);
+    }, [workflowEditorForm.setValues]);
 
     // Get workflow input values from options
     const workflowInputDefinitions = useMemo(() => {
@@ -571,7 +576,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                     <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                                         Nodes
                                     </p>
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-1 gap-2">
                                     {Object.values(WORKFLOW_NODES_MAP)
                                         .filter(node => {
                                             return true;
@@ -663,9 +668,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                 <div className="space-y-1">
                                     <Label className="text-xs font-medium text-muted-foreground">Edge style</Label>
                                     <Select
-                                        value={values.edgeType || 'smoothstep'}
+                                        value={edgeType}
                                         onValueChange={(val) => {
-                                            setFieldValue("edgeType", val);
                                             updateAllEdgesType(val);
                                         }}
                                     >
@@ -767,7 +771,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                             nodeTypes={nodeTypes}
                                             edgeTypes={edgeTypes}
                                             defaultEdgeOptions={{
-                                                type: values.edgeType || 'smoothstep',
+                                                type: edgeType,
                                                 animated: false,
                                                 style: {
                                                     strokeWidth: 2,
@@ -876,6 +880,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                     )}
                     {dataCollectionRequest && isDataCollectionModalOpen && (
                         <WorkflowDataCollectionModal
+                            key={dataCollectionRequest.collectionRequestID}
                             request={dataCollectionRequest}
                             onSubmit={handleDataCollectionSubmit}
                             onDismiss={() => setIsDataCollectionModalOpen(false)}

@@ -1,0 +1,95 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["list", "read", "stat"],
+        "default": "list",
+        "description": "Directory listing, file read, or file stat."
+      },
+      "path": {
+        "type": "string",
+        "description": "Path relative to the jailed root (or absolute inside the root).",
+        "default": "."
+      },
+      "maxBytes": {
+        "type": "integer",
+        "description": "Maximum bytes to return for read (optional, capped by connection maxFileSize).",
+        "minimum": 1
+      },
+      "encoding": {
+        "type": "string",
+        "enum": ["utf8", "base64"],
+        "default": "utf8"
+      },
+      "inputDefinitions": {
+        "type": "array",
+        "description": "Query parameters",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/operation",
+        "label": "Operation"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/path",
+        "label": "Path"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/maxBytes",
+            "label": "Max Bytes"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/encoding",
+            "label": "Encoding"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "options": {
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Parameters"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "operation": "list",
+    "path": ".",
+    "maxBytes": null,
+    "encoding": "utf8",
+    "inputDefinitions": []
+  }
+}

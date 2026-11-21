@@ -5,28 +5,33 @@
  * that other widgets can invoke via the command bus.
  *
  * Methods are registered on mount and cleaned up on unmount.
+ *
+ * B24 identity: registration is per runtime placement instance
+ * (see widgetInstanceIdentity). Unmounting one placement unregisters only its
+ * own instance key — sibling placements of the same resource keep their
+ * methods and state.
  */
 
 import { useCallback, useEffect } from "react";
 import { useAppPageDispatch } from "./useAppPageDispatch";
 import { appPageActions } from "./appPageActions";
 
-export const useWidgetMethodRegistry = (widgetID) => {
+export const useWidgetMethodRegistry = (instanceID) => {
   const dispatch = useAppPageDispatch();
 
   const registerWidgetMethods = useCallback(
     (methods) => {
-      dispatch(appPageActions.registerWidgetMethods(widgetID, methods));
+      dispatch(appPageActions.registerWidgetMethods(instanceID, methods));
     },
-    [dispatch, widgetID]
+    [dispatch, instanceID]
   );
 
-  // Unregister on unmount
+  // Unregister on unmount (instance-scoped: siblings survive)
   useEffect(() => {
     return () => {
-      dispatch(appPageActions.unregisterWidget(widgetID));
+      dispatch(appPageActions.unregisterWidget(instanceID));
     };
-  }, [dispatch, widgetID]);
+  }, [dispatch, instanceID]);
 
   return { registerWidgetMethods };
 };

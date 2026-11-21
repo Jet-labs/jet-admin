@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { RefreshCw } from 'lucide-react';
 import { Button, Label, SearchSelect } from '@jet-admin/ui';
+import { formatValidationMessage } from './formatValidationMessage.js';
 
 export const CustomSelectInput = (props) => {
   const {
@@ -55,6 +56,7 @@ export const CustomSelectInput = (props) => {
   };
 
   const hasErrors = errors && errors.length > 0;
+  const errorMessage = hasErrors ? formatValidationMessage(Array.isArray(errors) ? errors[0] : errors) : "";
 
   const selectOptions = options.map((optionValue) => ({
     value: optionValue,
@@ -65,7 +67,7 @@ export const CustomSelectInput = (props) => {
     <div className="">
       <Label
         htmlFor={path}
-        className={`block mb-1 ${hasErrors ? "text-red-500" : ""}`}
+        className={`block mb-1 ${hasErrors ? "text-destructive" : ""}`}
       >
         {label || description}
       </Label>
@@ -77,7 +79,7 @@ export const CustomSelectInput = (props) => {
           options={selectOptions}
           disabled={isDisabled}
           placeholder={uischema?.options?.placeholder || "Select an option"}
-          className={`${hasErrors ? "border-red-500" : ""}`}
+          className={`${hasErrors ? "border-destructive" : ""}`}
         />
         {showRefreshButton && onRefresh && (
           <Button
@@ -94,7 +96,7 @@ export const CustomSelectInput = (props) => {
         )}
       </div>
       {hasErrors && (
-        <p className="text-xs text-red-500 mt-1">{errors}</p>
+        <p className="mt-1 text-xs text-destructive">{errorMessage}</p>
       )}
     </div>
   );

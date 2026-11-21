@@ -2,12 +2,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Input, Label } from '@jet-admin/ui';
+import { formatValidationMessage } from './formatValidationMessage.js';
 
 export const CustomSuggestionInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
   const { suggestions, placeholder } = uischema.options || {};
   const [isOpen, setIsOpen] = useState(false);
   const hasErrors = errors && errors.length > 0;
+  const errorMessage = hasErrors
+    ? formatValidationMessage(Array.isArray(errors) ? errors[0] : errors)
+    : "";
 
   const handleSelect = (value) => {
     const currentVal = data || "";
@@ -20,7 +24,7 @@ export const CustomSuggestionInput = (props) => {
       <Label
         htmlFor={path}
         className={`block mb-1 ${
-          hasErrors ? "text-red-500" : ""
+          hasErrors ? "text-destructive" : ""
         } flex justify-between items-center`}
       >
         <span>{label || description}</span>
@@ -43,14 +47,14 @@ export const CustomSuggestionInput = (props) => {
         id={path}
         name={path}
         disabled={!enabled}
-        className={hasErrors ? "border-red-500 focus:border-red-500" : ""}
-        placeholder={errors || placeholder || ""}
+        className={hasErrors ? "border-destructive focus:border-destructive" : ""}
+        placeholder={placeholder || ""}
         onChange={(ev) => handleChange(path, ev.target.value)}
         value={data || ""}
       />
 
       {hasErrors && (
-        <p className="text-xs text-red-500 mt-1">{errors}</p>
+        <p className="mt-1 text-xs text-destructive">{errorMessage}</p>
       )}
 
       {isOpen && suggestions && (

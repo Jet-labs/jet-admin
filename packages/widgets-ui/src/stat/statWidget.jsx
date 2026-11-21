@@ -13,10 +13,11 @@ export const StatWidget = ({
     data,
 }) => {
     const label = widgetConfig?.label || "Metric";
-    const rawValue = widgetConfig?.valueTemplate ?? "";
+    // Dual-read: canonical valueTemplate, legacy value fallback (F04).
+    const rawValue = widgetConfig?.valueTemplate ?? widgetConfig?.value ?? "";
     const prefix = widgetConfig?.prefix || "";
     const suffix = widgetConfig?.suffix || "";
-    const rawTrend = widgetConfig?.trendTemplate ?? "";
+    const rawTrend = widgetConfig?.trendTemplate ?? widgetConfig?.trend ?? "";
     const trendDirection = widgetConfig?.trendDirection || "up-is-good"; // "up-is-good" | "down-is-good"
     const align = widgetConfig?.textAlign || "center";
 

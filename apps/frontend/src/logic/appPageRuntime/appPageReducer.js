@@ -18,10 +18,10 @@ export const createAppPageInitialState = () => ({
   /** Workflow results keyed by data source alias */
   workflowResults: {},
 
-  /** Widget-local UI state keyed by widgetID */
+  /** Widget-local UI state keyed by runtime instance ID (B24, opaque) */
   widgetStates: {},
 
-  /** Widget-exposed methods keyed by widgetID */
+  /** Widget-exposed methods keyed by runtime instance ID (B24, opaque) */
   widgetMethods: {},
 
   /** Page-level scratch variables keyed by variable key */
@@ -57,7 +57,8 @@ export const appPageReducer = (state, action) => {
           : null;
       }
       return {
-        ...state,
+        ...(state.globals.pageID !== globals.pageID || state.globals.tenantID !== globals.tenantID
+          ? createAppPageInitialState() : state),
         variableDefinitions,
         variables,
         globals,
@@ -77,13 +78,26 @@ export const appPageReducer = (state, action) => {
 
     case APP_PAGE_ACTIONS.SET_WIDGET_STATE: {
       const { widgetID, state: widgetState } = action.payload;
+      const prevWidgetState = state.widgetStates[widgetID] || {};
+      let patch = widgetState;
+      // Single contract (see useWidgetState): evaluate a functional updater
+      // once, here, against the latest committed widget state. This keeps
+      // sequential dispatches atomic and avoids stale render closures. The
+      // updater must be pure; only its returned plain object is stored.
+      if (typeof patch === "function") {
+        patch = patch(prevWidgetState);
+      }
+      // Guard malformed updater results: only plain-object patches merge.
+      // Null/undefined/primitives/arrays leave state untouched (stable ref).
+      if (patch === null || patch === undefined) return state;
+      if (typeof patch !== "object" || Array.isArray(patch)) return state;
       return {
         ...state,
         widgetStates: {
           ...state.widgetStates,
           [widgetID]: {
-            ...state.widgetStates[widgetID],
-            ...widgetState,
+            ...prevWidgetState,
+            ...patch,
           },
         },
       };
@@ -127,10 +141,12 @@ export const appPageReducer = (state, action) => {
         workflowResults: {
           ...state.workflowResults,
           [alias]: {
+            ...state.workflowResults[alias],
             data,
             error,
             isLoading,
             instanceID: instanceID !== null ? instanceID : (state.workflowResults[alias]?.instanceID || null),
+            pendingRequests: isLoading ? (state.workflowResults[alias]?.pendingRequests || []) : [],
             lastUpdated: Date.now(),
           },
         },
@@ -148,9 +164,31 @@ export const appPageReducer = (state, action) => {
             isLoading: true,
             error: null,
             instanceID: null,
+            pendingRequests: [],
+            submittedRequestIDs: [],
           },
         },
       };
+    }
+
+    case APP_PAGE_ACTIONS.SET_WORKFLOW_REQUESTS: {
+      const { alias, requests, instanceID } = action.payload;
+      const previous = state.workflowResults[alias];
+      if (!previous || previous.instanceID !== instanceID || !previous.isLoading) return state;
+      const pendingRequests = requests.filter(request => !(previous.submittedRequestIDs || []).includes(request.collectionRequestID));
+      if (JSON.stringify(previous.pendingRequests || []) === JSON.stringify(pendingRequests)) return state;
+      return { ...state, workflowResults: { ...state.workflowResults, [alias]: { ...previous, pendingRequests } } };
+    }
+
+    case APP_PAGE_ACTIONS.ACK_WORKFLOW_REQUEST: {
+      const { alias, collectionRequestID, instanceID } = action.payload;
+      const previous = state.workflowResults[alias];
+      if (!previous || previous.instanceID !== instanceID) return state;
+      const submittedRequestIDs = [...new Set([...(previous.submittedRequestIDs || []), collectionRequestID])].slice(-32);
+      return { ...state, workflowResults: { ...state.workflowResults, [alias]: {
+        ...previous, submittedRequestIDs,
+        pendingRequests: (previous.pendingRequests || []).filter(request => request.collectionRequestID !== collectionRequestID),
+      } } };
     }
 
     case APP_PAGE_ACTIONS.REGISTER_WIDGET_METHODS: {

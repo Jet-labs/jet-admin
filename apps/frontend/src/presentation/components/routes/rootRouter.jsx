@@ -18,8 +18,8 @@ const HomePage = lazy(() => import("../../pages/homePage"));
 const AccountPage = lazy(() => import("../../pages/accountPage"));
 const AddTenantPage = lazy(() => import("../../pages/addTenantPage"));
 const UpdateTenantPage = lazy(() => import("../../pages/updateTenantPage"));
-const TenantLayoutLandingPage = lazy(() =>
-  import("../../pages/tenantLayoutLandingPage")
+const DashboardLandingPage = lazy(() =>
+  import("../../pages/dashboardLandingPage")
 );
 const AddDataQueryPage = lazy(() => import("../../pages/addDataQueryPage"));
 const UpdateDataQueryPage = lazy(() =>
@@ -97,10 +97,17 @@ const UpdateListenerPage = lazy(() =>
 const EngineDashboardPage = lazy(() =>
   import("../../pages/engineDashboardPage")
 );
+const NotFoundPage = lazy(() => import("../../pages/notFoundPage"));
+const RouteErrorPage = lazy(() =>
+  import("../../pages/notFoundPage").then((module) => ({
+    default: module.RouteErrorPage,
+  }))
+);
 
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         path: CONSTANTS.ROUTES.SIGN_IN.code,
@@ -127,7 +134,7 @@ const router = createBrowserRouter([
           },
           {
             path: CONSTANTS.ROUTES.VIEW_TENANT.code,
-            element: <TenantLayoutLandingPage />,
+            element: <DashboardLandingPage />,
             handle: { title: CONSTANTS.ROUTES.VIEW_TENANT.title },
           },
           {
@@ -394,6 +401,11 @@ const router = createBrowserRouter([
                 handle: { title: CONSTANTS.ROUTES.UPDATE_TENANT_ROLE_BY_ID.title },
               },
             ],
+          },
+          {
+            path: "*",
+            element: <NotFoundPage />,
+            handle: { title: "Page Not Found" },
           },
         ],
       },

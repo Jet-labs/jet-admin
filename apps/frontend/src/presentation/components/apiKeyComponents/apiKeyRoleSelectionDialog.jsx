@@ -51,8 +51,8 @@ export const APIKeyRoleSelectionDialog = ({
         open={isAPIKeyRoleSelectDialogOpen}
         onOpenChange={setIsAPIKeyRoleSelectDialogOpen}
       >
-        <DialogContent>
-          <DialogHeader>
+        <DialogContent className="max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader className="shrink-0">
             <DialogTitle className="text-base font-semibold text-foreground">
               {CONSTANTS.STRINGS.API_KEY_ROLE_SELECTION_TITLE}
             </DialogTitle>
@@ -61,7 +61,7 @@ export const APIKeyRoleSelectionDialog = ({
             </DialogDescription>
           </DialogHeader>
 
-          <DialogBody>
+          <DialogBody className="overflow-y-auto min-h-0 flex-1">
             <TenantRoleSelectionInput
               tenantID={tenantID}
               selectedTenantRoleIDs={apiKeyEditorForm?.values?.roleIDs}
@@ -72,7 +72,7 @@ export const APIKeyRoleSelectionDialog = ({
           </DialogBody>
 
 
-          <DialogFooter>
+          <DialogFooter className="shrink-0">
             <Button
               onClick={() => setIsAPIKeyRoleSelectDialogOpen(false)}
               type="button"
@@ -86,7 +86,7 @@ export const APIKeyRoleSelectionDialog = ({
                 setIsAPIKeyRoleSelectDialogOpen(false);
               }}
               type="button"
-
+              aria-label="Update roles"
             >
               {CONSTANTS.STRINGS.API_KEY_ROLE_SELECTION_SUBMIT}
             </Button>

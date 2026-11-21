@@ -9,8 +9,8 @@ export const ErrorDisplay = ({ error }) => {
   };
   return (
     <>
-      <AlertCircle className="text-red-500 h-6 w-6" />
-      <span className="text-red-500 text-xs">
+      <AlertCircle className="text-destructive h-6 w-6" />
+      <span className="text-destructive text-xs">
         {extractError(error || "Something went wrong")}
       </span>
     </>

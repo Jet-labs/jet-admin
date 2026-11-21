@@ -22,6 +22,7 @@ import PropTypes from "prop-types";
 import { appPageReducer, createAppPageInitialState } from "./appPageReducer";
 import { appPageActions } from "./appPageActions";
 import { buildAppPageStateTree } from "./appPageExpressionEngine";
+import { getQueryCoordinator } from './queryCoordinator';
 import {
   readVariablesFromUrl,
   writeVariablesToUrl,
@@ -44,7 +45,7 @@ export const AppPageMetaContext = createContext(null);
 // Provider Component
 // ============================================================
 
-export const AppPageRuntimeProvider = ({
+const AppPageRuntimeSession = ({
   pageID,
   tenantID,
   pageConfig = {},
@@ -87,6 +88,7 @@ export const AppPageRuntimeProvider = ({
       )
     );
   });
+  useEffect(() => () => getQueryCoordinator(dispatch).retireAll(), [dispatch]);
 
   // Track previous state tree for change detection
   const prevStateTreeRef = useRef(null);
@@ -164,6 +166,12 @@ export const AppPageRuntimeProvider = ({
     </AppPageMetaContext.Provider>
   );
 };
+
+// Identity changes create a new reducer/dispatch and unmount old observers
+// synchronously; no render can expose the previous tenant's query results.
+export const AppPageRuntimeProvider = (props) => (
+  <AppPageRuntimeSession key={JSON.stringify([props.tenantID, props.pageID])} {...props} />
+);
 
 AppPageRuntimeProvider.propTypes = {
   pageID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,

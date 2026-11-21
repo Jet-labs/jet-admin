@@ -10,6 +10,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, Label, TemplateAutocompleteInput } from '@jet-admin/ui';
+import { formatValidationMessage } from './formatValidationMessage.js';
 
 export const CustomTextInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
@@ -17,17 +18,24 @@ export const CustomTextInput = (props) => {
   const isMulti = options.multi;
   const isPassword = options.format === "password";
   const isDisabled = enabled === false;
-  const hasErrors = errors && errors.length > 0;
+  // JSON Forms normally passes an array, but some custom controls pass a
+  // single string. Normalize both shapes instead of warning and rendering
+  // "[object Object]".
+  const errorList = Array.isArray(errors) ? errors : errors ? [String(errors)] : [];
+  const hasErrors = errorList.length > 0;
+  const errorText = formatValidationMessage(errorList[0] || "");
   const stateTree = options.stateTree || null;
   const templateMode = options.templateMode;
-  const placeholder = hasErrors ? errors : options.placeholder || "";
+  // Validation copy must never become the field's placeholder/value. Errors
+  // are still rendered below the control (and on the label/border).
+  const placeholder = options.placeholder || "";
   const stringValue = typeof data === 'object' ? JSON.stringify(data) : data || "";
 
   return (
     <div className="">
       <Label
         htmlFor={path}
-        className={`block mb-1 ${hasErrors ? "text-red-500" : ""}`}
+        className={`block mb-1 ${hasErrors ? "text-destructive" : ""}`}
       >
         {label || description}
       </Label>
@@ -38,7 +46,7 @@ export const CustomTextInput = (props) => {
           id={path}
           name={path}
           disabled={isDisabled}
-          className={hasErrors ? "border-red-500 focus:border-red-500" : ""}
+          className={hasErrors ? "border-destructive focus:border-destructive" : ""}
           placeholder={placeholder}
           onChange={(ev) => handleChange(path, ev.target.value)}
           value={stringValue}
@@ -57,7 +65,7 @@ export const CustomTextInput = (props) => {
         />
       )}
       {hasErrors && (
-        <p className="text-xs text-red-500 mt-1">{errors}</p>
+        <p className="text-xs text-destructive mt-1">{errorText}</p>
       )}
     </div>
   );
@@ -69,7 +77,10 @@ CustomTextInput.propTypes = {
   handleChange: PropTypes.func.isRequired,
   label: PropTypes.string,
   description: PropTypes.string,
-  errors: PropTypes.arrayOf(PropTypes.string),
+  errors: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.string),
+    PropTypes.string,
+  ]),
   uischema: PropTypes.object.isRequired,
   enabled: PropTypes.bool,
 };

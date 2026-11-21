@@ -17,22 +17,30 @@ export const SwitchWidget = ({ widgetConfig, widgetState, setWidgetState, fireWi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgetConfig?.defaultChecked]);
 
+  // Current-state refs (B05/F02): methods must read the latest committed
+  // value and live callbacks, never the first render's closure.
+  const liveRef = useRef(null);
+  liveRef.current = { checked, setWidgetState, fireWidgetEvent };
   const methodsRef = useRef(null);
   if (!methodsRef.current) {
     methodsRef.current = {
       setValue: (v) => {
+        const rt = liveRef.current;
         const b = v === true || v === "true";
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: b }));
-        if (fireWidgetEvent) fireWidgetEvent("onChange", { value: b });
+        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: b }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: b });
       },
       toggle: () => {
-        const next = !checked;
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: next }));
-        if (fireWidgetEvent) fireWidgetEvent("onChange", { value: next });
+        const rt = liveRef.current;
+        // Resolve against the latest committed state, not the creation closure.
+        const next = !rt.checked;
+        if (rt.setWidgetState) rt.setWidgetState(() => ({ value: next }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: next });
       },
       clear: () => {
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: false }));
-        if (fireWidgetEvent) fireWidgetEvent("onChange", { value: false });
+        const rt = liveRef.current;
+        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: false }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: false });
       },
     };
   }

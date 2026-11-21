@@ -14,10 +14,10 @@ const JET_FREE_PRESET = {
 };
 
 const FREE_MODEL_OPTIONS = [
-  "minimax/minimax-m3",
-  "nvidia/nemotron-3-ultra-550b-a55b:free",
-  "nvidia/nemotron-3-super-120b-a12b:free",
-  "z-ai/glm-5.2:free",
+  { id: "minimax/minimax-m3", label: "MiniMax M3" },
+  { id: "nvidia/nemotron-3-ultra-550b-a55b:free", label: "Nemotron 3 Ultra" },
+  { id: "nvidia/nemotron-3-super-120b-a12b:free", label: "Nemotron 3 Super" },
+  { id: "z-ai/glm-5.2:free", label: "GLM 5.2" },
 ];
 
 const schema = {
@@ -136,25 +136,25 @@ export const TenantAIConfigEditor = ({ tenantID }) => {
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2 rounded border border-border bg-muted/20 p-2">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-foreground">Jet Agent (Recommended)</p>
-            <p className="text-[11px] text-muted-foreground truncate">
-              OpenRouter · {JET_FREE_PRESET.model} · 1M context · tool-calling verified
+            <p className="text-xs font-medium text-foreground">Jet Agent (recommended)</p>
+            <p className="text-[11px] text-muted-foreground">
+              Fast, free-tier model with tool calling and a large context window.
             </p>
           </div>
           <Button type="button" size="sm" onClick={() => setFormData((prev) => ({ ...prev, ...JET_FREE_PRESET }))}>
             Use Jet Default
           </Button>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {FREE_MODEL_OPTIONS.map((m) => (
+        <div className="flex flex-wrap gap-2">
+          {FREE_MODEL_OPTIONS.map((model) => (
             <button
-              key={m}
+              key={model.id}
               type="button"
-              onClick={() => setFormData((prev) => ({ ...prev, model: m }))}
-              className="text-[11px] font-mono px-2 py-1 rounded border border-border bg-background hover:border-primary/50 hover:text-primary transition-colors"
-              title={`Use ${m}`}
+              onClick={() => setFormData((prev) => ({ ...prev, model: model.id }))}
+              className="rounded border border-border bg-background px-2 py-1 text-[11px] transition-colors hover:border-primary/50 hover:text-primary"
+              title={`Use ${model.label}`}
             >
-              {m}
+              {model.label}
             </button>
           ))}
         </div>
@@ -165,15 +165,17 @@ export const TenantAIConfigEditor = ({ tenantID }) => {
           renderers={jetFormsRenderers}
           onChange={handleChange}
         />
-        <div className="pt-2">
+        <div className="flex flex-wrap items-center gap-2 pt-2">
           <Button
             type="button"
             onClick={handleSubmit}
             disabled={isUpdating || isLoading || formErrors.length > 0}
-            size="sm"
           >
-            Save Configuration
+            Save AI settings
           </Button>
+          <span className="text-[11px] text-muted-foreground">
+            Saved separately from tenant details.
+          </span>
         </div>
       </div>
     </Section>

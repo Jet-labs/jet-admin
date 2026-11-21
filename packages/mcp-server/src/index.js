@@ -27,7 +27,7 @@
  *         "command": "node",
  *         "args": ["/absolute/path/to/packages/mcp-server/src/index.js"],
  *         "env": {
- *           "JET_ADMIN_MCP_BASE_URL": "http://localhost:5000",
+ *           "JET_ADMIN_BACKEND_URL": "http://localhost:5000",
  *           "JET_ADMIN_API_KEY": "your_api_key",
  *           "JET_ADMIN_TENANT_ID": "your_tenant_id"
  *         }
@@ -276,8 +276,13 @@ function jsonSchemaToZod(schema) {
  */
 function getErrorHint(error) {
   if (!error) return "An unknown error occurred.";
-  if (error.status === 401 || error.status === 403) {
-    return "Authentication failed. Check that JET_ADMIN_API_KEY is valid and has sufficient permissions.";
+  if (error.status === 401) {
+    return "Authentication failed. Check that JET_ADMIN_API_KEY is valid.";
+  }
+  if (error.status === 403) {
+    return "Permission denied (Casbin). The key is valid but its role lacks the required grant — e.g. move needs " +
+      "folder.update + per-entity update; clone needs create+read; page create needs dataquery/workflow/listener/widget execute. " +
+      "Fix in Roles, not by retrying with the same key.";
   }
   if (error.status === 404) {
     return "Resource not found. Verify the ID is correct and belongs to the configured tenant.";

@@ -591,6 +591,27 @@ The state tree has separate namespaces per widget: `state.widgets.{widgetID}`. W
 
 On unmount, `useWidgetMethodRegistry` dispatches `UNREGISTER_WIDGET`, which cleans up both `widgetMethods` and `widgetStates` for that widgetID.
 
+### B24 instance identity (resource vs placement vs repeat)
+
+`widgetID` above is the **runtime placement instance**, not the persisted
+widget resource (see `widgetInstanceIdentity.js`, the single source of truth):
+
+- `resourceID` (`parseResourceID(widgetKey)`, e.g. `42` from `widget_42_7`) —
+  persisted definition fetch, tenant scope, bundle-import remap (suffix kept).
+- `placementID` (full `widgetKey`, e.g. `widget_42_7`) — runtime state, method
+  registration/cleanup, and event context. Placing one saved widget twice gives
+  two isolated instances; removing one unregisters only its own key.
+- repeat instance (`<placement>::repeat:<nodeId>:<index>/…`) — runtime-only,
+  never persisted; each repeat iteration gets isolated state/methods, and a
+  firing iteration resolves its own bare placement/resource refs.
+
+New explicit reference form: `{{ state.widgets.<placementKey>… }}` and
+`CALL_WIDGET_METHOD` targets holding the full placement/instance key. Legacy
+`state.widgets.<resourceID>` aliases resolve only for unambiguous singletons
+and are `undefined` (with `widgetDiagnostics.ambiguousWidgetResources` naming
+candidates) when duplicated — never silently rerouted. Ambiguous method
+targets warn and skip instead of triggering an arbitrary placement.
+
 ---
 
 ## 13. Data Resolution: Who Does It & When

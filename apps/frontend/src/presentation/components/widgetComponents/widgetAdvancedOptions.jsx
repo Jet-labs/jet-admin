@@ -24,7 +24,7 @@ export const WidgetAdvancedOptions = ({ widgetForm, parentWidgetType }) => {
 
   return (
     <div className="mt-4">
-      <h3 className="mb-2 text-sm font-semibold text-foreground">
+      <h3 className="mb-2 text-sm font-medium text-foreground">
         Advanced Options
       </h3>
       <JsonForms

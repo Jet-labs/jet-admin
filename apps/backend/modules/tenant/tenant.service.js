@@ -145,79 +145,94 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
       params: { userID, tenantID },
     });
 
-    const tenantDeletionTransaction = await prisma.$transaction([
-      prisma.tblWidgetQueryMappings.deleteMany({
-        where: {
-          OR: [
-            { tblDataQueries: { tenantID } },
-            { tblWidgets: { tenantID } },
-          ],
-        },
-      }),
-      prisma.tblAPIKeyRoleMappings.deleteMany({
+    // Tenant-scoped rows are spread across many tables, and several foreign
+    // keys are "NoAction" rather than "Cascade", so the delete order matters.
+    // Keep this list in dependency order: children before parents.
+    await prisma.$transaction(async (tx) => {
+      // Workflow runtime data (logs/data collection requests cascade from
+      // instances; instances must go before workflows because their FK is
+      // NoAction).
+      await tx.tblWorkflowDataCollectionRequests.deleteMany({
+        where: { tblWorkflowInstances: { tenantID } },
+      });
+      await tx.tblWorkflowInstanceLogs.deleteMany({
+        where: { tblWorkflowInstances: { tenantID } },
+      });
+      await tx.tblWorkflowInstances.deleteMany({ where: { tenantID } });
+
+      // Cron jobs must be removed before their workflows, and history before
+      // the jobs themselves.
+      await tx.tblCronJobHistory.deleteMany({
+        where: { tblCronJobs: { tenantID } },
+      });
+      await tx.tblCronJobs.deleteMany({ where: { tenantID } });
+
+      // Listener actions/events cascade from listeners; delete listeners
+      // explicitly before their datasources.
+      await tx.tblListenerActions.deleteMany({
+        where: { tblListeners: { tenantID } },
+      });
+      await tx.tblListenerEvents.deleteMany({ where: { tenantID } });
+      await tx.tblListeners.deleteMany({ where: { tenantID } });
+
+      // Workflow graph rows cascade from the workflow, but remove them
+      // explicitly so the operation is obvious and order-safe.
+      await tx.tblWorkflowEdge.deleteMany({
+        where: { tblWorkflows: { tenantID } },
+      });
+      await tx.tblWorkflowNodes.deleteMany({
+        where: { tblWorkflows: { tenantID } },
+      });
+      await tx.tblWorkflows.deleteMany({ where: { tenantID } });
+
+      // App-page versions have no FK to app pages in the schema, so they
+      // must be removed by tenant explicitly.
+      await tx.tblAppPageVersions.deleteMany({ where: { tenantID } });
+      await tx.tblAppPages.deleteMany({ where: { tenantID } });
+
+      await tx.tblDataQueries.deleteMany({ where: { tenantID } });
+      await tx.tblDatasources.deleteMany({ where: { tenantID } });
+      await tx.tblWidgets.deleteMany({ where: { tenantID } });
+
+      // Vault entries reference API keys/roles with NoAction.
+      await tx.tblVaultCredentials.deleteMany({ where: { tenantID } });
+
+      await tx.tblAPIKeyRoleMappings.deleteMany({
         where: {
           OR: [
             { tblAPIKeys: { tenantID } },
             { tblRoles: { tenantID } },
           ],
         },
-      }),
-      prisma.tblRolePermissionMappings.deleteMany({
-        where: {
-          tblRoles: { tenantID },
-        },
-      }),
-      prisma.tblUserTenantRoleMappings.deleteMany({
-        where: {
-          tenantID,
-        },
-      }),
-      prisma.tblUserNotifications.deleteMany({
-        where: {
-          tenantID,
-        },
-      }),
-      prisma.tblUserTenantConfigMap.deleteMany({
-        where: {
-          tenantID,
-        },
-      }),
-      prisma.tblUsersTenantsRelationship.deleteMany({
-        where: {
-          tenantID,
-        },
-      }),
-      prisma.tblAPIKeys.deleteMany({
-        where: {
-          tenantID,
-        },
-      }),
-      prisma.tblWidgets.deleteMany({
-        where: {
-          tenantID,
-        },
-      }),
-      prisma.tblAppPages.deleteMany({
-        where: {
-          tenantID,
-        },
-      }),
-      prisma.tblDataQueries.deleteMany({
-        where: {
-          tenantID,
-        },
-      }),
-      prisma.tblRoles.deleteMany({
-        where: {
-          tenantID,
-        },
-      }),
-      prisma.tblTenants.delete({
-        where: {
-          tenantID,
-        },
-      }),
-    ]);
+      });
+      await tx.tblRolePermissionMappings.deleteMany({
+        where: { tblRoles: { tenantID } },
+      });
+      await tx.tblUserTenantRoleMappings.deleteMany({ where: { tenantID } });
+      await tx.tblUserNotifications.deleteMany({ where: { tenantID } });
+      await tx.tblUserTenantConfigMap.deleteMany({ where: { tenantID } });
+      await tx.tblUsersTenantsRelationship.deleteMany({ where: { tenantID } });
+
+      // API keys and roles must go after everything that references them.
+      await tx.tblAPIKeys.deleteMany({ where: { tenantID } });
+      await tx.tblRoles.deleteMany({ where: { tenantID } });
+
+      // Folders last: widgets, queries, pages, workflows, etc. reference them.
+      await tx.tblFolders.deleteMany({ where: { tenantID } });
+
+      // Not represented by tenant relations in the Prisma schema, but still
+      // tenant-scoped. Published widget-library entries are deployment-wide
+      // and intentionally retained (their sourceTenantID is advisory only).
+      await tx.tblTenantConfig.deleteMany({ where: { tenantID } });
+
+      // Remove Casbin policies for this tenant domain (v1 = tenantID).
+      await tx.$executeRawUnsafe(
+        `DELETE FROM casbin_rule WHERE v1 = $1`,
+        tenantID
+      );
+
+      await tx.tblTenants.delete({ where: { tenantID } });
+    }, { timeout: 60000 });
 
     Logger.log("success", {
       message: "tenantService:deleteUserTenantByID:success",
@@ -356,6 +371,20 @@ tenantService.createTenant = async ({
     } catch (casbinErr) {
       Logger.log("warning", { message: "tenantService:createTenant:casbinFailed", params: { error: casbinErr.message } });
       // don't fail tenant creation if casbin fails
+    }
+
+    // Global roles are seeded with tenantID=null; their Casbin policies must
+    // exist in the new tenant domain immediately. Previously this only
+    // happened after a manual sync/restart, so a brand-new ADMIN API key got
+    // 403 on every protected route.
+    try {
+      await tenantRoleService.syncGlobalRolesForTenant(newTenant.tenantID);
+    } catch (policyErr) {
+      Logger.log("warning", {
+        message: "tenantService:createTenant:globalRolePolicySyncFailed",
+        params: { error: policyErr.message, tenantID: newTenant.tenantID },
+      });
+      // don't fail tenant creation if policy sync fails
     }
 
     Logger.log("success", {

@@ -178,7 +178,14 @@ async function listLiveProxies(opts = {}) {
   for (let i = 0; i < keys.length; i += 1) {
     try {
       const node = JSON.parse(raws[i]);
-      if (node && typeof node === 'object') {
+      if (node && typeof node === "object") {
+        // TTL normally removes dead nodes, but a clock skew / paused process
+        // can leave a key alive with an old heartbeat. Treat that as dead so
+        // listeners are reassigned instead of staying pinned forever.
+        const last = Date.parse(node.lastHeartbeatAt || "");
+        if (Number.isFinite(last) && Date.now() - last > NODE_TTL_SEC * 1000) {
+          continue;
+        }
         live.push({ proxyID: keys[i].slice('proxy:node:'.length), ...node });
       }
     } catch (_) { /* corrupt entry — treated as not-live */ }
@@ -224,7 +231,22 @@ async function readAssignments(listenerIDs, opts = {}) {
 // no torn shards.
 const APPLY_LUA = `
 local moves = cjson.decode(ARGV[1])
+local version = tonumber(redis.call('GET', 'proxy:version') or '0')
+if version ~= tonumber(ARGV[2]) then return -1 end
+local shards = cjson.decode(ARGV[3])
+-- Validate the entire snapshot before mutating anything.
 for _, m in ipairs(moves) do
+  local raw = redis.call('GET', 'proxy:assign:' .. m.listenerID)
+  local owner = nil
+  if raw then
+    local ok, parsed = pcall(cjson.decode, raw)
+    if ok and parsed and parsed.proxyID and parsed.proxyID ~= cjson.null then owner = parsed.proxyID end
+  end
+  if owner ~= m.from then return -1 end
+  if m.to and redis.call('EXISTS', 'proxy:node:' .. m.to) == 0 then return -2 end
+end
+for _, m in ipairs(moves) do
+  for _, shard in ipairs(shards) do redis.call('SREM', shard, m.listenerID) end
   if m.from then
     redis.call('SREM', 'proxy:shard:' .. m.from, m.listenerID)
     if redis.call('SCARD', 'proxy:shard:' .. m.from) == 0 then
@@ -233,7 +255,7 @@ for _, m in ipairs(moves) do
   end
   if m.to then
     redis.call('SADD', 'proxy:shard:' .. m.to, m.listenerID)
-    redis.call('SET', 'proxy:assign:' .. m.listenerID, cjson.encode({proxyID = m.to}))
+    redis.call('SET', 'proxy:assign:' .. m.listenerID, cjson.encode({proxyID = m.to, epoch = version + 1}))
   else
     redis.call('DEL', 'proxy:assign:' .. m.listenerID)
   end
@@ -241,20 +263,77 @@ end
 return redis.call('INCR', 'proxy:version')
 `;
 
+const REMOVE_LISTENER_LUA = `
+local raw = redis.call('GET', KEYS[1])
+if not raw then return 0 end
+local ok, assignment = pcall(cjson.decode, raw)
+if ok and assignment and assignment.proxyID then
+  redis.call('SREM', 'proxy:shard:' .. assignment.proxyID, ARGV[1])
+  if redis.call('SCARD', 'proxy:shard:' .. assignment.proxyID) == 0 then
+    redis.call('DEL', 'proxy:shard:' .. assignment.proxyID)
+  end
+end
+redis.call('DEL', KEYS[1])
+redis.call('INCR', 'proxy:version')
+return 1
+`;
+
+/**
+ * Remove a listener's placement and shard membership. Used when a listener
+ * is deactivated or deleted so stale assignments do not survive forever.
+ */
+async function removeListener(listenerID, opts = {}) {
+  if (!listenerID) return { removed: false, version: await getVersion(opts) };
+  const client = opts.client || getClient();
+  const removed = await client.eval(REMOVE_LISTENER_LUA, 1, keyAssign(listenerID), listenerID);
+  let version = await getVersion({ ...opts, client });
+  if (Number(removed) === 1) {
+    try {
+      // eslint-disable-next-line global-require
+      const { publishControl } = require('../../config/listenerBus.config');
+      await publishControl({ type: 'ASSIGNMENTS_CHANGED', version }, { client });
+    } catch (_) { /* best effort */ }
+    Logger.log('info', {
+      message: 'proxyRegistry:listenerRemoved',
+      params: { listenerID, version },
+    });
+  }
+  return { removed: Number(removed) === 1, version };
+}
+
 /**
  * Reconcile desired vs stored placement; apply only the delta.
  * @returns {{moved: number, moves: Array, version: number}}
  */
 async function rebalance(listenerIDs, proxies, opts = {}) {
   const client = opts.client || getClient();
+  const expectedVersion = await getVersion({ ...opts, client });
   const desired = assignListeners(listenerIDs, proxies);
-  const ids = [...new Set((listenerIDs || []).filter(Boolean))].sort();
+  // Inspect shard membership as well as assign keys so old split-brain debris
+  // and removed listeners heal, even when the desired assign key looks right.
+  let cursor = '0';
+  const shardKeys = new Set();
+  do {
+    const [next, keys] = await client.scan(cursor, 'MATCH', 'proxy:shard:*', 'COUNT', SCAN_COUNT);
+    cursor = String(next);
+    for (const key of keys || []) if (key.startsWith('proxy:shard:')) shardKeys.add(key);
+  } while (cursor !== '0');
+  const observed = new Map();
+  for (const key of shardKeys) {
+    for (const id of await client.smembers(key)) {
+      if (!observed.has(id)) observed.set(id, new Set());
+      observed.get(id).add(key.slice('proxy:shard:'.length));
+    }
+  }
+  const ids = [...new Set([...(listenerIDs || []).filter(Boolean), ...observed.keys()])].sort();
   const current = await readAssignments(ids, { ...opts, client });
   const moves = [];
   for (const listenerID of ids) {
     const from = current[listenerID] || null;
     const to = desired[listenerID] || null;
-    if (from !== to) {
+    const owners = observed.get(listenerID) || new Set();
+    const shardDrift = to ? owners.size !== 1 || !owners.has(to) : owners.size > 0;
+    if (from !== to || shardDrift) {
       moves.push({
         listenerID,
         ...(from ? { from } : {}),
@@ -265,12 +344,37 @@ async function rebalance(listenerIDs, proxies, opts = {}) {
   if (moves.length === 0) {
     return { moved: 0, moves, version: await getVersion({ ...opts, client }) };
   }
-  const newVersion = await client.eval(APPLY_LUA, 0, JSON.stringify(moves));
+  const newVersion = await client.eval(APPLY_LUA, 0, JSON.stringify(moves), String(expectedVersion), JSON.stringify([...shardKeys]));
+  if (Number(newVersion) < 0) return { moved: 0, moves: [], version: await getVersion({ ...opts, client }), conflict: true };
   Logger.log('info', {
     message: 'proxyRegistry:rebalanced',
     params: { moved: moves.length, version: Number(newVersion) },
   });
   return { moved: moves.length, moves, version: Number(newVersion) };
+}
+
+async function getAssignment(listenerID, opts = {}) {
+  const client = opts.client || getClient();
+  const token = await client.get(keyAssign(listenerID));
+  if (!token) return null;
+  try { return { ...JSON.parse(token), token }; } catch (_) { return null; }
+}
+
+const PUBLISH_OWNED_LUA = `
+if redis.call('GET', KEYS[1]) ~= ARGV[1] then return 0 end
+if redis.call('EXISTS', KEYS[2]) == 0 then return 0 end
+return redis.call('XADD', KEYS[3], 'MAXLEN', '~', ARGV[2], '*', 'data', ARGV[3])
+`;
+
+async function publishOwnedListenerEvent({ proxyID, assignmentToken, ...job }, opts = {}) {
+  const client = opts.client || getClient();
+  const { getBusConfig, buildEnvelope } = require('../../config/listenerBus.config');
+  const { stream, maxLen } = getBusConfig();
+  const envelope = buildEnvelope(job);
+  const accepted = await client.eval(PUBLISH_OWNED_LUA, 3, keyAssign(job.listenerID), keyNode(proxyID), stream,
+    assignmentToken, String(maxLen), JSON.stringify(envelope));
+  if (!accepted || accepted === 0) throw new Error('Listener ownership fence rejected stale ingress');
+  return envelope;
 }
 
 /**
@@ -309,7 +413,7 @@ async function reconcileAndAnnounce({ fetchActiveIDs } = {}, opts = {}) {
     try {
       // eslint-disable-next-line global-require
       const { publishControl } = require('../../config/listenerBus.config');
-      publishControl({ type: 'ASSIGNMENTS_CHANGED', version }).catch((err) => {
+      publishControl({ type: 'ASSIGNMENTS_CHANGED', version }, opts).catch((err) => {
         Logger.log('warning', { message: 'proxyRegistry:announce:failed', params: { error: err.message } });
       });
     } catch (err) {
@@ -340,6 +444,9 @@ module.exports = {
   getShard,
   getVersion,
   readAssignments,
+  getAssignment,
+  publishOwnedListenerEvent,
+  removeListener,
   rebalance,
   reconcile,
   reconcileAndAnnounce,

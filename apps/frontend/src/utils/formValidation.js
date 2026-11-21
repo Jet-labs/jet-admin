@@ -148,17 +148,41 @@ formValidations.apiKeyUpdationFormValidationSchema = Yup.object().shape({
   apiKeyTitle: Yup.string().required("API key name is required"),
 });
 
+// Five-field cron expression check (minute hour day month weekday). It
+// accepts numbers, names, lists, ranges and steps; the backend performs the
+// authoritative node-cron validation.
+export const isValidCronExpression = (value) => {
+  if (typeof value !== "string") return false;
+  const parts = value.trim().split(/\s+/);
+  if (parts.length !== 5) return false;
+  return parts.every((part) =>
+    /^(\*|[0-9A-Za-z]+)([-,/][0-9A-Za-z*]+)*$/.test(part)
+  );
+};
+
+const cronScheduleSchema = Yup.string()
+  .required("Schedule is required")
+  .test(
+    "valid-cron",
+    "Invalid cron schedule expression",
+    (value) => isValidCronExpression(value)
+  );
+
 formValidations.cronJobAdditionFormValidationSchema = Yup.object().shape({
-  cronJobTitle: Yup.string().required("Scheduled job title is required"),
+  cronJobTitle: Yup.string()
+    .required("Scheduled job title is required")
+    .max(255, "Scheduled job title must be 255 characters or fewer"),
   cronJobDescription: Yup.string().optional(),
-  cronJobSchedule: Yup.string().required("Schedule is required"),
+  cronJobSchedule: cronScheduleSchema,
   workflowID: Yup.string().required("Workflow is required"),
 });
 
 formValidations.cronJobUpdationFormValidationSchema = Yup.object().shape({
-  cronJobTitle: Yup.string().required("Scheduled job title is required"),
+  cronJobTitle: Yup.string()
+    .required("Scheduled job title is required")
+    .max(255, "Scheduled job title must be 255 characters or fewer"),
   cronJobDescription: Yup.string().optional(),
-  cronJobSchedule: Yup.string().required("Schedule is required"),
+  cronJobSchedule: cronScheduleSchema,
   workflowID: Yup.string().required("Workflow is required"),
 });
 

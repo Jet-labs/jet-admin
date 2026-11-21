@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
 import React, { useEffect, useMemo, useState, useRef } from "react";
@@ -27,6 +27,7 @@ import { AppPageConsole } from "../editor/appPageConsole";
 import { appendWidgetToAppPageConfig } from "../editor/appPageLayoutUtils";
 import { AppPageRuntimeProvider } from "../../../../logic/appPageRuntime/AppPageRuntimeProvider";
 import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootstrapper";
+import { AppPageWorkflowInputHost } from '../appPageWorkflowInputHost';
 
 import { PageHeader, Button } from "@jet-admin/ui";
 import { BundleExportButton } from "../../bundleComponents/bundleExportButton";
@@ -47,6 +48,12 @@ const EMPTY_INITIAL_VALUES = {
 // debounced but continuous dragging still produces many entries; without a
 // cap the history grows without bound over long editing sessions.
 const MAX_HISTORY_ENTRIES = 50;
+
+// JSON.stringify is key-order sensitive; server/runtime normalization can
+// otherwise look like a user edit and show a false "1 unsaved change".
+// appPageConfigSignature() migrates V1 layouts and ignores editor-only node
+// IDs/legacy containers so reopening a saved page is not treated as dirty.
+import { appPageConfigSignature } from "../layout/engine/configSignature.js";
 
 export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
   const queryClient = useQueryClient();
@@ -126,7 +133,12 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
         confirmButtonClass: "",
       });
       if (!confirmed) return;
-      updateAppPage(appPageUpdationForm.values);
+      updateAppPage({
+        ...appPageUpdationForm.values,
+        // Optimistic concurrency: the server rejects a save if this page was
+        // changed after it was loaded.
+        expectedUpdatedAt: appPage?.updatedAt || undefined,
+      });
     },
   });
 
@@ -157,22 +169,38 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
       isUndoAction.current = false;
       return;
     }
+    if (!hasInitialized || !appPage) return;
 
-    if (history.length > 0 && appPageUpdationForm.values.appPageConfig) {
+    if (appPageUpdationForm.values.appPageConfig) {
       const currentConfig = appPageUpdationForm.values.appPageConfig;
-      const lastConfig = history[historyIndex];
+      const currentSignature = appPageConfigSignature(currentConfig);
+      const loadedSignature = appPageConfigSignature(appPage.appPageConfig || {});
 
-      if (JSON.stringify(currentConfig) !== JSON.stringify(lastConfig)) {
-        const branched = [...history.slice(0, historyIndex + 1), currentConfig];
-        const newHistory =
-          branched.length > MAX_HISTORY_ENTRIES
-            ? branched.slice(branched.length - MAX_HISTORY_ENTRIES)
-            : branched;
-        setHistory(newHistory);
-        setHistoryIndex(newHistory.length - 1);
+      // The form/runtime may normalize or reorder the config after load. If
+      // it is still equivalent to what the server returned, it is not a user
+      // edit and must not create an undo entry or an unsaved-change prompt.
+      if (currentSignature === loadedSignature) {
+        if (historyIndex !== 0 || history.length !== 1) {
+          setHistory([currentConfig]);
+          setHistoryIndex(0);
+        }
+        return;
+      }
+
+      if (history.length > 0 && history[historyIndex] !== undefined) {
+        const lastConfig = history[historyIndex];
+        if (appPageConfigSignature(currentConfig) !== appPageConfigSignature(lastConfig)) {
+          const branched = [...history.slice(0, historyIndex + 1), currentConfig];
+          const newHistory =
+            branched.length > MAX_HISTORY_ENTRIES
+              ? branched.slice(branched.length - MAX_HISTORY_ENTRIES)
+              : branched;
+          setHistory(newHistory);
+          setHistoryIndex(newHistory.length - 1);
+        }
       }
     }
-  }, [appPageUpdationForm.values.appPageConfig]);
+  }, [appPageUpdationForm.values.appPageConfig, appPage, hasInitialized, history, historyIndex]);
 
   useUnsavedChangesGuard({
     isDirty: historyIndex > 0,
@@ -198,6 +226,9 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
       ...appPageUpdationForm.values.appPageConfig,
       ...nextAppPageConfig,
     });
+    // Re-seed the canvas explicitly so the new placement cannot be lost to a
+    // late onChangeLayout emission from the previous tree.
+    setEditorKey((prev) => prev + 1);
   };
 
   return (
@@ -258,6 +289,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
             pageConfig={appPageUpdationForm.values.appPageConfig}
           >
             <AppPageDataSourceBootstrapper />
+            <AppPageWorkflowInputHost />
             <ResizablePanelGroup direction="vertical" className="!h-full !w-full">
               <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_TOP_PANEL} defaultSize={75} className="flex min-h-0 min-w-0">
                 <ResizablePanelGroup
@@ -303,6 +335,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
                         );
                       }}
                       appPageEditorForm={appPageUpdationForm}
+                      onAddWidget={handleAddWidgetToCanvas}
                     />
                   </ResizablePanel>
                 </ResizablePanelGroup>

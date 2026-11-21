@@ -51,6 +51,7 @@ export const testDatasourceConnectionAPI = async ({
   tenantID,
   datasourceType,
   datasourceOptions,
+  datasourceID,
 }) => {
   try {
     const url =
@@ -63,6 +64,7 @@ export const testDatasourceConnectionAPI = async ({
         {
           datasourceType,
           datasourceOptions,
+          ...(datasourceID ? { datasourceID } : {}),
         },
         {
           headers: {

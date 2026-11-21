@@ -11,14 +11,17 @@ export const DatasourceTestingForm = ({
   tenantID,
   datasourceType,
   datasourceOptions,
+  datasourceID,
   setDatasourceTestResult,
-  size = "sm"
+  size = "default"
 }) => {
   DatasourceTestingForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
     datasourceType: PropTypes.string.isRequired,
     datasourceOptions: PropTypes.object.isRequired,
+    datasourceID: PropTypes.string,
     setDatasourceTestResult: PropTypes.func.isRequired,
+    size: PropTypes.oneOf(["default", "sm", "lg"]),
   };
 
   const { isPending: isTestingDatasource, mutate: testDatasource } =
@@ -28,6 +31,7 @@ export const DatasourceTestingForm = ({
           tenantID,
           datasourceType,
           datasourceOptions,
+          datasourceID,
         });
       },
       retry: false,
@@ -36,8 +40,15 @@ export const DatasourceTestingForm = ({
         displaySuccess(CONSTANTS.STRINGS.TEST_DATASOURCE_FORM_TESTING_SUCCESS);
       },
       onError: (error) => {
-        setDatasourceTestResult(error);
-        displayError(error);
+        // Axios errors carry a large stack/config object. Show only the
+        // server-provided message so the result panel cannot dump internals.
+        const serverError = error?.response?.data?.error;
+        const message = (typeof serverError === "string" ? serverError : serverError?.message)
+          || error?.response?.data?.message
+          || error?.message
+          || "Connection test failed";
+        setDatasourceTestResult({ ok: false, error: message });
+        displayError(message);
       },
     });
 
@@ -50,7 +61,7 @@ export const DatasourceTestingForm = ({
       <Button
         type="button"
         variant="outline"
-        size="sm"
+        size={size}
         onClick={_handleTestQuery}
         disabled={isTestingDatasource}
         aria-label="Test datasource"

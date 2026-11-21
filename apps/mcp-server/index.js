@@ -17,7 +17,7 @@
  *
  * Why dynamic import for tools:
  *   environment.js must run (dotenv.config) before the tool modules
- *   load their own config (which reads JET_ADMIN_MCP_BASE_URL).
+ *   load their own config (which reads JET_ADMIN_BACKEND_URL).
  *   Static imports are hoisted so we use await import() for the tools
  *   to guarantee env is set first.
  */

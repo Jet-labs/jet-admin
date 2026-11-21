@@ -75,11 +75,14 @@ export function CanvasWidgetSlot({
   style,
   condition,
   repeat,
+  hideMode,
+  keepMounted,
   locked,
 }) {
   const { renderWidget, previewMode, editorLiveStateTree } = useCraftEditorContext();
   // Edit-canvas dimming: node stays visible for editing but shows its
   // viewer-hidden state via reduced opacity (badge still explains why).
+  // Preview mimics viewer: collapse unmounts, preserve/keepMounted hide via CSS.
   const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
 
   const {
@@ -101,6 +104,9 @@ export function CanvasWidgetSlot({
       parentDisplayName: pNode?.data?.displayName ?? null,
     };
   });
+  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+    return null;
+  }
 
   const isInRow = parentDisplayName === "CanvasRow";
   const isFixedPx = width != null && width !== "grow" && !(typeof width === "string" && width.endsWith("%"));
@@ -123,6 +129,11 @@ export function CanvasWidgetSlot({
     ...(style || {}),
     ...resolveWidthStyle(width, isInRow),
     ...resolveHeightStyle(height, sizing, fixedHeight),
+    ...(previewMode && hiddenByCondition
+      ? hideMode === "preserve-space"
+        ? { visibility: "hidden", pointerEvents: "none" }
+        : { display: "none", pointerEvents: "none" }
+      : {}),
   };
 
   // Grid placement: use inline style for guaranteed 12-column grid participation.
@@ -137,7 +148,7 @@ export function CanvasWidgetSlot({
   return (
     <div
       ref={(ref) => !previewMode && connect(locked ? ref : drag(ref))}
-      className={`flex flex-col relative min-w-0 self-stretch min-h-0 box-border craft-node craft-node-widget ${sizingClass} ${
+      className={`group flex flex-col relative min-w-0 self-stretch min-h-0 box-border craft-node craft-node-widget ${sizingClass} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
       } ${!previewMode ? "layout-widget-slot-edit" : ""} ${locked ? "layout-widget-locked" : ""} ${hiddenByCondition && !previewMode ? "opacity-40 saturate-50" : ""}`}
       style={slotStyle}
@@ -146,9 +157,9 @@ export function CanvasWidgetSlot({
       title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
     >
       {!previewMode && (condition || repeat || locked) && (
-        <div className="absolute left-2 top-2 z-50 pointer-events-none flex gap-1 items-center">
+        <div className="absolute left-2 bottom-2 z-40 pointer-events-none flex gap-1 items-center">
           {locked && (
-            <div className="flex items-center gap-1.5 rounded bg-amber-500/20 text-amber-600 border border-amber-500/30 text-[9px] font-bold px-1.5 py-0.5 leading-none uppercase tracking-wider">
+            <div className="flex items-center gap-1.5 rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none tracking-wider text-amber-400 backdrop-blur-sm">
               <Lock className="h-2.5 w-2.5" />
               <span>Locked</span>
             </div>
@@ -210,6 +221,8 @@ CanvasWidgetSlot.craft = {
     style: {},
     condition: null,
     repeat: null,
+    hideMode: null,
+    keepMounted: false,
     locked: false,
   },
   rules: {

@@ -3,7 +3,7 @@ import { Logger } from "../../utils/logger.js";
 import DataSource from "../datasource.js";
 
 export default class RestAPIDataSource extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions, context, helpers = {}) {
     const {
       method,
       apiEndpoint,
@@ -104,6 +104,7 @@ export default class RestAPIDataSource extends DataSource {
         data: queryBody,
         params: finalParams,
         timeout: (datasourceOptions.timeout || 15) * 1000,
+        ...(helpers?.signal ? { signal: helpers.signal } : {}),
       };
 
       Logger.log("info", {

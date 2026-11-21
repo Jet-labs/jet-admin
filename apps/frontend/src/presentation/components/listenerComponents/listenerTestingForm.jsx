@@ -152,7 +152,7 @@ export const ListenerTestingForm = ({
             <div className={`ml-2 flex items-center gap-1.5 text-xs font-mono px-2 py-0.5 rounded border ${
               testResult.success
                 ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-400"
-                : "border-red-500/30 bg-red-500/5 text-red-400"
+                : "border-destructive/30 bg-destructive/5 text-destructive"
             }`}>
                <span className="font-semibold">{testResult.success ? "✓" : "✗"}</span>
                {testResult.message}
@@ -260,7 +260,7 @@ export const ListenerTestingForm = ({
               <div key={`transform-${idx}`} className="mb-2 border-b border-zinc-800/50 pb-2 last:border-0 last:pb-0">
                 <div className="text-zinc-500 mb-1">[{new Date(evt.timestamp).toLocaleTimeString()}]</div>
                 {evt.transformError ? (
-                  <pre className="whitespace-pre-wrap break-words text-red-400">
+                  <pre className="whitespace-pre-wrap break-words text-destructive">
                     Error: {evt.transformError}
                   </pre>
                 ) : evt.transformedEvent === null || evt.transformedEvent === undefined ? (

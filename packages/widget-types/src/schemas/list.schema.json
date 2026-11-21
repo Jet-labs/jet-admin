@@ -4,14 +4,55 @@
   "schema": {
     "type": "object",
     "properties": {
-      "dataTemplate": { "type": "string", "description": "Template resolving to an array" },
-      "titleKey": { "type": "string", "default": "title" },
-      "subtitleKey": { "type": "string", "default": "subtitle" },
-      "metaKeys": { "type": "array", "items": { "type": "string" }, "description": "Extra keys to show as meta line" },
-      "layout": { "type": "string", "enum": ["rows", "cards"], "default": "rows" },
-      "emptyText": { "type": "string", "default": "No items" },
-      "searchable": { "type": "boolean", "default": false }
+      "dataTemplate": {
+        "type": "string",
+        "description": "Template resolving to an array"
+      },
+      "titleKey": {
+        "type": "string",
+        "default": "title"
+      },
+      "subtitleKey": {
+        "type": "string",
+        "default": "subtitle"
+      },
+      "metaKeys": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Extra keys to show as meta line"
+      },
+      "layout": {
+        "type": "string",
+        "enum": [
+          "rows",
+          "cards"
+        ],
+        "default": "rows"
+      },
+      "emptyText": {
+        "type": "string",
+        "default": "No items"
+      },
+      "searchable": {
+        "type": "boolean",
+        "default": false
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onItemClick", "onSearch"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onItemClick",
+    "onSearch"
+  ]
 }

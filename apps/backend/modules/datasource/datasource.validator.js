@@ -25,6 +25,15 @@ const testConnectionSchema = z.object({
   datasourceOptions: z.object({}).passthrough(),
 }).passthrough();
 
+// Separate JSON-endpoint validation (does NOT alter /test behavior).
+// Validates that a restapi baseUrl + testPath serves parseable JSON, not an SPA shell.
+const testJsonEndpointSchema = z.object({
+  datasourceType: z.string().min(1, "datasourceType is required"),
+  datasourceOptions: z.object({}).passthrough(),
+  testPath: z.string().min(1, "testPath is required").max(2048),
+  testMethod: z.string().optional(),
+}).passthrough();
+
 const proxyActionSchema = z.object({
   action: z.string().min(1, "action is required"),
   params: z.object({}).passthrough().optional(),
@@ -40,6 +49,7 @@ const datasourceIdParamSchema = z.object({
 
 const listDatasourcesQuerySchema = z.object({
   search: z.string().optional(),
+  folderID: schemas.uuidSchema.optional(),
 }).merge(schemas.paginationSchema).passthrough();
 
 // ============================================================
@@ -50,6 +60,7 @@ module.exports = {
   createDatasourceSchema,
   updateDatasourceSchema,
   testConnectionSchema,
+  testJsonEndpointSchema,
   proxyActionSchema,
   datasourceIdParamSchema,
   listDatasourcesQuerySchema,

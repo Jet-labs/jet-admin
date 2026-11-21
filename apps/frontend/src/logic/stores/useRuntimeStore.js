@@ -214,9 +214,17 @@ export const useRuntimeStore = create((set, get) => ({
 
   setWidgetState: (widgetID, widgetState) => {
     set((state) => {
+      const prevWidgetState = state.widgetStates[widgetID] || {};
+      let patch = widgetState;
+      // B01 parity: accept React-style functional updaters atomically.
+      if (typeof patch === "function") {
+        patch = patch(prevWidgetState);
+      }
+      if (patch === null || patch === undefined) return state;
+      if (typeof patch !== "object" || Array.isArray(patch)) return state;
       const nextWidgetStates = {
         ...state.widgetStates,
-        [widgetID]: { ...state.widgetStates[widgetID], ...widgetState },
+        [widgetID]: { ...prevWidgetState, ...patch },
       };
       const nextState = { ...state, widgetStates: nextWidgetStates };
       return {

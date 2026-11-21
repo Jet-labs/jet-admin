@@ -1,0 +1,122 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "method": {
+        "type": "string",
+        "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+        "default": "GET"
+      },
+      "path": {
+        "type": "string",
+        "description": "API path, e.g. /repos/owner/repo/issues",
+        "default": "/repos/owner/repo/issues"
+      },
+      "queryParams": {
+        "type": "array",
+        "description": "Query parameters",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "value": { "type": "string" }
+          },
+          "required": ["key"]
+        }
+      },
+      "headers": {
+        "type": "array",
+        "description": "Extra headers",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "value": { "type": "string" }
+          },
+          "required": ["key"]
+        }
+      },
+      "body": {
+        "description": "JSON body for POST/PUT/PATCH."
+      },
+      "inputDefinitions": {
+        "type": "array",
+        "description": "Query parameters",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["method", "path"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/method",
+            "label": "Method"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/path",
+            "label": "Path"
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/queryParams",
+            "label": "Query Params"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/headers",
+            "label": "Headers"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/body",
+        "label": "Body"
+      },
+      {
+        "type": "Group",
+        "options": {
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Parameters"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "method": "GET",
+    "path": "/repos/owner/repo/issues",
+    "queryParams": [],
+    "headers": [],
+    "body": null,
+    "inputDefinitions": []
+  }
+}

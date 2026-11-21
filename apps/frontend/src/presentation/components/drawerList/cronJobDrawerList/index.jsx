@@ -43,7 +43,8 @@ export const CronJobDrawerList = () => {
           </div>
 
           <span
-            className={`truncate text-sm ${isActive ? "font-semibold" : "font-medium"}`}
+            className={`truncate text-sm ${isActive ? "font-medium" : "font-normal"}`}
+            title={cronJob.cronJobTitle}
           >
             {cronJob.cronJobTitle}
           </span>

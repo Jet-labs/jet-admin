@@ -38,11 +38,12 @@ export const datasourceTools = [
         },
         page: { type: "number", description: "Page number (1-based). Default 1. Example: 1." },
         pageSize: { type: "number", description: "Results per page (max 100). Default 20. Example: 20." },
+        folderID: { type: "string", description: "Optional. Filter by folder UUID (see list_folders with entityType datasource)." },
       },
     },
-    handler: async ({ search, page, pageSize } = {}, context) => {
+    handler: async ({ search, page, pageSize, folderID } = {}, context) => {
       const { datasourceAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      const data = await datasourceAPI.list({ search, page, pageSize });
+      const data = await datasourceAPI.list({ search, page, pageSize, folderID });
       const datasources = safeArray(data, "datasources");
 
       return {
@@ -132,12 +133,16 @@ export const datasourceTools = [
       try {
         return await datasourceAPI.proxy(id, { action: "getSchema", params: {} });
       } catch (proxyErr) {
-        // If the datasource type doesn't support schema introspection, fall back to config info
+        // If the datasource type doesn't support schema introspection, fall back to config info.
+        // NOTE: the backend proxy answers ALL action failures with HTTP 400, so status
+        // codes must NOT trigger the fallback — only messages stating the action is
+        // unsupported/not allowed. Anything else (auth, timeout, SQL errors) is rethrown
+        // so the real cause surfaces instead of a misleading "does not support" message.
+        const msg = proxyErr.message || "";
         const isUnsupported =
-          proxyErr.message?.includes("not supported") ||
-          proxyErr.message?.includes("getSchema") ||
-          proxyErr.status === 400 ||
-          proxyErr.status === 422;
+          msg.includes("not supported") ||
+          msg.includes("not allowed") ||
+          msg.includes("is not supported or allowed");
 
         if (isUnsupported) {
           try {
@@ -208,11 +213,13 @@ export const datasourceTools = [
           params: { table, limit: Math.min(limit, 50) },
         });
       } catch (proxyErr) {
+        // Same rule as get_datasource_schema above: HTTP 400 is the proxy's generic
+        // failure status, so only unsupported-action messages trigger the fallback.
+        const msg = proxyErr.message || "";
         const isUnsupported =
-          proxyErr.message?.includes("not supported") ||
-          proxyErr.message?.includes("getSampleData") ||
-          proxyErr.status === 400 ||
-          proxyErr.status === 422;
+          msg.includes("not supported") ||
+          msg.includes("not allowed") ||
+          msg.includes("is not supported or allowed");
 
         if (isUnsupported) {
           try {
@@ -245,32 +252,34 @@ export const datasourceTools = [
       "Test whether a set of connection options can reach a datasource — WITHOUT saving anything.\n\n" +
       "Returns: the backend test result — typically { success, latencyMs?, ... } with latency when the\n" +
       "connection succeeds, and an error description when it fails.\n\n" +
+      "SCOPE: host reachability ONLY. For restapi, success:true on a bare baseUrl does NOT prove any API\n" +
+      "endpoint serves JSON (an SPA shell also returns 200 HTML). For endpoint validation use\n" +
+      "test_datasource_json_endpoint with a testPath instead.\n\n" +
       "Use this to validate credentials/options BEFORE create_datasource (creation does not test the\n" +
       "connection), or to diagnose a broken existing connection with modified options.\n" +
-      "The options object is the same shape create_datasource expects for that datasourceType — if unsure,\n" +
-      "call get_datasource_schemas first.\n\n" +
-      "Example call 1 — PostgreSQL:\n" +
+      "The options object MUST match the backend-validated shape for that datasourceType — call\n" +
+      "get_datasource_schemas FIRST and copy its structure.\n\n" +
+      "Example call 1 — PostgreSQL (connectionString form):\n" +
       '  { "datasourceType": "postgresql",\n' +
-      '    "datasourceOptions": { "host": "db.example.com", "port": 5432, "database": "appdb",\n' +
-      '                           "user": "readonly", "password": "secret", "ssl": true } }\n' +
-      "Example call 2 — REST API:\n" +
+      '    "datasourceOptions": { "connectionOption": "connectionString",\n' +
+      '                           "connectionString": "postgresql://user:pass@host:5432/db?sslmode=require" } }\n' +
+      "Example call 2 — REST API reachability:\n" +
       '  { "datasourceType": "restapi", "datasourceOptions": { "baseUrl": "https://api.example.com/v1",\n' +
-      '                                                        "headers": { "Authorization": "Bearer xyz" } } }\n\n' +
-      "Related: create_datasource, get_datasource_schemas.",
+      '      "timeout": 10, "authType": "none", "headers": [], "queryParams": [],\n' +
+      '      "contentType": "application/json", "followRedirects": true, "sslVerify": true } }\n\n' +
+      "Related: test_datasource_json_endpoint, create_datasource, get_datasource_schemas.",
     inputSchema: {
       type: "object",
       properties: {
         datasourceType: {
           type: "string",
           description:
-            "Datasource type to test. Example: 'postgresql', 'mysql', 'mssql', 'restapi'.",
+            "Datasource type from list_datasource_types (35 values). Example: 'postgresql', 'restapi'.",
         },
         datasourceOptions: {
           type: "object",
           description:
-            "Connection options for that type — same shape create_datasource expects:\n" +
-            "  postgresql/mysql/mssql: { host, port, database, user, password, ssl? }\n" +
-            "  restapi: { baseUrl, headers?, authType? }",
+            "Connection options — same shape create_datasource expects (see get_datasource_schemas).",
         },
       },
       required: ["datasourceType", "datasourceOptions"],
@@ -278,6 +287,43 @@ export const datasourceTools = [
     handler: async ({ datasourceType, datasourceOptions }, context) => {
       const { datasourceAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       return datasourceAPI.test({ datasourceType, datasourceOptions });
+    },
+  },
+  {
+    name: "test_datasource_json_endpoint",
+    description:
+      "Validate that a restapi baseUrl + path serves parseable JSON — WITHOUT saving anything.\n\n" +
+      "Separate from test_datasource_connection (reachability): hits baseUrl+testPath with the datasource's\n" +
+      "headers/auth and returns { ok, validatedJson, status, topLevelKeys, bodyPreview, warning }.\n" +
+      "validatedJson:false with HTML body means you hit an SPA shell, not the API — fix the path.\n\n" +
+      "Example: { \"datasourceType\": \"restapi\", \"datasourceOptions\": { \"baseUrl\": \"https://api.example.com\" },\n" +
+      '  "testPath": "/health" }\n\n' +
+      "Related: test_datasource_connection, test_query_by_data.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        datasourceType: {
+          type: "string",
+          description: "Must be 'restapi' (other types rejected with a clear error).",
+        },
+        datasourceOptions: {
+          type: "object",
+          description: "restapi connection options (baseUrl, timeout?, authType?, headers?, queryParams?, ...).",
+        },
+        testPath: {
+          type: "string",
+          description: "API path appended to baseUrl (e.g. '/health', '/indicators/...').",
+        },
+        testMethod: {
+          type: "string",
+          description: "Optional: 'GET' (default) or 'HEAD'.",
+        },
+      },
+      required: ["datasourceType", "datasourceOptions", "testPath"],
+    },
+    handler: async ({ datasourceType, datasourceOptions, testPath, testMethod }, context) => {
+      const { datasourceAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      return datasourceAPI.testJson({ datasourceType, datasourceOptions, testPath, testMethod });
     },
   },
 
@@ -288,24 +334,24 @@ export const datasourceTools = [
       "Returns: the created datasource object including its new datasourceID (a UUID — you will need it\n" +
       "for create_query, get_datasource_schema, etc.).\n\n" +
       "IMPORTANT:\n" +
+      "  - Call list_datasource_types FIRST for the full 35-type catalog; call get_datasource_schemas for the\n" +
+      "    live connection shape of the type you picked.\n" +
       "  - Creation does NOT validate credentials. Call test_datasource_connection FIRST with the same\n" +
       "    options; only create after it succeeds.\n" +
       "  - Check for an existing datasource first (get_tenant_resource_summary or list_datasources) —\n" +
-      "    duplicate connections to the same database are a common mistake.\n" +
-      "  - Supported types: 'postgresql', 'mysql', 'mssql', 'restapi'. For other connection types, the\n" +
-      "    datasource must be created via the Jet Admin UI.\n" +
-      "  - If unsure about required options fields, call get_datasource_schemas.\n\n" +
-      "Example call — PostgreSQL:\n" +
+      "    duplicate connections to the same database are a common mistake.\n\n" +
+      "Example call — PostgreSQL (use get_datasource_schemas for the full shape):\n" +
       '  { "datasourceTitle": "Production PostgreSQL",\n' +
       '    "datasourceType": "postgresql",\n' +
-      '    "datasourceOptions": { "host": "db.example.com", "port": 5432, "database": "appdb",\n' +
-      '                           "user": "readonly", "password": "secret", "ssl": true },\n' +
+      '    "datasourceOptions": { "connectionOption": "connectionString",\n' +
+      '                           "connectionString": "postgresql://readonly:secret@db.example.com:5432/appdb?sslmode=require" },\n' +
       '    "datasourceTags": ["production", "primary"] }\n' +
       "Example call — REST API:\n" +
       '  { "datasourceTitle": "Stripe API",\n' +
       '    "datasourceType": "restapi",\n' +
-      '    "datasourceOptions": { "baseUrl": "https://api.stripe.com/v1",\n' +
-      '                           "headers": { "Authorization": "Bearer sk_live_..." } } }\n\n' +
+      '    "datasourceOptions": { "baseUrl": "https://api.stripe.com/v1", "timeout": 10, "authType": "none",\n' +
+      '                           "headers": [], "queryParams": [], "contentType": "application/json",\n' +
+      '                           "followRedirects": true, "sslVerify": true } }\n\n' +
       "After creating: get_datasource_schema to confirm tables are visible, then create_query.\n\n" +
       "Related: test_datasource_connection, get_datasource_schema, create_query, delete_datasource.",
     inputSchema: {
@@ -317,9 +363,8 @@ export const datasourceTools = [
         },
         datasourceType: {
           type: "string",
-          enum: ["postgresql", "mysql", "mssql", "restapi"],
           description:
-            "Datasource type. Must be one of: postgresql, mysql, mssql, restapi. Example: 'postgresql'.",
+            "Datasource type from list_datasource_types (35 values, e.g. 'postgresql', 'mongodb', 'stripe', 'kafka', 'restapi'). Example: 'postgresql'.",
         },
         datasourceOptions: {
           type: "object",
@@ -358,10 +403,11 @@ export const datasourceTools = [
       "Use this to fix a broken connection (e.g. rotated password), rename a datasource, or change its tags.\n" +
       "Only the fields you pass are changed. After updating connection options, call\n" +
       "test_datasource_connection (or get_datasource_schema) to confirm the connection still works.\n\n" +
-      "Example call — rotate the DB password:\n" +
+      "Example call — rotate the DB connection string (send COMPLETE options):\n" +
       '  { "datasourceID": "d7a1c3e2-4b5f-4c6a-9e8d-1f2a3b4c5d6e",\n' +
-      '    "datasourceOptions": { "host": "db.example.com", "port": 5432, "database": "appdb",\n' +
-      '                           "user": "readonly", "password": "newSecret", "ssl": true } }\n' +
+      '    "datasourceType": "postgresql",\n' +
+      '    "datasourceOptions": { "connectionOption": "connectionString",\n' +
+      '      "connectionString": "postgresql://readonly:newSecret@db.example.com:5432/appdb?sslmode=require" } }\n' +
       "Example call — rename and re-tag:\n" +
       '  { "datasourceID": "d7a1c3e2-4b5f-4c6a-9e8d-1f2a3b4c5d6e",\n' +
       '    "datasourceTitle": "Analytics DB", "datasourceTags": ["analytics"] }\n\n' +
@@ -391,6 +437,14 @@ export const datasourceTools = [
     handler: async ({ datasourceID, ...updates }, context) => {
       const { datasourceAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const id = trimId(datasourceID, "datasourceID");
+      // Backend requires datasourceType + datasourceOptions on update — backfill
+      // current values for any required field the caller omitted (title-only renames).
+      if (updates.datasourceType === undefined || updates.datasourceOptions === undefined) {
+        const current = await datasourceAPI.getById(id);
+        const ds = current?.datasource || current;
+        if (updates.datasourceType === undefined && ds?.datasourceType) updates.datasourceType = ds.datasourceType;
+        if (updates.datasourceOptions === undefined && ds?.datasourceOptions) updates.datasourceOptions = ds.datasourceOptions;
+      }
       await datasourceAPI.update(id, updates);
       return { success: true, datasourceID: id };
     },

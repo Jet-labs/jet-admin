@@ -4,6 +4,7 @@ const constants = require("../../constants");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 const { cronJobEngine } = require("./cronJobEngine/engine");
+const { assertTenantReferences } = require("../../utils/tenantReference.util");
 
 const cronJobService = {};
 
@@ -60,6 +61,11 @@ cronJobService.createCronJob = async ({
     if (!finalCreatorID && !createdByApiKeyID) {
       throw new Error("Creator ID or Created By API Key ID is required");
     }
+
+    if (workflowID) {
+      await assertTenantReferences({ tenantID, workflowIDs: [workflowID] });
+    }
+
     const newCronJob = await prisma.tblCronJobs.create({
       data: {
         cronJobTitle,
@@ -311,6 +317,13 @@ cronJobService.updateCronJobByID = async ({
   });
 
   try {
+    if (updateData?.workflowID) {
+      await assertTenantReferences({
+        tenantID,
+        workflowIDs: [updateData.workflowID],
+      });
+    }
+
     const updated = await prisma.tblCronJobs.updateMany({
       where: {
         cronJobID: cronJobID,
@@ -512,6 +525,32 @@ cronJobService.scheduleAllCronJobs = async () => {
   } catch (error) {
     Logger.log("error", { message: "cronJobService:scheduleAllCronJobs:catch", params: { error } });
   }
+};
+
+// Schedules are process-local timers, so a CRUD change on one replica must be
+// reconciled onto every replica. This interval is the fleet convergence path;
+// scheduleCronJobOnChange remains the fast local path.
+const CRON_FLEET_SYNC_INTERVAL_MS = 60 * 1000;
+let cronFleetSyncTimer = null;
+
+cronJobService.startCronSchedulerSync = () => {
+  if (cronFleetSyncTimer) return cronFleetSyncTimer;
+  const sync = async () => {
+    try {
+      const cronJobs = await cronJobService.getAllCronJobsForScheduler();
+      cronJobEngine.reconcileSchedules(cronJobs);
+    } catch (error) {
+      Logger.log("warning", { message: "cronJobService:fleetSync:skipped", params: { error: error.message } });
+    }
+  };
+  cronFleetSyncTimer = setInterval(sync, CRON_FLEET_SYNC_INTERVAL_MS);
+  if (typeof cronFleetSyncTimer.unref === "function") cronFleetSyncTimer.unref();
+  return cronFleetSyncTimer;
+};
+
+cronJobService.stopCronSchedulerSync = () => {
+  if (cronFleetSyncTimer) clearInterval(cronFleetSyncTimer);
+  cronFleetSyncTimer = null;
 };
 
 /**

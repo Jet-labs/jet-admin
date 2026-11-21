@@ -1,0 +1,128 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "host": {
+        "type": "string",
+        "description": "SFTP server hostname or IP.",
+        "format": "hostname",
+        "default": "localhost"
+      },
+      "port": {
+        "type": "integer",
+        "description": "SFTP port (22).",
+        "minimum": 1,
+        "maximum": 65535,
+        "default": 22
+      },
+      "username": {
+        "type": "string",
+        "description": "SFTP username."
+      },
+      "password": {
+        "type": "string",
+        "description": "Password (or omit when using a private key).",
+        "format": "password"
+      },
+      "privateKey": {
+        "type": "string",
+        "description": "PEM private key (alternative to password).",
+        "format": "password"
+      },
+      "passphrase": {
+        "type": "string",
+        "description": "Passphrase for an encrypted private key.",
+        "format": "password"
+      },
+      "rootPath": {
+        "type": "string",
+        "description": "Base directory on the server; query paths resolve inside it. Leave empty for the home directory."
+      },
+      "hostKeyFingerprint": {
+        "type": "string",
+        "description": "Optional SHA-256 host-key fingerprint (base64, with or without the SHA256: prefix). When set, the server key must match exactly; when empty, a warning is logged and keys are accepted (configure known_hosts instead)."
+      },
+      "timeout": {
+        "type": "integer",
+        "description": "Connection timeout in seconds.",
+        "minimum": 1,
+        "default": 15
+      }
+    },
+    "required": ["host", "port", "username"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/host",
+            "label": "Host"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/port",
+            "label": "Port"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/username",
+        "label": "Username"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/password",
+        "label": "Password",
+        "options": { "format": "password" }
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/privateKey",
+        "label": "Private Key (PEM)",
+        "options": { "format": "password" }
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/passphrase",
+            "label": "Key Passphrase",
+            "options": { "format": "password" }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/rootPath",
+            "label": "Root Path"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/hostKeyFingerprint",
+            "label": "Host Key Fingerprint"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/timeout",
+            "label": "Timeout (seconds)"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "host": "localhost",
+    "port": 22,
+    "username": "",
+    "password": "",
+    "privateKey": "",
+    "passphrase": "",
+    "rootPath": "",
+    "hostKeyFingerprint": "",
+    "timeout": 15
+  }
+}

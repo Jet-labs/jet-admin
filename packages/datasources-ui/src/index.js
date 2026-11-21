@@ -93,4 +93,17 @@ export const DATASOURCE_UI_COMPONENTS = {
       return React.createElement(ExcelCSVQueryBuilder, { queryEditorForm });
     },
   },
+  // Analytics, metrics, file, code-hosting and directory integrations.
+  // Without a registry entry the datasource/query editors fall back to
+  // name+type only, even though formConfig/queryConfig are registered.
+  [DATASOURCE_TYPES.CLICKHOUSE.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.DUCKDB.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.PROMETHEUS.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.INFLUXDB.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.FILESYSTEM.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.SFTP.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.GITHUB.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.GITLAB.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.SMTP.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.LDAP.value]: createGenericDatasourceUI(),
 };

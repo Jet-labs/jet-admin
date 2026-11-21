@@ -1,0 +1,116 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["search", "bind"],
+        "default": "search",
+        "description": "Search the directory, or test the bind (same as the connection test)."
+      },
+      "base": {
+        "type": "string",
+        "description": "Search base DN override (defaults to connection searchBase)."
+      },
+      "filter": {
+        "type": "string",
+        "description": "LDAP search filter (e.g. (objectClass=person))."
+      },
+      "scope": {
+        "type": "string",
+        "enum": ["base", "one", "sub"],
+        "default": "sub"
+      },
+      "attributes": {
+        "type": "array",
+        "description": "Attributes to return (empty = directory defaults).",
+        "items": { "type": "string" }
+      },
+      "sizeLimit": {
+        "type": "integer",
+        "description": "Maximum entries to return.",
+        "minimum": 1,
+        "default": 100
+      },
+      "inputDefinitions": {
+        "type": "array",
+        "description": "Query parameters",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/operation",
+        "label": "Operation"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/base",
+        "label": "Base DN"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/filter",
+        "label": "Filter"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/scope",
+            "label": "Scope"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/attributes",
+            "label": "Attributes"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/sizeLimit",
+            "label": "Size Limit"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "options": {
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Parameters"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "operation": "search",
+    "base": "",
+    "filter": "(objectClass=person)",
+    "scope": "sub",
+    "attributes": [],
+    "sizeLimit": 100,
+    "inputDefinitions": []
+  }
+}

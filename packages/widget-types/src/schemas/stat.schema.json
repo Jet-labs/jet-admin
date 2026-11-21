@@ -4,23 +4,94 @@
   "schema": {
     "type": "object",
     "properties": {
-      "value": { "type": ["string", "number"], "description": "Main metric value. Supports template expressions." },
-      "label": { "type": "string", "description": "Label below the metric value" },
-      "prefix": { "type": "string", "description": "Prefix text/symbol (e.g. '$')" },
-      "suffix": { "type": "string", "description": "Suffix text/symbol (e.g. '%')" },
+      "value": {
+        "type": [
+          "string",
+          "number"
+        ],
+        "description": "Main metric value. Supports template expressions. Legacy alias — frontend renders valueTemplate; set both to the same template for compat."
+      },
+      "valueTemplate": {
+        "type": "string",
+        "description": "Main metric template actually rendered by the frontend (statWidget.jsx reads valueTemplate ?? ''). Supports {{ }} expressions. Set to the same value as `value`."
+      },
+      "label": {
+        "type": "string",
+        "description": "Label below the metric value"
+      },
+      "prefix": {
+        "type": "string",
+        "description": "Prefix text/symbol (e.g. '$')"
+      },
+      "suffix": {
+        "type": "string",
+        "description": "Suffix text/symbol (e.g. '%')"
+      },
       "trend": {
         "type": "object",
         "properties": {
-          "value": { "type": ["string", "number"], "description": "Trend/change value" },
-          "direction": { "type": "string", "enum": ["up", "down", "neutral"] },
-          "label": { "type": "string", "description": "e.g. 'vs last month'" },
-          "positiveIsGood": { "type": "boolean", "default": true }
+          "value": {
+            "type": [
+              "string",
+              "number"
+            ],
+            "description": "Trend/change value"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "neutral"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "description": "e.g. 'vs last month'"
+          },
+          "positiveIsGood": {
+            "type": "boolean",
+            "default": true
+          }
         }
       },
-      "icon": { "type": "string", "description": "Icon name to display alongside the metric" },
-      "iconColor": { "type": "string", "description": "CSS color for the icon" },
-      "decimals": { "type": "number", "description": "Number of decimal places to display", "default": 0 }
+      "icon": {
+        "type": "string",
+        "description": "Icon name to display alongside the metric"
+      },
+      "iconColor": {
+        "type": "string",
+        "description": "CSS color for the icon"
+      },
+      "trendTemplate": {
+        "type": "string",
+        "description": "Trend value template actually rendered by the frontend (statWidget.jsx reads trendTemplate)."
+      },
+      "trendDirection": {
+        "type": "string",
+        "description": "Trend semantics: 'up-is-good' | 'down-is-good'. Frontend default 'up-is-good'."
+      },
+      "textAlign": {
+        "type": "string",
+        "description": "Text alignment rendered by the frontend: 'left' | 'center' | 'right'."
+      },
+      "isLoading": {
+        "type": [
+          "string",
+          "boolean"
+        ],
+        "description": "Loading overlay flag (true/'true' shows overlay)."
+      },
+      "decimals": {
+        "type": "number",
+        "description": "Number of decimal places to display",
+        "default": 0
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad"
+  ]
 }

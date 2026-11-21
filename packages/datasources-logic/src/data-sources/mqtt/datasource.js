@@ -86,9 +86,16 @@ export default class MQTTDataSource extends DataSource {
         } catch (e) {
           // keep as string
         }
-        onEvent({ topic, payload });
+        // Enqueue failures must be visible in logs, never unhandled rejections.
+        Promise.resolve(onEvent({ topic, payload })).catch((error) => {
+          Logger.log("error", { message: "mqtt:event:rejected", params: { error: error.message } });
+        });
       });
     });
+  }
+
+  get recoveryMode() {
+    return "plugin"; // mqtt.js reconnects internally (reconnectPeriod default)
   }
 
   async unsubscribe(handle) {

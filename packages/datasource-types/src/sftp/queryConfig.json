@@ -1,0 +1,105 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["list", "read", "write", "stat"],
+        "default": "list",
+        "description": "Directory listing, file read, file write, or file stat."
+      },
+      "path": {
+        "type": "string",
+        "description": "Remote path (resolved inside rootPath when set; otherwise the SFTP home).",
+        "default": "."
+      },
+      "content": {
+        "type": "string",
+        "description": "Text content for operation=write."
+      },
+      "encoding": {
+        "type": "string",
+        "enum": ["utf8", "base64"],
+        "default": "utf8"
+      },
+      "maxBytes": {
+        "type": "integer",
+        "description": "Maximum bytes to return for read.",
+        "minimum": 1
+      },
+      "inputDefinitions": {
+        "type": "array",
+        "description": "Query parameters",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/operation",
+        "label": "Operation"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/path",
+        "label": "Path"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/content",
+        "label": "Content (write)"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/encoding",
+            "label": "Encoding"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/maxBytes",
+            "label": "Max Bytes"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "options": {
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Parameters"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "operation": "list",
+    "path": ".",
+    "content": "",
+    "encoding": "utf8",
+    "maxBytes": null,
+    "inputDefinitions": []
+  }
+}

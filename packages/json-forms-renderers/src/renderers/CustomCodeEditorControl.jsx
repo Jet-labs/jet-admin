@@ -41,7 +41,7 @@ export const CustomCodeEditorControl = ({
     <div className="">
       <Label
         htmlFor={path}
-        className={`block mb-1 ${hasErrors ? 'text-red-500' : ''}`}
+        className={`block mb-1 ${hasErrors ? 'text-destructive' : ''}`}
       >
         {label || description}
       </Label>

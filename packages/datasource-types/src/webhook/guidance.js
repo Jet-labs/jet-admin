@@ -1,3 +1,11 @@
+function normalizeAllowedMethods(value) {
+  const raw = Array.isArray(value) ? value : [value];
+  const methods = raw
+    .filter((method) => typeof method === "string" && method.trim())
+    .map((method) => method.trim().toUpperCase());
+  return methods.length ? [...new Set(methods)] : ["POST"];
+}
+
 export default function getWebhookGuidance({
   tenantID,
   listenerID,
@@ -8,7 +16,9 @@ export default function getWebhookGuidance({
   const options = { ...datasourceOptions, ...listenerConfig };
   const pathSuffix = (listenerConfig.pathSuffix || "").replace(/^\//, "");
   const effectiveSuffix = pathSuffix || "your-path-suffix";
-  const allowedMethod = (options.allowedMethods || "POST").toUpperCase();
+  const allowedMethods = normalizeAllowedMethods(options.allowedMethods);
+  const allowedMethod = allowedMethods[0];
+  const allowedMethodLabel = allowedMethods.join(", ");
   const authType = options.authType || "none";
 
   const pathSuffixUrl = `${baseUrl}/webhooks/v1/inbound/${tenantID}/${effectiveSuffix}`;
@@ -49,7 +59,7 @@ export default function getWebhookGuidance({
     title: "Webhook Ingestion Guidance",
     summary: "Ingests HTTP POST, PUT, or GET requests sent to Jet Admin's dedicated Webhook Receiver service on port 8095.",
     badges: [
-      { label: `Method: ${allowedMethod}`, color: "neutral" },
+      { label: `Method: ${allowedMethodLabel}`, color: "neutral" },
       { label: `Auth: ${authDescription}`, color: authType === "none" ? "neutral" : "emerald" },
       { label: "Port: 8095", color: "emerald" },
     ],

@@ -12,7 +12,7 @@ import { Button, Spinner, Input, Label, Section } from "@jet-admin/ui";
 
 function FieldError({ message }) {
   if (!message) return null;
-  return <p className="text-xs text-red-500">{message}</p>;
+  return <p className="text-xs text-destructive">{message}</p>;
 }
 export const TenantEditor = ({ tenantEditorForm }) => {
   TenantEditor.propTypes = {

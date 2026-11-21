@@ -19,10 +19,10 @@ export const WidgetLayout = () => {
           autoSaveId={CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_LAYOUT_SEPARATION}
           className="h-full w-full"
         >
-          <ResizablePanel defaultSize={20}>
+          <ResizablePanel defaultSize={20} className="max-md:hidden">
             <WidgetDrawerList />
           </ResizablePanel>
-          <ResizableHandle withHandle={true} />
+          <ResizableHandle withHandle={true} className="max-md:hidden" />
           <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
             <Outlet />
           </ResizablePanel>

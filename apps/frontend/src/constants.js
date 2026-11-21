@@ -1011,6 +1011,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}`,
       stopTestWorkflowAPI: (tenantID, instanceID) =>
         `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}/stop`,
+      cancelWorkflowAPI: (tenantID, instanceID) =>
+        `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}/cancel`,
       getWorkflowRunStatusForWidgetAPI: (tenantID, instanceID) =>
         `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}/widget`,
       getDataCollectionRequestAPI: (tenantID, collectionRequestID) =>
@@ -1051,6 +1053,14 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/widget-library/${libraryEntryID}/preview`,
       installWidgetAPI: (tenantID, libraryEntryID) =>
         `/api/v1/tenants/${tenantID}/widget-library/${libraryEntryID}/install`,
+    },
+    MARKETPLACE: {
+      listItemsAPI: (tenantID) => `/api/v1/tenants/${tenantID}/marketplace`,
+      getItemAPI: (tenantID, itemID) => `/api/v1/tenants/${tenantID}/marketplace/${itemID}`,
+      previewInstallAPI: (tenantID, itemID) =>
+        `/api/v1/tenants/${tenantID}/marketplace/${itemID}/preview`,
+      installItemAPI: (tenantID, itemID) =>
+        `/api/v1/tenants/${tenantID}/marketplace/${itemID}/install`,
     },
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",
@@ -1330,6 +1340,7 @@ export const CONSTANTS = {
     AUDIT_LOGS: (tenantID) => `${tenantID}-AUDIT_LOGS`,
     FOLDERS: (tenantID, entityType) => `${tenantID}-FOLDERS-${entityType}`,
     WIDGET_LIBRARY: "WIDGET_LIBRARY",
+    MARKETPLACE: (tenantID) => `${tenantID}-MARKETPLACE`,
   },
 
   DATA_TYPES: {

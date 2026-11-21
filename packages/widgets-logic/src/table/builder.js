@@ -21,6 +21,20 @@ export class TableWidgetBuilder extends BaseWidgetBuilder {
   buildRender({ widgetType = 'table', widgetConfig }) {
     if (!widgetConfig) return null;
 
+    // Dual-read: legacy boolean flags behave like { enabled } objects (F04).
+    // Explicit object forms always win; this mirrors normalizeWidgetConfig.
+    const search =
+      widgetConfig.search ??
+      (typeof widgetConfig.searchable === "boolean" ? { enabled: widgetConfig.searchable } : undefined);
+    const expt =
+      widgetConfig.export ??
+      (typeof widgetConfig.exportable === "boolean" ? { enabled: widgetConfig.exportable } : undefined);
+    const multiSelect =
+      widgetConfig.multiSelect ??
+      (typeof widgetConfig.selectable === "boolean" ? { enabled: widgetConfig.selectable } : undefined);
+    const bulkActions =
+      multiSelect?.actions ?? widgetConfig.bulkActions;
+
     // Extract the data array from the resolved config
     const data = Array.isArray(widgetConfig.dataArrayTemplate)
       ? widgetConfig.dataArrayTemplate
@@ -48,10 +62,13 @@ export class TableWidgetBuilder extends BaseWidgetBuilder {
         pageSize,
         totalRows,
       },
-      search: widgetConfig.search || { enabled: false },
-      export: widgetConfig.export || { enabled: false },
+      search: search || { enabled: false },
+      export: expt || { enabled: false },
       editing: widgetConfig.editing || { enabled: false },
-      multiSelect: widgetConfig.multiSelect || { enabled: false },
+      multiSelect: {
+        ...(multiSelect || { enabled: false }),
+        ...(bulkActions !== undefined ? { actions: bulkActions } : {}),
+      },
       bulkEdit: widgetConfig.bulkEdit || { enabled: false },
       emptyText: widgetConfig.emptyText,
       emptyHint: widgetConfig.emptyHint,

@@ -4,8 +4,9 @@ const Logger = require("../../utils/logger");
 const { datasourceService } = require("./datasource.service");
 const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 const fileStorageUtil = require("../../utils/fileStorage.util");
-// Credentials are sent as-is to the frontend (display masking is handled by the UI
-// via HTML password inputs). Logging still redacts via logger.js / sensitive.js.
+const { maskDatasource } = require("../../utils/sensitive");
+// Credentials are masked at the API boundary. Updates send the mask sentinel
+// back and the service restores the stored value (mergeAndRestoreMaskedOptions).
 
 const datasourceController = {};
 
@@ -18,7 +19,7 @@ datasourceController.getAllDatasources = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { search, page, pageSize } = req.query;
+    const { search, page, pageSize, folderID } = req.query;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "datasourceController:getAllDatasources:params",
@@ -38,6 +39,7 @@ datasourceController.getAllDatasources = async (req, res) => {
       search,
       page,
       pageSize,
+      folderID,
       authContext,
     });
 
@@ -50,7 +52,7 @@ datasourceController.getAllDatasources = async (req, res) => {
       },
     });
 
-    const sanitizedDatasources = result.datasources;
+    const sanitizedDatasources = result.datasources.map(maskDatasource);
 
     return expressUtils.sendResponse(
       res,
@@ -85,7 +87,7 @@ datasourceController.testDatasourceConnection = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { datasourceType, datasourceOptions } = req.body;
+    const { datasourceType, datasourceOptions, datasourceID } = req.body;
 
     Logger.log("info", {
       message: "datasourceController:testDatasourceConnection:params",
@@ -102,6 +104,7 @@ datasourceController.testDatasourceConnection = async (req, res) => {
       tenantID,
       datasourceType,
       datasourceOptions,
+      datasourceID,
     });
 
     Logger.log("success", {
@@ -124,6 +127,51 @@ datasourceController.testDatasourceConnection = async (req, res) => {
       params: {
         error: error.message || error,
       },
+    });
+    return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+/**
+ * POST /datasources/test-json — validates a restapi endpoint returns JSON.
+ * Separate from testDatasourceConnection (host reachability), which is untouched.
+ */
+datasourceController.testDatasourceJsonEndpoint = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+    const { datasourceType, datasourceOptions, testPath, testMethod } = req.body;
+
+    Logger.log("info", {
+      message: "datasourceController:testDatasourceJsonEndpoint:params",
+      params: { userID: user.userID, tenantID, datasourceType, testPath, testMethod },
+    });
+
+    const validationResult = await datasourceService.testDatasourceJsonEndpoint({
+      userID: user.userID,
+      tenantID,
+      datasourceType,
+      datasourceOptions,
+      testPath,
+      testMethod,
+    });
+
+    Logger.log("success", {
+      message: "datasourceController:testDatasourceJsonEndpoint:success",
+      params: { validationResult },
+    });
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        validationResult,
+        message: "Datasource JSON endpoint validated successfully.",
+      }, null, constants.HTTP_STATUS.OK
+    );
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:testDatasourceJsonEndpoint:error",
+      params: { error: error.message || error },
     });
     return expressUtils.sendResponse(res, false, {}, error.message || error, constants.HTTP_STATUS.BAD_REQUEST);
   }
@@ -160,7 +208,7 @@ datasourceController.getDatasourceByID = async (req, res) => {
       },
     });
 
-    const sanitizedDatasource = datasource ?? null;
+    const sanitizedDatasource = datasource ? maskDatasource(datasource) : null;
 
     return expressUtils.sendResponse(
       res,
@@ -231,7 +279,7 @@ datasourceController.createDatasource = async (req, res) => {
       },
     });
 
-    const sanitizedDatasource = datasource ?? null;
+    const sanitizedDatasource = datasource ? maskDatasource(datasource) : null;
 
     return expressUtils.sendResponse(
       res,
@@ -371,7 +419,13 @@ datasourceController.deleteDatasourceByID = async (req, res) => {
       },
     });
 
-    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      error,
+      error.statusCode || constants.HTTP_STATUS.BAD_REQUEST
+    );
   }
 };
 

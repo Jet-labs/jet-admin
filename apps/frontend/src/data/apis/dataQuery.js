@@ -264,6 +264,7 @@ export const runDataQueryByIDAPI = async ({
   tenantID,
   dataQueryID,
   inputValues,
+  signal,
 }) => {
   try {
     const url =
@@ -275,6 +276,7 @@ export const runDataQueryByIDAPI = async ({
         url,
         { inputValues },
         {
+          signal,
           headers: {
             authorization: `Bearer ${bearerToken}`,
           },

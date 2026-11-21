@@ -4,21 +4,46 @@
   "schema": {
     "type": "object",
     "properties": {
-      "dataTemplate": { "type": "string", "description": "Template resolving to an object, e.g. {{state.queries.user.data[0]}}" },
+      "dataTemplate": {
+        "type": "string",
+        "description": "Template resolving to an object, e.g. {{state.queries.user.data[0]}}"
+      },
       "items": {
         "type": "array",
         "description": "Static rows (used when dataTemplate is empty)",
         "items": {
           "type": "object",
           "properties": {
-            "label": { "type": "string" },
-            "value": { "type": "string" }
+            "label": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
           }
         }
       },
-      "columns": { "type": "number", "default": 1, "description": "Grid columns 1-3" },
-      "emptyText": { "type": "string", "default": "No data" }
+      "columns": {
+        "type": "number",
+        "default": 1,
+        "description": "Grid columns 1-3"
+      },
+      "emptyText": {
+        "type": "string",
+        "default": "No data"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad"
+  ]
 }

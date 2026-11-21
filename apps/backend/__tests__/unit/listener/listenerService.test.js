@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ListenerService Unit Tests
  * Tests CRUD operations for listeners and actions, cloning, hot reload integration, and permission policy handling.
  */
@@ -28,7 +28,14 @@ jest.mock('../../../config/prisma.config', () => ({
   prisma: mockPrisma,
 }));
 
-// Mock Listener Proxy app (backend routes all ingress through it —
+// The backend publishes control messages directly; it no longer imports the
+// listener-proxy app (which is absent from the backend image).
+const mockPublishControl = jest.fn().mockResolvedValue(undefined);
+jest.mock('../../../config/listenerBus.config', () => ({
+  publishControl: (...args) => mockPublishControl(...args),
+}));
+
+// Mock Listener Proxy app (backend routes all ingress through it â€”
 // subscriptions live in the standalone proxy, the backend only notifies)
 const mockProxyApp = {
   notifyListenerChange: jest.fn().mockResolvedValue(undefined),
@@ -37,11 +44,13 @@ jest.mock('../../../../listener-proxy', () => mockProxyApp);
 
 // Mock Proxy Registry (placement reconcile on CRUD + live status)
 const mockReconcile = jest.fn().mockResolvedValue({ moved: 0, version: 1 });
+const mockRemoveListener = jest.fn().mockResolvedValue({ removed: true, version: 2 });
 const mockListLive = jest.fn().mockResolvedValue([]);
 const mockGetVersion = jest.fn().mockResolvedValue(0);
 const mockGetShard = jest.fn().mockResolvedValue([]);
 jest.mock('../../../modules/proxyRegistry/proxyRegistry.service', () => ({
   reconcileAndAnnounce: (...args) => mockReconcile(...args),
+  removeListener: (...args) => mockRemoveListener(...args),
   listLiveProxies: (...args) => mockListLive(...args),
   getVersion: (...args) => mockGetVersion(...args),
   getShard: (...args) => mockGetShard(...args),
@@ -133,7 +142,7 @@ describe('ListenerService', () => {
 
     expect(mockPrisma.tblListeners.create).toHaveBeenCalled();
     expect(mockGrantCreatorAccess).toHaveBeenCalledWith(tenantID, 'listener', 'lst-200', {}, userID);
-    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_RELOAD', 'lst-200');
+    expect(mockPublishControl).toHaveBeenCalledWith(expect.objectContaining({ type: 'LISTENER_RELOAD', listenerID: 'lst-200' }));
   });
 
   it('should update listener and trigger hot reload if active', async () => {
@@ -150,7 +159,7 @@ describe('ListenerService', () => {
     });
 
     expect(result.listenerTitle).toBe('Updated Stream');
-    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_RELOAD', 'lst-100');
+    expect(mockPublishControl).toHaveBeenCalledWith(expect.objectContaining({ type: 'LISTENER_RELOAD', listenerID: 'lst-100' }));
     expect(mockReconcile).toHaveBeenCalledWith(
       expect.objectContaining({ fetchActiveIDs: expect.any(Function) })
     );
@@ -162,7 +171,7 @@ describe('ListenerService', () => {
 
     const result = await listenerService.deleteListener({ tenantID, listenerID: 'lst-100' });
 
-    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_REMOVE', 'lst-100');
+    expect(mockPublishControl).toHaveBeenCalledWith(expect.objectContaining({ type: 'LISTENER_REMOVE', listenerID: 'lst-100' }));
     expect(mockPrisma.tblListeners.delete).toHaveBeenCalledWith({ where: { listenerID: 'lst-100' } });
     expect(mockRemovePoliciesForResource).toHaveBeenCalledWith(tenantID, 'listener:lst-100');
     expect(result).toEqual({ listenerID: 'lst-100' });
@@ -193,7 +202,7 @@ describe('ListenerService', () => {
     });
 
     expect(action.actionID).toBe('act-2');
-    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_RELOAD', 'lst-100');
+    expect(mockPublishControl).toHaveBeenCalledWith(expect.objectContaining({ type: 'LISTENER_RELOAD', listenerID: 'lst-100' }));
   });
 
   it('should update listener action and delete action', async () => {
@@ -208,7 +217,7 @@ describe('ListenerService', () => {
       data: { isEnabled: false },
     });
 
-    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_RELOAD', 'lst-100');
+    expect(mockPublishControl).toHaveBeenCalledWith(expect.objectContaining({ type: 'LISTENER_RELOAD', listenerID: 'lst-100' }));
 
     await listenerService.deleteAction({ tenantID, listenerID: 'lst-100', actionID: 'act-1' });
     expect(mockPrisma.tblListenerActions.delete).toHaveBeenCalledWith({ where: { actionID: 'act-1' } });
@@ -257,7 +266,7 @@ describe('ListenerService', () => {
 
     mockPrisma.tblListeners.update.mockResolvedValue({ ...sampleListener, status: 'inactive' });
     await listenerService.deactivateListener({ tenantID, listenerID: 'lst-100' });
-    expect(mockProxyApp.notifyListenerChange).toHaveBeenCalledWith('LISTENER_REMOVE', 'lst-100');
+    expect(mockPublishControl).toHaveBeenCalledWith(expect.objectContaining({ type: 'LISTENER_REMOVE', listenerID: 'lst-100' }));
   });
 
 });

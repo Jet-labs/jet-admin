@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Play } from 'lucide-react';
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import { CONSTANTS } from "../../../constants";
 import { testDataQueryByDataAPI, testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { displayError, displaySuccess } from "../../../utils/notification";
@@ -12,13 +13,10 @@ export const DataQueryTestingForm = ({
   tenantID,
   dataQueryID,
   setDataQueryTestResult,
-  // eslint-disable-next-line no-unused-vars
   datasourceID,
-  // eslint-disable-next-line no-unused-vars
   datasourceType,
   dataQueryOptions,
   dataQuery,
-  size = "sm"
 }) => {
   DataQueryTestingForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -31,17 +29,9 @@ export const DataQueryTestingForm = ({
     dataQuery: PropTypes.object.isRequired,
   };
   const [isArgsFormOpen, setIsArgsFormOpen] = useState(false);
-  console.log({
-    tenantID,
-    dataQueryID,
-    setDataQueryTestResult,
-    // eslint-disable-next-line no-unused-vars
-    datasourceID,
-    // eslint-disable-next-line no-unused-vars
-    datasourceType,
-    dataQueryOptions,
-    dataQuery,
-  });
+  // Stable id lets a subsequent failure dismiss the previous success toast
+  // instead of showing a success and an error side by side.
+  const successToastId = `data-query-test-success-${dataQueryID || "unsaved"}`;
 
   const { isPending: isTestingDataQuery, mutate: testDataQuery } = useMutation({
     mutationFn: ({ inputValues }) => {
@@ -62,9 +52,16 @@ export const DataQueryTestingForm = ({
     retry: false,
     onSuccess: (data) => {
       setDataQueryTestResult(data);
-      displaySuccess(CONSTANTS.STRINGS.TEST_QUERY_FORM_QUERY_TESTING_SUCCESS);
+      displaySuccess(
+        CONSTANTS.STRINGS.TEST_QUERY_FORM_QUERY_TESTING_SUCCESS,
+        { toastId: successToastId }
+      );
     },
     onError: (error) => {
+      // A failed run must not leave the previous successful rows or success
+      // toast looking like the current result.
+      toast.dismiss(successToastId);
+      setDataQueryTestResult(undefined);
       displayError(error);
     },
   });
@@ -109,7 +106,6 @@ export const DataQueryTestingForm = ({
       <Button
         type="button"
         variant="outline"
-        size="sm"
         onClick={_handleTestQuery}
         disabled={isTestingDataQuery}
         className="shrink-0"

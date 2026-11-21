@@ -1,21 +1,37 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Globe } from "lucide-react";
+import { Globe, ShieldAlert } from "lucide-react";
+import {
+  buildSandboxAttribute,
+  isAllowedEmbedUrl,
+  normalizeEmbedBoolean,
+} from "../_shared/embedSafety";
 
 /**
  * IframeWidget
  *
  * Renders an iframe securely with customizable sandbox capabilities
  * and referral policy.
+ *
+ * Security posture (F03/B02/E10):
+ * - The sandbox attribute is ALWAYS rendered, including as "" (B02).
+ * - Capability toggles normalize strictly ("false" disables); persisted
+ *   defaults (scripts/forms on) are kept for saved-content compatibility.
+ * - Only http(s)/relative URLs embed; other schemes render a blocked-embed
+ *   fallback instead of a frame (URL policy).
  */
 export const IframeWidget = ({
   widgetConfig,
 }) => {
-  const url = widgetConfig?.url || "";
-  const allowSameOrigin = widgetConfig?.allowSameOrigin ?? false;
-  const allowScripts = widgetConfig?.allowScripts ?? true;
-  const allowForms = widgetConfig?.allowForms ?? true;
-  const allowPopups = widgetConfig?.allowPopups ?? false;
+  // Legacy `src` alias accepted; `url` is the canonical runtime field.
+  const rawUrl = widgetConfig?.url ?? widgetConfig?.src ?? "";
+  const url = typeof rawUrl === "string" ? rawUrl.trim() : String(rawUrl ?? "").trim();
+  // Compat defaults preserved for saved content; strict normalization means
+  // an explicit "false"/0/"0" genuinely disables the token.
+  const allowSameOrigin = normalizeEmbedBoolean(widgetConfig?.allowSameOrigin, false);
+  const allowScripts = normalizeEmbedBoolean(widgetConfig?.allowScripts, true);
+  const allowForms = normalizeEmbedBoolean(widgetConfig?.allowForms, true);
+  const allowPopups = normalizeEmbedBoolean(widgetConfig?.allowPopups, false);
 
   if (!url) {
     return (
@@ -26,15 +42,24 @@ export const IframeWidget = ({
     );
   }
 
-  // Construct sandbox attributes based on toggles
-  const sandboxTokens = [];
-  if (allowSameOrigin) sandboxTokens.push("allow-same-origin");
-  if (allowScripts) sandboxTokens.push("allow-scripts");
-  if (allowForms) sandboxTokens.push("allow-forms");
-  if (allowPopups) sandboxTokens.push("allow-popups");
-  
-  const sandboxValue = sandboxTokens.join(" ");
-  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+  if (!isAllowedEmbedUrl(url)) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-full p-4 border border-dashed border-destructive/40 bg-destructive/5 text-muted-foreground text-xs gap-1.5">
+        <ShieldAlert className="h-5 w-5 opacity-60" />
+        <span className="font-medium text-foreground">Embedding blocked</span>
+        <span className="break-all text-center">This URL scheme cannot be embedded: {url.slice(0, 160)}</span>
+      </div>
+    );
+  }
+
+  // Construct sandbox attributes based on toggles (always a string).
+  const sandboxValue = buildSandboxAttribute({
+    allowSameOrigin,
+    allowScripts,
+    allowForms,
+    allowPopups,
+  });
+  const isLoading = normalizeEmbedBoolean(widgetConfig?.isLoading, false);
 
   return (
     <div className="w-full h-full p-0 bg-background overflow-hidden relative">
@@ -51,7 +76,7 @@ export const IframeWidget = ({
       <iframe
         src={url}
         className="w-full h-full border-0 bg-background"
-        sandbox={sandboxValue || undefined}
+        sandbox={sandboxValue}
         referrerPolicy="no-referrer-when-downgrade"
         title="Embedded Content"
       />

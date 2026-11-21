@@ -37,7 +37,7 @@ export const GoogleOAuthButton = ({
     <div className="space-y-1 w-full">
       <Label
         className={`block text-xs font-medium ${
-          hasErrors ? "text-red-500" : "text-muted-foreground"
+          hasErrors ? "text-destructive" : "text-muted-foreground"
         }`}
       >
         {label || description || "Google Authentication"}
@@ -72,7 +72,7 @@ export const GoogleOAuthButton = ({
             <div className="flex items-center gap-2 flex-1">
               <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
               <div>
-                <p className="text-sm font-semibold text-foreground">
+                <p className="text-sm font-medium text-foreground">
                   Account authentication required
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -82,11 +82,10 @@ export const GoogleOAuthButton = ({
             </div>
             <Button
               type="button"
-              variant="primary"
-              size="sm"
+              variant="outline"
               disabled={disabled || loading}
               onClick={onClick}
-              className="bg-blue-600 hover:bg-blue-700 text-white flex items-center"
+              className="flex items-center"
             >
               <GoogleIcon />
               {loading ? "Connecting..." : "Connect Google Account"}
@@ -96,7 +95,7 @@ export const GoogleOAuthButton = ({
       </div>
 
       {hasErrors && errors && (
-        <p className="text-xs text-red-500 mt-1">{errors}</p>
+        <p className="mt-1 text-xs text-destructive">{errors}</p>
       )}
     </div>
   );

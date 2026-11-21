@@ -1,451 +1,173 @@
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { testWorkflowAPI, executeWorkflowAPI, stopTestWorkflowAPI, cancelWorkflowAPI, submitDataCollectionAPI } from '../../../data/apis/workflow';
+import { observeWorkflowRun } from '../../../logic/appPageRuntime/observeWorkflowRun';
+import { extractError } from '../../../utils/error';
 
-import { useState, useRef, useCallback, useEffect } from "react";
-import { CONSTANTS } from "../../../constants";
-import { testWorkflowAPI, executeWorkflowAPI, stopTestWorkflowAPI, getWorkflowRunStatusAPI } from "../../../data/apis/workflow";
-import { extractError } from "../../../utils/error";
-import { submitDataCollectionAPI } from "../../../data/apis/workflow";
+const nodeStatus = value => ({
+    success: 'completed', completed: 'completed', running: 'running', suspended: 'suspended',
+    failed: 'failed', error: 'failed', cancelled: 'cancelled', canceled: 'cancelled', skipped: 'skipped',
+})[String(value || '').toLowerCase()];
 
-/**
- * Custom hook to handle workflow execution (both test and saved runs).
- * Manages socket subscription, state updates, and execution lifecycle.
- */
+/** One observer and one generation object per run; no callback can own a later run. */
 export const useWorkflowRun = ({ tenantID }) => {
     const [isRunning, setIsRunning] = useState(false);
     const [result, setResult] = useState(null);
-    const [nodeExecutionStatus, setNodeExecutionStatus] = useState({}); // Map of nodeId -> status
+    const [nodeExecutionStatus, setNodeExecutionStatus] = useState({});
     const [logs, setLogs] = useState([]);
     const [context, setContext] = useState({});
-    
-    // Refs for cleanup and internal state
-    const socketRef = useRef(null);
-    const instanceIdRef = useRef(null);
-    const isTestRunRef = useRef(false);
-    const isStoppingRef = useRef(false); // Guard to prevent race conditions when stopping
-    const pollRef = useRef(null); // Polling fallback when socket events are missed
     const [dataCollectionRequest, setDataCollectionRequest] = useState(null);
-
-    // Helper to add log entry
+    const current = useRef(null);
+    const mounted = useRef(true);
+    const tenant = useRef(tenantID);
+    tenant.current = tenantID;
+    const isCurrent = useCallback(run => mounted.current && current.current === run && run.tenantID === tenant.current, []);
     const addLog = useCallback((type, label, message, extra = {}) => {
-        setLogs(prev => [...prev, {
-            type,
-            label,
-            message,
-            timestamp: Date.now(),
-            ...extra,
-        }]);
+        setLogs(previous => [...previous, { type, label, message, timestamp: Date.now(), ...extra }]);
     }, []);
-
-    // Clear logs
-    const clearLogs = useCallback(() => {
-        setLogs([]);
-    }, []);
-
-    // Clear context
-    const clearContext = useCallback(() => {
-        setContext({});
-    }, []);
-
-    // Reset node execution status
-    const resetNodeExecutionStatus = useCallback(() => {
-        setNodeExecutionStatus({});
-    }, []);
-
-    const disconnectSocket = useCallback(() => {
-        if (pollRef.current) {
-            clearInterval(pollRef.current);
-            pollRef.current = null;
+    const clearLogs = useCallback(() => setLogs([]), []);
+    const invalidate = useCallback(() => {
+        const previous = current.current;
+        previous?.observer?.disconnect();
+        if (previous?.isTest && previous.instanceID && !previous.finished && !previous.stopping) {
+            stopTestWorkflowAPI({ tenantID: previous.tenantID, instanceID: previous.instanceID }).catch(() => {});
         }
-        const sock = socketRef.current;
-        socketRef.current = null;
-        if (sock) {
-            // Detach first: intentional teardown must not trip the
-            // 'disconnect' warning handler (it would log a spurious
-            // "Connection Warning" on every clean completion).
-            try {
-                sock.off("disconnect");
-                sock.off("connect_error");
-            } catch (_) {}
-            sock.disconnect();
-        }
+        current.current = null;
     }, []);
-
-    /**
-     * Subscribe to a workflow instance via Socket.IO
-     * Shared logic for both test and saved runs
-     */
-    const subscribeToInstance = useCallback(async (instanceID, nodes = []) => {
-        try {
-             // Get socket from context (we need to access it directly)
-            // Note: In a real app we might use a SocketContext, but here we import dynamically to match existing pattern
-            const socketModule = await import("socket.io-client");
-            const { firebaseAuth } = await import("../../../config/firebase");
-
-            const bearerToken = await firebaseAuth.currentUser?.getIdToken();
-            const socket = socketModule.io(CONSTANTS.SOCKET_HOST, {
-                auth: { token: bearerToken }
-            });
-
-            // Store socket reference for cleanup
-            socketRef.current = socket;
-
-            // Helper to get node name (defined before listeners use it)
-            const getNodeName = (nodeId) => {
-                const node = nodes.find(n => n.id === nodeId);
-                return node?.data?.title || node?.type || nodeId;
-            };
-
-            // Listen for node updates from backend
-            socket.on("workflow_node_update", (data) => {
-                try {
-                // Ignore events if we're stopping
-                if (isStoppingRef.current) return;
-
-                const nodeId = data?.nodeID;
-                if (!nodeId || !data?.status) {
-                    addLog('node_error', 'Node update', `Malformed update (missing nodeID/status): ${JSON.stringify(data)?.substring(0, 200)}`);
-                    return;
-                }
-                {
-                    const nodeName = getNodeName(nodeId);
-                    const statusLower = String(data.status).toLowerCase();
-                    const isSuccess = statusLower === 'success' || statusLower === 'completed';
-                    const isRunning = statusLower === 'running';
-                    const isSuspended = statusLower === 'suspended';
-                    const status = isSuccess ? 'completed' : isRunning ? 'running' : isSuspended ? 'suspended' : 'failed';
-
-                    setNodeExecutionStatus(prev => ({
-                        ...prev,
-                        [nodeId]: status,
-                    }));
-
-                    // Update workflow context with assembled context from orchestrator
-                    // This gives a flat, consistent shape: { input: {}, queryResult: [...], ... }
-                    if (data.contextData) {
-                        setContext(data.contextData);
-                    }
-
-                    // Log the node update
-                    if (isSuccess) {
-                        addLog('node_complete', `Node: ${nodeName}`, 'Completed successfully', {
-                            nodeId,
-                            output: data.output
-                        });
-                    } else if (isRunning) {
-                        addLog('node_start', `Node: ${nodeName}`, 'Running', {
-                            nodeId,
-                        });
-                    } else if (isSuspended) {
-                        addLog('info', `Node: ${nodeName}`, 'Waiting for input', {
-                            nodeId,
-                        });
-                    } else {
-                        addLog('node_error', `Node: ${nodeName}`, 'Execution failed', {
-                            nodeId,
-                            error: data.error
-                        });
-                    }
-
-                    // Mark next nodes as running (visual feedback)
-                    // Note: This matches the old logic but relies on passed 'nodes' and edges would need to be passed too for full accuracy.
-                    // For now, we rely on the backend events mostly, but the old code had edge logic here.
-                    // Simplification: We will just update status based on events.
-                }
-                } catch (handlerErr) {
-                    // Never let one bad packet kill the stream — surface it visibly.
-                    addLog('node_error', 'Node update', `Handler failed: ${handlerErr?.message}`, {
-                        error: String(handlerErr?.stack || handlerErr).substring(0, 500),
-                    });
-                }
-            });
-
-            // Listen for data collection requests
-            socket.on("workflow_data_collection_request", (data) => {
-                if (isStoppingRef.current) return;
-                // data = { instanceID, nodeID, collectionRequestID, collectionType, collectionConfig }
-                const nodeName = getNodeName(data.nodeID);
-                addLog('info', `Node: ${nodeName}`, 'Waiting for input');
-                setDataCollectionRequest(data);
-            });
-
-            // Shared completion handler for socket + polling fallback.
-            // Polling covers the case where `workflow_status_update` is emitted
-            // before join or while the socket is disconnected (roomSize 0).
-            const finishFromStatus = (data) => {
-                if (isStoppingRef.current) return;
-                if (!data || data.status === "RUNNING") return;
-                if (data.contextData) {
-                    setContext(data.contextData);
-                }
-                if (data.status === "COMPLETED") {
-                    addLog('workflow_complete', 'Workflow Complete', 'All nodes executed successfully');
-                } else if (data.status === "FAILED") {
-                    addLog('workflow_error', 'Workflow Failed', data.error || data.errorMessage || 'Execution terminated with errors', {
-                        ...(data.error ? { error: data.error } : {}),
-                    });
-                    // Mark the currently-running (or suspended) node as failed
-                    // so its animation stops even if its node update was missed.
-                    setNodeExecutionStatus(prev => {
-                        const next = { ...prev };
-                        for (const [k, v] of Object.entries(next)) {
-                            if (v === 'running' || v === 'suspended') next[k] = 'failed';
-                        }
-                        return next;
-                    });
-                } else if (data.status === "STOPPED" || data.status === "CANCELLED") {
-                    addLog('info', 'Workflow Stopped', 'Execution was stopped');
-                } else {
-                    return;
-                }
-                setIsRunning(false);
-                setResult(data);
-                disconnectSocket();
-            };
-
-            // Listen for workflow status update (completion/failure/stopped)
-            socket.on("workflow_status_update", (data) => {
-                // Ignore events if we're stopping
-                if (isStoppingRef.current) return;
-
-                // Update context with full contextData from completion
-                if (data.contextData) {
-                    setContext(data.contextData);
-                }
-
-                if (data.status === "COMPLETED") {
-                    addLog('workflow_complete', 'Workflow Complete', 'All nodes executed successfully');
-                    setIsRunning(false);
-                    setResult(data);
-                    disconnectSocket();
-                } else if (data.status === "FAILED") {
-                    addLog('workflow_error', 'Workflow Failed', 'Execution terminated with errors', {
-                        ...(data.error ? { error: data.error } : {}),
-                    });
-                    setNodeExecutionStatus(prev => {
-                        const next = { ...prev };
-                        for (const [k, v] of Object.entries(next)) {
-                            if (v === 'running' || v === 'suspended') next[k] = 'failed';
-                        }
-                        return next;
-                    });
-                    setIsRunning(false);
-                    setResult(data);
-                    disconnectSocket();
-                } else if (data.status === "STOPPED" || data.status === "CANCELLED") {
-                    addLog('info', 'Workflow Stopped', 'Execution was stopped');
-                    setIsRunning(false);
-                    setResult(data);
-                    disconnectSocket();
-                }
-            });
-
-            // Socket dropped before completion -> don't hang on spinning
-            // animation; polling below will resolve the final state.
-            socket.on("disconnect", (reason) => {
-                if (isStoppingRef.current) return;
-                addLog('warning', 'Connection Warning', `Live updates disconnected (${reason}) — polling run status`);
-            });
-            socket.on("connect_error", (err) => {
-                if (isStoppingRef.current) return;
-                addLog('warning', 'Connection Warning', `Live updates unavailable (${err?.message || 'connect_error'}) — polling run status`);
-            });
-
-            // Join AFTER listeners are registered and the transport is connected,
-            // so no event is missed and the join can never sit in a dead buffer.
-            await new Promise((resolve) => {
-                if (socket.connected) return resolve();
-                const timer = setTimeout(() => resolve(), 5000);
-                socket.once("connect", () => { clearTimeout(timer); resolve(); });
-                socket.once("connect_error", () => { clearTimeout(timer); resolve(); });
-            });
-            if (!socket.connected) {
-                addLog('workflow_error', 'Connection Error', 'Socket did not connect — live node updates will be missing');
-            }
-            socket.emit("workflow_run_join", { runId: instanceID });
-            addLog('info', 'Connected', 'Joined workflow execution room');
-
-            // Polling fallback: backend DB is source of truth. If the single
-            // `workflow_status_update` socket event is missed (join race or
-            // disconnect at completion time), polling still stops the animation.
-            if (pollRef.current) clearInterval(pollRef.current);
-            const pollStatus = async () => {
-                if (isStoppingRef.current) return;
-                try {
-                    const res = await getWorkflowRunStatusAPI({ tenantID, instanceID });
-                    const statusData = res?.data || res;
-                    if (statusData && statusData.status && statusData.status !== "RUNNING") {
-                        finishFromStatus(statusData);
-                    }
-                } catch (_) {
-                    // Best-effort only — socket remains primary channel.
-                }
-            };
-            pollRef.current = setInterval(pollStatus, 5000);
-            // Immediate check covers fast-failing runs that complete before join.
-            setTimeout(pollStatus, 2000);
-
-        } catch (error) {
-            addLog('workflow_error', 'Connection Error', error.message);
-            setIsRunning(false);
-        }
-    }, [addLog, tenantID, disconnectSocket]);
-
     const clearRunState = useCallback(() => {
-        disconnectSocket();
-        setIsRunning(false);
-        setResult(null);
-        resetNodeExecutionStatus();
-        clearLogs();
-        clearContext();
-        setDataCollectionRequest(null);
-        instanceIdRef.current = null;
-        isTestRunRef.current = false;
-        isStoppingRef.current = false;
-    }, [disconnectSocket, resetNodeExecutionStatus, clearLogs, clearContext]);
+        invalidate();
+        setIsRunning(false); setResult(null); setNodeExecutionStatus({});
+        setLogs([]); setContext({}); setDataCollectionRequest(null);
+    }, [invalidate]);
 
-    /**
-     * Start a Test Run (In-Memory)
-     */
-    const startTestRun = useCallback(async ({ nodes, edges, inputValues, workflowOptions, workflowID }) => {
-        // Reset stopping guard for new run
-        isStoppingRef.current = false;
-        clearRunState();
-        setIsRunning(true);
-        isTestRunRef.current = true;
-
-        addLog('start', 'Test Run Started', `Running workflow with ${nodes.length} nodes`);
-
+    const requestStop = useCallback(async run => {
+        run.stopRequested = true;
+        if (!run.instanceID || run.stopping || run.finished) return;
+        run.stopping = true;
         try {
-            // Start test execution (workflowID attributes the run to a saved
-            // workflow for history; omitted for unsaved graphs)
-            const result = await testWorkflowAPI({
-                tenantID,
-                nodes,
-                edges,
-                inputValues,
-                workflowOptions,
-                ...(workflowID ? { workflowID } : {}),
-            });
-
-            const instanceID = result.instanceID;
-            instanceIdRef.current = instanceID;
-            addLog('info', 'Instance Created', `Instance ID: ${instanceID.substring(0, 8)}...`);
-
-            // Mark start node as running
-            const startNode = nodes.find(n => n.type === 'start');
-            if (startNode) {
-                setNodeExecutionStatus(prev => ({
-                    ...prev,
-                    [startNode.id]: 'running',
-                }));
-                addLog('node_start', 'Node: Start', startNode.data?.title || 'Start', { nodeId: startNode.id });
+            if (run.isTest) await stopTestWorkflowAPI({ tenantID: run.tenantID, instanceID: run.instanceID });
+            else await cancelWorkflowAPI({ tenantID: run.tenantID, instanceID: run.instanceID });
+            if (!isCurrent(run) || run.finished) return;
+            if (run.isTest) {
+                run.finished = true;
+                run.observer?.disconnect();
+                setIsRunning(false); setDataCollectionRequest(null);
+                setResult({ instanceID: run.instanceID, status: 'CANCELLED' });
+                setNodeExecutionStatus(previous => Object.fromEntries(Object.entries(previous).map(([key, value]) => [key, ['running', 'suspended'].includes(value) ? 'cancelled' : value])));
+                addLog('info', 'Test stopped', 'Test instance terminated and deleted');
+            } else {
+                // Continue observing until Temporal confirms the terminal state.
+                addLog('info', 'Cancellation requested', 'Waiting for the server to confirm cancellation');
             }
-
-            // Subscribe
-            await subscribeToInstance(instanceID, nodes);
-
         } catch (error) {
-            addLog('workflow_error', 'Error', extractError(error) || error?.message || String(error));
-            setIsRunning(false);
-            resetNodeExecutionStatus();
-        }
-    }, [tenantID, clearRunState, resetNodeExecutionStatus, addLog, subscribeToInstance]);
+            if (isCurrent(run)) addLog('warning', 'Cancellation failed', error?.message || String(error));
+        } finally { run.stopping = false; }
+    }, [addLog, isCurrent]);
 
-    /**
-     * Start a Saved Run (Database)
-     */
-    const startSavedRun = useCallback(async ({ workflowID, nodes, inputValues }) => {
-        // Reset stopping guard for new run
-        isStoppingRef.current = false;
-        clearRunState();
-        setIsRunning(true);
-        isTestRunRef.current = false;
-
-        addLog('start', 'Run Started', `Executing saved workflow ${workflowID}`);
-
-        try {
-            // Start execution
-            const result = await executeWorkflowAPI({
-                tenantID,
-                workflowID,
-                inputValues,
-            });
-
-            const instanceID = result.instanceID;
-            instanceIdRef.current = instanceID;
-             addLog('info', 'Instance Created', `Instance ID: ${instanceID.substring(0, 8)}...`);
-
-            // Subscribe
-            await subscribeToInstance(instanceID, nodes);
-
-        } catch (error) {
-             addLog('workflow_error', 'Error', error.message);
-            setIsRunning(false);
-            resetNodeExecutionStatus();
-        }
-    }, [tenantID, clearRunState, resetNodeExecutionStatus, addLog, subscribeToInstance]);
-
-    /**
-     * Stop the current run
-     */
-    const stopRun = useCallback(async () => {
-        // Set stopping guard immediately to prevent race conditions
-        isStoppingRef.current = true;
-
-        const currentInstanceId = instanceIdRef.current;
-        const isTest = isTestRunRef.current;
-
-        // Disconnect socket first to stop receiving events
-        disconnectSocket();
-        
-        // Update UI state immediately
-        addLog('info', 'Stopped', 'Workflow run was manually stopped');
-        setIsRunning(false);
-
-        // For test runs, we need to clean up
-        if (currentInstanceId && isTest) {
-            try {
-                await stopTestWorkflowAPI({ tenantID, instanceID: currentInstanceId });
-                addLog('info', 'Cleanup', 'Test instance deleted from database');
-            } catch (error) {
-                addLog('warning', 'Cleanup Warning', `Failed to delete test instance: ${error.message}`);
+    const observe = useCallback(run => {
+        const update = data => {
+            if (!isCurrent(run) || run.finished) return;
+            if (data.contextData) setContext(data.contextData);
+            const statuses = {};
+            if (data.nodeID && nodeStatus(data.status)) {
+                statuses[data.nodeID] = nodeStatus(data.status);
+                const node = run.nodes.find(item => item.id === data.nodeID);
+                addLog(statuses[data.nodeID] === 'failed' ? 'node_error' : statuses[data.nodeID] === 'completed' ? 'node_complete' : 'info',
+                    `Node: ${node?.data?.title || node?.type || data.nodeID}`, statuses[data.nodeID], { nodeId: data.nodeID, output: data.output, error: data.error });
             }
-        }
-        
-        instanceIdRef.current = null;
-        isStoppingRef.current = false; // Reset for next run
-    }, [addLog, tenantID, disconnectSocket]);
-
-    const submitCollectedData = useCallback(async (submittedData) => {
-        if (!dataCollectionRequest) return;
-        const { collectionRequestID } = dataCollectionRequest;
-        try {
-            await submitDataCollectionAPI({ tenantID, collectionRequestID, submittedData });
-            addLog('info', 'Data submitted', 'Workflow is resuming');
-            setDataCollectionRequest(null);
-        } catch (error) {
-            addLog('workflow_error', 'Submission failed', error?.message || String(error));
-        }
-    }, [dataCollectionRequest, tenantID, addLog]);
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            disconnectSocket();
+            for (const event of data.logs || []) {
+                if (event.nodeID && nodeStatus(event.nodeStatus)) statuses[event.nodeID] = nodeStatus(event.nodeStatus);
+                if (run.seenLogs.has(event.logID)) continue;
+                run.seenLogs.add(event.logID);
+                if (event.errorMessage) addLog('node_error', 'Run history', event.errorMessage, { nodeId: event.nodeID });
+            }
+            if (Object.keys(statuses).length) setNodeExecutionStatus(previous => ({ ...previous, ...statuses }));
         };
-    }, [disconnectSocket]);
+        run.observer = observeWorkflowRun({
+            tenantID: run.tenantID, instanceID: run.instanceID,
+            onUpdate: update,
+            onRequest: request => {
+                if (!isCurrent(run) || run.finished || run.submitted.has(request.collectionRequestID)) return;
+                setDataCollectionRequest(previous => previous?.collectionRequestID === request.collectionRequestID ? previous : request);
+            },
+            onTerminal: data => {
+                if (!isCurrent(run) || run.finished) return;
+                update(data);
+                run.finished = true;
+                setIsRunning(false); setResult(data); setDataCollectionRequest(null);
+                const fallback = data.status === 'COMPLETED' ? 'skipped' : data.status === 'FAILED' ? 'failed' : 'cancelled';
+                setNodeExecutionStatus(previous => Object.fromEntries(Object.entries(previous).map(([key, value]) => [key, ['running', 'suspended'].includes(value) ? fallback : value])));
+                addLog(data.status === 'FAILED' ? 'workflow_error' : 'workflow_complete', `Workflow ${data.status.toLowerCase()}`, data.error || 'Server confirmed the final workflow state');
+            },
+            onObservationError: error => {
+                if (isCurrent(run) && !run.finished && !run.observationWarning) {
+                    run.observationWarning = true;
+                    addLog('warning', 'Connection warning', error?.message || 'Retrying run observation');
+                }
+            },
+        });
+    }, [addLog, isCurrent]);
 
-    return {
-        isRunning,
-        result,
-        nodeExecutionStatus,
-        dataCollectionRequest,
-        logs,
-        context,
-        clearRunState,
-        startTestRun,
-        startSavedRun,
-        stopRun,
-        clearLogs,
-        submitCollectedData,  
-    };
+    const start = useCallback(async (options, isTest) => {
+        clearRunState();
+        const run = { tenantID, isTest, nodes: options.nodes || [], seenLogs: new Set(), submitted: new Set(), submitting: new Set(), stopRequested: false, finished: false };
+        current.current = run;
+        setIsRunning(true);
+        addLog('start', isTest ? 'Test run started' : 'Run started', 'Starting workflow execution');
+        try {
+            const response = await (isTest ? testWorkflowAPI({ ...options, tenantID }) : executeWorkflowAPI({ tenantID, workflowID: options.workflowID, inputValues: options.inputValues }));
+            run.instanceID = response.instanceID;
+            if (!run.instanceID) throw new Error('No instanceID returned from workflow execution');
+            if (!isCurrent(run)) {
+                // Late test starts must not become orphan fixtures. Saved runs
+                // are cancelled only if the user actually requested Stop.
+                if (isTest) await stopTestWorkflowAPI({ tenantID: run.tenantID, instanceID: run.instanceID }).catch(() => {});
+                else if (run.stopRequested) await cancelWorkflowAPI({ tenantID: run.tenantID, instanceID: run.instanceID }).catch(() => {});
+                return;
+            }
+            addLog('info', 'Instance created', `Instance ID: ${run.instanceID}`);
+            if (run.stopRequested && isTest) await requestStop(run);
+            else {
+                observe(run);
+                if (run.stopRequested) await requestStop(run);
+            }
+        } catch (error) {
+            if (!isCurrent(run)) return;
+            addLog('workflow_error', 'Start failed', extractError(error) || error?.message || String(error));
+            setIsRunning(false); setNodeExecutionStatus({}); setDataCollectionRequest(null);
+        }
+    }, [tenantID, clearRunState, isCurrent, addLog, observe, requestStop]);
+    const startTestRun = useCallback(options => start(options, true), [start]);
+    const startSavedRun = useCallback(options => start(options, false), [start]);
+    const stopRun = useCallback(async () => {
+        const run = current.current;
+        if (run && isCurrent(run)) await requestStop(run);
+    }, [isCurrent, requestStop]);
+
+    const submitCollectedData = useCallback(async submittedData => {
+        const run = current.current;
+        const request = dataCollectionRequest;
+        if (!run || !request || !isCurrent(run) || run.submitting.has(request.collectionRequestID)) return;
+        run.submitting.add(request.collectionRequestID);
+        try {
+            await submitDataCollectionAPI({ tenantID: run.tenantID, collectionRequestID: request.collectionRequestID, submittedData });
+            if (!isCurrent(run) || run.finished) return;
+            run.submitted.add(request.collectionRequestID);
+            setDataCollectionRequest(previous => previous?.collectionRequestID === request.collectionRequestID ? null : previous);
+            addLog('info', 'Data submitted', 'Submission accepted; waiting for workflow to resume');
+        } catch (error) {
+            if (isCurrent(run)) addLog('workflow_error', 'Submission failed', error?.message || String(error));
+        } finally { run.submitting.delete(request.collectionRequestID); }
+    }, [dataCollectionRequest, isCurrent, addLog]);
+
+    const previousTenant = useRef(tenantID);
+    useEffect(() => {
+        if (previousTenant.current !== tenantID) { previousTenant.current = tenantID; clearRunState(); }
+    }, [tenantID, clearRunState]);
+    useEffect(() => {
+        mounted.current = true;
+        return () => { mounted.current = false; invalidate(); };
+    }, [invalidate]);
+
+    return { isRunning, result, nodeExecutionStatus, dataCollectionRequest, logs, context,
+        clearRunState, startTestRun, startSavedRun, stopRun, clearLogs, submitCollectedData };
 };

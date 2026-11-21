@@ -1,18 +1,80 @@
 {
   "widgetType": "date-picker",
-  "description": "Date / Time Picker widget. Allows users to select a date and optionally a time.",
+  "description": "Date / Time Picker widget. Date-only values are calendar dates (YYYY-MM-DD, no timezone); datetime values are local wall time (YYYY-MM-DDTHH:mm:ss, no Z). Defaults apply once; clearing stays empty.",
   "schema": {
     "type": "object",
     "properties": {
-      "label": { "type": "string", "description": "Input label" },
-      "placeholder": { "type": "string" },
-      "defaultValue": { "type": "string", "description": "Default ISO date string" },
-      "enableTime": { "type": "boolean", "default": false, "description": "Show time picker alongside date" },
-      "dateFormat": { "type": "string", "description": "Display format (e.g. 'YYYY-MM-DD')", "default": "YYYY-MM-DD" },
-      "minDate": { "type": "string", "description": "Minimum selectable ISO date" },
-      "maxDate": { "type": "string", "description": "Maximum selectable ISO date" },
-      "disabled": { "type": ["boolean", "string"], "default": false }
+      "label": {
+        "type": "string",
+        "description": "Input label"
+      },
+      "help": {
+        "type": "string",
+        "description": "Help text under the field (aria-describedby)."
+      },
+      "placeholder": {
+        "type": "string"
+      },
+      "defaultValue": {
+        "type": "string",
+        "description": "Default ISO date string. Applies once on first load; clearing stays empty (use Reset method to re-apply)."
+      },
+      "enableTime": {
+        "type": "boolean",
+        "default": false,
+        "description": "Show time picker alongside date"
+      },
+      "dateFormat": {
+        "type": "string",
+        "description": "Documented display preference (rendered via locale display); input accepts YYYY-MM-DD.",
+        "default": "YYYY-MM-DD"
+      },
+      "minDate": {
+        "type": "string",
+        "description": "Minimum selectable ISO date (inclusive, enforced for calendar/typed/time/method routes)."
+      },
+      "maxDate": {
+        "type": "string",
+        "description": "Maximum selectable ISO date (inclusive, enforced for calendar/typed/time/method routes)."
+      },
+      "disabledDates": {
+        "type": "array",
+        "description": "Disabled calendar dates as YYYY-MM-DD strings (aria-disabled, non-clickable, rejected on typed/method routes).",
+        "items": { "type": "string" }
+      },
+      "required": {
+        "type": ["boolean", "string"],
+        "default": false,
+        "description": "Required: empty value blocks form submit and shows an error."
+      },
+      "disabled": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "default": false
+      },
+      "readOnly": {
+        "type": ["boolean", "string"],
+        "default": false,
+        "description": "Read-only: focusable but not editable (distinct from disabled which blocks all routes)."
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onChange", "onOpen", "onClose", "onClear"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onChange",
+    "onOpen",
+    "onClose",
+    "onClear"
+  ]
 }

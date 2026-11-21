@@ -10,20 +10,23 @@ export const AppPageConsole = () => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-      <div className="p-2 border-b border-border bg-muted/20 flex-shrink-0 flex items-center justify-between">
+      <div className="flex flex-shrink-0 items-center justify-between border-b border-border bg-muted/20 p-2">
         <div>
-          <span className="text-xs font-semibold text-foreground block">
-            Page Data Console
+          <span className="block text-xs font-medium text-foreground">
+            Page data
+          </span>
+          <span className="block text-[11px] text-muted-foreground">
+            Live values available to widgets on this page.
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <Label className="flex items-center gap-2 cursor-pointer">
+          <Label className="flex cursor-pointer items-center gap-2 text-xs">
             <Checkbox
               checked={isTruncated}
               onCheckedChange={(checked) => setIsTruncated(checked === true)}
-              aria-label="Truncate large data"
+              aria-label="Trim large values"
             />
-            Truncate Large Data
+            Trim large values
           </Label>
         </div>
       </div>
@@ -32,9 +35,9 @@ export const AppPageConsole = () => {
         <ResizablePanel defaultSize={100} className="flex flex-col bg-background">
           <div className="flex-1 overflow-hidden">
             {!contextTree ? (
-               <div className="text-muted-foreground italic p-2 text-[11px]">Console not connected to runtime.</div>
+               <div className="p-2 text-xs italic text-muted-foreground">Page data is not available in preview.</div>
             ) : Object.keys(contextTree.queries || {}).length === 0 && Object.keys(contextTree.workflows || {}).length === 0 && Object.keys(contextTree.listeners || {}).length === 0 ? (
-               <div className="text-muted-foreground italic p-2 text-[11px]">No data sources configured yet.</div>
+               <div className="p-2 text-xs italic text-muted-foreground">Connect a data source to preview page data.</div>
             ) : (
               <CodeEditor
                 language="json"

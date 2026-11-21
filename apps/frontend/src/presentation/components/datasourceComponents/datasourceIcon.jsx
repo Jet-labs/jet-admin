@@ -5,13 +5,18 @@ import {
   SiAirtable,
   SiAmazons3,
   SiApachekafka,
+  SiClickhouse,
   SiCockroachlabs,
+  SiDuckdb,
   SiElasticsearch,
   SiFirebase,
+  SiGithub,
+  SiGitlab,
   SiGoogleanalytics,
   SiGooglebigquery,
   SiGooglesheets,
   SiGraphql,
+  SiInfluxdb,
   SiJira,
   SiMongodb,
   SiMysql,
@@ -19,6 +24,7 @@ import {
   SiNotion,
   SiOracle,
   SiPostgresql,
+  SiPrometheus,
   SiRabbitmq,
   SiRedis,
   SiSendgrid,
@@ -29,7 +35,7 @@ import {
   SiTwilio
 } from "react-icons/si";
 import { FaFileExcel } from "react-icons/fa";
-import { TbApi, TbDatabase, TbWorldWww } from "react-icons/tb";
+import { TbApi, TbDatabase, TbFolder, TbMail, TbServer, TbUsers, TbWorldWww } from "react-icons/tb";
 
 /**
  * Icon mapping from string identifiers to React components
@@ -62,9 +68,19 @@ const ICON_MAP = {
   SiNotion,
   SiJira,
   SiGoogleanalytics,
+  SiClickhouse,
+  SiDuckdb,
+  SiPrometheus,
+  SiInfluxdb,
+  SiGithub,
+  SiGitlab,
   TbApi,
   TbWorldWww,
   TbDatabase,
+  TbFolder,
+  TbServer,
+  TbMail,
+  TbUsers,
 };
 
 /**

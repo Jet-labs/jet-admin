@@ -93,7 +93,7 @@ export const WidgetPropertiesEditor = ({ widgetEditorForm }) => {
 
       <hr className="my-4 border-border" />
 
-      <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+      <h3 className="text-xs font-medium text-foreground uppercase tracking-wider">
         Widget Styling
       </h3>
 

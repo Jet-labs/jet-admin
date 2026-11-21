@@ -46,6 +46,7 @@ export const ListenerDeletionForm = ({ tenantID, listenerID }) => {
       title: CONSTANTS.STRINGS.DELETE_LISTENER_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_LISTENER_DIALOG_MESSAGE,
       confirmText: "Delete",
+      confirmVariant: "destructive",
       cancelText: "Cancel",
     });
     if (!confirmed) return;

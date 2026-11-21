@@ -35,3 +35,18 @@ export {
 
 // Actions (for advanced use cases)
 export { APP_PAGE_ACTIONS, appPageActions } from "./appPageActions";
+
+// Instance identity (B24/F01 + F12 repeat scope)
+export {
+  parseResourceID,
+  parseWidgetKey,
+  isRepeatInstanceID,
+  normalizeRepeatPath,
+  getPlacementInstanceID,
+  getPlacementKeyOfInstance,
+  groupInstancesByResource,
+  resolveLegacyWidgetReference,
+  buildIterationWidgetsView,
+  remapPlacementResource,
+  deriveSlotIdentity,
+} from "./widgetInstanceIdentity";

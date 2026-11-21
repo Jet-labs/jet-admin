@@ -20,6 +20,9 @@ export const CONSTANTS = {
       publishWidgetAPI: () => "/api/v1/operator/widget-library",
       unpublishWidgetAPI: (libraryEntryID) =>
         `/api/v1/operator/widget-library/${libraryEntryID}`,
+      listMarketplaceItemsAPI: () => "/api/v1/operator/marketplace",
+      verifyMarketplaceItemAPI: (itemID) => `/api/v1/operator/marketplace/${itemID}`,
+      unpublishMarketplaceItemAPI: (itemID) => `/api/v1/operator/marketplace/${itemID}`,
     },
   },
 
@@ -27,6 +30,7 @@ export const CONSTANTS = {
     ROLES: "ROLES",
     PERMISSIONS: "PERMISSIONS",
     WIDGET_LIBRARY: "WIDGET_LIBRARY",
+    MARKETPLACE: "MARKETPLACE",
   },
 
   STRINGS: {

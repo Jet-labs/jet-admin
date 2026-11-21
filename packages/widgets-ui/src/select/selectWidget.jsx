@@ -18,17 +18,35 @@ export const SelectWidget = ({ widgetConfig, widgetState, setWidgetState, fireWi
   const options = useMemo(() => {
     const staticOpts = Array.isArray(widgetConfig?.options) ? widgetConfig.options : [];
     const tpl = widgetConfig?.optionsTemplate;
+    // Radix Select.Item rejects an empty-string value. Drop unfinished/blank
+    // option rows so live authoring previews render instead of crashing.
+    const withValidValue = (opts) =>
+      opts.map((o) => (typeof o === "object" && o !== null
+        ? { label: String(o.label ?? o.value ?? ""), value: o.value }
+        : { label: String(o), value: o }))
+        .filter((o) => coerce(o.value) !== "");
     // optionsTemplate is already resolved by runtime into array when bound;
     // support both array and already-resolved arrays passed via widgetConfig
     if (Array.isArray(tpl)) {
       const lk = widgetConfig?.labelKey || "label";
       const vk = widgetConfig?.valueKey || "value";
-      return tpl.map((o) => (typeof o === "object" && o !== null ? { label: String(o[lk] ?? o.value ?? ""), value: o[vk] ?? o.value } : { label: String(o), value: o }));
+      return withValidValue(tpl.map((o) => (typeof o === "object" && o !== null
+        ? { label: String(o[lk] ?? o.value ?? ""), value: o[vk] ?? o.value }
+        : { label: String(o), value: o })));
     }
-    return staticOpts.map((o) => (typeof o === "object" && o !== null ? { label: String(o.label ?? o.value ?? ""), value: o.value } : { label: String(o), value: o }));
+    return withValidValue(staticOpts);
   }, [widgetConfig?.options, widgetConfig?.optionsTemplate, widgetConfig?.labelKey, widgetConfig?.valueKey]);
 
   const value = widgetState?.value ?? widgetConfig?.defaultValue ?? "";
+  const clearable = widgetConfig?.clearable === true || widgetConfig?.clearable === "true";
+
+  // Advertised open/close behavior (B17/E15): exactly one event per open and
+  // per close through the live dispatcher.
+  const handleOpenChange = (open) => {
+    if (liveRef.current.fireWidgetEvent) {
+      liveRef.current.fireWidgetEvent(open ? "onOpen" : "onClose", { value });
+    }
+  };
 
   useEffect(() => {
     if (widgetState?.value === undefined && widgetConfig?.defaultValue !== undefined) {
@@ -37,17 +55,25 @@ export const SelectWidget = ({ widgetConfig, widgetState, setWidgetState, fireWi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgetConfig?.defaultValue]);
 
+  // Live callbacks via ref (B05/F02): open/close/clear/change always use the
+  // current dispatcher, never the first render's closure.
+  const liveRef = useRef(null);
+  liveRef.current = { setWidgetState, fireWidgetEvent };
+  const emitChange = (v) => {
+    const rt = liveRef.current;
+    if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: v }));
+    if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: v });
+  };
+  const emitClear = () => {
+    const rt = liveRef.current;
+    if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: "" }));
+    if (rt.fireWidgetEvent) rt.fireWidgetEvent("onClear", { value: "" });
+  };
   const methodsRef = useRef(null);
   if (!methodsRef.current) {
     methodsRef.current = {
-      setValue: (v) => {
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: v }));
-        if (fireWidgetEvent) fireWidgetEvent("onChange", { value: v });
-      },
-      clear: () => {
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: "" }));
-        if (fireWidgetEvent) fireWidgetEvent("onClear", { value: "" });
-      },
+      setValue: (v) => emitChange(v),
+      clear: () => emitClear(),
     };
   }
   useEffect(() => { if (onWidgetInit) onWidgetInit(methodsRef.current); }, [onWidgetInit]);
@@ -63,8 +89,20 @@ export const SelectWidget = ({ widgetConfig, widgetState, setWidgetState, fireWi
         </div>
       )}
       {label && <Label className="text-xs font-medium text-foreground">{label}{required && <span className="text-rose-500 ml-0.5">*</span>}</Label>}
-      <Select value={coerce(value)} onValueChange={(v) => { if (setWidgetState) setWidgetState((p) => ({ ...p, value: v })); if (fireWidgetEvent) fireWidgetEvent("onChange", { value: v }); }} disabled={disabled}>
-        <SelectTrigger className="text-xs w-full"><SelectValue placeholder={placeholder} /></SelectTrigger>
+      <Select value={coerce(value)} onValueChange={(v) => emitChange(v)} onOpenChange={handleOpenChange} disabled={disabled}>
+        <div className="relative w-full">
+          <SelectTrigger className="text-xs w-full"><SelectValue placeholder={placeholder} /></SelectTrigger>
+          {clearable && value !== "" && value !== undefined && (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); emitClear(); }}
+              className="absolute right-7 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label="Clear selection"
+            >
+              <span className="text-xs leading-none">×</span>
+            </button>
+          )}
+        </div>
         <SelectContent>
           {options.length === 0 && <div className="px-2 py-1.5 text-xs text-muted-foreground">No options configured</div>}
           {options.map((o, i) => (

@@ -1,0 +1,137 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["send", "verify"],
+        "default": "send",
+        "description": "Send an email, or verify the connection (same as the connection test)."
+      },
+      "to": {
+        "type": "string",
+        "description": "Recipient(s), comma-separated."
+      },
+      "subject": {
+        "type": "string",
+        "description": "Email subject."
+      },
+      "text": {
+        "type": "string",
+        "description": "Plain-text body."
+      },
+      "html": {
+        "type": "string",
+        "description": "HTML body (optional)."
+      },
+      "from": {
+        "type": "string",
+        "description": "From override (defaults to connection From)."
+      },
+      "cc": {
+        "type": "string",
+        "description": "CC recipients, comma-separated."
+      },
+      "bcc": {
+        "type": "string",
+        "description": "BCC recipients, comma-separated."
+      },
+      "inputDefinitions": {
+        "type": "array",
+        "description": "Query parameters",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/operation",
+        "label": "Operation"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/to",
+            "label": "To"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/from",
+            "label": "From"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/subject",
+        "label": "Subject"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/text",
+        "label": "Text Body"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/html",
+        "label": "HTML Body"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/cc",
+            "label": "CC"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/bcc",
+            "label": "BCC"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "options": {
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Parameters"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "operation": "send",
+    "to": "",
+    "subject": "",
+    "text": "",
+    "html": "",
+    "from": "",
+    "cc": "",
+    "bcc": "",
+    "inputDefinitions": []
+  }
+}

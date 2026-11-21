@@ -97,6 +97,7 @@ function ResizeHandle({ cursor, top, left, wDir, hDir, width, height, onResize }
   return (
     <div
       ref={ref}
+      className="craft-resize-handle"
       style={{
         position: "absolute",
         top: `${top}%`,
@@ -105,10 +106,10 @@ function ResizeHandle({ cursor, top, left, wDir, hDir, width, height, onResize }
         height: HANDLE_SIZE,
         transform: "translate(-50%, -50%)",
         cursor,
-        zIndex: 200,
+        zIndex: 60,
         backgroundColor: "hsl(var(--primary))",
         border: "1.5px solid white",
-        borderRadius: 2,
+        borderRadius: 3,
         boxShadow: "0 1px 4px rgba(0,0,0,0.35)",
         pointerEvents: "all",
       }}

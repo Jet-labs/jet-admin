@@ -4,9 +4,15 @@ const { isUUID } = require("validator");
 const { v4: uuid } = require("uuid");
 const dataQueryService = {};
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
-const { authorizedExecuteDataQuery, createQueryEngine, defaultDatasourceFetcher } = require("../../utils/authorizedProxy");
+const {
+  authorizedExecuteDataQuery,
+  createQueryEngine,
+  defaultDatasourceFetcher,
+  clearQueryEngineCache,
+} = require("../../utils/authorizedProxy");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { extractQueryDefinitions } = require("../../utils/input.util");
+const { findDataQueryReferences } = require("./dataQuery.references");
 
 dataQueryService.getDataQueriesWithDatasource = async ({
   userID,
@@ -678,6 +684,8 @@ dataQueryService.updateDataQueryByID = async ({
       },
     });
 
+    clearQueryEngineCache();
+
     Logger.log("success", {
       message: "dataQueryService:updateDataQueryByID:success",
       params: {
@@ -730,7 +738,38 @@ dataQueryService.deleteDataQueryByID = async ({
   });
 
   try {
-    // Update the database query using Prisma
+    const references = await findDataQueryReferences({ tenantID, dataQueryID });
+    if (references.total > 0) {
+      const error = new Error(
+        "Data query is still referenced by other resources. Remove those references before deleting it."
+      );
+      error.name = "DataQueryInUseError";
+      error.code = "DATA_QUERY_IN_USE";
+      error.statusCode = 409;
+      error.details = {
+        appPages: references.appPages.map((page) => ({
+          appPageID: page.appPageID,
+          appPageTitle: page.appPageTitle,
+        })),
+        widgets: references.widgets.map((widget) => ({
+          widgetID: widget.widgetID,
+          widgetTitle: widget.widgetTitle,
+        })),
+        workflows: references.workflows.map((node) => ({
+          workflowID: node.workflowID,
+          workflowTitle: node.tblWorkflows?.title,
+          nodeID: node.nodeID,
+        })),
+        listenerActions: references.listenerActions.map((action) => ({
+          actionID: action.actionID,
+          listenerID: action.listenerID,
+          listenerTitle: action.tblListeners?.listenerTitle,
+        })),
+      };
+      throw error;
+    }
+
+    // Delete the database query using Prisma
     await prisma.tblDataQueries.delete({
       where: {
         dataQueryID: dataQueryID, // Assuming `id` is the primary key for the query
@@ -739,6 +778,8 @@ dataQueryService.deleteDataQueryByID = async ({
     });
 
     await removePoliciesForResource(tenantID, `dataquery:${dataQueryID}`);
+
+    clearQueryEngineCache();
 
     Logger.log("success", {
       message: "dataQueryService:deleteDataQueryByID:success",

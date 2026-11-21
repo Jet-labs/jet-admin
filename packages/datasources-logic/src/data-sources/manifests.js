@@ -777,6 +777,167 @@ const weburlManifest = {
 };
 
 // ============================================================
+// ANALYTICS & TIME SERIES (NEW BATCH)
+// ============================================================
+
+const clickhouseManifest = {
+  name: "ClickHouse",
+  description: `ClickHouse columnar OLAP database over HTTP. Use for fast analytics,
+    event/metrics aggregation, and large-scan reporting.`,
+  capabilities: ["read", "aggregate", "filter", "write"],
+  queryInstructions: `
+    Write ClickHouse SQL in 'query' (ClickHouse dialect).
+    Query shape: { "query": "SELECT ... FROM db.table WHERE ... SETTINGS ..." }
+    Rules: SELECT is read-only and cacheable; INSERT/CREATE/ALTER are writes and are not cached.
+    Roles are returned as JSONEachRow objects.
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+const duckdbManifest = {
+  name: "DuckDB",
+  description: `DuckDB embedded OLAP engine. Queries local database files, CSV, and
+    Parquet directly with SQL, in-process and without a server.`,
+  capabilities: ["read", "aggregate", "filter", "write"],
+  queryInstructions: `
+    Write DuckDB SQL in 'query'.
+    Use read_csv('path'), read_parquet('path'), and read_json('path') for file analytics.
+    Query shape: { "query": "SELECT ... FROM read_csv('data.csv')" }
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+const prometheusManifest = {
+  name: "Prometheus",
+  description: `Prometheus metrics over HTTP. Use for instant/range metric queries,
+    label discovery, and scrape target health.`,
+  capabilities: ["read", "aggregate", "filter"],
+  queryInstructions: `
+    Query shape examples:
+    { "operation": "instantQuery", "query": "up" }
+    { "operation": "rangeQuery", "query": "rate(http_requests_total[5m])", "start": "2026-01-01T00:00:00Z", "end": "2026-01-01T01:00:00Z", "step": "30s" }
+    { "operation": "labelValues", "labelName": "job", "matches": ["up"] }
+    { "operation": "targets" }
+    start/end accept RFC3339 timestamps or Unix seconds (relative durations like -1h are not accepted by the HTTP API).
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+const influxdbManifest = {
+  name: "InfluxDB",
+  description: `InfluxDB v2 time-series database. Use Flux queries for analytics and
+    line-protocol writes for metrics ingestion.`,
+  capabilities: ["read", "aggregate", "filter", "write"],
+  queryInstructions: `
+    Query shape examples:
+    { "operation": "query", "flux": "from(bucket: \\"metrics\\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \\"cpu\\")" }
+    { "operation": "write", "measurement": "cpu", "tags": {"host":"a"}, "fields": {"usage": 42} }
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+// ============================================================
+// FILES & DIRECTORY SERVICES (NEW BATCH)
+// ============================================================
+
+const filesystemManifest = {
+  name: "File System",
+  description: `Local filesystem reads jailed under a configured root. Use for
+    browsing exported files and reading configuration/data files inside the
+    backend container. Read-only.`,
+  capabilities: ["read", "filter"],
+  queryInstructions: `
+    Query shape examples:
+    { "operation": "list", "path": "exports" }
+    { "operation": "read", "path": "exports/report.csv", "encoding": "utf8" }
+    { "operation": "stat", "path": "exports/report.csv" }
+    Paths must stay inside the connection rootPath.
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+const sftpManifest = {
+  name: "SFTP",
+  description: `Remote files over SFTP (SSH). Use for listing/reading/writing
+    files on a remote server.`,
+  capabilities: ["read", "write", "filter"],
+  queryInstructions: `
+    Query shape examples:
+    { "operation": "list", "path": "/var/data" }
+    { "operation": "read", "path": "/var/data/file.json" }
+    { "operation": "write", "path": "/var/data/out.json", "content": "{\\"ok\\":true}" }
+    { "operation": "stat", "path": "/var/data/file.json" }
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+const smtpManifest = {
+  name: "SMTP",
+  description: `SMTP email sending. Use for transactional and notification emails
+    from workflows and queries. Sends immediately; never cached.`,
+  capabilities: ["write"],
+  queryInstructions: `
+    Query shape:
+    { "operation": "send", "to": "team@example.com", "subject": "Report", "text": "Body", "html": "<p>Body</p>" }
+    Use operation "verify" to test the connection without sending.
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+const ldapManifest = {
+  name: "LDAP",
+  description: `LDAP directory service (Active Directory / OpenLDAP). Use for
+    directory search, user lookup, and group membership checks.`,
+  capabilities: ["read", "filter"],
+  queryInstructions: `
+    Query shape examples:
+    { "operation": "search", "base": "dc=example,dc=com", "filter": "(objectClass=person)", "scope": "sub", "sizeLimit": 50 }
+    { "operation": "bind" }  // test the connection
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+// ============================================================
+// CODE HOSTING (NEW BATCH)
+// ============================================================
+
+const githubManifest = {
+  name: "GitHub",
+  description: `GitHub REST API. Use for repository, issue, pull request, and
+    release data, and for creating issues/comments via POST.`,
+  capabilities: ["read", "write", "filter"],
+  queryInstructions: `
+    Query shape:
+    { "method": "GET", "path": "/repos/owner/repo/issues", "queryParams": [{"key":"state","value":"open"}], "headers": [], "body": null }
+    Paths are relative to the configured API URL. GET/HEAD are cacheable.
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+const gitlabManifest = {
+  name: "GitLab",
+  description: `GitLab REST API. Use for project, issue, and pipeline data, and for
+    creating issues/notes via POST. Auth via PRIVATE-TOKEN or OAuth Bearer.`,
+  capabilities: ["read", "write", "filter"],
+  queryInstructions: `
+    Query shape:
+    { "method": "GET", "path": "/projects/owner%2Frepo/issues", "queryParams": [{"key":"state","value":"opened"}], "headers": [], "body": null }
+    Project paths in URLs must be URL-encoded. GET/HEAD are cacheable.
+  `,
+  exampleQueries: [],
+  semanticHints: {}
+};
+
+// ============================================================
 // MANIFEST REGISTRY
 // ============================================================
 
@@ -824,6 +985,22 @@ export const DATASOURCE_MANIFESTS = {
 
   // Web
   weburl: weburlManifest,
+
+  // Analytics & time series (new batch)
+  clickhouse: clickhouseManifest,
+  duckdb: duckdbManifest,
+  prometheus: prometheusManifest,
+  influxdb: influxdbManifest,
+
+  // Files & directory services (new batch)
+  filesystem: filesystemManifest,
+  sftp: sftpManifest,
+  smtp: smtpManifest,
+  ldap: ldapManifest,
+
+  // Code hosting (new batch)
+  github: githubManifest,
+  gitlab: gitlabManifest,
 };
 
 /**

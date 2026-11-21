@@ -1,33 +1,130 @@
 {
   "widgetType": "date-range-picker",
-  "description": "Date Range Picker widget. Allows users to select a start and end date range.",
+  "description": "Date Range Picker widget. Date-only values are calendar dates; datetime values are local wall time (no Z). Draft range is separate from applied value when requireApply is set.",
   "schema": {
     "type": "object",
     "properties": {
-      "label": { "type": "string", "description": "Input label" },
-      "startPlaceholder": { "type": "string", "default": "Start date" },
-      "endPlaceholder": { "type": "string", "default": "End date" },
-      "defaultStart": { "type": "string", "description": "Default start ISO date" },
-      "defaultEnd": { "type": "string", "description": "Default end ISO date" },
-      "enableTime": { "type": "boolean", "default": false },
-      "dateFormat": { "type": "string", "default": "YYYY-MM-DD" },
-      "minDate": { "type": "string" },
-      "maxDate": { "type": "string" },
+      "label": {
+        "type": "string",
+        "description": "Input label"
+      },
+      "help": {
+        "type": "string",
+        "description": "Help text under the field."
+      },
+      "startPlaceholder": {
+        "type": "string",
+        "default": "Start date",
+        "description": "Legacy alias of placeholderStart (canonical wins)."
+      },
+      "endPlaceholder": {
+        "type": "string",
+        "default": "End date",
+        "description": "Legacy alias of placeholderEnd (canonical wins)."
+      },
+      "defaultStart": {
+        "type": "string",
+        "description": "Default start ISO date (applies once; clearing stays empty)."
+      },
+      "defaultEnd": {
+        "type": "string",
+        "description": "Default end ISO date (applies once; clearing stays empty)."
+      },
+      "enableTime": {
+        "type": "boolean",
+        "default": false
+      },
+      "requireApply": {
+        "type": "boolean",
+        "default": false,
+        "description": "When true, popover edits draftStart/draftEnd and Apply commits (validated); Cancel discards the draft."
+      },
+      "dateFormat": {
+        "type": "string",
+        "default": "YYYY-MM-DD",
+        "description": "Documented display preference; input accepts YYYY-MM-DD."
+      },
+      "minDate": {
+        "type": "string",
+        "description": "Minimum selectable ISO date (inclusive)."
+      },
+      "maxDate": {
+        "type": "string",
+        "description": "Maximum selectable ISO date (inclusive)."
+      },
+      "disabledDates": {
+        "type": "array",
+        "description": "Disabled dates as YYYY-MM-DD strings.",
+        "items": { "type": "string" }
+      },
       "presets": {
         "type": "array",
-        "description": "Quick-select preset ranges",
+        "description": "Quick-select preset ranges. Canonical { label, start, end } ISO; legacy { label, startOffset, endOffset } (number days or startOfMonth/endOfMonth/startOfYear/endOfYear) also accepted.",
         "items": {
           "type": "object",
           "properties": {
-            "label": { "type": "string" },
-            "start": { "type": "string", "description": "ISO date or relative expression e.g. 'now-7d'" },
-            "end": { "type": "string" }
+            "label": {
+              "type": "string"
+            },
+            "start": {
+              "type": "string",
+              "description": "ISO date or relative expression e.g. 'now-7d'"
+            },
+            "end": {
+              "type": "string"
+            },
+            "startOffset": {
+              "description": "Legacy offset: number of days or startOfMonth/startOfYear."
+            },
+            "endOffset": {
+              "description": "Legacy offset: number of days or endOfMonth/endOfYear."
+            }
           },
-          "required": ["label", "start", "end"]
+          "required": [
+            "label"
+          ]
         }
       },
-      "disabled": { "type": ["boolean", "string"], "default": false }
+      "required": {
+        "type": ["boolean", "string"],
+        "default": false
+      },
+      "disabled": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "default": false
+      },
+      "readOnly": {
+        "type": ["boolean", "string"],
+        "default": false,
+        "description": "Read-only: focusable but not editable."
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      },
+      "placeholderStart": {
+        "type": "string",
+        "description": "Canonical start placeholder (legacy alias: startPlaceholder)."
+      },
+      "placeholderEnd": {
+        "type": "string",
+        "description": "Canonical end placeholder (legacy alias: endPlaceholder)."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onChange", "onOpen", "onClose", "onClear"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onChange",
+    "onOpen",
+    "onClose",
+    "onClear"
+  ]
 }

@@ -95,6 +95,13 @@ describe('proxyRegistry assignment (pure, deterministic)', () => {
 describe('proxyRegistry redis interactions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    for (const fn of Object.values(mockRedisClient)) fn.mockReset?.();
+    mockRedisClient.get.mockResolvedValue(null);
+    mockRedisClient.mget.mockResolvedValue([]);
+    mockRedisClient.smembers.mockResolvedValue([]);
+    mockRedisClient.scan.mockResolvedValue(['0', []]);
+    mockRedisClient.eval.mockResolvedValue(1);
+    mockRedisClient.set.mockResolvedValue('OK');
   });
 
   test('registerProxy validates proxyID and sets node key with TTL', async () => {
@@ -183,6 +190,8 @@ describe('proxyRegistry redis interactions', () => {
       })
     );
     mockRedisClient.get.mockResolvedValue('4');
+    mockRedisClient.scan.mockResolvedValue(['0', ['proxy:shard:p-1']]);
+    mockRedisClient.smembers.mockResolvedValue(ids);
     const res = await registry.rebalance(ids, [{ proxyID: 'p-1' }]);
     expect(res).toEqual({ moved: 0, moves: [], version: 4 });
     expect(mockRedisClient.eval).not.toHaveBeenCalled();
@@ -205,6 +214,12 @@ describe('proxyRegistry redis interactions', () => {
       expect(m.to).toBe('p-1');
       expect(m).not.toHaveProperty('from'); // nulls stripped (cjson.null is truthy!)
     }
+  });
+  test('stale CAS snapshot reports conflict without claiming any moves', async () => {
+    mockRedisClient.mget.mockResolvedValue([null]);
+    mockRedisClient.eval.mockResolvedValue(-1);
+    expect(await registry.rebalance(['l-1'], [{ proxyID: 'p-1' }])).toMatchObject({ moved: 0, moves: [], conflict: true });
+    expect(mockRedisClient.eval.mock.calls[0][0]).toContain('version ~= tonumber(ARGV[2])');
   });
 
   test('reconcile assigns drift and announces moves', async () => {
@@ -238,7 +253,7 @@ describe('proxyRegistry redis interactions', () => {
     mockRedisClient.eval.mockResolvedValue(7);
     await registry.reconcileAndAnnounce({ fetchActiveIDs: async () => ['l-1'] });
     expect(mockPublishControl).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'ASSIGNMENTS_CHANGED', version: 7 })
+      expect.objectContaining({ type: 'ASSIGNMENTS_CHANGED', version: 7 }), {}
     );
 
     jest.clearAllMocks();
@@ -266,5 +281,28 @@ describe('proxyRegistry redis interactions', () => {
       { listenerID: 'l-1', from: 'p-dead' },
       { listenerID: 'l-2', from: 'p-dead' },
     ]);
+  });
+
+  test('removeListener deletes placement and shard membership', async () => {
+    mockRedisClient.eval.mockResolvedValueOnce(1); // remove Lua
+    mockRedisClient.get.mockResolvedValue('12'); // version bump is inside remove Lua
+    const result = await registry.removeListener('l-1');
+    expect(result).toEqual({ removed: true, version: 12 });
+    expect(mockRedisClient.eval).toHaveBeenCalledWith(
+      expect.stringContaining('proxy:shard:'),
+      1,
+      'proxy:assign:l-1',
+      'l-1'
+    );
+    expect(mockPublishControl).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'ASSIGNMENTS_CHANGED', version: 12 }), { client: mockRedisClient }
+    );
+  });
+
+  test('removeListener is a no-op when no placement exists', async () => {
+    mockRedisClient.eval.mockResolvedValueOnce(0);
+    mockRedisClient.get.mockResolvedValue(null);
+    const result = await registry.removeListener('l-missing');
+    expect(result).toEqual({ removed: false, version: 0 });
   });
 });

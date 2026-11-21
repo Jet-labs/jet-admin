@@ -12,7 +12,8 @@
  */
 import { useEditor } from "@craftjs/core";
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
-import { resolveValue } from "../../../../../logic/evaluationEngine";import {
+import { evaluateVisibilityCondition } from "../../../../../logic/evaluationEngine";
+import {
   ArrowDown,
   ArrowUp,
   Box,
@@ -79,24 +80,45 @@ function moveNodeInCraft(actions, nodeId, parentId, direction, siblings) {
 /**
  * Live preview badge for a visibility condition, evaluated against the
  * editor-time state tree (variable defaults + data-source aliases).
- * Mirrors LayoutRenderer's `!!resolveValue(condition, stateTree)` semantics.
+ * Mirrors LayoutRenderer fail-closed semantics: empty => always,
+ * error => error (hidden in viewer), truthy non-boolean => warning.
  */
 function ConditionPreviewBadge({ condition, editorLiveStateTree }) {
-  const { label, tone } = useMemo(() => {
-    if (!condition?.trim()) return { label: "always", tone: "text-muted-foreground bg-muted/50 border-border/50" };
-    try {
-      const inner = editorLiveStateTree?.state || {};
-      const result = resolveValue(condition, inner);
-      return result
-        ? { label: "shown", tone: "text-emerald-600 bg-emerald-500/10 border-emerald-500/30" }
-        : { label: "hidden", tone: "text-amber-600 bg-amber-500/10 border-amber-500/30" };
-    } catch {
-      return { label: "error", tone: "text-destructive bg-destructive/10 border-destructive/30" };
+  const { label, tone, title } = useMemo(() => {
+    if (typeof condition !== "string" || !condition.trim()) {
+      return { label: "always", tone: "text-muted-foreground bg-muted/50 border-border/50", title: "No condition — always shown" };
     }
+    const inner = editorLiveStateTree?.state || {};
+    const res = evaluateVisibilityCondition(condition, inner, { silent: true });
+    if (res.isEmpty) return { label: "always", tone: "text-muted-foreground bg-muted/50 border-border/50", title: "No condition — always shown" };
+    if (res.hasError) {
+      return {
+        label: "error → hidden",
+        tone: "text-destructive bg-destructive/10 border-destructive/30",
+        title: `Condition errors in viewer it hides (fail-closed). ${res.missingMustaches ? "Missing {{ }}? " : ""}${(res.errors[0]?.message || "evaluation error")}`,
+      };
+    }
+    if (res.missingMustaches) {
+      return {
+        label: "no {{ }}?",
+        tone: "text-amber-700 bg-amber-500/10 border-amber-500/40",
+        title: "Condition has no {{ }} — it is treated as literal text (always truthy). Wrap JS in {{ }}.",
+      };
+    }
+    if (res.isNonBoolean) {
+      return {
+        label: `truthy (${typeof res.rawValue})`,
+        tone: "text-amber-600 bg-amber-500/10 border-amber-500/30",
+        title: `Returns ${typeof res.rawValue} (${JSON.stringify(res.rawValue)?.slice(0, 80)}), not boolean. It shows because truthy, but prefer === / > / && returning boolean. Note: "false", [], {} are truthy.`,
+      };
+    }
+    return res.visible
+      ? { label: "shown", tone: "text-emerald-600 bg-emerald-500/10 border-emerald-500/30", title: "Condition is true with defaults — shown in viewer" }
+      : { label: "hidden", tone: "text-amber-600 bg-amber-500/10 border-amber-500/30", title: "Condition is false with defaults — hidden in viewer" };
   }, [condition, editorLiveStateTree]);
 
   return (
-    <span className={`ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${tone}`} title="Evaluated against variable defaults + data-source aliases">
+    <span className={`ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${tone}`} title={title}>
       {label}
     </span>
   );
@@ -130,7 +152,7 @@ function ConditionQuickInserts({ editorLiveStateTree, onInsert, onClear }) {
           key={`q-${k}`}
           type="button"
           onClick={() => onInsert(`{{ state.queries.${k}.data.length }}`)}
-          className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20"
+          className="rounded border border-primary/30 bg-primary/10 px-1.5 py-0.5 font-mono text-[9px] text-primary hover:bg-primary/20"
           title={`Insert {{ state.queries.${k}.data.length }}`}
         >
           {k}.len
@@ -335,6 +357,23 @@ export default function CraftSettingsPanel({
     if (!selectedNodeId) return;
     actions.setProp(selectedNodeId, (props) => {
       props.condition = condition?.trim() || null;
+    });
+  };
+
+  const handleUpdateHiddenBehavior = (behavior) => {
+    if (!selectedNodeId) return;
+    actions.setProp(selectedNodeId, (props) => {
+      // behavior: 'collapse' | 'preserve-space' | 'collapse-keep-state'
+      if (behavior === "preserve-space") {
+        props.hideMode = "preserve-space";
+        props.keepMounted = false;
+      } else if (behavior === "collapse-keep-state") {
+        props.hideMode = "collapse";
+        props.keepMounted = true;
+      } else {
+        props.hideMode = null;
+        props.keepMounted = false;
+      }
     });
   };
 
@@ -1150,8 +1189,29 @@ export default function CraftSettingsPanel({
                   onClear={() => handleUpdateCondition("")}
                 />
                 <span className="text-[9px] text-muted-foreground/60 leading-tight">
-                  Enter JavaScript expression. Renders component only if truthy.
+                  Full JS inside {`{{ }}`}, e.g. {`{{ state.variables.dnsType === 'Domain' }}`}. Empty = always show. Error = hidden + logged (fail-closed). Truthy non-boolean shows but warns.
                 </span>
+                <div className="flex flex-col gap-2">
+                  <span className="text-[11px] text-foreground">When hidden</span>
+                  <select
+                    value={
+                      nodeProps.hideMode === "preserve-space"
+                        ? "preserve-space"
+                        : nodeProps.keepMounted
+                          ? "collapse-keep-state"
+                          : "collapse"
+                    }
+                    onChange={(e) => handleUpdateHiddenBehavior(e.target.value)}
+                    className="w-full bg-background border border-border rounded p-2 text-xs"
+                  >
+                    <option value="collapse">Collapse (unmount, no space)</option>
+                    <option value="preserve-space">Preserve space (hidden, keeps state)</option>
+                    <option value="collapse-keep-state">Collapse but keep state (display:none)</option>
+                  </select>
+                  <span className="text-[9px] text-muted-foreground/60 leading-tight">
+                    Collapse unmounts and loses form/table state. Preserve space keeps layout space + state. Keep-state collapses layout but preserves state.
+                  </span>
+                </div>
               </div>
 
               <div className="flex flex-col gap-2">

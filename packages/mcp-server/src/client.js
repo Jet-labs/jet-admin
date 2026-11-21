@@ -156,6 +156,9 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
     test: (body) =>
       call(() => http.post(`${T}/datasources/test`, body)),
 
+    testJson: (body) =>
+      call(() => http.post(`${T}/datasources/test-json`, body)),
+
     proxy: (datasourceID, body) =>
       call(() => http.post(`${T}/datasources/${datasourceID}/proxy`, body)),
   };
@@ -307,6 +310,296 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
       call(() => http.get(`/api/v1/tenants/${tenantId}`)),
   };
 
+  // ─── Folders ─────────────────────────────────────────────────────────────
+  // Backend: apps/backend/modules/folder/folder.v1.routes.js
+  //   GET /folders?entityType= | POST /folders | POST /folders/move
+  //   PATCH /folders/:folderID | DELETE /folders/:folderID
+  // entityType ∈ widget, workflow, dataQuery, cronJob, appPage, listener
+
+  const folderAPI = {
+    list: (params = {}) =>
+      call(() => http.get(`${T}/folders`, { params })),
+
+    create: (body) =>
+      call(() => http.post(`${T}/folders`, body)),
+
+    update: (folderID, body) =>
+      call(() => http.patch(`${T}/folders/${folderID}`, body)),
+
+    delete: (folderID) =>
+      call(() => http.delete(`${T}/folders/${folderID}`)),
+
+    move: (body) =>
+      call(() => http.post(`${T}/folders/move`, body)),
+  };
+
+  // ─── CronJobs ────────────────────────────────────────────────────────────
+  // Backend: apps/backend/modules/cronJob/cronJob.v1.routes.js
+  // NOTE path is lowercase `/cronjobs` (not cronJobs).
+
+  const cronJobAPI = {
+    list: (params = {}) =>
+      call(() => http.get(`${T}/cronjobs`, { params })),
+
+    getById: (cronJobID) =>
+      call(() => http.get(`${T}/cronjobs/${cronJobID}`)),
+
+    create: (body) =>
+      call(() => http.post(`${T}/cronjobs`, body)),
+
+    update: (cronJobID, body) =>
+      call(() => http.patch(`${T}/cronjobs/${cronJobID}`, body)),
+
+    delete: (cronJobID) =>
+      call(() => http.delete(`${T}/cronjobs/${cronJobID}`)),
+
+    clone: (cronJobID) =>
+      call(() => http.post(`${T}/cronjobs/${cronJobID}/clone`)),
+
+    history: (cronJobID, params = {}) =>
+      call(() => http.get(`${T}/cronjobs/${cronJobID}/history`, { params })),
+
+    connectionStatus: () =>
+      call(() => http.get(`${T}/cronjobs/status/connections`)),
+  };
+
+  // ─── Audit ───────────────────────────────────────────────────────────────
+  // Backend: apps/backend/modules/audit/audit.v1.routes.js (read-only)
+
+  const auditAPI = {
+    list: (params = {}) =>
+      call(() => http.get(`${T}/audit`, { params })),
+
+    exportCSV: (params = {}) =>
+      call(() => http.get(`${T}/audit/export`, { params })),
+  };
+
+  // ─── API Keys ────────────────────────────────────────────────────────────
+  // Backend: apps/backend/modules/apiKey/apiKey.v1.routes.js
+  // NOTE path is lowercase `/apikeys`.
+
+  const apiKeyAPI = {
+    list: (params = {}) =>
+      call(() => http.get(`${T}/apikeys`, { params })),
+
+    getById: (apiKeyID) =>
+      call(() => http.get(`${T}/apikeys/${apiKeyID}`)),
+
+    create: (body) =>
+      call(() => http.post(`${T}/apikeys`, body)),
+
+    update: (apiKeyID, body) =>
+      call(() => http.patch(`${T}/apikeys/${apiKeyID}`, body)),
+
+    delete: (apiKeyID) =>
+      call(() => http.delete(`${T}/apikeys/${apiKeyID}`)),
+
+    clone: (apiKeyID) =>
+      call(() => http.post(`${T}/apikeys/${apiKeyID}/clone`)),
+  };
+
+  // ─── Users (extended) ────────────────────────────────────────────────────
+  // Backend: apps/backend/modules/userManagement/userManagement.v1.routes.js
+
+  const userAPI = {
+    list: (params = {}) =>
+      call(() => http.get(`${T}/users`, { params })),
+
+    getById: (tenantUserID) =>
+      call(() => http.get(`${T}/users/${tenantUserID}`)),
+
+    add: (body) =>
+      call(() => http.post(`${T}/users`, body)),
+
+    remove: (tenantUserID) =>
+      call(() => http.delete(`${T}/users/${tenantUserID}`)),
+
+    updateRoles: (tenantUserID, body) =>
+      call(() => http.patch(`${T}/users/${tenantUserID}/roles`, body)),
+  };
+
+  // ─── Roles + Permissions ─────────────────────────────────────────────────
+  // Backend: apps/backend/modules/tenantRole/tenantRole.v1.routes.js
+
+  const roleAPI = {
+    list: (params = {}) =>
+      call(() => http.get(`${T}/roles`, { params })),
+
+    getById: (roleID) =>
+      call(() => http.get(`${T}/roles/${roleID}`)),
+
+    create: (body) =>
+      call(() => http.post(`${T}/roles`, body)),
+
+    update: (roleID, body) =>
+      call(() => http.patch(`${T}/roles/${roleID}`, body)),
+
+    delete: (roleID) =>
+      call(() => http.delete(`${T}/roles/${roleID}`)),
+
+    listPermissions: (params = {}) =>
+      call(() => http.get(`${T}/roles/permissions`, { params })),
+
+    syncPolicies: () =>
+      call(() => http.post(`${T}/roles/sync-policies`, {})),
+  };
+
+  // ─── Tenant (extended) ───────────────────────────────────────────────────
+  // Backend: apps/backend/modules/tenant/tenant.v1.routes.js
+
+  const tenantAPI = {
+    listMine: (params = {}) =>
+      call(() => http.get(`/api/v1/tenants`, { params })),
+
+    getById: (id) =>
+      call(() => http.get(`/api/v1/tenants/${id || tenantId}`)),
+
+    create: (body) =>
+      call(() => http.post(`/api/v1/tenants`, body)),
+
+    update: (body) =>
+      call(() => http.patch(`/api/v1/tenants/${tenantId}`, body)),
+
+    getAiConfig: () =>
+      call(() => http.get(`/api/v1/tenants/${tenantId}/ai-config`)),
+
+    updateAiConfig: (body) =>
+      call(() => http.post(`/api/v1/tenants/${tenantId}/ai-config`, body)),
+  };
+
+  // ─── Bundle (import/export) ──────────────────────────────────────────────
+  // Backend: apps/backend/modules/bundle/bundle.v1.routes.js
+  // Export lives per-resource (`/:id/export`, `/:id/clone`); import is central.
+
+  const bundleAPI = {
+    previewImport: (body) =>
+      call(() => http.post(`${T}/import/preview`, body)),
+
+    executeImport: (body) =>
+      call(() => http.post(`${T}/import/execute`, body)),
+
+    exportDatasource: (datasourceID) =>
+      call(() => http.get(`${T}/datasources/${datasourceID}/export`)),
+
+    cloneDatasource: (datasourceID) =>
+      call(() => http.post(`${T}/datasources/${datasourceID}/clone`)),
+
+    exportQuery: (dataQueryID) =>
+      call(() => http.get(`${T}/queries/${dataQueryID}/export`)),
+
+    cloneQuery: (dataQueryID) =>
+      call(() => http.post(`${T}/queries/${dataQueryID}/clone`)),
+
+    exportWidget: (widgetID) =>
+      call(() => http.get(`${T}/widgets/${widgetID}/export`)),
+
+    cloneWidget: (widgetID) =>
+      call(() => http.post(`${T}/widgets/${widgetID}/clone`)),
+
+    exportAppPage: (appPageID) =>
+      call(() => http.get(`${T}/app-pages/${appPageID}/export`)),
+
+    cloneAppPage: (appPageID) =>
+      call(() => http.post(`${T}/app-pages/${appPageID}/clone`)),
+
+    exportListener: (listenerID) =>
+      call(() => http.get(`${T}/listeners/${listenerID}/export`)),
+
+    cloneListener: (listenerID) =>
+      call(() => http.post(`${T}/listeners/${listenerID}/clone`)),
+
+    exportWorkflow: (workflowID) =>
+      call(() => http.get(`${T}/workflows/${workflowID}/export`)),
+
+    cloneWorkflow: (workflowID) =>
+      call(() => http.post(`${T}/workflows/${workflowID}/clone`)),
+
+    cloneCronJob: (cronJobID) =>
+      call(() => http.post(`${T}/cronjobs/${cronJobID}/clone`)),
+
+    cloneApiKey: (apiKeyID) =>
+      call(() => http.post(`${T}/apikeys/${apiKeyID}/clone`)),
+  };
+
+  // ─── Widget Library ──────────────────────────────────────────────────────
+  // Backend: apps/backend/modules/widgetLibrary/widgetLibrary.tenant.v1.routes.js
+
+  const libraryAPI = {
+    list: (params = {}) =>
+      call(() => http.get(`${T}/widget-library`, { params })),
+
+    publish: (body) =>
+      call(() => http.post(`${T}/widget-library`, body)),
+
+    previewInstall: (libraryEntryID) =>
+      call(() => http.post(`${T}/widget-library/${libraryEntryID}/preview`, {})),
+
+    install: (libraryEntryID, body = {}) =>
+      call(() => http.post(`${T}/widget-library/${libraryEntryID}/install`, body)),
+
+    unpublish: (libraryEntryID) =>
+      call(() => http.delete(`${T}/widget-library/${libraryEntryID}`)),
+  };
+
+  // ─── App Page versions ───────────────────────────────────────────────────
+
+  const appPageVersionAPI = {
+    list: (appPageID, params = {}) =>
+      call(() => http.get(`${T}/app-pages/${appPageID}/versions`, { params })),
+
+    getById: (appPageID, versionID) =>
+      call(() => http.get(`${T}/app-pages/${appPageID}/versions/${versionID}`)),
+
+    restore: (appPageID, versionID) =>
+      call(() => http.post(`${T}/app-pages/${appPageID}/versions/${versionID}/restore`, {})),
+  };
+
+  // ─── Listener extras (actions + status) ──────────────────────────────────
+
+  const listenerExtraAPI = {
+    connectionStatus: () =>
+      call(() => http.get(`${T}/listeners/status/connections`)),
+
+    addAction: (listenerID, body) =>
+      call(() => http.post(`${T}/listeners/${listenerID}/actions`, body)),
+
+    updateAction: (listenerID, actionID, body) =>
+      call(() => http.put(`${T}/listeners/${listenerID}/actions/${actionID}`, body)),
+
+    deleteAction: (listenerID, actionID) =>
+      call(() => http.delete(`${T}/listeners/${listenerID}/actions/${actionID}`)),
+  };
+
+  // ─── Workflow extras (instances, test, data-collection) ──────────────────
+
+  const workflowExtraAPI = {
+    listInstances: (params = {}) =>
+      call(() => http.get(`${T}/workflows/instances`, { params })),
+
+    test: (body) =>
+      call(() => http.post(`${T}/workflows/test`, body)),
+
+    stopInstance: (instanceID) =>
+      call(() => http.delete(`${T}/workflows/instances/${instanceID}/stop`)),
+
+    widgetData: (instanceID) =>
+      call(() => http.post(`${T}/workflows/instances/${instanceID}/widget`, {})),
+
+    getDataCollection: (collectionRequestID) =>
+      call(() => http.get(`${T}/workflows/data-collection/${collectionRequestID}`)),
+
+    submitDataCollection: (collectionRequestID, body = {}) =>
+      call(() => http.post(`${T}/workflows/data-collection/${collectionRequestID}/submit`, body)),
+  };
+
+  // ─── Datasource generic proxy ────────────────────────────────────────────
+  // Exposes the full ALLOWED_ACTIONS matrix per type (not just getSchema/sample).
+
+  const datasourceProxyAPI = {
+    invoke: (datasourceID, action, params = {}) =>
+      call(() => http.post(`${T}/datasources/${datasourceID}/proxy`, { action, params })),
+  };
+
   return {
     tenantId,
     datasourceAPI,
@@ -316,5 +609,18 @@ export function createApiClient(tenantId, apiKey, bearerToken) {
     widgetAPI,
     appPageAPI,
     iamAPI,
+    folderAPI,
+    cronJobAPI,
+    auditAPI,
+    apiKeyAPI,
+    userAPI,
+    roleAPI,
+    tenantAPI,
+    bundleAPI,
+    libraryAPI,
+    appPageVersionAPI,
+    listenerExtraAPI,
+    workflowExtraAPI,
+    datasourceProxyAPI,
   };
 }

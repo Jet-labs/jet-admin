@@ -6,19 +6,19 @@ import { JsonViewer } from "@jet-admin/ui";
 // Helpers
 // ---------------------------------------------------------------------------
 
+const NEUTRAL_CHIP = "bg-muted/40 text-foreground border-border";
+
 const METHOD_STYLES = {
-  GET:    "bg-green-950/40 text-green-400 border-green-800/40",
-  POST:   "bg-blue-950/40 text-blue-400 border-blue-800/40",
-  PUT:    "bg-yellow-950/40 text-yellow-400 border-yellow-800/40",
-  PATCH:  "bg-orange-950/40 text-orange-400 border-orange-800/40",
-  DELETE: "bg-red-950/40 text-red-400 border-red-800/40",
+  GET: NEUTRAL_CHIP,
+  POST: NEUTRAL_CHIP,
+  PUT: NEUTRAL_CHIP,
+  PATCH: NEUTRAL_CHIP,
+  DELETE: "bg-destructive/10 text-destructive border-destructive/30",
 };
 
 const STATUS_STYLE = (code) => {
-  if (code >= 500) return "bg-red-950/40 text-red-400";
-  if (code >= 400) return "bg-orange-950/40 text-orange-400";
-  if (code >= 300) return "bg-yellow-950/40 text-yellow-400";
-  return "bg-green-950/40 text-green-400";
+  if (code >= 400) return "bg-destructive/10 text-destructive";
+  return "bg-primary/10 text-primary";
 };
 
 /** Strips the tenant prefix from API URLs for readability. */
@@ -96,16 +96,16 @@ export const AuditLogMetadataViewer = ({ metadata }) => {
   const methodStyle = METHOD_STYLES[method] ?? "bg-muted text-foreground border-border";
 
   return (
-    <div className="flex flex-col gap-4 text-sm">
+    <div className="flex flex-col gap-2 text-sm">
 
       {/* ── Request summary ──────────────────────────────────────── */}
       <section>
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+        <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
           Request
         </p>
 
         {/* Method + URL hero row */}
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
           {method && (
             <span className={`px-2 py-0.5 rounded border text-xs font-bold font-mono ${methodStyle}`}>
               {method}
@@ -123,7 +123,7 @@ export const AuditLogMetadataViewer = ({ metadata }) => {
           )}
         </div>
 
-        <div className="rounded-md border border-border/50 bg-muted/10 px-3 py-2">
+        <div className="rounded border border-border/50 bg-muted/10 p-2">
           {ip          && <Row label="IP Address">{ip}</Row>}
           {authType    && <Row label="Auth type">{authType}</Row>}
           {apiKeyTitle && <Row label="API key">{apiKeyTitle}</Row>}
@@ -136,11 +136,11 @@ export const AuditLogMetadataViewer = ({ metadata }) => {
 
       {/* ── Response summary ─────────────────────────────────────── */}
       <section>
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+        <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
           Response
         </p>
 
-        <div className="rounded-md border border-border/50 bg-muted/10 px-3 py-2">
+        <div className="rounded border border-border/50 bg-muted/10 p-2">
           {statusCode !== undefined && (
             <Row label="Status">
               <span className={`px-1.5 py-0.5 rounded text-xs font-mono font-semibold ${STATUS_STYLE(statusCode)}`}>
@@ -157,7 +157,7 @@ export const AuditLogMetadataViewer = ({ metadata }) => {
           )}
           {durationMs !== undefined && (
             <Row label="Duration">
-              <span className={durationMs > 2000 ? "text-orange-400" : durationMs > 500 ? "text-yellow-400" : "text-green-400"}>
+              <span className={durationMs > 2000 ? "text-destructive" : "text-foreground"}>
                 {durationMs} ms
               </span>
             </Row>

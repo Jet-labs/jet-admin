@@ -219,15 +219,19 @@ async function getEnforcer() {
       // Load Model
       const modelPath = path.join(__dirname, "casbin_model.conf");
 
-      // Initialize Enforcer
-      _enforcer = await newEnforcer(modelPath, adapter);
-      await _enforcer.loadPolicy();
+      // Initialize Enforcer. Keep the singleton hidden until the policy has
+      // finished loading: concurrent callers check `_enforcer` first, so
+      // publishing it early lets them enforce against an empty model and
+      // spuriously deny requests during startup.
+      const enforcer = await newEnforcer(modelPath, adapter);
+      await enforcer.loadPolicy();
+      _enforcer = enforcer;
 
       Logger.log("success", {
         message: "casbin:getEnforcer:ready",
       });
 
-      return _enforcer;
+      return enforcer;
     } catch (error) {
       Logger.log("error", {
         message: "casbin:getEnforcer:failed",

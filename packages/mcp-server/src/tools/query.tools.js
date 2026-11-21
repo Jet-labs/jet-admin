@@ -5,7 +5,7 @@
  */
 
 import { createApiClient } from "../client.js";
-import { safeArray, trimId } from "../utils.js";
+import { safeArray, trimId, summarizeRows } from "../utils.js";
 
 export const queryTools = [
   {
@@ -112,25 +112,30 @@ export const queryTools = [
       "Before creating:\n" +
       "  1. Check list_queries / get_tenant_resource_summary for an existing equivalent query.\n" +
       "  2. For SQL, use real table/column names — get them from get_datasource_schema, never guess.\n\n" +
-      "dataQueryOptions shape by datasourceType:\n" +
-      "  postgresql/mysql/mssql: { sql: 'SELECT ...', inputArgs?: [{ name, type }] }\n" +
-      "    — inputArgs declares parameters you can substitute at run time via inputValues.\n" +
-      "  restapi: { method: 'GET'|'POST'|'PUT'|'DELETE', path: '/resource', headers?, body?, queryParams? }\n" +
-      "    — path is relative to the datasource's baseUrl.\n" +
-      "If unsure of the exact schema, call get_data_query_schemas.\n\n" +
-      "Example call 1 — parameterized PostgreSQL query:\n" +
+      "dataQueryOptions shape by datasourceType (BACKEND TRUTH — from get_data_query_schemas, not the legacy below):\n" +
+      "  postgresql/mysql/mssql/sqlite/cockroachdb/oracle: { queryType: 'query', query: 'SELECT ... WHERE x = {{inputs.name}}', inputDefinitions?: [{ key, type }] }\n" +
+      "    — inputDefinitions declares params substituted at run time via inputValues. Template refs use\n" +
+      "    {{inputs.<key>}} inside apiEndpoint/query/body. Legacy {sql,inputArgs} is NOT accepted — use query/inputDefinitions.\n" +
+      "  restapi: { apiEndpoint: '/resource', method: 'GET'|'POST'|'PUT'|'DELETE'|'PATCH', headers?: [{key,value}],\n" +
+      "             body?, queryParams?: [{key,value}], contentType?, inputDefinitions?: [{key,type}] }\n" +
+      "    — apiEndpoint is relative to the datasource baseUrl. For path params with slashes/URLs use\n" +
+      "    encodeURIComponent in the template, e.g. /indicators/url/{{encodeURIComponent(inputs.url)}}/general.\n" +
+      "    Legacy {method,path,...} is NOT accepted — use apiEndpoint/inputDefinitions.\n" +
+      "If unsure of the exact schema, call get_data_query_schemas (all or per-type) and copy a get_query example.\n\n" +
+      "Example call 1 — parameterized PostgreSQL query (backend shape):\n" +
       '  { "dataQueryTitle": "orders_by_status",\n' +
       '    "datasourceID": "d7a1c3e2-4b5f-4c6a-9e8d-1f2a3b4c5d6e",\n' +
       '    "datasourceType": "postgresql",\n' +
       '    "dataQueryOptions": {\n' +
-      '      "sql": "SELECT id, customer_name, status, total FROM orders WHERE status = $1 ORDER BY created_at DESC",\n' +
-      '      "inputArgs": [{ "name": "status", "type": "string" }] },\n' +
+      '      "queryType": "query",\n' +
+      '      "query": "SELECT id, customer_name, status, total FROM orders WHERE status = {{inputs.status}} ORDER BY created_at DESC",\n' +
+      '      "inputDefinitions": [{ "key": "status", "type": "string" }] },\n' +
       '    "runOnLoad": true }\n' +
-      "Example call 2 — REST API query:\n" +
+      "Example call 2 — REST API query (backend shape):\n" +
       '  { "dataQueryTitle": "stripe_recent_charges",\n' +
       '    "datasourceID": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6f",\n' +
       '    "datasourceType": "restapi",\n' +
-      '    "dataQueryOptions": { "method": "GET", "path": "/charges", "queryParams": { "limit": "50" } } }\n\n' +
+      '    "dataQueryOptions": { "method": "GET", "apiEndpoint": "/charges", "queryParams": [{ "key": "limit", "value": "50" }] } }\n\n' +
       "Typical flow: create_query → test_query → create_widget → create_app_page / update_app_page.\n\n" +
       "Related: test_query, test_query_by_data (try without saving), get_query, delete_query.",
     inputSchema: {
@@ -152,15 +157,15 @@ export const queryTools = [
         dataQueryOptions: {
           type: "object",
           description:
-            "Query configuration, shape depends on datasourceType:\n" +
-            "  postgresql/mysql/mssql: { sql: 'SELECT ...', inputArgs?: [{ name, type }] }\n" +
-            "  restapi: { method, path, headers?, body?, queryParams? }\n" +
-            "Example: { sql: 'SELECT id, status FROM orders', inputArgs: [{ name: 'status', type: 'string' }] }",
+            "Query configuration, BACKEND shape (see tool description):\n" +
+            "  SQL: { queryType: 'query', query: 'SELECT ... {{inputs.x}}', inputDefinitions?: [{ key, type }] }\n" +
+            "  restapi: { apiEndpoint, method, headers?, body?, queryParams?, inputDefinitions? }\n" +
+            "Example: { queryType: 'query', query: 'SELECT ...', inputDefinitions: [{ key: 'status', type: 'string' }] }",
         },
         runOnLoad: {
           type: "boolean",
-          description: "If true the query auto-runs when an App Page loads. Set true for data displayed " +
-            "on page open (tables, charts); false for action-triggered queries. Default false.",
+          description: "If true the query auto-runs when an App Page loads. Prefer one auto query per page intent; " +
+            "extra manual queries run via EXECUTE_QUERY. See create_app_page triggerMode/refreshOn mapping. Default false.",
         },
       },
       required: ["dataQueryTitle", "datasourceType"],
@@ -217,6 +222,15 @@ export const queryTools = [
     handler: async ({ dataQueryID, ...updates }, context) => {
       const { queryAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const id = trimId(dataQueryID, "dataQueryID");
+      // Backend requires dataQueryOptions on update — backfill current values
+      // for any required field the caller omitted (title-only renames).
+      if (updates.dataQueryOptions === undefined || updates.datasourceID === undefined || updates.datasourceType === undefined) {
+        const current = await queryAPI.getById(id);
+        const q = current?.dataQuery || current;
+        if (updates.dataQueryOptions === undefined && q?.dataQueryOptions) updates.dataQueryOptions = q.dataQueryOptions;
+        if (updates.datasourceID === undefined && q?.datasourceID) updates.datasourceID = q.datasourceID;
+        if (updates.datasourceType === undefined && q?.datasourceType) updates.datasourceType = q.datasourceType;
+      }
       await queryAPI.update(id, updates);
       return { success: true, dataQueryID: id };
     },
@@ -258,10 +272,12 @@ export const queryTools = [
       "Use this:\n" +
       "  - Immediately after create_query or update_query to validate the query works\n" +
       "  - With realistic inputValues to check parameterization behaves as expected\n" +
-      "If the query has inputArgs, pass a value for each one in inputValues.\n\n" +
+      "If the query declares inputDefinitions, pass a value for each key in inputValues.\n\n" +
+      "Large payloads: pass maxRows (e.g. 50) to get { totalCount, truncated, rows } instead of the full\n" +
+      "array — avoids MCP output truncation on 200KB+ responses. Prefer narrow queries (limit/filter) first.\n\n" +
       "Example call:\n" +
       '  { "dataQueryID": "9f8b7a6c-5d4e-4f3a-2b1c-0d9e8f7a6b5c",\n' +
-      '    "inputValues": { "status": "refunded" } }\n\n' +
+      '    "inputValues": { "status": "refunded" }, "maxRows": 50 }\n\n' +
       "Prefer test_query over run_query for validation — run_query is for actual reads during normal\n" +
       "operation. For write operations (INSERT/UPDATE/DELETE, POST/PUT), confirm with the user first.\n\n" +
       "Related: run_query, test_query_by_data (test unsaved config), create_query.",
@@ -274,15 +290,20 @@ export const queryTools = [
         },
         inputValues: {
           type: "object",
-          description: "Map of input argument names to values, one per inputArg the query declares. " +
+          description: "Map of input argument names to values, one per inputDefinition key. " +
             "Example: { status: 'refunded', minTotal: 100 }.",
+        },
+        maxRows: {
+          type: "number",
+          description: "Optional row cap (1-1000) to avoid truncation. Returns summary envelope when capped.",
         },
       },
       required: ["dataQueryID"],
     },
-    handler: async ({ dataQueryID, inputValues = {} }, context) => {
+    handler: async ({ dataQueryID, inputValues = {}, maxRows }, context) => {
       const { queryAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return queryAPI.test(trimId(dataQueryID, "dataQueryID"), { inputValues });
+      const res = await queryAPI.test(trimId(dataQueryID, "dataQueryID"), { inputValues });
+      return summarizeRows(res, maxRows);
     },
   },
 
@@ -290,13 +311,13 @@ export const queryTools = [
     name: "run_query",
     description:
       "Execute a saved query and return its results — for READ operations (SELECT, GET).\n\n" +
-      "Returns: the query result data.\n\n" +
+      "Returns: the query result data. Pass maxRows to cap large responses (see test_query).\n\n" +
       "Use this to fetch live data for the user during normal operation (e.g. 'show me the latest orders').\n" +
       "For validation during development use test_query instead. For write operations (INSERT, UPDATE,\n" +
       "DELETE, POST/PUT/DELETE on REST), confirm with the user BEFORE running.\n\n" +
       "Example call:\n" +
       '  { "dataQueryID": "9f8b7a6c-5d4e-4f3a-2b1c-0d9e8f7a6b5c",\n' +
-      '    "inputValues": { "status": "pending" } }\n\n' +
+      '    "inputValues": { "status": "pending" }, "maxRows": 50 }\n\n' +
       "Related: test_query, execute_workflow (for side-effecting operations).",
     inputSchema: {
       type: "object",
@@ -309,12 +330,17 @@ export const queryTools = [
           type: "object",
           description: "Map of input argument names to values. Example: { status: 'pending' }.",
         },
+        maxRows: {
+          type: "number",
+          description: "Optional row cap (1-1000) to avoid truncation.",
+        },
       },
       required: ["dataQueryID"],
     },
-    handler: async ({ dataQueryID, inputValues = {} }, context) => {
+    handler: async ({ dataQueryID, inputValues = {}, maxRows }, context) => {
       const { queryAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return queryAPI.run(trimId(dataQueryID, "dataQueryID"), { inputValues });
+      const res = await queryAPI.run(trimId(dataQueryID, "dataQueryID"), { inputValues });
+      return summarizeRows(res, maxRows);
     },
   },
 
@@ -322,16 +348,18 @@ export const queryTools = [
     name: "test_query_by_data",
     description:
       "Execute a query configuration WITHOUT saving it — pass the full query config inline.\n\n" +
-      "Returns: the result data, exactly as a saved query would produce.\n\n" +
+      "Returns: the result data, exactly as a saved query would produce. Pass maxRows to cap large responses.\n\n" +
       "Use this to iterate on SQL or REST config BEFORE create_query: run here until the results look\n" +
       "right, then persist the exact same options with create_query. Also useful for trying query variants\n" +
       "without polluting the tenant with throwaway saved queries.\n\n" +
+      "Backend shape: SQL { queryType: 'query', query: 'SELECT ... {{inputs.x}}', inputDefinitions }, " +
+      "restapi { apiEndpoint, method, queryParams: [{key,value}], inputDefinitions }.\n\n" +
       "Example call:\n" +
       '  { "datasourceID": "d7a1c3e2-4b5f-4c6a-9e8d-1f2a3b4c5d6e",\n' +
       '    "datasourceType": "postgresql",\n' +
-      '    "dataQueryOptions": { "sql": "SELECT count(*) AS total FROM orders WHERE status = $1",\n' +
-      '                          "inputArgs": [{ "name": "status", "type": "string" }] },\n' +
-      '    "inputValues": { "status": "refunded" } }\n\n' +
+      '    "dataQueryOptions": { "queryType": "query", "query": "SELECT count(*) AS total FROM orders WHERE status = {{inputs.status}}",\n' +
+      '                          "inputDefinitions": [{ "key": "status", "type": "string" }] },\n' +
+      '    "inputValues": { "status": "refunded" }, "maxRows": 50 }\n\n' +
       "Related: create_query (persist the validated config), test_query (test an already-saved query).",
     inputSchema: {
       type: "object",
@@ -346,24 +374,29 @@ export const queryTools = [
         },
         dataQueryOptions: {
           type: "object",
-          description: "Query config — same shape as create_query's dataQueryOptions. " +
-            "Example: { sql: 'SELECT count(*) FROM orders', inputArgs: [] }.",
+          description: "Query config — BACKEND shape (see create_query). " +
+            "Example: { queryType: 'query', query: 'SELECT count(*) FROM orders', inputDefinitions: [] }.",
         },
         inputValues: {
           type: "object",
-          description: "Values for the query's inputArgs. Example: { status: 'refunded' }.",
+          description: "Values for the query's inputDefinitions keys. Example: { status: 'refunded' }.",
+        },
+        maxRows: {
+          type: "number",
+          description: "Optional row cap (1-1000) to avoid truncation.",
         },
       },
       required: ["datasourceType", "dataQueryOptions"],
     },
-    handler: async ({ datasourceID, datasourceType, dataQueryOptions, inputValues = {} }, context) => {
+    handler: async ({ datasourceID, datasourceType, dataQueryOptions, inputValues = {}, maxRows }, context) => {
       const { queryAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return queryAPI.testByData({
+      const res = await queryAPI.testByData({
         datasourceID: datasourceID ? trimId(datasourceID, "datasourceID") : undefined,
         datasourceType,
         dataQueryOptions,
         inputValues,
       });
+      return summarizeRows(res, maxRows);
     },
   },
 ];

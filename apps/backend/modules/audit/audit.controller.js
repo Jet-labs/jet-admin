@@ -53,7 +53,7 @@ auditController.exportAuditLogsCSV = async (req, res) => {
     });
 
     const csv = await auditService.exportAuditLogsCSV({
-      tenantID: parseInt(tenantID),
+      tenantID,
       dateFrom: dateFrom || undefined,
       dateTo: dateTo || undefined,
     });

@@ -13,14 +13,18 @@ import { widgetTools } from "./widget.tools.js";
 import { appPageTools } from "./appPage.tools.js";
 import { iamTools } from "./iam.tools.js";
 import { introspectionTools } from "./introspection.tools.js";
+import { catalogTools } from "./catalog.tools.js";
+import { adminTools } from "./admin.tools.js";
+import { lifecycleTools } from "./lifecycle.tools.js";
 
 /**
  * All MCP tools exposed by the Jet Admin MCP Server.
  * Each entry has: { name, description, inputSchema, handler }
  */
 export const allTools = [
-  // Discovery — call these FIRST
+  // Discovery — call these FIRST (live backend schemas + offline plugin catalogs)
   ...introspectionTools,
+  ...catalogTools,
   // Core CRUD
   ...datasourceTools,
   ...queryTools,
@@ -28,8 +32,11 @@ export const allTools = [
   ...workflowTools,
   ...widgetTools,
   ...appPageTools,
-  // IAM (read-only)
+  // IAM (read-only) + tenant admin (folders, cron, audit, keys, users, roles, library, import)
   ...iamTools,
+  ...adminTools,
+  // Lifecycle (clone/export, versions, run history, actions, generic proxy)
+  ...lifecycleTools,
 ];
 
 export const toolMap = new Map(allTools.map((t) => [t.name, t]));

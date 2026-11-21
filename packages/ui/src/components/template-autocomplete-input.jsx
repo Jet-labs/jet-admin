@@ -141,6 +141,11 @@ export const TemplateAutocompleteInput = ({
   const containerRef = useRef(null);
   const viewRef = useRef(null);
   const internalChange = useRef(false);
+  // CodeMirror extensions are created once. Keep the latest onChange in a ref
+  // so the update listener never calls a stale closure (this previously made
+  // structured condition/output editors act on an outdated row list).
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   // Each instance gets its own Compartments to avoid shared state conflicts
   const readOnlyCompartment = useRef(new Compartment()).current;
   const autocompleteCompartment = useRef(new Compartment()).current;
@@ -220,7 +225,7 @@ export const TemplateAutocompleteInput = ({
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           internalChange.current = true;
-          onChange?.(update.state.doc.toString());
+          onChangeRef.current?.(update.state.doc.toString());
         }
       }),
 

@@ -150,7 +150,9 @@ export const deleteUserTenantByIDAPI = async ({ tenantID }) => {
       CONSTANTS.APIS.TENANT.deleteUserTenantByIDAPI(tenantID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
-      const response = await axios.get(url, {
+      // The backend route is DELETE /tenants/:tenantID. Calling GET here
+      // silently returned the tenant (success) without deleting anything.
+      const response = await axios.delete(url, {
         headers: { authorization: `Bearer ${bearerToken}` },
       });
       if (response.data && response.data.success === true) {

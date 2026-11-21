@@ -1,0 +1,56 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "apiUrl": {
+        "type": "string",
+        "description": "GitHub API base URL (use https://api.github.com for GitHub, or your GHES host).",
+        "format": "uri",
+        "default": "https://api.github.com"
+      },
+      "token": {
+        "type": "string",
+        "description": "Personal access token (PAT) or fine-grained token.",
+        "format": "password"
+      },
+      "timeout": {
+        "type": "integer",
+        "description": "Request timeout in seconds.",
+        "minimum": 1,
+        "default": 15
+      }
+    },
+    "required": ["apiUrl"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/apiUrl",
+        "label": "API URL"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/token",
+            "label": "Token",
+            "options": { "format": "password" }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/timeout",
+            "label": "Timeout (seconds)"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "apiUrl": "https://api.github.com",
+    "token": "",
+    "timeout": 15
+  }
+}

@@ -63,7 +63,7 @@ async function publishListenerEvent({ listenerID, tenantID, rawEvent, eventID })
 async function ensureConsumerGroup(client) {
   const { stream, group } = getBusConfig();
   try {
-    await client.xgroup('CREATE', stream, group, '$', 'MKSTREAM');
+    await client.xgroup('CREATE', stream, group, '0', 'MKSTREAM');
     Logger.log('success', { message: 'listenerBus:group:created', params: { stream, group } });
   } catch (err) {
     if (!/BUSYGROUP/i.test(err.message)) throw err;
@@ -71,7 +71,7 @@ async function ensureConsumerGroup(client) {
 }
 
 /**
- * Move a failed envelope to the DLQ stream (best-effort, never throws).
+ * Durably accept a failed envelope before its source entry may be ACKed.
  */
 async function moveToDlq(client, envelope, error) {
   const { dlqStream, maxLen } = getBusConfig();
@@ -82,6 +82,7 @@ async function moveToDlq(client, envelope, error) {
     );
   } catch (dlqErr) {
     Logger.log('error', { message: 'listenerBus:dlq:failed', params: { error: dlqErr.message } });
+    throw dlqErr;
   }
 }
 
@@ -103,10 +104,10 @@ function parseStreamMessage(msgId, fields) {
 /**
  * Publish a control signal for the ingress proxy (best-effort).
  */
-async function publishControl(message) {
+async function publishControl(message, opts = {}) {
   const { getRedisClient } = require('./redis.config');
   const { controlChannel } = getBusConfig();
-  const client = getRedisClient('bus');
+  const client = opts.client || getRedisClient('bus');
   await client.publish(controlChannel, JSON.stringify({ ...message, at: Date.now() }));
 }
 

@@ -261,10 +261,15 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
     setFormData(prev => ({ ...prev, ...newData }));
   }, []);
 
-  // Handle parameters change
+  // Handle parameters change. Propagate to the parent immediately as well as
+  // keeping local form state: output rows are edited outside JSON Forms, and
+  // this guarantees the graph receives them even if the configurator Save is
+  // followed directly by the header Update.
   const handleParametersChange = useCallback((newParams) => {
-    setFormData(prev => ({ ...prev, outputParameters: newParams }));
-  }, []);
+    const next = { ...formData, outputParameters: newParams };
+    setFormData(next);
+    onChange(next);
+  }, [formData, onChange]);
 
   // Handle save
   const handleSave = useCallback(() => {

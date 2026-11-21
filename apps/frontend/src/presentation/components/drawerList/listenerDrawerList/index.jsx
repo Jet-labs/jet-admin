@@ -12,7 +12,7 @@ import { useEntityItems } from "../../../../logic/hooks/useEntityItems";
 const STATUS_COLORS = {
   active: "bg-emerald-500",
   inactive: "bg-zinc-500",
-  error: "bg-red-500",
+  error: "bg-destructive",
 };
 
 export const ListenerDrawerList = () => {

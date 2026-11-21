@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 8px;
+  gap: 12px;
   box-sizing: border-box;
 }
 
@@ -15,7 +15,7 @@
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   width: 100%;
-  gap: 8px;
+  gap: 12px;
   align-items: stretch;
   box-sizing: border-box;
 }
@@ -249,8 +249,25 @@
   height: 100%;
   overflow-y: auto;
   background-color: hsl(var(--muted) / 0.15);
-  padding: 8px;
+  padding: 20px;
   position: relative;
+}
+
+/* Edit-mode widget slots: soft surface + rounded corners + guaranteed
+   touch target so small widgets (button/badge) don't collapse. */
+.layout-widget-slot-edit {
+  border-radius: 12px;
+  min-height: 64px;
+}
+
+/* Resize handles stay out of the way until needed. */
+.layout-widget-slot-edit .craft-resize-handle {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.layout-widget-slot-edit:hover .craft-resize-handle,
+.craft-node-selected .craft-resize-handle {
+  opacity: 1;
 }
 
 /* Node visual highlight overlays in editor */
@@ -265,19 +282,10 @@
   cursor: pointer;
 }
 
+/* Hover shows an outline only — no floating tag. Tags on every nested node
+   stacked up over widget headers and caused the cluttered/overlapping feel. */
 .craft-node:hover:not(.craft-node-selected)::after {
-  content: attr(data-node-type);
-  position: absolute;
-  top: -14px;
-  left: 4px;
-  background-color: hsl(var(--primary) / 0.85);
-  color: hsl(var(--background));
-  font-size: 8px;
-  font-family: var(--font-mono, monospace);
-  padding: 1px 4px;
-  border-radius: 2px;
-  z-index: 50;
-  pointer-events: none;
+  display: none;
 }
 
 .craft-node:has(.craft-node:hover):not(.craft-node-selected) {
@@ -290,24 +298,28 @@
 
 .craft-node-selected {
   outline: 2px solid hsl(var(--primary)) !important;
-  outline-offset: 1px;
+  outline-offset: 2px;
+  border-radius: 10px;
 }
 
+/* Selected tag sits BELOW the node so it never covers widget headers,
+   the parent-select button, or ancestor tags. */
 .craft-node-selected::after {
   content: attr(data-node-type);
   position: absolute;
-  top: -15px;
-  left: 1px;
+  bottom: -18px;
+  left: 2px;
   background-color: hsl(var(--primary));
   color: hsl(var(--background));
   font-size: 9px;
   font-family: var(--font-mono, monospace);
   font-weight: 600;
   padding: 1px 5px;
-  border-radius: 2px 2px 0 0;
+  border-radius: 0 0 4px 4px;
   z-index: 50;
   pointer-events: none;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
 }
 
 /* Disable dragging while resizing (used by WidgetResizeHandles) */

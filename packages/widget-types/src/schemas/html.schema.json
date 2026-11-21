@@ -1,15 +1,70 @@
 {
   "widgetType": "html",
-  "description": "HTML Widget. Renders arbitrary custom HTML/CSS/JS in an isolated sandbox. Communicates with the dashboard via window.postMessage.",
+  "description": "HTML Widget. Renders arbitrary custom HTML/CSS in an isolated sandbox (sandbox attribute always present, allow-same-origin never granted). Scripts run only from the html content when allowScripts is on. Communicates via window.postMessage with envelope { type: 'jet-html-message', widgetID, payload }.",
   "schema": {
     "type": "object",
     "properties": {
-      "html": { "type": "string", "description": "Full HTML document content (or body fragment)" },
-      "css": { "type": "string", "description": "Additional CSS to inject" },
-      "js": { "type": "string", "description": "JavaScript to inject. Use window.parent.postMessage({ type: 'JET_MESSAGE', data: {...} }, '*') to emit the onMessage event." },
-      "height": { "type": ["number", "string"], "description": "Widget height in px", "default": 300 },
-      "scrollable": { "type": "boolean", "default": false }
+      "html": {
+        "type": "string",
+        "description": "Full HTML document content (or body fragment)"
+      },
+      "css": {
+        "type": "string",
+        "description": "Additional CSS to inject"
+      },
+      "js": {
+        "type": "string",
+        "description": "DEPRECATED/unsupported: ignored by the renderer. Put scripts in `html` and enable `allowScripts`. Kept so old saved configs still validate."
+      },
+      "allowScripts": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Allow <script> execution inside the sandbox. Default false.",
+        "default": false
+      },
+      "allowForms": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Allow form submission inside the sandbox. Default false.",
+        "default": false
+      },
+      "allowPopups": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Allow popups/new tabs from the sandbox. Default false.",
+        "default": false
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay flag."
+      },
+      "height": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Widget height in px",
+        "default": 300
+      },
+      "scrollable": {
+        "type": "boolean",
+        "default": false
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onMessage"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onMessage"
+  ]
 }

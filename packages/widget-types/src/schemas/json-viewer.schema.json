@@ -4,10 +4,30 @@
   "schema": {
     "type": "object",
     "properties": {
-      "dataTemplate": { "type": "string", "description": "Template resolving to any value" },
-      "collapsed": { "type": "boolean", "default": false },
-      "maxHeight": { "type": "number", "description": "Max height in px before scrolling" }
+      "dataTemplate": {
+        "type": "string",
+        "description": "Template resolving to any value"
+      },
+      "collapsed": {
+        "type": "boolean",
+        "default": false
+      },
+      "maxHeight": {
+        "type": "number",
+        "description": "Max height in px before scrolling"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad"
+  ]
 }

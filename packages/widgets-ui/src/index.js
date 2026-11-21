@@ -70,5 +70,10 @@ export * from "./timeline";
 export * from "./video";
 export * from "./code-block";
 
+// Shared pure contracts (F05/E08/E11/E12): field coercion/validation,
+// date parsing/validation/presets, instance-scoped a11y identities.
+export * from "./_shared/fieldContracts";
+export * from "./_shared/dateContracts";
+export * from "./_shared/fieldA11y";
 // Shared components removed, TemplateAutocompleteInput moved to @jet-admin/ui
 export { WidgetEditorContext } from "./context/WidgetEditorContext";

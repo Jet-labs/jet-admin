@@ -146,3 +146,52 @@ export const unpublishWidgetFromLibraryAPI = async ({ libraryEntryID }) => {
     return _throwFromResponse(error);
   }
 };
+
+// ─── Generalized marketplace store ───────────────────────────────────────
+
+export const listMarketplaceItemsAPI = async ({ search, itemType, category, page, pageSize } = {}) => {
+  const url =
+    CONSTANTS.SERVER_HOST + CONSTANTS.APIS.OPERATOR_ADMIN.listMarketplaceItemsAPI();
+  try {
+    const response = await operatorClient.get(url, {
+      headers: _getHeaders(),
+      params: { search, itemType, category, page, pageSize },
+    });
+    if (response.data && response.data.success === true) {
+      return {
+        entries: response.data.entries || [],
+        totalCount: response.data.totalCount || 0,
+        page: response.data.page || 1,
+        pageSize: response.data.pageSize || 0,
+        totalPages: response.data.totalPages || 1,
+      };
+    }
+    throw new Error("Request failed.");
+  } catch (error) {
+    return _throwFromResponse(error);
+  }
+};
+
+export const verifyMarketplaceItemAPI = async ({ itemID, isVerified }) => {
+  const url =
+    CONSTANTS.SERVER_HOST + CONSTANTS.APIS.OPERATOR_ADMIN.verifyMarketplaceItemAPI(itemID);
+  try {
+    const response = await operatorClient.patch(url, { isVerified }, { headers: _getHeaders() });
+    if (response.data && response.data.success === true) return response.data.item;
+    throw new Error("Request failed.");
+  } catch (error) {
+    return _throwFromResponse(error);
+  }
+};
+
+export const unpublishMarketplaceItemAPI = async ({ itemID }) => {
+  const url =
+    CONSTANTS.SERVER_HOST + CONSTANTS.APIS.OPERATOR_ADMIN.unpublishMarketplaceItemAPI(itemID);
+  try {
+    const response = await operatorClient.delete(url, { headers: _getHeaders() });
+    if (response.data && response.data.success === true) return response.data;
+    throw new Error("Request failed.");
+  } catch (error) {
+    return _throwFromResponse(error);
+  }
+};

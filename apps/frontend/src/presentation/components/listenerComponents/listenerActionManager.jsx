@@ -49,11 +49,11 @@ const LISTENER_EVENT_STATE_TREE = {
   },
 };
 const ACTION_TYPES = [
-  { value: "transform", label: "Transform Event", description: "Run JS over the event, filter or reshape it", icon: Wand2, iconClass: "bg-violet-500/10 text-violet-500 border-violet-500/20" },
-  { value: "trigger_workflow", label: "Trigger Workflow", description: "Start a workflow with event data", icon: GitBranch, iconClass: "bg-blue-500/10 text-blue-500 border-blue-500/20" },
-  { value: "trigger_query", label: "Trigger Data Query", description: "Run a data query with event data", icon: FileCode2, iconClass: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
-  { value: "save_to_buffer", label: "Save to Buffer", description: "Persist events for replay / history", icon: DatabaseZap, iconClass: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
-  { value: "push_to_app_page", label: "Push to App Page", description: "Push live data to an app page", icon: PanelTop, iconClass: "bg-pink-500/10 text-pink-500 border-pink-500/20" },
+  { value: "transform", label: "Transform Event", description: "Run JS over the event, filter or reshape it", icon: Wand2, iconClass: "bg-muted/50 text-foreground border-border" },
+  { value: "trigger_workflow", label: "Trigger Workflow", description: "Start a workflow with event data", icon: GitBranch, iconClass: "bg-primary/10 text-primary border-primary/20" },
+  { value: "trigger_query", label: "Trigger Data Query", description: "Run a data query with event data", icon: FileCode2, iconClass: "bg-muted/50 text-foreground border-border" },
+  { value: "save_to_buffer", label: "Save to Buffer", description: "Persist events for replay / history", icon: DatabaseZap, iconClass: "bg-muted/50 text-foreground border-border" },
+  { value: "push_to_app_page", label: "Push to App Page", description: "Push live data to an app page", icon: PanelTop, iconClass: "bg-muted/50 text-foreground border-border" },
 ];
 
 const getActionTypeConfig = (actionType) =>
@@ -168,10 +168,10 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <h3 className="text-sm font-semibold text-foreground">Pipeline Steps</h3>
+          <h3 className="text-sm font-medium text-foreground">Pipeline Steps</h3>
           <Badge variant="secondary" className="text-xs font-medium">
             {allActions.length}
           </Badge>
@@ -188,15 +188,15 @@ export const ListenerActionManager = ({ tenantID, listenerID, actions = [] }) =>
       </p>
 
       {allActions.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center border-dashed py-10 text-center">
-          <div className="mb-3 rounded-full bg-muted p-3">
+        <Card className="flex flex-col items-center justify-center border-dashed py-8 text-center">
+          <div className="mb-2 rounded bg-muted p-2">
             <ListTree className="h-5 w-5 text-muted-foreground" />
           </div>
-          <h4 className="text-sm font-semibold text-foreground">No pipeline steps yet</h4>
+          <h4 className="text-sm font-medium text-foreground">No pipeline steps yet</h4>
           <p className="mt-1 max-w-sm text-xs text-muted-foreground">
             Transform the event, trigger workflows or queries, buffer it, or push it to an app page.
           </p>
-          <Button size="sm" variant="secondary" className="mt-4" onClick={() => setIsAdding(true)}>
+          <Button size="sm" variant="secondary" className="mt-2" onClick={() => setIsAdding(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Add your first step
           </Button>
@@ -467,11 +467,11 @@ const PipelineStepCard = ({
   const Icon = typeConfig?.icon || Zap;
 
   return (
-    <li className="relative flex gap-3">
+    <li className="relative flex gap-2">
       {/* Step number rail */}
       <div className="flex w-7 shrink-0 flex-col items-center" aria-hidden="true">
         <span
-          className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-bold ${
+          className={`flex h-7 w-7 items-center justify-center rounded border text-xs font-medium ${
             action.isEnabled
               ? "border-border bg-muted text-foreground"
               : "border-dashed border-border bg-background text-muted-foreground"
@@ -482,15 +482,15 @@ const PipelineStepCard = ({
         {!isLast && <span className="w-px flex-1 bg-border/70" />}
       </div>
 
-      <Card className={`min-w-0 flex-1 p-3 ${!action.isEnabled ? "opacity-70" : ""}`}>
+      <Card className={`min-w-0 flex-1 p-2 ${!action.isEnabled ? "opacity-70" : ""}`}>
         {/* Header — always-visible controls */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border ${typeConfig?.iconClass || "border-border bg-muted text-muted-foreground"}`}>
+          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded border ${typeConfig?.iconClass || "border-border bg-muted text-muted-foreground"}`}>
             <Icon className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-sm font-semibold text-foreground">
+              <span className="text-sm font-medium text-foreground">
                 {typeConfig?.label || action.actionType}
               </span>
               <Badge variant="secondary" className="px-1.5 py-0 text-[11px]">
@@ -556,7 +556,7 @@ const PipelineStepCard = ({
         </div>
 
         {/* Details — full config, not truncated */}
-        <div className="mt-2 rounded-md border border-border/50 bg-background/40 p-2.5">
+        <div className="mt-2 rounded border border-border/50 bg-background/40 p-2">
           <StepDetails action={action} tenantID={tenantID} listenerID={listenerID} />
         </div>
 
@@ -571,7 +571,7 @@ const PipelineStepCard = ({
           {isExpanded ? "Hide full config" : "Show full config"}
         </button>
         {isExpanded && (
-          <div className="mt-1.5 rounded-md border border-border/50 bg-muted/20 p-2">
+          <div className="mt-1.5 rounded border border-border/50 bg-muted/20 p-2">
             <JsonViewer data={action.actionConfig || {}} />
           </div>
         )}
@@ -621,12 +621,12 @@ const ActionForm = ({ action, nextOrderIndex = 0, onSave, onCancel, isSaving, te
 
   return (
     <Card className="">
-      <div className="border-b rounded-t-md border-border/50 bg-background p-3 flex items-center gap-2.5">
-        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border ${selectedType?.iconClass || "border-border bg-muted text-muted-foreground"}`}>
+      <div className="flex items-center gap-2 rounded-t border-b border-border/50 bg-background p-2">
+        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded border ${selectedType?.iconClass || "border-border bg-muted text-muted-foreground"}`}>
           <SelectedIcon className="h-4 w-4" />
         </div>
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-foreground tracking-tight">
+          <h3 className="text-sm font-medium text-foreground tracking-tight">
             {action ? `Edit Step — ${selectedType?.label || formData.actionType}` : "Add Pipeline Step"}
           </h3>
           {selectedType?.description && (
@@ -635,8 +635,8 @@ const ActionForm = ({ action, nextOrderIndex = 0, onSave, onCancel, isSaving, te
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-3 space-y-3">
-        <div className="space-y-3">
+      <form onSubmit={handleSubmit} className="p-2 space-y-2">
+        <div className="space-y-2">
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Step Type</Label>
             <Select
@@ -662,7 +662,7 @@ const ActionForm = ({ action, nextOrderIndex = 0, onSave, onCancel, isSaving, te
             </Select>
           </div>
 
-          <div className="rounded-md border border-border/50 bg-background/40 p-2.5">
+          <div className="rounded border border-border/50 bg-background/40 p-2">
             <div className="flex items-center gap-2 mb-2">
               <SelectedIcon className="h-4 w-4 text-muted-foreground" />
               <h4 className="text-sm font-medium text-foreground">{selectedType?.label || "Configuration"}</h4>
@@ -677,7 +677,7 @@ const ActionForm = ({ action, nextOrderIndex = 0, onSave, onCancel, isSaving, te
           </div>
 
           <div className="flex items-center justify-between rounded border border-border/50 bg-background/40 p-2">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className={`flex h-8 w-8 items-center justify-center rounded ${formData.isEnabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                 {formData.isEnabled ? <Play className="h-4 w-4" /> : <CircleSlash className="h-4 w-4" />}
               </div>
@@ -695,7 +695,7 @@ const ActionForm = ({ action, nextOrderIndex = 0, onSave, onCancel, isSaving, te
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end gap-2">
           <Button variant="destructive" size="sm" type="button" onClick={onCancel} disabled={isSaving} className="px-6 hover:bg-brand-border/40">
             Cancel
           </Button>

@@ -28,7 +28,7 @@ const crypto = require("crypto");
 const { SENSITIVE_KEY_PATTERNS } = require("../../utils/sensitive");
 const { grantCreatorAccess } = require("../../config/casbin.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
-const { decryptOptions, encryptOptions } = require("../datasource/datasource.service");
+const { encryptOptions, decryptOptions } = require("../../utils/datasourceOptions.util");
 
 const BUNDLE_VERSION = 1;
 
@@ -868,7 +868,7 @@ bundleService.executeImport = async ({ tenantID, userID, authContext, bundle }) 
             throw new Error(`Unknown bundle item type: ${item.type}`);
         }
       }
-    });
+    }, { timeout: 120000 });
 
     // Grant creator access outside the transaction, matching other services.
     const { creatorID } = getCreationContextFromAuthContext(authContext);
@@ -891,4 +891,56 @@ bundleService.executeImport = async ({ tenantID, userID, authContext, bundle }) 
   }
 };
 
-module.exports = { bundleService, BUNDLE_VERSION, assertImportableBundle, orderItemsTopologically, remapAppPageWidgetKeys };
+/**
+ * Build an install selection from a bundle's declared dependency graph.
+ * Selected keys are exact "<type>:<uuid>" entries. Omitted selection means all.
+ * Dependencies are reported, not silently added: the UI must present the
+ * trade-off, and previewImport will flag any selected item left referencing an
+ * asset that was deliberately excluded.
+ */
+function selectBundleItems(bundle, selectedItemKeys) {
+  assertImportableBundle(bundle);
+  const items = bundle.items;
+  const keyOf = (item) => `${item.type}:${item.id}`;
+  const allKeys = items.map(keyOf);
+  const known = new Set(allKeys);
+  const selected = selectedItemKeys == null
+    ? new Set(allKeys)
+    : new Set(Array.isArray(selectedItemKeys) ? selectedItemKeys : []);
+  if (!selected.size) throw new Error("Select at least one bundle asset to install.");
+  for (const key of selected) {
+    if (!known.has(key)) throw new Error(`Unknown bundle asset: ${key}`);
+  }
+  const dependencies = new Map();
+  const requiredBy = new Map(allKeys.map((key) => [key, []]));
+  for (const item of items) {
+    const key = keyOf(item);
+    const deps = dedupeRefs(
+      (item.dependencies || []).filter((dep) => known.has(`${dep.type}:${dep.id}`))
+    ).map((dep) => `${dep.type}:${dep.id}`);
+    dependencies.set(key, deps);
+    for (const dep of deps) requiredBy.get(dep).push(key);
+  }
+  const selection = items.map((item) => {
+    const key = keyOf(item);
+    const dependsOn = dependencies.get(key) || [];
+    return {
+      key,
+      type: item.type,
+      id: item.id,
+      title: item.payload[TITLE_FIELD_BY_TYPE[item.type]] || "(untitled)",
+      selected: selected.has(key),
+      dependsOn,
+      requiredBy: requiredBy.get(key) || [],
+      missingDependencies: dependsOn.filter((dep) => !selected.has(dep)),
+    };
+  });
+  return {
+    bundle: { ...bundle, items: items.filter((item) => selected.has(keyOf(item))) },
+    selection,
+    selectedCount: selected.size,
+    totalCount: items.length,
+  };
+}
+
+module.exports = { bundleService, BUNDLE_VERSION, assertImportableBundle, orderItemsTopologically, remapAppPageWidgetKeys, selectBundleItems };

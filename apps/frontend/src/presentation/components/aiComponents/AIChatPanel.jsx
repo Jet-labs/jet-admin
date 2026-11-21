@@ -209,9 +209,9 @@ function SimpleMarkdown({ text }) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h1: ({ children }) => <h1 className="text-base font-bold tracking-tight text-foreground my-2">{children}</h1>,
-          h2: ({ children }) => <h2 className="text-sm font-semibold tracking-tight text-foreground my-2">{children}</h2>,
-          h3: ({ children }) => <h3 className="text-xs font-semibold tracking-tight text-foreground my-1">{children}</h3>,
+          h1: ({ children }) => <h1 className="my-2 text-base font-medium tracking-tight text-foreground">{children}</h1>,
+          h2: ({ children }) => <h2 className="my-2 text-sm font-medium tracking-tight text-foreground">{children}</h2>,
+          h3: ({ children }) => <h3 className="text-xs font-medium tracking-tight text-foreground my-1">{children}</h3>,
           p: ({ children }) => <p className="last:mb-0 leading-relaxed">{children}</p>,
           ul: ({ children }) => <ul className="list-disc pl-5 space-y-2 my-2">{children}</ul>,
           ol: ({ children }) => <ol className="list-decimal pl-5 space-y-2 my-2">{children}</ol>,
@@ -388,8 +388,8 @@ function QueryPreviewCard({ query, tenantID }) {
           </button>
         </div>
         {error && (
-          <div className="text-xs text-red-400 bg-red-500/5 border border-red-500/30 p-2 rounded flex items-center gap-1.5">
-            <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+          <div className="text-xs text-destructive bg-destructive/5 border border-destructive/30 p-2 rounded flex items-center gap-1.5">
+            <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" />
             <span>{error}</span>
           </div>
         )}
@@ -545,8 +545,8 @@ function DatasourcePreviewCard({ datasource, tenantID }) {
             <span>Connected {testResult.latency ? `(${testResult.latency}ms)` : ''}</span>
           </span>
         ) : (
-            <span className="text-[11px] text-red-400 flex items-center gap-1 bg-red-500/5 px-2 py-1 rounded border border-red-500/30" title={testResult.error}>
-              <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+            <span className="text-[11px] text-destructive flex items-center gap-1 bg-destructive/5 px-2 py-1 rounded border border-destructive/30" title={testResult.error}>
+              <AlertCircle className="w-3.5 h-3.5 text-destructive" />
               <span>Error</span>
           </span>
         ))}
@@ -605,8 +605,8 @@ function WorkflowPreviewCard({ workflow, tenantID }) {
             <span>Running…</span>
           </span>
         ) : (
-            <span className="text-[11px] text-red-400 flex items-center gap-1 bg-red-500/5 px-2 py-1 rounded border border-red-500/30" title={runResult.error}>
-              <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+            <span className="text-[11px] text-destructive flex items-center gap-1 bg-destructive/5 px-2 py-1 rounded border border-destructive/30" title={runResult.error}>
+              <AlertCircle className="w-3.5 h-3.5 text-destructive" />
               <span>Error</span>
           </span>
         ))}
@@ -713,7 +713,7 @@ function AskUserToolStep({ invocation, addToolResult }) {
     }
 
     return (
-      <div className="mt-2 p-3 rounded-xl border border-border bg-muted/20 text-xs text-muted-foreground flex items-center justify-between">
+      <div className="mt-2 p-2 rounded border border-border bg-muted/20 text-xs text-muted-foreground flex items-center justify-between">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
           <div>
@@ -1281,7 +1281,7 @@ export const AIChatPanel = () => {
       >
         {/* Header */}
         <div className="flex items-center gap-2 px-2 py-2  shrink-0 bg-background/80 backdrop-blur-md sticky top-0 z-10">
-          <div className="w-7 h-7 rounded bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-primary/20 shadow-sm shadow-primary/10">
+          <div className="w-7 h-7 rounded bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm shadow-primary/10">
             <Sparkles className="w-3.5 h-3.5 text-primary drop-shadow-sm" />
           </div>
           <div className="flex-1 min-w-0">
@@ -1289,7 +1289,7 @@ export const AIChatPanel = () => {
               <p className="text-sm font-medium text-foreground">Jet</p>
               <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground border border-border rounded-full px-2 py-0.5 bg-muted/30">
                 <span className={`w-1.5 h-1.5 rounded-full ${busy ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-                {busy ? 'working…' : 'MiniMax M3 · free'}
+                {busy ? 'working…' : 'ready'}
               </span>
             </div>
             <p className="text-[11px] text-muted-foreground truncate">Your Jet Admin operator — Ctrl+K to toggle</p>
@@ -1345,9 +1345,9 @@ export const AIChatPanel = () => {
 
               {/* Error banner */}
               {error && (
-                  <div className="text-xs text-red-400 bg-red-500/5 border border-red-500/30 p-2 rounded space-y-2">
+                  <div className="text-xs text-destructive bg-destructive/5 border border-destructive/30 p-2 rounded space-y-2">
                     <div className="flex items-center gap-2 font-medium">
-                      <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                      <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" />
                       <span>{error.message || 'An error occurred. Please try again.'}</span>
                     </div>
                     {(() => {
@@ -1363,11 +1363,11 @@ export const AIChatPanel = () => {
                       }
                       return null;
                     })()}
-                    <details className="text-xs text-red-400/85 cursor-pointer">
-                      <summary className="hover:text-red-300 transition-colors select-none font-mono">
+                    <details className="text-xs text-destructive/85 cursor-pointer">
+                      <summary className="hover:text-destructive transition-colors select-none font-mono">
                         Error Details
                       </summary>
-                      <pre className="mt-1 p-2 bg-background border border-border rounded font-mono text-xs text-foreground/90 overflow-x-auto whitespace-pre-wrap cursor-text selection:bg-red-900/30">
+                      <pre className="mt-1 p-2 bg-background border border-border rounded font-mono text-xs text-foreground/90 overflow-x-auto whitespace-pre-wrap cursor-text selection:bg-destructive/20">
                         {JSON.stringify(
                           error,
                           null,

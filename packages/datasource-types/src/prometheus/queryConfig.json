@@ -1,0 +1,139 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["instantQuery", "rangeQuery", "labelValues", "targets"],
+        "default": "instantQuery",
+        "description": "Prometheus HTTP API operation."
+      },
+      "query": {
+        "type": "string",
+        "description": "PromQL expression (instant/range queries)."
+      },
+      "labelName": {
+        "type": "string",
+        "description": "Label name for labelValues (e.g. job, instance, __name__)."
+      },
+      "matches": {
+        "type": "array",
+        "description": "Optional series selectors for labelValues, e.g. [\"up\"]",
+        "items": { "type": "string" }
+      },
+      "time": {
+        "type": "string",
+        "description": "Optional RFC3339 time or Unix timestamp for instant queries."
+      },
+      "start": {
+        "type": "string",
+        "description": "Range start (RFC3339 or Unix timestamp)."
+      },
+      "end": {
+        "type": "string",
+        "description": "Range end (RFC3339 or Unix timestamp)."
+      },
+      "step": {
+        "type": "string",
+        "description": "Range step, e.g. 30s, 1m, 1h.",
+        "default": "30s"
+      },
+      "inputDefinitions": {
+        "type": "array",
+        "description": "Query parameters",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/operation",
+        "label": "Operation"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/query",
+        "label": "PromQL Query"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/labelName",
+            "label": "Label Name"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/matches",
+            "label": "Series Selectors"
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/time",
+            "label": "Time"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/start",
+            "label": "Start"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/end",
+            "label": "End"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/step",
+            "label": "Step"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "options": {
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Parameters"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "operation": "instantQuery",
+    "query": "up",
+    "labelName": "job",
+    "matches": [],
+    "time": "",
+    "start": "",
+    "end": "",
+    "step": "30s",
+    "inputDefinitions": []
+  }
+}

@@ -46,7 +46,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
         {label || uischema.label || "Conditions"}
       </Label>
       {errors && errors.length > 0 && (
-        <p className="text-red-500 text-xs mb-2">{errors}</p>
+        <p className="text-destructive text-xs mb-2">{errors}</p>
       )}
 
       <div className="space-y-2">

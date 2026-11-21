@@ -23,7 +23,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 
 function FieldError({ message }) {
   if (!message) return null;
-  return <p className="text-xs text-red-500">{message}</p>;
+  return <p className="text-xs text-destructive">{message}</p>;
 }
 
 export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {

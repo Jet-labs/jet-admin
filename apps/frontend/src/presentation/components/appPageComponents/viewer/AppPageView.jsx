@@ -21,6 +21,7 @@ import { resolveValue } from "../../../../logic/evaluationEngine";
 import { migrateV1ToV2, LayoutRenderer } from "../layout/index.js";
 import { AppPageWidgetSlot } from "../editor/appPageWidgetSlot";
 import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootstrapper";
+import { AppPageWorkflowInputHost } from '../appPageWorkflowInputHost';
 import { ErrorBoundary } from "@jet-admin/ui";
 
 const EmptyPageState = () => (
@@ -43,13 +44,14 @@ const AppPageViewContent = ({ tenantID, pageID, migratedPageConfig, scrollerClas
   const stateTree = useAppPageStateTree();
 
   const renderWidget = React.useCallback(
-    (widgetKey, sizing, scopedStateTree) => (
+    (widgetKey, sizing, scopedStateTree, repeatScope) => (
       <AppPageWidgetSlot
         tenantID={tenantID}
         widgetKey={widgetKey}
         editable={false}
         sizing={sizing}
         scopedStateTree={scopedStateTree}
+        repeatPath={repeatScope?.repeatPath || []}
       />
     ),
     [tenantID]
@@ -58,6 +60,7 @@ const AppPageViewContent = ({ tenantID, pageID, migratedPageConfig, scrollerClas
   return (
     <>
       <AppPageDataSourceBootstrapper />
+      <AppPageWorkflowInputHost />
       <div
         className={scrollerClassName}
         id={`printable-area-app-page-${pageID}`}

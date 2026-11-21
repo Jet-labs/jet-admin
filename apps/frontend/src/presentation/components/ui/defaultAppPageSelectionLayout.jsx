@@ -160,7 +160,7 @@ export const DefaultAppPageSelectionLayout = ({
           <div className="h-full w-full flex justify-center items-center p-6">
             <div className="bg-background p-8 max-w-md text-center">
               <div className="flex justify-center mb-4">
-                <div className="bg-primary/10 p-4 rounded-full">
+                <div className="rounded bg-primary/10 p-3">
                   <LayoutDashboard className="text-primary text-4xl" />
                 </div>
               </div>

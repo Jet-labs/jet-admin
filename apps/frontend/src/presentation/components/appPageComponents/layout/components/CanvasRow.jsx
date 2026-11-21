@@ -5,12 +5,13 @@
  */
 import React from "react";
 import { useNode } from "@craftjs/core";
-import { useCraftEditorContext } from "./CraftEditorContext.js";
+import { useCraftEditorContext, useConditionHidden } from "./CraftEditorContext.js";
 import { LogicBadges } from "./LogicBadges.jsx";
 import { SelectParentButton } from "./SelectParentButton.jsx";
 
-export function CanvasRow({ children, sizing, fixedHeight, style, condition, repeat }) {
-  const { previewMode } = useCraftEditorContext();
+export function CanvasRow({ children, sizing, fixedHeight, style, condition, repeat, hideMode, keepMounted }) {
+  const { previewMode, editorLiveStateTree } = useCraftEditorContext();
+  const hiddenByCondition = useConditionHidden(condition, editorLiveStateTree);
   const {
     connectors: { connect, drag },
     id,
@@ -20,9 +21,19 @@ export function CanvasRow({ children, sizing, fixedHeight, style, condition, rep
     isSelected: node.events.selected,
     isEmpty: node.data.nodes.length === 0,
   }));
+  if (previewMode && hiddenByCondition && hideMode !== "preserve-space" && !keepMounted) {
+    return null;
+  }
 
   const rowSizingClass = `sizing-${sizing || "auto"}`;
-  const rowStyle = { ...(style || {}) };
+  const rowStyle = {
+    ...(style || {}),
+    ...(previewMode && hiddenByCondition
+      ? hideMode === "preserve-space"
+        ? { visibility: "hidden", pointerEvents: "none" }
+        : { display: "none", pointerEvents: "none" }
+      : {}),
+  };
   if (sizing === "fixed" && fixedHeight) {
     rowStyle["--fixed-height"] = `${fixedHeight}px`;
     rowStyle.height = `${fixedHeight}px`;
@@ -35,10 +46,11 @@ export function CanvasRow({ children, sizing, fixedHeight, style, condition, rep
       ref={(ref) => !previewMode && connect(drag(ref))}
       className={`grid grid-cols-12 w-full gap-2 items-stretch box-border craft-node craft-node-row ${rowSizingClass} ${
         isSelected && !previewMode ? "craft-node-selected" : ""
-      }`}
+      } ${hiddenByCondition && !previewMode ? "opacity-40 saturate-50" : ""}`}
       style={rowStyle}
       id={id}
       data-node-type="Row"
+      title={hiddenByCondition && !previewMode ? "Hidden by condition in viewer" : undefined}
     >
       {!previewMode && (condition || repeat) && (
         <div className="absolute left-2 top-2 z-50 pointer-events-none">
@@ -46,9 +58,9 @@ export function CanvasRow({ children, sizing, fixedHeight, style, condition, rep
         </div>
       )}
       {isEmpty && !previewMode ? (
-        <div className="col-span-12 flex justify-center items-center h-12 border border-dashed border-muted-foreground/45 text-muted-foreground text-[11px] transition-all bg-transparent rounded hover:border-primary/70 hover:bg-primary/5">
-          <span className="text-muted-foreground/40 text-xs uppercase font-mono select-none">
-            Empty Row (Drop components here)
+        <div className="col-span-12 flex h-12 items-center justify-center rounded border border-dashed border-muted-foreground/45 bg-transparent text-xs text-muted-foreground transition-all hover:border-primary/70 hover:bg-primary/5">
+          <span className="select-none text-xs text-muted-foreground/70">
+            Empty row — drag a widget here
           </span>
         </div>
       ) : (
@@ -68,6 +80,8 @@ CanvasRow.craft = {
     style: {},
     condition: null,
     repeat: null,
+    hideMode: null,
+    keepMounted: false,
   },
   isCanvas: true,
   rules: {

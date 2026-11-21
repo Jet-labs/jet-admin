@@ -103,7 +103,11 @@ workflowController.updateWorkflow = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, workflowID } = req.params;
-    const { title, nodes = [], edges = [], workflowOptions } = req.body;
+    // Do not default nodes/edges to [] here: that turns a partial PATCH
+    // (for example a title-only rename) into a "replace graph with empty"
+    // instruction. The service only replaces the graph when both keys are
+    // present.
+    const { title, nodes, edges, workflowOptions } = req.body;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", { message: "WorkflowController:updateWorkflow:params", params: { userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions, authContext } });
     const workflow = await workflowService.updateWorkflow({ userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions, authContext });
@@ -131,7 +135,13 @@ workflowController.deleteWorkflow = async (req, res) => {
     expressUtils.sendResponse(res, true, { message: "Workflow deleted successfully." }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:deleteWorkflow:error", params: { error: error.message } });
-    expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+    expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      error,
+      error.statusCode || constants.HTTP_STATUS.BAD_REQUEST
+    );
   }
 };
 
@@ -272,6 +282,15 @@ workflowController.testWorkflow = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
+workflowController.cancelRun = async (req, res) => {
+  try {
+    const result = await workflowService.cancelRun({ instanceID: req.params.instanceID, tenantID: req.params.tenantID });
+    return expressUtils.sendResponse(res, true, result, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    return expressUtils.sendResponse(res, false, {}, error, error.statusCode || constants.HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+};
+
 workflowController.stopTestWorkflow = async (req, res) => {
   try {
     const { instanceID } = req.params;

@@ -119,6 +119,37 @@ import natsFormConfig from "./nats/formConfig.json";
 import natsQueryConfigForm from "./nats/queryConfig.json";
 import natsListenerConfigForm from "./nats/listenerConfig.json";
 
+// New batch: analytics, metrics, files, and code-hosting integrations
+import clickhouseFormConfig from "./clickhouse/formConfig.json";
+import clickhouseQueryConfigForm from "./clickhouse/queryConfig.json";
+
+import duckdbFormConfig from "./duckdb/formConfig.json";
+import duckdbQueryConfigForm from "./duckdb/queryConfig.json";
+
+import prometheusFormConfig from "./prometheus/formConfig.json";
+import prometheusQueryConfigForm from "./prometheus/queryConfig.json";
+
+import influxdbFormConfig from "./influxdb/formConfig.json";
+import influxdbQueryConfigForm from "./influxdb/queryConfig.json";
+
+import filesystemFormConfig from "./filesystem/formConfig.json";
+import filesystemQueryConfigForm from "./filesystem/queryConfig.json";
+
+import sftpFormConfig from "./sftp/formConfig.json";
+import sftpQueryConfigForm from "./sftp/queryConfig.json";
+
+import githubFormConfig from "./github/formConfig.json";
+import githubQueryConfigForm from "./github/queryConfig.json";
+
+import gitlabFormConfig from "./gitlab/formConfig.json";
+import gitlabQueryConfigForm from "./gitlab/queryConfig.json";
+
+import smtpFormConfig from "./smtp/formConfig.json";
+import smtpQueryConfigForm from "./smtp/queryConfig.json";
+
+import ldapFormConfig from "./ldap/formConfig.json";
+import ldapQueryConfigForm from "./ldap/queryConfig.json";
+
 import postgresqlGuidance from "./postgresql/guidance";
 import firestoreGuidance from "./firestore/guidance";
 import mongodbGuidance from "./mongodb/guidance";
@@ -462,6 +493,86 @@ export const DATASOURCE_TYPES = {
     queryConfigForm: excelcsvQueryConfigForm,
     supportsListener: false,
     hasDedicatedQueryEditor: true,
+  },
+  CLICKHOUSE: {
+    name: "ClickHouse",
+    value: "clickhouse",
+    icon: "SiClickhouse",
+    iconColor: "#F8DC1A",
+    formConfig: clickhouseFormConfig,
+    queryConfigForm: clickhouseQueryConfigForm,
+  },
+  DUCKDB: {
+    name: "DuckDB",
+    value: "duckdb",
+    icon: "SiDuckdb",
+    iconColor: "#FFF100",
+    formConfig: duckdbFormConfig,
+    queryConfigForm: duckdbQueryConfigForm,
+  },
+  PROMETHEUS: {
+    name: "Prometheus",
+    value: "prometheus",
+    icon: "SiPrometheus",
+    iconColor: "#E6522C",
+    formConfig: prometheusFormConfig,
+    queryConfigForm: prometheusQueryConfigForm,
+  },
+  INFLUXDB: {
+    name: "InfluxDB",
+    value: "influxdb",
+    icon: "SiInfluxdb",
+    iconColor: "#229ED9",
+    formConfig: influxdbFormConfig,
+    queryConfigForm: influxdbQueryConfigForm,
+  },
+  FILESYSTEM: {
+    name: "File System",
+    value: "filesystem",
+    icon: "TbFolder",
+    iconColor: "#64748B",
+    formConfig: filesystemFormConfig,
+    queryConfigForm: filesystemQueryConfigForm,
+  },
+  SFTP: {
+    name: "SFTP",
+    value: "sftp",
+    icon: "TbServer",
+    iconColor: "#0EA5E9",
+    formConfig: sftpFormConfig,
+    queryConfigForm: sftpQueryConfigForm,
+  },
+  GITHUB: {
+    name: "GitHub",
+    value: "github",
+    icon: "SiGithub",
+    iconColor: "#181717",
+    formConfig: githubFormConfig,
+    queryConfigForm: githubQueryConfigForm,
+  },
+  GITLAB: {
+    name: "GitLab",
+    value: "gitlab",
+    icon: "SiGitlab",
+    iconColor: "#FC6D26",
+    formConfig: gitlabFormConfig,
+    queryConfigForm: gitlabQueryConfigForm,
+  },
+  SMTP: {
+    name: "SMTP",
+    value: "smtp",
+    icon: "TbMail",
+    iconColor: "#EA4335",
+    formConfig: smtpFormConfig,
+    queryConfigForm: smtpQueryConfigForm,
+  },
+  LDAP: {
+    name: "LDAP",
+    value: "ldap",
+    icon: "TbUsers",
+    iconColor: "#30538E",
+    formConfig: ldapFormConfig,
+    queryConfigForm: ldapQueryConfigForm,
   },
 };
 

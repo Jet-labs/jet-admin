@@ -6,10 +6,10 @@ import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
 import { WorkflowEditor } from "./workflowEditor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getWorkflowByIDAPI, updateWorkflowAPI, deleteWorkflowAPI } from "../../../data/apis/workflow";
+import { getWorkflowByIDAPI, updateWorkflowAPI } from "../../../data/apis/workflow";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-import { useGlobalUI } from "../../../logic/stores/useUIStore";
+import { useUnsavedChangesGuard } from "../../../logic/hooks/useUnsavedChangesGuard";
 
 import { PageHeader } from "@jet-admin/ui";
 import { BundleExportButton } from "../bundleComponents/bundleExportButton";
@@ -33,7 +33,6 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
   };
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { showConfirmation } = useGlobalUI();
 
   const {
     isLoading: isLoadingWorkflow,
@@ -93,6 +92,11 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
     onSubmit: (values) => {
       updateWorkflow(values);
     },
+  });
+
+  useUnsavedChangesGuard({
+    isDirty: workflowUpdationForm.dirty,
+    title: CONSTANTS.STRINGS.UPDATE_WORKFLOW_FORM_TITLE,
   });
 
   return (

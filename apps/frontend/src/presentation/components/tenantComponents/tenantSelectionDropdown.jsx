@@ -7,7 +7,6 @@ import {
   useTenantActions,
   useTenantState,
 } from "../../../logic/hooks/useTenant";
-import { StringUtils } from "../../../utils/string";
 import { TenantLogo } from "./tenantLogo";
 
 import {
@@ -65,9 +64,12 @@ export const TenantSelectionDropdown = () => {
               )}
             </div>
             <div className="ml-2 flex flex-col min-w-0 overflow-hidden flex-1">
-              <span className="text-sm font-semibold text-foreground text-left truncate">
+              <span
+                className="text-sm font-semibold text-foreground text-left truncate"
+                title={selectedTenant?.tenantTitle}
+              >
                 {selectedTenant
-                  ? StringUtils.truncateName(selectedTenant.tenantTitle, 15)
+                  ? selectedTenant.tenantTitle
                   : CONSTANTS.STRINGS
                     .TENANT_SELECTION_DROPDOWN_NO_TENANT_SELECTED}
               </span>
@@ -78,8 +80,9 @@ export const TenantSelectionDropdown = () => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-[var(--radix-dropdown-menu-trigger-width)]"
+        className="z-[70] w-[var(--radix-dropdown-menu-trigger-width)] min-w-[16rem] max-w-[calc(100vw-1rem)]"
         sideOffset={4}
+        collisionPadding={8}
       >
         {tenants.map((tenant) => (
           <DropdownMenuItem
@@ -99,10 +102,11 @@ export const TenantSelectionDropdown = () => {
               )}
             </div>
             <div className="ml-3 flex flex-col justify-start items-start min-w-0 overflow-hidden w-full">
-              <span className="text-sm font-semibold text-foreground text-left truncate w-full">
-                {StringUtils.truncateName(tenant.tenantTitle, 16).replace(/^./, (c) =>
-                  c.toUpperCase()
-                )}
+              <span
+                className="text-sm font-semibold text-foreground text-left truncate w-full"
+                title={tenant.tenantTitle}
+              >
+                {tenant.tenantTitle?.replace(/^./, (c) => c.toUpperCase())}
               </span>
             </div>
           </DropdownMenuItem>

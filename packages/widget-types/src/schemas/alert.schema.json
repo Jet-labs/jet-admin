@@ -4,19 +4,59 @@
   "schema": {
     "type": "object",
     "properties": {
-      "message": { "type": "string", "description": "Alert message text. Supports template expressions." },
-      "title": { "type": "string", "description": "Optional alert title" },
+      "message": {
+        "type": "string",
+        "description": "Alert message text. Supports template expressions."
+      },
+      "title": {
+        "type": "string",
+        "description": "Optional alert title"
+      },
       "variant": {
         "type": "string",
-        "enum": ["info", "success", "warning", "error"],
+        "enum": [
+          "info",
+          "success",
+          "warning",
+          "error"
+        ],
         "default": "info",
         "description": "Alert severity type"
       },
-      "dismissible": { "type": "boolean", "default": false, "description": "Whether the user can dismiss the alert" },
-      "icon": { "type": "boolean", "default": true, "description": "Show variant icon" },
-      "visible": { "type": ["boolean", "string"], "description": "Visibility — boolean or template expression", "default": true }
+      "dismissible": {
+        "type": "boolean",
+        "default": false,
+        "description": "Whether the user can dismiss the alert"
+      },
+      "icon": {
+        "type": "boolean",
+        "default": true,
+        "description": "Show variant icon"
+      },
+      "visible": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Visibility — boolean or template expression",
+        "default": true
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     },
-    "required": ["message"]
+    "required": [
+      "message"
+    ]
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onDismiss"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onDismiss"
+  ]
 }

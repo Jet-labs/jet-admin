@@ -1,0 +1,130 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["query", "write"],
+        "default": "query",
+        "description": "Flux query or line-protocol write."
+      },
+      "flux": {
+        "type": "string",
+        "description": "Flux query for operation=query (buckets/org come from connection config unless overridden).",
+        "format": "code-sql"
+      },
+      "bucket": {
+        "type": "string",
+        "description": "Bucket override for this query/write."
+      },
+      "measurement": {
+        "type": "string",
+        "description": "Measurement for operation=write."
+      },
+      "tags": {
+        "type": "object",
+        "description": "Tags for operation=write.",
+        "additionalProperties": { "type": "string" }
+      },
+      "fields": {
+        "type": "object",
+        "description": "Field values for operation=write (numbers, strings, booleans).",
+        "additionalProperties": {}
+      },
+      "timestamp": {
+        "type": "string",
+        "description": "Optional RFC3339 timestamp for operation=write."
+      },
+      "inputDefinitions": {
+        "type": "array",
+        "description": "Query parameters",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/operation",
+        "label": "Operation"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/flux",
+        "label": "Flux Query"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/bucket",
+            "label": "Bucket"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/measurement",
+            "label": "Measurement"
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/tags",
+            "label": "Tags"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/fields",
+            "label": "Fields"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/timestamp",
+        "label": "Timestamp"
+      },
+      {
+        "type": "Group",
+        "options": {
+          "customClass": "!border-none !bg-transparent p-2"
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/inputDefinitions",
+            "label": "Parameters"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "operation": "query",
+    "flux": "from(bucket: \"metrics\") |> range(start: -1h)",
+    "bucket": "",
+    "measurement": "",
+    "tags": {},
+    "fields": {},
+    "timestamp": "",
+    "inputDefinitions": []
+  }
+}

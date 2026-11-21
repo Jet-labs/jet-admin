@@ -2,6 +2,7 @@ const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
+const { validateAppPageReferences } = require("./appPage.references");
 const appPageService = {};
 
 /**
@@ -128,6 +129,9 @@ appPageService.createAppPage = async ({
     if (!creatorID && !createdByApiKeyID) {
       throw new Error("Creator ID or Created By API Key ID is required");
     }
+
+    await validateAppPageReferences({ tenantID, appPageConfig });
+
     const appPage = await prisma.$transaction(async (tx) => {
       const page = await tx.tblAppPages.create({
         data: {
@@ -310,6 +314,7 @@ appPageService.updateAppPageByID = async ({
   appPageDescription,
   appPageConfig,
   changeNote,
+  expectedUpdatedAt,
 }) => {
   Logger.log("info", {
     message: "appPageService:updateAppPageByID:params",
@@ -320,55 +325,86 @@ appPageService.updateAppPageByID = async ({
       appPageTitle,
       appPageDescription,
       appPageConfig,
+      expectedUpdatedAt,
     },
   });
 
   try {
-    const existingAppPage = await prisma.tblAppPages.findFirst({
-      where: {
-        appPageID: appPageID,
-        tenantID: tenantID,
-      },
-    });
+    await validateAppPageReferences({ tenantID, appPageConfig });
 
-    if (!existingAppPage) {
-      throw new Error("App page not found");
+    let expectedDate = null;
+    if (expectedUpdatedAt !== undefined && expectedUpdatedAt !== null && expectedUpdatedAt !== "") {
+      expectedDate = new Date(expectedUpdatedAt);
+      if (Number.isNaN(expectedDate.getTime())) {
+        const error = new Error("expectedUpdatedAt must be a valid ISO date");
+        error.code = "INVALID_EXPECTED_UPDATED_AT";
+        error.statusCode = 400;
+        throw error;
+      }
     }
+
     await prisma.$transaction(async (tx) => {
-      const updatedAppPage = await tx.tblAppPages.update({
-        where: { appPageID: appPageID },
+      // Serialize saves for the same page. Without this, two editors can both
+      // read the same revision and race the version snapshot unique key.
+      // $executeRaw avoids Prisma trying to deserialize the function's void
+      // return type (which $queryRaw rejects).
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${appPageID}::text))`;
+
+      const existingAppPage = await tx.tblAppPages.findFirst({
+        where: { appPageID, tenantID },
+      });
+
+      if (!existingAppPage) {
+        const error = new Error("App page not found");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      if (expectedDate && existingAppPage.updatedAt) {
+        const current = new Date(existingAppPage.updatedAt);
+        if (current.getTime() !== expectedDate.getTime()) {
+          const error = new Error(
+            "This app page was modified by someone else. Reload before saving again."
+          );
+          error.name = "AppPageVersionConflictError";
+          error.code = "APP_PAGE_VERSION_CONFLICT";
+          error.statusCode = 409;
+          throw error;
+        }
+      }
+
+      await tx.tblAppPages.update({
+        where: { appPageID },
         data: {
           ...(appPageTitle != undefined && { appPageTitle }),
-          ...(appPageDescription != undefined && {
-            appPageDescription,
-          }),
-          ...(appPageConfig != undefined && {
-            appPageConfig,
-          }),
+          ...(appPageDescription != undefined && { appPageDescription }),
+          ...(appPageConfig != undefined && { appPageConfig }),
+          updatedAt: new Date(),
         },
       });
-    });
 
-    // Snapshot the pre-update state so every save is restorable.
-    // Fire-and-forget w.r.t. the update itself: a version failure must
-    // never fail the save. changeNote rides the update body (passthrough).
-    try {
-      await snapshotAppPageVersion({
-        tenantID,
-        appPageID,
-        appPageTitle: existingAppPage.appPageTitle,
-        appPageDescription: existingAppPage.appPageDescription,
-        appPageConfig: existingAppPage.appPageConfig,
-        changeNote: changeNote || null,
-        creatorID: userID || null,
-        createdByApiKeyID: null,
-      });
-    } catch (versionError) {
-      Logger.log("error", {
-        message: "appPageService:updateAppPageByID:version-snapshot-failed",
-        params: { appPageID, tenantID, error: versionError?.message },
-      });
-    }
+      // Snapshot the pre-update state in the same transaction. The version
+      // row and the config it describes can never diverge.
+      try {
+        await snapshotAppPageVersion({
+          tenantID,
+          appPageID,
+          appPageTitle: existingAppPage.appPageTitle,
+          appPageDescription: existingAppPage.appPageDescription,
+          appPageConfig: existingAppPage.appPageConfig,
+          changeNote: changeNote || null,
+          creatorID: userID || null,
+          createdByApiKeyID: null,
+          tx,
+        });
+      } catch (versionError) {
+        Logger.log("error", {
+          message: "appPageService:updateAppPageByID:version-snapshot-failed",
+          params: { appPageID, tenantID, error: versionError?.message },
+        });
+        throw versionError;
+      }
+    });
 
     Logger.log("success", {
       message: "appPageService:updateAppPageByID:success",
@@ -418,16 +454,52 @@ appPageService.deleteAppPageByID = async ({
   });
 
   try {
-    await prisma.tblAppPages.delete({
-      where: {
-        appPageID: appPageID,
-        tenantID: tenantID,
+    const listenerPushes = await prisma.tblListenerActions.findMany({
+      where: { actionType: "push_to_app_page", tblListeners: { tenantID } },
+      select: {
+        actionID: true,
+        listenerID: true,
+        actionConfig: true,
+        tblListeners: { select: { listenerTitle: true } },
       },
     });
 
+    const referencingListeners = listenerPushes.filter(
+      (action) => String(action.actionConfig?.appPageID) === String(appPageID)
+    );
+
+    if (referencingListeners.length > 0) {
+      const error = new Error(
+        "App page is still targeted by one or more listener actions. Remove those actions before deleting it."
+      );
+      error.name = "AppPageInUseError";
+      error.code = "APP_PAGE_IN_USE";
+      error.statusCode = 409;
+      error.details = {
+        listenerActions: referencingListeners.map((action) => ({
+          actionID: action.actionID,
+          listenerID: action.listenerID,
+          listenerTitle: action.tblListeners?.listenerTitle,
+        })),
+      };
+      throw error;
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const deleted = await tx.tblAppPages.deleteMany({
+        where: {
+          appPageID: appPageID,
+          tenantID: tenantID,
+        },
+      });
+      if (deleted.count === 0) {
+        throw new Error("App page not found");
+      }
+
     // Versions are not FK-cascaded by design — clean them explicitly.
-    await prisma.tblAppPageVersions.deleteMany({
-      where: { appPageID, tenantID },
+      await tx.tblAppPageVersions.deleteMany({
+        where: { appPageID, tenantID },
+      });
     });
 
     await removePoliciesForResource(tenantID, `appPage:${appPageID}`);
@@ -560,7 +632,9 @@ const APP_PAGE_CONFIG_SCHEMA = {
           id: { type: 'string', description: 'Unique node ID' },
           type: { type: 'string', enum: ['column'] },
           children: { type: 'array', items: { '$ref': '#/definitions/layoutNode' } },
-          condition: { type: 'string', description: 'Optional mustache expression. Node renders only when truthy.' },
+          condition: { type: 'string', description: 'Optional mustache expression, e.g. "{{ state.variables.dnsType === \'Domain\' }}". Empty = always show. Error = hidden (fail-closed).' },
+          hideMode: { type: 'string', enum: ['collapse', 'preserve-space'], description: 'Hidden behavior: "collapse" (default, unmounts, no space) or "preserve-space" (visibility:hidden, keeps space + state).' },
+          keepMounted: { type: 'boolean', description: 'When true with hideMode != preserve-space, hidden nodes stay mounted with display:none (preserves form/table state, collapses layout). Default false.' },
           style: { type: 'object', description: 'Optional inline CSS styles.' }
         },
         required: ['id', 'type', 'children']
@@ -680,15 +754,16 @@ async function snapshotAppPageVersion({
   changeNote,
   creatorID,
   createdByApiKeyID,
+  tx,
 }) {
-  return prisma.$transaction(async (tx) => {
-    const latest = await tx.tblAppPageVersions.findFirst({
+  const run = async (client) => {
+    const latest = await client.tblAppPageVersions.findFirst({
       where: { tenantID, appPageID },
       orderBy: { versionNumber: "desc" },
       select: { versionNumber: true },
     });
     const versionNumber = (latest?.versionNumber || 0) + 1;
-    const version = await tx.tblAppPageVersions.create({
+    const version = await client.tblAppPageVersions.create({
       data: {
         tenantID,
         appPageID,
@@ -702,20 +777,22 @@ async function snapshotAppPageVersion({
       },
     });
     // Prune oldest beyond the cap, keeping versionNumber monotonic.
-    const overflow = await tx.tblAppPageVersions.count({ where: { tenantID, appPageID } });
+    const overflow = await client.tblAppPageVersions.count({ where: { tenantID, appPageID } });
     if (overflow > MAX_VERSIONS_PER_PAGE) {
-      const stale = await tx.tblAppPageVersions.findMany({
+      const stale = await client.tblAppPageVersions.findMany({
         where: { tenantID, appPageID },
         orderBy: { versionNumber: "asc" },
         take: overflow - MAX_VERSIONS_PER_PAGE,
         select: { appPageVersionID: true },
       });
-      await tx.tblAppPageVersions.deleteMany({
+      await client.tblAppPageVersions.deleteMany({
         where: { appPageVersionID: { in: stale.map((s) => s.appPageVersionID) } },
       });
     }
     return version;
-  });
+  };
+
+  return tx ? run(tx) : prisma.$transaction(run);
 }
 
 appPageService.getAppPageVersions = async ({ userID, tenantID, appPageID, page, pageSize }) => {
@@ -788,38 +865,44 @@ appPageService.restoreAppPageVersion = async ({ userID, tenantID, appPageID, ver
     params: { userID, tenantID, appPageID, versionID },
   });
   try {
-    const [page, version] = await Promise.all([
-      prisma.tblAppPages.findFirst({ where: { tenantID, appPageID } }),
-      prisma.tblAppPageVersions.findFirst({ where: { tenantID, appPageID, appPageVersionID: versionID } }),
-    ]);
-    if (!page) throw new Error("App page not found");
-    if (!version) throw new Error("App page version not found");
+    return await prisma.$transaction(async (tx) => {
+      // Same lock as ordinary save, held across read/snapshot/restore/pruning.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${appPageID}::text))`;
+      const [page, version] = await Promise.all([
+        tx.tblAppPages.findFirst({ where: { tenantID, appPageID } }),
+        tx.tblAppPageVersions.findFirst({ where: { tenantID, appPageID, appPageVersionID: versionID } }),
+      ]);
+      if (!page) throw new Error("App page not found");
+      if (!version) throw new Error("App page version not found");
 
-    const { creatorID, createdByApiKeyID } = authContext
-      ? getCreationContextFromAuthContext(authContext)
-      : { creatorID: userID, createdByApiKeyID: null };
+      const { creatorID, createdByApiKeyID } = authContext
+        ? getCreationContextFromAuthContext(authContext)
+        : { creatorID: userID, createdByApiKeyID: null };
 
-    // Snapshot current state first so the restore itself is undoable.
-    await snapshotAppPageVersion({
-      tenantID,
-      appPageID,
-      appPageTitle: page.appPageTitle,
-      appPageDescription: page.appPageDescription,
-      appPageConfig: page.appPageConfig,
-      changeNote: `Before restore to v${version.versionNumber}`,
-      creatorID: creatorID || userID || null,
-      createdByApiKeyID: createdByApiKeyID || null,
+      // Snapshot current state first so the restore itself is undoable.
+      await snapshotAppPageVersion({
+        tenantID,
+        appPageID,
+        appPageTitle: page.appPageTitle,
+        appPageDescription: page.appPageDescription,
+        appPageConfig: page.appPageConfig,
+        changeNote: `Before restore to v${version.versionNumber}`,
+        tx,
+        creatorID: creatorID || userID || null,
+        createdByApiKeyID: createdByApiKeyID || null,
+      });
+
+      await tx.tblAppPages.update({
+        where: { appPageID },
+        data: {
+          appPageTitle: version.appPageTitle ?? page.appPageTitle,
+          appPageDescription: version.appPageDescription,
+          appPageConfig: version.appPageConfig,
+          updatedAt: new Date(),
+        },
+      });
+      return true;
     });
-
-    await prisma.tblAppPages.update({
-      where: { appPageID },
-      data: {
-        appPageTitle: version.appPageTitle ?? page.appPageTitle,
-        appPageDescription: version.appPageDescription,
-        appPageConfig: version.appPageConfig,
-      },
-    });
-    return true;
   } catch (error) {
     Logger.log("error", {
       message: "appPageService:restoreAppPageVersion:failure",

@@ -26,7 +26,9 @@ export const TenantDeletionForm = ({ tenantID }) => {
     onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.DELETE_TENANT_SUCCESS_TOAST);
       queryClient.invalidateQueries({ queryKey: [CONSTANTS.REACT_QUERY_KEYS.TENANTS] });
-      navigate(-1);
+      // The deleted tenant's settings route must not remain mounted; navigate
+      // to a deterministic list even when this page was opened directly.
+      navigate(CONSTANTS.ROUTES.HOME.path(), { replace: true });
     },
     onError: (error) => {
       displayError(error);
@@ -38,6 +40,7 @@ export const TenantDeletionForm = ({ tenantID }) => {
       title: CONSTANTS.STRINGS.DELETE_TENANT_CONFIRMATION_TITLE,
       message: CONSTANTS.STRINGS.DELETE_TENANT_CONFIRMATION_DESCRIPTION,
       confirmText: "Delete",
+      confirmVariant: "destructive",
       cancelText: "Cancel",
     });
     if (!confirmed) return;

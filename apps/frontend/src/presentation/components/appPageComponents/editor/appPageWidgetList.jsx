@@ -12,6 +12,7 @@ import { Button, Input } from "@jet-admin/ui";
 import { WidgetIdeModal } from "./widgetIdeModal";
 import { useDebounce } from "@uidotdev/usehooks";
 import { createWidgetInstanceKey, parseWidgetKey } from "./appPageLayoutUtils";
+import { getWidgetDisplayName, isInternalEntityName } from "../../../../utils/widgetDisplay";
 
 export const AppPageWidgetList = ({
   tenantID,
@@ -133,6 +134,11 @@ export const AppPageWidgetList = ({
     const key = `widget_${widget.widgetID}`;
     const widgetLabel = WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType;
     const widgetDesc = WIDGETS_MAP[widget.widgetType]?.description || "Custom component";
+    const displayName = getWidgetDisplayName({
+      widgetTitle: widget.widgetTitle,
+      widgetTypeLabel: widgetLabel,
+    });
+    const titleIsInternal = isInternalEntityName(widget.widgetTitle);
 
     return (
       <div
@@ -155,15 +161,19 @@ export const AppPageWidgetList = ({
           </div>
 
           <div className="min-w-0 flex-1">
-            <span className="truncate text-sm font-medium text-foreground block">
-              {widget.widgetTitle}
+            <span className="block truncate text-sm font-medium text-foreground">
+              {displayName}
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-mono font-semibold uppercase tracking-wider text-muted-foreground/60 shrink-0">
-                {widgetLabel}
-              </span>
-              <span className="text-[9px] text-muted-foreground/30 select-none shrink-0">•</span>
-              <span className="text-[9px] text-muted-foreground truncate">
+              {!titleIsInternal && (
+                <>
+                  <span className="shrink-0 font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                    {widgetLabel}
+                  </span>
+                  <span className="shrink-0 select-none text-[9px] text-muted-foreground/30">•</span>
+                </>
+              )}
+              <span className="truncate text-[9px] text-muted-foreground">
                 {widgetDesc}
               </span>
             </div>
@@ -195,7 +205,7 @@ export const AppPageWidgetList = ({
           }}
         >
           <Plus className="h-3.5 w-3.5 text-primary" />
-          Create Inline
+          Create widget
         </Button>
       </div>
 

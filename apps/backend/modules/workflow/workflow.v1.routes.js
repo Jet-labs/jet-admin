@@ -156,6 +156,15 @@ router.post(
 );
 
 // Stop and delete a test workflow instance
+router.post(
+  "/instances/:instanceID/cancel",
+  validate(instanceIdParamSchema, "params"),
+  workflowMiddleware.resolveWorkflowIDFromInstance,
+  authMiddleware.authorize({ ...P.workflow.execute, reqKey: "workflowID" }),
+  workflowController.cancelRun
+);
+
+// Test-only destructive cleanup remains separate from production cancellation.
 router.delete(
   "/instances/:instanceID/stop",
   validate(instanceIdParamSchema, "params"),

@@ -41,10 +41,28 @@ async function executeNodeActivity({ node, context, tenantID, instanceID, workfl
   });
 
   const helpers = { instanceID, nodeID, workflowID, tenantID, resolveTemplate };
+
+  // A sub-workflow side effect needs a stable invocation identity. Temporal
+  // activity IDs are deterministic across retries and unique per loop call,
+  // so an accepted-but-unacknowledged start resumes the SAME child instead of
+  // creating a duplicate (or orphan) child instance.
+  let childExecutionKey = null;
+  if (nodeType === 'subWorkflow') {
+    try {
+      const { Context } = require('@temporalio/activity');
+      const info = Context.current().info;
+      childExecutionKey = `subflow:${info.workflowExecution.runId}:${info.activityId}`;
+    } catch (_) {
+      childExecutionKey = null;
+    }
+  }
+
   const services = {
     resolveInputs,
     authorizedExecuteDataQuery,
-    runSubWorkflow: runSubWorkflowAndWait,
+    ...(childExecutionKey
+      ? { runSubWorkflow: (params) => runSubWorkflowAndWait({ ...params, executionKey: childExecutionKey }) }
+      : { runSubWorkflow: runSubWorkflowAndWait }),
     createSystemContext,
     deriveChildContext,
     ORIGIN_TYPES,
@@ -63,16 +81,14 @@ async function executeNodeActivity({ node, context, tenantID, instanceID, workfl
     // Message regex is the cross-boundary signal — prototypes don't survive serialization.
     const isDeterministic =
       /is not defined|is not a function|Unexpected token|SyntaxError/.test(err?.message || String(err));
-    if (isDeterministic) {
-      try {
-        const { ApplicationFailure } = require('@temporalio/activity');
-        throw ApplicationFailure.nonRetryable(err.message, err.name, { cause: err });
-      } catch (_) {
-        const e = new Error(err.message);
-        e.name = err.name;
-        e.nonRetryable = true;
-        throw e;
-      }
+    if (isDeterministic || err?.childInstanceID) {
+      const { ApplicationFailure } = require('@temporalio/activity');
+      throw ApplicationFailure.create({
+        message: err.message,
+        type: err.name || 'Error',
+        nonRetryable: isDeterministic,
+        details: err.childInstanceID ? [{ childInstanceID: err.childInstanceID, childStatus: err.childStatus }] : [],
+      });
     }
     throw err;
   }

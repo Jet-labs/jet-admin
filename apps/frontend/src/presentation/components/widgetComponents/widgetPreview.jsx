@@ -55,8 +55,8 @@ export const WidgetPreview = ({
 
     if (!WidgetComponent) {
       return (
-        <div className="h-full w-full p-3 flex justify-center items-center">
-          <span style={{ color: '#dc2626', fontSize: '12px' }}>
+        <div className="flex h-full w-full items-center justify-center p-2">
+          <span className="text-xs text-destructive">
             {CONSTANTS.STRINGS.WIDGET_TYPE_INVALID_ERROR}
           </span>
         </div>
@@ -66,12 +66,15 @@ export const WidgetPreview = ({
     // Data can be passed directly from the parent (query results, etc.)
     let chartData = data?.data || data;
 
-    // Resolve data from dataSourceResults via the widget type's builder
-    if (!chartData && dataSourceResults) {
+    // Resolve data from dataSourceResults via the widget type's builder.
+    // Resolve even when there are no query results yet: builders such as
+    // Vega need to wrap the authored spec with $schema/defaults, otherwise
+    // the standalone preview shows "No visualization spec provided".
+    if (!chartData && widgetConfig) {
       chartData = resolveWidgetData({
         widgetType: resolvedType,
         widgetConfig,
-        dataSourceResults,
+        dataSourceResults: dataSourceResults || {},
       });
     }
 
@@ -127,18 +130,18 @@ export const WidgetPreview = ({
           >
             {showDebug ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
             <Code className="w-3 h-3" />
-            <span>Debug: Widget Config</span>
+            <span>Widget configuration</span>
           </button>
           
           {showDebug && (
-            <Label className="flex items-center gap-1.5 cursor-pointer" onClick={(e) => e.stopPropagation()}>
+            <Label className="flex items-center gap-1.5 cursor-pointer text-xs" onClick={(e) => e.stopPropagation()}>
               <input 
                 type="checkbox" 
                 checked={isTruncated} 
                 onChange={(e) => setIsTruncated(e.target.checked)}
-                className="w-3 h-3 accent-primary"
+                className="h-3 w-3 accent-primary"
               />
-              Truncate Large Data
+              Trim large values
             </Label>
           )}
         </div>

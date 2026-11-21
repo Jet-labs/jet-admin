@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Label, TemplateAutocompleteInput } from '@jet-admin/ui';
+import { formatValidationMessage } from './formatValidationMessage.js';
 
 export const CustomNumberInput = (props) => {
   const {
@@ -51,14 +52,16 @@ export const CustomNumberInput = (props) => {
     displayErrors = "";
   }
 
+  displayErrors = formatValidationMessage(displayErrors);
   const hasErrors = displayErrors.length > 0;
-  const placeholder = hasErrors ? displayErrors : uischema?.options?.placeholder || "";
+  // Validation copy belongs below the control — never in the placeholder.
+  const placeholder = uischema?.options?.placeholder || "";
 
   return (
     <div className="">
       <Label
         htmlFor={path}
-        className={`block mb-1 ${hasErrors ? "text-red-500" : ""}`}
+        className={`block mb-1 ${hasErrors ? "text-destructive" : ""}`}
       >
         {label || description}
       </Label>
@@ -72,7 +75,7 @@ export const CustomNumberInput = (props) => {
         className={hasErrors ? "ring-1 ring-red-500 rounded" : ""}
       />
       {hasErrors && (
-        <p className="text-xs text-red-500 mt-1">{displayErrors}</p>
+        <p className="text-xs text-destructive mt-1">{displayErrors}</p>
       )}
     </div>
   );

@@ -6,6 +6,7 @@
 const { initializeQueue, closeQueue } = require('./queue.config');
 const Logger = require('../utils/logger');
 const environmentVariables = require('../environment');
+const { withTimeout } = require('../utils/async.util');
 
 let temporalEnsureStopped = false;
 
@@ -16,20 +17,45 @@ let temporalEnsureStopped = false;
 const PROXY_SWEEP_INTERVAL_MS = 30 * 1000;
 let proxySweepTimer = null;
 
+// Temporal is the execution authority. Stale projections are periodically
+// reconciled against it; a DB timestamp alone never marks a run failed.
+const WORKFLOW_RECONCILE_INTERVAL_MS = 5 * 60 * 1000;
+let workflowReconcileTimer = null;
+
+async function reconcileStaleWorkflows() {
+  try {
+    // eslint-disable-next-line global-require
+    const { stateManager } = require('../modules/workflow/workflowEngine/stateManager');
+    const staleAfterMs = Number(environmentVariables.WORKFLOW_STALE_AFTER_MS || 15 * 60 * 1000);
+    const stale = await stateManager.getStaleRunningInstances({ staleAfterMs });
+    if (stale.length === 0) return { reconciled: 0 };
+    await stateManager.markInstancesAsRecovered(stale.map((i) => i.instanceID));
+    Logger.log('info', { message: 'startup:workflows:reconcileSweep', params: { candidates: stale.length } });
+    return { reconciled: stale.length };
+  } catch (recoveryErr) {
+    Logger.log('warning', { message: 'startup:workflows:recoverySkipped', params: { error: recoveryErr.message } });
+    return { reconciled: 0 };
+  }
+}
+
 async function sweepProxyPlacements() {
   try {
     // eslint-disable-next-line global-require
     const registry = require('../modules/proxyRegistry/proxyRegistry.service');
     // eslint-disable-next-line global-require
     const { prisma } = require('./prisma.config');
-    const { moved, version, proxies } = await registry.reconcileAndAnnounce({
-      fetchActiveIDs: async () => (
-        await prisma.tblListeners.findMany({
-          where: { status: 'active' },
-          select: { listenerID: true },
-        })
-      ).map((r) => r.listenerID).filter(Boolean),
-    });
+    const { moved, version, proxies } = await withTimeout(
+      registry.reconcileAndAnnounce({
+        fetchActiveIDs: async () => (
+          await prisma.tblListeners.findMany({
+            where: { status: 'active' },
+            select: { listenerID: true },
+          })
+        ).map((r) => r.listenerID).filter(Boolean),
+      }),
+      5000,
+      'Proxy placement sweep timed out'
+    );
     if (moved > 0) {
       Logger.log('info', { message: 'startup:proxySweep:rebalanced', params: { moved, version, proxies } });
     }
@@ -76,25 +102,21 @@ async function startAllListeners() {
       }
     }
 
-    // Mark RUNNING workflow instances with no heartbeat as FAILED so the UI
-    // doesn't show them as running forever after a crash/restart.
+    // Old projections are candidates for Temporal-authoritative reconciliation.
+    // Timers/HITL may be silent indefinitely; DB age never proves failure.
     // Best-effort: never blocks startup.
-    try {
-      const { stateManager } = require('../modules/workflow/workflowEngine/stateManager');
-      const staleAfterMs = Number(environmentVariables.WORKFLOW_STALE_AFTER_MS || 5 * 60 * 1000);
-      const stale = await stateManager.getStaleRunningInstances({ staleAfterMs });
-      if (stale.length > 0) {
-        await stateManager.markInstancesAsRecovered(stale.map((i) => i.instanceID));
-        Logger.log('warning', { message: 'startup:workflows:recoveredStale', params: { count: stale.length } });
-      }
-    } catch (recoveryErr) {
-      Logger.log('warning', { message: 'startup:workflows:recoverySkipped', params: { error: recoveryErr.message } });
-    }
+    await reconcileStaleWorkflows();
+    workflowReconcileTimer = setInterval(() => {
+      reconcileStaleWorkflows().catch(() => { /* never throws */ });
+    }, WORKFLOW_RECONCILE_INTERVAL_MS);
+    if (typeof workflowReconcileTimer.unref === 'function') workflowReconcileTimer.unref();
 
     // 4. Listener pipeline worker — consumes raw envelopes from the Redis
     //    Streams consumer group and dispatches actions.
     const { startPipelineWorker } = require('../modules/listener/listenerEngine/pipelineWorker');
     await startPipelineWorker();
+    const { startSubmissionDelivery } = require('../modules/workflow/dataCollection/submissionDelivery');
+    startSubmissionDelivery();
 
     // 5. Listener ingress (subscriptions + webhook handlers) is owned by the
     //    standalone listener-proxy app — this backend only consumes +
@@ -125,6 +147,7 @@ async function startAllListeners() {
 async function stopAllListeners() {
   Logger.log('info', { message: 'startup:stopAllListeners:init' });
   temporalEnsureStopped = true;
+  require('../modules/workflow/dataCollection/submissionDelivery').stopSubmissionDelivery();
 
   // No ingress to stop here — subscriptions live in the listener-proxy node.
 
@@ -132,6 +155,16 @@ async function stopAllListeners() {
     if (proxySweepTimer) clearInterval(proxySweepTimer);
   } catch (e) { /* ignore */ }
   proxySweepTimer = null;
+
+  try {
+    if (workflowReconcileTimer) clearInterval(workflowReconcileTimer);
+  } catch (e) { /* ignore */ }
+  workflowReconcileTimer = null;
+
+  try {
+    const { cronJobService } = require('../modules/cronJob/cronJob.service');
+    cronJobService.stopCronSchedulerSync();
+  } catch (e) { /* ignore */ }
 
   try {
     const { auditService } = require('../modules/audit/audit.service');

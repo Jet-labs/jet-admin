@@ -92,7 +92,15 @@ const CodeEditor = React.forwardRef(({
   const [isExpanded, setIsExpanded] = React.useState(false);
   const containerRef = React.useRef(null);
   const viewRef = React.useRef(null);
-  const internalChange = React.useRef(false);
+  // CodeMirror's update listener is installed once. Always call the current
+  // React callback so editing one input cannot restore an old form snapshot.
+  const onChangeRef = React.useRef(onChange);
+  onChangeRef.current = onChange;
+  // Suppress onChange only for document updates that came from the `value`
+  // prop. The old flag was also set by programmatic updates, so the next
+  // external value change was skipped entirely (stale query results stayed
+  // visible after a failed run).
+  const programmaticChange = React.useRef(false);
 
   const isReadOnly = disabled || readOnly;
 
@@ -239,10 +247,12 @@ const CodeEditor = React.forwardRef(({
       oneDark,
       ...extensions,
       EditorView.updateListener.of((update) => {
-        if (update.docChanged) {
-          internalChange.current = true;
-          onChange?.(update.state.doc.toString());
+        if (!update.docChanged) return;
+        if (programmaticChange.current) {
+          programmaticChange.current = false;
+          return;
         }
+        onChangeRef.current?.(update.state.doc.toString());
       }),
       EditorView.theme({
         '&': {
@@ -348,13 +358,10 @@ const CodeEditor = React.forwardRef(({
   React.useEffect(() => {
     const view = viewRef.current;
     if (!view) return;
-    if (internalChange.current) {
-      internalChange.current = false;
-      return;
-    }
     const current = view.state.doc.toString();
     const incoming = value || '';
     if (current !== incoming) {
+      programmaticChange.current = true;
       view.dispatch({
         changes: { from: 0, to: current.length, insert: incoming },
       });
@@ -409,8 +416,8 @@ const CodeEditor = React.forwardRef(({
             {status && (
               <span className={cn(
                 "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold tracking-wide",
-                status === "valid" ? "bg-green-950/40 text-green-400 border border-green-800" :
-                status === "error" ? "bg-red-950/40 text-red-400 border border-red-800" : ""
+                status === "valid" ? "bg-primary/10 text-primary border border-primary/30" :
+                status === "error" ? "bg-destructive/10 text-destructive border border-destructive/30" : ""
               )}>
                 {status === "valid" ? <CheckCircle2 className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
                 {status === "valid" ? "Valid" : "Invalid"}

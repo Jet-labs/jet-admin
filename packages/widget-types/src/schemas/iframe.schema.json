@@ -1,16 +1,82 @@
 {
   "widgetType": "iframe",
-  "description": "IFrame Embed widget. Embeds an external URL inside the dashboard.",
+  "description": "IFrame Embed widget. Embeds an external URL inside the dashboard. The sandbox attribute is always rendered (empty string = fully locked down). Only http(s)/relative URLs embed; other schemes render a blocked-embed fallback.",
   "schema": {
     "type": "object",
     "properties": {
-      "src": { "type": "string", "description": "URL to embed. Supports template expressions." },
-      "height": { "type": ["number", "string"], "description": "Frame height in px or CSS value", "default": 400 },
-      "scrolling": { "type": "boolean", "default": true },
-      "allowFullscreen": { "type": "boolean", "default": false },
-      "sandbox": { "type": "string", "description": "HTML sandbox attribute value (space-separated tokens)" }
+      "url": {
+        "type": "string",
+        "description": "URL to embed. Supports template expressions. Canonical runtime field."
+      },
+      "src": {
+        "type": "string",
+        "description": "Legacy alias of url (frontend renders url ?? src)."
+      },
+      "allowScripts": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Allow script execution. Persisted default true for saved-content compatibility.",
+        "default": true
+      },
+      "allowForms": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Allow form submission. Persisted default true for saved-content compatibility.",
+        "default": true
+      },
+      "allowPopups": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Allow popups/new tabs.",
+        "default": false
+      },
+      "allowSameOrigin": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Allow same-origin access (storage/cookies).",
+        "default": false
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay flag."
+      },
+      "height": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Frame height in px or CSS value",
+        "default": 400
+      },
+      "scrolling": {
+        "type": "boolean",
+        "default": true
+      },
+      "allowFullscreen": {
+        "type": "boolean",
+        "default": false
+      },
+      "sandbox": {
+        "type": "string",
+        "description": "Legacy raw HTML sandbox attribute value (space-separated tokens). Capability toggles take precedence when set."
+      }
     },
-    "required": ["src"]
+    "required": []
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad"
+  ]
 }

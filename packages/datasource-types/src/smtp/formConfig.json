@@ -1,0 +1,121 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "host": {
+        "type": "string",
+        "description": "SMTP server hostname.",
+        "format": "hostname",
+        "default": "smtp.gmail.com"
+      },
+      "port": {
+        "type": "integer",
+        "description": "SMTP port (587 STARTTLS, 465 SSL, 25).",
+        "minimum": 1,
+        "maximum": 65535,
+        "default": 587
+      },
+      "secure": {
+        "type": "boolean",
+        "description": "Use implicit TLS (port 465).",
+        "default": false
+      },
+      "requireTLS": {
+        "type": "boolean",
+        "description": "Require STARTTLS before auth.",
+        "default": true
+      },
+      "username": {
+        "type": "string",
+        "description": "SMTP username/email."
+      },
+      "password": {
+        "type": "string",
+        "description": "SMTP password / app password.",
+        "format": "password"
+      },
+      "from": {
+        "type": "string",
+        "description": "Default From address (sender)."
+      },
+      "timeout": {
+        "type": "integer",
+        "description": "Connection timeout in seconds.",
+        "minimum": 1,
+        "default": 15
+      }
+    },
+    "required": ["host", "port"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/host",
+            "label": "Host"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/port",
+            "label": "Port"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/secure",
+            "label": "Implicit TLS"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/requireTLS",
+            "label": "Require TLS"
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/username",
+            "label": "Username"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/password",
+            "label": "Password",
+            "options": { "format": "password" }
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/from",
+            "label": "From (default)"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/timeout",
+            "label": "Timeout (seconds)"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "secure": false,
+    "requireTLS": true,
+    "username": "",
+    "password": "",
+    "from": "",
+    "timeout": 15
+  }
+}

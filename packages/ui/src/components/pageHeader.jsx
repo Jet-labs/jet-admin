@@ -24,10 +24,10 @@ export const PageHeader = ({
 }) => {
 
   return (
-    <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background p-2">
+    <div className="flex w-full flex-wrap items-center justify-between gap-2 border-b border-border bg-background p-2">
       <div className="flex flex-row justify-start items-center gap-2">
         {leadingChildren}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           {/* {parentTitle && (
           <>
             <h1
@@ -41,16 +41,19 @@ export const PageHeader = ({
           </>
         )} */}
           <div>
-            <h1 className="text-base font-semibold tracking-tight text-foreground leading-none">
+            <h1 className="text-base font-medium tracking-tight text-foreground leading-none">
               {title}
             </h1>
             {id && (
-              <p className="mt-1.5 font-mono text-xs text-muted-foreground">
-                ID: {id}
+              <p
+                className="mt-1.5 font-mono text-xs text-muted-foreground"
+                title={String(id)}
+              >
+                ID: {String(id).length > 8 ? `${String(id).slice(0, 8)}…` : id}
               </p>
             )}
             {subTitle && (
-              <p className="mt-1.5 font-mono text-xs text-muted-foreground">
+              <p className="mt-1.5 text-xs text-muted-foreground">
                 {subTitle}
               </p>
             )}
@@ -63,13 +66,13 @@ export const PageHeader = ({
         {children}
 
         {hasHistory && onHistory && (
-          <Button variant="outline" size="sm" onClick={onHistory}>
+          <Button variant="outline" onClick={onHistory}>
             View History
           </Button>
         )}
 
         {onClone && (
-          <Button variant="outline" size="sm" onClick={onClone} disabled={isCloning}>
+          <Button variant="outline" onClick={onClone} disabled={isCloning}>
             {isCloning && <Spinner size={14} className="mr-2" />}
             Clone
           </Button>
@@ -78,7 +81,6 @@ export const PageHeader = ({
         {onDelete && (
           <Button
             variant="outline"
-            size="sm"
             onClick={onDelete}
             disabled={isDeleting}
             className="text-destructive hover:bg-destructive/10 border-destructive/20"
@@ -89,7 +91,7 @@ export const PageHeader = ({
         )}
 
         {onSave && (
-          <Button size="sm" onClick={onSave} disabled={isSaving}>
+          <Button onClick={onSave} disabled={isSaving}>
             {isSaving && <Spinner size={14} className="mr-2" />}
             {saveText}
           </Button>

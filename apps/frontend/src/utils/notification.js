@@ -14,8 +14,8 @@ export const displayError = (error) => {
   });
 };
 
-export const displaySuccess = (message) => {
-  toast.success(message, {
+export const displaySuccess = (message, options = {}) => {
+  return toast.success(message, {
     position: "bottom-right",
     autoClose: 5000,
     hideProgressBar: false,
@@ -23,6 +23,7 @@ export const displaySuccess = (message) => {
     pauseOnHover: true,
     draggable: false,
     progress: undefined,
+    ...options,
   });
 };
 

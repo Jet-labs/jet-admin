@@ -49,6 +49,12 @@ const ENTITY_CONFIG = {
     resource: "listener",
     updatePermission: "listener:update",
   },
+  datasource: {
+    model: "tblDatasources",
+    idField: "datasourceID",
+    resource: "datasource",
+    updatePermission: "datasource:update",
+  },
 };
 
 const folderService = {};

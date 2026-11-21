@@ -27,7 +27,9 @@ export const IframeConfigEditor = ({ widgetEditorForm, stateTree }) => {
       <div className="space-y-2 border-t pt-2 mt-2">
         <Label className="text-xs font-medium text-foreground">Sandbox Security Options</Label>
         <p className="text-xs text-muted-foreground leading-snug mb-1">
-          Toggle capabilities granted to the embedded page. Restricted by default.
+          Toggle capabilities granted to the embedded page. Scripts and forms are
+          enabled by default for saved-content compatibility; disable anything the
+          embedded page does not need.
         </p>
 
         {/* Scripts */}

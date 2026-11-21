@@ -1,6 +1,7 @@
 import DataSource from "../datasource.js";
 import { Logger } from "../../utils/logger.js";
 import { webhookRouter } from "./router.js";
+import { normalizeAllowedMethods } from "./methods.js";
 
 export default class WebhookDataSource extends DataSource {
   async execute(dataQueryOptions, context) {
@@ -72,20 +73,22 @@ export default class WebhookDataSource extends DataSource {
 
   // ─── Internal request handler ────────────────────────────────────────────────
 
-  _handleRequest(req, res, options, listenerID, onEvent) {
+  async _handleRequest(req, res, options, listenerID, onEvent) {
     const requestMethod = req.method.toUpperCase();
 
     try {
-      // 1. Validate HTTP method
-      const allowedMethods = (options.allowedMethods || "POST").toUpperCase();
-      if (allowedMethods !== "ANY" && requestMethod !== allowedMethods) {
+      // 1. Validate HTTP method. The API has historically accepted both a
+      // string ("POST") and an array (["POST"]); normalize either shape so a
+      // saved array does not throw inside the request handler.
+      const allowedMethods = normalizeAllowedMethods(options.allowedMethods);
+      if (!allowedMethods.includes("ANY") && !allowedMethods.includes(requestMethod)) {
         Logger.log("warning", {
           message: "webhook:methodNotAllowed",
           params: { listenerID, requestMethod, allowedMethods },
         });
         return res.status(405).json({
           success: false,
-          error: `Method '${requestMethod}' not allowed. Configured allowed method is '${allowedMethods}'.`,
+          error: `Method '${requestMethod}' not allowed. Configured allowed methods: '${allowedMethods.join(", ")}'.`,
         });
       }
 
@@ -138,13 +141,9 @@ export default class WebhookDataSource extends DataSource {
         timestamp: new Date().toISOString(),
       };
 
-      // Fire-and-forget — don't await so the HTTP response is not blocked
-      onEvent(rawEvent).catch((err) => {
-        Logger.log("error", {
-          message: "webhook:onEvent:error",
-          params: { listenerID, error: err.message },
-        });
-      });
+      // A successful HTTP response means durable acceptance, not merely that
+      // an asynchronous enqueue was started. Senders can retry a 503.
+      await onEvent(rawEvent);
 
       // 4. Send configured response
       const responseStatus = options.responseStatusCode || 200;
@@ -168,7 +167,7 @@ export default class WebhookDataSource extends DataSource {
         message: "webhook:handleRequest:error",
         params: { listenerID, error: error.message },
       });
-      return res.status(500).json({ success: false, error: "Internal server error processing webhook." });
+      return res.status(503).json({ success: false, error: "Webhook could not be accepted. Please retry." });
     }
   }
 }

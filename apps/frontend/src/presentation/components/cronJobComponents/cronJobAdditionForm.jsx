@@ -45,9 +45,12 @@ export const CronJobAdditionForm = ({ tenantID }) => {
       workflowID: "",
       workflowConfig: { inputValues: {} },
       isDisabled: false,
-      timeoutSeconds: "",
-      retryAttempts: "",
-      retryDelaySeconds: "",
+      // These match the backend/platform defaults and the field
+      // placeholders. Submitting empty strings used to fail validation with
+      // "expected number, received string".
+      timeoutSeconds: 300,
+      retryAttempts: 0,
+      retryDelaySeconds: 60,
     },
     validationSchema: formValidations.cronJobAdditionFormValidationSchema,
     onSubmit: (data) => {
@@ -67,7 +70,7 @@ export const CronJobAdditionForm = ({ tenantID }) => {
       />
 
       {/* ── Form body ───────────────────────────────────────────────────── */}
-      <div className="mx-auto w-full max-w-2xl p-8">
+      <div className="mx-auto w-full max-w-2xl p-4 sm:p-6">
         <form onSubmit={cronJobAdditionForm.handleSubmit} noValidate>
           <CronJobEditor
             tenantID={tenantID}

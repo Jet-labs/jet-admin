@@ -101,13 +101,17 @@ export const WidgetIdeModal = ({
             tenantID,
             widgetData: values,
           });
+          if (!newWidget?.widgetID) {
+            throw new Error("Widget was created but no ID was returned. Reload the widget list and try again.");
+          }
+          if (!onAddWidget) {
+            throw new Error("Widget was created but the page editor could not place it. Open this page editor and try Create & Place again.");
+          }
+          onAddWidget(newWidget.widgetID);
           displaySuccess("Widget created and added to page canvas.");
           queryClient.invalidateQueries({
             queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID)],
           });
-          if (onAddWidget && newWidget?.widgetID) {
-            onAddWidget(newWidget.widgetID);
-          }
         }
         onClose();
       } catch (error) {

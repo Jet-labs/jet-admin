@@ -1,0 +1,113 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "protocol": {
+        "type": "string",
+        "enum": ["http", "https"],
+        "default": "http",
+        "description": "HTTP (8123) or HTTPS (8443) protocol."
+      },
+      "host": {
+        "type": "string",
+        "description": "ClickHouse host or IP address.",
+        "format": "hostname",
+        "default": "localhost"
+      },
+      "port": {
+        "type": "integer",
+        "description": "ClickHouse HTTP port (8123).",
+        "minimum": 1,
+        "maximum": 65535,
+        "default": 8123
+      },
+      "username": {
+        "type": "string",
+        "description": "Username (default user in local installs).",
+        "default": "default"
+      },
+      "password": {
+        "type": "string",
+        "description": "Password (empty for the default user).",
+        "format": "password"
+      },
+      "database": {
+        "type": "string",
+        "description": "Default database for queries.",
+        "default": "default"
+      },
+      "timeout": {
+        "type": "integer",
+        "description": "Request timeout in seconds.",
+        "minimum": 1,
+        "default": 15
+      }
+    },
+    "required": ["host", "port", "username", "database"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/protocol",
+            "label": "Protocol"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/host",
+            "label": "Host"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/port",
+            "label": "Port"
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/username",
+            "label": "Username"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/password",
+            "label": "Password",
+            "options": { "format": "password" }
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/database",
+            "label": "Database"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/timeout",
+            "label": "Timeout (seconds)"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "protocol": "http",
+    "host": "localhost",
+    "port": 8123,
+    "username": "default",
+    "password": "",
+    "database": "default",
+    "timeout": 15
+  }
+}
