@@ -72,6 +72,26 @@ Install is idempotent per `(tenantID, slug)`. Re-running without
 `reinstall: true` returns the existing ledger record. Uninstall deletes the
 ledger, platform resources and the tenant-specific `tpl_*` tables.
 
+### Registering packages in the database
+
+The folder `marketplace/templates/` is **authoring source only**. Runtime reads
+from the database:
+
+- `tblMarketplaceItem.payload` — manifest, schema/seed SQL, queries, widgets,
+  pages, workflows, listeners, cron jobs, roles, README and ERD.
+- `tblMarketplaceTemplateAssets` — icon, cover, screenshots, email HTML and
+  sample CSVs as BYTEA.
+
+After applying the manual migrations, register or refresh packages:
+
+```bash
+node apps/backend/scripts/run-manual-migrations.js
+npm run templates:seed:db
+```
+
+The seed script is idempotent. The production backend image does not copy the
+authoring folder; it only needs the DB rows.
+
 ## Package layout
 
 ```
@@ -102,6 +122,10 @@ marketplace/
     roles/roles.json
     assets/ (icon, cover, screenshots, emails, sample CSVs)
 ```
+
+At runtime these files are **not** read. `templates:seed:db` copies the package
+into `tblMarketplaceItem.payload` and `tblMarketplaceTemplateAssets`; the
+installer, gallery and asset endpoint read only those rows.
 
 ## How to author a new template
 
@@ -139,6 +163,7 @@ marketplace/
 ## Validation status
 
 - `npm run templates:validate` — passes.
+- `npm run templates:seed:db` — registers the CRM package + 16 assets in the database.
 - SQL DDL + 2,390 seed rows + 45 read queries — pass in a rolled-back transaction.
 - Fresh-tenant install — 342 bundle resources + 16 cron/role resources.
 - Page read-query smoke — 69 queries, 0 failures, 0 orphan tables/ledger rows.

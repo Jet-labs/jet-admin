@@ -647,6 +647,19 @@ model tblMarketplaceItem {
   @@index([sourceFamily], map: "idx_tblMarketplaceItem_sourceFamily")
 }
 
+model tblMarketplaceTemplateAssets {
+  assetID      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  templateSlug String   @db.VarChar(160)
+  assetPath    String   @db.VarChar(255)
+  mimeType     String   @db.VarChar(120)
+  content      Bytes
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([templateSlug, assetPath], map: "uq_tblMarketplaceTemplateAssets_slug_path")
+  @@index([templateSlug], map: "idx_tblMarketplaceTemplateAssets_slug")
+  @@map("tblMarketplaceTemplateAssets")
+}
+
 model tblMarketplaceTemplateInstalls {
   installID         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantID          String   @db.Uuid

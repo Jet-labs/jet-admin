@@ -35,6 +35,7 @@ test("listItems applies search, itemType and category filters with pagination", 
     expect.objectContaining({ OR: expect.any(Array) }),
     { itemType: "widget" },
     { category: { equals: "Payments & Commerce", mode: "insensitive" } },
+    { NOT: { sourceFamily: "marketplace-templates" } },
   ]);
   expect(result).toMatchObject({ totalCount: 25, page: 2, pageSize: 12, totalPages: 3 });
 });
@@ -50,11 +51,14 @@ test("listItems excludes legacy generated placeholders by default", async () => 
           { publisher: { not: "jet-admin" } },
         ],
       },
+      { NOT: { sourceFamily: "marketplace-templates" } },
     ],
   });
 
   const result = await marketplaceService.listItems({ includeLegacy: true });
-  expect(model.findMany.mock.calls[1][0].where).toEqual({});
+  expect(model.findMany.mock.calls[1][0].where).toEqual({
+    AND: [{ NOT: { sourceFamily: "marketplace-templates" } }],
+  });
   expect(result.page).toBe(1);
 });
 

@@ -90,7 +90,7 @@ templateController.asset = async (req, res) => {
   try {
     const { slug } = req.params;
     const assetPath = req.params[0] || "";
-    const asset = readAsset({ slug, assetPath });
+    const asset = await readAsset({ slug, assetPath });
     res.setHeader("Content-Type", asset.mime);
     res.setHeader("Cache-Control", "public, max-age=300");
     return res.send(asset.content);

@@ -76,3 +76,11 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 - DataCollection API/webhook delivery not first-class; forms/approval plus REST/webhook listeners are used.
 - XLSX export is Excel-compatible CSV; no XLSX runtime exists.
 - Existing curated-marketplace tests fail because of pre-existing uncommitted work in the tree; not modified here.
+
+### DB-backed runtime correction
+
+- [x] Authoring folder is source/test-only; runtime reads `tblMarketplaceItem.payload` and `tblMarketplaceTemplateAssets`.
+- [x] Added manual migration `marketplace_template_assets.sql` and Prisma model.
+- [x] Added idempotent `marketplace/scripts/seed-templates.js` (`npm run templates:seed:db`).
+- [x] Removed the marketplace folder from the production backend image; reverted Dockerfile/.dockerignore copying.
+- [x] Verified DB list/detail/asset reads and a fresh install/uninstall (358 resources) from DB-only package data.

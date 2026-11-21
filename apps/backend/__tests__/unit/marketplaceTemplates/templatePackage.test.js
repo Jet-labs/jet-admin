@@ -6,7 +6,7 @@
  */
 const path = require("path");
 const { loadPackage, validatePackage } = require("../../../../../marketplace/scripts/validate-templates");
-const { loadPackage: loadCompilerPackage, compileBundle, tablePrefix } = require("../../../../../apps/backend/modules/marketplace/template.package");
+const { loadPackageFromDisk, compileBundle, tablePrefix } = require("../../../../../apps/backend/modules/marketplace/template.package");
 
 const TEMPLATES_ROOT = path.resolve(__dirname, "../../../../../marketplace/templates");
 const CRM_DIR = path.join(TEMPLATES_ROOT, "crm-sales-pipeline");
@@ -57,7 +57,7 @@ describe("crm-sales-pipeline marketplace template package", () => {
   });
 
   test("compiles to a dependency-complete, deterministic Bundle v1", () => {
-    const compilerPkg = loadCompilerPackage("crm-sales-pipeline");
+    const compilerPkg = loadPackageFromDisk("crm-sales-pipeline");
     const prefix = tablePrefix(compilerPkg.manifest, "11111111-2222-4333-8444-555555555555");
     const bundle = compileBundle(compilerPkg, prefix);
     const again = compileBundle(compilerPkg, prefix);

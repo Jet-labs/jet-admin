@@ -79,3 +79,10 @@ Every ambiguity and platform extension is recorded here. Newest entries are adde
 44. **Temporal validation uses a dedicated task queue.** The shared jet-admin-workflows queue was served by a stale container image without the parameterized datasource change. Validation uses jet-admin-workflows-local with a local worker; the fix is committed in source, and production workers must be rebuilt.
 45. **Pre-existing curated-marketplace test failures are left untouched.** marketplaceSelection.test.js and curatedMarketplace.layout.test.js fail because of uncommitted work that predates this task (curatedMarketplace.js). They are unrelated to the CRM package and were not modified.
 
+
+46. **Template packages are DB-backed at runtime.** The authoring folder marketplace/templates/<slug>/ is source/test input only. marketplace/scripts/seed-templates.js registers each package into 	blMarketplaceItem (itemType ppTemplate, sourceFamily marketplace-templates) and its binary assets into 	blMarketplaceTemplateAssets. The API, installer and asset endpoint never read the folder. The production backend image intentionally does not copy marketplace/. Register packages with 
+pm run templates:seed:db after applying the manual migration.
+47. **Template assets are stored as BYTEA.** Icons, covers, screenshots, email HTML and sample CSVs are rows in 	blMarketplaceTemplateAssets, served by the authenticated asset route. No object-storage bucket is required for template assets.
+48. **Seeder is idempotent.** It upserts the 	blMarketplaceItem row by slug and replaces that template's asset rows in one transaction. Re-running after regeneration is safe.
+49. **Uninstall does not require the package row.** If a template is removed from the store, uninstall uses the ledger's 	ablePrefix, 	ables and esources to remove the installation.
+

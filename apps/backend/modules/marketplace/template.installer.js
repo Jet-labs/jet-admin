@@ -6,8 +6,6 @@
  * workflows and listeners.
  */
 const { Client } = require("pg");
-const fs = require("fs");
-const path = require("path");
 const { prisma } = require("../../config/prisma.config");
 const Logger = require("../../utils/logger");
 const { encryptOptions } = require("../../utils/datasourceOptions.util");
@@ -15,7 +13,7 @@ const { bundleService } = require("../bundle/bundle.service");
 const { tenantRoleService } = require("../tenantRole/tenantRole.service");
 const { addPolicy, removePoliciesForResource, removePoliciesForRole, getEnforcer, reloadPolicies } = require("../../config/casbin.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
-const { loadPackage, listSlugs, tablePrefix, resolvePlaceholders, compileBundle, deterministicUUID } = require("./template.package");
+const { loadPackage, listSlugs, tablePrefix, resolvePlaceholders, compileBundle, deterministicUUID, readAsset } = require("./template.package");
 
 const LEDGER_TABLE = '"tblMarketplaceTemplateInstalls"';
 
@@ -212,7 +210,7 @@ async function createDemoUsers({ tenantID, pkg, ledger, roles, creatorID }) {
 }
 
 async function installTemplate({ tenantID, slug, options = {}, userID, authContext }) {
-  const pkg = loadPackage(slug);
+  const pkg = await loadPackage(slug);
   const includeSampleData = options.includeSampleData !== false;
   const createDemoUsersOption = options.createDemoUsers === true;
   const enableAutomation = options.enableAutomation === true;
@@ -432,7 +430,14 @@ async function cleanupInstall({ tenantID, slug, prefix, resources = [], tables =
 }
 
 async function uninstallTemplate({ tenantID, slug, userID }) {
-  const pkg = loadPackage(slug);
+  let pkg = null;
+  try {
+    pkg = await loadPackage(slug);
+  } catch (error) {
+    // The ledger is still authoritative for uninstall even if the package was
+    // unregistered from the store.
+    pkg = null;
+  }
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
   let lockAcquired = false;
@@ -444,9 +449,9 @@ async function uninstallTemplate({ tenantID, slug, userID }) {
     await cleanupInstall({
       tenantID,
       slug,
-      prefix: ledger.tablePrefix || tablePrefix(pkg.manifest, tenantID),
+      prefix: ledger.tablePrefix || (pkg ? tablePrefix(pkg.manifest, tenantID) : ""),
       resources: Array.isArray(ledger.resources) ? ledger.resources : [],
-      tables: Array.isArray(ledger.tables) && ledger.tables.length ? ledger.tables : pkg.tables,
+      tables: Array.isArray(ledger.tables) && ledger.tables.length ? ledger.tables : (pkg ? pkg.tables : []),
       client,
     });
     Logger.log("success", { message: "templateInstaller:uninstall:success", params: { tenantID, slug, userID } });
@@ -465,8 +470,8 @@ async function listTemplates({ tenantID, search, category }) {
     const ledgerBySlug = new Map(ledgers.map((row) => [row.slug, row]));
     const searchValue = String(search || "").toLowerCase();
     const entries = [];
-    for (const slug of listSlugs()) {
-      const pkg = loadPackage(slug);
+    for (const slug of await listSlugs()) {
+      const pkg = await loadPackage(slug);
       const manifest = pkg.manifest;
       if (searchValue) {
         const haystack = `${manifest.name} ${manifest.slug} ${manifest.category} ${(manifest.tags || []).join(" ")} ${manifest.shortDescription}`.toLowerCase();
@@ -488,27 +493,8 @@ async function listTemplates({ tenantID, search, category }) {
   }
 }
 
-function readAsset({ slug, assetPath }) {
-  const pkg = loadPackage(slug);
-  const root = path.resolve(pkg.dir, "assets");
-  const target = path.resolve(root, assetPath);
-  if (!target.startsWith(root + path.sep) && target !== root) throw templateError("Invalid asset path.", "INVALID_ASSET", 400);
-  if (!fs.existsSync(target) || !fs.statSync(target).isFile()) throw templateError("Asset not found.", "ASSET_NOT_FOUND", 404);
-  const ext = path.extname(target).toLowerCase();
-  const mime = {
-    ".svg": "image/svg+xml",
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".csv": "text/csv; charset=utf-8",
-    ".html": "text/html; charset=utf-8",
-    ".json": "application/json; charset=utf-8",
-  }[ext] || "application/octet-stream";
-  return { content: fs.readFileSync(target), mime, fileName: path.basename(target) };
-}
-
 async function getTemplate({ tenantID, slug }) {
-  const pkg = loadPackage(slug);
+  const pkg = await loadPackage(slug);
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
   try {

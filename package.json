@@ -49,6 +49,7 @@
         "seed": "cd apps/backend && npm run seed",
         "templates:generate": "node marketplace/scripts/generate-templates.js",
         "templates:validate": "node marketplace/scripts/validate-templates.js",
+        "templates:seed:db": "node marketplace/scripts/seed-templates.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "start:a": "cd apps/admin && npm run dev",
         "build:a": "cd apps/admin && npm run build",
