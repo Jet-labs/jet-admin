@@ -132,9 +132,9 @@ export function CanvasStack({
         </div>
       )}
       {isEmpty && !previewMode ? (
-        <div className="w-full flex items-center justify-center p-2 border border-dashed border-muted-foreground/45 text-muted-foreground text-[11px] transition-all bg-transparent rounded hover:border-primary/70 hover:bg-primary/5">
-          <span className="text-muted-foreground/40 text-xs uppercase font-mono select-none">
-            Empty Stack (Drop components here)
+        <div className="flex w-full items-center justify-center rounded border border-dashed border-muted-foreground/45 bg-transparent p-2 text-xs text-muted-foreground transition-all hover:border-primary/70 hover:bg-primary/5">
+          <span className="select-none text-xs text-muted-foreground/70">
+            Empty stack — drag a widget here
           </span>
         </div>
       ) : (

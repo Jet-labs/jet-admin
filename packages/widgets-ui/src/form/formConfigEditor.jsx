@@ -64,6 +64,47 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                         </SelectContent>
                     </Select>
                 </div>
+                <div className="space-y-1">
+                    <Label className="text-xs font-medium text-foreground">Layout</Label>
+                    <Select
+                        value={config.layout || "vertical"}
+                        onValueChange={(val) => widgetEditorForm.setFieldValue("widgetConfig.layout", val)}
+                    >
+                        <SelectTrigger className="text-xs h-8">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="vertical">Vertical (stacked)</SelectItem>
+                            <SelectItem value="horizontal">Horizontal (wrapped row)</SelectItem>
+                            <SelectItem value="grid">Grid (columns)</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-1">
+                    <Label className="text-xs font-medium text-foreground">Grid columns</Label>
+                    <Input
+                        type="number"
+                        min={1}
+                        max={4}
+                        className="text-xs h-8"
+                        value={config.columns ?? 2}
+                        disabled={(config.layout || "vertical") !== "grid"}
+                        onChange={(e) => widgetEditorForm.setFieldValue("widgetConfig.columns", Number(e.target.value) || 1)}
+                    />
+                </div>
+                <div className="space-y-1 col-span-2">
+                    <Label className="text-xs font-medium text-foreground">Reset button label <span className="text-muted-foreground font-normal">(empty hides reset)</span></Label>
+                    <Input
+                        type="text"
+                        className="text-xs h-8"
+                        value={config.resetLabel ?? ""}
+                        placeholder="Reset — empty hides the button"
+                        onChange={(e) => {
+                          widgetEditorForm.setFieldValue("widgetConfig.resetLabel", e.target.value);
+                          widgetEditorForm.setFieldValue("widgetConfig.showReset", e.target.value !== "");
+                        }}
+                    />
+                </div>
             </div>
 
             <div className="flex items-center justify-between">
@@ -89,6 +130,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                             size="icon"
                             className="absolute top-1 right-1 h-6 w-6 text-muted-foreground hover:text-destructive"
                             onClick={() => handleRemoveField(idx)}
+                            aria-label={`Remove field ${field.label || field.key || idx + 1}`}
                         >
                             <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -135,6 +177,7 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                                         <SelectItem value="email">Email</SelectItem>
                                         <SelectItem value="password">Password</SelectItem>
                                         <SelectItem value="number">Number</SelectItem>
+                                        <SelectItem value="textarea">Textarea</SelectItem>
                                         <SelectItem value="checkbox">Checkbox</SelectItem>
                                         <SelectItem value="select">Select / Dropdown</SelectItem>
                                     </SelectContent>
@@ -156,6 +199,18 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                             )}
                         </div>
 
+                        {/* Help text */}
+                        <div className="space-y-1">
+                            <Label className="text-xs text-muted-foreground font-medium">Help text (optional)</Label>
+                            <Input
+                                type="text"
+                                className="text-xs h-7"
+                                value={field.help || ""}
+                                onChange={(e) => handleFieldChange(idx, "help", e.target.value)}
+                                placeholder="Shown under the field"
+                            />
+                        </div>
+
                         {/* Options list for select type */}
                         {field.type === "select" && (
                             <div className="space-y-1">
@@ -170,7 +225,21 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                             </div>
                         )}
 
-                        <div className="grid grid-cols-2 gap-2 pt-1 border-t border-dashed">
+                        {/* Number bounds */}
+                        {field.type === "number" && (
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground font-medium">Min</Label>
+                                    <Input type="number" className="text-xs h-7" value={field.validation?.min ?? ""} onChange={(e) => handleFieldChange(idx, "validation", { ...(field.validation || {}), min: e.target.value === "" ? undefined : Number(e.target.value) })} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground font-medium">Max</Label>
+                                    <Input type="number" className="text-xs h-7" value={field.validation?.max ?? ""} onChange={(e) => handleFieldChange(idx, "validation", { ...(field.validation || {}), max: e.target.value === "" ? undefined : Number(e.target.value) })} />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-3 gap-2 pt-1 border-t border-dashed">
                             {/* Required Check */}
                             <div className="flex items-center gap-1.5">
                                 <Checkbox
@@ -179,17 +248,39 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                                     onCheckedChange={(val) => handleFieldChange(idx, "required", !!val)}
                                   />
                                 <Label htmlFor={`field-req-${idx}`} className="text-xs text-muted-foreground cursor-pointer font-medium">
-                                      Required field
+                                      Required
                                   </Label>
                               </div>
-  
+                            {/* Disabled */}
+                            <div className="flex items-center gap-1.5">
+                                <Checkbox
+                                    id={`field-dis-${idx}`}
+                                    checked={!!field.disabled}
+                                    onCheckedChange={(val) => handleFieldChange(idx, "disabled", !!val)}
+                                  />
+                                <Label htmlFor={`field-dis-${idx}`} className="text-xs text-muted-foreground cursor-pointer font-medium">
+                                      Disabled
+                                  </Label>
+                              </div>
+                            {/* Read-only */}
+                            <div className="flex items-center gap-1.5">
+                                <Checkbox
+                                    id={`field-ro-${idx}`}
+                                    checked={!!field.readOnly}
+                                    onCheckedChange={(val) => handleFieldChange(idx, "readOnly", !!val)}
+                                  />
+                                <Label htmlFor={`field-ro-${idx}`} className="text-xs text-muted-foreground cursor-pointer font-medium">
+                                      Read-only
+                                  </Label>
+                              </div>
+
                               {/* Default Value */}
-                              <div className="space-y-0.5">
+                              <div className="space-y-0.5 col-span-3">
                                   <Label className="text-[9px] text-muted-foreground block leading-none">Default Value</Label>
                                   <Input
                                       type="text"
                                     className="text-xs h-6 font-mono px-1.5"
-                                      value={field.defaultValue || ""}
+                                      value={field.defaultValue ?? ""}
                                       onChange={(e) => handleFieldChange(idx, "defaultValue", e.target.value)}
                                       placeholder="e.g. {{widgets.table1.selectedRow.name}}"
                                   />
@@ -203,12 +294,12 @@ export const FormConfigEditor = ({ widgetEditorForm }) => {
                       </div>
                   )}
               </div>
-  
+
               {/* Show Reset Option */}
               <div className="flex items-center gap-2 pt-2">
                 <Checkbox
                     id="form-show-reset"
-                    checked={config.showReset ?? false}
+                    checked={config.showReset ?? (config.resetLabel !== undefined ? config.resetLabel !== "" : false)}
                     onCheckedChange={(checked) =>
                         widgetEditorForm.setFieldValue("widgetConfig.showReset", !!checked)
                     }

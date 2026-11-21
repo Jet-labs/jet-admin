@@ -15,11 +15,14 @@ export const TabsWidget = ({ widgetConfig, widgetState, setWidgetState, fireWidg
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgetConfig?.defaultTab]);
 
+  // Live callbacks via ref (B05/F02): never initial closures.
+  const liveRef = useRef(null);
+  liveRef.current = { setWidgetState, fireWidgetEvent };
   const methodsRef = useRef(null);
   if (!methodsRef.current) {
     methodsRef.current = {
-      setValue: (v) => { if (setWidgetState) setWidgetState((p) => ({ ...p, value: v })); if (fireWidgetEvent) fireWidgetEvent("onChange", { value: v }); },
-      setTab: (v) => { if (setWidgetState) setWidgetState((p) => ({ ...p, value: v })); if (fireWidgetEvent) fireWidgetEvent("onChange", { value: v }); },
+      setValue: (v) => { const rt = liveRef.current; if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: v })); if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: v }); },
+      setTab: (v) => { const rt = liveRef.current; if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: v })); if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: v }); },
     };
   }
   useEffect(() => { if (onWidgetInit) onWidgetInit(methodsRef.current); }, [onWidgetInit]);

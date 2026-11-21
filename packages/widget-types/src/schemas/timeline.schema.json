@@ -4,12 +4,39 @@
   "schema": {
     "type": "object",
     "properties": {
-      "dataTemplate": { "type": "string", "description": "Template resolving to an event array" },
-      "titleKey": { "type": "string", "default": "title" },
-      "timeKey": { "type": "string", "default": "time" },
-      "descriptionKey": { "type": "string", "default": "description" },
-      "emptyText": { "type": "string", "default": "No activity yet" }
+      "dataTemplate": {
+        "type": "string",
+        "description": "Template resolving to an event array"
+      },
+      "titleKey": {
+        "type": "string",
+        "default": "title"
+      },
+      "timeKey": {
+        "type": "string",
+        "default": "time"
+      },
+      "descriptionKey": {
+        "type": "string",
+        "default": "description"
+      },
+      "emptyText": {
+        "type": "string",
+        "default": "No activity yet"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onItemClick"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onItemClick"
+  ]
 }

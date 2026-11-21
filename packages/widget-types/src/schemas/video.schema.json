@@ -4,13 +4,41 @@
   "schema": {
     "type": "object",
     "properties": {
-      "src": { "type": "string", "description": "Video URL. Supports templates." },
-      "poster": { "type": "string" },
-      "autoplay": { "type": "boolean", "default": false },
-      "controls": { "type": "boolean", "default": true },
-      "loop": { "type": "boolean", "default": false },
-      "muted": { "type": "boolean", "default": false }
+      "src": {
+        "type": "string",
+        "description": "Video URL. Supports templates."
+      },
+      "poster": {
+        "type": "string"
+      },
+      "autoplay": {
+        "type": "boolean",
+        "default": false
+      },
+      "controls": {
+        "type": "boolean",
+        "default": true
+      },
+      "loop": {
+        "type": "boolean",
+        "default": false
+      },
+      "muted": {
+        "type": "boolean",
+        "default": false
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad"
+  ]
 }

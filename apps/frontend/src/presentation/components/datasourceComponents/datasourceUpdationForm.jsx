@@ -133,6 +133,7 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
         />
         <DatasourceTestingForm
           tenantID={tenantID}
+          datasourceID={datasource?.datasourceID || datasourceID}
           datasourceType={datasourceUpdationForm.values.datasourceType}
           datasourceOptions={
             datasourceUpdationForm.values.datasourceOptions

@@ -340,17 +340,27 @@ export const WIDGET_EVENT_TYPES = {
   /** Form-specific events */
   form: [
     {
-      value: "onSubmit", label: "On Submit", desc: "Fires when the form is submitted",
+      value: "onSubmit", label: "On Submit", desc: "Fires when the form is submitted (validated; failed submit retains draft)",
       inputDefinitions: [
         { key: "event.formData", description: "Submitted form data object" },
+        { key: "event.values", description: "Alias of formData (canonical state key)" },
+        { key: "event.errors", description: "Validation errors when invalid (else absent)" },
+        { key: "event.isValid", description: "False when validation blocked submit" },
       ],
     },
     {
       value: "onFieldChange", label: "On Field Change", desc: "Fires when any form field changes",
       inputDefinitions: [
         { key: "event.field", description: "Changed field name" },
-        { key: "event.value", description: "New field value" },
+        { key: "event.value", description: "New typed field value (numbers stay numbers)" },
         { key: "event.formData", description: "Current form data" },
+      ],
+    },
+    {
+      value: "onReset", label: "On Reset", desc: "Fires once when reset restores defaults",
+      inputDefinitions: [
+        { key: "event.formData", description: "Reset form data (defaults)" },
+        { key: "event.source", description: "user | method" },
       ],
     },
   ],
@@ -367,39 +377,43 @@ export const WIDGET_EVENT_TYPES = {
 
   "date-picker": [
     {
-      value: "onChange", label: "On Change", desc: "Fires when the selected date/time changes",
+      value: "onChange", label: "On Change", desc: "Fires when the selected date/time changes (date-only YYYY-MM-DD calendar date; datetime local wall time, no Z)",
       inputDefinitions: [
-        { key: "event.value", description: "ISO datetime string" },
+        { key: "event.value", description: "ISO value (date-only or local wall-time datetime)" },
         { key: "event.date", description: "ISO date string (YYYY-MM-DD)" },
         { key: "event.time", description: "Time portion (HH:mm:ss) when enableTime is on" },
+        { key: "event.source", description: "calendar | typed | time | method | init | clear-button" },
       ],
     },
     { value: "onOpen", label: "On Open", desc: "Fires when the picker popover opens" },
     { value: "onClose", label: "On Close", desc: "Fires when the picker popover closes" },
     {
-      value: "onClear", label: "On Clear", desc: "Fires when the selected value is cleared",
+      value: "onClear", label: "On Clear", desc: "Fires when the selected value is cleared (stays empty)",
       inputDefinitions: [
         { key: "event.value", description: "Cleared value (empty string)" },
+        { key: "event.source", description: "Entry route that cleared the value" },
       ],
     },
   ],
 
   "date-range-picker": [
     {
-      value: "onChange", label: "On Change", desc: "Fires when the selected range changes",
+      value: "onChange", label: "On Change", desc: "Fires when both range ends are present and valid (partial selections update state without firing)",
       inputDefinitions: [
-        { key: "event.start", description: "ISO start datetime" },
-        { key: "event.end", description: "ISO end datetime" },
+        { key: "event.start", description: "ISO start (date-only or local wall-time)" },
+        { key: "event.end", description: "ISO end (date-only or local wall-time)" },
         { key: "event.startDate", description: "ISO start date (YYYY-MM-DD)" },
         { key: "event.endDate", description: "ISO end date (YYYY-MM-DD)" },
+        { key: "event.source", description: "calendar | time | preset | apply | method | init" },
       ],
     },
     { value: "onOpen", label: "On Open", desc: "Fires when the picker popover opens" },
     { value: "onClose", label: "On Close", desc: "Fires when the picker popover closes" },
     {
-      value: "onClear", label: "On Clear", desc: "Fires when the range is cleared",
+      value: "onClear", label: "On Clear", desc: "Fires when the range is cleared (stays empty)",
       inputDefinitions: [
         { key: "event.start", description: "Cleared start (empty string)" },
+        { key: "event.source", description: "Entry route that cleared the range" },
       ],
     },
   ],
@@ -636,6 +650,30 @@ export const WIDGET_METHODS = {
     { name: "setTab", description: "Select tab by value" },
     { name: "setValue", description: "Select tab by value" },
   ],
+  form: [
+    { name: "validate", description: "Validate all fields; returns { valid, errors }" },
+    { name: "submit", description: "Validate then fire onSubmit; awaits action outcomes" },
+    { name: "reset", description: "Restore defaults, clear errors/dirty, fire onReset once" },
+    { name: "clear", description: "Alias of reset" },
+    { name: "setValues", description: "Merge values into the draft (marks keys dirty)" },
+  ],
+  "date-picker": [
+    { name: "setValue", description: "Set ISO date/datetime (validated against min/max/disabled)" },
+    { name: "clear", description: "Clear to empty (stays empty; does not re-apply default)" },
+    { name: "reset", description: "Re-apply defaultValue (or clear when none)" },
+    { name: "open", description: "Open the calendar popover" },
+    { name: "close", description: "Close the calendar popover (focus returns to trigger)" },
+    { name: "focus", description: "Focus the trigger" },
+  ],
+  "date-range-picker": [
+    { name: "setRange", description: "Set start/end ISO dates (validated; same-day inverted times rejected)" },
+    { name: "clear", description: "Clear both ends (stays empty)" },
+    { name: "reset", description: "Re-apply defaultStart/defaultEnd" },
+    { name: "open", description: "Open the range popover" },
+    { name: "close", description: "Close the range popover (focus returns)" },
+    { name: "apply", description: "Commit draft when requireApply is set" },
+    { name: "cancel", description: "Discard draft, keep applied values" },
+  ],
 };
 
 /**
@@ -649,3 +687,32 @@ export const getWidgetMethods = (widgetType) => {
 };
 
 export * from './schemas/index.js';
+export * from './descriptors.js';
+export * from './normalize.js';
+export * from './validate.js';
+import { WIDGET_DESCRIPTORS } from './descriptors.js';
+
+/**
+ * Supported (actually implemented) event entries for a widget type:
+ * declared events minus descriptor unsupportedEvents (B17). Configs may
+ * still carry unsupported names (never dropped); they warn, not fire.
+ */
+export const getSupportedEvents = (widgetType) => {
+  const all = getWidgetEventTypes(widgetType);
+  const unsupported = new Set(
+    (WIDGET_DESCRIPTORS[widgetType] && WIDGET_DESCRIPTORS[widgetType].unsupportedEvents) || []
+  );
+  return all.filter((e) => !unsupported.has(e.value));
+};
+
+/**
+ * Supported (actually registered by renderers) methods for a widget type:
+ * declared methods minus descriptor unsupportedMethods (B17).
+ */
+export const getSupportedMethods = (widgetType) => {
+  const all = getWidgetMethods(widgetType);
+  const unsupported = new Set(
+    (WIDGET_DESCRIPTORS[widgetType] && WIDGET_DESCRIPTORS[widgetType].unsupportedMethods) || []
+  );
+  return all.filter((m) => !unsupported.has(m.name));
+};

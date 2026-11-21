@@ -31,7 +31,7 @@ export const CustomSearchSelectInput = (props) => {
     <div className="space-y-1">
       <Label
         htmlFor={path}
-        className={`${hasErrors ? "text-red-500" : ""}`}
+        className={`${hasErrors ? "text-destructive" : ""}`}
       >
         {label || description} {required ? <span className="text-destructive">*</span> : null}
       </Label>
@@ -42,7 +42,7 @@ export const CustomSearchSelectInput = (props) => {
         options={selectOptions}
         disabled={isDisabled}
         placeholder={placeholder}
-        className={`text-xs bg-background ${hasErrors ? "border-red-500" : ""}`}
+        className={`text-xs bg-background ${hasErrors ? "border-destructive" : ""}`}
         onSearchChange={onSearchChange}
         onLoadMore={onLoadMore}
         hasNextPage={hasNextPage}
@@ -50,7 +50,7 @@ export const CustomSearchSelectInput = (props) => {
         isLoading={isLoading}
       />
       {hasErrors && (
-        <p className="text-xs text-red-500 mt-1">{errors}</p>
+        <p className="text-xs text-destructive mt-1">{errors}</p>
       )}
     </div>
   );

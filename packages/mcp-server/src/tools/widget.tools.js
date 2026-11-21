@@ -106,21 +106,23 @@ export const widgetTools = [
       "  plus {{ state.variables.<key> }} and {{ state.queries.<alias>.isLoading }}.\n" +
       "  BINDING-KEY MATRIX (per widgetType — using the wrong key renders blank with NO error):\n" +
       "  table:      dataArrayTemplate (array) | text: content | key-value/list/json-viewer: dataTemplate\n" +
-      "  stat:       value AND valueTemplate (SET BOTH to the same template — frontend reads valueTemplate,\n" +
-      "              schema historically listed only value; blank stat = these diverged)\n" +
-      "  progress:   valueTemplate (0-100) | badge: text | alert: message | vega/vega-lite: spec+vegaSpec\n" +
+      "  stat:       valueTemplate (canonical; legacy `value` accepted and mirrored on save)\n" +
+      "  progress:   valueTemplate (0-100) | badge: text | alert: message | vega/vega-lite: vegaSpec\n" +
       "  table:    { columns: [{key,label,type,width,sortable}], dataArrayTemplate: '{{ state.queries.<alias>.data }}', isLoading?, pagination?, search?, export? }\n" +
-      "  stat:     { value: '{{ ... }}', valueTemplate: '{{ ... SAME ... }}', label, prefix?, suffix?,\n" +
+      "  stat:     { valueTemplate: '{{ ... }}', label, prefix?, suffix?,\n" +
       "              trendTemplate?, trendDirection? ('up-is-good'|'down-is-good'), textAlign?, isLoading? }\n" +
+      "            (Legacy `value`/`trend` aliases are accepted; the API migrates and mirrors them.)\n" +
       "  text:     { content: '... {{ state.queries.<alias>.data.field }} ...', format: 'markdown' }\n" +
       "  vega-lite:{ vegaSpec: { data: { values: '{{ state.queries.<alias>.data }}' }, mark, encoding },\n" +
-      "              spec: { ...same... }, options?: {renderer, showActions}, showHeader? }\n" +
-      "            NOTE: production charts use vegaSpec (not just spec) — set BOTH spec and vegaSpec\n" +
-      "            with data.values bound, or the chart renders empty.\n" +
+      "              renderer?, showActions? }\n" +
+      "            NOTE: vegaSpec is the canonical render spec (legacy `spec` accepted and mirrored on save).\n" +
       "  key-value:{ dataTemplate: '{{state.queries.<alias>.data.<object>}}', columns? }\n" +
       "  list:     { dataTemplate: '{{state.queries.<alias>.data.<array>}}', titleKey, subtitleKey }\n" +
       "  badge:    { text: '{{ ... }}', variant? } | alert: { message: '... {{...}} ...', variant? }\n" +
       "  json-viewer: { dataTemplate: '{{...}}' } | select: { label?, options:[{label,value}], defaultValue? }\n" +
+      "  form:      { fields: [{key,label,type,required,options?,defaultValue?}], submitLabel?, layout? (vertical|horizontal|grid), columns?, size? (sm|default|lg), showReset?, resetLabel?; state.widgets.<id>.values holds the draft }\n" +
+      "  date-picker: { label?, placeholder?, defaultValue? (YYYY-MM-DD or local wall-time YYYY-MM-DDTHH:mm:ss, no Z), enableTime?, minDate?, maxDate?, disabledDates?[], required?, disabled?, readOnly?; state.widgets.<id>.value }\n" +
+      "  date-range-picker: { label?, placeholderStart/placeholderEnd (canonical; startPlaceholder/endPlaceholder legacy), defaultStart?, defaultEnd?, enableTime?, requireApply? (draft Apply/Cancel), presets? [{label,start,end}|{label,startOffset,endOffset}], minDate?, maxDate?; state.widgets.<id>.start/.end }\n" +
       "  TEMPLATE SUBSET (blank render instead of error on violation — keep expressions simple):\n" +
       "  SAFE: a ? b : c | a || b | arr.length | arr[0] | obj?.field | Math.round/JSON.stringify | encodeURIComponent(x)\n" +
       "  RISKY/BLANK: a && b | x != null | nested ternary | statements/loops | fetch/window/eval (shadowed).\n" +
@@ -146,11 +148,22 @@ export const widgetTools = [
       '      { "key": "total", "label": "Total", "width": 100 } ],\n' +
       '      "dataArrayTemplate": "{{ state.queries.orders_list.data }}",\n' +
       '      "isLoading": "{{ state.queries.orders_list.isLoading }}" } }\n' +
-      "Example call 2 — stat bound to first row (SET BOTH value + valueTemplate):\n" +
+      "Example call 2 — stat bound to first row (canonical valueTemplate):\n" +
       '  { "widgetTitle": "Total Revenue", "widgetType": "stat",\n' +
       '    "widgetConfig": { "label": "Revenue", "prefix": "$",\n' +
-      '      "value": "{{ (state.queries.orders_summary.data || [])[0]?.total_revenue }}",\n' +
-      '      "valueTemplate": "{{ (state.queries.orders_summary.data || [])[0]?.total_revenue }}" } }\n\n' +
+      '      "valueTemplate": "{{ (state.queries.orders_summary.data || [])[0]?.total_revenue }}" } }\n' +
+      "Example call 3 — form with typed validation (numbers stay numbers):\n" +
+      '  { "widgetTitle": "Add member", "widgetType": "form",\n' +
+      '    "widgetConfig": { "fields": [{ "key": "name", "label": "Name", "type": "text", "required": true },\n' +
+      '      { "key": "role", "label": "Role", "type": "select", "options": ["admin","member"], "required": true },\n' +
+      '      { "key": "agree", "label": "Accept terms", "type": "checkbox", "required": true }],\n' +
+      '      "submitLabel": "Save", "layout": "vertical", "showReset": false,\n' +
+      '      "events": { "onSubmit": [{ "actionType": "EXECUTE_QUERY", "config": { "alias": "create_member" } }] } } }\n' +
+      "Example call 4 — date range with presets (canonical placeholders):\n" +
+      '  { "widgetTitle": "Period", "widgetType": "date-range-picker",\n' +
+      '    "widgetConfig": { "label": "Period", "placeholderStart": "Start", "placeholderEnd": "End",\n' +
+      '      "presets": [{ "label": "Last 7 days", "startOffset": -7, "endOffset": 0 }] } }\n' +
+      "  (The API validates the type/config on create/update and migrates legacy aliases.)\n\n" +
       "Typical flow: create_query → create_widget → create_app_page (or update_app_page to add it).\n\n" +
       "Related: get_widget_schemas, update_widget, create_app_page, update_app_page.",
     inputSchema: {
@@ -188,8 +201,9 @@ export const widgetTools = [
       "Returns: { success: true, widgetID }.\n\n" +
       "FULL-REPLACE (destructive on omission): widgetConfig REPLACES the entire config. You MUST:\n" +
       "  1. get_widget to read the current config\n" +
-      "  2. copy ALL existing keys (esp. stat value+valueTemplate, table dataArrayTemplate/columns)\n" +
-      "  3. send the COMPLETE object. A partial send silently drops binding keys and blanks the widget.\n\n" +
+      "  2. copy ALL existing keys (esp. table dataArrayTemplate/columns)\n" +
+      "  3. send the COMPLETE object. A partial send silently drops binding keys and blanks the widget.\n" +
+      "  Legacy aliases (stat value, vega spec, iframe src, text align, table searchable/...) are migrated server-side.\n\n" +
       "Example call — add a column to an existing table widget:\n" +
       '  { "widgetID": "3d4e5f6a-7b8c-4d9e-0f1a-2b3c4d5e6f7a",\n' +
       '    "widgetConfig": { "columns": [\n' +

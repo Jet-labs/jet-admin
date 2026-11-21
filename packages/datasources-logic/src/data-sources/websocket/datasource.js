@@ -31,42 +31,108 @@ export default class WebSocketDataSource extends DataSource {
       options.headers = normalizedHeaders;
     }
 
-    // Connect WebSocket
-    const ws = new WebSocket(endpoint, protocols || [], options);
+    // Reconnection is owned here, not by the listener engine: without it a
+    // dropped socket stays dead until a config change or process restart.
+    const state = { stopped: false, attempts: 0, socket: null, timer: null };
+    const connect = () => {
+      if (state.stopped) return;
+      state.timer = null;
+      const ws = new WebSocket(endpoint, protocols || [], options);
+      state.socket = ws;
 
-    ws.on("message", (data) => {
-      const raw = data.toString();
-      if (messageFilter) {
-        try {
-          if (!new RegExp(messageFilter).test(raw)) return;
-        } catch {
-          // Invalid regex — do not filter, deliver the event.
-        }
-      }
-      let payload = raw;
-      if (parseAsJSON) {
-        try {
-          payload = JSON.parse(raw);
-        } catch (e) {
-          // keep as string
-        }
-      }
-      onEvent({ payload });
-    });
-
-    ws.on("error", (error) => {
-      Logger.log("error", {
-        message: "websocket:subscribe:error",
-        params: { error: error.message },
+      ws.on("open", () => {
+        state.attempts = 0;
+        Logger.log("success", {
+          message: "websocket:connected",
+          params: { datasourceID: this.config.datasourceID },
+        });
       });
-    });
 
-    return { ws };
+      ws.on("message", async (data) => {
+        const raw = data.toString();
+        if (messageFilter) {
+          try {
+            if (!new RegExp(messageFilter).test(raw)) return;
+          } catch {
+            // Invalid regex — do not filter, deliver the event.
+          }
+        }
+        let payload = raw;
+        if (parseAsJSON) {
+          try {
+            payload = JSON.parse(raw);
+          } catch (e) {
+            // keep as string
+          }
+        }
+        try {
+          // Await so a rejected durable enqueue reaches the sender and can be retried.
+          await onEvent({ payload });
+        } catch (error) {
+          Logger.log("error", {
+            message: "websocket:event:rejected",
+            params: { datasourceID: this.config.datasourceID, error: error.message },
+          });
+        }
+      });
+
+      ws.on("error", (error) => {
+        Logger.log("error", {
+          message: "websocket:subscribe:error",
+          params: { error: error.message },
+        });
+      });
+
+      ws.on("close", () => {
+        if (state.stopped) return;
+        const delay = Math.min(30000, 1000 * 2 ** Math.min(state.attempts, 5));
+        state.attempts += 1;
+        Logger.log("warning", {
+          message: "websocket:reconnecting",
+          params: { datasourceID: this.config.datasourceID, delayMs: delay, attempt: state.attempts },
+        });
+        state.timer = setTimeout(connect, delay);
+      });
+    };
+
+    connect();
+    this._connectionState = state;
+
+    const handle = {
+      get ws() { return state.socket; },
+      stop() {
+        state.stopped = true;
+        if (state.timer) clearTimeout(state.timer);
+        state.timer = null;
+      },
+    };
+    return handle;
+  }
+
+  get recoveryMode() {
+    return "plugin";
+  }
+
+  /** Observed transport state, separate from the engine's activation intent. */
+  getConnectionState() {
+    const state = this._connectionState;
+    if (!state || state.stopped) return "closed";
+    if (state.socket && state.socket.readyState === 1) return "open";
+    if (state.timer) return "reconnecting";
+    return "connecting";
+  }
+
+  async healthCheck() {
+    // Transient drops are owned by the reconnect loop; only a stopped
+    // subscription is a hard failure the engine should act on.
+    return true;
   }
 
   async unsubscribe(handle) {
-    if (!handle || !handle.ws) return;
-    
+    if (!handle) return;
+    if (typeof handle.stop === "function") handle.stop();
+    if (!handle.ws) return;
+
     Logger.log("info", {
       message: "websocket:unsubscribe",
       params: { datasourceID: this.config.datasourceID },

@@ -8,17 +8,42 @@
         "type": "object",
         "description": "Vega JSON specification (https://vega.github.io/vega/docs/specification/)",
         "properties": {
-          "$schema": { "type": "string" },
-          "width": { "type": "number" },
-          "height": { "type": "number" },
-          "signals": { "type": "array" },
-          "data": { "type": "array" },
-          "scales": { "type": "array" },
-          "axes": { "type": "array" },
-          "marks": { "type": "array" },
-          "legends": { "type": "array" },
-          "title": { "type": ["string", "object"] },
-          "config": { "type": "object" }
+          "$schema": {
+            "type": "string"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "signals": {
+            "type": "array"
+          },
+          "data": {
+            "type": "array"
+          },
+          "scales": {
+            "type": "array"
+          },
+          "axes": {
+            "type": "array"
+          },
+          "marks": {
+            "type": "array"
+          },
+          "legends": {
+            "type": "array"
+          },
+          "title": {
+            "type": [
+              "string",
+              "object"
+            ]
+          },
+          "config": {
+            "type": "object"
+          }
         }
       },
       "showActions": {
@@ -30,11 +55,36 @@
       "renderer": {
         "type": "string",
         "title": "Renderer",
-        "enum": ["svg", "canvas"],
+        "enum": [
+          "svg",
+          "canvas"
+        ],
         "description": "Rendering engine for the chart",
         "default": "svg"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      },
+      "vegaSpec": {
+        "type": "object",
+        "description": "Canonical runtime Vega spec (legacy alias: spec). Named datasets bind via data[].values templates."
+      },
+      "theme": {
+        "type": "string",
+        "description": "Theme name consumed by the shared Vega renderer."
       }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onMarkClick",
+    "onBrush",
+    "onRenderError"
+  ]
 }

@@ -8,18 +8,48 @@ const Logger = require('../../utils/logger');
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 const { getListenerIngressInfo } = require("./listenerIngress.util");
+const { withTimeout } = require("../../utils/async.util");
+const {
+  maskDatasourceOptions,
+  mergeAndRestoreMaskedOptions,
+} = require("../../utils/sensitive");
+const { assertTenantReferences } = require("../../utils/tenantReference.util");
+
+const PROXY_SYNC_TIMEOUT_MS = 3000;
+const PLACEMENT_LOOKUP_TIMEOUT_MS = 3000;
+
+function maskListener(listener) {
+  if (!listener || typeof listener !== "object") return listener;
+  return {
+    ...listener,
+    listenerConfig: maskDatasourceOptions(listener.listenerConfig),
+  };
+}
+
+async function validateActionReferences({ tenantID, actionType, actionConfig = {} }) {
+  const dataQueryIDs = [];
+  const workflowIDs = [];
+  const appPageIDs = [];
+
+  if (actionType === "trigger_query" && actionConfig.dataQueryID) {
+    dataQueryIDs.push(actionConfig.dataQueryID);
+  }
+  if (actionType === "trigger_workflow" && actionConfig.workflowID) {
+    workflowIDs.push(actionConfig.workflowID);
+  }
+  if (actionType === "push_to_app_page" && actionConfig.appPageID) {
+    appPageIDs.push(actionConfig.appPageID);
+  }
+
+  await assertTenantReferences({ tenantID, dataQueryIDs, workflowIDs, appPageIDs });
+}
 
 /**
  * All listener ingress (subscriptions + webhook ownership + hot-reload)
- * lives in the standalone `listener-proxy` app. It is required lazily so
- * backend ↔ proxy never form a load-time cycle. The backend holds no
- * subscriptions itself — every change is forwarded to the proxy, which
- * reloads the listener config from DB.
+ * lives in the standalone `listener-proxy` app. The backend holds no
+ * subscriptions itself; every change is forwarded over the Redis control
+ * channel, so the backend image does not need to import the proxy app.
  */
-function getProxyApp() {
-  // eslint-disable-next-line global-require
-  return require('../../../listener-proxy');
-}
 
 /**
  * Forward a listener change to the standalone ingress proxy fleet.
@@ -28,11 +58,33 @@ function getProxyApp() {
  *    and any drift). Best-effort throughout — never throws, never blocks CRUD.
  */
 async function syncIngressProxy(action, listenerID) {
-  await getProxyApp().notifyListenerChange(action, listenerID);
+  try {
+    const { publishControl } = require('../../config/listenerBus.config');
+    await withTimeout(
+      publishControl({ type: action, listenerID }),
+      PROXY_SYNC_TIMEOUT_MS,
+      'Listener proxy notify timed out'
+    );
+  } catch (err) {
+    Logger.log('warning', { message: 'listenerService:notify:skipped', params: { action, listenerID, error: err.message } });
+  }
+
   try {
     // eslint-disable-next-line global-require
     const registry = require('../../modules/proxyRegistry/proxyRegistry.service');
-    await registry.reconcileAndAnnounce({ fetchActiveIDs });
+    if (action === 'LISTENER_REMOVE') {
+      await withTimeout(
+        registry.removeListener(listenerID),
+        PROXY_SYNC_TIMEOUT_MS,
+        'Listener placement removal timed out'
+      );
+      return;
+    }
+    await withTimeout(
+      registry.reconcileAndAnnounce({ fetchActiveIDs }),
+      PROXY_SYNC_TIMEOUT_MS,
+      'Listener proxy reconcile timed out'
+    );
   } catch (err) {
     Logger.log('warning', { message: 'listenerService:reconcile:skipped', params: { error: err.message } });
   }
@@ -107,6 +159,7 @@ const listenerService = {
       for (const listener of listeners) {
         const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
         listener.transformScript = transformAction?.actionConfig?.script || null;
+        listener.listenerConfig = maskDatasourceOptions(listener.listenerConfig);
         listener.ingress = getListenerIngressInfo(listener);
       }
 
@@ -148,6 +201,7 @@ const listenerService = {
       if (listener) {
         const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
         listener.transformScript = transformAction?.actionConfig?.script || null;
+        listener.listenerConfig = maskDatasourceOptions(listener.listenerConfig);
         listener.ingress = getListenerIngressInfo(listener);
       }
 
@@ -226,7 +280,7 @@ const listenerService = {
       }
 
       listener.ingress = getListenerIngressInfo(listener);
-      return listener;
+      return maskListener(listener);
     } catch (error) {
       Logger.log("error", {
         message: "listenerService:createListener:error",
@@ -281,12 +335,16 @@ const listenerService = {
           }
         }
 
+        const effectiveListenerConfig = data.listenerConfig !== undefined
+          ? mergeAndRestoreMaskedOptions(data.listenerConfig, existing.listenerConfig)
+          : existing.listenerConfig;
+
         return await tx.tblListeners.update({
           where: { listenerID },
           data: {
             listenerTitle: data.listenerTitle ?? existing.listenerTitle,
             listenerDescription: data.listenerDescription !== undefined ? data.listenerDescription : existing.listenerDescription,
-            listenerConfig: data.listenerConfig ?? existing.listenerConfig,
+            listenerConfig: effectiveListenerConfig,
             status: data.status ?? existing.status,
             endpointPath: data.endpointPath !== undefined ? data.endpointPath : existing.endpointPath,
             updatedAt: new Date(),
@@ -301,6 +359,7 @@ const listenerService = {
       const transformAction = listener.tblListenerActions?.find(a => a.actionType === 'transform');
       listener.transformScript = transformAction?.actionConfig?.script || null;
       listener.ingress = getListenerIngressInfo(listener);
+      const maskedListener = maskListener(listener);
 
       Logger.log("success", {
         message: "listenerService:updateListener:success",
@@ -315,7 +374,7 @@ const listenerService = {
         await syncIngressProxy('LISTENER_REMOVE', listenerID);
       }
 
-      return listener;
+      return maskedListener;
     } catch (error) {
       Logger.log("error", {
         message: "listenerService:updateListener:error",
@@ -417,7 +476,7 @@ const listenerService = {
         message: "listenerService:cloneListener:success",
         params: { listenerID, newListenerID: newListener.listenerID },
       });
-      return newListener;
+      return maskListener(newListener);
     } catch (error) {
       Logger.log("error", {
         message: "listenerService:cloneListener:error",
@@ -439,6 +498,12 @@ const listenerService = {
         where: { listenerID, tenantID },
       });
       if (!listener) return null;
+
+      await validateActionReferences({
+        tenantID,
+        actionType: data.actionType,
+        actionConfig: data.actionConfig || {},
+      });
 
       const action = await prisma.tblListenerActions.create({
         data: {
@@ -485,6 +550,12 @@ const listenerService = {
         where: { actionID, listenerID },
       });
       if (!existingAction) return null;
+
+      await validateActionReferences({
+        tenantID,
+        actionType: data.actionType ?? existingAction.actionType,
+        actionConfig: data.actionConfig ?? existingAction.actionConfig ?? {},
+      });
 
       const action = await prisma.tblListenerActions.update({
         where: { actionID },
@@ -573,14 +644,22 @@ const listenerService = {
     try {
       // eslint-disable-next-line global-require
       const registry = require('../../modules/proxyRegistry/proxyRegistry.service');
-      const [live, version] = await Promise.all([
-        registry.listLiveProxies(),
-        registry.getVersion(),
-      ]);
+      const [live, version] = await withTimeout(
+        Promise.all([
+          registry.listLiveProxies(),
+          registry.getVersion(),
+        ]),
+        PLACEMENT_LOOKUP_TIMEOUT_MS,
+        'Listener placement lookup timed out'
+      );
       const proxies = [];
       for (const proxy of live) {
         // eslint-disable-next-line no-await-in-loop
-        const shard = await registry.getShard(proxy.proxyID);
+        const shard = await withTimeout(
+          registry.getShard(proxy.proxyID),
+          PLACEMENT_LOOKUP_TIMEOUT_MS,
+          'Listener shard lookup timed out'
+        );
         proxies.push({
           proxyID: proxy.proxyID,
           baseUrl: proxy.baseUrl || null,

@@ -12,7 +12,7 @@ const JsonValue = ({ value }) => {
   }
   if (typeof value === "boolean") {
     return (
-      <span className={value ? "text-green-400" : "text-red-400"}>
+      <span className={value ? "text-primary" : "text-destructive"}>
         {String(value)}
       </span>
     );
@@ -171,8 +171,8 @@ const JsonViewer = React.forwardRef(({ data, className, ...props }, ref) => {
       >
         {copied ? (
           <>
-            <Check className="w-3 h-3 text-green-400" />
-            <span className="text-green-400">Copied</span>
+            <Check className="w-3 h-3 text-primary" />
+            <span className="text-primary">Copied</span>
           </>
         ) : (
           <>

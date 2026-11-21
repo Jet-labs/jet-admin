@@ -227,7 +227,7 @@ export function AnimatedAIChat({
     const inputCard = (
         <motion.div 
             className={cn(
-                "relative bg-card border rounded-lg shadow-sm transition-all duration-200 w-full",
+                "relative bg-card border rounded shadow-sm transition-all duration-200 w-full",
                 isFocused 
                     ? "border-primary/80 shadow-[0_0_0_1px_rgba(117,130,255,0.25)]" 
                     : "border-border"
@@ -240,7 +240,7 @@ export function AnimatedAIChat({
                 {showCommandPalette && (
                     <motion.div 
                         ref={commandPaletteRef}
-                        className="absolute left-2 right-2 bottom-full mb-1 bg-popover rounded-lg z-50 shadow-md border border-border overflow-hidden"
+                        className="absolute left-2 right-2 bottom-full mb-1 bg-popover rounded z-50 shadow-md border border-border overflow-hidden"
                         initial={{ opacity: 0, y: 5 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 5 }}

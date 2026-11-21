@@ -4,15 +4,65 @@
   "schema": {
     "type": "object",
     "properties": {
-      "label": { "type": "string", "description": "Input label" },
-      "placeholder": { "type": "string" },
-      "inputType": { "type": "string", "enum": ["text", "number", "email", "password", "url", "textarea"], "default": "text" },
-      "defaultValue": { "type": "string", "description": "Default value. Supports template expressions." },
-      "required": { "type": "boolean", "default": false },
-      "disabled": { "type": ["boolean", "string"], "default": false },
-      "maxLength": { "type": "number", "description": "Maximum character length" },
-      "rows": { "type": "number", "default": 3, "description": "Visible rows when inputType is textarea" }
+      "label": {
+        "type": "string",
+        "description": "Input label"
+      },
+      "placeholder": {
+        "type": "string"
+      },
+      "inputType": {
+        "type": "string",
+        "enum": [
+          "text",
+          "number",
+          "email",
+          "password",
+          "url",
+          "textarea"
+        ],
+        "default": "text"
+      },
+      "defaultValue": {
+        "type": "string",
+        "description": "Default value. Supports template expressions."
+      },
+      "required": {
+        "type": "boolean",
+        "default": false
+      },
+      "disabled": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "default": false
+      },
+      "maxLength": {
+        "type": "number",
+        "description": "Maximum character length"
+      },
+      "rows": {
+        "type": "number",
+        "default": 3,
+        "description": "Visible rows when inputType is textarea"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onChange", "onFocus", "onBlur", "onClear"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onChange",
+    "onFocus",
+    "onBlur",
+    "onClear"
+  ]
 }

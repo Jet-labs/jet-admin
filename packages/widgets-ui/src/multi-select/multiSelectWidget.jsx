@@ -36,17 +36,22 @@ export const MultiSelectWidget = ({ widgetConfig, widgetState, setWidgetState, f
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgetConfig?.defaultValue]);
 
+  // Live callbacks via ref (B05/F02): never initial closures.
+  const liveRef = useRef(null);
+  liveRef.current = { setWidgetState, fireWidgetEvent };
   const methodsRef = useRef(null);
   if (!methodsRef.current) {
     methodsRef.current = {
       setValue: (v) => {
+        const rt = liveRef.current;
         const arr = Array.isArray(v) ? v : [v];
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: arr }));
-        if (fireWidgetEvent) fireWidgetEvent("onChange", { value: arr });
+        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: arr }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: arr });
       },
       clear: () => {
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: [] }));
-        if (fireWidgetEvent) fireWidgetEvent("onClear", { value: [] });
+        const rt = liveRef.current;
+        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: [] }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onClear", { value: [] });
       },
     };
   }

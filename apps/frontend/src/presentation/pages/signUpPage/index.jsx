@@ -49,7 +49,7 @@ const SignUpPage = () => {
               {CONSTANTS.APP_NAME}
             </p>
           </div>
-          <h3 className="mt-6 text-xl font-semibold text-foreground dark:text-foreground">
+          <h3 className="mt-6 text-xl font-medium text-foreground dark:text-foreground">
             {CONSTANTS.STRINGS.SIGN_UP_FORM_TITLE}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground dark:text-muted-foreground">
@@ -115,7 +115,7 @@ const SignUpPage = () => {
                 type="password"
                 name="password"
                 id="password"
-                className={cn("mt-2 w-full", emailSignUpForm.errors.password && "!border-red-400")}
+                className={cn("mt-2 w-full", emailSignUpForm.errors.password && "!border-destructive")}
                 placeholder="********"
                 required={true}
                 onChange={emailSignUpForm.handleChange}
@@ -134,7 +134,7 @@ const SignUpPage = () => {
                 type="password"
                 name="confirmPassword"
                 id="confirmPassword"
-                className={cn("mt-2 w-full", emailSignUpForm.errors.confirmPassword && "!border-red-400")}
+                className={cn("mt-2 w-full", emailSignUpForm.errors.confirmPassword && "!border-destructive")}
                 placeholder="********"
                 required={true}
                 onChange={emailSignUpForm.handleChange}
@@ -155,7 +155,7 @@ const SignUpPage = () => {
 
             {signUpState && signUpState.error && (
               <div
-                className="mt-4 p-4 text-sm text-red-400 rounded bg-red-950/40"
+                className="mt-4 p-4 text-sm text-destructive rounded bg-destructive/10"
                 role="alert"
               >
                 <span className="font-medium">Sign up error!</span>

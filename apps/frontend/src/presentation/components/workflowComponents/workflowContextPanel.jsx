@@ -37,13 +37,13 @@ export const WorkflowContextPanel = ({
   return (
     <div className={`flex flex-col bg-background overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-border">
+      <div className="flex items-center justify-between border-b border-border bg-muted/30 px-2 py-1">
         <div className="flex items-center gap-2">
           <FileJson className="size-4 text-muted-foreground" />
-          <span className="text-sm font-semibold text-foreground">Context</span>
+          <span className="text-sm font-medium text-foreground">Context</span>
           {isRunning && (
-            <span className="flex items-center gap-1.5 text-xs text-blue-500 font-medium">
-              <span className="size-1.5 bg-blue-950/400 rounded-full animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+            <span className="flex items-center gap-1.5 text-xs font-medium text-primary">
+              <span className="size-1.5 animate-pulse rounded-full bg-primary" />
               Live
             </span>
           )}

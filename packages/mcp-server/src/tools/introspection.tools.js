@@ -272,7 +272,8 @@ export const introspectionTools = [
       "Fetch the JSON schema(s) defining how a widget's widgetConfig object must be structured.\n\n" +
       "TRUNCATION WARNING: omitting widgetType returns all 32 schemas and WILL be truncated into a file.\n" +
       "PREFERRED: call list_widget_types first, then request ONE type per call (e.g. { \"widgetType\": \"stat\" }).\n" +
-      "For stat, the schema now includes both value (legacy) and valueTemplate (rendered) — set both.\n\n" +
+      "Each entry carries its JSON schema plus a canonical descriptor (aliases, defaults, example, supported events/methods).\n" +
+      "Author the canonical fields (stat valueTemplate, vega vegaSpec, iframe url, text textAlign); legacy aliases are migrated server-side.\n\n" +
       "Use this when create_widget or update_widget returns a validation error, or BEFORE constructing a\n" +
       "complex widgetConfig you are unsure about.\n\n" +
       "Example call 1 — one type (recommended):\n" +

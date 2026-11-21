@@ -35,16 +35,21 @@ export const GenericDatasourceTestResultUI = ({ connectionResult }) => {
       // Extract details
       if (connectionResult?.details) {
         details = connectionResult.details;
-      } else if (connectionResult?.stack) {
-        details = connectionResult.stack;
-      } else if (connectionResult?.response?.data) {
-        details = connectionResult.response.data;
+      } else if (connectionResult?.response?.data?.error?.message) {
+        details = connectionResult.response.data.error.message;
+      } else if (connectionResult?.response?.data?.message) {
+        details = connectionResult.response.data.message;
       } else if (typeof connectionResult === "object") {
-        // Filter out fields we already show in title
+        // Filter out fields we already show in title and never render the
+        // Axios stack/config/request internals.
         const filtered = { ...connectionResult };
         delete filtered.ok;
         delete filtered.message;
         delete filtered.error;
+        delete filtered.stack;
+        delete filtered.config;
+        delete filtered.request;
+        delete filtered.response;
         if (Object.keys(filtered).length > 0) {
           details = filtered;
         }

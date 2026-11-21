@@ -224,7 +224,7 @@ export const AuditLogsGrid = ({ tenantID }) => {
             </PageHeader>
 
             {/* ── Data grid ──────────────────────────────────────────── */}
-            <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
+            <div className="flex min-h-0 w-full flex-grow flex-col items-stretch justify-between overflow-hidden text-sm font-medium">
               <DataGrid
                 ref={datagridRef}
                 apiRef={datagridAPIRef}

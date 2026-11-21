@@ -1349,7 +1349,7 @@ export const PostgresQueryEditor = ({ queryEditorForm }) => {
   return (
     <div className="space-y-2">
       {/* ── Mode toggle ── */}
-      <div className="flex items-center gap-1 rounded-md border border-border bg-muted/40 p-0.5 w-fit">
+      <div className="flex w-fit items-center gap-1 rounded border border-border bg-muted/40 p-0.5">
         <button
           type="button"
           onClick={() => handleModeSwitch("query")}

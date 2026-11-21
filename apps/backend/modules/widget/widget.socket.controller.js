@@ -11,11 +11,10 @@ const Logger = require("../../utils/logger");
 const { widgetWorkflowBridge } = require('./widgetWorkflowBridge');
 const { workflowService } = require('../workflow/workflow.service');
 const { stateManager } = require('../workflow/workflowEngine/stateManager');
+const { authService } = require('../auth/auth.service');
+const { prisma } = require('../../config/prisma.config');
 const constants = require("../../constants");
-
-/**
- * Widget Socket Controller
- */
+const { authorizeWorkflowInstance } = require('../auth/socketAuthorization');
 
 /**
  * Strip internal orchestrator keys (prefixed with __) from context
@@ -26,6 +25,42 @@ function _stripInternalKeys(context) {
   return Object.fromEntries(
     Object.entries(context).filter(([key]) => !key.startsWith('__'))
   );
+}
+
+/**
+ * Authorize a widget socket operation against the authenticated Firebase user
+ * and the requested tenant. Workflow instance IDs are guessable UUIDs, so
+ * subscribe/replay/send-input must never trust the client-supplied tenant or
+ * instance alone (H-001).
+ */
+async function _authorizeWidgetTenant({ socket, firebaseID, tenantID, instanceID = null }) {
+  const uid = firebaseID || socket?.handshake?.auth?.firebase_id;
+  if (!uid) throw new Error('Authenticated Firebase user is required.');
+  if (!tenantID) throw new Error('tenantID is required.');
+
+  const user = await authService.getUserFromFirebaseID({ firebaseID: uid });
+  if (!user) throw new Error('User not found.');
+
+  const membership = await prisma.tblUsersTenantsRelationship.findFirst({
+    where: { tenantID, userID: user.userID },
+  });
+  if (!membership) {
+    const error = new Error('Tenant access denied.');
+    error.code = 'PERMISSION_DENIED';
+    throw error;
+  }
+
+  if (instanceID) {
+    const instance = await authorizeWorkflowInstance({ socket, instanceID, tenantID });
+    if (!instance || String(instance.tenantID) !== String(tenantID)) {
+      const error = new Error('Workflow instance not found in tenant.');
+      error.code = 'PERMISSION_DENIED';
+      throw error;
+    }
+    return { user, instance };
+  }
+
+  return { user, instance: null };
 }
 
 const widgetSocketController = {
@@ -70,6 +105,13 @@ const widgetSocketController = {
       let initialContext = null;
       let workflowMeta = null;
 
+      const auth = await _authorizeWidgetTenant({
+        socket,
+        firebaseID,
+        tenantID,
+        instanceID: (mode === 'subscribe' || mode === 'replay') ? instanceID : null,
+      });
+
       switch (mode) {
         case 'execute': {
           // Start a new workflow execution
@@ -77,15 +119,9 @@ const widgetSocketController = {
             throw new Error('workflowID is required for execute mode');
           }
 
-          const { authService } = require("../auth/auth.service");
-          const user = await authService.getUserFromFirebaseID({ firebaseID });
-          if (!user) {
-            throw new Error("User not found.");
-          }
-
           const { createUserContext } = require("../../utils/executionContext");
           const { authorizedExecuteWorkflow } = require("../../utils/authorizedProxy");
-          const executionCtx = createUserContext(user, tenantID);
+          const executionCtx = createUserContext(auth.user, tenantID);
 
           const result = await authorizedExecuteWorkflow({
             workflowID,
@@ -131,7 +167,7 @@ const widgetSocketController = {
             throw new Error('instanceID is required for subscribe mode');
           }
 
-          const instance = await stateManager.getInstance(instanceID);
+          const instance = auth.instance;
           if (!instance) {
             throw new Error(`Instance ${instanceID} not found`);
           }
@@ -155,7 +191,7 @@ const widgetSocketController = {
             throw new Error('instanceID is required for replay mode');
           }
 
-          const replayInstance = await stateManager.getInstance(instanceID);
+          const replayInstance = auth.instance;
           if (!replayInstance) {
             throw new Error(`Instance ${instanceID} not found`);
           }
@@ -250,11 +286,22 @@ const widgetSocketController = {
         throw new Error('Widget is not connected to any workflow instance');
       }
 
+      // Only the socket that established this widget connection may drive it.
+      const connection = widgetWorkflowBridge.getWidgetConnection(widgetID);
+      if (
+        !connection ||
+        connection.socketId !== socket.id ||
+        String(connection.instanceID) !== String(targetInstanceID)
+      ) {
+        throw new Error('Widget is not connected to this socket');
+      }
+
       // Get current instance
       const instance = await stateManager.getInstance(targetInstanceID);
       if (!instance) {
         throw new Error(`Instance ${targetInstanceID} not found`);
       }
+      await authorizeWorkflowInstance({ socket, instanceID: targetInstanceID, tenantID: connection.tenantID, action: 'execute' });
 
       // Store widget input in context for workflow to access
       const widgetInputUpdate = {
@@ -323,6 +370,9 @@ const widgetSocketController = {
       if (!connection) {
         throw new Error('Widget is not connected');
       }
+      if (connection.socketId !== socket.id) {
+        throw new Error('Widget is not connected to this socket');
+      }
 
       // Unregister from old instance
       widgetWorkflowBridge.unregisterWidget(widgetID, socket);
@@ -335,6 +385,7 @@ const widgetSocketController = {
         mode: 'execute',
         inputValues: inputValues || {},
         tenantID: tenantID || connection.tenantID,
+        firebaseID: socket?.handshake?.auth?.firebase_id,
       });
 
       Logger.log('success', {

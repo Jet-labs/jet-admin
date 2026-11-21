@@ -477,7 +477,13 @@ dataQueryController.deleteDataQueryByID = async (req, res) => {
       message: "dataQueryController:deleteDataQueryByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      error,
+      error.statusCode || constants.HTTP_STATUS.BAD_REQUEST
+    );
   }
 };
 

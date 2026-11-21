@@ -47,6 +47,7 @@ jest.mock('../../../modules/vault/vault.service', () => ({
 const mockUnsubscribe = jest.fn().mockResolvedValue(true);
 const mockSubscribeHandle = { id: 'handle-1' };
 let mockSubscribeCallback = null;
+let mockSubscribeGate = null;
 
 class MockDataSource {
   constructor(config, helpers) {
@@ -54,6 +55,7 @@ class MockDataSource {
     this.helpers = helpers;
   }
   async subscribe(config, onEvent) {
+    if (mockSubscribeGate) await mockSubscribeGate;
     mockSubscribeCallback = onEvent;
     return mockSubscribeHandle;
   }
@@ -101,6 +103,7 @@ describe('ListenerEngine', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    mockSubscribeGate = null;
     // Stop all active listeners in engine before each test
     await listenerEngine.stopAll();
   });
@@ -142,6 +145,21 @@ describe('ListenerEngine', () => {
 
     // Call startOne again
     await listenerEngine.startOne(sampleListener);
+    expect(listenerEngine.active.size).toBe(1);
+  });
+
+  it('should not start the same listener twice while subscribe is in flight', async () => {
+    let release;
+    mockSubscribeGate = new Promise((resolve) => { release = resolve; });
+
+    const first = listenerEngine.startOne(sampleListener);
+    const second = listenerEngine.startOne(sampleListener);
+
+    // Both calls are pending; only one subscribe should have been attempted.
+    expect(listenerEngine.active.size).toBe(0);
+    expect(listenerEngine.getStatus()['lst-001'].state).toBe('connecting');
+    release();
+    await Promise.all([first, second]);
     expect(listenerEngine.active.size).toBe(1);
   });
 
@@ -194,6 +212,54 @@ describe('ListenerEngine', () => {
     expect(listenerEngine.active.has('lst-001')).toBe(false);
   });
 
+  it('disposes a late subscribe handle after stop instead of resurrecting it', async () => {
+    let release;
+    mockSubscribeGate = new Promise(resolve => { release = resolve; });
+    const starting = listenerEngine.startOne(sampleListener);
+    await listenerEngine.stopOne('lst-001');
+    release();
+    await starting;
+    expect(listenerEngine.active.has('lst-001')).toBe(false);
+    expect(mockUnsubscribe).toHaveBeenCalledWith(mockSubscribeHandle);
+    expect(listenerEngine.generations.has('lst-001')).toBe(false);
+    expect(mockPrisma.tblListeners.update).not.toHaveBeenCalled();
+    await expect(mockSubscribeCallback({ id: 'stale' })).rejects.toThrow('no longer current');
+    expect(mockAddListenerEvent).not.toHaveBeenCalled();
+  });
+
+  it('a stale subscribe completion cannot clear a newer pending start', async () => {
+    let releaseOld, releaseNew;
+    mockSubscribeGate = new Promise(resolve => { releaseOld = resolve; });
+    const oldStart = listenerEngine.startOne(sampleListener);
+    await listenerEngine.stopOne('lst-001');
+    mockSubscribeGate = new Promise(resolve => { releaseNew = resolve; });
+    const newStart = listenerEngine.startOne(sampleListener);
+    releaseOld();
+    await oldStart;
+    expect(listenerEngine.starting.has('lst-001')).toBe(true);
+    releaseNew();
+    await newStart;
+    expect(listenerEngine.active.has('lst-001')).toBe(true);
+  });
+
+  it('stop during reload lookup prevents a late restart', async () => {
+    let release;
+    mockPrisma.tblListeners.findUnique.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+    const reloading = listenerEngine.restartOne('lst-001');
+    await Promise.resolve();
+    await listenerEngine.stopOne('lst-001');
+    release(sampleListener);
+    await reloading;
+    expect(listenerEngine.active.has('lst-001')).toBe(false);
+  });
+
+  it('propagates enqueue failure and never changes activation intent on success', async () => {
+    await listenerEngine.startOne(sampleListener);
+    expect(mockPrisma.tblListeners.update.mock.calls[0][0].data).toEqual({ lastError: null });
+    mockAddListenerEvent.mockRejectedValueOnce(new Error('Redis unavailable'));
+    await expect(mockSubscribeCallback({ id: 'retry' })).rejects.toThrow('Redis unavailable');
+  });
+
   it('should restart listener on restartOne()', async () => {
     await listenerEngine.startOne(sampleListener);
     mockPrisma.tblListeners.findUnique.mockResolvedValue(sampleListener);
@@ -207,19 +273,41 @@ describe('ListenerEngine', () => {
   it('should handle disconnects with exponential backoff and max retries', async () => {
     await listenerEngine.startOne(sampleListener);
 
-    // Simulate exceeding max retries (MAX_RETRIES is 10, so 11 disconnect triggers exceed limit)
-    for (let i = 0; i < 11; i++) {
-      await listenerEngine._handleDisconnect('lst-001', new Error('Connection lost'));
-    }
+    // Exhausted retry budget, not eleven duplicate callbacks for one disconnect.
+    listenerEngine.active.get('lst-001').retryCount = 10;
+    await listenerEngine._handleDisconnect('lst-001', new Error('Connection lost'));
 
     expect(listenerEngine.active.has('lst-001')).toBe(false);
     expect(mockPrisma.tblListeners.update).toHaveBeenCalledWith({
       where: { listenerID: 'lst-001' },
       data: {
-        status: 'error',
         lastError: expect.stringContaining('Max retries exceeded'),
       },
     });
+  });
+
+  it('coalesces repeated disconnect callbacks into one retry timer', async () => {
+    await listenerEngine.startOne(sampleListener);
+    await listenerEngine._handleDisconnect('lst-001', new Error('lost'));
+    const entry = listenerEngine.active.get('lst-001');
+    const timer = entry.retryTimer;
+    await listenerEngine._handleDisconnect('lst-001', new Error('lost again'));
+    expect(entry.retryCount).toBe(1);
+    expect(entry.retryTimer).toBe(timer);
+  });
+
+  it('does not race plugin-owned recovery with an engine restart loop', async () => {
+    await listenerEngine.startOne(sampleListener);
+    const entry = listenerEngine.active.get('lst-001');
+    entry.instance.recoveryMode = 'plugin';
+    entry.instance.healthCheck = jest.fn().mockRejectedValue(new Error('transient drop'));
+
+    listenerEngine._healthCheck();
+    await Promise.resolve();
+
+    expect(entry.instance.healthCheck).not.toHaveBeenCalled();
+    expect(entry.state).toBe('running');
+    expect(entry.retryCount).toBe(0);
   });
 
   it('should perform health checks and handle unhealthy instances', async () => {

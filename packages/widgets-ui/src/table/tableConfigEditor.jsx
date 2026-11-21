@@ -513,6 +513,26 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
             />
           </div>
         </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <Label className="text-xs">Loading Text</Label>
+            <Input
+              value={config.loadingText || ""}
+              onChange={(e) => handleConfigChange("loadingText", e.target.value)}
+              placeholder="Updating..."
+              className="h-7 text-xs"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Searching Text</Label>
+            <Input
+              value={config.searchingText || ""}
+              onChange={(e) => handleConfigChange("searchingText", e.target.value)}
+              placeholder="Searching..."
+              className="h-7 text-xs"
+            />
+          </div>
+        </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
           <div className="flex items-center gap-1.5">
             <Checkbox
@@ -570,6 +590,12 @@ export const TableConfigEditor = ({ widgetEditorForm, stateTree }) => {
                 placeholder="Search placeholder..."
                 className="h-7 text-xs"
               />
+              {search.serverSide && (
+                <p className="text-[0.6rem] text-muted-foreground">
+                  Shows a search button. Click it or press Enter to fire <code className="bg-background px-1 rounded border border-border font-mono">onSearch</code>.
+                  Bind a query to <strong>On Search</strong> and point the table&apos;s <code className="bg-background px-1 rounded border border-border font-mono">isLoading</code> template at that query&apos;s loading state.
+                </p>
+              )}
             </div>
           )}
         </div>

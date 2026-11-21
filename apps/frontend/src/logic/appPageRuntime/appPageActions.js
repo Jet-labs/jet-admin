@@ -16,7 +16,10 @@ export const APP_PAGE_ACTIONS = {
   /** Set a page-level variable: { key, value } */
   SET_VARIABLE: "APP_PAGE_SET_VARIABLE",
 
-  /** Merge updates into a widget's local state: { widgetID, state } */
+  /** Merge updates into a widget's local state: { widgetID, state }.
+   * widgetID carries the runtime instance ID (B24, opaque placement key).
+   * See useWidgetState contract: object patch or pure updater
+   * (prevWidgetState) => partialPatch, evaluated once in the reducer. */
   SET_WIDGET_STATE: "APP_PAGE_SET_WIDGET_STATE",
 
   /** Store a query result: { alias, data, error, isLoading } */
@@ -30,11 +33,13 @@ export const APP_PAGE_ACTIONS = {
 
   /** Mark a workflow data source as loading: { alias } */
   SET_WORKFLOW_LOADING: "APP_PAGE_SET_WORKFLOW_LOADING",
+  SET_WORKFLOW_REQUESTS: 'APP_PAGE_SET_WORKFLOW_REQUESTS',
+  ACK_WORKFLOW_REQUEST: 'APP_PAGE_ACK_WORKFLOW_REQUEST',
 
-  /** Register methods a widget exposes: { widgetID, methods } */
+  /** Register methods a widget exposes: { widgetID, methods } (B24: instance ID) */
   REGISTER_WIDGET_METHODS: "APP_PAGE_REGISTER_WIDGET_METHODS",
 
-  /** Unregister a widget on unmount: { widgetID } */
+  /** Unregister a widget on unmount: { widgetID } (B24: instance ID only) */
   UNREGISTER_WIDGET: "APP_PAGE_UNREGISTER_WIDGET",
 
   /** Store listener event data: { alias, data, error, mode, limit } */
@@ -79,6 +84,14 @@ export const appPageActions = {
   setWorkflowLoading: (alias) => ({
     type: APP_PAGE_ACTIONS.SET_WORKFLOW_LOADING,
     payload: { alias },
+  }),
+  setWorkflowRequests: (alias, requests, instanceID) => ({
+    type: APP_PAGE_ACTIONS.SET_WORKFLOW_REQUESTS,
+    payload: { alias, requests, instanceID },
+  }),
+  acknowledgeWorkflowRequest: (alias, collectionRequestID, instanceID) => ({
+    type: APP_PAGE_ACTIONS.ACK_WORKFLOW_REQUEST,
+    payload: { alias, collectionRequestID, instanceID },
   }),
 
   registerWidgetMethods: (widgetID, methods) => ({

@@ -43,6 +43,7 @@ export const WidgetDeletionForm = ({ tenantID, widgetID }) => {
       title: CONSTANTS.STRINGS.DELETE_WIDGET_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_WIDGET_DIALOG_MESSAGE,
       confirmText: "Delete",
+      confirmVariant: "destructive",
       cancelText: "Cancel",
     });
     if (!confirmed) return;

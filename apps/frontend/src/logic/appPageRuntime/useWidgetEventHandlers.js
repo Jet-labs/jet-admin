@@ -4,17 +4,49 @@
  * Reads widget event config and returns a `fireWidgetEvent` function.
  * When called, it executes the configured action chain sequentially:
  * SET_VARIABLE, EXECUTE_QUERY, CALL_WIDGET_METHOD, SHOW_TOAST, etc.
+ *
+ * Event/method contract (F02):
+ * - Sources: user gestures (click/type/select), programmatic widget methods
+ *   (e.g. table.setSelectedRow, button.click), and lifecycle (onLoad/onRefresh).
+ * - Exactly-once dispatch: each gesture or method call executes the
+ *   configured action chain ONCE. Renderers notify exactly one route —
+ *   either fireWidgetEvent with the documented flat payload (table row
+ *   selection, bulk actions) or the direct onX callback the page slot shapes
+ *   into one chain (chart mark/brush) — never both.
+ * - Programmatic methods that change selection/value emit the same event a
+ *   gesture would (e.g. setSelectedRow fires onRowSelect once).
+ * - fireWidgetEvent resolves to an array of per-action structured results
+ *   ({ actionType, success, result } or { actionType, success:false, error })
+ *   so callers awaiting success/failure can branch on outcomes.
  */
 
-import { useCallback, useContext, useRef, useEffect } from "react";
+import { useCallback, useContext, useRef, useEffect, useMemo } from "react";
 import { useAppPageStateTree } from "./useAppPageStateTree";
 import { useAppPageDispatch } from "./useAppPageDispatch";
 import { AppPageMetaContext } from "./AppPageRuntimeProvider";
+import { getQueryCoordinator } from './queryCoordinator';
 import { appPageActions } from "./appPageActions";
 import { resolveConfig } from "../evaluationEngine";
-import { runDataQueryByIDAPI } from "../../data/apis/dataQuery";
-import { executeWorkflowWithStreaming } from "./executeWorkflowWithStreaming";
-import { displaySuccess, displayError } from "../../utils/notification";
+import {
+  buildIterationWidgetsView,
+  getPlacementInstanceID,
+  groupInstancesByResource,
+  normalizeRepeatPath,
+  resolveLegacyWidgetReference,
+} from "./widgetInstanceIdentity";
+
+/**
+ * Shape a table row-selection callback into exactly one flat page event.
+ * Pure + unit-tested: one call -> one fireWidgetEvent("onRowSelect",
+ * { row, rowIndex }) — never the generic { inputs } nesting, never a second
+ * direct fire (B04/F02 exactly-once policy). Used by AppPageWidgetSlot.
+ */
+export const shapeTableRowSelect = (fireWidgetEvent) => (row, rowIndex) =>
+  fireWidgetEvent("onRowSelect", { row, rowIndex });
+// I/O modules (data APIs, workflow streaming, toasts) load lazily inside the
+// actions that need them: keeps this hook import-light for tests and keeps
+// Firebase/socket/toast side effects out of module evaluation. Behavior at
+// action time is unchanged (dynamic imports cache after first use).
 
 /**
  * Execute a single action within the AppPage context.
@@ -47,7 +79,17 @@ const normalizeEventRefs = (value) => {
   return value;
 };
 
-const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowRegistry) => {
+const showAppPageToast = async (message, variant = "success") => {
+  if (!message) return;
+  const { displaySuccess, displayError } = await import("../../utils/notification");
+  if (variant === "error") {
+    displayError(message);
+  } else {
+    displaySuccess(message);
+  }
+};
+
+const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowRegistry, isActive = () => true) => {
   const { actionType, config: rawConfigOrig } = action;
   const rawConfig = normalizeEventRefs(rawConfigOrig);
 
@@ -116,24 +158,38 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
           }
           delete workflowRegistry[alias];
 
+          const { executeWorkflowWithStreaming } = await import(
+            "./executeWorkflowWithStreaming"
+          );
+          if (!isActive()) return null;
+          const successToast = config?.successToast || dataSource.successToast;
+          const errorToast = config?.errorToast || dataSource.errorToast;
           const { disconnect } = executeWorkflowWithStreaming({
             tenantID: meta.tenantID,
             workflowID: dataSource.workflowID,
             inputValues: mergedInputValues,
             alias,
             dispatch,
+            onComplete: () => {
+              if (isActive()) showAppPageToast(successToast, "success");
+            },
+            onError: () => {
+              if (isActive()) showAppPageToast(errorToast, "error");
+            },
           });
 
           workflowRegistry[alias] = disconnect;
           return null;
         } else {
-          dispatch(appPageActions.setQueryLoading(alias));
-          const result = await runDataQueryByIDAPI({
+          const { runDataQueryByIDAPI } = await import("../../data/apis/dataQuery");
+          if (!isActive()) return null;
+          const result = await getQueryCoordinator(dispatch).run({
+            alias,
             tenantID: meta.tenantID,
-            dataQueryID: dataSource.queryID,
+            queryID: dataSource.queryID,
             inputValues: mergedInputValues,
+            execute: runDataQueryByIDAPI,
           });
-          dispatch(appPageActions.setQueryResult(alias, result));
           return result;
         }
       } catch (error) {
@@ -143,8 +199,6 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
             workflowRegistry[alias]();
           }
           delete workflowRegistry[alias];
-        } else {
-          dispatch(appPageActions.setQueryResult(alias, null, error));
         }
         console.error(`[AppPageEvents] EXECUTE_QUERY "${alias}" failed:`, error);
         throw error;
@@ -164,6 +218,8 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
           stateTree
         );
 
+        const { runDataQueryByIDAPI } = await import("../../data/apis/dataQuery");
+        if (!isActive()) return null;
         const result = await runDataQueryByIDAPI({
           tenantID: meta.tenantID,
           dataQueryID: queryID,
@@ -192,17 +248,29 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
         // Stable alias per target workflow: re-triggering replaces the active
         // stream instead of accumulating new reducer entries/disconnectors
         // (the old Date.now()-suffixed aliases leaked both).
+        const { executeWorkflowWithStreaming } = await import(
+          "./executeWorkflowWithStreaming"
+        );
+        if (!isActive()) return null;
         const temporaryAlias = `direct_workflow_${workflowID}`;
         if (typeof workflowRegistry[temporaryAlias] === "function") {
           workflowRegistry[temporaryAlias]();
         }
 
+        const successToast = config?.successToast;
+        const errorToast = config?.errorToast;
         const { disconnect } = executeWorkflowWithStreaming({
           tenantID: meta.tenantID,
           workflowID: workflowID,
           inputValues: mergedInputValues,
           alias: temporaryAlias,
           dispatch,
+          onComplete: () => {
+            if (isActive()) showAppPageToast(successToast, "success");
+          },
+          onError: () => {
+            if (isActive()) showAppPageToast(errorToast, "error");
+          },
         });
 
         workflowRegistry[temporaryAlias] = disconnect;
@@ -225,20 +293,48 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
         console.warn("[AppPageEvents] CALL_WIDGET_METHOD missing target or method");
         return null;
       }
-      const widgetMethods = stateTree.widgetMethods?.[targetWidgetID];
+      // B24: instance-aware target resolution. Exact instance keys always win.
+      // Inside a repeat iteration, a bare placement key first tries the same
+      // iteration; legacy resource IDs resolve only when unambiguous — never
+      // silently rerouted to an arbitrary placement.
+      const liveMethods = stateTree.widgetMethods || {};
+      const liveInstances = Object.keys(liveMethods);
+      let resolvedTarget = targetWidgetID;
+      const repeatPath = normalizeRepeatPath(stateTree.__firingRepeatPath);
+      if (
+        repeatPath.length > 0 &&
+        !targetWidgetID.includes("::") &&
+        liveMethods[getPlacementInstanceID(targetWidgetID, repeatPath)]
+      ) {
+        resolvedTarget = getPlacementInstanceID(targetWidgetID, repeatPath);
+      } else {
+        const resolution = resolveLegacyWidgetReference(targetWidgetID, liveInstances);
+        if (resolution.kind === "ambiguous") {
+          console.warn(
+            `[AppPageEvents] CALL_WIDGET_METHOD: ambiguous target "${targetWidgetID}" matches ${resolution.candidates.length} placements (${resolution.candidates.join(", ")}). Use an explicit instance key; skipping call to ${methodName} so no arbitrary placement is triggered.`
+          );
+          return null;
+        }
+        if (resolution.kind === "missing") {
+          console.warn(`[AppPageEvents] CALL_WIDGET_METHOD: widget ${targetWidgetID} not found or has no registered methods`);
+          return null;
+        }
+        resolvedTarget = resolution.instanceID;
+      }
+      const widgetMethods = liveMethods[resolvedTarget];
       if (!widgetMethods) {
         console.warn(`[AppPageEvents] CALL_WIDGET_METHOD: widget ${targetWidgetID} not found or has no registered methods`);
         return null;
       }
       const method = widgetMethods[methodName];
       if (typeof method !== "function") {
-        console.warn(`[AppPageEvents] CALL_WIDGET_METHOD: method ${methodName} on widget ${targetWidgetID} is not a function`, widgetMethods);
+        console.warn(`[AppPageEvents] CALL_WIDGET_METHOD: method ${methodName} on widget ${resolvedTarget} is not a function`, widgetMethods);
         return null;
       }
       try {
         return method(...inputs);
       } catch (error) {
-        console.error(`[AppPageEvents] CALL_WIDGET_METHOD: Failed to execute ${targetWidgetID}.${methodName}():`, error);
+        console.error(`[AppPageEvents] CALL_WIDGET_METHOD: Failed to execute ${resolvedTarget}.${methodName}():`, error);
         throw error;
       }
     }
@@ -246,11 +342,7 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
     case "SHOW_TOAST": {
       const message = config?.message || "Action completed";
       const variant = config?.variant || "success";
-      if (variant === "error") {
-        displayError(message);
-      } else {
-        displaySuccess(message);
-      }
+      await showAppPageToast(message, variant);
       return null;
     }
 
@@ -260,10 +352,13 @@ const executeAppPageAction = async (action, stateTree, dispatch, meta, workflowR
   }
 };
 
-export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
+export const useWidgetEventHandlers = (instanceID, widgetConfig, identityMeta) => {
+  const widgetID = instanceID;
   const stateTree = useAppPageStateTree();
   const dispatch = useAppPageDispatch();
   const meta = useContext(AppPageMetaContext);
+  const identityRef = useRef(identityMeta || null);
+  const lifetime = useMemo(() => ({ active: true }), [instanceID]);
 
   const stateTreeRef = useRef(stateTree);
   const widgetConfigRef = useRef(widgetConfig);
@@ -273,6 +368,7 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
     stateTreeRef.current = stateTree;
     widgetConfigRef.current = widgetConfig;
     metaRef.current = meta;
+    identityRef.current = identityMeta || null;
   });
 
   // Active workflow streams started by THIS page instance. Disconnected when
@@ -280,8 +376,10 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
   const workflowRegistryRef = useRef({});
 
   useEffect(() => {
+    lifetime.active = true;
     const registry = workflowRegistryRef.current;
     return () => {
+      lifetime.active = false;
       for (const alias of Object.keys(registry)) {
         if (typeof registry[alias] === "function") {
           registry[alias]();
@@ -289,7 +387,7 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
       }
       workflowRegistryRef.current = {};
     };
-  }, []);
+  }, [lifetime]);
 
   const fireWidgetEvent = useCallback(
     async (eventType, eventInputs = {}) => {
@@ -309,11 +407,40 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
       // so sequential chains would otherwise read stale values.
       const pendingMutations = {};
       for (const action of actions) {
+        if (!lifetime.active) break;
         // Re-read the latest tree before each action so sequential chains see
         // mutations from earlier steps whenever a re-render has committed.
         const latestStateTree = stateTreeRef.current;
+        // B24/F12: iteration-scoped widgets view so a firing repeat iteration
+        // resolves its own bare placement/resource refs deterministically.
+        const identity = identityRef.current;
+        let actionWidgets = latestStateTree.widgets;
+        let firingRepeatPath = [];
+        if (identity) {
+          firingRepeatPath = normalizeRepeatPath(identity.repeatPath);
+          const currentState = latestStateTree.widgets?.[widgetID];
+          if (currentState !== undefined) {
+            const solePlacement = (() => {
+              const groups = groupInstancesByResource(Object.keys(latestStateTree.widgets || {}));
+              const list = groups[identity.resourceID] || [];
+              return (
+                list.length >= 1 &&
+                list.every((id) => id === widgetID || id.startsWith(`${identity.placementKey}::`))
+              );
+            })();
+            actionWidgets = buildIterationWidgetsView({
+              globalWidgets: latestStateTree.widgets || {},
+              placementKey: identity.placementKey,
+              resourceID: identity.resourceID,
+              instanceID: widgetID,
+              solePlacementForResource: solePlacement,
+            });
+          }
+        }
         const dynamicEventStateTree = {
           ...latestStateTree,
+          widgets: actionWidgets,
+          __firingRepeatPath: firingRepeatPath,
           variables: {
             ...latestStateTree.variables,
             ...pendingMutations,
@@ -321,6 +448,10 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
           event: {
             type: eventType,
             widgetID,
+            instanceID: widgetID,
+            resourceID: identity?.resourceID,
+            placementKey: identity?.placementKey,
+            repeatPath: firingRepeatPath,
             ...eventInputs,
           },
         };
@@ -331,7 +462,8 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
             dynamicEventStateTree,
             dispatch,
             currentMeta,
-            workflowRegistryRef.current
+            workflowRegistryRef.current,
+            () => lifetime.active
           );
           if (action.actionType === "SET_VARIABLE" && result?.key !== undefined) {
             pendingMutations[result.key] = result.value;
@@ -344,7 +476,7 @@ export const useWidgetEventHandlers = (widgetID, widgetConfig) => {
 
       return results;
     },
-    [dispatch, widgetID]
+    [dispatch, widgetID, lifetime]
   );
 
   return { fireWidgetEvent };

@@ -280,7 +280,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
       } else if (actionTypeValue === "TRIGGER_QUERY") {
         defaultConfig = { queryID: "", inputValues: {} };
       } else if (actionTypeValue === "TRIGGER_WORKFLOW") {
-        defaultConfig = { workflowID: "", inputValues: {} };
+        defaultConfig = { workflowID: "", inputValues: {}, successToast: "", errorToast: "" };
       }
       widgetEditorForm.setFieldValue(
         `widgetConfig.events.${eventType}[${actionIndex}].config`,
@@ -434,7 +434,7 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                         onClick={() => toggleExpand(path)}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted border border-border text-xs font-bold text-muted-foreground">
+                          <div className="flex h-5 w-5 items-center justify-center rounded border border-border bg-muted text-xs font-medium text-muted-foreground">
                             {actionIndex + 1}
                           </div>
                           
@@ -706,6 +706,30 @@ export const WidgetEventsEditor = ({ widgetEditorForm, stateTree, appPageEditorF
                                   </div>
                                 );
                               })()}
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground font-semibold">Success toast</Label>
+                                  <TemplateAutocompleteInput
+                                    value={action.config?.successToast || ""}
+                                    onChange={(val) =>
+                                      handleActionConfigChange(eventType, actionIndex, "successToast", val)
+                                    }
+                                    placeholder="e.g. Workflow completed"
+                                    liveStateTree={localStateTree}
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground font-semibold">Error toast</Label>
+                                  <TemplateAutocompleteInput
+                                    value={action.config?.errorToast || ""}
+                                    onChange={(val) =>
+                                      handleActionConfigChange(eventType, actionIndex, "errorToast", val)
+                                    }
+                                    placeholder="e.g. Workflow failed"
+                                    liveStateTree={localStateTree}
+                                  />
+                                </div>
+                              </div>
                             </div>
                           )}
 

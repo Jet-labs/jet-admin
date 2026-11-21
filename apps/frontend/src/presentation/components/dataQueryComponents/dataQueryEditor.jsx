@@ -283,7 +283,7 @@ export const DataQueryEditor = ({
               value={dataQueryEditorForm.values.dataQueryTitle}
             />
             {dataQueryEditorForm.touched.dataQueryTitle && dataQueryEditorForm.errors.dataQueryTitle && (
-              <p className="text-xs text-red-500">
+              <p className="text-xs text-destructive">
                 {dataQueryEditorForm.errors.dataQueryTitle}
               </p>
             )}
@@ -314,10 +314,33 @@ export const DataQueryEditor = ({
               />
             )}
             {dataQueryEditorForm.touched.datasourceID && dataQueryEditorForm.errors.datasourceID && (
-              <p className="text-xs text-red-500">
+              <p className="text-xs text-destructive">
                 {dataQueryEditorForm.errors.datasourceID}
               </p>
             )}
+          </div>
+
+          {/* Global Query Options — kept above datasource-specific fields so
+              the control stays visible in the scrollable configurator. */}
+          <div className="space-y-1">
+            <Label htmlFor="timeoutSeconds">Timeout (seconds)</Label>
+            <Input
+              name="timeoutSeconds"
+              id="timeoutSeconds"
+              type="number"
+              placeholder="60"
+              onChange={(e) => {
+                const val = e.target.value === "" ? undefined : Number(e.target.value);
+                dataQueryEditorForm.setFieldValue("dataQueryOptions", {
+                  ...dataQueryEditorForm.values.dataQueryOptions,
+                  timeoutSeconds: val,
+                });
+              }}
+              value={dataQueryEditorForm.values.dataQueryOptions?.timeoutSeconds ?? ""}
+            />
+            <p className="text-xs text-muted-foreground">
+              Maximum time the query may run before it is aborted. Defaults to 60 seconds.
+            </p>
           </div>
 
           {/* Render dedicated query editor OR JsonForms fallback */}
@@ -338,34 +361,17 @@ export const DataQueryEditor = ({
                   data={dataQueryEditorForm.values.dataQueryOptions}
                   renderers={[...materialRenderers, ...customJSONFormRenderers]}
                   cells={materialCells}
-                  validationMode="ValidateAndShow"
+                  validationMode={
+                    Number(dataQueryEditorForm.submitCount || 0) > 0
+                      ? "ValidateAndShow"
+                      : "ValidateAndHide"
+                  }
                   onChange={_handleDatasourceOptionsChange}
                 />
 
             ) : null
           )}
 
-          {/* Global Query Options */}
-          <div className="space-y-1">
-            <Label htmlFor="timeoutSeconds">Timeout (Seconds)</Label>
-            <Input
-              name="timeoutSeconds"
-              id="timeoutSeconds"
-              type="number"
-              placeholder="60"
-              onChange={(e) => {
-                const val = e.target.value === "" ? undefined : Number(e.target.value);
-                dataQueryEditorForm.setFieldValue("dataQueryOptions", {
-                  ...dataQueryEditorForm.values.dataQueryOptions,
-                  timeoutSeconds: val,
-                });
-              }}
-              value={dataQueryEditorForm.values.dataQueryOptions?.timeoutSeconds ?? ""}
-            />
-            <p className="text-xs text-muted-foreground">
-              Maximum time the query is allowed to run before being aborted. Defaults to 60s.
-            </p>
-          </div>
         </div>
       </Section>
     </div>

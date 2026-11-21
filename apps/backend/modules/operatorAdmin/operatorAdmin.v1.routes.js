@@ -32,6 +32,11 @@ const {
   libraryEntryIdParamSchema,
   listWidgetsQuerySchema,
 } = require("../widgetLibrary/widgetLibrary.validator");
+const {
+  listMarketplaceQuerySchema,
+  marketplaceItemIdParamSchema,
+  updateMarketplaceItemSchema,
+} = require("../marketplace/marketplace.validator");
 
 const router = express.Router();
 
@@ -89,6 +94,29 @@ router.delete(
   "/widget-library/:libraryEntryID",
   validate(libraryEntryIdParamSchema, "params"),
   operatorAdminController.unpublishWidget
+);
+
+// ─── Generalized Marketplace Store ───────────────────────────────────────
+
+router.get(
+  "/marketplace",
+  validate(listMarketplaceQuerySchema, "query"),
+  operatorAdminController.listMarketplaceItems
+);
+
+router.patch(
+  "/marketplace/:itemID",
+  validateAll({
+    params: marketplaceItemIdParamSchema,
+    body: updateMarketplaceItemSchema,
+  }),
+  operatorAdminController.verifyMarketplaceItem
+);
+
+router.delete(
+  "/marketplace/:itemID",
+  validate(marketplaceItemIdParamSchema, "params"),
+  operatorAdminController.unpublishMarketplaceItem
 );
 
 module.exports = router;

@@ -11,6 +11,7 @@ export const AppPageDropzone = ({
   setWidgets,
   onChangePageConfig,
   appPageEditorForm,
+  onAddWidget,
 }) => {
   const migratedConfig = useMemo(() => {
     return migrateV1ToV2(pageConfig);
@@ -104,12 +105,14 @@ export const AppPageDropzone = ({
   ]);
 
   const renderWidget = React.useCallback(
-    (widgetKey, sizing) => (
+    (widgetKey, sizing, scopedStateTree, repeatScope) => (
       <AppPageWidgetSlot
         tenantID={tenantID}
         widgetKey={widgetKey}
         editable={true}
         sizing={sizing}
+        scopedStateTree={scopedStateTree}
+        repeatPath={repeatScope?.repeatPath || []}
       />
     ),
     [tenantID]
@@ -137,6 +140,7 @@ export const AppPageDropzone = ({
         tenantID={tenantID}
         widgetID={selectedWidgetID}
         appPageEditorForm={appPageEditorForm}
+        onAddWidget={onAddWidget}
       />
     </div>
   );
@@ -150,4 +154,5 @@ AppPageDropzone.propTypes = {
   setWidgets: PropTypes.func.isRequired,
   onChangePageConfig: PropTypes.func,
   appPageEditorForm: PropTypes.object,
+  onAddWidget: PropTypes.func,
 };

@@ -44,6 +44,7 @@ export const APIKeyDeletionForm = ({ tenantID, apiKeyID }) => {
       title: CONSTANTS.STRINGS.DELETE_API_KEY_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_API_KEY_DIALOG_MESSAGE,
       confirmText: "Delete",
+      confirmVariant: "destructive",
       cancelText: "Cancel",
     });
     if (!confirmed) return;

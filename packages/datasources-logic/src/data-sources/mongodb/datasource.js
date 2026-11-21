@@ -110,7 +110,13 @@ export default class MongoDBDataSource extends DataSource {
   }
 
   parseJSON(str) {
-    if (!str || str.trim() === "") return {};
+    if (str === null || str === undefined) return {};
+    // Query form values can be objects when submitted through JSON, and
+    // strings when typed into the raw editor. Accept both instead of calling
+    // .trim() on an object (which produced "str.trim is not a function").
+    if (typeof str === "object") return str;
+    if (typeof str !== "string") return str;
+    if (str.trim() === "") return {};
     try {
       return JSON.parse(str);
     } catch {

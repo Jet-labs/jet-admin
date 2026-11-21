@@ -1,0 +1,92 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "LDAP URL (e.g. ldap://localhost:389 or ldaps://ldap.example.com:636).",
+        "format": "uri",
+        "default": "ldap://localhost:389"
+      },
+      "bindDN": {
+        "type": "string",
+        "description": "Bind DN (e.g. cn=admin,dc=example,dc=com). Leave empty for anonymous bind."
+      },
+      "password": {
+        "type": "string",
+        "description": "Bind password.",
+        "format": "password"
+      },
+      "searchBase": {
+        "type": "string",
+        "description": "Default search base DN (e.g. dc=example,dc=com)."
+      },
+      "rejectUnauthorized": {
+        "type": "boolean",
+        "description": "Verify TLS certificates for ldaps:// URLs.",
+        "default": true
+      },
+      "timeout": {
+        "type": "integer",
+        "description": "Request timeout in seconds.",
+        "minimum": 1,
+        "default": 15
+      }
+    },
+    "required": ["url"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/url",
+        "label": "URL"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/bindDN",
+            "label": "Bind DN"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/password",
+            "label": "Password",
+            "options": { "format": "password" }
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/searchBase",
+            "label": "Default Search Base"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/rejectUnauthorized",
+            "label": "Verify TLS"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/timeout",
+            "label": "Timeout (seconds)"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "url": "ldap://localhost:389",
+    "bindDN": "",
+    "password": "",
+    "searchBase": "",
+    "rejectUnauthorized": true,
+    "timeout": 15
+  }
+}

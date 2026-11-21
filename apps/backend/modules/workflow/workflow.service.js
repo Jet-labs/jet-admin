@@ -9,6 +9,7 @@ const {
   getCreationContextFromAuthContext,
 } = require("../../utils/auth.context.utils");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
+const { validateWorkflowGraph, findWorkflowReferences } = require("./workflow.references");
 
 function mapWorkflowNodeForPersistence(node, workflowID) {
   return {
@@ -181,6 +182,9 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges,
     if (!finalCreatorID && !createdByApiKeyID) {
       throw new Error("Creator ID or Created By API Key ID is required");
     }
+
+    await validateWorkflowGraph({ tenantID, nodes });
+
     const workflowCreationTransaction = await prisma.$transaction(async (tx) => {
       const workflow = await tx.tblWorkflows.create({
         data: {
@@ -262,15 +266,22 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
   });
 
   try {
+    // Validate references before mutating: a rejected PATCH must leave the
+    // existing graph untouched.
+    await validateWorkflowGraph({ tenantID, nodes });
+
     const workflowUpdateTransaction = await prisma.$transaction(async (tx) => {
-      // Update workflow title and options
+      // A PATCH must only change the fields that were sent. In particular a
+      // title-only update must not clear workflowOptions.
+      const updateData = { updatedAt: new Date() };
+      if (title !== undefined) updateData.title = title;
+      if (workflowOptions !== undefined) {
+        updateData.workflowOptions = workflowOptions;
+      }
+
       const updated = await tx.tblWorkflows.updateMany({
         where: { workflowID, tenantID },
-        data: {
-          title,
-          workflowOptions: workflowOptions || {},
-          updatedAt: new Date(),
-        },
+        data: updateData,
       });
 
       if (updated.count === 0) {
@@ -279,9 +290,17 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
 
       const workflow = { workflowID, tenantID, title, workflowOptions };
 
-      // Only replace the graph when nodes/edges are explicitly provided.
+      // Only replace the graph when nodes/edges are explicitly provided, and
+      // require both together so a partial payload cannot silently delete one
+      // side of the graph.
+      const hasNodes = nodes !== undefined;
+      const hasEdges = edges !== undefined;
+      if (hasNodes !== hasEdges) {
+        throw new Error("nodes and edges must be provided together");
+      }
+
       // A title-only update must NOT wipe the existing nodes/edges.
-      if (nodes !== undefined || edges !== undefined) {
+      if (hasNodes && hasEdges) {
         // Delete existing nodes and edges
         await tx.tblWorkflowNodes.deleteMany({
           where: { workflowID: workflowID },
@@ -354,6 +373,38 @@ workflowService.deleteWorkflow = async ({ userID, tenantID, workflowID, authCont
   });
 
   try {
+    const references = await findWorkflowReferences({ tenantID, workflowID });
+    if (references.total > 0) {
+      const error = new Error(
+        "Workflow is still referenced by other resources. Remove those references before deleting it."
+      );
+      error.name = "WorkflowInUseError";
+      error.code = "WORKFLOW_IN_USE";
+      error.statusCode = 409;
+      error.details = {
+        cronJobs: references.cronJobs,
+        appPages: references.appPages.map((page) => ({
+          appPageID: page.appPageID,
+          appPageTitle: page.appPageTitle,
+        })),
+        widgets: references.widgets.map((widget) => ({
+          widgetID: widget.widgetID,
+          widgetTitle: widget.widgetTitle,
+        })),
+        listenerActions: references.listenerActions.map((action) => ({
+          actionID: action.actionID,
+          listenerID: action.listenerID,
+          listenerTitle: action.tblListeners?.listenerTitle,
+        })),
+        workflows: references.workflows.map((node) => ({
+          workflowID: node.workflowID,
+          workflowTitle: node.tblWorkflows?.title,
+          nodeID: node.nodeID,
+        })),
+      };
+      throw error;
+    }
+
     await prisma.$transaction(async (tx) => {
       // Delete nodes and edges first (foreign key constraints)
       await tx.tblWorkflowNodes.deleteMany({
@@ -564,6 +615,7 @@ workflowService.getRunStatus = async (instanceID) => {
       errorMessage: log.errorMessage,
       nodeAttempt: log.nodeAttempt,
       createdAt: log.createdAt,
+      eventSequence: log.eventSequence?.toString(),
     }));
 
     // Assemble context from unified log and strip internal keys
@@ -571,6 +623,7 @@ workflowService.getRunStatus = async (instanceID) => {
     const contextData = Object.fromEntries(
       Object.entries(fullContext).filter(([key]) => !key.startsWith('__'))
     );
+    const pendingDataCollectionRequests = await sm.getPendingDataCollectionRequests(instanceID);
 
     return {
       instanceID: instanceData.instanceID,
@@ -582,8 +635,10 @@ workflowService.getRunStatus = async (instanceID) => {
       parentNodeID: instanceData.parentNodeID ?? null,
       startedAt: instanceData.startedAt,
       completedAt: instanceData.completedAt,
+      output: instanceData.workflowOutput ?? null,
       contextData,
       logs,
+      pendingDataCollectionRequests,
     };
   }
   catch (error) {
@@ -683,6 +738,8 @@ workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputValues = {}
   });
 
   try {
+    await validateWorkflowGraph({ tenantID, nodes });
+
     // Attribute test runs launched from a saved workflow editor so they show
     // up in that workflow's run history (still stored as isTest runs).
     if (sourceWorkflowID) {
@@ -718,6 +775,16 @@ workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputValues = {}
  * @param {string} param0.instanceID - The test instance ID to stop and delete
  * @returns {Promise<{success: boolean}>}
  */
+workflowService.cancelRun = async ({ instanceID, tenantID }) => {
+  if (!tenantID) { const error = new Error('Tenant is required'); error.statusCode = 403; throw error; }
+  const instance = await prisma.tblWorkflowInstances.findFirst({ where: { instanceID, tenantID } });
+  if (!instance) {
+    const error = new Error('Run not found'); error.statusCode = 404; throw error;
+  }
+  if (['COMPLETED', 'FAILED', 'CANCELLED'].includes(instance.status)) return { cancellationRequested: false, status: instance.status };
+  return require('./temporal/service').cancelWorkflow({ instanceID });
+};
+
 workflowService.stopTestWorkflow = async ({ instanceID }) => {
   const { stateManager } = require("./workflowEngine/stateManager");
 
@@ -727,6 +794,24 @@ workflowService.stopTestWorkflow = async ({ instanceID }) => {
   });
 
   try {
+    // Validate BEFORE terminating anything. The previous order terminated the
+    // Temporal workflow first and then rejected non-test instances, leaving a
+    // real workflow killed with a stale DB status.
+    const instance = await prisma.tblWorkflowInstances.findUnique({
+      where: { instanceID },
+      select: { instanceID: true, isTest: true, status: true },
+    });
+    if (!instance) {
+      const error = new Error(`Workflow instance ${instanceID} not found`);
+      error.statusCode = 404;
+      throw error;
+    }
+    if (!instance.isTest) {
+      const error = new Error("Only test workflow instances can be stopped and deleted through this endpoint");
+      error.statusCode = 400;
+      throw error;
+    }
+
     const { terminateWorkflow } = require("./temporal/service");
     await terminateWorkflow({ instanceID, reason: 'stopTestWorkflow' }).catch(() => { });
     await stateManager.deleteTestInstance(instanceID);

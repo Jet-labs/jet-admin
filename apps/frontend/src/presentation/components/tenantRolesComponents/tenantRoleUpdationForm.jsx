@@ -17,7 +17,7 @@ import { Button, Spinner, Input, Label, PageHeader, Section } from "@jet-admin/u
 
 function FieldError({ message }) {
   if (!message) return null;
-  return <p className="text-xs text-red-500">{message}</p>;
+  return <p className="text-xs text-destructive">{message}</p>;
 }
 
 const EMPTY_INITIAL_VALUES = {

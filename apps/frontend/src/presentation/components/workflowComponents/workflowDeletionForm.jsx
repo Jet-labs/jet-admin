@@ -43,6 +43,7 @@ export const WorkflowDeletionForm = ({ tenantID, workflowID }) => {
       title: CONSTANTS.STRINGS.DELETE_WORKFLOW_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_WORKFLOW_DIALOG_MESSAGE,
       confirmText: "Delete",
+      confirmVariant: "destructive",
       cancelText: "Cancel",
     });
     if (!confirmed) return;

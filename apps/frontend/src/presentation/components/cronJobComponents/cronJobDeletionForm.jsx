@@ -48,6 +48,7 @@ export const CronJobDeletionForm = ({ tenantID, cronJobID }) => {
       title: CONSTANTS.STRINGS.DELETE_CRON_JOB_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_CRON_JOB_DIALOG_MESSAGE,
       confirmText: "Delete",
+      confirmVariant: "destructive",
       cancelText: "Cancel",
     });
 

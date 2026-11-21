@@ -1,11 +1,27 @@
 import React, { useRef, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
+import {
+  buildSandboxAttribute,
+  isTrustedMessageSource,
+  isValidHtmlMessage,
+  normalizeEmbedBoolean,
+} from "../_shared/embedSafety";
 
 /**
  * HtmlWidget
  *
  * Renders custom HTML and CSS inside a securely sandboxed <iframe>.
  * Supports events (onMessage) and methods (refresh).
+ *
+ * Security posture (F03/B02/B20/E13):
+ * - The sandbox attribute is ALWAYS rendered, including as "" (B02).
+ * - allow-same-origin is never granted: srcDoc + same-origin + scripts would
+ *   escape the sandbox. The `js` schema field is intentionally NOT injected;
+ *   authors put scripts in `html` behind the explicit allowScripts toggle.
+ * - onMessage accepts only exact-source, valid-envelope messages. srcDoc
+ *   frames have the opaque origin "null", so origin checks cannot gate them;
+ *   the `event.source === contentWindow` identity check is the gate, and
+ *   opaque origins are allowed ONLY under that source-checked policy.
  */
 export const HtmlWidget = ({
   widgetID,
@@ -14,28 +30,28 @@ export const HtmlWidget = ({
   fireWidgetEvent,
 }) => {
   const iframeRef = useRef(null);
+  const refreshTimerRef = useRef(null);
 
   const html = widgetConfig?.html || "";
   const css = widgetConfig?.css || "";
-  const allowScripts = widgetConfig?.allowScripts === true || widgetConfig?.allowScripts === "true";
-  const allowForms = widgetConfig?.allowForms === true || widgetConfig?.allowForms === "true";
-  const allowPopups = widgetConfig?.allowPopups === true || widgetConfig?.allowPopups === "true";
-  const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
+  const allowScripts = normalizeEmbedBoolean(widgetConfig?.allowScripts, false);
+  const allowForms = normalizeEmbedBoolean(widgetConfig?.allowForms, false);
+  const allowPopups = normalizeEmbedBoolean(widgetConfig?.allowPopups, false);
+  const isLoading = normalizeEmbedBoolean(widgetConfig?.isLoading, false);
 
   // Listen for message events from inside the iframe sandbox
   useEffect(() => {
     const handleMessage = (event) => {
-      // Validate that the message is meant for this widget instance
-      if (
-        event.data &&
-        event.data.type === "jet-html-message" &&
-        event.data.widgetID === widgetID
-      ) {
-        if (fireWidgetEvent) {
-          fireWidgetEvent("onMessage", {
-            data: event.data.payload || {},
-          });
-        }
+      // B20: the sender must be EXACTLY this placement's frame window.
+      // Another frame/window knowing our widgetID still fails this gate.
+      const frameWindow = iframeRef.current?.contentWindow;
+      if (!isTrustedMessageSource(event?.source, frameWindow)) return;
+      const check = isValidHtmlMessage(event?.data, widgetID);
+      if (!check.valid) return;
+      if (fireWidgetEvent) {
+        fireWidgetEvent("onMessage", {
+          data: check.payload,
+        });
       }
     };
 
@@ -45,6 +61,17 @@ export const HtmlWidget = ({
     };
   }, [widgetID, fireWidgetEvent]);
 
+  // Clear any pending refresh-restore timer on unmount.
+  useEffect(() => {
+    const timers = refreshTimerRef;
+    return () => {
+      if (timers.current) {
+        clearTimeout(timers.current);
+        timers.current = null;
+      }
+    };
+  }, []);
+
   // 1. Expose widget methods to the parent AppPage runtime
   useEffect(() => {
     if (onWidgetInit) {
@@ -53,8 +80,10 @@ export const HtmlWidget = ({
           if (iframeRef.current) {
             // Trigger iframe reload by resetting the srcDoc
             const currentSrcDoc = iframeRef.current.srcDoc;
+            if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
             iframeRef.current.srcDoc = "";
-            setTimeout(() => {
+            refreshTimerRef.current = setTimeout(() => {
+              refreshTimerRef.current = null;
               if (iframeRef.current) {
                 iframeRef.current.srcDoc = currentSrcDoc;
               }
@@ -65,14 +94,12 @@ export const HtmlWidget = ({
     }
   }, [onWidgetInit]);
 
-  // 2. Setup Sandbox Tokens
+  // 2. Setup Sandbox Tokens (always a string, possibly "" — never omitted)
   const sandboxTokens = useMemo(() => {
-    const tokens = [];
-    if (allowScripts) tokens.push("allow-scripts");
-    if (allowForms) tokens.push("allow-forms");
-    if (allowPopups) tokens.push("allow-popups");
-    // Explicitly omit allow-same-origin for maximum security (XSS protection)
-    return tokens.join(" ") || undefined;
+    return buildSandboxAttribute(
+      { allowScripts, allowForms, allowPopups },
+      { forbidSameOrigin: true }
+    );
   }, [allowScripts, allowForms, allowPopups]);
 
   // 3. Assemble Iframe Document Content
@@ -90,8 +117,12 @@ export const HtmlWidget = ({
               width: 100%;
               height: 100%;
               overflow: auto;
-              background-color: transparent;
-              color: var(--foreground, #ffffff);
+              /* CSS variables do not cross into a srcDoc iframe, so the old
+                 var(--foreground) fallback produced white text on the white
+                 iframe canvas (invisible preview). Use an explicit readable
+                 canvas; authors can override it via CSS Styles. */
+              background-color: #ffffff;
+              color: #111827;
               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             }
             ${css}

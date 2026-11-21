@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const { morganMiddleware } = require("./morgan.config");
 const environmentVariables = require("../environment");
-const constants = require("../constants");
 
 var corsOptions = {
   credentials: true,
@@ -16,7 +15,11 @@ var corsOptions = {
     ) {
       callback(null, true);
     } else {
-      callback(new Error(constants.ERROR_CODES.NOT_ALLOWED_BY_CORS.message));
+      // Reject the origin without throwing: throwing here turned a CORS
+      // rejection into a 500 (and exposed the error stack in development).
+      // Returning false simply omits the CORS headers, so browsers block the
+      // response while server-to-server clients still get a normal reply.
+      callback(null, false);
     }
   },
 };

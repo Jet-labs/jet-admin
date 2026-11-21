@@ -122,8 +122,6 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
   React.useEffect(() => {
     setDataQueryTestResult(undefined);
   }, [dataQueryID]);
-
-  console.log({ datasourceID: queryUpdationForm?.values?.datasourceID })
   return (
     <div className="flex h-full w-full flex-col items-center bg-background">
       <PageHeader
@@ -172,7 +170,7 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
           }
           className={"!w-full !h-full"}
         >
-          <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.DATA_QUERY_EDITOR_PANEL} defaultSize={20} className="!overflow-y-auto h-full p-8">
+          <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.DATA_QUERY_EDITOR_PANEL} defaultSize={35} minSize={30} className="!overflow-y-auto h-full p-4">
             <div className="mx-auto w-full max-w-2xl">
               <form
                 id="dataquery-update-form"

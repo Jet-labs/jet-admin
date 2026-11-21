@@ -145,7 +145,7 @@ export const ListenerEditor = ({ listenerEditorForm, tenantID, ingress = null })
               value={listenerEditorForm.values.listenerTitle}
             />
             {listenerEditorForm.errors.listenerTitle && (
-              <p className="text-xs text-red-500">
+              <p className="text-xs text-destructive">
                 {listenerEditorForm.errors.listenerTitle}
               </p>
             )}

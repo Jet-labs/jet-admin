@@ -1,0 +1,100 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "baseUrl": {
+        "type": "string",
+        "description": "Prometheus base URL (e.g. http://localhost:9090).",
+        "format": "uri",
+        "default": "http://localhost:9090"
+      },
+      "authType": {
+        "type": "string",
+        "enum": ["none", "basic", "bearer"],
+        "default": "none"
+      },
+      "username": {
+        "type": "string",
+        "description": "Username for Basic auth."
+      },
+      "password": {
+        "type": "string",
+        "description": "Password for Basic auth.",
+        "format": "password"
+      },
+      "bearerToken": {
+        "type": "string",
+        "description": "Bearer token.",
+        "format": "password"
+      },
+      "timeout": {
+        "type": "integer",
+        "description": "Request timeout in seconds.",
+        "minimum": 1,
+        "default": 15
+      }
+    },
+    "required": ["baseUrl"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/baseUrl",
+        "label": "Base URL"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/authType",
+            "label": "Auth Type"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/timeout",
+            "label": "Timeout (seconds)"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Authentication",
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/username",
+                "label": "Username"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/password",
+                "label": "Password",
+                "options": { "format": "password" }
+              }
+            ]
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/bearerToken",
+            "label": "Bearer Token",
+            "options": { "format": "password" }
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "baseUrl": "http://localhost:9090",
+    "authType": "none",
+    "username": "",
+    "password": "",
+    "bearerToken": "",
+    "timeout": 15
+  }
+}

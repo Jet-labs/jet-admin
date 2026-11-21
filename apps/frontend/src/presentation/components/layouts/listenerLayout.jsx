@@ -16,10 +16,10 @@ export const ListenerLayout = () => {
         autoSaveId={CONSTANTS.RESIZABLE_PANEL_KEYS.LISTENER_LAYOUT_SEPARATION}
         className="h-full w-full"
       >
-        <ResizablePanel defaultSize={20}>
+        <ResizablePanel defaultSize={20} className="max-md:hidden">
           <ListenerDrawerList />
         </ResizablePanel>
-        <ResizableHandle withHandle={true} />
+        <ResizableHandle withHandle={true} className="max-md:hidden" />
         <ResizablePanel
           defaultSize={80}
           className="overflow-hidden bg-background"

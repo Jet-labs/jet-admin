@@ -28,6 +28,8 @@ import { runDataQueryByIDAPI } from "../../data/apis/dataQuery";
 import { executeWorkflowWithStreaming } from "./executeWorkflowWithStreaming";
 import { resolveConfig } from "../evaluationEngine";
 import { useSocketStore } from "../stores/useSocketStore";
+import { getQueryCoordinator } from './queryCoordinator';
+import { retainSocketRoom } from './socketRoomLease';
 
 /** State-tree namespace each data source type writes its results to. */
 const getOutputNamespace = (type) =>
@@ -49,15 +51,19 @@ export const useAppPageDataSourceManager = () => {
   // Track in-flight request IDs to deduplicate
   const requestCounterRef = useRef({});
   // Track in-flight query requests per alias (prevents overlapping polls)
-  const inFlightQueriesRef = useRef({});
+  const queryCoordinator = getQueryCoordinator(dispatch);
+  const sourceSignaturesRef = useRef({});
   // Track polling intervals for cleanup
   const pollIntervalsRef = useRef({});
   // Track which data source aliases have been auto-fetched
   const fetchedAliasesRef = useRef(new Set());
   // Track active workflow/listener stream disconnectors for cleanup
   const activeDisconnectorsRef = useRef({});
-  // Track socket rooms joined for page listeners
-  const joinedListenerRoomsRef = useRef(new Set());
+  // Bounded auto-fetch retry state (transient backend/network failures).
+  const retryTimersRef = useRef({});
+  const retryAttemptsRef = useRef({});
+  const isMountedRef = useRef(true);
+  const executeDataSourceRef = useRef(null);
 
   // Keep the latest state tree accessible to the stable executor
   useEffect(() => {
@@ -66,7 +72,18 @@ export const useAppPageDataSourceManager = () => {
 
   // Full teardown on unmount
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
+      isMountedRef.current = false;
+      fetchedAliasesRef.current.clear();
+      queryCoordinator.retireAll();
+      for (const alias of Object.keys(requestCounterRef.current)) requestCounterRef.current[alias] += 1;
+
+      for (const timer of Object.values(retryTimersRef.current)) {
+        clearTimeout(timer);
+      }
+      retryTimersRef.current = {};
+
       for (const alias of Object.keys(activeDisconnectorsRef.current)) {
         const disconnect = activeDisconnectorsRef.current[alias];
         if (typeof disconnect === "function") {
@@ -75,36 +92,37 @@ export const useAppPageDataSourceManager = () => {
       }
       activeDisconnectorsRef.current = {};
 
-      const socket = useSocketStore.getState().socket;
-      if (socket) {
-        for (const room of joinedListenerRoomsRef.current) {
-          socket.emit("leave_room", room);
-        }
-      }
-      joinedListenerRoomsRef.current.clear();
-
       for (const intervalID of Object.values(pollIntervalsRef.current)) {
         clearInterval(intervalID);
       }
       pollIntervalsRef.current = {};
     };
-  }, []);
+  }, [queryCoordinator]);
 
   /**
    * Disconnect any active stream/listener registered for an alias.
    */
-  const disconnectAlias = useCallback((alias) => {
+  const disconnectAlias = useCallback((alias, invalidate = true) => {
+    queryCoordinator.retire(alias);
+    if (invalidate) requestCounterRef.current[alias] = (requestCounterRef.current[alias] || 0) + 1;
     if (typeof activeDisconnectorsRef.current[alias] === "function") {
       activeDisconnectorsRef.current[alias]();
     }
     delete activeDisconnectorsRef.current[alias];
-  }, []);
+
+    if (retryTimersRef.current[alias]) {
+      clearTimeout(retryTimersRef.current[alias]);
+      delete retryTimersRef.current[alias];
+    }
+    delete retryAttemptsRef.current[alias];
+  }, [queryCoordinator]);
 
   /**
    * Execute a single data source and store the result.
    */
   const executeDataSource = useCallback(
-    async (dataSource, overrideInputs = {}) => {
+    async (dataSource, overrideInputs = {}, opts = {}) => {
+      if (!isMountedRef.current) return null;
       const { alias, type, queryID, workflowID, listenerID, channelName, inputValues = {} } = dataSource;
 
       // Increment request counter for deduplication
@@ -143,7 +161,7 @@ export const useAppPageDataSourceManager = () => {
       try {
         if (isWorkflow) {
           // Disconnect any existing stream for this alias
-          disconnectAlias(alias);
+          disconnectAlias(alias, false);
 
           const { disconnect } = executeWorkflowWithStreaming({
             tenantID,
@@ -160,24 +178,10 @@ export const useAppPageDataSourceManager = () => {
           return null;
         } else if (isListener) {
           // Disconnect any existing listener stream for this alias
-          disconnectAlias(alias);
-
-          const socket = useSocketStore.getState().socket;
-          if (!socket) {
-            console.warn(`[ListenerStream] Shared socket not connected for "${alias}"`);
-            dispatch(appPageActions.setListenerResult(alias, null));
-            return null;
-          }
-
-          if (pageID) {
-            const room = `listener:app_page:${pageID}`;
-            if (!joinedListenerRoomsRef.current.has(room)) {
-              socket.emit("join_room", room);
-              joinedListenerRoomsRef.current.add(room);
-            }
-          }
+          disconnectAlias(alias, false);
 
           const handleListenerEvent = (payload) => {
+            if (!isMountedRef.current || requestCounterRef.current[alias] !== requestID) return;
             if (
               payload.channelName === `listener:${listenerID}` ||
               payload.channelName === channelName
@@ -186,43 +190,50 @@ export const useAppPageDataSourceManager = () => {
             }
           };
 
-          socket.on("listener_event", handleListenerEvent);
-
-          const disconnect = () => {
-            socket.off("listener_event", handleListenerEvent);
+          let boundSocket = null;
+          let releaseRoom = () => {};
+          const bind = socket => {
+            if (socket === boundSocket) return;
+            boundSocket?.off('listener_event', handleListenerEvent);
+            releaseRoom();
+            boundSocket = socket;
+            releaseRoom = () => {};
+            if (!socket) return;
+            socket.on('listener_event', handleListenerEvent);
+            if (pageID) releaseRoom = retainSocketRoom(socket, `listener:app_page:${pageID}`);
           };
-
-          activeDisconnectorsRef.current[alias] = disconnect;
+          const unsubscribe = useSocketStore.subscribe?.(state => bind(state.socket));
+          bind(useSocketStore.getState().socket);
+          activeDisconnectorsRef.current[alias] = () => {
+            unsubscribe?.();
+            boundSocket?.off('listener_event', handleListenerEvent);
+            releaseRoom();
+          };
           dispatch(appPageActions.setListenerResult(alias, null));
 
           return null;
         } else {
-          // Skip this tick if a previous request for this alias is still
-          // running (e.g. slow query with a short refetchInterval).
-          if (inFlightQueriesRef.current[alias]) {
-            return null;
+          const result = await queryCoordinator.run({
+            alias, tenantID, queryID, inputValues: resolvedInputValues,
+            execute: runDataQueryByIDAPI,
+          });
+
+          // A successful auto-fetch resets the retry backoff.
+          delete retryAttemptsRef.current[alias];
+          if (retryTimersRef.current[alias]) {
+            clearTimeout(retryTimersRef.current[alias]);
+            delete retryTimersRef.current[alias];
           }
 
-          dispatch(appPageActions.setQueryLoading(alias));
-
-          inFlightQueriesRef.current[alias] = true;
-          try {
-            const result = await runDataQueryByIDAPI({
-              tenantID,
-              dataQueryID: queryID,
-              inputValues: resolvedInputValues,
-            });
-
-            // Only store if this is still the latest request for this alias
-            if (requestCounterRef.current[alias] === requestID) {
-              dispatch(appPageActions.setQueryResult(alias, result));
-            }
-            return result;
-          } finally {
-            inFlightQueriesRef.current[alias] = false;
-          }
+          return result;
         }
       } catch (error) {
+        const isCanceled =
+          error?.code === "ERR_CANCELED" ||
+          error?.name === "CanceledError" ||
+          error?.name === "AbortError";
+        if (isCanceled) return null;
+
         // Allow auto-fetch retries after a failure (the auto-fetch effect
         // only re-runs when the dataSources list changes, so no hot loop).
         fetchedAliasesRef.current.delete(alias);
@@ -230,10 +241,28 @@ export const useAppPageDataSourceManager = () => {
           if (isWorkflow) {
             dispatch(appPageActions.setWorkflowResult(alias, null, error));
             disconnectAlias(alias);
-          } else {
-            dispatch(appPageActions.setQueryResult(alias, null, error));
           }
         }
+
+        // Bounded retry with exponential backoff for transient failures.
+        // Only auto-fetches retry; manual/polling calls try again on their
+        // own cadence.
+        if (opts.auto && !isWorkflow && !isListener && isMountedRef.current) {
+          const attempts = (retryAttemptsRef.current[alias] || 0) + 1;
+          retryAttemptsRef.current[alias] = attempts;
+          if (attempts <= 3) {
+            const delay = Math.min(30000, 5000 * (2 ** (attempts - 1)));
+            if (retryTimersRef.current[alias]) {
+              clearTimeout(retryTimersRef.current[alias]);
+            }
+            retryTimersRef.current[alias] = setTimeout(() => {
+              if (isMountedRef.current) {
+                executeDataSourceRef.current?.(dataSource, {}, { auto: true });
+              }
+            }, delay);
+          }
+        }
+
         console.error(
           `[DataSourceManager] Failed to execute "${alias}":`,
           error
@@ -241,8 +270,12 @@ export const useAppPageDataSourceManager = () => {
         return null;
       }
     },
-    [tenantID, pageID, dispatch, disconnectAlias]
+    [tenantID, pageID, dispatch, disconnectAlias, queryCoordinator]
   );
+
+  useEffect(() => {
+    executeDataSourceRef.current = executeDataSource;
+  }, [executeDataSource]);
 
   // ============================================================
   // Teardown for sources removed/renamed while editing
@@ -252,11 +285,21 @@ export const useAppPageDataSourceManager = () => {
       dataSources.map((ds) => ds.alias).filter(Boolean)
     );
 
-    for (const alias of Object.keys(activeDisconnectorsRef.current)) {
-      if (!activeAliases.has(alias)) {
+    const trackedAliases = new Set([
+      ...Object.keys(sourceSignaturesRef.current),
+      ...Object.keys(activeDisconnectorsRef.current),
+      ...Object.keys(retryTimersRef.current),
+    ]);
+
+    for (const alias of trackedAliases) {
+      const source = dataSources.find(ds => ds.alias === alias);
+      const signature = source ? JSON.stringify(source) : null;
+      if (!activeAliases.has(alias) || sourceSignaturesRef.current[alias] !== signature) {
         disconnectAlias(alias);
+        fetchedAliasesRef.current.delete(alias);
       }
     }
+    sourceSignaturesRef.current = Object.fromEntries(dataSources.map(ds => [ds.alias, JSON.stringify(ds)]));
   }, [dataSources, disconnectAlias]);
 
   // ============================================================
@@ -285,7 +328,7 @@ export const useAppPageDataSourceManager = () => {
 
     for (const ds of autoSources) {
       fetchedAliasesRef.current.add(ds.alias);
-      executeDataSource(ds);
+      executeDataSource(ds, {}, { auto: true });
     }
   }, [dataSources, executeDataSource]);
 
@@ -294,10 +337,10 @@ export const useAppPageDataSourceManager = () => {
   // ============================================================
   useEffect(() => {
     const prevTree = prevStateTreeRef.current;
+    prevStateTreeRef.current = stateTree;
     if (!prevTree || prevTree === stateTree) return;
 
     const changedPaths = getChangedPaths(prevTree, stateTree);
-    prevStateTreeRef.current = stateTree;
     if (changedPaths.length === 0) return;
 
     const reactiveSources = dataSources.filter(
@@ -310,10 +353,13 @@ export const useAppPageDataSourceManager = () => {
     for (const ds of reactiveSources) {
       const ownOutput = `${getOutputNamespace(ds.type)}.${ds.alias}`;
       const shouldRefresh = ds.refreshOn.some((path) => {
-        if (!changedPaths.includes(path)) return false;
+        path = path.replace(/^state\./, '').replace(/\[['"]?([^\]'"\s]+)['"]?\]/g, '.$1');
         // Ignore the source's own output — writing results back must not
         // re-trigger the same source (infinite refresh loop guard).
-        return !(path === ownOutput || path.startsWith(`${ownOutput}.`));
+        return changedPaths.some(changed => {
+          if (changed === ownOutput || changed.startsWith(`${ownOutput}.`)) return false;
+          return changed === path || changed.startsWith(`${path}.`) || path.startsWith(`${changed}.`);
+        });
       });
       if (shouldRefresh) {
         executeDataSource(ds);
@@ -337,6 +383,11 @@ export const useAppPageDataSourceManager = () => {
 
     for (const ds of pollingSources) {
       const intervalID = setInterval(() => {
+        // Hidden tabs must not keep hammering the backend. The next visible
+        // tick picks up naturally; no catch-up burst is triggered.
+        if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+          return;
+        }
         executeDataSource(ds);
       }, ds.refetchInterval);
       pollIntervalsRef.current[ds.alias] = intervalID;

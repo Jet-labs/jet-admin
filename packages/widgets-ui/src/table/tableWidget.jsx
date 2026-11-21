@@ -154,6 +154,8 @@ export const TableWidget = ({
   const bulkEditConfig = tableData.bulkEdit || widgetConfig?.bulkEdit || { enabled: false };
   const emptyText = tableData.emptyText || widgetConfig?.emptyText || "No data available.";
   const emptyHint = widgetConfig?.emptyHint || "Ensure the data array template resolves to a non-empty array.";
+  const loadingText = widgetConfig?.loadingText || "Updating...";
+  const searchingText = widgetConfig?.searchingText || "Searching...";
   const striped = widgetConfig?.striped !== false;
   const dense = !!widgetConfig?.dense;
   const stickyHeader = widgetConfig?.stickyHeader !== false;
@@ -161,6 +163,8 @@ export const TableWidget = ({
 
   // ── Local state ──
   const [globalFilter, setGlobalFilter] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const loadingMessage = isSearching ? searchingText : loadingText;
   const [sorting, setSorting] = useState([]);
   const [editingRowId, setEditingRowId] = useState(null);
   const [rowDraft, setRowDraft] = useState({});
@@ -192,21 +196,19 @@ export const TableWidget = ({
     rowsKeyRef.current = key;
   }, [rows]);
 
-  // ── Server-side search debounce ──
-  // Skip the initial mount: page auto-fetch already loads the first page,
-  // and firing here would redundantly re-execute search queries on load.
-  const searchInitRef = useRef(true);
-  useEffect(() => {
-    if (!searchConfig.enabled || !searchConfig.serverSide) return;
-    if (searchInitRef.current) {
-      searchInitRef.current = false;
-      return;
+  // ── Server-side search ──
+  // Server-side search is explicit: click the search button or press Enter.
+  // This avoids firing a query on every keystroke and lets the bound query's
+  // isLoading state drive the table overlay.
+  const runServerSearch = useCallback(async () => {
+    if (!searchConfig.serverSide || !fireWidgetEvent) return;
+    setIsSearching(true);
+    try {
+      await fireWidgetEvent("onSearch", { searchTerm: globalFilter.trim() });
+    } finally {
+      setIsSearching(false);
     }
-    const timer = setTimeout(() => {
-      if (fireWidgetEvent) fireWidgetEvent("onSearch", { searchTerm: globalFilter });
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [globalFilter, searchConfig.serverSide, searchConfig.enabled, fireWidgetEvent]);
+  }, [fireWidgetEvent, globalFilter, searchConfig.serverSide]);
 
   // ── Sync selection state to runtime ──
   const lastSyncSignatureRef = useRef(null);
@@ -470,11 +472,14 @@ export const TableWidget = ({
     }
   }, [rowSelection, rows, fireWidgetEvent]);
 
+  // Single dispatch route (B04/F02): row selection notifies ONLY the direct
+  // onRowSelect callback. The page slot shapes it into exactly one
+  // fireWidgetEvent("onRowSelect", { row, rowIndex }) call; firing here too
+  // would execute the action chain twice with differing payloads.
   const handleRowSelect = useCallback((rowOriginal, rowIdx) => {
     if (setWidgetState) setWidgetState(prev => ({ ...prev, selectedRowIndex: rowIdx, selectedRow: rowOriginal }));
     if (onRowSelect) onRowSelect(rowOriginal, rowIdx);
-    if (fireWidgetEvent) fireWidgetEvent("onRowSelect", { row: rowOriginal, rowIndex: rowIdx });
-  }, [setWidgetState, onRowSelect, fireWidgetEvent]);
+  }, [setWidgetState, onRowSelect]);
 
   // ── Widget methods (registered once; live data via refs) ──
   const rowsRef = useRef(rows);
@@ -490,6 +495,8 @@ export const TableWidget = ({
         if (rt.runWorkflow) rt.runWorkflow();
         if (rt.refreshData) rt.refreshData();
       },
+      // Programmatic selection emits the same single onRowSelect event as a
+      // click (exactly-once policy for method-triggered events).
       setSelectedRow: (index) => {
         const i = Number(index);
         const currentRows = rowsRef.current;
@@ -497,7 +504,6 @@ export const TableWidget = ({
         if (!Number.isNaN(i) && i >= 0 && i < currentRows.length) {
           if (rt.setWidgetState) rt.setWidgetState(prev => ({ ...prev, selectedRowIndex: i, selectedRow: currentRows[i] }));
           if (rt.onRowSelect) rt.onRowSelect(currentRows[i], i);
-          if (rt.fireWidgetEvent) rt.fireWidgetEvent("onRowSelect", { row: currentRows[i], rowIndex: i });
         }
       },
       clearSelection: () => {
@@ -525,10 +531,10 @@ export const TableWidget = ({
   if (!rows.length) {
     return (
       <div className="flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6">
-        {isLoading ? (
+        {(isLoading || isSearching) ? (
           <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm shadow-sm border border-border">
             <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Loading data...
+            {loadingMessage}
           </div>
         ) : (
           <>
@@ -552,11 +558,11 @@ export const TableWidget = ({
   return (
     <div className="flex flex-col w-full h-full min-h-0 overflow-hidden relative">
       {/* Loading overlay */}
-      {isLoading && (
+      {(isLoading || isSearching) && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
           <div className="flex items-center gap-2 rounded bg-muted/50 px-4 py-2 text-sm text-foreground shadow-sm border border-border">
             <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" /></svg>
-            Updating...
+            {loadingMessage}
           </div>
         </div>
       )}
@@ -570,9 +576,36 @@ export const TableWidget = ({
               <Input
                 value={globalFilter ?? ""}
                 onChange={e => setGlobalFilter(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === "Enter" && searchConfig.serverSide) {
+                    e.preventDefault();
+                    runServerSearch();
+                  }
+                }}
                 placeholder={searchConfig.placeholder || "Search..."}
-                className="h-7 text-xs pl-8 bg-background border-border rounded"
+                className={`h-7 text-xs pl-8 bg-background border-border rounded ${searchConfig.serverSide ? "pr-9" : ""}`}
+                aria-label={searchConfig.serverSide ? "Search (press Enter)" : "Search"}
               />
+              {searchConfig.serverSide && (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="absolute right-0.5 top-0.5 h-6 w-6"
+                  onClick={runServerSearch}
+                  disabled={isSearching || isLoading || !fireWidgetEvent}
+                  aria-label="Run search"
+                  title="Run search"
+                >
+                  {isSearching || isLoading ? (
+                    <svg width="13" height="13" viewBox="0 0 24 24" className="animate-spin">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" />
+                    </svg>
+                  ) : (
+                    <Search className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+              )}
             </div>
           ) : <div />}
           <div className="flex items-center gap-2">

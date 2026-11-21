@@ -48,7 +48,7 @@ export const CustomKeyValueArrayRenderer = ({
         {label || uischema.label || "Items"}
       </Label>
       {errors && errors.length > 0 && (
-        <p className="text-red-500 text-xs mb-2">{errors}</p>
+        <p className="text-destructive text-xs mb-2">{errors}</p>
       )}
 
       <div className="flex flex-col gap-2">

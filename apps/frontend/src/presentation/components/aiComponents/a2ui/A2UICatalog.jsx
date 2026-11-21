@@ -46,12 +46,12 @@ export function A2UICard({ title, description, fields, actions, onAction, submit
   };
 
   return (
-    <div className="mt-2.5 rounded-xl border border-primary/20 bg-gradient-to-b from-card to-muted/20 p-4 shadow-sm space-y-3.5 text-foreground overflow-hidden">
+    <div className="mt-2 rounded border border-primary/20 bg-card p-2 shadow-sm space-y-2 text-foreground overflow-hidden">
       {title && (
-        <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
+        <div className="flex items-center justify-between border-b border-border/50 pb-2">
           <div className="flex items-center gap-2 min-w-0">
             <Sparkles className="w-4 h-4 text-primary shrink-0" />
-            <h4 className="text-sm font-semibold truncate text-foreground">{title}</h4>
+            <h4 className="text-sm font-medium truncate text-foreground">{title}</h4>
           </div>
         </div>
       )}
@@ -62,7 +62,7 @@ export function A2UICard({ title, description, fields, actions, onAction, submit
 
       {/* Render Fields */}
       {Array.isArray(fields) && fields.length > 0 && (
-        <div className="space-y-3 pt-1">
+        <div className="space-y-2 pt-1">
           {fields.map((field, idx) => (
             <div key={idx} className="space-y-2 text-xs">
               {field.label && (
@@ -130,12 +130,12 @@ export function A2UICard({ title, description, fields, actions, onAction, submit
                 disabled={submitting}
                 onClick={() => handleActionClick(act)}
                 className={cn(
-                  "h-8 px-3 text-xs font-medium rounded-lg flex items-center gap-2 transition-all disabled:opacity-50",
+                  "h-8 px-3 text-xs font-medium rounded flex items-center gap-2 transition-all disabled:opacity-50",
                   isDanger
-                    ? "bg-red-600 hover:bg-red-700 text-white shadow-sm"
+                    ? "bg-destructive/10 text-destructive border border-destructive/30 hover:bg-destructive/20"
                     : isOutline
                     ? "bg-background border border-border hover:bg-muted text-foreground"
-                    : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm"
+                    : "bg-primary hover:bg-primary/90 text-brand-black shadow-sm"
                 )}
               >
                 {submitting ? (
@@ -174,14 +174,14 @@ export function A2UIConfirmCard({ title, description, toolName, params, onAction
   };
 
   return (
-    <div className="mt-2.5 rounded-xl border border-red-500/30 bg-gradient-to-b from-red-500/5 to-card p-4 shadow-sm space-y-3 text-foreground">
-      <div className="flex items-center gap-2.5 border-b border-red-500/20 pb-2.5">
-        <ShieldAlert className="w-4 h-4 text-red-500 shrink-0" />
+    <div className="mt-2 rounded border border-destructive/30 bg-card p-2 shadow-sm space-y-2 text-foreground">
+      <div className="flex items-center gap-2 border-b border-destructive/20 pb-2">
+        <ShieldAlert className="w-4 h-4 text-destructive shrink-0" />
         <div>
-          <h4 className="text-xs font-bold text-red-600 dark:text-red-400">
+          <h4 className="text-xs font-medium text-destructive">
             {title || `Approval Required: ${toolName}`}
           </h4>
-          <p className="text-[11px] text-muted-foreground">High-impact action detected</p>
+          <p className="text-xs text-muted-foreground">High-impact action detected</p>
         </div>
       </div>
 
@@ -199,7 +199,7 @@ export function A2UIConfirmCard({ title, description, toolName, params, onAction
             <span>{showDetails ? "Hide" : "View"} Execution Parameters</span>
           </button>
           {showDetails && (
-            <pre className="text-[11px] font-mono bg-muted/40 p-2.5 rounded border border-border/60 overflow-x-auto max-h-36">
+            <pre className="text-xs font-mono bg-background p-2 rounded border border-border/60 overflow-x-auto max-h-36">
               {JSON.stringify(params, null, 2)}
             </pre>
           )}
@@ -211,7 +211,7 @@ export function A2UIConfirmCard({ title, description, toolName, params, onAction
           type="button"
           disabled={submitting}
           onClick={handleApprove}
-          className="h-8 px-3.5 text-xs font-semibold rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-sm flex items-center gap-2 disabled:opacity-50 transition-all"
+          className="h-8 px-3 text-xs font-medium rounded border border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center gap-2 disabled:opacity-50 transition-all"
         >
           {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
           <span>Approve Execution</span>
@@ -221,7 +221,7 @@ export function A2UIConfirmCard({ title, description, toolName, params, onAction
           type="button"
           disabled={submitting}
           onClick={handleCancel}
-          className="h-8 px-3 text-xs font-medium rounded-lg bg-background border border-border hover:bg-muted text-foreground transition-all"
+          className="h-8 px-3 text-xs font-medium rounded bg-background border border-border hover:bg-muted text-foreground transition-all"
         >
           Cancel
         </button>
@@ -233,11 +233,11 @@ export function A2UIConfirmCard({ title, description, toolName, params, onAction
 // ─── 3. A2UI Readymade Multi-Choice Decision Selector ──────────────────────────
 export function A2UIChoiceSelector({ title, description, choices = [], onAction, submitting }) {
   return (
-    <div className="mt-2.5 rounded-xl border border-border bg-card p-4 space-y-3">
+    <div className="mt-2 rounded border border-border bg-card p-2 space-y-2">
       {title && (
         <div className="flex items-center gap-2 border-b border-border/50 pb-2">
           <Layers className="w-4 h-4 text-primary shrink-0" />
-          <h4 className="text-xs font-semibold text-foreground">{title}</h4>
+          <h4 className="text-xs font-medium text-foreground">{title}</h4>
         </div>
       )}
       {description && <p className="text-xs text-muted-foreground">{description}</p>}
@@ -255,7 +255,7 @@ export function A2UIChoiceSelector({ title, description, choices = [], onAction,
                 actionLabel: choice.label,
               })
             }
-            className="w-full text-left p-3 rounded-lg border border-border/70 bg-background hover:bg-muted/40 hover:border-primary/40 transition-all flex items-start justify-between group disabled:opacity-50"
+            className="w-full text-left p-2 rounded border border-border/70 bg-background hover:bg-muted/40 hover:border-primary/40 transition-all flex items-start justify-between group disabled:opacity-50"
           >
             <div className="space-y-0.5 min-w-0 pr-2">
               <div className="flex items-center gap-2">
@@ -309,12 +309,12 @@ export function A2UICodeView({ title, language = "sql", code, actions = [], onAc
         </button>
       </div>
 
-      <pre className="p-3 text-xs font-mono bg-slate-950 text-slate-100 dark:bg-zinc-950 overflow-x-auto max-h-48">
+      <pre className="border-t border-border bg-background p-2 text-xs font-mono text-foreground overflow-x-auto max-h-48">
         {code}
       </pre>
 
       {Array.isArray(actions) && actions.length > 0 && (
-        <div className="p-2.5 bg-muted/20 border-t border-border flex gap-2">
+        <div className="p-2 bg-muted/20 border-t border-border flex gap-2">
           {actions.map((act, idx) => (
             <button
               key={idx}
@@ -343,7 +343,7 @@ export function A2UIChart({ title, chartType = "bar", data = [] }) {
   const isPie = chartType === "pie" || chartType === "donut";
 
   return (
-    <div className="mt-2.5 rounded-xl border border-border bg-card p-3.5 space-y-2">
+    <div className="mt-2 rounded border border-border bg-card p-2 space-y-2">
       <div className="flex items-center justify-between border-b border-border/50 pb-2">
         <div className="flex items-center gap-2">
           {isPie ? (
@@ -353,7 +353,7 @@ export function A2UIChart({ title, chartType = "bar", data = [] }) {
           ) : (
             <BarChart3 className="w-4 h-4 text-primary shrink-0" />
           )}
-          <span className="text-xs font-semibold text-foreground">{title || "Data Visualization"}</span>
+          <span className="text-xs font-medium text-foreground">{title || "Data Visualization"}</span>
         </div>
         <span className="text-xs bg-muted px-2 py-0.5 rounded text-muted-foreground uppercase font-mono">
           {chartType}
@@ -394,9 +394,9 @@ export function A2UIChart({ title, chartType = "bar", data = [] }) {
 // ─── 6. A2UI Steps / Workflow Progress Tracker ─────────────────────────────────
 export function A2UISteps({ title, steps = [] }) {
   return (
-    <div className="mt-2.5 rounded-xl border border-border bg-card p-3.5 space-y-3">
+    <div className="mt-2 rounded border border-border bg-card p-2 space-y-2">
       {title && (
-        <h4 className="text-xs font-semibold text-foreground border-b border-border/50 pb-2">{title}</h4>
+        <h4 className="text-xs font-medium text-foreground border-b border-border/50 pb-2">{title}</h4>
       )}
       <div className="space-y-2">
         {steps.map((step, idx) => {
@@ -412,9 +412,9 @@ export function A2UISteps({ title, steps = [] }) {
                 ) : isCurrent ? (
                   <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
                 ) : isError ? (
-                  <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                  <AlertCircle className="w-3.5 h-3.5 text-destructive" />
                 ) : (
-                  <div className="w-3.5 h-3.5 rounded-full border border-border bg-muted flex items-center justify-center text-[9px] text-muted-foreground">
+                  <div className="w-3.5 h-3.5 rounded border border-border bg-muted flex items-center justify-center text-[9px] text-muted-foreground">
                     {idx + 1}
                   </div>
                 )}
@@ -438,14 +438,14 @@ export function A2UISteps({ title, steps = [] }) {
 // ─── 7. A2UI Stat Component ───────────────────────────────────────────────────
 export function A2UIStat({ title, value, label, trend, change }) {
   return (
-    <div className="mt-2.5 rounded-xl border border-border bg-card p-3.5 space-y-2">
+    <div className="mt-2 rounded border border-border bg-card p-2 space-y-2">
       <span className="text-xs text-muted-foreground font-medium">{title || label || "Metric"}</span>
-      <div className="text-xl font-bold text-foreground tracking-tight">{value || 0}</div>
+      <div className="text-xl font-medium text-foreground tracking-tight">{value || 0}</div>
       {change && (
         <span
           className={cn(
             "text-[11px] font-medium block",
-            trend === "down" ? "text-red-500" : "text-emerald-600"
+            trend === "down" ? "text-destructive" : "text-emerald-600"
           )}
         >
           {trend === "down" ? "↓" : "↑"} {change}
@@ -507,12 +507,12 @@ export function A2UIAlert({ title, description, variant = "info" }) {
       className={cn(
         "mt-2 p-2 rounded border flex gap-2 items-start text-xs",
         isDanger
-          ? "bg-red-500/10 border-red-500/30 text-red-600"
+          ? "bg-destructive/10 border-destructive/30 text-destructive"
           : isWarning
           ? "bg-amber-500/10 border-amber-500/30 text-amber-600"
           : isSuccess
-          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
-          : "bg-blue-500/10 border-blue-500/30 text-blue-600"
+          ? "bg-primary/10 border-primary/30 text-primary"
+          : "bg-primary/10 border-primary/30 text-primary"
       )}
     >
       {isSuccess ? (

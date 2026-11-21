@@ -35,12 +35,12 @@ const Section = React.forwardRef(
               )}
               <div className="flex-1 min-w-0">
                 {title && (
-                  <h3 className="text-xs font-semibold text-foreground">
+                  <h3 className="text-sm font-medium text-foreground">
                     {title}
                   </h3>
                 )}
                 {description && (
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{description}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
                 )}
               </div>
             </div>

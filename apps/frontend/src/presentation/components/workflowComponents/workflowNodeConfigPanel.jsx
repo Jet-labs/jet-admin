@@ -43,7 +43,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
         <div className="fixed right-0 top-0 h-full w-[400px] bg-background shadow-2xl border-l border-border z-[1000] flex flex-col pb-4">
             {/* Header */}
             <div className="flex justify-between items-center p-2 border-b border-border bg-background">
-                <h3 className="font-semibold text-foreground tracking-tight">
+                <h3 className="font-medium text-foreground tracking-tight">
                     {WORKFLOW_NODES_MAP[node.type]?.label || 'Node Configuration'}
                 </h3>
                 <div className="flex items-center gap-2">
@@ -115,7 +115,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
             {showDeleteConfirm && (
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
                     <div className="bg-background rounded shadow-2xl border border-border p-6 w-full max-w-sm animate-in fade-in zoom-in duration-200">
-                        <h4 className="font-bold text-foreground text-lg mb-2">Delete Node?</h4>
+                        <h4 className="mb-2 text-lg font-medium text-foreground">Delete Node?</h4>
                         <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                             This will remove the node and all its connections. This action cannot be undone.
                         </p>

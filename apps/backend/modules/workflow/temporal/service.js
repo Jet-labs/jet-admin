@@ -6,6 +6,7 @@
 const { v4: uuidv4 } = require('uuid');
 const Logger = require('../../../utils/logger');
 const constants = require('../../../constants');
+const { validateExecutableGraph, describeWorkflowFailure } = require('@jet-admin/workflow-nodes-logic/runtime-contract');
 const { TASK_QUEUE, WORKFLOW_TYPE, SIGNALS } = require('./config');
 const {
   resolveWorkflowConfig,
@@ -23,13 +24,14 @@ async function getTemporalClientSafe() {
  * For persisted workflows: loads nodes/edges from tblWorkflowNodes/Edge
  * plus per-workflow execution policy from tblWorkflows.workflowOptions.
  */
-async function loadPersistedGraph(workflowID) {
+async function loadPersistedGraph(workflowID, tenantID) {
   const { prisma } = require('../../../config/prisma.config');
   const [workflow, dbNodes, dbEdges] = await Promise.all([
-    prisma.tblWorkflows.findUnique({ where: { workflowID }, select: { workflowOptions: true } }),
+    prisma.tblWorkflows.findFirst({ where: { workflowID, tenantID }, select: { workflowOptions: true } }),
     prisma.tblWorkflowNodes.findMany({ where: { workflowID } }),
     prisma.tblWorkflowEdge.findMany({ where: { workflowID } }),
   ]);
+  if (!tenantID || !workflow) throw new Error('Workflow not found in tenant');
 
   const nodes = dbNodes.map((n) => ({
     id: n.nodeID,
@@ -47,25 +49,43 @@ async function loadPersistedGraph(workflowID) {
   return { nodes, edges, workflowOptions };
 }
 
+// An RPC failure can happen after Temporal accepted the execution. Confirm by
+// the stable workflowId before claiming start failure or allocating another run.
+async function startConfirmed(client, options, workflowType = WORKFLOW_TYPE) {
+  try {
+    return await client.workflow.start(workflowType, options);
+  } catch (error) {
+    try {
+      const handle = client.workflow.getHandle(options.workflowId);
+      const description = await handle.describe();
+      return { workflowId: options.workflowId, firstExecutionRunId: description.runId || description.execution?.runId };
+    } catch (_) { /* unknown, not proof that the start was rejected */ }
+    const wrapped = new Error(error.message, { cause: error });
+    wrapped.code = error.code;
+    wrapped.startUncertain = !(error instanceof TypeError || error.code === 3 || error.name === 'ValueError');
+    throw wrapped;
+  }
+}
+
 /**
  * Start persisted workflow via Temporal.
  */
-async function startWorkflowTemporal({ workflowID, tenantID, inputValues = {} }) {
+async function startWorkflowTemporal({ workflowID, tenantID, inputValues = {}, executionKey }) {
   const { stateManager } = require('../workflowEngine/stateManager');
   const { getTemporalClient } = require('./client');
 
   Logger.log('info', { message: 'temporal:service:startWorkflow', params: { workflowID, tenantID } });
 
-  const { instance, initialContext } = await stateManager.createInstance({
-    workflowID,
-    tenantID,
-    inputValues,
-  });
-
-  const { nodes, edges, workflowOptions } = await loadPersistedGraph(workflowID);
+  const existing = executionKey ? await stateManager.getInstanceForExecutionKey(tenantID, executionKey) : null;
+  if (existing && ['COMPLETED', 'FAILED', 'CANCELLED'].includes(existing.status)) {
+    return { instanceID: existing.instanceID, temporalWorkflowId: existing.instanceID, alreadyStarted: true, status: existing.status };
+  }
+  const { nodes, edges, workflowOptions } = existing?.executionDefinition?.args
+    || await loadPersistedGraph(workflowID, tenantID);
   if (!nodes.find((n) => n.type === 'start')) {
     throw new Error(`No start node for workflow ${workflowID}`);
   }
+  validateExecutableGraph(nodes, edges);
 
   // Per-workflow policy: node.data > workflowOptions > platform defaults.
   // Materialize resolved timeouts/retries into the node payload so the
@@ -74,32 +94,35 @@ async function startWorkflowTemporal({ workflowID, tenantID, inputValues = {} })
   const resolvedNodes = applyWorkflowConfigToNodes(nodes, workflowConfig);
   const startOptions = resolveWorkflowStartOptions(workflowConfig);
 
+  const prepared = existing?.executionDefinition || {
+    kind: 'workflow', workflowType: WORKFLOW_TYPE,
+    args: { nodes: resolvedNodes, edges, tenantID, workflowID, isTestRun: false, workflowOptions, workflowConfig },
+    startOptions,
+  };
+  const { instance, initialContext } = await stateManager.createInstance({ workflowID, tenantID, inputValues, executionKey, executionDefinition: prepared });
+  const definition = instance.executionDefinition || prepared;
+
   const workflowId = instance.instanceID;
 
   let handle;
   try {
     const client = await getTemporalClient();
-    handle = await client.workflow.start(WORKFLOW_TYPE, {
+    handle = await startConfirmed(client, {
       taskQueue: TASK_QUEUE,
       workflowId,
       args: [
         {
-          nodes: resolvedNodes,
-          edges,
+          ...definition.args,
           initialContext,
           instanceID: instance.instanceID,
-          tenantID,
-          workflowID,
-          isTestRun: false,
-          workflowOptions,
-          workflowConfig,
         },
       ],
-      workflowRunTimeout: startOptions.workflowRunTimeout,
-      workflowTaskTimeout: startOptions.workflowTaskTimeout,
+      workflowRunTimeout: definition.startOptions.workflowRunTimeout,
+      workflowTaskTimeout: definition.startOptions.workflowTaskTimeout,
       workflowIdReusePolicy: 3,
       retry: { maximumAttempts: 1 },
-    });
+    }, definition.workflowType);
+    await stateManager.markInstanceStarted(instance.instanceID);
 
     Logger.log('success', {
       message: 'temporal:service:workflowStarted',
@@ -109,17 +132,19 @@ async function startWorkflowTemporal({ workflowID, tenantID, inputValues = {} })
   } catch (err) {
     const isConnectionError = /Failed to connect|deadline|ECONNREFUSED|ENOTFOUND/i.test(err.message);
     Logger.log('error', { message: 'temporal:service:startFailed', params: { workflowID, error: err.message, isConnectionError } });
-    await stateManager.completeInstance(instance.instanceID, 'FAILED').catch(() => {});
+    if (!err.startUncertain && (!executionKey || err.cause instanceof TypeError || err.cause?.code === 3)) await stateManager.completeInstance(instance.instanceID, 'FAILED').catch(() => {});
+    err.instanceID = instance.instanceID;
     await stateManager.logEvent({
       instanceID: instance.instanceID,
       nodeID: null,
       eventType: constants.WORKFLOW_LOG_EVENT_TYPES.SYSTEM_SET,
       payload: { __temporalStartError: err.message },
     }).catch(() => {});
-    if (isConnectionError) {
+    if (isConnectionError && !err.startUncertain) {
       const help = 'Temporal not running at ' + require('./config').ADDRESS + '. Start it: docker compose -f docker-compose.temporal.yml up -d  (UI at http://localhost:8088)';
       const wrapped = new Error(help + ' :: ' + err.message);
       wrapped.code = 'TEMPORAL_NOT_RUNNING';
+      wrapped.instanceID = instance.instanceID;
       throw wrapped;
     }
     throw err;
@@ -136,6 +161,7 @@ async function startTestWorkflowTemporal({ nodes, edges, tenantID, inputValues =
 
   const startNode = nodes.find((n) => n.type === 'start');
   if (!startNode) throw new Error('No start node found in test workflow');
+  validateExecutableGraph(nodes, edges);
 
   const testWorkflowID = uuidv4();
   const { instance, initialContext } = await stateManager.createInstance({
@@ -158,16 +184,21 @@ async function startTestWorkflowTemporal({ nodes, edges, tenantID, inputValues =
     })),
   };
 
-  await stateManager.logEvent({
-    instanceID: instance.instanceID,
-    nodeID: null,
-    eventType: constants.WORKFLOW_LOG_EVENT_TYPES.SYSTEM_SET,
-    outputVariable: '__meta',
-    payload: {
-      __workflowDefinition: workflowDefinition,
-      __isTestRun: true,
-    },
-  });
+  try {
+    await stateManager.logEvent({
+      instanceID: instance.instanceID,
+      nodeID: null,
+      eventType: constants.WORKFLOW_LOG_EVENT_TYPES.SYSTEM_SET,
+      outputVariable: '__meta',
+      payload: {
+        __workflowDefinition: workflowDefinition,
+        __isTestRun: true,
+      },
+    });
+  } catch (error) {
+    await stateManager.completeInstance(instance.instanceID, 'FAILED');
+    throw error;
+  }
 
   const firstJobContext = {
     ...initialContext,
@@ -182,7 +213,7 @@ async function startTestWorkflowTemporal({ nodes, edges, tenantID, inputValues =
     const workflowConfig = resolveWorkflowConfig(workflowOptions);
     const resolvedNodes = applyWorkflowConfigToNodes(nodes, workflowConfig);
     const startOptions = resolveWorkflowStartOptions(workflowConfig);
-    const handle = await client.workflow.start(WORKFLOW_TYPE, {
+    const handle = await startConfirmed(client, {
       taskQueue: TASK_QUEUE,
       workflowId,
       args: [{ nodes: resolvedNodes, edges, initialContext: firstJobContext, instanceID: instance.instanceID, tenantID, workflowID: testWorkflowID, isTestRun: true, workflowOptions, workflowConfig }],
@@ -191,20 +222,23 @@ async function startTestWorkflowTemporal({ nodes, edges, tenantID, inputValues =
       workflowIdReusePolicy: 3,
       retry: { maximumAttempts: 1 },
     });
+    await stateManager.markInstanceStarted(instance.instanceID);
     Logger.log('success', { message: 'temporal:service:testWorkflowStarted', params: { instanceID: instance.instanceID } });
     return { instanceID: instance.instanceID, isTest: true, temporalWorkflowId: handle.workflowId, runId: handle.firstExecutionRunId };
   } catch (err) {
     const isConnectionError = /Failed to connect|deadline|ECONNREFUSED|ENOTFOUND/i.test(err.message);
     Logger.log('error', { message: 'temporal:service:testStartFailed', params: { error: err.message, isConnectionError } });
-    await require('../workflowEngine/stateManager').stateManager.completeInstance(instance.instanceID, 'FAILED').catch(()=>{});
+    if (!err.startUncertain) await stateManager.completeInstance(instance.instanceID, 'FAILED').catch(()=>{});
+    err.instanceID = instance.instanceID;
     await require('../workflowEngine/stateManager').stateManager.logEvent({
       instanceID: instance.instanceID, nodeID: null, eventType: constants.WORKFLOW_LOG_EVENT_TYPES.SYSTEM_SET,
       payload: { __temporalStartError: err.message },
     }).catch(()=>{});
-    if (isConnectionError) {
+    if (isConnectionError && !err.startUncertain) {
       const help = 'Temporal not running at ' + require('./config').ADDRESS + '. Start it: docker compose -f docker-compose.temporal.yml up -d  (UI at http://localhost:8088)';
       const wrapped = new Error(help + ' :: ' + err.message);
       wrapped.code = 'TEMPORAL_NOT_RUNNING';
+      wrapped.instanceID = instance.instanceID;
       throw wrapped;
     }
     throw err;
@@ -220,7 +254,7 @@ async function startTestWorkflowTemporal({ nodes, edges, tenantID, inputValues =
  *
  * Isolated context: the child sees ONLY `inputValues` as its ctx.input.
  */
-async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenantID, parentInstanceID, parentNodeID, depth = 0, isTest = false }) {
+async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenantID, parentInstanceID, parentNodeID, depth = 0, isTest = false, executionKey = null }) {
   const { stateManager } = require('../workflowEngine/stateManager');
   const { prisma } = require('../../../config/prisma.config');
 
@@ -248,6 +282,13 @@ async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenant
   const systemContext = { __subDepth: depth + 1 };
   if (isTest) systemContext.__isTestRun = true;
 
+  const { nodes, edges, workflowOptions } = await loadPersistedGraph(childWorkflowID, tenantID);
+  if (!nodes.find((n) => n.type === 'start')) throw new Error(`Sub-Workflow child has no start node: ${childWorkflowID}`);
+  validateExecutableGraph(nodes, edges);
+  const workflowConfig = resolveWorkflowConfig(workflowOptions);
+  const resolvedNodes = applyWorkflowConfigToNodes(nodes, workflowConfig);
+  const startOptions = resolveWorkflowStartOptions(workflowConfig);
+
   const { instance, initialContext } = await stateManager.createInstance({
     workflowID: childWorkflowID,
     tenantID,
@@ -257,38 +298,42 @@ async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenant
     parentInstanceID,
     parentNodeID,
     systemContext,
+    // Stable per parent activity invocation: a retried activity resumes the
+    // same child instance instead of starting a duplicate/orphan.
+    executionKey,
+    executionDefinition: executionKey ? {
+      kind: 'subWorkflow', workflowType: WORKFLOW_TYPE, workflowID: childWorkflowID,
+    } : undefined,
   });
 
-  const { nodes, edges, workflowOptions } = await loadPersistedGraph(childWorkflowID);
-  if (!nodes.find((n) => n.type === 'start')) {
-    await stateManager.completeInstance(instance.instanceID, 'FAILED').catch(() => {});
-    throw new Error(`Sub-Workflow child has no start node: ${childWorkflowID}`);
+  let handle;
+  try {
+    const client = await getTemporalClientSafe();
+    const started = await startConfirmed(client, {
+      taskQueue: TASK_QUEUE,
+      workflowId: instance.instanceID,
+      args: [{
+        nodes: resolvedNodes,
+        edges,
+        initialContext,
+        instanceID: instance.instanceID,
+        tenantID,
+        workflowID: childWorkflowID,
+        isTestRun: Boolean(isTest),
+        workflowOptions,
+        workflowConfig,
+      }],
+      workflowRunTimeout: startOptions.workflowRunTimeout,
+      workflowTaskTimeout: startOptions.workflowTaskTimeout,
+      workflowIdReusePolicy: 3,
+      retry: { maximumAttempts: 1 },
+    });
+    handle = client.workflow.getHandle(started.workflowId);
+    await stateManager.markInstanceStarted(instance.instanceID);
+  } catch (error) {
+    if (!error.startUncertain) await stateManager.completeInstance(instance.instanceID, 'FAILED');
+    throw error;
   }
-
-  const workflowConfig = resolveWorkflowConfig(workflowOptions);
-  const resolvedNodes = applyWorkflowConfigToNodes(nodes, workflowConfig);
-  const startOptions = resolveWorkflowStartOptions(workflowConfig);
-
-  const client = await getTemporalClientSafe();
-  const handle = await client.workflow.start(WORKFLOW_TYPE, {
-    taskQueue: TASK_QUEUE,
-    workflowId: instance.instanceID,
-    args: [{
-      nodes: resolvedNodes,
-      edges,
-      initialContext,
-      instanceID: instance.instanceID,
-      tenantID,
-      workflowID: childWorkflowID,
-      isTestRun: Boolean(isTest),
-      workflowOptions,
-      workflowConfig,
-    }],
-    workflowRunTimeout: startOptions.workflowRunTimeout,
-    workflowTaskTimeout: startOptions.workflowTaskTimeout,
-    workflowIdReusePolicy: 3,
-    retry: { maximumAttempts: 1 },
-  });
 
   Logger.log('info', { message: 'temporal:service:subWorkflowStarted', params: { childInstanceID: instance.instanceID, parentInstanceID } });
 
@@ -312,7 +357,7 @@ async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenant
       status: (dbInstance && dbInstance.status) || 'FAILED',
       output: null,
       contextSnapshot: {},
-      errorMessage: err?.message || String(err),
+      errorMessage: describeWorkflowFailure(err).message,
     };
   }
 }
@@ -321,13 +366,14 @@ async function runSubWorkflowAndWait({ childWorkflowID, inputValues = {}, tenant
  * Signal human input to a running Temporal workflow.
  * Called by dataCollection.service.submitCollectionData when driver=temporal.
  */
-async function signalHumanInput({ instanceID, nodeID, data, collectionRequestID }) {
+async function signalHumanInput({ instanceID, nodeID, data, collectionRequestID, waitID }) {
   const client = await getTemporalClientSafe();
   const handle = client.workflow.getHandle(instanceID); // workflowId == instanceID
   await handle.signal(SIGNALS.SUBMIT_HUMAN_INPUT, {
     nodeID,
     data,
     collectionRequestID,
+    waitID,
   });
   Logger.log('success', { message: 'temporal:signal:humanInput', params: { instanceID, nodeID } });
   return { signalled: true };
@@ -336,13 +382,8 @@ async function signalHumanInput({ instanceID, nodeID, data, collectionRequestID 
 async function cancelWorkflow({ instanceID }) {
   const client = await getTemporalClientSafe();
   const handle = client.workflow.getHandle(instanceID);
-  try {
-    await handle.signal(SIGNALS.CANCEL_WORKFLOW);
-    await handle.cancel();
-  } catch (e) {
-    Logger.log('warning', { message: 'temporal:cancel:failed', params: { instanceID, error: e.message } });
-  }
-  return { cancelled: true };
+  await handle.cancel(); // accepted cancellation request, not yet terminal
+  return { cancellationRequested: true };
 }
 
 async function terminateWorkflow({ instanceID, reason = 'terminated' }) {
@@ -359,6 +400,32 @@ async function describeWorkflow({ instanceID }) {
   return desc;
 }
 
+async function reconcileWorkflowInstance({ instanceID }) {
+  try {
+    const description = await describeWorkflow({ instanceID });
+    const name = description.status?.name;
+    let terminal = { COMPLETED: 'COMPLETED', FAILED: 'FAILED', TIMED_OUT: 'FAILED', TERMINATED: 'CANCELLED', CANCELED: 'CANCELLED', CANCELLED: 'CANCELLED' }[name];
+    if (!terminal) return { reconciled: false, temporalStatus: name };
+    let snapshot = {};
+    if (name === 'COMPLETED') {
+      const client = await getTemporalClientSafe();
+      const result = await client.workflow.getHandle(instanceID).result();
+      if (['COMPLETED', 'FAILED', 'CANCELLED'].includes(result?._workflowStatus)) terminal = result._workflowStatus;
+      if (result && typeof result === 'object') {
+        const { _workflowStatus, _workflowOutput, ...contextData } = result;
+        snapshot = { contextData, workflowOutput: _workflowOutput };
+      }
+    }
+    const { stateManager } = require('../workflowEngine/stateManager');
+    const changed = await stateManager.completeInstance(instanceID, terminal, snapshot);
+    return { reconciled: changed, temporalStatus: name };
+  } catch (error) {
+    // Unavailable/not-found is not evidence of failure (including ambiguous start).
+    Logger.log('warning', { message: 'temporal:reconcile:unknown', params: { instanceID, error: error.message } });
+    return { reconciled: false, unknown: true };
+  }
+}
+
 module.exports = {
   startWorkflowTemporal,
   startTestWorkflowTemporal,
@@ -367,4 +434,5 @@ module.exports = {
   cancelWorkflow,
   terminateWorkflow,
   describeWorkflow,
+  reconcileWorkflowInstance,
 };

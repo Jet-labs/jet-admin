@@ -342,7 +342,7 @@ button {
 
 .Toastify__toast {
   border: 1px solid hsl(var(--border));
-  border-radius: 8px !important; /* rounded-lg */
+  border-radius: 6px !important; /* DS radius: rounded */
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12) !important; /* shadow-lg */
   font-family: "Circular", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   color: hsl(var(--foreground)) !important;

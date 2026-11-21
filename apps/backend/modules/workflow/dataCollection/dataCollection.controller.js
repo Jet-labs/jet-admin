@@ -15,13 +15,14 @@ dataCollectionController.submitData = async (req, res) => {
             params: { collectionRequestID },
         });
 
-        if (!submittedData || typeof submittedData !== 'object') {
+        if (!submittedData || typeof submittedData !== 'object' || Array.isArray(submittedData)) {
             return expressUtils.sendResponse(res, false, {}, { message: 'submittedData must be a non-null object' }, constants.HTTP_STATUS.BAD_REQUEST);
         }
 
         const result = await dataCollectionService.submitCollectionData({
             collectionRequestID,
             submittedData,
+            tenantID: req.params.tenantID,
         });
 
         Logger.log('success', {

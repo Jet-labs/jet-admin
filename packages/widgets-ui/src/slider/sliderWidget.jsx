@@ -23,17 +23,30 @@ export const SliderWidget = ({ widgetConfig, widgetState, setWidgetState, fireWi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgetConfig?.defaultValue]);
 
+  // Current-state refs (B05/F02/E20): methods must honor the CURRENT
+  // min/max/step and live callbacks, never the first render's closure.
+  // Non-finite inputs resolve to min so state never holds NaN/Infinity.
+  const liveRef = useRef(null);
+  liveRef.current = { min, max, setWidgetState, fireWidgetEvent };
+  const clampLive = (v) => {
+    const { min: lo, max: hi } = liveRef.current;
+    const n = Number(v);
+    const finite = Number.isFinite(n) ? n : lo;
+    return Math.min(hi, Math.max(lo, finite));
+  };
   const methodsRef = useRef(null);
   if (!methodsRef.current) {
     methodsRef.current = {
       setValue: (v) => {
-        const n = Math.min(max, Math.max(min, Number(v)));
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: n }));
-        if (fireWidgetEvent) fireWidgetEvent("onChange", { value: n });
+        const rt = liveRef.current;
+        const n = clampLive(v);
+        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: n }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: n });
       },
       clear: () => {
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: min }));
-        if (fireWidgetEvent) fireWidgetEvent("onChange", { value: min });
+        const rt = liveRef.current;
+        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: rt.min }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: rt.min });
       },
     };
   }

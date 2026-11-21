@@ -260,11 +260,12 @@ userManagementService.addUserToTenant = async ({
   userID,
   tenantUserID,
   tenantID,
+  roleIDs = [],
 }) => {
   try {
     Logger.log("info", {
       message: "userManagementService:addUserToTenant:params",
-      params: { userID, tenantID, tenantUserID },
+      params: { userID, tenantID, tenantUserID, roleIDs },
     });
 
     const existingUserTenantRelationship =
@@ -284,13 +285,35 @@ userManagementService.addUserToTenant = async ({
       throw constants.ERROR_CODES.USER_ALREADY_MEMBER_OF_TENANT;
     }
     const newUserTenantRelationship =
-      await prisma.tblUsersTenantsRelationship.create({
-        data: {
-          tenantID,
-          userID: tenantUserID,
-          role: "MEMBER",
-        },
+      await prisma.$transaction(async (tx) => {
+        const relationship = await tx.tblUsersTenantsRelationship.create({
+          data: {
+            tenantID,
+            userID: tenantUserID,
+            role: "MEMBER",
+          },
+        });
+
+        // Persist the roles selected in the "Add member" form instead of
+        // silently dropping them.
+        if (roleIDs.length > 0) {
+          await tx.tblUserTenantRoleMappings.createMany({
+            data: roleIDs.map((roleID) => ({
+              tenantID,
+              userID: tenantUserID,
+              roleID,
+            })),
+          });
+        }
+
+        return relationship;
       });
+
+    // Keep Casbin in sync with the persisted role mappings.
+    for (const roleID of roleIDs) {
+      await addRoleForUser(tenantUserID, `role:${roleID}`, tenantID);
+    }
+
     await notificationService.sendUserTenantAdditionNotification({
       notifierID: userID,
       userID: tenantUserID,
@@ -335,7 +358,7 @@ userManagementService.updateTenantUserRolesByID = async ({
   });
 
   try {
-    if (!tenantID || !tenantUserID || !userTenantRelationship) {
+    if (!tenantID || !tenantUserID) {
       throw new Error(constants.ERROR_CODES.INVALID_REQUEST.message);
     }
 
@@ -351,6 +374,10 @@ userManagementService.updateTenantUserRolesByID = async ({
     }
 
     const { role: currentRole } = existingUserTenantRelationship;
+    // The membership role is optional in the PATCH body; when omitted, keep
+    // the user's current ADMIN/MEMBER relationship.
+    const nextRelationship =
+      userTenantRelationship || existingUserTenantRelationship.role;
     const ADMIN_ROLE = constants.ROLES.PRIMARY.ADMIN.value;
     const MEMBER_ROLE = constants.ROLES.PRIMARY.MEMBER.value;
 
@@ -362,12 +389,13 @@ userManagementService.updateTenantUserRolesByID = async ({
         tenantID,
         roleIDs,
         userTenantRelationship,
+        nextRelationship,
         currentRole,
       },
     });
 
     // Check if user is already an admin
-    if (currentRole == ADMIN_ROLE && userTenantRelationship == ADMIN_ROLE) {
+    if (currentRole == ADMIN_ROLE && nextRelationship == ADMIN_ROLE) {
       Logger.log("error", {
         message:
           "userManagementService:updateTenantUserRolesByID:user-already-admin",
@@ -376,7 +404,7 @@ userManagementService.updateTenantUserRolesByID = async ({
       throw new Error(constants.ERROR_CODES.USER_ALREADY_ADMIN_OF_TENANT.message);
     } else if (
       currentRole == ADMIN_ROLE &&
-      userTenantRelationship == MEMBER_ROLE
+      nextRelationship == MEMBER_ROLE
     ) {
       await userManagementService.demoteUserToMember(tenantUserID, tenantID);
       await removePolicy(tenantUserID, tenantID, "*", "*", "allow");
@@ -387,7 +415,7 @@ userManagementService.updateTenantUserRolesByID = async ({
       }
     } else if (
       currentRole == MEMBER_ROLE &&
-      userTenantRelationship == ADMIN_ROLE
+      nextRelationship == ADMIN_ROLE
     ) {
       await userManagementService.promoteUserToAdmin(tenantUserID, tenantID);
       await addPolicy(tenantUserID, tenantID, "*", "*", "allow");

@@ -191,8 +191,11 @@ services:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
-      start_period: 30s
-      retries: 3
+      # Fresh databases run migrations + seeds before the health endpoint is
+      # meaningful; 30s was shorter than a cold seed and made the first
+      # `docker compose up` abort on an unhealthy backend.
+      start_period: 180s
+      retries: 10
 
   # ============================================
   # PostgreSQL Database
@@ -216,8 +219,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 10s
+      start_period: 30s
+      retries: 10
 
   # ============================================
   # Redis — shared by the listener bus (Streams: `listener:events` +
@@ -304,7 +307,10 @@ services:
       test: ["CMD-SHELL", "pg_isready -U temporal -d temporal"]
       interval: 5s
       timeout: 3s
-      retries: 10
+      # Fresh volume initdb can exceed the old 50s window; give it a full
+      # minute of grace plus more retries so the first `up` does not abort.
+      start_period: 60s
+      retries: 20
     ports:
       - "5433:5432"
 
@@ -392,6 +398,9 @@ services:
       # Same app DB as backend — activities read/write via Prisma.
       # Mirrors the backend default; override together via DATABASE_URL.
       - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-your_strong_password}@postgres:5432/${POSTGRES_DB:-jet_admin_db}}
+      # The workflow worker publishes progress/socket events through Redis.
+      # Without this it defaults to localhost:6379 inside the container.
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
       # Same S3 storage as backend (workflow activities can read files).
       - S3_ENDPOINT=${S3_ENDPOINT:-http://rustfs:9000}
       - S3_REGION=${S3_REGION:-us-east-1}

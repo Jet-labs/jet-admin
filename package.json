@@ -1,6 +1,6 @@
 {
     "name": "jet-admin",
-    "version": "2.0.0",
+    "version": "2.1.0-preview.1",
     "main": "index.js",
     "engines": {
         "node": "20.x"
@@ -49,7 +49,13 @@
         "seed": "cd apps/backend && npm run seed",
         "test": "echo \"Error: no test specified\" && exit 1",
         "start:a": "cd apps/admin && npm run dev",
-        "build:a": "cd apps/admin && npm run build"
+        "build:a": "cd apps/admin && npm run build",
+        "start": "node scripts/start.js",
+        "start:core": "node scripts/start.js --preset core",
+        "start:dev": "node scripts/start.js --mode dev",
+        "start:combo": "node scripts/start.js --preset",
+        "start:list": "node scripts/start.js --list",
+        "start:stop": "node scripts/start.js --stop"
     },
     "author": "",
     "license": "ISC",

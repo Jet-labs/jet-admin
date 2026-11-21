@@ -18,7 +18,8 @@ export class VegaWidgetBuilder extends BaseWidgetBuilder {
    * @returns {object} Complete Vega spec ready for vega-embed
    */
   buildRender({ widgetType = 'vega-lite', widgetConfig }) {
-    const vegaSpec = widgetConfig?.vegaSpec;
+    // Dual-read: canonical vegaSpec, legacy spec fallback (F04).
+    const vegaSpec = widgetConfig?.vegaSpec ?? widgetConfig?.spec;
     if (!vegaSpec) return null;
 
     const isVegaLite = widgetType !== 'vega';
@@ -113,11 +114,20 @@ export class VegaWidgetBuilder extends BaseWidgetBuilder {
    * @param {object|null} dataSourceResults - Executed data source results
    * @returns {object|null} Complete Vega spec with data, or null
    */
-  resolveData(widgetConfig, dataSourceResults) {
+  resolveData(widgetConfig, dataSourceResults, widgetType = 'vega-lite') {
     if (!widgetConfig?.vegaSpec) return null;
 
     // Clone spec safely to avoid mutating form/config state and prevent circular JSON crashes
-    const spec = VegaWidgetBuilder.safeClone(widgetConfig.vegaSpec);
+    const clonedSpec = VegaWidgetBuilder.safeClone(widgetConfig.vegaSpec);
+    if (!clonedSpec) return null;
+
+    // Always produce a renderable spec: authored templates often omit
+    // $schema/container sizing, and VegaWidget requires $schema. Shared by
+    // the standalone preview and the page runtime.
+    const spec = this.buildRender({
+      widgetType,
+      widgetConfig: { ...widgetConfig, vegaSpec: clonedSpec },
+    });
     if (!spec) return null;
 
     // Helper to recursively sanitize all data blocks in the spec.

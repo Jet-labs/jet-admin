@@ -60,7 +60,7 @@ apiKeyController.createAPIKey = async (req, res) => {
       params: { userID: user.userID, tenantID, apiKeyTitle },
     });
 
-    const { apiKey } = await apiKeyService.createAPIKey({
+    const { apiKey, apiKeyID } = await apiKeyService.createAPIKey({
       userID: user.userID,
       tenantID: tenantID,
       roleIDs,
@@ -73,6 +73,7 @@ apiKeyController.createAPIKey = async (req, res) => {
       true,
       {
         apiKey,
+        apiKeyID,
         message: "APIKey created successfully.",
       },
       null,

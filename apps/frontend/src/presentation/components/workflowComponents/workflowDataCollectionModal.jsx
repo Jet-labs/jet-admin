@@ -105,7 +105,7 @@ export const WorkflowDataCollectionModal = ({
                             className="mt-1 w-full"
                         />
                         {commentError && (
-                            <p className="text-xs text-red-500 mt-1">{commentError}</p>
+                            <p className="text-xs text-destructive mt-1">{commentError}</p>
                         )}
                     </DialogBody>
                 ) : (

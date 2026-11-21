@@ -227,7 +227,13 @@ appPageController.updateAppPageByID = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, appPageID } = req.params;
-    const { appPageConfig, appPageDescription, appPageTitle, changeNote } = req.body;
+    const {
+      appPageConfig,
+      appPageDescription,
+      appPageTitle,
+      changeNote,
+      expectedUpdatedAt,
+    } = req.body;
 
     Logger.log("info", {
       message: "appPageController:updateAppPageByID:params",
@@ -249,6 +255,7 @@ appPageController.updateAppPageByID = async (req, res) => {
       appPageDescription,
       appPageTitle,
       changeNote,
+      expectedUpdatedAt,
     });
 
     Logger.log("success", {
@@ -271,7 +278,13 @@ appPageController.updateAppPageByID = async (req, res) => {
       message: "appPageController:updateAppPageByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      error,
+      error.statusCode || constants.HTTP_STATUS.BAD_REQUEST
+    );
   }
 };
 
@@ -318,7 +331,13 @@ appPageController.deleteAppPageByID = async (req, res) => {
       message: "appPageController:deleteAppPageByID:catch-1",
       params: { error },
     });
-    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      error,
+      error.statusCode || constants.HTTP_STATUS.BAD_REQUEST
+    );
   }
 };
 

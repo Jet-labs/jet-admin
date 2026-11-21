@@ -26,9 +26,9 @@ const EMPTY_INITIAL_VALUES = {
   workflowID: "",
   workflowConfig: { inputValues: {} },
   isDisabled: false,
-  timeoutSeconds: "",
-  retryAttempts: "",
-  retryDelaySeconds: "",
+  timeoutSeconds: 300,
+  retryAttempts: 0,
+  retryDelaySeconds: 60,
 };
 
 export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
@@ -105,9 +105,9 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
       workflowID: cronJob.workflowID != null ? String(cronJob.workflowID) : "",
       workflowConfig: cronJob.workflowConfig ?? { inputValues: {} },
       isDisabled: cronJob.isDisabled ?? false,
-      timeoutSeconds: cronJob.timeoutSeconds ?? "",
-      retryAttempts: cronJob.retryAttempts ?? "",
-      retryDelaySeconds: cronJob.retryDelaySeconds ?? "",
+      timeoutSeconds: cronJob.timeoutSeconds ?? 300,
+      retryAttempts: cronJob.retryAttempts ?? 0,
+      retryDelaySeconds: cronJob.retryDelaySeconds ?? 60,
     };
   }, [cronJob]);
 

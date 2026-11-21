@@ -1,0 +1,66 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "rootPath": {
+        "type": "string",
+        "description": "Absolute root directory the backend may read from (jailed). E.g. /data/exports.",
+        "default": "/tmp"
+      },
+      "showHidden": {
+        "type": "boolean",
+        "description": "Include dotfiles in listings.",
+        "default": false
+      },
+      "maxFileSize": {
+        "type": "integer",
+        "description": "Maximum single-file read size in bytes (1 MiB default).",
+        "minimum": 1024,
+        "default": 1048576
+      },
+      "maxEntries": {
+        "type": "integer",
+        "description": "Maximum directory entries returned per listing.",
+        "minimum": 1,
+        "default": 200
+      }
+    },
+    "required": ["rootPath"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/rootPath",
+        "label": "Root Path (jailed)"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/showHidden",
+            "label": "Show Hidden"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/maxFileSize",
+            "label": "Max File Size (bytes)"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/maxEntries",
+            "label": "Max Entries"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "rootPath": "/tmp",
+    "showHidden": false,
+    "maxFileSize": 1048576,
+    "maxEntries": 200
+  }
+}

@@ -53,7 +53,9 @@ export default class NatsDataSource extends DataSource {
           } catch (e) {
             // keep as string
           }
-          onEvent({ subject: msg.subject, payload });
+          Promise.resolve(onEvent({ subject: msg.subject, payload })).catch((error) => {
+            Logger.log("error", { message: "nats:event:rejected", params: { error: error.message } });
+          });
         }
       })(activeSub).catch((error) => {
         Logger.log("error", {
@@ -64,6 +66,10 @@ export default class NatsDataSource extends DataSource {
     }
 
     return { nc, sub, subs };
+  }
+
+  get recoveryMode() {
+    return "plugin"; // nats.js reconnects internally by default
   }
 
   async unsubscribe(handle) {

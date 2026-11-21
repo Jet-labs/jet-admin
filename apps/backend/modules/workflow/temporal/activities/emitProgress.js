@@ -4,26 +4,17 @@
  */
 const Logger = require('../../../../utils/logger');
 const constants = require('../../../../constants');
+const { activityEventKey } = require('./activityEventKey');
+const { buildContextDelta } = require('@jet-admin/workflow-nodes-logic/runtime-contract');
 
 /**
  * Build the DB payload from activity output. Shared shape with the workflow's
  * mergeOutputIntoContext (see workflows/dslWorkflow.js) — outputVariable wins,
  * __contextPatch spreads, __node_<id> sentinel always recorded.
  */
-function buildProgressPayload({ nodeID, output, outputVariable }) {
-  const payload = {};
-  if (output && typeof output === 'object') {
-    if (output.__contextPatch && typeof output.__contextPatch === 'object') {
-      Object.assign(payload, output.__contextPatch);
-    } else if (outputVariable && output[outputVariable] !== undefined) {
-      payload[outputVariable] = output[outputVariable];
-    } else if (outputVariable) {
-      payload[outputVariable] = output[outputVariable] ?? output;
-    }
-    payload[`__node_${nodeID}`] = { output, status: undefined, outputVariable };
-    if (output.__deleteKeys) payload.__deleteKeys = output.__deleteKeys;
-  }
-  return payload;
+function buildProgressPayload(params) {
+  const { values, deleteKeys } = buildContextDelta(params);
+  return { ...values, ...(deleteKeys.length ? { __deleteKeys: deleteKeys } : {}) };
 }
 
 function resolveProgressEvent(status) {
@@ -40,6 +31,9 @@ function resolveProgressEvent(status) {
       nodeStatus: constants.WORKFLOW_STATUS.ERROR,
     };
   }
+  if (s === 'CANCELLED' || s === 'SKIPPED') {
+    return { eventType: constants.WORKFLOW_LOG_EVENT_TYPES.NODE_COMPLETED, nodeStatus: s.toLowerCase() };
+  }
   if (s === 'SUSPENDED' || status === constants.WORKFLOW_STATUS.SUSPENDED) {
     return {
       eventType: constants.WORKFLOW_LOG_EVENT_TYPES.NODE_SUSPENDED,
@@ -49,7 +43,7 @@ function resolveProgressEvent(status) {
   return { eventType: null, nodeStatus: null }; // RUNNING — ephemeral
 }
 
-async function emitProgressActivity({ instanceID, nodeID, status, output, contextData, errorMessage, nodeType, outputVariable, nodeAttempt = 1 }) {
+async function emitProgressActivity({ instanceID, nodeID, status, output, contextData, errorMessage, nodeType, outputVariable, nodeAttempt = 1, persist = true, required = false }) {
   try {
     const { stateManager } = require('../../workflowEngine/stateManager');
     const { socketIO } = require('../../../../config/socket.io');
@@ -58,8 +52,8 @@ async function emitProgressActivity({ instanceID, nodeID, status, output, contex
     const userContext = contextData ? Object.fromEntries(Object.entries(contextData).filter(([k]) => !k.startsWith('__'))) : {};
     const { eventType, nodeStatus } = resolveProgressEvent(status);
 
-    if (eventType) {
-      const payload = buildProgressPayload({ nodeID, output, outputVariable });
+    if (eventType && persist) {
+      const payload = buildProgressPayload({ nodeID, nodeType, output, outputVariable });
       // Stamp the actual status on the sentinel (builder leaves it undefined).
       if (payload[`__node_${nodeID}`]) payload[`__node_${nodeID}`].status = status;
       try {
@@ -72,8 +66,11 @@ async function emitProgressActivity({ instanceID, nodeID, status, output, contex
           payload,
           errorMessage: errorMessage || null,
           nodeAttempt,
+          eventKey: activityEventKey(status),
+          ...(contextData != null ? { contextSnapshot: contextData } : {}),
         });
       } catch (logErr) {
+        if (required) throw logErr;
         if (logErr?.code !== 'P2002') {
           Logger.log('warning', { message: 'temporal:emitProgress:logEventFailed', params: { instanceID, nodeID, error: logErr.message } });
         }
@@ -121,6 +118,7 @@ async function emitProgressActivity({ instanceID, nodeID, status, output, contex
     return { emitted: true };
   } catch (err) {
     Logger.log('error', { message: 'temporal:emitProgress:failed', params: { instanceID, nodeID, error: err.message } });
+    if (required) throw err;
     return { emitted: false, error: err.message };
   }
 }

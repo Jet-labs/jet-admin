@@ -44,7 +44,7 @@ export const CustomRadioInput = (props) => {
   return (
     <div className="">
       <Label
-        className={`block mb-2 ${hasErrors ? "text-red-500" : ""}`}
+        className={`block mb-2 ${hasErrors ? "text-destructive" : ""}`}
       >
         {label || description}
       </Label>
@@ -67,7 +67,7 @@ export const CustomRadioInput = (props) => {
         ))}
       </RadioGroup>
       {hasErrors && (
-        <p className="text-xs text-red-500 mt-1">{errors}</p>
+        <p className="text-xs text-destructive mt-1">{errors}</p>
       )}
     </div>
   );

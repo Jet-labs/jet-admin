@@ -23,7 +23,10 @@ import {
   sleep,
   ApplicationFailure,
   CancellationScope,
+  patched,
 } from '@temporalio/workflow';
+import { humanInputTimeoutMs } from './humanInputPolicy.js';
+import runtimeContract from '@jet-admin/workflow-nodes-logic/runtime-contract';
 import {
   normalizeHandle,
   buildGraphMaps,
@@ -50,6 +53,19 @@ const { emitProgressActivity, emitWorkflowCompletedActivity, createDataCollectio
   startToCloseTimeout: '30 seconds',
   retry: { maximumAttempts: 1 },
 });
+// Temporal's SDK rejects maximumAttempts <= 0 (it means "unlimited" only on the
+// server proto, not in proxyActivities options). One attempt is the intended
+// "no automatic retry" policy here; failures are handled by the workflow.
+const humanActivities = proxyActivities({
+  startToCloseTimeout: '30 seconds',
+  retry: { maximumAttempts: 1 },
+});
+const durableActivities = proxyActivities({
+  startToCloseTimeout: '30 seconds', retry: { maximumAttempts: 1 },
+});
+const emitNodeProgress = (common, payload) => common.repairedNodeOutcomes
+  ? durableActivities.emitProgressActivity({ ...payload, required: true })
+  : safeEmitProgress(payload);
 
 // Progress emits are observability only — they must never fail the workflow.
 // A slow DB/socket (e.g. 10s+ emit during Fetch FX rates) previously surfaced
@@ -74,7 +90,28 @@ export const cancelWorkflowSignal = defineSignal(SIGNALS.CANCEL_WORKFLOW);
 // Context helpers
 // ──────────────────────────────────────────────────────────────────────────────
 
-function mergeOutputIntoContext(context, node, activityResult) {
+/**
+ * Map an End node's configured completion status to the terminal run status.
+ * The End handler emits 'success' | 'failure' | 'cancelled'; treating only
+ * 'error' as failure used to report a Failure End as a successful run.
+ */
+function resolveEndTerminalStatus(status) {
+  const normalized = String(status || 'success').toLowerCase();
+  if (normalized === 'failure' || normalized === 'failed' || normalized === 'error') return 'FAILED';
+  if (normalized === 'cancelled' || normalized === 'canceled') return 'CANCELLED';
+  return 'COMPLETED';
+}
+
+function mergeOutputIntoContext(context, node, activityResult, repaired = false) {
+  if (repaired) {
+    const endStatus = node.type === 'end' ? resolveEndTerminalStatus(activityResult?.output?.status) : null;
+    const status = endStatus && endStatus !== 'COMPLETED' ? endStatus
+      : activityResult?.skipped ? 'SKIPPED' : activityResult?.output?.success === false ? 'FAILED' : 'SUCCESS';
+    return runtimeContract.applyContextDelta(context, runtimeContract.buildContextDelta({
+      nodeID: node.id, nodeType: node.type, output: activityResult?.output,
+      outputVariable: node.data?.outputVariable, status,
+    }));
+  }
   const output = activityResult?.output || {};
   const outputVariable = node?.data?.outputVariable;
   if (output.__contextPatch && typeof output.__contextPatch === 'object') Object.assign(context, output.__contextPatch);
@@ -124,6 +161,66 @@ function normalizeApprovalDecision(humanData) {
   return { approved, comment: humanData?.comment ?? '' };
 }
 
+// New histories use request identity, a single deadline and canonical DB data.
+// The patch marker in the entry point preserves the command sequence of old
+// histories; legacy executions keep their existing wait protocol.
+async function waitForHumanNode(node, suspended, context, common) {
+  const waitID = `${node.id}:${++common.waitCounter}`;
+  const timeoutMs = humanInputTimeoutMs(node.data, common.workflowConfig, suspended.collectionConfig);
+  const deadline = timeoutMs === null ? null : Date.now() + timeoutMs;
+  common.activeWaitIDs.add(waitID);
+  let collectionRequestID;
+  try {
+    const request = await humanActivities.createDataCollectionRequestActivity({
+      instanceID: common.instanceID, nodeID: node.id, nodeAttempt: 1, waitID,
+      expiresAt: deadline === null ? null : new Date(deadline).toISOString(),
+      collectionConfig: {
+        ...suspended.collectionConfig,
+        expiryMinutes: timeoutMs === null ? 0 : timeoutMs / 60000,
+        expiresAt: deadline === null ? null : new Date(deadline).toISOString(),
+      },
+      contextData: { ...context },
+    });
+    collectionRequestID = request.collectionRequestID;
+    while (true) {
+      if (common.isCancelled()) throw ApplicationFailure.nonRetryable('Workflow cancelled via signal');
+      const remaining = deadline === null ? null : Math.max(0, deadline - Date.now());
+      const resolution = await humanActivities.resolveDataCollectionRequestActivity({ collectionRequestID, expire: remaining === 0 });
+      let result;
+      if (resolution.status === 'COMPLETED') {
+        const data = node.type === 'approval' ? normalizeApprovalDecision(resolution.submittedData) : resolution.submittedData;
+        result = {
+          output: { [suspended.outputVariable]: data, success: true },
+          nextHandle: node.type === 'approval' ? (data.approved ? 'approved' : 'rejected') : 'output',
+        };
+      } else if (resolution.status === 'EXPIRED') {
+        const timeoutHandle = resolveSuspendTimeoutHandle(node);
+        if (!timeoutHandle) throw ApplicationFailure.nonRetryable(`Data collection timeout for node ${node.id}`);
+        const data = node.type === 'approval' ? { approved: false, expired: true, comment: '' } : { expired: true };
+        result = { output: { [suspended.outputVariable]: data, success: true }, nextHandle: timeoutHandle };
+      } else if (resolution.status !== 'PENDING' && resolution.status !== 'SUBMITTED') {
+        throw ApplicationFailure.nonRetryable(`Human-input request is ${resolution.status}`);
+      }
+      if (result) {
+        mergeOutputIntoContext(context, node, result, common.repairedNodeOutcomes);
+        await emitNodeProgress(common, {
+          instanceID: common.instanceID, nodeID: node.id, nodeType: node.type,
+          status: WORKFLOW_PROGRESS.SUCCESS, output: result.output,
+          contextData: { ...context }, outputVariable: suspended.outputVariable,
+        });
+        return result;
+      }
+      common.requestSignals.delete(collectionRequestID);
+      const ready = () => common.requestSignals.has(collectionRequestID) || common.isCancelled();
+      if (remaining === null) await condition(ready);
+      else await condition(ready, remaining);
+    }
+  } finally {
+    common.activeWaitIDs.delete(waitID);
+    if (collectionRequestID) common.requestSignals.delete(collectionRequestID);
+  }
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // executeNode — common abstraction for ALL node types
 // Thin deterministic wrapper around the activity. Handles delay sleep & emits.
@@ -142,10 +239,12 @@ function normalizeApprovalDecision(humanData) {
  * attempts so they survive worker restarts and honor per-node delays.
  */
 async function executeNode(node, context, common) {
+  if (common.repairedNodeOutcomes) node = { ...node, data: runtimeContract.normalizeNodeData(node.type, node.data) };
   const { instanceID, tenantID, workflowID, workflowConfig } = common;
   const nodeID = node.id;
   const nodeType = node.type;
   const nodeConfig = node.data || {};
+  const emit = payload => emitNodeProgress(common, payload);
 
   // Per-node policy (service.js pre-materializes these into node.data;
   // resolveNodePolicy re-applies the same precedence defensively).
@@ -175,7 +274,7 @@ async function executeNode(node, context, common) {
 
   let lastErrorOutput = null;
   for (let attempt = 1; attempt <= totalAttempts; attempt++) {
-    await safeEmitProgress({
+    await emit({
       instanceID, nodeID, nodeType, status: WORKFLOW_PROGRESS.RUNNING, output: null,
       contextData: { ...context }, outputVariable, nodeAttempt: attempt,
     });
@@ -188,11 +287,27 @@ async function executeNode(node, context, common) {
         tenantID, instanceID, workflowID,
       });
     } catch (err) {
-      const errorMessage = err?.message || String(err);
+      if (common.repairedHumanInput && common.isCancelled()) throw ApplicationFailure.nonRetryable('Workflow cancelled via signal');
+      if (common.repairedHumanInput && (err?.name === 'CancelledFailure' || err?.cause?.name === 'CancelledFailure')) throw err;
+      const failureDetails = common.repairedNodeOutcomes
+        ? runtimeContract.describeWorkflowFailure(err) : { message: err?.message || String(err) };
+      const errorMessage = failureDetails.message;
       const exhausted = attempt >= totalAttempts;
       // Deterministic user-code failures (non-retryable) never retry.
       if (isNonRetryableError(err) || exhausted || !retriesAllowed) {
-        await safeEmitProgress({
+        if (common.repairedNodeOutcomes) {
+          const failure = {
+            output: { ...(outputVariable ? { [outputVariable]: errorHandling === ERROR_HANDLING.CONTINUE_DEFAULT ? (nodeConfig.defaultOutput ?? null) : null } : {}), success: false, error: failureDetails },
+            nextHandle: errorHandling === ERROR_HANDLING.CONTINUE_DEFAULT ? 'default' : 'error',
+            __skipItem: errorHandling === ERROR_HANDLING.SKIP_ITEM,
+          };
+          mergeOutputIntoContext(context, node, failure, true);
+          await emit({ instanceID, nodeID, nodeType, status: WORKFLOW_PROGRESS.FAILED, output: failure.output, errorMessage,
+            contextData: { ...context }, outputVariable, nodeAttempt: attempt });
+          if (continueOnExhausted) return failure;
+          throw err;
+        }
+        await emit({
           instanceID, nodeID, nodeType, status: WORKFLOW_PROGRESS.FAILED, output: null, errorMessage,
           contextData: { ...context }, outputVariable, nodeAttempt: attempt,
         });
@@ -208,15 +323,34 @@ async function executeNode(node, context, common) {
       continue;
     }
 
+    if (common.repairedHumanInput && common.isCancelled()) throw ApplicationFailure.nonRetryable('Workflow cancelled via signal');
     // DataCollection suspension — signal to caller to wait for human input
     if (result?.suspended) {
-      await safeEmitProgress({
+      if (!common.repairedHumanInput) await emit({
         instanceID, nodeID, nodeType, status: WORKFLOW_PROGRESS.SUSPENDED, output: result.output,
         contextData: { ...context }, outputVariable,
       });
       return { __suspend: true, collectionConfig: result.output, nodeID, outputVariable: outputVariable || 'collectedData' };
     }
 
+    if (common.repairedNodeOutcomes && result?.output?.success === false) {
+      if (retriesAllowed && attempt < totalAttempts) {
+        if (policy.retryDelaySeconds > 0) await sleep(policy.retryDelaySeconds * 1000);
+        continue;
+      }
+      result = {
+        ...result,
+        output: { ...result.output, ...(outputVariable ? { [outputVariable]: errorHandling === ERROR_HANDLING.CONTINUE_DEFAULT ? (nodeConfig.defaultOutput ?? null) : null } : {}) },
+        nextHandle: errorHandling === ERROR_HANDLING.CONTINUE_DEFAULT ? 'default' : 'error',
+        __skipItem: errorHandling === ERROR_HANDLING.SKIP_ITEM,
+      };
+      mergeOutputIntoContext(context, node, result, true);
+      const message = result.output.error?.message || `Node ${nodeID} reported failure`;
+      await emit({ instanceID, nodeID, nodeType, status: WORKFLOW_PROGRESS.FAILED, output: result.output,
+        errorMessage: message, contextData: { ...context }, outputVariable, nodeAttempt: attempt });
+      if (!continueOnExhausted) throw ApplicationFailure.nonRetryable(message);
+      return result;
+    }
     // Handler-reported failure with a retry_then_* mode — retry durably.
     if (result?.output?.success === false && (errorHandling === ERROR_HANDLING.RETRY_THEN_CONTINUE || errorHandling === ERROR_HANDLING.RETRY_THEN_FAIL)) {
       lastErrorOutput = result;
@@ -224,7 +358,7 @@ async function executeNode(node, context, common) {
         if (policy.retryDelaySeconds > 0) await sleep(policy.retryDelaySeconds * 1000);
         continue;
       }
-      await safeEmitProgress({
+      await emit({
         instanceID, nodeID, nodeType, status: WORKFLOW_PROGRESS.FAILED, output: result.output,
         errorMessage: result.output?.error?.message || 'Node reported failure',
         contextData: { ...context }, outputVariable, nodeAttempt: attempt,
@@ -241,13 +375,30 @@ async function executeNode(node, context, common) {
     if (nodeType === 'delay' && result?.queueDelay > 0) {
       await sleep(result.queueDelay);
     }
+    if (common.repairedHumanInput && common.isCancelled()) throw ApplicationFailure.nonRetryable('Workflow cancelled via signal');
 
-    // Merge context + emit SUCCESS
-    mergeOutputIntoContext(context, node, result);
-    await safeEmitProgress({
-      instanceID, nodeID, nodeType, status: WORKFLOW_PROGRESS.SUCCESS, output: result.output,
+    // Merge context, then emit the truthful terminal node status. A Failure
+    // End node must be recorded as a failed node, not a successful one, so
+    // the console counts and terminal event agree.
+    mergeOutputIntoContext(context, node, result, common.repairedNodeOutcomes);
+    if (nodeType === 'end') {
+      const terminalStatus = resolveEndTerminalStatus(result?.output?.status);
+      if (terminalStatus !== 'COMPLETED') {
+        await emit({
+          instanceID, nodeID: nodeID, nodeType, status: common.repairedNodeOutcomes && terminalStatus === 'CANCELLED' ? 'CANCELLED' : WORKFLOW_PROGRESS.FAILED, output: result.output,
+          errorMessage: terminalStatus === 'CANCELLED'
+            ? 'Workflow ended with cancelled status'
+            : 'Workflow ended with failure status',
+          contextData: { ...context }, outputVariable, nodeAttempt: attempt,
+        });
+        return result;
+      }
+    }
+    await emit({
+      instanceID, nodeID: nodeID, nodeType, status: common.repairedNodeOutcomes && result.skipped ? 'SKIPPED' : WORKFLOW_PROGRESS.SUCCESS, output: result.output,
       contextData: { ...context }, outputVariable, nodeAttempt: attempt,
     });
+    if (common.repairedHumanInput && common.isCancelled()) throw ApplicationFailure.nonRetryable('Workflow cancelled via signal');
     return result;
   }
 
@@ -260,9 +411,103 @@ async function executeNode(node, context, common) {
 // Loop — native JS for-loop, no graph cycle
 // ──────────────────────────────────────────────────────────────────────────────
 
+// One scoped DAG scheduler for new main graphs and loop bodies. Edges are
+// pending/active/inactive; untaken exclusive paths propagate inactivity instead
+// of permanently blocking an all-join. A loop node is atomic in its parent scope.
+async function executeGraphScope(entryIDs, context, common, graph, boundaryNodeID = null) {
+  const roots = new Set(entryIDs);
+  const scope = new Set();
+  const outgoing = new Map();
+  const incoming = new Map();
+  const pending = [...roots];
+  while (pending.length) {
+    const id = pending.shift();
+    if (id === boundaryNodeID || scope.has(id)) continue;
+    const node = graph.nodeMap.get(id);
+    if (!node) throw ApplicationFailure.nonRetryable(`Unknown graph node ${id}`);
+    scope.add(id);
+    const edges = (graph.outgoingBySource.get(id) || []).filter(edge =>
+      node.type !== 'loop' || normalizeHandle(edge.sourceHandle) !== 'loop');
+    outgoing.set(id, edges);
+    for (const edge of edges) if (edge.target !== boundaryNodeID) pending.push(edge.target);
+  }
+  for (const id of scope) incoming.set(id, []);
+  const edgeState = new Map();
+  for (const edges of outgoing.values()) for (const edge of edges) {
+    if (scope.has(edge.target)) incoming.get(edge.target).push(edge);
+    edgeState.set(edge, 'pending');
+  }
+  // Reject non-loop cycles before executing any side effect in this scope.
+  const indegrees = new Map([...scope].map(id => [id, incoming.get(id).length]));
+  const acyclic = [...scope].filter(id => indegrees.get(id) === 0);
+  let visited = 0;
+  while (acyclic.length) {
+    const id = acyclic.shift(); visited++;
+    for (const edge of outgoing.get(id)) {
+      if (!scope.has(edge.target)) continue;
+      indegrees.set(edge.target, indegrees.get(edge.target) - 1);
+      if (indegrees.get(edge.target) === 0) acyclic.push(edge.target);
+    }
+  }
+  if (visited !== scope.size) throw ApplicationFailure.nonRetryable('Graph cycle must use an explicit loop boundary');
+
+  const unfinished = new Set(scope);
+  let lastResult = null;
+  while (unfinished.size) {
+    if (common.isCancelled()) throw ApplicationFailure.nonRetryable('Workflow cancelled via signal');
+    let progressed = false;
+    for (const id of [...unfinished].sort()) {
+      const node = graph.nodeMap.get(id);
+      const inputs = incoming.get(id);
+      const active = roots.has(id) || inputs.some(edge => edgeState.get(edge) === 'active');
+      const resolved = inputs.every(edge => edgeState.get(edge) !== 'pending');
+      if (!active && resolved) {
+        unfinished.delete(id);
+        for (const edge of outgoing.get(id)) edgeState.set(edge, 'inactive');
+        progressed = true;
+        break;
+      }
+      const joinMode = node.data?.joinMode ?? (node.type === 'loop' ? 'any' : 'all');
+      if (!active || (joinMode !== 'any' && !resolved)) continue;
+      const result = node.type === 'loop'
+        ? await executeLoopNode(node, context, common, graph)
+        : await executeNode(node, context, common);
+      if (common.isCancelled()) throw ApplicationFailure.nonRetryable('Workflow cancelled via signal');
+      let resumed = result;
+      if (result?.__suspend) resumed = await waitForHumanNode(node, result, context, common);
+      if (resumed?.__workflowTerminal) return resumed;
+      if (node.type === 'end') return {
+        __workflowTerminal: true, finalStatus: resolveEndTerminalStatus(resumed.output?.status),
+        workflowOutput: resumed.output?.workflowOutput ?? null,
+      };
+      if (resumed?.__skipItem) {
+        if (!boundaryNodeID) throw ApplicationFailure.nonRetryable('skip_item can only be used inside a loop');
+        return resumed;
+      }
+      unfinished.delete(id);
+      lastResult = resumed;
+      const all = outgoing.get(id);
+      const handles = resumed?.__fanout ? resumed.handles : [resumed?.nextHandle || 'output'];
+      let selected = all.filter(edge => handles.some(handle => normalizeHandle(handle) === normalizeHandle(edge.sourceHandle)));
+      if (!selected.length && (node.type === 'condition' || node.type === 'switch')) selected = all.filter(edge => normalizeHandle(edge.sourceHandle) === 'default');
+      if (!selected.length && handles[0] !== 'error') selected = all.filter(edge => normalizeHandle(edge.sourceHandle) === 'output');
+      if (!selected.length && node.type === 'loop') selected = all.filter(edge => ['completed', 'done'].includes(normalizeHandle(edge.sourceHandle)));
+      if (!selected.length && resumed?.output?.success === false) throw ApplicationFailure.nonRetryable(`Unhandled failure at node ${id}: connect its ${handles[0]} path`);
+      for (const edge of all) edgeState.set(edge, selected.includes(edge) ? 'active' : 'inactive');
+      progressed = true;
+      break;
+    }
+    if (!progressed) throw ApplicationFailure.nonRetryable(`Graph deadlock: ${[...unfinished].sort().join(', ')}`);
+  }
+  return lastResult;
+}
+
 async function executeLoopNode(loopNode, context, common, graph) {
+  if (common.repairedGraph && graph.loopAncestors?.includes(loopNode.id)) throw ApplicationFailure.nonRetryable(`Recursive loop boundary ${loopNode.id}`);
+  const bodyGraph = { ...graph, loopAncestors: [...(graph.loopAncestors || []), loopNode.id] };
   const { nodeMap, outgoingBySource } = graph;
   const { instanceID, workflowConfig } = common;
+  const emit = payload => emitNodeProgress(common, payload);
   const nodeConfig = loopNode.data || {};
   const outputVariable = nodeConfig.outputVariable || 'loopResults';
   const itemVariable = nodeConfig.itemVariable || 'item';
@@ -279,7 +524,7 @@ async function executeLoopNode(loopNode, context, common, graph) {
   if (nodeConfig.isDisabled) {
     context[outputVariable] = [];
     context[`__node_${loopNode.id}`] = { output: { [outputVariable]: [] }, status: 'success' };
-    await safeEmitProgress({
+    await emit({
       instanceID, nodeID: loopNode.id, nodeType: 'loop', status: WORKFLOW_PROGRESS.SUCCESS,
       output: { [outputVariable]: [], totalItems: 0, skipped: true, success: true },
       contextData: { ...context }, outputVariable,
@@ -291,7 +536,7 @@ async function executeLoopNode(loopNode, context, common, graph) {
   if (!Array.isArray(items)) items = normalizeItems(items);
   if (items.length > maxIterations) throw ApplicationFailure.nonRetryable(`Loop ${loopNode.id} has ${items.length} items > maxIterations ${maxIterations}`);
 
-  await safeEmitProgress({
+  await emit({
     instanceID, nodeID: loopNode.id, nodeType: 'loop', status: WORKFLOW_PROGRESS.RUNNING, output: null,
     contextData: { ...context }, outputVariable,
   });
@@ -299,12 +544,14 @@ async function executeLoopNode(loopNode, context, common, graph) {
   const loopResults = [];
   const loopOutgoing = outgoingBySource.get(loopNode.id) || [];
   const loopBodyEdge = loopOutgoing.find((e) => normalizeHandle(e.sourceHandle) === 'loop');
+  const bodyEntryIDs = loopOutgoing.filter(edge => normalizeHandle(edge.sourceHandle) === 'loop').map(edge => edge.target);
   const completedEdge = loopOutgoing.find((e) => ['completed', 'done'].includes(normalizeHandle(e.sourceHandle)));
   const bodyEntryID = loopBodyEdge?.target;
 
   if (!bodyEntryID && items.length > 0) {
+    if (common.repairedGraph) throw ApplicationFailure.nonRetryable(`Loop ${loopNode.id} has items but no body path`);
     context[outputVariable] = [];
-    await safeEmitProgress({
+    await emit({
       instanceID, nodeID: loopNode.id, nodeType: 'loop', status: WORKFLOW_PROGRESS.SUCCESS,
       output: { [outputVariable]: [], totalItems: items.length, success: true },
       contextData: { ...context }, outputVariable,
@@ -313,6 +560,7 @@ async function executeLoopNode(loopNode, context, common, graph) {
   }
 
   async function executeBodyIteration(iterContext) {
+    if (common.repairedGraph) return executeGraphScope(bodyEntryIDs, iterContext, common, bodyGraph, loopNode.id);
     if (!bodyEntryID) return null;
     let currentID = bodyEntryID;
     let lastResult = null;
@@ -328,6 +576,9 @@ async function executeLoopNode(loopNode, context, common, graph) {
       } else {
         res = await executeNode(curNode, iterContext, common);
         if (res?.__suspend) {
+          if (common.repairedHumanInput) {
+            res = await waitForHumanNode(curNode, res, iterContext, common);
+          } else {
           const timeout = resolveHumanTimeout(curNode.data, workflowConfig);
           const ok = await condition(() => common.humanInputs[res.nodeID] !== undefined, timeout);
           if (!ok) {
@@ -338,7 +589,7 @@ async function executeLoopNode(loopNode, context, common, graph) {
               : { expired: true };
             iterContext[res.outputVariable] = expiredData;
             iterContext[`__node_${res.nodeID}`] = { output: { [res.outputVariable]: expiredData }, status: 'success' };
-            await safeEmitProgress({
+            await emit({
               instanceID, nodeID: res.nodeID, nodeType: curNode.type, status: WORKFLOW_PROGRESS.SUCCESS,
               output: { [res.outputVariable]: expiredData, success: true },
               errorMessage: 'Approval expired (timeout)',
@@ -356,12 +607,13 @@ async function executeLoopNode(loopNode, context, common, graph) {
             }
             iterContext[res.outputVariable] = resumeData;
             iterContext[`__node_${res.nodeID}`] = { output: { [res.outputVariable]: resumeData }, status: 'success' };
-            await safeEmitProgress({
+            await emit({
               instanceID, nodeID: res.nodeID, nodeType: curNode.type, status: WORKFLOW_PROGRESS.SUCCESS,
               output: { [res.outputVariable]: resumeData, success: true },
               contextData: { ...iterContext }, outputVariable: res.outputVariable,
             });
             res = { output: { [res.outputVariable]: resumeData, success: true }, nextHandle: resumeHandle };
+          }
           }
         }
       }
@@ -384,8 +636,14 @@ async function executeLoopNode(loopNode, context, common, graph) {
     try {
       iterationResult = await executeBodyIteration(iterContext);
     } catch (iterErr) {
+      if (common.repairedHumanInput && (common.isCancelled() || iterErr?.name === 'CancelledFailure' || iterErr?.cause?.name === 'CancelledFailure')) throw iterErr;
       if ((nodeConfig.errorHandling || ERROR_HANDLING.FAIL_WORKFLOW) === ERROR_HANDLING.FAIL_WORKFLOW) throw iterErr;
       iterationResult = { output: { success: false, error: iterErr.message }, nextHandle: 'error' };
+    }
+    if (common.repairedNodeOutcomes && iterationResult?.__skipItem) continue;
+    if (common.repairedGraph && iterationResult?.__workflowTerminal) {
+      Object.assign(context, iterContext);
+      return iterationResult;
     }
     let bodyValue;
     if (iterationResult?.output) {
@@ -401,7 +659,7 @@ async function executeLoopNode(loopNode, context, common, graph) {
 
   context[outputVariable] = loopResults;
   context[`__node_${loopNode.id}`] = { output: { [outputVariable]: loopResults }, status: 'success' };
-  await safeEmitProgress({
+  await emit({
     instanceID, nodeID: loopNode.id, nodeType: 'loop', status: WORKFLOW_PROGRESS.SUCCESS,
     output: { [outputVariable]: loopResults, totalItems: items.length, success: true },
     contextData: { ...context }, outputVariable,
@@ -421,8 +679,19 @@ export async function dslInterpreterWorkflow({ nodes, edges, initialContext, ins
   // (same field names) fills gaps, platform defaults apply last (see policy).
   const wfConfig = { ...(workflowOptions || {}), ...(workflowConfig || {}) };
 
+  const repairedHumanInput = typeof patched === 'function' && patched('human-input-protocol-v2');
+  const repairedNodeOutcomes = typeof patched === 'function' && patched('node-outcome-contract-v2');
+  const repairedGraph = typeof patched === 'function' && patched('scoped-graph-routing-v2');
+  const finalize = repairedNodeOutcomes ? durableActivities.emitWorkflowCompletedActivity : emitWorkflowCompletedActivity;
+  const activeWaitIDs = new Set();
+  const requestSignals = new Set();
+
   const humanInputs = {};
   setHandler(submitHumanInputSignal, (payload) => {
+    if (repairedHumanInput) {
+      if (payload?.waitID && activeWaitIDs.has(payload.waitID) && payload.collectionRequestID) requestSignals.add(payload.collectionRequestID);
+      return;
+    }
     const nid = payload.nodeID || payload.nodeId;
     if (nid) humanInputs[nid] = payload.data ?? payload.submittedData ?? payload;
   });
@@ -443,7 +712,20 @@ export async function dslInterpreterWorkflow({ nodes, edges, initialContext, ins
     const completed = new Set();
     let frontier = [startNode.id];
     const enqueued = new Set(frontier);
-    const common = { instanceID, tenantID, workflowID, humanInputs, workflowConfig: wfConfig };
+    const common = {
+      instanceID, tenantID, workflowID, humanInputs, workflowConfig: wfConfig,
+      repairedHumanInput, repairedNodeOutcomes, repairedGraph, activeWaitIDs, requestSignals, waitCounter: 0, isCancelled: () => cancelled,
+    };
+
+    if (repairedGraph) {
+      runtimeContract.validateExecutableGraph(nodes, edges);
+      const result = await executeGraphScope([startNode.id], context, common, { nodeMap, outgoingBySource, incomingByTarget });
+      const finalStatus = result?.__workflowTerminal ? result.finalStatus : 'COMPLETED';
+      const workflowOutput = result?.__workflowTerminal ? result.workflowOutput : context.output ?? null;
+      await finalize({ instanceID, finalStatus, contextData: { ...context }, workflowOutput,
+        ...(finalStatus === 'FAILED' ? { errorMessage: 'Workflow ended with failure status' } : {}) });
+      return { ...context, _workflowStatus: finalStatus, _workflowOutput: workflowOutput };
+    }
 
     while (frontier.length > 0) {
       if (cancelled) throw ApplicationFailure.nonRetryable('Workflow cancelled via signal');
@@ -491,12 +773,20 @@ export async function dslInterpreterWorkflow({ nodes, edges, initialContext, ins
           } else if (node.type === 'end') {
             const res = await executeNode(node, context, common);
             completed.add(nid);
-            const finalStatus = res.output?.status === 'error' ? 'FAILED' : 'COMPLETED';
-            await emitWorkflowCompletedActivity({ instanceID, finalStatus, contextData: { ...context }, workflowOutput: res.output?.workflowOutput || null });
-            return { ...context, _workflowStatus: finalStatus, _workflowOutput: res.output?.workflowOutput || null };
+            const finalStatus = resolveEndTerminalStatus(res.output?.status);
+            await finalize({ instanceID, finalStatus, contextData: { ...context }, workflowOutput: (repairedNodeOutcomes ? res.output?.workflowOutput ?? null : res.output?.workflowOutput || null), ...(finalStatus === 'FAILED' ? { errorMessage: 'Workflow ended with failure status' } : {}) });
+            return { ...context, _workflowStatus: finalStatus, _workflowOutput: repairedNodeOutcomes ? res.output?.workflowOutput ?? null : res.output?.workflowOutput || null };
           } else {
             const result = await executeNode(node, context, common);
+            if (repairedNodeOutcomes && result?.__skipItem) throw ApplicationFailure.nonRetryable('skip_item can only be used inside a loop');
             if (result?.__suspend) {
+              if (repairedHumanInput) {
+                const resumed = await waitForHumanNode(node, result, context, common);
+                completed.add(nid);
+                let outgoing = getOutgoingEdges(nid, resumed.nextHandle, outgoingBySource);
+                if (!outgoing.length && resumed.nextHandle !== 'error') outgoing = getOutgoingEdges(nid, 'output', outgoingBySource);
+                for (const edge of outgoing) if (!completed.has(edge.target) && !nextAdditions.includes(edge.target)) nextAdditions.push(edge.target);
+              } else {
               const timeout = resolveHumanTimeout(node.data, wfConfig);
               await createDataCollectionRequestActivity({ instanceID, nodeID: nid, nodeAttempt: 1, collectionConfig: result.collectionConfig });
               const signalled = await condition(() => humanInputs[nid] !== undefined, timeout);
@@ -537,6 +827,7 @@ export async function dslInterpreterWorkflow({ nodes, edges, initialContext, ins
                 let resumeOutgoing = getOutgoingEdges(nid, resumeHandle, outgoingBySource);
                 if (resumeOutgoing.length === 0 && resumeHandle !== 'output') resumeOutgoing = getOutgoingEdges(nid, 'output', outgoingBySource);
                 for (const e of resumeOutgoing) if (!completed.has(e.target) && !nextAdditions.includes(e.target)) nextAdditions.push(e.target);
+              }
               }
             } else if (result?.__fanout && Array.isArray(result.handles)) {
               completed.add(nid);
@@ -586,9 +877,9 @@ export async function dslInterpreterWorkflow({ nodes, edges, initialContext, ins
         for (const { nid, result, node } of parallelResults) {
           completed.add(nid);
           if (node.type === 'end') {
-            const finalStatus = result?.output?.status === 'error' ? 'FAILED' : 'COMPLETED';
-            await emitWorkflowCompletedActivity({ instanceID, finalStatus, contextData: { ...context }, workflowOutput: result?.output?.workflowOutput || null });
-            return { ...context, _workflowStatus: finalStatus, _workflowOutput: result?.output?.workflowOutput || null };
+            const finalStatus = resolveEndTerminalStatus(result?.output?.status);
+            await finalize({ instanceID, finalStatus, contextData: { ...context }, workflowOutput: (repairedNodeOutcomes ? result?.output?.workflowOutput ?? null : result?.output?.workflowOutput || null), ...(finalStatus === 'FAILED' ? { errorMessage: 'Workflow ended with failure status' } : {}) });
+            return { ...context, _workflowStatus: finalStatus, _workflowOutput: repairedNodeOutcomes ? result?.output?.workflowOutput ?? null : result?.output?.workflowOutput || null };
           }
           if (result?.__fanout && Array.isArray(result.handles)) {
             for (const h of result.handles) {
@@ -610,14 +901,14 @@ export async function dslInterpreterWorkflow({ nodes, edges, initialContext, ins
       frontier = newFrontier;
       if (frontier.length === 0) {
         const endNode = nodes.find((n) => n.type === 'end');
-        if (endNode && !completed.has(endNode.id)) {
+        if (!repairedNodeOutcomes && endNode && !completed.has(endNode.id)) {
           await emitWorkflowCompletedActivity({ instanceID, finalStatus: 'COMPLETED', contextData: { ...context }, workflowOutput: null });
         }
         break;
       }
     }
   } catch (err) {
-    const message = err?.message || String(err);
+    const message = repairedNodeOutcomes ? runtimeContract.describeWorkflowFailure(err).message : err?.message || String(err);
     const isCancel =
       cancelled ||
       err?.name === 'CancelledFailure' ||
@@ -627,7 +918,7 @@ export async function dslInterpreterWorkflow({ nodes, edges, initialContext, ins
       // cancelled scope would otherwise reject this activity immediately and
       // the run would again end with no status update.
       await CancellationScope.nonCancellable(() =>
-        emitWorkflowCompletedActivity({
+        finalize({
           instanceID,
           finalStatus: isCancel ? 'CANCELLED' : 'FAILED',
           contextData: { ...context },
@@ -639,6 +930,10 @@ export async function dslInterpreterWorkflow({ nodes, edges, initialContext, ins
       // Best effort only — never mask the original failure.
     }
     throw err;
+  }
+  if (repairedNodeOutcomes) {
+    await finalize({ instanceID, finalStatus: 'COMPLETED', contextData: { ...context }, workflowOutput: context.output ?? null });
+    return { ...context, _workflowStatus: 'COMPLETED', _workflowOutput: context.output ?? null };
   }
   try { await emitWorkflowCompletedActivity({ instanceID, finalStatus: 'COMPLETED', contextData: { ...context }, workflowOutput: context.output || null }); } catch (_) {}
   return context;

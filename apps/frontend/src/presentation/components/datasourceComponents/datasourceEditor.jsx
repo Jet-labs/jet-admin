@@ -83,6 +83,10 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
 
   const currentDatasourceType = getDatasourceTypeByValue(datasourceEditorForm.values.datasourceType);
 
+  // Keep the initial empty render clean. Field errors are shown after the
+  // first submit attempt (and continue updating live from then on).
+  const showValidation = Number(datasourceEditorForm.submitCount || 0) > 0;
+
   // Build the strict editor form interface for dedicated editors
   const strictEditorForm = useMemo(
     () => buildDatasourceEditorForm(datasourceEditorForm),
@@ -130,7 +134,7 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
               value={datasourceEditorForm.values.datasourceTitle}
             />
             {datasourceEditorForm.touched.datasourceTitle && datasourceEditorForm.errors.datasourceTitle && (
-              <p className="text-xs text-red-500">
+              <p className="text-xs text-destructive">
                 {datasourceEditorForm.errors.datasourceTitle}
               </p>
             )}
@@ -168,7 +172,7 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
               </SelectContent>
             </Select>
             {datasourceEditorForm.touched.datasourceType && datasourceEditorForm.errors.datasourceType && (
-              <p className="text-xs text-red-500">
+              <p className="text-xs text-destructive">
                 {datasourceEditorForm.errors.datasourceType}
               </p>
             )}
@@ -201,11 +205,16 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
                 <OAuthContext.Provider value={{ startOAuth, loading: isOAuthLoading }}>
                   <FileUploadContext.Provider value={{ uploadFile: handleUploadFile }}>
                     <JsonForms
+                      // Force a fresh renderer tree on type switch so inputs
+                      // do not retain the previous type's placeholder/values
+                      // (e.g. WebSocket URL placeholder or Connection Name).
+                      key={datasourceEditorForm.values.datasourceType}
                       schema={currentDatasourceType.formConfig.schema}
                       uischema={currentDatasourceType.formConfig.uischema}
                       data={datasourceEditorForm.values.datasourceOptions}
                       renderers={[...materialRenderers, ...customJSONFormRenderers]}
                       cells={materialCells}
+                      validationMode={showValidation ? "ValidateAndShow" : "ValidateAndHide"}
                       onChange={handleDatasourceOptionsChange}
                     />
                   </FileUploadContext.Provider>

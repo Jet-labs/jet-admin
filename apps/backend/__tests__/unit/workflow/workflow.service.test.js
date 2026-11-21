@@ -64,4 +64,38 @@ describe('workflow.service graph persistence payload', () => {
       },
     ]);
   });
+
+  it('persists End node outputParameters inside nodeConfig', () => {
+    const outputParameters = [
+      {
+        id: 'output_1',
+        name: 'qa_result',
+        sourceVariable: '{{ctx.input.qa}}',
+        description: 'QA output',
+      },
+    ];
+
+    const result = buildWorkflowGraphPersistencePayload({
+      workflowID: 'workflow-1',
+      nodes: [
+        {
+          id: 'end-1',
+          type: 'end',
+          data: {
+            title: 'QA End',
+            status: 'failure',
+            outputParameters,
+          },
+          position: { x: 1, y: 2 },
+        },
+      ],
+      edges: [],
+    });
+
+    expect(result.nodeCreateManyData[0].nodeConfig).toMatchObject({
+      title: 'QA End',
+      status: 'failure',
+      outputParameters,
+    });
+  });
 });

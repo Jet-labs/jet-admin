@@ -1,0 +1,52 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "databasePath": {
+        "type": "string",
+        "description": "DuckDB database file path, or ':memory:' for an ephemeral in-memory database.",
+        "default": ":memory:"
+      },
+      "readonly": {
+        "type": "boolean",
+        "description": "Open the database read-only (recommended for file-backed databases).",
+        "default": false
+      },
+      "memoryLimit": {
+        "type": "string",
+        "description": "Optional memory limit, e.g. '2GB'. Leave empty for defaults."
+      }
+    },
+    "required": ["databasePath"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/databasePath",
+            "label": "Database Path"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/readonly",
+            "label": "Read Only"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/memoryLimit",
+        "label": "Memory Limit"
+      }
+    ]
+  },
+  "data": {
+    "databasePath": ":memory:",
+    "readonly": false,
+    "memoryLimit": ""
+  }
+}

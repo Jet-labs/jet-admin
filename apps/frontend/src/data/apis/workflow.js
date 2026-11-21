@@ -93,7 +93,7 @@ export const createWorkflowAPI = async ({ tenantID, workflowData }) => {
         }
       );
       if (response.data && response.data.success === true) {
-        return true;
+        return response.data.workflow;
       } else if (response.data.error) {
         throw response.data.error;
       } else {
@@ -470,4 +470,16 @@ export const getDataCollectionRequestAPI = async ({ tenantID, collectionRequestI
   } catch (error) {
     throw error;
   }
+};
+
+/** Requests server cancellation; it does not imply the run is already terminal. */
+export const cancelWorkflowAPI = async ({ tenantID, instanceID }) => {
+  const bearerToken = await firebaseAuth.currentUser?.getIdToken();
+  if (!bearerToken) throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+  const response = await axios.post(
+    CONSTANTS.SERVER_HOST + CONSTANTS.APIS.WORKFLOW.cancelWorkflowAPI(tenantID, instanceID),
+    {}, { headers: { authorization: `Bearer ${bearerToken}` } }
+  );
+  if (!response.data?.success) throw response.data?.error || CONSTANTS.ERROR_CODES.SERVER_ERROR;
+  return response.data;
 };

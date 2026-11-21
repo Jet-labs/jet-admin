@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 
 import { CONSTANTS } from "../../../constants";
@@ -12,7 +12,7 @@ import { Breadcrumbs } from "../ui/breadCrumbs";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { UserAvatar } from "../ui/userAvatar";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
-import { Sparkles } from "lucide-react";
+import { Menu, Sparkles, X } from "lucide-react";
 import { AIChatPanel } from "../aiComponents/AIChatPanel";
 import { useAIStore } from "../../../logic/stores/useAIStore";
 import { Input } from "@jet-admin/ui";
@@ -21,11 +21,13 @@ export const ProtectedLayout = () => {
   const { firebaseUserState } = useAuthState();
   const { tenantID } = useParams();
   const { getUserConfig } = useAuthActions();
-  const { isOpen, togglePanel, openPanel, openWithMessage } = useAIStore();
+  const { togglePanel, openPanel, openWithMessage } = useAIStore();
   const [agentQuery, setAgentQuery] = useState("");
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const agentInputRef = useRef(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (tenantID && firebaseUserState && firebaseUserState.user) {
@@ -50,10 +52,18 @@ export const ProtectedLayout = () => {
         e.preventDefault();
         togglePanel();
       }
+      if (e.key === "Escape") {
+        setIsMobileNavOpen(false);
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [togglePanel]);
+
+  // Mobile navigation is an overlay; dismiss it on every route change.
+  useEffect(() => {
+    setIsMobileNavOpen(false);
+  }, [location.pathname]);
 
   return (
     <ReactQueryLoadingErrorWrapper
@@ -62,30 +72,37 @@ export const ProtectedLayout = () => {
       loadingContainerClass="h-screen w-screen bg-background flex flex-col justify-center items-center"
     >
       <div className="flex h-full w-full flex-col justify-start items-stretch overflow-hidden">
-        <nav className="w-full  border-b-2 border-primary bg-background">
-          <div className="px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center justify-start rtl:justify-end gap-4">
-                <Link to="/">
+        <nav className="w-full border-b border-border bg-background">
+          <div className="px-3 py-2 sm:px-4 sm:py-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center justify-start gap-2 rtl:justify-end sm:gap-4">
+                <button
+                  type="button"
+                  onClick={() => setIsMobileNavOpen(true)}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
+                  aria-label="Open navigation"
+                  aria-expanded={isMobileNavOpen}
+                >
+                  <Menu className="h-4 w-4" />
+                </button>
+                <Link to="/" className="shrink-0">
                   <div className="flex flex-row items-end">
-                    <img src={logo} className="w-8 h-8" />
+                    <img src={logo} className="h-8 w-8" alt="Jet Admin" />
                   </div>
                 </Link>
-
               </div>
 
 
-              <div className="flex flex-row justify-end items-center gap-3 flex-1 ">
+              <div className="flex min-w-0 flex-1 flex-row items-center justify-end gap-2 sm:gap-3">
                 <Breadcrumbs />
                 {/* AI Agent input */}
                 {tenantID && (
-
                   <Input
                     ref={agentInputRef}
                     type="text"
                     size="sm"
                     value={agentQuery}
-                    className="max-w-32"
+                    className="hidden max-w-32 sm:block"
                     onChange={(e) => setAgentQuery(e.target.value)}
                     onFocus={() => openPanel()}
                     onKeyDown={(e) => {
@@ -101,8 +118,16 @@ export const ProtectedLayout = () => {
                     onClick={(e) => e.stopPropagation()}
                     placeholder="Ask Agent…"
                   />
-
                 )}
+
+                <button
+                  type="button"
+                  onClick={() => openPanel()}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:hidden"
+                  aria-label="Open AI assistant"
+                >
+                  <Sparkles className="h-4 w-4" />
+                </button>
 
                 <UserAvatar />
               </div>
@@ -116,10 +141,15 @@ export const ProtectedLayout = () => {
           }
           className="flex-1 overflow-hidden w-full"
         >
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
+          <ResizablePanel
+            defaultSize={20}
+            minSize={15}
+            maxSize={30}
+            className="max-md:hidden"
+          >
             <MainDrawerList />
           </ResizablePanel>
-          <ResizableHandle withHandle={true} />
+          <ResizableHandle withHandle={true} className="max-md:hidden" />
           <ResizablePanel defaultSize={80}>
             <div className="w-full h-full overflow-hidden bg-background">
               <Outlet />
@@ -127,6 +157,36 @@ export const ProtectedLayout = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
+
+      {/* Mobile navigation overlay */}
+      {isMobileNavOpen && (
+        <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true" aria-label="Navigation">
+          <button
+            type="button"
+            aria-label="Close navigation"
+            className="absolute inset-0 bg-background/70 backdrop-blur-sm"
+            onClick={() => setIsMobileNavOpen(false)}
+          />
+          <aside className="relative flex h-full w-72 max-w-[85vw] flex-col border-r border-border bg-background shadow-lg">
+            <div className="flex items-center justify-between border-b border-border p-2">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Navigation
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsMobileNavOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label="Close navigation"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1">
+              <MainDrawerList />
+            </div>
+          </aside>
+        </div>
+      )}
 
       {/* AI Chat Panel — fixed position, doesn't affect layout */}
       <AIChatPanel />

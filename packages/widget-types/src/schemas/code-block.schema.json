@@ -4,11 +4,35 @@
   "schema": {
     "type": "object",
     "properties": {
-      "code": { "type": "string", "description": "Code content. Supports templates." },
-      "language": { "type": "string", "default": "sql", "description": "Language label e.g. sql, json, bash, javascript" },
-      "showCopy": { "type": "boolean", "default": true },
-      "maxHeight": { "type": "number", "description": "Max height in px before scrolling" }
+      "code": {
+        "type": "string",
+        "description": "Code content. Supports templates."
+      },
+      "language": {
+        "type": "string",
+        "default": "sql",
+        "description": "Language label e.g. sql, json, bash, javascript"
+      },
+      "showCopy": {
+        "type": "boolean",
+        "default": true
+      },
+      "maxHeight": {
+        "type": "number",
+        "description": "Max height in px before scrolling"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad"
+  ]
 }

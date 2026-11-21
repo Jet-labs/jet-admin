@@ -89,6 +89,7 @@ export async function executeSubWorkflow(nodeConfig, context, helpers = {}, serv
           (child?.errorMessage ? `: ${child.errorMessage}` : '')
       );
       if (child?.childInstanceID) err.childInstanceID = child.childInstanceID;
+      err.childStatus = child?.status || 'UNKNOWN';
       throw err;
     }
 
@@ -104,9 +105,10 @@ export async function executeSubWorkflow(nodeConfig, context, helpers = {}, serv
     // merges activity output into ctx; `input` is excluded so the parent's
     // own inputs can never be clobbered by a child.
     if (mergeOutputs && child.contextSnapshot && typeof child.contextSnapshot === 'object') {
+      output.__contextPatch = {};
       for (const [k, v] of Object.entries(child.contextSnapshot)) {
         if (k === 'input' || k.startsWith('__')) continue;
-        if (!(k in output)) output[k] = v;
+        if (!(k in output)) output.__contextPatch[k] = v;
       }
     }
 

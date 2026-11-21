@@ -12,17 +12,10 @@ async function emitWorkflowCompletedActivity({ instanceID, finalStatus, contextD
     const { socketIO } = require('../../../../config/socket.io');
     const { widgetWorkflowBridge } = require('../../../widget/widgetWorkflowBridge');
     const userContext = contextData ? Object.fromEntries(Object.entries(contextData).filter(([k]) => !k.startsWith('__'))) : {};
-    if (finalStatus === 'FAILED' && errorMessage) {
-      // Instance-level failure row so the run-details timeline can show WHY
-      // the run failed (NODE_FAILED rows are excluded from context assembly).
-      await stateManager.logEvent({
-        instanceID,
-        nodeID: null,
-        eventType: constants.WORKFLOW_LOG_EVENT_TYPES.NODE_FAILED,
-        errorMessage,
-      });
-    }
-    await stateManager.completeInstance(instanceID, finalStatus);
+    const changed = await stateManager.completeInstance(instanceID, finalStatus, {
+      contextData, workflowOutput, errorMessage: finalStatus === 'FAILED' ? errorMessage : undefined,
+    });
+    if (!changed) return { completed: false }; // terminal state is absorbing
     const roomSize = socketIO.sockets?.adapter?.rooms?.get?.(instanceID)?.size ?? null;
     if (roomSize === 0 || roomSize === null) {
       Logger.log('warning', {
@@ -30,14 +23,18 @@ async function emitWorkflowCompletedActivity({ instanceID, finalStatus, contextD
         params: { instanceID, finalStatus, roomSize },
       });
     }
-    socketIO.to(instanceID).emit(constants.SOCKET_EMIT_EVENTS.WORKFLOW_STATUS_UPDATE, {
-      instanceID,
-      status: finalStatus,
-      contextData: userContext,
-      output: workflowOutput || null,
-      ...(errorMessage ? { error: errorMessage } : {}),
-    });
-    widgetWorkflowBridge.emitWorkflowStatus(instanceID, finalStatus, userContext);
+    try {
+      socketIO.to(instanceID).emit(constants.SOCKET_EMIT_EVENTS.WORKFLOW_STATUS_UPDATE, {
+        instanceID,
+        status: finalStatus,
+        contextData: userContext,
+        output: workflowOutput ?? null,
+        ...(errorMessage ? { error: errorMessage } : {}),
+      });
+      widgetWorkflowBridge.emitWorkflowStatus(instanceID, finalStatus, userContext);
+    } catch (notificationError) {
+      Logger.log('warning', { message: 'temporal:workflowCompleted:notificationFailed', params: { instanceID, error: notificationError.message } });
+    }
     Logger.log('success', { message: 'temporal:workflowCompleted', params: { instanceID, finalStatus, ...(errorMessage ? { errorMessage } : {}) } });
     return { completed: true };
   } catch (err) {

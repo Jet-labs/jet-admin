@@ -15,9 +15,11 @@ const createAppPageSchema = z.object({
 }).passthrough();
 
 const updateAppPageSchema = z.object({
-  appPageTitle: z.string().min(1, "appPageTitle is required").max(255),
+  // PATCH semantics: every field is optional; the service updates only what
+  // was supplied (title-only renames, config-only saves, etc.).
+  appPageTitle: z.string().min(1, "appPageTitle is required").max(255).optional(),
   appPageDescription: z.string().optional(),
-  appPageConfig: z.object({}).passthrough(),
+  appPageConfig: z.object({}).passthrough().optional(),
 }).passthrough();
 
 // ============================================================

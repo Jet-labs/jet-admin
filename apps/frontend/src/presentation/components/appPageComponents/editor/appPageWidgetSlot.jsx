@@ -19,9 +19,8 @@ import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../../constants";
 import { getWidgetByIDAPI } from "../../../../data/apis/widget";
 import { ReactQueryLoadingErrorWrapper } from "../../ui/reactQueryLoadingErrorWrapper";
-import { Badge, Button, Card, ErrorBoundary } from "@jet-admin/ui";
+import { Button, Card, ErrorBoundary } from "@jet-admin/ui";
 import { resolveWidgetData } from "@jet-admin/widgets-logic";
-import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
 
 import {
   useAppPageStateTree,
@@ -30,7 +29,13 @@ import {
   useWidgetEventHandlers,
 } from "../../../../logic/appPageRuntime";
 import { resolveConfig } from "../../../../logic/evaluationEngine";
-import { parseWidgetKey } from "./appPageLayoutUtils";
+import {
+  buildIterationWidgetsView,
+  deriveSlotIdentity,
+  groupInstancesByResource,
+} from "../../../../logic/appPageRuntime/widgetInstanceIdentity";
+import { shapeTableRowSelect } from "../../../../logic/appPageRuntime/useWidgetEventHandlers";
+import { getWidgetDisplayName } from "../../../../utils/widgetDisplay";
 
 const WidgetContent = ({
   RenderedWidgetComponent,
@@ -46,6 +51,9 @@ const WidgetContent = ({
   widgetState,
   setWidgetState,
   widgetID,
+  resourceID,
+  placementKey,
+  instanceID,
 }) => {
   const widgetData = useMemo(() => {
     return resolveWidgetData({
@@ -73,9 +81,23 @@ const WidgetContent = ({
     };
   }, [widgetType, fireWidgetEvent]);
 
+  // Shaped table row-selection route (B04/F02): TableWidget notifies ONLY the
+  // direct onRowSelect(row, rowIndex) callback. Shape it here into exactly one
+  // flat fireWidgetEvent call ({{ event.row }} / {{ event.rowIndex }}) instead
+  // of the generic { inputs } nesting, and instead of a second direct fire.
+  const tableHandlers = useMemo(() => {
+    if (widgetType !== "table") return {};
+    return {
+      onRowSelect: shapeTableRowSelect(fireWidgetEvent),
+    };
+  }, [widgetType, fireWidgetEvent]);
+
   return (
     <RenderedWidgetComponent
       widgetID={widgetID}
+      resourceID={resourceID}
+      placementKey={placementKey}
+      instanceID={instanceID || widgetID}
       widgetTitle={widgetTitle}
       widgetType={widgetType}
       widgetConfig={resolvedConfig}
@@ -88,6 +110,7 @@ const WidgetContent = ({
       setWidgetState={setWidgetState}
       {...runtimeEventHandlers}
       {...drillHandlers}
+      {...tableHandlers}
     />
   );
 };
@@ -106,6 +129,9 @@ WidgetContent.propTypes = {
   widgetState: PropTypes.object,
   setWidgetState: PropTypes.func,
   widgetID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  resourceID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  placementKey: PropTypes.string,
+  instanceID: PropTypes.string,
 };
 
 const MemoizedWidgetContent = React.memo(WidgetContent);
@@ -118,9 +144,17 @@ export const AppPageWidgetSlot = ({
   editable = false,
   sizing,
   scopedStateTree = null,
+  repeatPath = [],
 }) => {
-  const widgetID = parseWidgetKey(widgetKey);
-  const [ref, size] = useComponentSize();
+  // B24 identity split: resourceID (persisted definition) vs instanceID
+  // (placement key, repeat-qualified inside repeats). State, methods and
+  // events are keyed by instanceID; fetches use resourceID.
+  const {
+    resourceID,
+    placementKey,
+    repeatPath: normalizedRepeatPath,
+    instanceID,
+  } = deriveSlotIdentity(widgetKey, repeatPath);
   const [isMouseHover, setIsMouseHover] = useState(false);
   const onLoadFiredRef = useRef(false);
 
@@ -130,19 +164,51 @@ export const AppPageWidgetSlot = ({
     error: loadWidgetError,
     refetch: refetchWidget,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), widgetID],
-    queryFn: () => getWidgetByIDAPI({ tenantID, widgetID }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), resourceID],
+    queryFn: () => getWidgetByIDAPI({ tenantID, widgetID: resourceID }),
     refetchOnWindowFocus: false,
   });
 
   const globalStateTree = useAppPageStateTree();
-  const stateTree = scopedStateTree || globalStateTree;
-  const { widgetState, setWidgetState } = useWidgetState(widgetID);
-  const { registerWidgetMethods } = useWidgetMethodRegistry(widgetID);
-  const { fireWidgetEvent } = useWidgetEventHandlers(
-    widgetID,
-    widget?.widgetConfig
+  const baseStateTree = scopedStateTree || globalStateTree;
+  const { widgetState, setWidgetState } = useWidgetState(instanceID);
+  const { registerWidgetMethods } = useWidgetMethodRegistry(instanceID);
+  const identityMeta = useMemo(
+    () => ({
+      resourceID,
+      placementKey,
+      repeatPath: normalizedRepeatPath,
+    }),
+    [resourceID, placementKey, normalizedRepeatPath]
   );
+  const { fireWidgetEvent } = useWidgetEventHandlers(
+    instanceID,
+    widget?.widgetConfig,
+    identityMeta
+  );
+  // F12: inside a repeat iteration, bare placement/resource refs in this
+  // placement's own config resolve to the firing iteration (deterministic per
+  // iteration), while global instance keys stay addressable explicitly.
+  const stateTree = useMemo(() => {
+    if (!baseStateTree || normalizedRepeatPath.length === 0) return baseStateTree;
+    const globalWidgets = baseStateTree.widgets || {};
+    if (globalWidgets[instanceID] === undefined) return baseStateTree;
+    const groups = groupInstancesByResource(Object.keys(globalWidgets));
+    const list = groups[resourceID] || [];
+    const solePlacement =
+      list.length >= 1 &&
+      list.every((id) => id === instanceID || id.startsWith(`${placementKey}::`));
+    return {
+      ...baseStateTree,
+      widgets: buildIterationWidgetsView({
+        globalWidgets,
+        placementKey,
+        resourceID,
+        instanceID,
+        solePlacementForResource: solePlacement,
+      }),
+    };
+  }, [baseStateTree, normalizedRepeatPath, instanceID, placementKey, resourceID]);
 
   useEffect(() => {
     if (widget && !onLoadFiredRef.current) {
@@ -207,7 +273,10 @@ export const AppPageWidgetSlot = ({
 
   const widgetStyleProps = resolvedConfig?.properties?.style || {};
   const customCSS = widgetStyleProps.customCSS;
-  const customCSSClassName = customCSS ? `custom-widget-${widgetID}` : "";
+  // Style content is per-resource; keep the class resource-keyed so duplicate
+  // placements share it (instance keys can carry repeat suffixes that are not
+  // valid CSS class names).
+  const customCSSClassName = customCSS ? `custom-widget-${resourceID}` : "";
   const containerCss = resolvedConfig?.properties?.containerTailwindCss || "";
   const widgetCss = resolvedConfig?.properties?.widgetTailwindCss || "";
 
@@ -236,128 +305,120 @@ export const AppPageWidgetSlot = ({
         <style dangerouslySetInnerHTML={{ __html: `.${customCSSClassName} { ${customCSS} }` }} />
       )}
       <Card
-        className={`!h-full !w-full flex-grow relative rounded-none overflow-hidden bg-background/95 transition-all duration-200 ${
-          widgetStyleProps.showBorder !== false ? "border shadow-sm" : ""
-        } ${isMouseHover ? "border-primary" : "border-border/80"} ${customCSSClassName} ${containerCss}`}
+        className={`relative flex h-full w-full flex-col overflow-hidden rounded bg-card transition-colors duration-150 ${
+          widgetStyleProps.showBorder !== false ? "border border-border/70 shadow-[0_1px_2px_rgba(0,0,0,0.05)]" : "border border-transparent"
+        } ${editable && isMouseHover ? "border-primary/60" : ""} ${customCSSClassName} ${containerCss}`}
         style={widgetInlineStyle}
         onMouseEnter={editable ? () => setIsMouseHover(true) : null}
         onMouseLeave={editable ? () => setIsMouseHover(false) : null}
         onClick={editable ? (e) => e.stopPropagation() : null}
       >
-        {handleDelete && isMouseHover && editable && (
-          <div className="absolute right-0 top-0 z-50">
-            <Button
-              onClick={() => handleDelete(index)}
-              variant="destructive-ghost"
-              size="sm"
-              square
-              className="rounded-none p-0 bg-primary/10 text-primary h-6 w-6"
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              aria-label="Remove widget"
-            >
-              <X className="!text-xs" />
-            </Button>
-          </div>
-        )}
-
-        <div
-          className="!flex-row justify-center !items-center !w-full !h-full"
-          ref={!sizing ? ref : null}
+        <ReactQueryLoadingErrorWrapper
+          isLoading={isLoadingWidget}
+          isFetching={isLoadingWidget}
+          error={loadWidgetError}
+          loadingContainerClass="bg-muted/30"
+          refetch={() => refetchWidget()}
         >
-          <div
-            className="relative flex h-full flex-col overflow-hidden bg-transparent w-full"
-            style={!sizing ? { width: size.width, height: size.height } : { width: "100%", height: "100%" }}
-          >
-            <ReactQueryLoadingErrorWrapper
-              isLoading={isLoadingWidget}
-              isFetching={isLoadingWidget}
-              error={loadWidgetError}
-              loadingContainerClass="bg-gradient-to-br from-background to-muted/50"
-              refetch={() => refetchWidget()}
-            >
-              {widget && showHeader && (
-                <div className="border-b border-border/80 bg-gradient-to-r from-muted/50 to-background p-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <div className="min-w-0">
-                          <div className="truncate text-xs font-semibold text-foreground">
-                            {widget.widgetTitle}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+          {widget && showHeader && (
+            <div className="flex items-center gap-2 border-b border-border/60 bg-muted/30 px-2 py-1.5">
+              <div className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground">
+                {getWidgetDisplayName({
+                  widgetTitle: widget.widgetTitle,
+                  widgetTypeLabel:
+                    WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType,
+                })}
+              </div>
 
-                    <div className="flex shrink-0 items-center gap-2">
-                      {refreshLabel ? (
-                        <Badge
-                          variant="outline"
-                          className="gap-2 border-border text-[11px] text-foreground"
-                        >
-                          <Clock className="text-[11px]" />
-                          {refreshLabel}
-                        </Badge>
-                      ) : null}
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        square
-                        className="h-6 w-6 text-foreground hover:bg-muted hover:text-foreground"
-                        onClick={() => {
-                          refetchWidget();
-                          fireWidgetEvent("onRefresh");
-                        }}
-                        aria-label="Refresh widget"
-                      >
-                        <RefreshCw
-                          className={
-                            isLoadingWidget
-                              ? "animate-spin h-3.5 w-3.5"
-                              : "h-3.5 w-3.5"
-                          }
-                        />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {widgetRender?.errorMessage ? (
-                <div className="flex h-full w-full items-center justify-center p-2">
-                  <span className="rounded border border-destructive/30 bg-destructive/10 p-2 text-center text-xs text-destructive">
-                    {widgetRender.errorMessage}
+              <div className="flex shrink-0 items-center gap-1">
+                {refreshLabel ? (
+                  <span
+                    className="hidden items-center gap-1 text-[11px] tabular-nums text-muted-foreground sm:inline-flex"
+                    title={`Auto-refresh every ${widget.refreshInterval}s`}
+                  >
+                    <Clock className="h-3 w-3" />
+                    {refreshLabel}
                   </span>
-                </div>
-              ) : null}
+                ) : null}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  square
+                  className="h-7 w-7 rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+                  onClick={() => {
+                    refetchWidget();
+                    fireWidgetEvent("onRefresh");
+                  }}
+                  aria-label="Refresh widget"
+                  title="Refresh widget"
+                >
+                  <RefreshCw
+                    className={
+                      isLoadingWidget
+                        ? "animate-spin h-3.5 w-3.5"
+                        : "h-3.5 w-3.5"
+                    }
+                  />
+                </Button>
+                {handleDelete && editable && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    square
+                    className={`h-7 w-7 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-opacity ${
+                      isMouseHover ? "opacity-100" : "opacity-0 pointer-events-none"
+                    }`}
+                    onClick={() => handleDelete(index)}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    aria-label="Remove widget"
+                    title="Remove widget"
+                    tabIndex={isMouseHover ? 0 : -1}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
 
-              {RenderedWidgetComponent
-                ? (
-                  <div className={`min-h-0 flex-1 bg-transparent ${widgetCss}`}>
-                    <ErrorBoundary title="Widget Render Error">
-                      <MemoizedWidgetContent
-                        RenderedWidgetComponent={RenderedWidgetComponent}
-                        widgetTitle={widget.widgetTitle}
-                        widgetType={widgetRender.widgetType}
-                        resolvedConfig={resolvedConfig}
-                        stateTreeQueries={stateTree.queries}
-                        handleOnWidgetInit={handleOnWidgetInit}
-                        refreshInterval={widget.refreshInterval}
-                        refetchWidget={refetchWidget}
-                        fireWidgetEvent={fireWidgetEvent}
-                        runtimeEventHandlers={runtimeEventHandlers}
-                        widgetState={widgetState}
-                        setWidgetState={setWidgetState}
-                        widgetID={widgetID}
-                      />
-                    </ErrorBoundary>
-                  </div>
-                )
-                : null}
-            </ReactQueryLoadingErrorWrapper>
-          </div>
-        </div>
+          {widgetRender?.errorMessage ? (
+            <div className="flex h-full w-full items-center justify-center p-2">
+              <span className="rounded border border-destructive/30 bg-destructive/10 p-2 text-center text-xs text-destructive">
+                {widgetRender.errorMessage}
+              </span>
+            </div>
+          ) : null}
+
+          {RenderedWidgetComponent
+            ? (
+              <div className={`flex min-h-[56px] flex-1 flex-col min-w-0 bg-transparent ${widgetCss}`}>
+                <ErrorBoundary title="Widget Render Error">
+                  <MemoizedWidgetContent
+                    RenderedWidgetComponent={RenderedWidgetComponent}
+                    widgetTitle={widget.widgetTitle}
+                    widgetType={widgetRender.widgetType}
+                    resolvedConfig={resolvedConfig}
+                    stateTreeQueries={stateTree.queries}
+                    handleOnWidgetInit={handleOnWidgetInit}
+                    refreshInterval={widget.refreshInterval}
+                    refetchWidget={refetchWidget}
+                    fireWidgetEvent={fireWidgetEvent}
+                    runtimeEventHandlers={runtimeEventHandlers}
+                    widgetState={widgetState}
+                    setWidgetState={setWidgetState}
+                    widgetID={instanceID}
+                    resourceID={resourceID}
+                    placementKey={placementKey}
+                    instanceID={instanceID}
+                  />
+                </ErrorBoundary>
+              </div>
+            )
+            : null}
+        </ReactQueryLoadingErrorWrapper>
       </Card>
     </>
   );
@@ -372,4 +433,5 @@ AppPageWidgetSlot.propTypes = {
   editable: PropTypes.bool,
   sizing: PropTypes.string,
   scopedStateTree: PropTypes.object,
+  repeatPath: PropTypes.array,
 };

@@ -4,28 +4,104 @@
   "schema": {
     "type": "object",
     "properties": {
-      "text": { "type": "string", "description": "Button text. Supports template expressions. Legacy alias: label.", "default": "Click Me" },
-      "label": { "type": "string", "description": "Legacy alias of text (frontend renders text ?? label)." },
+      "text": {
+        "type": "string",
+        "description": "Button text. Supports template expressions. Legacy alias: label.",
+        "default": "Click Me"
+      },
+      "label": {
+        "type": "string",
+        "description": "Legacy alias of text (frontend renders text ?? label)."
+      },
       "variant": {
         "type": "string",
-        "enum": ["default", "secondary", "green", "destructive", "white", "outline", "ghost", "link", "pill", "primary-ghost", "destructive-ghost", "primary-outline"],
+        "enum": [
+          "default",
+          "secondary",
+          "green",
+          "destructive",
+          "white",
+          "outline",
+          "ghost",
+          "link",
+          "pill",
+          "primary-ghost",
+          "destructive-ghost",
+          "primary-outline"
+        ],
         "default": "default",
         "description": "Visual style variant (matches @jet-admin/ui Button)"
       },
       "size": {
         "type": "string",
-        "enum": ["default", "sm", "lg", "icon", "circle", "pill"],
+        "enum": [
+          "default",
+          "sm",
+          "lg",
+          "icon",
+          "circle",
+          "pill"
+        ],
         "default": "default",
         "description": "Button size (matches @jet-admin/ui Button)"
       },
-      "icon": { "type": "string", "description": "Optional icon name (play, plus, download, upload, trash, edit, save, search, refresh, arrowRight, check, close, filter, settings, chevronDown)" },
-      "iconPosition": { "type": "string", "enum": ["left", "right"], "default": "left" },
-      "alignment": { "type": "string", "enum": ["left", "center", "right"], "default": "center", "description": "Horizontal alignment of the button in its row" },
-      "fullWidth": { "type": ["boolean", "string"], "description": "Stretch button to fill the row width", "default": false },
-      "disabled": { "type": ["boolean", "string"], "description": "Disabled state — boolean or template expression" },
-      "isLoading": { "type": ["string", "boolean"], "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.myQuery.isLoading }}). Legacy alias: loading." },
-      "loading": { "type": ["boolean", "string"], "description": "Legacy alias of isLoading." }
+      "icon": {
+        "type": "string",
+        "description": "Optional icon name (play, plus, download, upload, trash, edit, save, search, refresh, arrowRight, check, close, filter, settings, chevronDown)"
+      },
+      "iconPosition": {
+        "type": "string",
+        "enum": [
+          "left",
+          "right"
+        ],
+        "default": "left"
+      },
+      "alignment": {
+        "type": "string",
+        "enum": [
+          "left",
+          "center",
+          "right"
+        ],
+        "default": "center",
+        "description": "Horizontal alignment of the button in its row"
+      },
+      "fullWidth": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Stretch button to fill the row width",
+        "default": false
+      },
+      "disabled": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Disabled state — boolean or template expression"
+      },
+      "isLoading": {
+        "type": [
+          "string",
+          "boolean"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.myQuery.isLoading }}). Legacy alias: loading."
+      },
+      "loading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Legacy alias of isLoading."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onSubmit"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onSubmit"
+  ]
 }

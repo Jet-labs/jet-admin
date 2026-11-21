@@ -35,8 +35,7 @@ export const GlobalDialogs = () => {
 
         <AlertDialogFooter>
           <Button
-            variant="destructive"
-            size="sm"
+            variant="outline"
             onClick={handleReject}
             disabled={dialogState.isLoading}
             className={dialogState.cancelButtonClass}
@@ -45,8 +44,7 @@ export const GlobalDialogs = () => {
           </Button>
 
           <Button
-            // variant="default"
-            size="sm"
+            variant={dialogState.confirmVariant || "default"}
             onClick={handleConfirm}
             disabled={dialogState.isLoading}
             className={dialogState.confirmButtonClass}

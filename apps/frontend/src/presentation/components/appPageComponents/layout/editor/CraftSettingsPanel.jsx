@@ -152,7 +152,7 @@ function ConditionQuickInserts({ editorLiveStateTree, onInsert, onClear }) {
           key={`q-${k}`}
           type="button"
           onClick={() => onInsert(`{{ state.queries.${k}.data.length }}`)}
-          className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20"
+          className="rounded border border-primary/30 bg-primary/10 px-1.5 py-0.5 font-mono text-[9px] text-primary hover:bg-primary/20"
           title={`Insert {{ state.queries.${k}.data.length }}`}
         >
           {k}.len

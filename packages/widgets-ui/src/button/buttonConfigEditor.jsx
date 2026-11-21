@@ -27,8 +27,12 @@ const SIZES = [
   { value: "pill", label: "Pill" },
 ];
 
+// Radix Select forbids an empty-string SelectItem value. Use a sentinel for
+// "no icon" and translate it back to "" in the stored config.
+const NO_ICON = "__none__";
+
 const ICONS = [
-  { value: "", label: "None" },
+  { value: NO_ICON, label: "None" },
   { value: "play", label: "Play" },
   { value: "plus", label: "Plus" },
   { value: "download", label: "Download" },
@@ -125,8 +129,8 @@ export const ButtonConfigEditor = ({ widgetEditorForm, stateTree }) => {
         <div className="space-y-1">
           <Label className="text-xs font-medium text-foreground">Icon <span className="text-muted-foreground font-normal">(optional)</span></Label>
           <Select
-            value={config.icon || ""}
-            onValueChange={(val) => set('icon', val)}
+            value={config.icon || NO_ICON}
+            onValueChange={(val) => set('icon', val === NO_ICON ? "" : val)}
           >
             <SelectTrigger className="text-xs">
               <SelectValue placeholder="No icon" />

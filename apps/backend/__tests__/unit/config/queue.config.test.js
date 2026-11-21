@@ -7,6 +7,16 @@
 
 process.env.REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
+// Keep the config's view of REDIS_URL tied to process.env. Without this,
+// environment.js reloads .env after jest.resetModules() and silently
+// restores REDIS_URL, so the missing-URL test can never exercise the guard.
+jest.mock('../../../environment', () => ({
+  get REDIS_URL() {
+    return process.env.REDIS_URL;
+  },
+  NODE_ID: 'test_node',
+}));
+
 const mockXadd = jest.fn().mockResolvedValue('1-0');
 const mockXack = jest.fn().mockResolvedValue(1);
 const mockXgroup = jest.fn().mockResolvedValue('OK');
@@ -153,5 +163,20 @@ describe('queue.config listener events (redis driver)', () => {
     } finally {
       process.env.REDIS_URL = saved;
     }
+  });
+
+  it('retains source message if processing and DLQ acceptance both fail', async () => {
+    const bus = require('../../../config/listenerBus.config');
+    let observed;
+    const attempted = new Promise(resolve => { observed = resolve; });
+    bus.moveToDlq.mockImplementationOnce(async () => { observed(); throw new Error('DLQ unavailable'); });
+    mockXreadgroup.mockResolvedValueOnce([
+      ['listener:events', [['9-1', ['data', JSON.stringify({ listenerID: 'l', eventID: 'e' })]]]],
+    ]);
+    registerListenerEventWorker(async () => { throw new Error('processing failed'); });
+    await attempted;
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(mockXack).not.toHaveBeenCalledWith('listener:events', 'listener-workers', '9-1');
   });
 });

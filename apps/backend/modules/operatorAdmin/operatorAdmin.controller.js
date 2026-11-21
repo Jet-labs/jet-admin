@@ -13,6 +13,7 @@ const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { tenantRoleService } = require("../tenantRole/tenantRole.service");
 const { widgetLibraryService } = require("../widgetLibrary/widgetLibrary.service");
+const { marketplaceService } = require("../marketplace/marketplace.service");
 
 const operatorAdminController = {};
 
@@ -234,6 +235,67 @@ operatorAdminController.unpublishWidget = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "operatorAdminController:unpublishWidget:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+// ─── Generalized Marketplace Store ────────────────────────────────────────
+
+operatorAdminController.listMarketplaceItems = async (req, res) => {
+  try {
+    const { search, itemType, category, page, pageSize } = req.query;
+    const result = await marketplaceService.listItems({
+      search,
+      itemType,
+      category,
+      page,
+      pageSize,
+    });
+    return expressUtils.sendResponse(res, true, result, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log("error", {
+      message: "operatorAdminController:listMarketplaceItems:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+operatorAdminController.verifyMarketplaceItem = async (req, res) => {
+  try {
+    const { itemID } = req.params;
+    Logger.log("info", {
+      message: "operatorAdminController:verifyMarketplaceItem:params",
+      params: { operatorID: req.operator.operatorID, itemID },
+    });
+    const item = await marketplaceService.verifyItem({
+      itemID,
+      isVerified: req.body.isVerified,
+    });
+    return expressUtils.sendResponse(res, true, { item }, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log("error", {
+      message: "operatorAdminController:verifyMarketplaceItem:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
+  }
+};
+
+operatorAdminController.unpublishMarketplaceItem = async (req, res) => {
+  try {
+    const { itemID } = req.params;
+    Logger.log("info", {
+      message: "operatorAdminController:unpublishMarketplaceItem:params",
+      params: { operatorID: req.operator.operatorID, itemID },
+    });
+    await marketplaceService.unpublishItem({ itemID });
+    return expressUtils.sendResponse(res, true, {}, null, constants.HTTP_STATUS.OK);
+  } catch (error) {
+    Logger.log("error", {
+      message: "operatorAdminController:unpublishMarketplaceItem:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);

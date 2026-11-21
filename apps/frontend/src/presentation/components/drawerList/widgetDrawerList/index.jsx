@@ -10,6 +10,7 @@ import { BundleImportDialog } from "../../bundleComponents/bundleImportDialog";
 import { WidgetLibraryBrowserDialog } from "../../widgetLibraryComponents/widgetLibraryBrowserDialog";
 import { EntityFolderTree } from "../../folderComponents/entityFolderTree";
 import { useEntityItems } from "../../../../logic/hooks/useEntityItems";
+import { getWidgetDisplayName } from "../../../../utils/widgetDisplay";
 
 export const WidgetDrawerList = () => {
   const { tenantID } = useParams();
@@ -59,11 +60,18 @@ export const WidgetDrawerList = () => {
           {_renderWidgetIcon(widget.widgetType, isActive)}
 
           <span
-            className={`text-sm truncate ${
-              isActive ? "font-semibold" : "font-medium"
+            className={`truncate text-sm ${
+              isActive ? "font-medium" : "font-normal"
             }`}
+            title={getWidgetDisplayName({
+              widgetTitle: widget.widgetTitle,
+              widgetTypeLabel: WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType,
+            })}
           >
-            {`${widget.widgetTitle}`}
+            {getWidgetDisplayName({
+              widgetTitle: widget.widgetTitle,
+              widgetTypeLabel: WIDGETS_MAP[widget.widgetType]?.label || widget.widgetType,
+            })}
           </span>
         </div>
       </Link>

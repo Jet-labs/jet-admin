@@ -2,7 +2,7 @@ import React from 'react';
 import { Input } from '@jet-admin/ui';
 import { Clock } from 'lucide-react';
 
-export function TimeInput({ hours = 0, minutes = 0, seconds = 0, onChange }) {
+export function TimeInput({ hours = 0, minutes = 0, seconds = 0, onChange, instanceId = "", labelPrefix = "Time", disabled = false, readOnly = false }) {
   const handleChange = (field, value) => {
     let num = parseInt(value, 10);
     if (isNaN(num)) num = 0;
@@ -30,32 +30,53 @@ export function TimeInput({ hours = 0, minutes = 0, seconds = 0, onChange }) {
 
   const pad = (n) => String(n).padStart(2, '0');
 
+  const base = instanceId ? `${instanceId}-time` : "time";
+  const ro = !!disabled || !!readOnly;
   return (
-    <div className="flex items-center gap-2 justify-center border-t border-border pt-3 mt-3">
-      <Clock className="w-4 h-4 text-muted-foreground mr-1" />
-      <Input 
-        type="text" 
-        value={pad(hours)} 
+    <div className="flex items-center gap-2 justify-center border-t border-border pt-3 mt-3" role="group" aria-label={`${labelPrefix} time picker`}>
+      <Clock className="w-4 h-4 text-muted-foreground mr-1" aria-hidden="true" />
+      <label htmlFor={`${base}-h`} className="sr-only">{labelPrefix} hours</label>
+      <Input
+        id={`${base}-h`}
+        type="text"
+        inputMode="numeric"
+        value={pad(hours)}
         onChange={(e) => handleChange('hours', e.target.value)}
         onKeyDown={(e) => handleKeyDown(e, 'hours', hours)}
-        className="w-12 h-8 text-center px-1" 
+        className="w-12 h-8 text-center px-1"
+        aria-label={`${labelPrefix} hours`}
+        disabled={disabled}
+        readOnly={readOnly}
       />
-      <span className="text-muted-foreground">:</span>
-      <Input 
-        type="text" 
-        value={pad(minutes)} 
+      <span className="text-muted-foreground" aria-hidden="true">:</span>
+      <label htmlFor={`${base}-m`} className="sr-only">{labelPrefix} minutes</label>
+      <Input
+        id={`${base}-m`}
+        type="text"
+        inputMode="numeric"
+        value={pad(minutes)}
         onChange={(e) => handleChange('minutes', e.target.value)}
         onKeyDown={(e) => handleKeyDown(e, 'minutes', minutes)}
-        className="w-12 h-8 text-center px-1" 
+        className="w-12 h-8 text-center px-1"
+        aria-label={`${labelPrefix} minutes`}
+        disabled={disabled}
+        readOnly={readOnly}
       />
-      <span className="text-muted-foreground">:</span>
-      <Input 
-        type="text" 
-        value={pad(seconds)} 
+      <span className="text-muted-foreground" aria-hidden="true">:</span>
+      <label htmlFor={`${base}-s`} className="sr-only">{labelPrefix} seconds</label>
+      <Input
+        id={`${base}-s`}
+        type="text"
+        inputMode="numeric"
+        value={pad(seconds)}
         onChange={(e) => handleChange('seconds', e.target.value)}
         onKeyDown={(e) => handleKeyDown(e, 'seconds', seconds)}
-        className="w-12 h-8 text-center px-1" 
+        className="w-12 h-8 text-center px-1"
+        aria-label={`${labelPrefix} seconds`}
+        disabled={disabled}
+        readOnly={readOnly}
       />
+      {ro && <span className="sr-only">{readOnly ? "Read only" : "Disabled"}</span>}
     </div>
   );
 }

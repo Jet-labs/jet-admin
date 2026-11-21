@@ -142,17 +142,45 @@ async function fetchActiveListenerIDs() {
  * reverse, so a migrating listener is never double-subscribed HERE).
  * DEFAULT-DENY: empty/unknown shard ⇒ stop everything, subscribe nothing.
  */
-async function syncSubscriptions() {
+let syncInFlight = null;
+const subscriptionRevisions = new Map();
+function syncSubscriptions() {
+  if (syncInFlight) return syncInFlight;
+  syncInFlight = performSubscriptionSync().finally(() => { syncInFlight = null; });
+  return syncInFlight;
+}
+
+async function performSubscriptionSync() {
   const registry = getRegistry();
   const listenerEngine = getEngine();
   const shard = await registry.getShard(PROXY_ID);
+  const { prisma } = require('../backend/config/prisma.config');
+  const rows = await prisma.tblListeners.findMany({
+    where: { status: 'active' },
+    select: { listenerID: true, listenerType: true, updatedAt: true, tblDatasources: { select: { datasourceType: true, updatedAt: true } } },
+  });
+  const active = new Map(rows.map(row => [row.listenerID, row]));
+  const webhook = row => row?.listenerType === 'webhook' || row?.tblDatasources?.datasourceType === 'webhook';
+  const desired = new Set(shard.filter(id => active.has(id)));
+  // Webhooks are stateless HTTP registrations and must be available on every
+  // proxy; stateful subscriptions alone are exclusively shard-owned.
+  for (const row of rows) if (webhook(row)) desired.add(row.listenerID);
+  const revisions = new Map();
+  for (const id of desired) {
+    const row = active.get(id);
+    const assignment = webhook(row) ? null : await registry.getAssignment(id);
+    if (!webhook(row) && assignment?.proxyID !== PROXY_ID) { desired.delete(id); continue; }
+    revisions.set(id, JSON.stringify([row.updatedAt, row.tblDatasources?.updatedAt, assignment?.token]));
+  }
   const { toStop, toStart } = computeSyncActions(
     Object.keys(listenerEngine.getStatus()),
-    shard
+    [...desired]
   );
+  for (const id of desired) if (!toStart.includes(id) && subscriptionRevisions.has(id) && subscriptionRevisions.get(id) !== revisions.get(id)) toStart.push(id);
   for (const listenerID of toStop) {
     try {
       await listenerEngine.stopOne(listenerID);
+      subscriptionRevisions.delete(listenerID);
     } catch (err) {
       Logger.log('warning', { message: 'proxy:sync:stop:failed', params: { listenerID, error: err.message } });
     }
@@ -161,10 +189,12 @@ async function syncSubscriptions() {
     try {
       // restartOne re-fetches fresh config from DB (no-op if not active).
       await listenerEngine.restartOne(listenerID);
+      subscriptionRevisions.set(listenerID, revisions.get(listenerID));
     } catch (err) {
       Logger.log('warning', { message: 'proxy:sync:start:failed', params: { listenerID, error: err.message } });
     }
   }
+  for (const id of subscriptionRevisions.keys()) if (!desired.has(id)) subscriptionRevisions.delete(id);
   if (toStop.length > 0 || toStart.length > 0) {
     Logger.log('info', { message: 'proxy:sync:done', params: { stopped: toStop.length, started: toStart.length } });
   }
@@ -202,7 +232,7 @@ async function resync(reason) {
     const versionChanged = lastSeenVersion === null || version !== lastSeenVersion;
     const fullDue = Date.now() - lastFullResyncAt > FULL_RESYNC_INTERVAL_MS;
     if (!forced && !membershipChanged && !versionChanged && !fullDue) {
-      return { changed: false };
+      return { changed: false, ...await syncSubscriptions() }; // config revisions are independent of ownership version
     }
     lastMembershipFp = fp;
     let moved = 0;
@@ -226,6 +256,7 @@ async function resync(reason) {
     const sync = await syncSubscriptions();
     return { changed: true, moved, version: currentVersion, ...sync };
   } catch (err) {
+    await getEngine().stopAll().catch(() => {}); // fail closed on lost ownership authority
     Logger.log('warning', { message: 'proxy:resync:failed', params: { reason, error: err.message } });
     return { changed: false, error: err.message };
   }
@@ -343,6 +374,14 @@ async function main() {
 
   const { initializeQueue, closeQueue } = require('../backend/config/queue.config');
   await initializeQueue();
+  getEngine().setEventPublisherFactory(async listener => {
+    const type = listener.tblDatasources?.datasourceType || listener.listenerType;
+    if (type === 'webhook') return require('../backend/config/queue.config').addListenerEvent;
+    const registry = getRegistry();
+    const assignment = await registry.getAssignment(listener.listenerID);
+    if (assignment?.proxyID !== PROXY_ID) throw new Error('Listener is not owned by this proxy');
+    return job => registry.publishOwnedListenerEvent({ ...job, proxyID: PROXY_ID, assignmentToken: assignment.token });
+  });
 
   const { subscribeControl, getProxyControlChannel } = require('../backend/config/listenerBus.config');
   try {

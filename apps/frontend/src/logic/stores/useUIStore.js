@@ -10,6 +10,7 @@ export const useUIStore = create((set, get) => ({
     resolve: null,
     reject: null,
     confirmText: "Confirm",
+    confirmVariant: "default",
     cancelText: "Cancel",
     confirmButtonClass: "",
     cancelButtonClass: "",
@@ -19,6 +20,7 @@ export const useUIStore = create((set, get) => ({
     title = "Confirmation Required",
     message,
     confirmText = "Confirm",
+    confirmVariant = "default",
     cancelText = "Cancel",
     confirmButtonClass = "",
     cancelButtonClass = "",
@@ -34,6 +36,7 @@ export const useUIStore = create((set, get) => ({
           resolve,
           reject,
           confirmText,
+          confirmVariant,
           confirmButtonClass,
           cancelText,
           cancelButtonClass,
@@ -47,6 +50,7 @@ export const useUIStore = create((set, get) => ({
       dialogState: {
         ...state.dialogState,
         open: false,
+        isLoading: false,
         resolve: null,
         reject: null,
       },
@@ -63,23 +67,30 @@ export const useUIStore = create((set, get) => ({
   },
 
   handleConfirm: async () => {
-    const { dialogState, setDialogLoading, closeDialog } = get();
+    // Capture the resolver, then dismiss the dialog before resuming the
+    // caller. Awaiting the resolver first kept the modal mounted with its
+    // buttons disabled when the caller synchronously navigated away (e.g.
+    // the unsaved-changes guard): the navigation unmounted the consumer and
+    // the finally-block never produced a visible close.
+    const { dialogState, closeDialog } = get();
+    const resolve = dialogState.resolve;
+    closeDialog();
     try {
-      setDialogLoading(true);
-      if (dialogState.resolve) {
-        await dialogState.resolve(true);
+      if (resolve) {
+        await resolve(true);
       }
-    } finally {
-      closeDialog();
+    } catch {
+      // The consumer handles its own errors; the dialog is already closed.
     }
   },
 
   handleReject: () => {
     const { dialogState, closeDialog } = get();
-    if (dialogState.resolve) {
-      dialogState.resolve(false);
-    }
+    const resolve = dialogState.resolve;
     closeDialog();
+    if (resolve) {
+      resolve(false);
+    }
   },
 }));
 

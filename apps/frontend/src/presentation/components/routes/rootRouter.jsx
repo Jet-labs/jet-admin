@@ -97,10 +97,17 @@ const UpdateListenerPage = lazy(() =>
 const EngineDashboardPage = lazy(() =>
   import("../../pages/engineDashboardPage")
 );
+const NotFoundPage = lazy(() => import("../../pages/notFoundPage"));
+const RouteErrorPage = lazy(() =>
+  import("../../pages/notFoundPage").then((module) => ({
+    default: module.RouteErrorPage,
+  }))
+);
 
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         path: CONSTANTS.ROUTES.SIGN_IN.code,
@@ -394,6 +401,11 @@ const router = createBrowserRouter([
                 handle: { title: CONSTANTS.ROUTES.UPDATE_TENANT_ROLE_BY_ID.title },
               },
             ],
+          },
+          {
+            path: "*",
+            element: <NotFoundPage />,
+            handle: { title: "Page Not Found" },
           },
         ],
       },

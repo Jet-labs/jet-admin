@@ -86,10 +86,19 @@ export const WorkflowInputModal = ({ inputDefinitions, onSubmit, onClose }) => {
             parsedValues[inputDef.key] = Boolean(value);
             break;
           case "object":
-            try {
-              parsedValues[inputDef.key] = value ? JSON.parse(value) : null;
-            } catch {
+            if (value === "" || value === undefined || value === null) {
               parsedValues[inputDef.key] = null;
+            } else if (typeof value === "string") {
+              try {
+                parsedValues[inputDef.key] = JSON.parse(value);
+              } catch {
+                parsedValues[inputDef.key] = null;
+              }
+            } else {
+              // CodeEditor displays objects as JSON but only calls onChange
+              // after an edit. The initial default is still an object, so it
+              // must be passed through instead of JSON.parse(object) -> null.
+              parsedValues[inputDef.key] = value;
             }
             break;
           case "array":

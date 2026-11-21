@@ -47,11 +47,30 @@ import { natsTestConnection } from "./data-sources/nats/connection";
 
 import { excelcsvTestConnection } from "./data-sources/excelcsv/connection";
 
+// New batch: analytics, metrics, files, and code-hosting integrations
+import { clickhouseTestConnection } from "./data-sources/clickhouse/connection";
+import { duckdbTestConnection } from "./data-sources/duckdb/connection";
+import { prometheusTestConnection } from "./data-sources/prometheus/connection";
+import { influxdbTestConnection } from "./data-sources/influxdb/connection";
+import { filesystemTestConnection } from "./data-sources/filesystem/connection";
+import { sftpTestConnection } from "./data-sources/sftp/connection";
+import { githubTestConnection } from "./data-sources/github/connection";
+import { gitlabTestConnection } from "./data-sources/gitlab/connection";
+import { smtpTestConnection } from "./data-sources/smtp/connection";
+import { ldapTestConnection } from "./data-sources/ldap/connection";
+
 // AI Agent — Datasource manifest registry
 import { getManifestForType } from "./data-sources/manifests";
 
 
 export { dataSourceRegistry, webhookRouter };
+export { redact, redactString } from "./utils/redact";
+export { buildPostgresClientConfig } from "./data-sources/postgresql/datasource";
+export { resolveInRoot, canonicalizeInRoot, normalizeRoot } from "./data-sources/filesystem/datasource";
+export { csvToObjects, parseCsv, toLineProtocol } from "./data-sources/influxdb/datasource";
+export { normalizeEntries, assertBalancedFilter } from "./data-sources/ldap/datasource";
+export { requireString } from "./data-sources/smtp/datasource";
+export { buildConfinedUrl, confinedFetch } from "./utils/confinedRequest";
 
 /**
  * Helper: creates a getDatasourceInfo function for any datasource type.
@@ -70,13 +89,9 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
     testConnection: async ({ datasourceOptions, helpers }) => {
       return await postgresqlTestConnection({
         connectionString: datasourceOptions.connectionString,
-        connectionData: {
-          host: datasourceOptions.host,
-          port: datasourceOptions.port,
-          database: datasourceOptions.database,
-          user: datasourceOptions.user,
-          password: datasourceOptions.password,
-        },
+        connectionOption: datasourceOptions.connectionOption,
+        connectionDetails: datasourceOptions.connectionDetails,
+        connectionData: datasourceOptions.connectionData,
         helpers,
       });
     },
@@ -289,5 +304,66 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
       return await excelcsvTestConnection({ datasourceOptions, helpers });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("excelcsv"),
+  },
+  // New batch
+  [DATASOURCE_TYPES.CLICKHOUSE.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await clickhouseTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("clickhouse"),
+  },
+  [DATASOURCE_TYPES.DUCKDB.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await duckdbTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("duckdb"),
+  },
+  [DATASOURCE_TYPES.PROMETHEUS.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await prometheusTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("prometheus"),
+  },
+  [DATASOURCE_TYPES.INFLUXDB.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await influxdbTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("influxdb"),
+  },
+  [DATASOURCE_TYPES.FILESYSTEM.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await filesystemTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("filesystem"),
+  },
+  [DATASOURCE_TYPES.SFTP.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await sftpTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("sftp"),
+  },
+  [DATASOURCE_TYPES.GITHUB.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await githubTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("github"),
+  },
+  [DATASOURCE_TYPES.GITLAB.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await gitlabTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("gitlab"),
+  },
+  [DATASOURCE_TYPES.SMTP.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await smtpTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("smtp"),
+  },
+  [DATASOURCE_TYPES.LDAP.value]: {
+    testConnection: async ({ datasourceOptions, helpers }) => {
+      return await ldapTestConnection({ datasourceOptions, helpers });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("ldap"),
   },
 };

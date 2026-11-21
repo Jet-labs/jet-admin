@@ -4,12 +4,47 @@
   "schema": {
     "type": "object",
     "properties": {
-      "valueTemplate": { "type": "string", "description": "Numeric 0-100 template" },
-      "variant": { "type": "string", "enum": ["bar", "ring"], "default": "bar" },
-      "label": { "type": "string" },
-      "showValue": { "type": "boolean", "default": true },
-      "status": { "type": "string", "enum": ["default", "success", "warning", "error"], "default": "default" }
+      "valueTemplate": {
+        "type": "string",
+        "description": "Numeric 0-100 template"
+      },
+      "variant": {
+        "type": "string",
+        "enum": [
+          "bar",
+          "ring"
+        ],
+        "default": "bar"
+      },
+      "label": {
+        "type": "string"
+      },
+      "showValue": {
+        "type": "boolean",
+        "default": true
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "default",
+          "success",
+          "warning",
+          "error"
+        ],
+        "default": "default"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad"
+  ]
 }

@@ -18,6 +18,16 @@ let listenerEventWorkerFn = null;
 // Redis consumer loop state
 let redisConsumerRunning = false;
 let redisConsumerStarted = false;
+let consumerGeneration = 0;
+const pendingSleeps = new Set();
+
+// Pending-entry recovery. XREADGROUP with ">" only delivers new messages;
+// a worker crash between delivery and XACK leaves the message in the PEL
+// forever unless another consumer claims it.
+const PENDING_RECLAIM_INTERVAL_MS = 60 * 1000;
+const PENDING_MIN_IDLE_MS = 5 * 60 * 1000;
+let pendingReclaimTimer = null;
+let pendingReclaimInFlight = false;
 
 function requireRedisUrl() {
   if (!environmentVariables.REDIS_URL) {
@@ -30,7 +40,11 @@ function getConsumerName() {
 }
 
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => {
+    const pending = { timer: null, resolve };
+    pending.timer = setTimeout(() => { pendingSleeps.delete(pending); resolve(); }, ms);
+    pendingSleeps.add(pending);
+  });
 }
 
 function isConnectionHealthy() {
@@ -91,6 +105,8 @@ async function startRedisConsumerLoop() {
   if (redisConsumerStarted) return;
   redisConsumerStarted = true;
   redisConsumerRunning = true;
+  const generation = ++consumerGeneration;
+  startPendingReclaimLoop();
 
   const { getRedisClient } = require('./redis.config');
   const bus = require('./listenerBus.config');
@@ -101,7 +117,7 @@ async function startRedisConsumerLoop() {
     params: { group: bus.getBusConfig().group, consumer: consumerName },
   });
 
-  while (redisConsumerRunning) {
+  while (redisConsumerRunning && generation === consumerGeneration) {
     try {
       const client = getRedisClient('consumer');
       await bus.ensureConsumerGroup(client);
@@ -114,12 +130,14 @@ async function startRedisConsumerLoop() {
         'BLOCK', 5000,
         'STREAMS', stream, '>'
       );
+      if (!redisConsumerRunning || generation !== consumerGeneration) break;
       if (!res) continue;
 
       const messages = (res[0] && res[0][1]) || [];
       await Promise.all(messages.map(([msgId, fields]) => handleRedisMessage(client, bus, msgId, fields)));
     } catch (err) {
       Logger.log('warning', { message: 'queue.config:redis:consumer:error', params: { error: err.message } });
+      if (!redisConsumerRunning || generation !== consumerGeneration) break;
       await sleep(2000);
     }
   }
@@ -132,13 +150,13 @@ async function handleRedisMessage(client, bus, msgId, fields) {
     ({ envelope } = bus.parseStreamMessage(msgId, fields));
   } catch (parseErr) {
     Logger.log('error', { message: 'queue.config:redis:badEnvelope', params: { error: parseErr.message } });
-    try { await client.xack(stream, group, msgId); } catch (_) { /* ignore */ }
+    await bus.moveToDlq(client, { sourceMessageID: msgId, fields }, parseErr);
+    await client.xack(stream, group, msgId);
     return;
   }
 
   if (!listenerEventWorkerFn) {
-    Logger.log('warning', { message: 'queue.config:no listener event worker registered, dropping event' });
-    try { await client.xack(stream, group, msgId); } catch (_) { /* ignore */ }
+    Logger.log('warning', { message: 'queue.config:no listener event worker registered, retaining pending event' });
     return;
   }
 
@@ -146,11 +164,81 @@ async function handleRedisMessage(client, bus, msgId, fields) {
     // Envelopes carry raw events only: actions are resolved fresh downstream
     // and hard failures must propagate so they land in the DLQ (not vanish).
     await listenerEventWorkerFn({ ...envelope });
-    await client.xack(stream, group, msgId);
   } catch (err) {
     Logger.log('error', { message: 'queue.config:redis:process:failed', params: { listenerID: envelope.listenerID, error: err.message } });
     await bus.moveToDlq(client, envelope, err);
-    try { await client.xack(stream, group, msgId); } catch (_) { /* ignore */ }
+  }
+  // ACK transport failure is not a business failure; leave it pending for retry.
+  await client.xack(stream, group, msgId);
+}
+
+/**
+ * Claim messages that have been pending for too long and process them.
+ * Redis 6.2+ XAUTOCLAIM handles both the pending lookup and ownership
+ * transfer atomically.
+ */
+async function reclaimPendingMessages() {
+  if (pendingReclaimInFlight) return;
+  pendingReclaimInFlight = true;
+  try {
+    const { isClientReady, getRedisClient } = require('./redis.config');
+    if (!isClientReady('consumer')) return;
+
+    const client = getRedisClient('consumer');
+    const bus = require('./listenerBus.config');
+    const { stream, group } = bus.getBusConfig();
+    const consumerName = getConsumerName();
+
+    let result;
+    try {
+      result = await client.xautoclaim(
+        stream,
+        group,
+        consumerName,
+        PENDING_MIN_IDLE_MS,
+        '0-0',
+        'COUNT',
+        10
+      );
+    } catch (err) {
+      // Older Redis (<6.2) or transient connection issue - retry next tick.
+      Logger.log('warning', {
+        message: 'queue.config:redis:reclaimUnsupported',
+        params: { error: err.message },
+      });
+      return;
+    }
+
+    const messages = Array.isArray(result?.[1]) ? result[1] : [];
+    if (messages.length === 0) return;
+
+    Logger.log('info', {
+      message: 'queue.config:redis:reclaimedPending',
+      params: { count: messages.length },
+    });
+
+    for (const [msgId, fields] of messages) {
+      // handleRedisMessage ACKs after processing/DLQ.
+      // eslint-disable-next-line no-await-in-loop
+      await handleRedisMessage(client, bus, msgId, fields);
+    }
+  } finally {
+    pendingReclaimInFlight = false;
+  }
+}
+
+function startPendingReclaimLoop() {
+  if (pendingReclaimTimer) return;
+  pendingReclaimTimer = setInterval(() => {
+    reclaimPendingMessages().catch((err) => {
+      Logger.log('warning', {
+        message: 'queue.config:redis:reclaimFailed',
+        params: { error: err.message },
+      });
+    });
+  }, PENDING_RECLAIM_INTERVAL_MS);
+  if (typeof pendingReclaimTimer.unref === 'function') {
+    pendingReclaimTimer.unref();
   }
 }
 
@@ -176,7 +264,15 @@ async function addListenerEvent(eventJob) {
  */
 async function closeQueue() {
   redisConsumerRunning = false;
+  consumerGeneration += 1;
+  for (const pending of pendingSleeps) { clearTimeout(pending.timer); pending.resolve(); }
+  pendingSleeps.clear();
   redisConsumerStarted = false;
+  if (pendingReclaimTimer) {
+    clearInterval(pendingReclaimTimer);
+    pendingReclaimTimer = null;
+  }
+  pendingReclaimInFlight = false;
   try {
     const { closeRedis } = require('./redis.config');
     await closeRedis();

@@ -4,12 +4,39 @@
   "schema": {
     "type": "object",
     "properties": {
-      "label": { "type": "string" },
-      "accept": { "type": "string", "description": "Accepted MIME/extensions, e.g. '.csv,.json,image/*'" },
-      "multiple": { "type": "boolean", "default": false },
-      "maxSizeMB": { "type": "number", "description": "Max file size in MB" },
-      "buttonLabel": { "type": "string", "default": "Choose file" }
+      "label": {
+        "type": "string"
+      },
+      "accept": {
+        "type": "string",
+        "description": "Accepted MIME/extensions, e.g. '.csv,.json,image/*'"
+      },
+      "multiple": {
+        "type": "boolean",
+        "default": false
+      },
+      "maxSizeMB": {
+        "type": "number",
+        "description": "Max file size in MB"
+      },
+      "buttonLabel": {
+        "type": "string",
+        "default": "Choose file"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onChange", "onClear"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onChange",
+    "onClear"
+  ]
 }

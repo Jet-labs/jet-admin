@@ -15,8 +15,8 @@
  *   - disconnect: tears down socket listeners (call on cleanup or re-run)
  */
 
-import { executeWorkflowAPI } from "../../data/apis/workflow";
-import { useSocketStore } from "../stores/useSocketStore";
+import { executeWorkflowAPI, cancelWorkflowAPI } from "../../data/apis/workflow";
+import { observeWorkflowRun } from './observeWorkflowRun';
 import { appPageActions } from "./appPageActions";
 
 /**
@@ -38,11 +38,19 @@ export const executeWorkflowWithStreaming = ({
   alias,
   dispatch,
   isStale = () => false,
+  onComplete,
   onError,
+  onCancelError,
 }) => {
   // Track listeners so we can tear them down
-  let nodeUpdateListener = null;
-  let statusUpdateListener = null;
+  let observer = null;
+  let currentInstanceID = null;
+  let cancelRequested = false;
+  const cancel = async () => {
+    cancelRequested = true;
+    if (currentInstanceID) return cancelWorkflowAPI({ tenantID, instanceID: currentInstanceID });
+    return { queued: true };
+  };
 
   // Set by disconnect(). Guards against the race where a fast re-trigger or
   // unmount tears this stream down BEFORE the async body below registers its
@@ -53,17 +61,12 @@ export const executeWorkflowWithStreaming = ({
   const disconnect = () => {
     if (disposed) return;
     disposed = true;
-    const socket = useSocketStore.getState().socket;
-    if (socket) {
-      if (nodeUpdateListener) socket.off("workflow_node_update", nodeUpdateListener);
-      if (statusUpdateListener) socket.off("workflow_status_update", statusUpdateListener);
-    }
-    nodeUpdateListener = null;
-    statusUpdateListener = null;
+    observer?.disconnect();
   };
 
   // Fire-and-forget: kick off the API call + socket subscription
-  (async () => {
+  Promise.resolve().then(async () => {
+    if (disposed || isStale()) return;
     try {
       // 1. Mark as loading
       dispatch(appPageActions.setWorkflowLoading(alias));
@@ -76,6 +79,7 @@ export const executeWorkflowWithStreaming = ({
       });
 
       const instanceID = runRes.instanceID;
+      currentInstanceID = instanceID;
       if (!instanceID) {
         throw new Error("No instanceID returned from workflow execution");
       }
@@ -85,27 +89,13 @@ export const executeWorkflowWithStreaming = ({
         dispatch(appPageActions.setWorkflowResult(alias, runRes, null, true, instanceID));
       }
 
-      // 4. Get the shared socket and subscribe to updates
-      const socket = useSocketStore.getState().socket;
-      if (!socket) {
-        console.warn(`[WorkflowStream] Shared socket not connected for "${alias}"`);
-        // No socket — mark as done with just the API response
-        if (!isStale() && !disposed) {
-          dispatch(appPageActions.setWorkflowResult(alias, runRes, null, false, instanceID));
-        }
+      if (disposed || isStale()) {
+        if (cancelRequested) await cancelWorkflowAPI({ tenantID, instanceID }).catch(() => {});
         return;
       }
-
-      // The stream may have been disconnected while awaiting the API call.
-      if (disposed) return;
-
-      // Join the room for this workflow run
-      socket.emit("workflow_run_join", { runId: instanceID });
-
-      // --- Node-level context updates (streaming) ---
-      nodeUpdateListener = (data) => {
-        if (data.instanceID !== instanceID) return;
-        if (isStale()) return;
+      const onUpdate = (data) => {
+        if (disposed || isStale()) return;
+        if (Array.isArray(data.pendingDataCollectionRequests)) dispatch(appPageActions.setWorkflowRequests(alias, data.pendingDataCollectionRequests, instanceID));
         if (data.contextData) {
           dispatch(
             appPageActions.setWorkflowResult(alias, data.contextData, null, true, instanceID)
@@ -114,9 +104,8 @@ export const executeWorkflowWithStreaming = ({
       };
 
       // --- Terminal status updates ---
-      statusUpdateListener = (data) => {
-        if (data.instanceID !== instanceID) return;
-        if (isStale()) {
+      const onTerminal = (data) => {
+        if (disposed || isStale()) {
           disconnect();
           return;
         }
@@ -127,17 +116,24 @@ export const executeWorkflowWithStreaming = ({
           dispatch(
             appPageActions.setWorkflowResult(alias, finalData, null, false, instanceID)
           );
+          if (typeof onComplete === "function") {
+            onComplete(finalData, instanceID);
+          }
           disconnect();
         } else if (data.status === "FAILED") {
+          const message = data.error || "Workflow execution failed";
           dispatch(
             appPageActions.setWorkflowResult(
               alias,
               finalData,
-              data.error || "Workflow execution failed",
+              message,
               false,
               instanceID
             )
           );
+          if (typeof onError === "function") {
+            onError(message, finalData, instanceID);
+          }
           disconnect();
         } else if (data.status === "STOPPED" || data.status === "CANCELLED") {
           dispatch(
@@ -149,23 +145,30 @@ export const executeWorkflowWithStreaming = ({
               instanceID
             )
           );
+          if (typeof onError === "function") {
+            onError("Workflow execution was stopped", finalData, instanceID);
+          }
           disconnect();
         }
       };
 
-      // Register only if still connected — disconnect() may have been called
-      // while the listeners were being defined above.
-      if (disposed) return;
-      socket.on("workflow_node_update", nodeUpdateListener);
-      socket.on("workflow_status_update", statusUpdateListener);
+      observer = observeWorkflowRun({ tenantID, instanceID, onUpdate, onTerminal,
+        onRequest: request => {
+          if (!disposed && !isStale()) dispatch(appPageActions.setWorkflowRequests(alias, [request], instanceID));
+        },
+      });
+      if (cancelRequested) {
+        try { await cancelWorkflowAPI({ tenantID, instanceID }); }
+        catch (error) { if (!disposed && !isStale()) onCancelError?.(error); }
+      }
     } catch (error) {
       if (!isStale() && !disposed) {
         dispatch(appPageActions.setWorkflowResult(alias, null, error));
       }
       console.error(`[WorkflowStream] Failed to execute "${alias}":`, error);
-      if (onError) onError(error);
+      if (!disposed && !isStale() && typeof onError === "function") onError(error);
     }
-  })();
+  });
 
-  return { disconnect };
+  return { disconnect, cancel };
 };

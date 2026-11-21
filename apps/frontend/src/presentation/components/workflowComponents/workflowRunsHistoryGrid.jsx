@@ -41,10 +41,10 @@ function formatDuration(startedAt, completedAt) {
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 const STATUS_CONFIG = {
-  completed: { icon: CheckCircle, className: "text-green-600 dark:text-green-400", bg: "bg-green-950/40 border-green-200 dark:border-green-800" },
-  failed: { icon: AlertCircle, className: "text-red-600 dark:text-red-400", bg: "bg-red-950/40 border-red-200 dark:border-red-800" },
-  running: { icon: Clock, className: "text-blue-600 dark:text-blue-400", bg: "bg-blue-950/40 border-blue-200 dark:border-blue-800" },
-  pending: { icon: Clock, className: "text-amber-600 dark:text-amber-400", bg: "bg-amber-950/40 border-amber-200 dark:border-amber-800" },
+  completed: { icon: CheckCircle, className: "text-primary", bg: "bg-primary/10 border-primary/30" },
+  failed: { icon: AlertCircle, className: "text-destructive", bg: "bg-destructive/10 border-destructive/30" },
+  running: { icon: Clock, className: "text-primary", bg: "bg-primary/10 border-primary/30" },
+  pending: { icon: Clock, className: "text-muted-foreground", bg: "bg-muted/50 border-border" },
   cancelled: { icon: XCircle, className: "text-muted-foreground/70", bg: "bg-background border-border" },
 };
 

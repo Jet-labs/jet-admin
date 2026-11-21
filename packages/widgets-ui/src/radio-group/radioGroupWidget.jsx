@@ -24,11 +24,14 @@ export const RadioGroupWidget = ({ widgetConfig, widgetState, setWidgetState, fi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgetConfig?.defaultValue]);
 
+  // Live callbacks via ref (B05/F02): never initial closures.
+  const liveRef = useRef(null);
+  liveRef.current = { setWidgetState, fireWidgetEvent };
   const methodsRef = useRef(null);
   if (!methodsRef.current) {
     methodsRef.current = {
-      setValue: (v) => { if (setWidgetState) setWidgetState((p) => ({ ...p, value: v })); if (fireWidgetEvent) fireWidgetEvent("onChange", { value: v }); },
-      clear: () => { if (setWidgetState) setWidgetState((p) => ({ ...p, value: "" })); if (fireWidgetEvent) fireWidgetEvent("onChange", { value: "" }); },
+      setValue: (v) => { const rt = liveRef.current; if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: v })); if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: v }); },
+      clear: () => { const rt = liveRef.current; if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: "" })); if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: "" }); },
     };
   }
   useEffect(() => { if (onWidgetInit) onWidgetInit(methodsRef.current); }, [onWidgetInit]);

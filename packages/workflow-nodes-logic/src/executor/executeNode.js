@@ -11,6 +11,7 @@
  * @returns {Promise<{output:object, nextHandle:string, suspended?:boolean, queueDelay?:number}>}
  */
 import { NODE_TYPE } from '../constants.js';
+import runtimeContract from '../runtimeContract.cjs';
 import { executeStart } from '../handlers/start.js';
 import { executeEnd } from '../handlers/end.js';
 import { executeJavascript } from '../handlers/javascript.js';
@@ -46,7 +47,15 @@ export async function executeNode({ node, context = {}, helpers = {}, services =
   const handler = HANDLER_MAP[node.type];
   if (!handler) throw new Error(`No handler found for node type: ${node.type}`);
 
-  const nodeConfig = node.data ?? {};
+  const nodeConfig = runtimeContract.normalizeNodeData(node.type, node.data ?? {});
+  if (nodeConfig.isDisabled === true) {
+    const nextHandle = nodeConfig.skipHandle ||
+      ([NODE_TYPE.JAVASCRIPT, NODE_TYPE.DATA_QUERY, NODE_TYPE.SUB_WORKFLOW].includes(node.type) ? 'success' : 'output');
+    return {
+      output: { ...(nodeConfig.outputVariable ? { [nodeConfig.outputVariable]: null } : {}), skipped: true, success: true },
+      nextHandle, skipped: true,
+    };
+  }
   // Normalize helpers.nodeID to node.id if not provided
   const enrichedHelpers = { ...helpers, nodeID: helpers.nodeID || node.id, workflowID: helpers.workflowID };
 

@@ -61,7 +61,21 @@ jest.mock('nats', () => ({
   StringCodec: jest.fn().mockReturnValue({ decode: (buf) => buf.toString() }),
 }), { virtual: true });
 
-const { dataSourceRegistry, webhookRouter } = require('@jet-admin/datasources-logic');
+// Load only the actual webhook source, not every database driver's registry.
+// This also prevents stale dist builds from hiding regressions.
+const path = require('path');
+const { buildSync } = require('esbuild');
+const compiled = buildSync({
+  stdin: {
+    contents: 'export { default as WebhookDataSource } from "./data-sources/webhook/datasource.js"; export { webhookRouter } from "./data-sources/webhook/router.js";',
+    resolveDir: path.resolve(__dirname, '../../../../../packages/datasources-logic/src'),
+  },
+  bundle: true, packages: 'external', platform: 'node', format: 'cjs', write: false,
+}).outputFiles[0].text;
+const sourceModule = { exports: {} };
+new Function('require', 'module', 'exports', compiled)(require, sourceModule, sourceModule.exports);
+const { WebhookDataSource, webhookRouter } = sourceModule.exports;
+const dataSourceRegistry = { getDataSource: () => WebhookDataSource };
 
 describe('Webhook Datasource (shared WebhookRouter)', () => {
   const makeRes = () => ({
@@ -163,6 +177,23 @@ describe('Webhook Datasource (shared WebhookRouter)', () => {
     expect(onEvent).not.toHaveBeenCalled();
   });
 
+  it('accepts allowedMethods saved as an array (D-023)', async () => {
+    const WebhookDataSource = dataSourceRegistry.getDataSource('webhook');
+    const instance = new WebhookDataSource({
+      datasourceID: 'ds-methods-array',
+      datasourceOptions: { authType: 'none', allowedMethods: ['POST'] },
+    });
+    const onEvent = jest.fn().mockResolvedValue(undefined);
+    await instance.subscribe({ listenerID: 'lst-methods-array' }, onEvent);
+
+    const handler = webhookRouter._handlers.get('id:lst-methods-array');
+    const res = makeRes();
+    handler(makeReq({ method: 'POST' }), res);
+
+    expect(res.status).not.toHaveBeenCalledWith(405);
+    expect(onEvent).toHaveBeenCalledTimes(1);
+  });
+
   it('enforces Basic Auth on the registered handler', async () => {
     const WebhookDataSource = dataSourceRegistry.getDataSource('webhook');
     const instance = new WebhookDataSource({
@@ -237,10 +268,33 @@ describe('Webhook Datasource (shared WebhookRouter)', () => {
 
     const handler = webhookRouter._handlers.get('id:lst-text');
     const res = makeRes();
-    handler(makeReq(), res);
+    await handler(makeReq(), res);
 
     expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'text/plain');
     expect(res.status).toHaveBeenCalledWith(202);
     expect(res.send).toHaveBeenCalledWith('OK - accepted');
+  });
+
+  it('does not acknowledge before durable enqueue finishes', async () => {
+    const WebhookDataSource = dataSourceRegistry.getDataSource('webhook');
+    const instance = new WebhookDataSource({ datasourceID: 'ds' });
+    let accept;
+    await instance.subscribe({ listenerID: 'slow' }, () => new Promise(resolve => { accept = resolve; }));
+    const res = makeRes();
+    const handling = webhookRouter._handlers.get('id:slow')(makeReq(), res);
+    expect(res.status).not.toHaveBeenCalled();
+    accept();
+    await handling;
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it('returns retryable failure instead of success when durable acceptance fails', async () => {
+    const WebhookDataSource = dataSourceRegistry.getDataSource('webhook');
+    const instance = new WebhookDataSource({ datasourceID: 'ds' });
+    await instance.subscribe({ listenerID: 'failed' }, async () => { throw new Error('Redis down'); });
+    const res = makeRes();
+    await webhookRouter._handlers.get('id:failed')(makeReq(), res);
+    expect(res.status).toHaveBeenCalledWith(503);
+    expect(res.status).not.toHaveBeenCalledWith(200);
   });
 });

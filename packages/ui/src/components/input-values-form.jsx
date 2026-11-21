@@ -39,7 +39,7 @@ export function InputValuesForm({
 }) {
   if (!Array.isArray(inputDefinitions) || inputDefinitions.length === 0) {
     return (
-      <p className="text-xs text-[#1c1c1e] italic">
+      <p className="text-xs text-foreground italic">
         No input parameters defined.
       </p>
     );
@@ -56,7 +56,7 @@ export function InputValuesForm({
         <>
           <Label htmlFor={`input-def-${inputName}`} className="text-xs">
             {inputName}{" "}
-            {inputDef.required && <span className="text-red-500">*</span>}{" "}
+            {inputDef.required && <span className="text-destructive">*</span>}{" "}
             {inputType !== "string" && (
               <span className="text-muted-foreground">({inputType})</span>
             )}
@@ -88,7 +88,7 @@ export function InputValuesForm({
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               {inputName}
-              {inputDef.required && <span className="text-red-500 ml-1">*</span>}
+              {inputDef.required && <span className="text-destructive ml-1">*</span>}
               <span className="text-muted-foreground ml-1">({inputType})</span>
             </Label>
           </div>
@@ -99,7 +99,7 @@ export function InputValuesForm({
           <>
             <Label htmlFor={`input-def-${inputName}`} className="text-xs">
               {inputName}{" "}
-              {inputDef.required && <span className="text-red-500">*</span>}{" "}
+              {inputDef.required && <span className="text-destructive">*</span>}{" "}
               <span className="text-muted-foreground">({inputType})</span>
             </Label>
             <ArrayInput
@@ -116,7 +116,7 @@ export function InputValuesForm({
           <>
             <Label htmlFor={`input-def-${inputName}`} className="text-xs">
               {inputName}{" "}
-              {inputDef.required && <span className="text-red-500">*</span>}{" "}
+              {inputDef.required && <span className="text-destructive">*</span>}{" "}
               <span className="text-muted-foreground">({inputType})</span>
             </Label>
             <CodeEditor
@@ -139,7 +139,7 @@ export function InputValuesForm({
           <>
             <Label htmlFor={`input-def-${inputName}`} className="text-xs">
               {inputName}{" "}
-              {inputDef.required && <span className="text-red-500">*</span>}{" "}
+              {inputDef.required && <span className="text-destructive">*</span>}{" "}
               <span className="text-muted-foreground">({inputType})</span>
             </Label>
             <Input
@@ -165,7 +165,7 @@ export function InputValuesForm({
           <>
             <Label htmlFor={`input-def-${inputName}`} className="text-xs">
               {inputName}{" "}
-              {inputDef.required && <span className="text-red-500">*</span>}{" "}
+              {inputDef.required && <span className="text-destructive">*</span>}{" "}
               {inputType !== "string" && (
                 <span className="text-muted-foreground">({inputType})</span>
               )}

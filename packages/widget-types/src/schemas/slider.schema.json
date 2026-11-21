@@ -4,14 +4,52 @@
   "schema": {
     "type": "object",
     "properties": {
-      "label": { "type": "string" },
-      "min": { "type": "number", "default": 0 },
-      "max": { "type": "number", "default": 100 },
-      "step": { "type": "number", "default": 1 },
-      "defaultValue": { "type": ["number", "string"], "default": 50 },
-      "showValue": { "type": "boolean", "default": true },
-      "disabled": { "type": ["boolean", "string"], "default": false }
+      "label": {
+        "type": "string"
+      },
+      "min": {
+        "type": "number",
+        "default": 0
+      },
+      "max": {
+        "type": "number",
+        "default": 100
+      },
+      "step": {
+        "type": "number",
+        "default": 1
+      },
+      "defaultValue": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "default": 50
+      },
+      "showValue": {
+        "type": "boolean",
+        "default": true
+      },
+      "disabled": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "default": false
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onChange"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onChange"
+  ]
 }

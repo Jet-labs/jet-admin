@@ -9,6 +9,8 @@
  */
 import { appPageReducer, createAppPageInitialState } from '../src/logic/appPageRuntime/appPageReducer';
 import { appPageActions } from '../src/logic/appPageRuntime/appPageActions';
+import { buildAppPageStateTree } from '../src/logic/appPageRuntime/appPageExpressionEngine';
+import { resolveConfig, resolveValue } from '../src/logic/evaluationEngine';
 
 const initWith = (defs, globals = { tenantID: 't1', pageID: 'p1' }, overrides = {}) =>
   appPageReducer(createAppPageInitialState(), appPageActions.init(defs, globals, overrides));
@@ -95,5 +97,118 @@ describe('appPageReducer', () => {
   test('unknown action returns the identical state reference', () => {
     const s = initWith([]);
     expect(appPageReducer(s, { type: 'NOPE' })).toBe(s);
+  });
+
+  // B01: functional updates must resolve atomically against latest state.
+  // Most input widgets call setWidgetState((prev) => ({ ...prev, value })).
+  // The old reducer spread the function itself, silently dropping the update.
+  describe('B01 functional widget-state updates', () => {
+    test('functional updater applies against latest state (text-input pattern)', () => {
+      let s = initWith([]);
+      const asTextInputCallsIt = (v) => (prev) => ({ ...prev, value: v });
+      s = appPageReducer(s, appPageActions.setWidgetState('name', asTextInputCallsIt('Ada')));
+      expect(s.widgetStates.name).toEqual({ value: 'Ada' });
+      s = appPageReducer(s, appPageActions.setWidgetState('name', asTextInputCallsIt('Grace')));
+      expect(s.widgetStates.name).toEqual({ value: 'Grace' });
+    });
+
+    test('object patches and functional updates behave identically', () => {
+      const fromObject = appPageReducer(
+        appPageReducer(initWith([]), appPageActions.setWidgetState('w', { a: 1 })),
+        appPageActions.setWidgetState('w', { value: 'x', b: 2 })
+      );
+      const fromFn = appPageReducer(
+        appPageReducer(initWith([]), appPageActions.setWidgetState('w', { a: 1 })),
+        appPageActions.setWidgetState('w', (prev) => ({ ...prev, value: 'x', b: 2 }))
+      );
+      expect(fromFn.widgetStates.w).toEqual(fromObject.widgetStates.w);
+      expect(fromFn.widgetStates.w).toEqual({ a: 1, value: 'x', b: 2 });
+    });
+
+    test('reducer merge preserves untouched keys even when updater omits them', () => {
+      let s = initWith([]);
+      s = appPageReducer(s, appPageActions.setWidgetState('w', { keep: 1, value: 'a' }));
+      // Updater returns only the changed slice (no ...prev spread).
+      s = appPageReducer(s, appPageActions.setWidgetState('w', () => ({ value: 'b' })));
+      expect(s.widgetStates.w).toEqual({ keep: 1, value: 'b' });
+    });
+
+    test('sequential toggles resolve against latest state (switch reproduction)', () => {
+      let s = initWith([]);
+      s = appPageReducer(s, appPageActions.setWidgetState('sw', { value: false }));
+      const toggle = (prev) => ({ ...prev, value: !prev.value });
+      s = appPageReducer(s, appPageActions.setWidgetState('sw', toggle));
+      expect(s.widgetStates.sw.value).toBe(true);
+      s = appPageReducer(s, appPageActions.setWidgetState('sw', toggle));
+      expect(s.widgetStates.sw.value).toBe(false);
+    });
+
+    test('counter increments atomically across rapid sequential dispatches', () => {
+      let s = initWith([]);
+      s = appPageReducer(s, appPageActions.setWidgetState('c', { count: 0 }));
+      const inc = (prev) => ({ count: (prev.count || 0) + 1 });
+      s = appPageReducer(s, appPageActions.setWidgetState('c', inc));
+      s = appPageReducer(s, appPageActions.setWidgetState('c', inc));
+      s = appPageReducer(s, appPageActions.setWidgetState('c', inc));
+      expect(s.widgetStates.c.count).toBe(3);
+    });
+
+    test('functional update isolates widgets and preserves slice references', () => {
+      let s = initWith([]);
+      s = appPageReducer(s, appPageActions.setQueryResult('q', [1]));
+      s = appPageReducer(s, appPageActions.setWidgetState('w1', { value: 'a' }));
+      const before = s;
+      const next = appPageReducer(s, appPageActions.setWidgetState('w2', (p) => ({ ...p, value: 'b' })));
+      expect(next.widgetStates.w1).toBe(before.widgetStates.w1);
+      expect(next.widgetStates.w2).toEqual({ value: 'b' });
+      expect(next.queryResults).toBe(before.queryResults);
+      expect(next.variables).toBe(before.variables);
+    });
+
+    test('malformed updater results leave state untouched instead of corrupting it', () => {
+      let s = initWith([]);
+      s = appPageReducer(s, appPageActions.setWidgetState('w', { value: 'ok' }));
+      const ref = s;
+      expect(appPageReducer(s, appPageActions.setWidgetState('w', () => null))).toBe(ref);
+      expect(appPageReducer(s, appPageActions.setWidgetState('w', () => undefined))).toBe(ref);
+      expect(appPageReducer(s, appPageActions.setWidgetState('w', () => 42))).toBe(ref);
+      expect(appPageReducer(s, appPageActions.setWidgetState('w', () => []))).toBe(ref);
+      expect(s.widgetStates.w).toEqual({ value: 'ok' });
+    });
+
+    test('real input -> page state -> bound sibling flow', () => {
+      let s = initWith([]);
+      // 1. Switch writes via functional updater, as SwitchWidget does.
+      s = appPageReducer(
+        s,
+        appPageActions.setWidgetState('switch1', (p) => ({ ...p, value: true }))
+      );
+      // 2. Page state tree exposes the committed value to siblings.
+      let tree = buildAppPageStateTree(s, []);
+      expect(tree.widgets.switch1.value).toBe(true);
+      // 3. A sibling text widget bound via {{ state.widgets.switch1.value }} resolves.
+      const siblingConfig = {
+        content: 'Switch is {{ state.widgets.switch1.value }}',
+        echo: '{{ state.widgets.switch1.value }}',
+      };
+      let resolved = resolveConfig(siblingConfig, tree);
+      expect(resolved.echo).toBe(true);
+      // 4. Toggle back via updater that reads latest state; binding follows.
+      s = appPageReducer(
+        s,
+        appPageActions.setWidgetState('switch1', (p) => ({ ...p, value: !p.value }))
+      );
+      tree = buildAppPageStateTree(s, []);
+      expect(tree.widgets.switch1.value).toBe(false);
+      resolved = resolveConfig(siblingConfig, tree);
+      expect(resolved.echo).toBe(false);
+      // 5. A text-input style write also flows to a bound echo.
+      s = appPageReducer(
+        s,
+        appPageActions.setWidgetState('name', (prev) => ({ ...prev, value: 'Ada' }))
+      );
+      tree = buildAppPageStateTree(s, []);
+      expect(resolveValue('{{ state.widgets.name.value }}', tree)).toBe('Ada');
+    });
   });
 });

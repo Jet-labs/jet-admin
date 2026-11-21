@@ -2,7 +2,63 @@ const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
+const {
+  normalizeWidgetConfig,
+  validateWidgetConfig,
+  getWidgetDescriptor,
+} = require("@jet-admin/widget-types");
+const { assertTenantReferences } = require("../../utils/tenantReference.util");
 const widgetService = {};
+
+/**
+ * Widget event actions can target a query/workflow by ID. Those IDs live in
+ * JSON, so validate tenant ownership whenever a widget config is written.
+ */
+async function validateWidgetEventReferences({ tenantID, widgetConfig }) {
+  const events = widgetConfig?.events;
+  if (!events || typeof events !== "object") return;
+
+  const dataQueryIDs = [];
+  const workflowIDs = [];
+
+  for (const actions of Object.values(events)) {
+    if (!Array.isArray(actions)) continue;
+    for (const action of actions) {
+      if (action?.actionType === "TRIGGER_QUERY" && action.config?.queryID) {
+        dataQueryIDs.push(action.config.queryID);
+      }
+      if (action?.actionType === "TRIGGER_WORKFLOW" && action.config?.workflowID) {
+        workflowIDs.push(action.config.workflowID);
+      }
+    }
+  }
+
+  await assertTenantReferences({ tenantID, dataQueryIDs, workflowIDs });
+}
+
+/**
+ * Canonical contract enforcement for writes (F04/B08/F15).
+ * Normalizes legacy aliases to the canonical shape, then validates.
+ * Unknown config keys and unsupported-but-declared events pass through
+ * (preserved, never dropped). Throws a 400-mapped contract error.
+ */
+const applyWidgetContract = (widgetType, widgetConfig) => {
+  if (!getWidgetDescriptor(widgetType)) {
+    throw Object.assign(
+      new Error(`Unknown widgetType '${widgetType}'. Use the 32 registered types.`),
+      { code: "WIDGET_TYPE_UNKNOWN", details: [{ code: "unknown-type", field: "widgetType" }] }
+    );
+  }
+  const { config } = normalizeWidgetConfig(widgetType, widgetConfig || {});
+  const result = validateWidgetConfig(widgetType, config, { mode: "authoring" });
+  if (!result.valid) {
+    throw Object.assign(
+      new Error(`Invalid widgetConfig: ${result.errors.map((e) => e.message).join("; ")}`),
+      { code: "WIDGET_CONFIG_INVALID", details: result.errors }
+    );
+  }
+  return config;
+};
 /**
  *
  * @param {object} param0
@@ -135,13 +191,17 @@ widgetService.createWidget = async ({
     if (!creatorID && !createdByApiKeyID) {
       throw new Error("Creator ID or Created By API Key ID is required");
     }
+    // Persist the canonical contract shape (legacy aliases migrated).
+    const canonicalConfig = applyWidgetContract(widgetType, widgetConfig);
+    await validateWidgetEventReferences({ tenantID, widgetConfig: canonicalConfig });
+
     const widget = await prisma.tblWidgets.create({
       data: {
         tenantID: tenantID,
         widgetTitle,
         widgetDescription,
         widgetType,
-        widgetConfig,
+        widgetConfig: canonicalConfig,
         creatorID,
         createdByApiKeyID,
       },
@@ -358,6 +418,17 @@ widgetService.updateWidgetByID = async ({
       throw new Error("Widget not found");
     }
 
+    // Full-replace semantics for widgetConfig (callers send the complete
+    // object). Persist the canonical contract shape against the effective
+    // type (incoming type or, when absent, the stored row's type).
+    const effectiveType = widgetType != undefined ? widgetType : existingWidget.widgetType;
+    const canonicalConfig =
+      widgetConfig != undefined ? applyWidgetContract(effectiveType, widgetConfig) : undefined;
+
+    if (canonicalConfig != undefined) {
+      await validateWidgetEventReferences({ tenantID, widgetConfig: canonicalConfig });
+    }
+
     // Update main widget data
     const updatedWidget = await prisma.tblWidgets.update({
       where: { widgetID: widgetID },
@@ -365,7 +436,7 @@ widgetService.updateWidgetByID = async ({
         ...(widgetTitle != undefined && { widgetTitle }),
         ...(widgetDescription != undefined && { widgetDescription }),
         ...(widgetType != undefined && { widgetType }),
-        ...(widgetConfig != undefined && { widgetConfig }),
+        ...(canonicalConfig != undefined && { widgetConfig: canonicalConfig }),
       },
     });
 
@@ -414,11 +485,48 @@ widgetService.deleteWidgetByID = async ({ authContext, tenantID, widgetID }) => 
   });
 
   try {
-    // Update the database query using Prisma
+    // Widget placements live inside appPageConfig.widgets as
+    // `widget_<resourceID>_<placement>`. Block deletion while any page still
+    // references this widget so the page does not render a broken slot.
+    const appPages = await prisma.tblAppPages.findMany({
+      where: { tenantID },
+      select: { appPageID: true, appPageTitle: true, appPageConfig: true },
+    });
+
+    const referencingPages = appPages.filter((page) => {
+      const placements = Array.isArray(page.appPageConfig?.widgets)
+        ? page.appPageConfig.widgets
+        : [];
+      return placements.some((placement) => {
+        if (typeof placement !== "string") return false;
+        return (
+          placement === `widget_${widgetID}` ||
+          placement.startsWith(`widget_${widgetID}_`)
+        );
+      });
+    });
+
+    if (referencingPages.length > 0) {
+      const error = new Error(
+        "Widget is still placed on one or more app pages. Remove it from those pages before deleting it."
+      );
+      error.name = "WidgetInUseError";
+      error.code = "WIDGET_IN_USE";
+      error.statusCode = 409;
+      error.details = {
+        appPages: referencingPages.map((page) => ({
+          appPageID: page.appPageID,
+          appPageTitle: page.appPageTitle,
+        })),
+      };
+      throw error;
+    }
+
+    // Delete the widget
     await prisma.tblWidgets.delete({
       where: {
-        widgetID: widgetID, // Assuming `id` is the primary key for the query
-        tenantID: tenantID, // Ensure tenantID matches for security
+        widgetID: widgetID,
+        tenantID: tenantID,
       },
     });
 
@@ -450,26 +558,38 @@ widgetService.deleteWidgetByID = async ({ authContext, tenantID, widgetID }) => 
 
 // ─── Schema Introspection ────────────────────────────────────────────────────
 
-/** @type {Record<string, object>|null} — in-process singleton */
-let _widgetConfigSchemas = null;
+/** @type {{ schemas: Record<string, object>, descriptors: Record<string, object> }|null} — in-process singleton */
+let _widgetContractDocs = null;
 
 /**
- * Lazy-loads WIDGET_CONFIG_SCHEMAS from the ESM package @jet-admin/widget-types.
- * After the first call the result is cached in-process for the lifetime of the server.
+ * Lazy-loads canonical contract docs from @jet-admin/widget-types:
+ * JSON config schemas plus versioned descriptors (aliases, defaults,
+ * examples, supported events/methods, categories). Cached in-process.
  *
- * @returns {Promise<Record<string, object>>}
+ * @returns {Promise<{ schemas: Record<string, object>, descriptors: Record<string, object> }>}
  */
-async function loadWidgetConfigSchemas() {
-  if (_widgetConfigSchemas) return _widgetConfigSchemas;
+async function loadWidgetContractDocs() {
+  if (_widgetContractDocs) return _widgetContractDocs;
   const mod = await import('@jet-admin/widget-types');
-  _widgetConfigSchemas = mod.WIDGET_CONFIG_SCHEMAS;
-  return _widgetConfigSchemas;
+  const descriptors = {};
+  for (const [type, descriptor] of Object.entries(mod.WIDGET_DESCRIPTORS || {})) {
+    descriptors[type] = {
+      ...descriptor,
+      supportedEvents: mod.getSupportedEvents(type).map((e) => e.value),
+      supportedMethods: mod.getSupportedMethods(type).map((m) => m.name),
+    };
+  }
+  _widgetContractDocs = { schemas: mod.WIDGET_CONFIG_SCHEMAS, descriptors };
+  return _widgetContractDocs;
 }
 
 /**
  * Returns widget config schema descriptors.
  * If widgetType is supplied, returns only the schema for that type.
  * If widgetType is omitted, returns all schemas.
+ * Each entry carries its JSON `schema` plus a canonical `descriptor`
+ * (aliases, defaults, example, supported events/methods) from the same
+ * versioned source that API validation enforces.
  *
  * @param {object} param0
  * @param {string|undefined} param0.widgetType
@@ -481,17 +601,20 @@ widgetService.getWidgetSchemas = async ({ widgetType } = {}) => {
     params: { widgetType },
   });
 
-  const all = await loadWidgetConfigSchemas();
+  const { schemas, descriptors } = await loadWidgetContractDocs();
+  const withDescriptors = (entry, type) => ({ ...entry, descriptor: descriptors[type] });
 
   if (widgetType) {
-    const schema = all[widgetType];
+    const schema = schemas[widgetType];
     if (!schema) {
       throw Object.assign(new Error(`No schema found for widgetType: '${widgetType}'`), { code: 'SCHEMA_NOT_FOUND' });
     }
-    return { [widgetType]: schema };
+    return { [widgetType]: withDescriptors(schema, widgetType) };
   }
 
-  return all;
+  return Object.fromEntries(
+    Object.entries(schemas).map(([type, schema]) => [type, withDescriptors(schema, type)])
+  );
 };
 
 module.exports = { widgetService };

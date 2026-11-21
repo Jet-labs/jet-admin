@@ -35,18 +35,27 @@ const { startWorkflowTemporal: startWorkflow } = require("../modules/workflow/te
 
 // ── Default Fetchers ──────────────────────────────────────────────────────────
 
-async function defaultQueryFetcher(queryID) {
+async function defaultQueryFetcher(queryID, { tenantID } = {}) {
   return prisma.tblDataQueries.findFirst({
-    where: { dataQueryID: queryID },
+    // Tenant scoping is mandatory when a context is available. The fallback
+    // keeps compatibility for internal callers that intentionally fetch by
+    // globally-unique ID (e.g. tests), but execution paths always pass it.
+    where: {
+      dataQueryID: queryID,
+      ...(tenantID ? { tenantID } : {}),
+    },
   });
 }
 
-async function defaultDatasourceFetcher(datasourceID) {
+async function defaultDatasourceFetcher(datasourceID, { tenantID } = {}) {
   if (!datasourceID || !isUUID(datasourceID)) {
     return null;
   }
   const datasource = await prisma.tblDatasources.findFirst({
-    where: { datasourceID },
+    where: {
+      datasourceID,
+      ...(tenantID ? { tenantID } : {}),
+    },
   });
   if (datasource && datasource.datasourceOptions) {
     const { decrypt } = require("./encryption.util");
@@ -74,6 +83,25 @@ function createQueryEngine({
   datasourceFetcher = defaultDatasourceFetcher,
 } = {}) {
   return new QueryEngine(queryFetcher, datasourceFetcher);
+}
+
+// One engine per process so the result/datasource caches actually survive
+// between executions. Previously every call constructed a fresh engine and
+// the caches were discarded immediately, making them pure overhead.
+let sharedQueryEngine = null;
+
+function getSharedQueryEngine() {
+  if (!sharedQueryEngine) {
+    sharedQueryEngine = createQueryEngine();
+  }
+  return sharedQueryEngine;
+}
+
+/** Invalidate cached query results after a query is updated/deleted. */
+function clearQueryEngineCache() {
+  if (sharedQueryEngine) {
+    sharedQueryEngine.clearCache();
+  }
 }
 
 function buildDataQueryExecutionInputs(inputDefinitions = [], inputValues = {}) {
@@ -205,16 +233,19 @@ async function authorizedExecuteDataQuery({
 
   // ── Execute via Engine ──────────────────────────────────────────────────
   try {
-    const activeEngine = engine || createQueryEngine();
+    const activeEngine = engine || getSharedQueryEngine();
 
     let finalRuntimeInputs = executionInputs;
 
     if (!finalRuntimeInputs) {
       let activeInputDefinitions = inputDefinitions;
 
-      // If definitions weren't passed (e.g. from a raw dataQueryID execution), fetch them
+      // If definitions weren't passed (e.g. from a raw dataQueryID execution), fetch them.
+      // Must be tenant-scoped for the same reason as the engine fetcher.
       if (!activeInputDefinitions) {
-        const queryData = await prisma.tblDataQueries.findUnique({ where: { dataQueryID } });
+        const queryData = await prisma.tblDataQueries.findFirst({
+          where: { dataQueryID, tenantID },
+        });
         activeInputDefinitions = queryData ? extractQueryDefinitions(queryData) : [];
       }
 
@@ -233,7 +264,10 @@ async function authorizedExecuteDataQuery({
       finalRuntimeInputs = resolved;
     }
 
-    return await activeEngine.executeQuery(dataQueryID, finalRuntimeInputs, { timeoutSeconds });
+    return await activeEngine.executeQuery(dataQueryID, finalRuntimeInputs, {
+      timeoutSeconds,
+      tenantID,
+    });
   } catch (error) {
     Logger.log("error", {
       message: "authorizedProxy:dataQuery:executionError",
@@ -263,6 +297,7 @@ async function authorizedExecuteWorkflow({
   tenantID,
   inputValues = {},
   executionCtx,
+  executionKey,
 }) {
   // ── Gate: context is mandatory ──────────────────────────────────────────
   if (!executionCtx) {
@@ -278,6 +313,7 @@ async function authorizedExecuteWorkflow({
   }
 
   const { caller } = executionCtx;
+  if (executionKey && !isSystemCaller(executionCtx)) throw new Error('Stable workflow execution keys are reserved for trusted system dispatch');
 
   Logger.log("info", {
     message: "authorizedProxy:workflow:gate",
@@ -345,9 +381,16 @@ async function authorizedExecuteWorkflow({
 
   // ── Execute via Workflow Engine ─────────────────────────────────────────
   try {
-    // Resolve & validate inputs through the unified pipeline
-    const workflow = await prisma.tblWorkflows.findUnique({ where: { workflowID } });
-    const inputDefinitions = workflow ? extractWorkflowDefinitions(workflow) : [];
+    // Resolve & validate inputs through the unified pipeline. The workflow
+    // lookup is tenant-scoped: a system caller (cron/listener) must not be
+    // able to start a workflow owned by another tenant by ID alone.
+    const workflow = await prisma.tblWorkflows.findFirst({
+      where: { workflowID, tenantID },
+    });
+    if (!workflow) {
+      throw new Error("Workflow not found or unauthorized");
+    }
+    const inputDefinitions = extractWorkflowDefinitions(workflow);
     const { resolved, errors, valid } = await resolveInputs({
       type: 'workflow', inputDefinitions, inputValues: inputValues,
     });
@@ -361,7 +404,7 @@ async function authorizedExecuteWorkflow({
     }
 
     // Start workflow with resolved inputs
-    const result = await startWorkflow({ workflowID, tenantID, inputValues: resolved });
+    const result = await startWorkflow({ workflowID, tenantID, inputValues: resolved, ...(executionKey ? { executionKey } : {}) });
 
     Logger.log("success", {
       message: "authorizedProxy:workflow:started",
@@ -382,5 +425,7 @@ module.exports = {
   authorizedExecuteDataQuery,
   authorizedExecuteWorkflow,
   createQueryEngine,
+  getSharedQueryEngine,
+  clearQueryEngineCache,
   defaultDatasourceFetcher,
 };

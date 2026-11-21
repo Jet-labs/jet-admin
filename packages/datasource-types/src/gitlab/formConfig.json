@@ -1,0 +1,67 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "baseUrl": {
+        "type": "string",
+        "description": "GitLab API base URL (e.g. https://gitlab.com/api/v4).",
+        "format": "uri",
+        "default": "https://gitlab.com/api/v4"
+      },
+      "authType": {
+        "type": "string",
+        "enum": ["privateToken", "oauthToken", "none"],
+        "default": "privateToken"
+      },
+      "token": {
+        "type": "string",
+        "description": "Private token (PRIVATE-TOKEN) or OAuth access token (Authorization: Bearer).",
+        "format": "password"
+      },
+      "timeout": {
+        "type": "integer",
+        "description": "Request timeout in seconds.",
+        "minimum": 1,
+        "default": 15
+      }
+    },
+    "required": ["baseUrl"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/baseUrl",
+        "label": "Base URL"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/authType",
+            "label": "Auth Type"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/timeout",
+            "label": "Timeout (seconds)"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/token",
+        "label": "Token",
+        "options": { "format": "password" }
+      }
+    ]
+  },
+  "data": {
+    "baseUrl": "https://gitlab.com/api/v4",
+    "authType": "privateToken",
+    "token": "",
+    "timeout": 15
+  }
+}

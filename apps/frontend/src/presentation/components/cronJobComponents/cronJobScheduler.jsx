@@ -140,6 +140,13 @@ function humanize({ period, minute, hour, dom, months, dows }) {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
+ToggleChip.propTypes = {
+  label: PropTypes.string.isRequired,
+  selected: PropTypes.bool,
+  onClick: PropTypes.func,
+  size: PropTypes.string,
+};
+
 function ToggleChip({ label, selected, onClick, size = "sm" }) {
   return (
     <button
@@ -160,6 +167,15 @@ function ToggleChip({ label, selected, onClick, size = "sm" }) {
     </button>
   );
 }
+
+NumberField.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.number,
+  onChange: PropTypes.func,
+  min: PropTypes.number,
+  max: PropTypes.number,
+  className: PropTypes.string,
+};
 
 function NumberField({ label, value, onChange, min, max, className = "" }) {
   return (
@@ -255,15 +271,13 @@ export const CronJobScheduler = ({
     (raw) => {
       setRawInput(raw);
       const p = parseCron(raw);
-      if (p) {
-        setRawError(false);
-        handleChange?.(raw);
-        onError?.(null);
-      } else {
-        const hasContent = raw.length > 0;
-        setRawError(hasContent);
-        onError?.(hasContent ? new Error("Invalid cron expression") : null);
-      }
+      const hasContent = raw.length > 0;
+      setRawError(!p && hasContent);
+      // Always propagate the raw text, including invalid/empty input. Keeping
+      // the previous valid schedule upstream let Save create a job with the
+      // default `* * * * *` even though the field showed an invalid cron.
+      handleChange?.(raw);
+      onError?.(!p && hasContent ? new Error("Invalid cron expression") : null);
     },
     [handleChange, onError]
   );

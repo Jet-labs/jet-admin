@@ -31,7 +31,7 @@ export const APIKeyEditor = ({ apiKeyEditorForm }) => {
             value={apiKeyEditorForm.values.apiKeyTitle}
           />
           {apiKeyEditorForm.touched.apiKeyTitle && apiKeyEditorForm.errors.apiKeyTitle && (
-            <p className="text-xs text-red-500">
+            <p className="text-xs text-destructive">
               {apiKeyEditorForm.errors.apiKeyTitle}
             </p>
           )}

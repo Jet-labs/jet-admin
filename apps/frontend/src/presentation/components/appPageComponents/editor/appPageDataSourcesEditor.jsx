@@ -25,7 +25,7 @@ import {
 import { TemplateAutocompleteInput } from "@jet-admin/ui";
 import { Plus, Trash2, Edit2, Play, Square, Database, GitBranch, Layers, Loader2, ArrowLeft, RefreshCw } from "lucide-react";
 import { testDataQueryByIDAPI } from "../../../../data/apis/dataQuery";
-import { stopTestWorkflowAPI } from "../../../../data/apis/workflow";
+import { cancelWorkflowAPI } from "../../../../data/apis/workflow";
 import { executeWorkflowWithStreaming } from "../../../../logic/appPageRuntime/executeWorkflowWithStreaming";
 import { resolveValue } from "../../../../logic/evaluationEngine";
 import { useSocketStore } from "../../../../logic/stores/useSocketStore";
@@ -74,6 +74,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
   const [isAdding, setIsAdding] = useState(false);
 
   const workflowDisconnectorsRef = React.useRef({});
+  const workflowCancellersRef = React.useRef({});
   const listenerDisconnectorsRef = React.useRef({});
 
   React.useEffect(() => {
@@ -84,6 +85,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
         }
       }
       workflowDisconnectorsRef.current = {};
+      workflowCancellersRef.current = {};
 
       for (const alias of Object.keys(listenerDisconnectorsRef.current)) {
         if (typeof listenerDisconnectorsRef.current[alias] === "function") {
@@ -170,7 +172,7 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
           workflowDisconnectorsRef.current[source.alias]();
         }
 
-        const { disconnect } = executeWorkflowWithStreaming({
+        const { disconnect, cancel } = executeWorkflowWithStreaming({
           tenantID,
           workflowID: source.workflowID,
           inputValues: resolvedInputValues,
@@ -179,9 +181,11 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
           onError: (err) => {
             displayError(`Failed to execute workflow "${source.alias}": ${err.message || err}`);
           },
+          onCancelError: err => displayError(`Cancellation failed: ${err.message || err}`),
         });
 
         workflowDisconnectorsRef.current[source.alias] = disconnect;
+        workflowCancellersRef.current[source.alias] = cancel;
         displaySuccess(`Workflow "${source.alias}" triggered. Observing updates live.`);
       } else {
         const result = await testDataQueryByIDAPI({
@@ -222,26 +226,11 @@ export const AppPageDataSourcesEditor = ({ appPageEditorForm }) => {
     const instanceID = stateTreeSource?.instanceID;
 
     try {
-      if (typeof workflowDisconnectorsRef.current[source.alias] === "function") {
-        workflowDisconnectorsRef.current[source.alias]();
-        delete workflowDisconnectorsRef.current[source.alias];
-      }
-
-      if (instanceID) {
-        await stopTestWorkflowAPI({ tenantID, instanceID });
-      }
-
-      dispatch(
-        appPageActions.setWorkflowResult(
-          source.alias,
-          stateTreeSource?.data,
-          "Workflow execution was stopped",
-          false,
-          instanceID
-        )
-      );
-
-      displaySuccess(`Workflow "${source.alias}" execution stopped.`);
+      const cancel = workflowCancellersRef.current[source.alias];
+      if (cancel) await cancel();
+      else if (instanceID) await cancelWorkflowAPI({ tenantID, instanceID });
+      else throw new Error('Workflow execution has not started');
+      displaySuccess(`Cancellation requested for workflow "${source.alias}". Waiting for server confirmation.`);
     } catch (err) {
       console.error("Failed to stop workflow:", err);
       displayError(`Failed to stop workflow "${source.alias}": ${err.message || err}`);

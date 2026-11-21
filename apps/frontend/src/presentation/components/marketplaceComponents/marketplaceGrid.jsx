@@ -1,14 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
-import { ChevronLeft, ChevronRight, Search, Store } from "lucide-react";
+import { BadgeCheck, ChevronLeft, ChevronRight, Search, Store } from "lucide-react";
 import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
-  getAllLibraryWidgetsAPI,
-  installWidgetAPI,
-  previewWidgetInstallAPI,
-} from "../../../data/apis/widgetLibrary";
+  installMarketplaceItemAPI,
+  listMarketplaceItemsAPI,
+  previewMarketplaceInstallAPI,
+} from "../../../data/apis/marketplace";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
@@ -29,6 +29,21 @@ import {
 
 const MARKETPLACE_PAGE_SIZE = 12;
 
+const ITEM_TYPE_FILTERS = [
+  { value: "", label: "All" },
+  { value: "datasource", label: "Datasources" },
+  { value: "widget", label: "Widgets" },
+  { value: "workflow", label: "Workflows" },
+  { value: "appTemplate", label: "App templates" },
+];
+
+const TYPE_LABELS = {
+  datasource: "Datasource",
+  widget: "Widget",
+  workflow: "Workflow",
+  appTemplate: "App template",
+};
+
 export const MarketplaceGrid = ({ tenantID }) => {
   MarketplaceGrid.propTypes = {
     tenantID: PropTypes.string.isRequired,
@@ -36,31 +51,36 @@ export const MarketplaceGrid = ({ tenantID }) => {
 
   const queryClient = useQueryClient();
   const [searchInput, setSearchInput] = useState("");
+  const [itemType, setItemType] = useState("");
+  const [category, setCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [preview, setPreview] = useState(null);
   const debouncedSearch = useDebounce(searchInput, 300);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, itemType, category]);
 
   const {
-    data: libraryData,
+    data: marketplaceData,
     isLoading,
     error,
     isFetching,
     refetch,
   } = useQuery({
     queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.WIDGET_LIBRARY,
-      tenantID,
+      CONSTANTS.REACT_QUERY_KEYS.MARKETPLACE(tenantID),
+      itemType,
+      category,
       debouncedSearch,
       currentPage,
     ],
     queryFn: () =>
-      getAllLibraryWidgetsAPI({
+      listMarketplaceItemsAPI({
         tenantID,
         search: debouncedSearch || undefined,
+        itemType: itemType || undefined,
+        category: category || undefined,
         page: currentPage,
         pageSize: MARKETPLACE_PAGE_SIZE,
       }),
@@ -69,23 +89,19 @@ export const MarketplaceGrid = ({ tenantID }) => {
     placeholderData: (previous) => previous,
   });
 
-  const entries = libraryData?.entries || [];
-  const totalCount = libraryData?.totalCount ?? 0;
-  const totalPages = Math.max(1, libraryData?.totalPages || 1);
+  const entries = marketplaceData?.entries || [];
+  const totalCount = marketplaceData?.totalCount ?? 0;
+  const totalPages = Math.max(1, marketplaceData?.totalPages || 1);
 
   const previewMutation = useMutation({
-    mutationFn: ({ libraryEntryID }) =>
-      previewWidgetInstallAPI({ tenantID, libraryEntryID }),
+    mutationFn: ({ itemID }) => previewMarketplaceInstallAPI({ tenantID, itemID }),
     retry: false,
-    onSuccess: ({ valid, summary, items }, { libraryEntryID }) => {
-      setPreview({ libraryEntryID, valid, summary, items });
-    },
+    onSuccess: (result, { itemID, title }) => setPreview({ itemID, title, ...result }),
     onError: (error) => displayError(error),
   });
 
   const installMutation = useMutation({
-    mutationFn: () =>
-      installWidgetAPI({ tenantID, libraryEntryID: preview.libraryEntryID }),
+    mutationFn: () => installMarketplaceItemAPI({ tenantID, itemID: preview.itemID }),
     retry: false,
     onSuccess: ({ results }) => {
       displaySuccess(
@@ -97,6 +113,7 @@ export const MarketplaceGrid = ({ tenantID }) => {
         CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID),
         CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID),
         CONSTANTS.REACT_QUERY_KEYS.LISTENERS(tenantID),
+        CONSTANTS.REACT_QUERY_KEYS.MARKETPLACE(tenantID),
       ].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
       setPreview(null);
     },
@@ -116,8 +133,8 @@ export const MarketplaceGrid = ({ tenantID }) => {
           title={CONSTANTS.STRINGS.VIEW_MARKETPLACE_TITLE}
           subTitle={
             totalCount === 0
-              ? "Nothing published yet"
-              : `${totalCount} published widget${totalCount === 1 ? "" : "s"}`
+              ? "No items found"
+              : `${totalCount} integration item${totalCount === 1 ? "" : "s"}`
           }
         >
           <div className="relative">
@@ -133,6 +150,45 @@ export const MarketplaceGrid = ({ tenantID }) => {
           </div>
         </PageHeader>
 
+        <div className="flex flex-wrap items-center gap-2 px-3 pt-3">
+          {ITEM_TYPE_FILTERS.map((filter) => (
+            <Button
+              key={filter.value || "all"}
+              type="button"
+              size="sm"
+              variant={itemType === filter.value ? "default" : "outline"}
+              onClick={() => setItemType(filter.value)}
+              disabled={isBusy || isFetching}
+            >
+              {filter.label}
+            </Button>
+          ))}
+          <select
+            aria-label="Filter by category"
+            className="ml-auto h-8 rounded border border-border/50 bg-background px-2 text-xs text-foreground"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            disabled={isBusy || isFetching}
+          >
+            <option value="">All categories</option>
+            {[
+              "Databases",
+              "Data & Analytics",
+              "Messaging",
+              "Payments & Commerce",
+              "DevOps & Infrastructure",
+              "Monitoring",
+              "Storage & Files",
+              "Identity & Security",
+              "Productivity & Content",
+            ].map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex-1 overflow-y-auto p-3">
           {entries.length > 0 ? (
             <div
@@ -142,7 +198,7 @@ export const MarketplaceGrid = ({ tenantID }) => {
             >
               {entries.map((entry) => (
                 <div
-                  key={entry.libraryEntryID}
+                  key={entry.itemID}
                   className="flex flex-col gap-2 rounded border border-border/50 bg-card p-3"
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -151,16 +207,24 @@ export const MarketplaceGrid = ({ tenantID }) => {
                         <Store className="h-4 w-4 text-muted-foreground" />
                       </span>
                       <div className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate text-sm font-semibold text-foreground">
-                          {entry.widgetTitle}
+                        <span className="flex items-center gap-1 truncate text-sm font-semibold text-foreground">
+                          {entry.title}
+                          {entry.isVerified && (
+                            <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-primary" />
+                          )}
                         </span>
                         <span className="line-clamp-2 text-xs text-muted-foreground">
-                          {entry.widgetDescription || entry.widgetType}
+                          {entry.description || entry.slug}
                         </span>
+                        {entry.category && (
+                          <span className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground/70">
+                            {entry.category}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <Badge variant="outline" className="shrink-0">
-                      {entry.widgetType}
+                      {TYPE_LABELS[entry.itemType] || entry.itemType}
                     </Badge>
                   </div>
                   <Button
@@ -169,13 +233,11 @@ export const MarketplaceGrid = ({ tenantID }) => {
                     variant="outline"
                     className="w-full justify-center"
                     onClick={() =>
-                      previewMutation.mutate({
-                        libraryEntryID: entry.libraryEntryID,
-                      })
+                      previewMutation.mutate({ itemID: entry.itemID, title: entry.title })
                     }
                     disabled={isBusy || isFetching}
                   >
-                    {previewMutation.isPending ? (
+                    {previewMutation.isPending && preview?.itemID === entry.itemID ? (
                       <Spinner size={14} />
                     ) : (
                       "Preview & Install"
@@ -184,10 +246,10 @@ export const MarketplaceGrid = ({ tenantID }) => {
                 </div>
               ))}
             </div>
-          ) : debouncedSearch ? (
-            <NoEntityUI message={`No widgets match "${debouncedSearch}".`} />
+          ) : debouncedSearch || itemType || category ? (
+            <NoEntityUI message="No marketplace items match these filters." />
           ) : (
-            <NoEntityUI message="No published widgets yet — publish one from a widget's editor page." />
+            <NoEntityUI message="No marketplace items yet — seed the store with `npm run seed-marketplace`." />
           )}
 
           {totalPages > 1 && (
@@ -204,16 +266,14 @@ export const MarketplaceGrid = ({ tenantID }) => {
                 Prev
               </Button>
               <span className="text-xs text-muted-foreground">
-                Page {currentPage} of {totalPages} · {totalCount} widget
+                Page {currentPage} of {totalPages} · {totalCount} item
                 {totalCount === 1 ? "" : "s"}
               </span>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() =>
-                  setCurrentPage((page) => Math.min(totalPages, page + 1))
-                }
+                onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
                 disabled={currentPage >= totalPages || isBusy || isFetching}
                 aria-label="Next page"
               >
@@ -233,11 +293,11 @@ export const MarketplaceGrid = ({ tenantID }) => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="text-base font-semibold text-foreground">
-                Install plan
+                Install plan{preview?.title ? `: ${preview.title}` : ""}
               </DialogTitle>
               <DialogDescription>
-                Installing clones the widget and its dependencies with fresh
-                IDs; datasources must be reconnected.
+                Installing clones the item and its dependencies with fresh IDs;
+                datasources must be reconnected.
               </DialogDescription>
             </DialogHeader>
             <DialogBody>
@@ -247,11 +307,9 @@ export const MarketplaceGrid = ({ tenantID }) => {
                     <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                       Preview
                     </p>
-                    <Badge
-                      variant={preview.valid ? "secondary" : "destructive"}
-                    >
-                      {preview.summary.createCount} item
-                      {preview.summary.createCount === 1 ? "" : "s"}
+                    <Badge variant={preview.valid ? "secondary" : "destructive"}>
+                      {preview.summary?.createCount ?? 0} item
+                      {preview.summary?.createCount === 1 ? "" : "s"}
                     </Badge>
                   </div>
                   <div className="max-h-72 space-y-2 overflow-y-auto rounded border border-border/50 p-2">
@@ -263,24 +321,17 @@ export const MarketplaceGrid = ({ tenantID }) => {
                         <span className="text-sm font-medium text-foreground">
                           {item.title}
                         </span>
-                        {(item.warnings.length > 0 ||
-                          item.missingDependencies.length > 0) && (
+                        {(item.warnings?.length > 0 ||
+                          item.missingDependencies?.length > 0) && (
                           <ul className="mt-1 space-y-0.5 pl-2">
                             {item.warnings.map((warning, index) => (
-                              <li
-                                key={`w_${index}`}
-                                className="text-xs text-muted-foreground"
-                              >
+                              <li key={`w_${index}`} className="text-xs text-muted-foreground">
                                 • {warning}
                               </li>
                             ))}
-                            {item.missingDependencies.map((dep) => (
-                              <li
-                                key={`d_${dep.type}_${dep.id}`}
-                                className="text-xs text-destructive"
-                              >
-                                • Missing {dep.type}: will be absent after
-                                install
+                            {(item.missingDependencies || []).map((dep) => (
+                              <li key={`d_${dep.type}_${dep.id}`} className="text-xs text-destructive">
+                                • Missing {dep.type}: will be absent after install
                               </li>
                             ))}
                           </ul>
@@ -308,11 +359,7 @@ export const MarketplaceGrid = ({ tenantID }) => {
                 }}
                 disabled={!preview?.valid || installMutation.isPending}
               >
-                {installMutation.isPending ? (
-                  <Spinner size={16} />
-                ) : (
-                  "Confirm install"
-                )}
+                {installMutation.isPending ? <Spinner size={14} /> : "Install"}
               </Button>
             </DialogFooter>
           </DialogContent>

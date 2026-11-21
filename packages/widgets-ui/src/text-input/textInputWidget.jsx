@@ -35,17 +35,21 @@ export const TextInputWidget = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [widgetConfig?.defaultValue]);
 
-  // Expose methods
+  // Expose methods (live callbacks via ref: B05/F02 — never initial closures).
+  const liveRef = useRef(null);
+  liveRef.current = { setWidgetState, fireWidgetEvent };
   const methodsRef = useRef(null);
   if (!methodsRef.current) {
     methodsRef.current = {
       setValue: (v) => {
-        if (setWidgetState) setWidgetState((prev) => ({ ...prev, value: v }));
-        if (fireWidgetEvent) fireWidgetEvent("onChange", { value: v });
+        const rt = liveRef.current;
+        if (rt.setWidgetState) rt.setWidgetState((prev) => ({ ...prev, value: v }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: v });
       },
       clear: () => {
-        if (setWidgetState) setWidgetState((prev) => ({ ...prev, value: "" }));
-        if (fireWidgetEvent) fireWidgetEvent("onClear", { value: "" });
+        const rt = liveRef.current;
+        if (rt.setWidgetState) rt.setWidgetState((prev) => ({ ...prev, value: "" }));
+        if (rt.fireWidgetEvent) rt.fireWidgetEvent("onClear", { value: "" });
       },
       focus: () => inputRef.current?.focus?.(),
     };

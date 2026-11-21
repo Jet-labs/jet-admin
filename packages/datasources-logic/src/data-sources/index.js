@@ -41,6 +41,18 @@ import NatsDataSource from "./nats/datasource";
 
 import ExcelCSVDataSource from "./excelcsv/datasource";
 
+// New batch: analytics, metrics, files, and code-hosting integrations
+import ClickHouseDataSource from "./clickhouse/datasource";
+import DuckDBDataSource from "./duckdb/datasource";
+import PrometheusDataSource from "./prometheus/datasource";
+import InfluxDBDataSource from "./influxdb/datasource";
+import FileSystemDataSource from "./filesystem/datasource";
+import SFTPDataSource from "./sftp/datasource";
+import GitHubDataSource from "./github/datasource";
+import GitLabDataSource from "./gitlab/datasource";
+import SMTPDataSource from "./smtp/datasource";
+import LDAPDataSource from "./ldap/datasource";
+
 const dataSources = {
   postgresql: PostgreSQLDataSource,
   restapi: RestAPIDataSource,
@@ -82,6 +94,18 @@ const dataSources = {
   nats: NatsDataSource,
 
   excelcsv: ExcelCSVDataSource,
+
+  // New batch
+  clickhouse: ClickHouseDataSource,
+  duckdb: DuckDBDataSource,
+  prometheus: PrometheusDataSource,
+  influxdb: InfluxDBDataSource,
+  filesystem: FileSystemDataSource,
+  sftp: SFTPDataSource,
+  github: GitHubDataSource,
+  gitlab: GitLabDataSource,
+  smtp: SMTPDataSource,
+  ldap: LDAPDataSource,
 };
 
 export default {

@@ -31,6 +31,7 @@ export default class RabbitMQDataSource extends DataSource {
       operation, 
       queue, 
       exchange, 
+      exchangeType = "direct",
       routingKey, 
       message, 
       messageCount = 1,
@@ -67,7 +68,7 @@ export default class RabbitMQDataSource extends DataSource {
       
       switch (operation) {
         case "publish":
-          result = await this.publish(channel, queue, exchange, routingKey, message, queueOptions, messageOptions);
+          result = await this.publish(channel, queue, exchange, routingKey, message, queueOptions, messageOptions, exchangeType);
           break;
         case "consume":
         case "peek":
@@ -110,7 +111,7 @@ export default class RabbitMQDataSource extends DataSource {
     }
   }
 
-  async publish(channel, queue, exchange, routingKey, message, queueOptions, messageOptions) {
+  async publish(channel, queue, exchange, routingKey, message, queueOptions, messageOptions, exchangeType = "direct") {
     const msgContent = typeof message === "string" ? message : JSON.stringify(message);
     const buffer = Buffer.from(msgContent);
     
@@ -121,7 +122,6 @@ export default class RabbitMQDataSource extends DataSource {
     };
 
     if (exchange) {
-      const exchangeType = dataQueryOptions.exchangeType || "direct";
       await channel.assertExchange(exchange, exchangeType, { durable: true });
       channel.publish(exchange, routingKey || queue, buffer, options);
     } else {

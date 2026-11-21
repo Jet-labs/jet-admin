@@ -4,13 +4,56 @@
   "schema": {
     "type": "object",
     "properties": {
-      "content": { "type": "string", "description": "Markdown or plain text content. Supports template expressions {{ variable }}" },
-      "format": { "type": "string", "enum": ["markdown", "plain"], "default": "markdown" },
-      "fontSize": { "type": "string", "description": "CSS font-size value e.g. '16px', '1rem'" },
-      "fontWeight": { "type": "string", "enum": ["normal", "bold", "semibold"], "default": "normal" },
-      "color": { "type": "string", "description": "CSS color value" },
-      "align": { "type": "string", "enum": ["left", "center", "right"], "default": "left" }
+      "content": {
+        "type": "string",
+        "description": "Markdown or plain text content. Supports template expressions {{ variable }}. Raw HTML is escaped (never executed); link/image URLs must be http(s)/relative/mailto/tel or the tag is dropped to text."
+      },
+      "format": {
+        "type": "string",
+        "enum": [
+          "markdown",
+          "plain"
+        ],
+        "default": "markdown"
+      },
+      "fontSize": {
+        "type": "string",
+        "description": "CSS font-size value e.g. '16px', '1rem'"
+      },
+      "fontWeight": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "bold",
+          "semibold"
+        ],
+        "default": "normal"
+      },
+      "color": {
+        "type": "string",
+        "description": "CSS color value"
+      },
+      "align": {
+        "type": "string",
+        "enum": [
+          "left",
+          "center",
+          "right"
+        ],
+        "default": "left"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad"
+  ]
 }

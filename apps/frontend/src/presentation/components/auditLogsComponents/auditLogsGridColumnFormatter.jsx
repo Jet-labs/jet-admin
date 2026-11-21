@@ -1,41 +1,23 @@
-import { Calendar } from 'lucide-react';
+import { Calendar, CheckCircle2, ExternalLink, XCircle } from "lucide-react";
 import moment from "moment";
 import React from "react";
+
+const NEUTRAL_CHIP =
+  "inline-flex items-center rounded border border-border bg-muted/40 px-2 py-0.5 text-xs font-medium text-foreground";
 
 /**
  * Generates column definitions for MUI DataGrid with custom rendering and editing components.
  * @param {object} param0 - Configuration object.
- * @param {string} param0.tenantID - Tenant ID.
  * @param {*} [param0.customIntMappings] - Optional custom mappings for integer types.
  * @returns {Array<object>} - Array of DataGrid column definitions.
  */
 export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
   try {
     const formattedColumns = [
-      // {
-      //   field: "auditLogID",
-      //   headerName: "Log ID",
-      //   width: 350,
-      //   editable: false,
-      //   sortable: true,
-      //   type: "number",
-      //   headerAlign: "left",
-      //   align: "left",
-      //   valueGetter: (value) => {
-      //     return value;
-      //   },
-      //   renderCell: (params) => {
-      //     return (
-      //       <div className="w-fit flex h-full flex-row justify-start items-center">
-      //         {params.value}
-      //       </div>
-      //     );
-      //   },
-      // },
       {
         field: "tblUsers",
         headerName: "User",
-        width: 220,
+        width: 200,
         editable: false,
         sortable: false,
         type: "string",
@@ -67,7 +49,7 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
       {
         field: "tblAPIKeys",
         headerName: "API Key",
-        width: 200,
+        width: 160,
         editable: false,
         sortable: false,
         type: "string",
@@ -90,7 +72,9 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
             <div className="flex flex-col justify-center h-full">
               {apiKeyTitle && <span className="text-sm font-medium leading-tight">{apiKeyTitle}</span>}
               {apiKeyPrefix && (
-                <span className="text-xs text-muted-foreground font-mono leading-tight">{apiKeyPrefix}••••••••</span>
+                <span className="text-xs text-muted-foreground font-mono leading-tight">
+                  {apiKeyPrefix}••••••••
+                </span>
               )}
             </div>
           );
@@ -98,8 +82,8 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
       },
       {
         field: "success",
-        headerName: "Success",
-        width: 150,
+        headerName: "Result",
+        width: 120,
         editable: false,
         sortable: true,
         type: "boolean",
@@ -109,21 +93,19 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
           return value;
         },
         renderCell: (params) => {
+          const succeeded = Boolean(params.value);
+          const Icon = succeeded ? CheckCircle2 : XCircle;
           return (
-            <div
-              className={
-                "w-full flex h-full flex-row justify-start items-center"
-              }
-            >
+            <div className="flex h-full w-full items-center">
               <span
-                className={`${"px-2 py-0.5 rounded text-sm font-medium w-min"} ${
-                  // eslint-disable-next-line no-extra-boolean-cast
-                  !!params.value
-                    ? "bg-green-950/40 text-green-400 w-full flex  flex-row justify-start items-center p-2"
-                    : "bg-red-950/40 text-red-400 w-full flex  flex-row justify-start items-center p-2"
+                className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-xs font-medium ${
+                  succeeded
+                    ? "border-primary/30 bg-primary/10 text-primary"
+                    : "border-destructive/30 bg-destructive/10 text-destructive"
                 }`}
               >
-                {String(Boolean(params.value))}
+                <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {succeeded ? "Success" : "Failed"}
               </span>
             </div>
           );
@@ -131,8 +113,8 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
       },
       {
         field: "createdAt",
-        headerName: "Created At",
-        width: 300,
+        headerName: "Created",
+        width: 190,
         editable: false,
         sortable: true,
         type: "date",
@@ -143,12 +125,12 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
         },
         renderCell: (params) => {
           return (
-            <div className="space-x-2 w-fit flex h-full flex-row justify-start items-center">
-              <Calendar className="text-primary flex-shrink-0" />
-              <span className="text-justify break-all overflow-hidden text-ellipsis whitespace-pre-wrap h-full flex items-center">
+            <div className="flex h-full w-fit flex-row items-center gap-2">
+              <Calendar className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <span className="whitespace-nowrap text-xs text-foreground">
                 {params.value
-                  ? moment(params.value).toDate().toISOString()
-                  : ""}
+                  ? moment(params.value).format("MMM D, YYYY · HH:mm")
+                  : "—"}
               </span>
             </div>
           );
@@ -157,7 +139,7 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
       {
         field: "type",
         headerName: "Type",
-        width: 150,
+        width: 120,
         editable: false,
         sortable: true,
         type: "string",
@@ -168,22 +150,16 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
         },
         renderCell: (params) => {
           return (
-            <div
-              className={
-                "w-full flex h-full flex-row justify-start items-center"
-              }
-            >
-              <span className="px-2 py-0.5 rounded text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2">
-                {params.value}
-              </span>
+            <div className="flex h-full w-full flex-row items-center">
+              <span className={NEUTRAL_CHIP}>{params.value || "—"}</span>
             </div>
           );
         },
       },
       {
         field: "subType",
-        headerName: "Sub Type",
-        width: 150,
+        headerName: "Method",
+        width: 110,
         editable: false,
         sortable: true,
         type: "string",
@@ -193,41 +169,17 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
           return value;
         },
         renderCell: (params) => {
-          let chipStyle =
-            "px-2 py-0.5 rounded text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2";
-          switch (params.value) {
-            case "GET":
-              chipStyle += " bg-green-950/40 text-green-400";
-              break
-            case "POST":
-              chipStyle += " bg-blue-950/40 text-blue-400";
-              break;
-            case "PUT":
-              chipStyle += " bg-yellow-100 text-yellow-800";
-              break;
-            case "DELETE":
-              chipStyle += " bg-red-950/40 text-red-400";
-              break;
-            default:
-              break;
-          }
           return (
-            <div
-              className={
-                "w-full flex h-full flex-row justify-start items-center"
-              }
-            >
-              <span className={chipStyle}>
-                {params.value}
-              </span>
+            <div className="flex h-full w-full flex-row items-center">
+              <span className={`${NEUTRAL_CHIP} font-mono`}>{params.value || "—"}</span>
             </div>
           );
         },
       },
       {
         field: "metadata",
-        headerName: "Metadata",
-        width: 200,
+        headerName: "Details",
+        width: 120,
         editable: false,
         sortable: false,
         type: "object",
@@ -239,14 +191,16 @@ export const getFormattedAuditLogColumns = ({ onMetadataClick } = {}) => {
         renderCell: (params) => {
           const hasData = params.value !== null && params.value !== undefined;
           return (
-            <div className="w-full flex h-full flex-row justify-start items-center">
+            <div className="flex h-full w-full flex-row items-center">
               {hasData ? (
-                  <button
+                <button
+                  type="button"
                   onClick={() => onMetadataClick?.(params.value)}
-                  className="px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer flex items-center gap-1 border border-primary/20"
+                  title="View request details"
+                  className="inline-flex items-center gap-1.5 rounded border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40"
                 >
-                  <span>View Details</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+                  <span>View</span>
+                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
                 </button>
               ) : (
                 <span className="text-muted-foreground text-xs italic">—</span>

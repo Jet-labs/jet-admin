@@ -53,7 +53,7 @@ apiKeyService.getAllAPIKeys = async ({ userID, tenantID }) => {
 apiKeyService.createAPIKey = async ({
   userID,
   tenantID,
-  roleIDs,
+  roleIDs = [],
   apiKeyTitle,
   authContext,
 }) => {
@@ -80,14 +80,16 @@ apiKeyService.createAPIKey = async ({
         },
       });
 
-      const apiKeyRoleMappings = roleIDs.map((roleID) => ({
-        roleID: roleID,
-        apiKeyID: apiKey.apiKeyID,
-      }));
+      if (roleIDs.length > 0) {
+        const apiKeyRoleMappings = roleIDs.map((roleID) => ({
+          roleID: roleID,
+          apiKeyID: apiKey.apiKeyID,
+        }));
 
-      await tx.tblAPIKeyRoleMappings.createMany({
-        data: apiKeyRoleMappings,
-      });
+        await tx.tblAPIKeyRoleMappings.createMany({
+          data: apiKeyRoleMappings,
+        });
+      }
 
       return apiKey;
     });
@@ -103,7 +105,7 @@ apiKeyService.createAPIKey = async ({
       }
     }
 
-    return { apiKey: rawKey };
+    return { apiKey: rawKey, apiKeyID: createdAPIKey.apiKeyID };
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:createAPIKey:failure",

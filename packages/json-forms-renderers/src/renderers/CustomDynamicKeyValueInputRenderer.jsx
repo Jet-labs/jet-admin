@@ -45,7 +45,7 @@ export const CustomDynamicKeyValueInputRenderer = (props) => {
         })}
       </div>
       {errors && errors.length > 0 && (
-        <p className="text-red-500 text-xs mt-2">{errors.join(", ")}</p>
+        <p className="text-destructive text-xs mt-2">{errors.join(", ")}</p>
       )}
     </div>
   );

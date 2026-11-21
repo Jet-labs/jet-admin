@@ -20,7 +20,7 @@ function isRedisEnabled() {
   return !!environmentVariables.REDIS_URL;
 }
 
-function getRedisClient(name = 'default') {
+function getRedisClient(name = 'default', options = {}) {
   if (clients[name]) return clients[name];
   if (!environmentVariables.REDIS_URL) {
     throw new Error('REDIS_URL is not set. Redis is required for the listener pipeline.');
@@ -36,6 +36,7 @@ function getRedisClient(name = 'default') {
     maxRetriesPerRequest: null,
     enableReadyCheck: true,
     retryStrategy: (times) => Math.min(times * 200, 5000),
+    ...options,
   });
   client.on('error', (err) => {
     Logger.log('warning', {

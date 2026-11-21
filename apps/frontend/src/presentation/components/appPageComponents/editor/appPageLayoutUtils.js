@@ -1,5 +1,6 @@
 import { cloneDeep } from "lodash";
 import { createRowNode, createWidgetNode } from "../layout/engine/layoutDefaults.js";
+import { parseResourceID } from "../../../../logic/appPageRuntime/widgetInstanceIdentity.js";
 
 export const GRID_BREAKPOINTS = {
   lg: 1000,
@@ -72,16 +73,13 @@ export const createWidgetInstanceKey = (widgetID, existingKeys = []) => {
 
 /**
  * Parses a widget key to extract the widget ID.
- * Handles formats: widget_<id>, widget_<id>_<instance>, widget_<id>_<timestamp>
+ * Handles formats: widget_<id>, widget_<id>_<instance>, widget_<id>_<timestamp>,
+ * plus runtime repeat-qualified instances (`<placement>::repeat:<path>`).
+ * Single source of truth lives in widgetInstanceIdentity.parseResourceID.
  * @param {string} widgetKey - The widget key string
  * @returns {string} The extracted widget ID
  */
-export const parseWidgetKey = (widgetKey) => {
-  if (!widgetKey) return "";
-  const parts = String(widgetKey).split("_");
-  // Format is widget_<id>[_<suffix>], so the ID is always parts[1]
-  return parts[1] || "";
-};
+export const parseWidgetKey = (widgetKey) => parseResourceID(widgetKey);
 
 export const appendWidgetToAppPageConfig = (
   appPageConfig = {},

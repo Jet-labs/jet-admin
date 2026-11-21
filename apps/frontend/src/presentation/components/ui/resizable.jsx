@@ -281,7 +281,7 @@ const ResizableHandle = ({ withHandle = true, className, id: idProp, ...props })
           onPointerDown={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onClick={handleCollapseToggle}
-          className="absolute z-50 flex h-5 w-5 items-center justify-center rounded-full bg-background border border-border shadow-sm hover:bg-accent hover:text-accent-foreground transition-all hover:scale-105"
+          className="absolute z-50 flex h-5 w-5 items-center justify-center rounded border border-border bg-background shadow-sm transition-all hover:scale-105 hover:bg-accent hover:text-accent-foreground"
           style={{ cursor: "pointer" }}
         >
           {getIcon()}

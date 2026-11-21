@@ -28,13 +28,23 @@ export const TenantPermissionSelectionInput = ({
     );
   }, [tenantPermissions]);
 
-  // Build the options list for MultiSearchSelect
+  // Build the options list for MultiSearchSelect. Show human descriptions
+  // instead of raw permission tokens (e.g. `tenant:read`).
   const permissionOptions = useMemo(() => {
-    return filteredPermissions.map((p) => ({
-      value: p.permissionID,
-      label: p.permissionTitle,
-      description: p.permissionDescription,
-    }));
+    return filteredPermissions.map((p) => {
+      const description = p.permissionDescription?.trim();
+      const label = description
+        ? description.replace(/^Permission to /i, "").replace(/^./, (c) => c.toUpperCase())
+        : p.permissionTitle
+            .split(":")
+            .map((part) => part.replace(/[-_]+/g, " ").replace(/^./, (c) => c.toUpperCase()))
+            .join(" · ");
+
+      return {
+        value: p.permissionID,
+        label,
+      };
+    });
   }, [filteredPermissions]);
 
   const handleChange = (newValue) => {
@@ -61,7 +71,7 @@ export const TenantPermissionSelectionInput = ({
         <Label htmlFor="rolePermissions">
           {label || CONSTANTS.STRINGS.TENANT_PERMISSION_SELECTION_LABEL}
         </Label>
-        <p className="text-xs text-red-500">Unable to load permissions.</p>
+        <p className="text-xs text-destructive">Unable to load permissions.</p>
       </div>
     );
   }
@@ -84,7 +94,7 @@ export const TenantPermissionSelectionInput = ({
       {helperText ? (
         <p className="text-xs text-muted-foreground">{helperText}</p>
       ) : null}
-      {error ? <p className="text-xs text-red-500">{error}</p> : null}
+      {error ? <p className="text-xs text-destructive">{error}</p> : null}
     </div>
   );
 };

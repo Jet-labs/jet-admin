@@ -67,6 +67,13 @@
     "execute": { "title": "tenant:listener:execute", "description": "Permission to execute a listener (cross-resource binding)" },
     "export": { "title": "tenant:listener:export", "description": "Permission to export a listener as a dependency bundle" }
   },
+  "marketplace": {
+    "list": { "title": "tenant:marketplace:list", "description": "Permission to browse marketplace items" },
+    "preview": { "title": "tenant:marketplace:preview", "description": "Permission to preview a marketplace item install" },
+    "install": { "title": "tenant:marketplace:install", "description": "Permission to install a marketplace item" },
+    "verify": { "title": "tenant:marketplace:verify", "description": "Permission to verify marketplace items" },
+    "unpublish": { "title": "tenant:marketplace:unpublish", "description": "Permission to remove marketplace items" }
+  },
   "permission": {
     "list": { "title": "tenant:permissions:list", "description": "Permission to list all permissions" }
   },

@@ -9,14 +9,36 @@
         "items": {
           "type": "object",
           "properties": {
-            "label": { "type": "string" },
-            "value": { "type": "string" }
+            "label": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
           },
-          "required": ["label", "value"]
+          "required": [
+            "label",
+            "value"
+          ]
         }
       },
-      "defaultTab": { "type": "string", "description": "Initially selected tab value" }
+      "defaultTab": {
+        "type": "string",
+        "description": "Initially selected tab value"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad", "onChange"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad",
+    "onChange"
+  ]
 }

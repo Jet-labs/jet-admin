@@ -1,7 +1,8 @@
 
 .agent
 .commandcode/
-
+reports/
+posts/
 # Dependencies - all node_modules anywhere (apps, packages, nested)
 **/node_modules/
 
@@ -22,6 +23,11 @@ apps/admin/.env
 apps/mcp-server/.env
 **/.env
 **/.env.local
+
+# Machine-local agent configuration and session notes (may reference credentials)
+.opencode/opencode.json
+.opencode/tui.json
+.opencode/mcp-fix-progress.md
 
 # Logs - root logs/ was missing (only apps/backend/logs was ignored)
 logs/

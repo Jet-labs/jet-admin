@@ -18,7 +18,8 @@ export const ProgressWidget = ({ widgetConfig, fireWidgetEvent }) => {
   const isLoading = widgetConfig?.isLoading === true || widgetConfig?.isLoading === "true";
 
   const value = useMemo(() => {
-    const raw = widgetConfig?.valueTemplate;
+      // Dual-read: canonical valueTemplate, legacy value fallback (F04).
+  const raw = widgetConfig?.valueTemplate ?? widgetConfig?.value;
     const n = Number(raw);
     if (Number.isNaN(n)) return 0;
     return Math.min(100, Math.max(0, n));

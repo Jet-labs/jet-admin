@@ -33,6 +33,7 @@
 const { prisma } = require("../../../config/prisma.config");
 const constants = require("../../../constants");
 const Logger = require("../../../utils/logger");
+const { v5: uuidv5 } = require('uuid');
 
 const stateManager = {};
 stateManager.WORKFLOW_LOG_EVENT_TYPES = constants.WORKFLOW_LOG_EVENT_TYPES;
@@ -63,24 +64,43 @@ stateManager.logEvent = async ({
   payload = {},
   errorMessage = null,
   nodeAttempt = null,
-}) => {
+  eventKey = null,
+  contextSnapshot,
+}, client) => {
   Logger.log('info', {
     message: 'stateManager:logEvent',
     params: { instanceID, nodeID, eventType, nodeStatus, outputVariable, nodeAttempt },
   });
 
-  return prisma.tblWorkflowInstanceLogs.create({
-    data: {
+  const data = {
       instanceID,
       nodeID: nodeID != null ? String(nodeID) : null,
       eventType,
       nodeStatus: nodeStatus || null,
       outputVariable: outputVariable || null,
-      payload,
+      payload: contextSnapshot != null ? { ...payload, __contextSnapshot: contextSnapshot } : payload,
       errorMessage: errorMessage || null,
       nodeAttempt: nodeAttempt ?? null,
-    },
-  });
+      eventKey,
+  };
+  const write = async target => {
+    const row = eventKey ? await target.tblWorkflowInstanceLogs.upsert({
+      where: { instanceID_eventKey: { instanceID, eventKey } }, create: data, update: {},
+    }) : await target.tblWorkflowInstanceLogs.create({ data });
+    if (contextSnapshot != null && row?.eventSequence != null) {
+      await target.tblWorkflowInstances.updateMany({
+        where: {
+          instanceID, status: { in: ['PENDING', 'RUNNING', 'SUSPENDED'] },
+          OR: [{ projectionSequence: null }, { projectionSequence: { lt: row.eventSequence } }],
+        },
+        data: { contextProjection: row.payload?.__contextSnapshot ?? contextSnapshot, projectionSequence: row.eventSequence },
+      });
+    }
+    return row;
+  };
+  // Event append and projection update either both commit or neither does.
+  if (!client && contextSnapshot != null) return prisma.$transaction(write);
+  return write(client || prisma);
 };
 
 // ─── logEventBulk — updated to pass nodeAttempt ───────────────────────────────
@@ -126,45 +146,56 @@ stateManager.logEventBulk = async (events) => {
  *   assembled history agree.
  * @returns {Promise<{ instance: object, initialContext: object }>}
  */
-stateManager.createInstance = async ({ workflowID, tenantID, inputValues = {}, isTest = false, sourceWorkflowID, parentInstanceID, parentNodeID, systemContext = {} }) => {
+stateManager.createInstance = async ({ workflowID, tenantID, inputValues = {}, isTest = false, sourceWorkflowID, parentInstanceID, parentNodeID, systemContext = {}, executionKey, executionDefinition }) => {
   Logger.log('info', {
     message: 'stateManager:createInstance',
     params: { workflowID, tenantID, isTest, sourceWorkflowID, parentInstanceID, parentNodeID },
   });
 
-  const instance = await prisma.tblWorkflowInstances.create({
-    data: {
-      workflowID: isTest ? (sourceWorkflowID ?? null) : workflowID,
-      tenantID,
-      status: constants.WORKFLOW_STATUS.RUNNING,
-      startedAt: new Date(),
-      isTest,
-      ...(parentInstanceID ? { parentInstanceID } : {}),
-      ...(parentNodeID ? { parentNodeID: String(parentNodeID) } : {}),
-    },
-  });
+  return prisma.$transaction(async (tx) => {
+    const data = {
+        workflowID: isTest ? (sourceWorkflowID ?? null) : workflowID,
+        tenantID,
+        status: constants.WORKFLOW_STATUS.PENDING,
+        startedAt: new Date(),
+        isTest,
+        ...(parentInstanceID ? { parentInstanceID } : {}),
+        ...(parentNodeID ? { parentNodeID: String(parentNodeID) } : {}),
+        ...(executionDefinition ? { executionDefinition } : {}),
+        ...(executionKey ? { executionKey, instanceID: uuidv5(`${tenantID}:${executionKey}`, uuidv5.URL) } : {}),
+    };
+    const instance = executionKey ? await tx.tblWorkflowInstances.upsert({
+      where: { tenantID_executionKey: { tenantID, executionKey } }, create: data, update: {},
+    }) : await tx.tblWorkflowInstances.create({ data });
 
-  const systemEntries = systemContext && typeof systemContext === 'object' ? systemContext : {};
-  const inputPayload = { input: inputValues, ...systemEntries };
+    const systemEntries = {
+      ...(systemContext && typeof systemContext === 'object' ? systemContext : {}),
+      ...(parentInstanceID ? { __parentInstanceID: parentInstanceID } : {}),
+    };
+    const inputPayload = { input: inputValues, ...systemEntries };
 
-  // Use logEvent instead of raw Prisma so all writes go through one path
-  await stateManager.logEvent({
-    instanceID: instance.instanceID,
-    nodeID: null,
-    eventType: constants.WORKFLOW_LOG_EVENT_TYPES.INPUT_SET,
-    outputVariable: 'input',
-    payload: inputPayload,
-  });
-  if (Object.keys(systemEntries).length > 0) {
-    await stateManager.logEvent({
+    // All initial writes use the same transaction as instance allocation.
+    const initial = await stateManager.logEvent({
       instanceID: instance.instanceID,
       nodeID: null,
-      eventType: constants.WORKFLOW_LOG_EVENT_TYPES.SYSTEM_SET,
-      payload: { ...systemEntries, ...(parentInstanceID ? { __parentInstanceID: parentInstanceID } : {}) },
-    });
-  }
+      eventType: constants.WORKFLOW_LOG_EVENT_TYPES.INPUT_SET,
+      outputVariable: 'input',
+      payload: inputPayload,
+      contextSnapshot: inputPayload,
+      eventKey: executionKey ? 'initial-input' : null,
+    }, tx);
+    if (Object.keys(systemEntries).length > 0) {
+      await stateManager.logEvent({
+        instanceID: instance.instanceID,
+        nodeID: null,
+        eventType: constants.WORKFLOW_LOG_EVENT_TYPES.SYSTEM_SET,
+        payload: systemEntries,
+        eventKey: executionKey ? 'initial-system' : null,
+      }, tx);
+    }
 
-  return { instance, initialContext: inputPayload };
+    return { instance, initialContext: initial?.payload?.__contextSnapshot || inputPayload };
+  });
 };
 
 /**
@@ -179,7 +210,7 @@ stateManager.getInstance = async (instanceID) => {
 };
 
 /**
- * Fetch an instance with its full log history ordered by logID.
+ * Fetch an instance with its full log history ordered by insertion sequence.
  *
  * @param {string} instanceID
  * @returns {Promise<object | null>}
@@ -188,7 +219,7 @@ stateManager.getInstanceWithLogs = async (instanceID) => {
   return prisma.tblWorkflowInstances.findUnique({
     where: { instanceID },
     include: {
-      tblWorkflowInstanceLogs: { orderBy: { logID: 'asc' } },
+      tblWorkflowInstanceLogs: { orderBy: { eventSequence: 'asc' } },
     },
   });
 };
@@ -215,7 +246,8 @@ stateManager.getOpenDispatchedNodeIDs = async (instanceID, nodeIDs) => {
       eventType: {
         in: [
           constants.WORKFLOW_LOG_EVENT_TYPES.NODE_DISPATCHED,
-          constants.WORKFLOW_LOG_EVENT_TYPES.NODE_COMPLETED,
+           constants.WORKFLOW_LOG_EVENT_TYPES.NODE_COMPLETED,
+          constants.WORKFLOW_LOG_EVENT_TYPES.NODE_FAILED,
           constants.WORKFLOW_LOG_EVENT_TYPES.NODE_FAILED,
         ],
       },
@@ -280,7 +312,7 @@ stateManager.getDispatchCounts = async (instanceID, nodeIDs) => {
  * NODE_DISPATCHED is intentionally NOT in this list — it carries no payload
  * and should not contribute to the context object.
  *
- * Same-key conflict: the row with the higher logID wins (later INSERT).
+ * Same-key conflict: the higher database eventSequence wins (later INSERT).
  * Identical semantics to the old jsonb || last-writer model, but the merge
  * now happens on already-committed, race-free data.
  *
@@ -288,6 +320,12 @@ stateManager.getDispatchCounts = async (instanceID, nodeIDs) => {
  * @returns {Promise<object>} Assembled context object
  */
 stateManager.assembleContext = async (instanceID) => {
+  const instance = await prisma.tblWorkflowInstances.findUnique({
+    where: { instanceID }, select: { finalContext: true, contextProjection: true },
+  });
+  // A terminal snapshot is authoritative even if a late activity writes a log.
+  if (instance?.finalContext != null) return instance.finalContext;
+  if (instance?.contextProjection != null) return instance.contextProjection;
   const rows = await prisma.tblWorkflowInstanceLogs.findMany({
     where: {
       instanceID,
@@ -299,18 +337,19 @@ stateManager.assembleContext = async (instanceID) => {
         ],
       },
     },
-    orderBy: { logID: 'asc' },
+    orderBy: { eventSequence: 'asc' },
     select: { payload: true },
   });
 
   return rows.reduce((acc, row) => {
     const payload = row.payload || {};
-    const { __deleteKeys, ...rest } = payload;
-    const next = { ...acc, ...rest };
+    const { __deleteKeys, __contextSnapshot, ...rest } = payload;
+    if (__contextSnapshot && typeof __contextSnapshot === 'object' && !Array.isArray(__contextSnapshot)) return __contextSnapshot;
+    const next = { ...acc };
     if (Array.isArray(__deleteKeys)) {
       for (const key of __deleteKeys) delete next[key];
     }
-    return next;
+    return Object.assign(next, rest);
   }, {});
 };
 
@@ -357,23 +396,29 @@ stateManager.createDataCollectionRequest = async ({
   collectionType,
   collectionConfig,
   expiresAt,
+  collectionRequestID,
+  waitID,
 }) => {
   Logger.log('info', {
     message: 'stateManager:createDataCollectionRequest',
     params: { instanceID, nodeID, collectionType },
   });
 
-  return prisma.tblWorkflowDataCollectionRequests.create({
-    data: {
+  const data = {
+      ...(collectionRequestID ? { collectionRequestID } : {}),
       instanceID,
       nodeID: String(nodeID),
+      waitID: waitID || null,
       nodeAttempt: nodeAttempt ?? null,
       status: constants.WORKFLOW_STATUS.PENDING,
       collectionType: collectionType || 'form',
       collectionConfig: collectionConfig ?? {},
       expiresAt: expiresAt ?? null,
-    },
+  };
+  if (collectionRequestID) return prisma.tblWorkflowDataCollectionRequests.upsert({
+    where: { collectionRequestID }, create: data, update: {},
   });
+  return prisma.tblWorkflowDataCollectionRequests.create({ data });
 };
 
 /**
@@ -399,6 +444,57 @@ stateManager.getPendingRequestForNode = async (instanceID, nodeID) => {
 stateManager.getDataCollectionRequest = async (collectionRequestID) => {
   return prisma.tblWorkflowDataCollectionRequests.findUnique({
     where: { collectionRequestID },
+  });
+};
+
+stateManager.getInstanceForExecutionKey = (tenantID, executionKey) => prisma.tblWorkflowInstances.findUnique({
+  where: { tenantID_executionKey: { tenantID, executionKey } },
+});
+stateManager.markInstanceStarted = instanceID => prisma.tblWorkflowInstances.updateMany({
+  where: { instanceID, status: 'PENDING' }, data: { status: 'RUNNING', updatedAt: new Date() },
+});
+
+// The request row is the durable signal outbox. Lock the parent before the
+// request (same ordering as finalization) to serialize submit-vs-termination.
+stateManager.submitDataCollectionRequest = async (request, submittedData) => {
+  const { isDeepStrictEqual } = require('node:util');
+  const outcome = await prisma.$transaction(async tx => {
+    const running = await tx.tblWorkflowInstances.updateMany({
+      where: { instanceID: request.instanceID, status: 'RUNNING' },
+      data: { version: { increment: 1 } },
+    });
+    if (!running.count) return { error: 'Workflow is no longer running' };
+    const now = new Date();
+    const expired = await tx.tblWorkflowDataCollectionRequests.updateMany({
+      where: { collectionRequestID: request.collectionRequestID, status: 'PENDING', expiresAt: { lte: now } },
+      data: { status: 'EXPIRED', updatedAt: now },
+    });
+    if (expired.count) return { error: 'Data collection request has expired' };
+    await tx.tblWorkflowDataCollectionRequests.updateMany({
+      where: { collectionRequestID: request.collectionRequestID, status: 'PENDING' },
+      data: { status: 'SUBMITTED', submittedData, updatedAt: now },
+    });
+    const current = await tx.tblWorkflowDataCollectionRequests.findUnique({ where: { collectionRequestID: request.collectionRequestID } });
+    if (!current || !['SUBMITTED', 'COMPLETED'].includes(current.status)) return { error: `Request is already ${current?.status || 'missing'}` };
+    if (!isDeepStrictEqual(current.submittedData, submittedData)) return { error: 'A different submission has already been accepted' };
+    return { request: current };
+  });
+  // Throw AFTER commit so the EXPIRED transition is not rolled back.
+  if (outcome.error) throw new Error(outcome.error);
+  return outcome.request;
+};
+
+stateManager.resolveDataCollectionRequest = async (collectionRequestID, expire = false) => {
+  return prisma.$transaction(async tx => {
+    await tx.tblWorkflowDataCollectionRequests.updateMany({
+      where: { collectionRequestID, status: 'SUBMITTED' },
+      data: { status: 'COMPLETED', updatedAt: new Date() },
+    });
+    if (expire) await tx.tblWorkflowDataCollectionRequests.updateMany({
+      where: { collectionRequestID, status: 'PENDING' },
+      data: { status: 'EXPIRED', updatedAt: new Date() },
+    });
+    return tx.tblWorkflowDataCollectionRequests.findUnique({ where: { collectionRequestID } });
   });
 };
 
@@ -448,15 +544,35 @@ stateManager.getPendingDataCollectionRequests = async (instanceID) => {
  * @param {string} instanceID
  * @param {'COMPLETED' | 'FAILED' | 'CANCELLED'} status
  */
-stateManager.completeInstance = async (instanceID, status) => {
+stateManager.completeInstance = async (instanceID, status, { contextData, workflowOutput, errorMessage } = {}) => {
   Logger.log('info', {
     message: 'stateManager:completeInstance',
     params: { instanceID, status },
   });
 
-  await prisma.tblWorkflowInstances.update({
-    where: { instanceID },
-    data: { status, completedAt: new Date(), updatedAt: new Date() },
+  if (!['COMPLETED', 'FAILED', 'CANCELLED'].includes(status)) throw new Error(`Invalid terminal status: ${status}`);
+  return prisma.$transaction(async (tx) => {
+    const result = await tx.tblWorkflowInstances.updateMany({
+      where: { instanceID, status: { in: ['PENDING', 'RUNNING', 'SUSPENDED'] } },
+      data: {
+        status, completedAt: new Date(), updatedAt: new Date(),
+        ...(contextData != null ? { finalContext: contextData } : {}),
+        ...(workflowOutput != null ? { workflowOutput } : {}),
+      },
+    });
+    if (result.count) {
+      if (errorMessage) await tx.tblWorkflowInstanceLogs.create({
+        data: {
+          instanceID, eventType: constants.WORKFLOW_LOG_EVENT_TYPES.NODE_FAILED,
+          errorMessage, payload: {}, eventKey: 'terminal-error',
+        },
+      });
+      await tx.tblWorkflowDataCollectionRequests.updateMany({
+        where: { instanceID, status: { in: ['PENDING', 'SUBMITTED'] } },
+        data: { status: 'CANCELLED', updatedAt: new Date() },
+      });
+    }
+    return result.count > 0;
   });
 };
 
@@ -475,7 +591,6 @@ stateManager.getStaleRunningInstances = async ({ staleAfterMs = 5 * 60 * 1000, t
     where: {
       status: constants.WORKFLOW_STATUS.RUNNING,
       updatedAt: { lt: staleThreshold },
-      isTest: false,
       ...(tenantID ? { tenantID } : {}),
     },
     orderBy: { updatedAt: 'asc' },
@@ -483,8 +598,8 @@ stateManager.getStaleRunningInstances = async ({ staleAfterMs = 5 * 60 * 1000, t
 };
 
 /**
- * Mark stale instances as FAILED and write a SYSTEM_SET log row for each,
- * recording the recovery event in the unified log.
+ * Reconcile candidates with Temporal. Age is only a selection criterion,
+ * never proof that a durable workflow has failed.
  *
  * @param {string[]} instanceIDs
  */
@@ -496,20 +611,10 @@ stateManager.markInstancesAsRecovered = async (instanceIDs) => {
     params: { count: instanceIDs.length, instanceIDs },
   });
 
-  await prisma.tblWorkflowInstances.updateMany({
-    where: { instanceID: { in: instanceIDs }, status: constants.WORKFLOW_STATUS.RUNNING },
-    data: { status: constants.WORKFLOW_STATUS.FAILED, completedAt: new Date(), updatedAt: new Date() },
-  });
-
-  await stateManager.logEventBulk(
-    instanceIDs.map((instanceID) => ({
-      instanceID,
-      nodeID: null,
-      eventType: constants.WORKFLOW_LOG_EVENT_TYPES.SYSTEM_SET,
-      outputVariable: '__recoveryError',
-      payload: { __recoveryError: 'Instance marked FAILED by startup recovery sweep' },
-    }))
-  );
+  const { reconcileWorkflowInstance } = require('../temporal/service');
+  for (const instanceID of instanceIDs) {
+    await reconcileWorkflowInstance({ instanceID });
+  }
 };
 
 // ─── Test helpers ─────────────────────────────────────────────────────────────

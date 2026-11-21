@@ -13,6 +13,7 @@ export const SearchInputWidget = ({ widgetConfig, widgetState, setWidgetState, f
   const value = widgetState?.value ?? widgetConfig?.defaultValue ?? "";
   const [local, setLocal] = useState(value);
   const timerRef = useRef(null);
+  const composingRef = useRef(false);
 
   useEffect(() => { setLocal(value ?? ""); }, [value]);
   useEffect(() => {
@@ -23,30 +24,55 @@ export const SearchInputWidget = ({ widgetConfig, widgetState, setWidgetState, f
   }, [widgetConfig?.defaultValue]);
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
+  // Live callbacks via ref (B05/F02): never initial closures.
+  const liveRef = useRef(null);
+  liveRef.current = { setWidgetState, fireWidgetEvent, debounceMs };
+
+  // Cancel any pending debounced search so a cleared/overwritten term can
+  // never emit a stale onSearch afterwards (B23/F02).
+  const cancelPendingSearch = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
   const methodsRef = useRef(null);
   if (!methodsRef.current) {
     methodsRef.current = {
       setValue: (v) => {
+        const rt = liveRef.current;
+        cancelPendingSearch();
         setLocal(v ?? "");
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: v ?? "" }));
-        if (fireWidgetEvent) { fireWidgetEvent("onChange", { value: v ?? "" }); fireWidgetEvent("onSearch", { searchTerm: v ?? "" }); }
+        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: v ?? "" }));
+        if (rt.fireWidgetEvent) { rt.fireWidgetEvent("onChange", { value: v ?? "" }); rt.fireWidgetEvent("onSearch", { searchTerm: v ?? "" }); }
       },
       clear: () => {
+        const rt = liveRef.current;
+        cancelPendingSearch();
         setLocal("");
-        if (setWidgetState) setWidgetState((p) => ({ ...p, value: "" }));
-        if (fireWidgetEvent) { fireWidgetEvent("onClear", { value: "" }); fireWidgetEvent("onSearch", { searchTerm: "" }); }
+        if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: "" }));
+        if (rt.fireWidgetEvent) { rt.fireWidgetEvent("onClear", { value: "" }); rt.fireWidgetEvent("onSearch", { searchTerm: "" }); }
       },
     };
   }
   useEffect(() => { if (onWidgetInit) onWidgetInit(methodsRef.current); }, [onWidgetInit]);
 
   const push = (v) => {
-    if (setWidgetState) setWidgetState((p) => ({ ...p, value: v }));
-    if (fireWidgetEvent) fireWidgetEvent("onChange", { value: v });
-    if (timerRef.current) clearTimeout(timerRef.current);
+    const rt = liveRef.current;
+    if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: v }));
+    if (rt.fireWidgetEvent) rt.fireWidgetEvent("onChange", { value: v });
+    cancelPendingSearch();
+    const wait = Number(rt.debounceMs);
     timerRef.current = setTimeout(() => {
-      if (fireWidgetEvent) fireWidgetEvent("onSearch", { searchTerm: v });
-    }, Number.isNaN(debounceMs) ? 300 : debounceMs);
+      timerRef.current = null;
+      const latest = liveRef.current;
+      if (latest.fireWidgetEvent) latest.fireWidgetEvent("onSearch", { searchTerm: v });
+    }, Number.isNaN(wait) ? 300 : wait);
+  };
+
+  const liveWidgetEventSearch = (v) => {
+    liveRef.current.fireWidgetEvent("onSearch", { searchTerm: v });
   };
 
   return (
@@ -65,7 +91,24 @@ export const SearchInputWidget = ({ widgetConfig, widgetState, setWidgetState, f
         <Input
           value={local ?? ""}
           disabled={disabled}
-          onChange={(e) => { setLocal(e.target.value); push(e.target.value); }}
+          onChange={(e) => {
+            setLocal(e.target.value);
+            // IME composition (CJK etc.): show keystrokes locally but do not
+            // launch partial searches until the composition commits (B23).
+            if (!composingRef.current) push(e.target.value);
+          }}
+          onCompositionStart={() => { composingRef.current = true; }}
+          onCompositionEnd={(e) => { composingRef.current = false; push(e.target.value); }}
+          onKeyDown={(e) => {
+            // Enter commits the current term immediately (cancels debounce).
+            if (e.key === "Enter") {
+              cancelPendingSearch();
+              const v = e.target.value ?? "";
+              const rt = liveRef.current;
+              if (rt.setWidgetState) rt.setWidgetState((p) => ({ ...p, value: v }));
+              if (rt.fireWidgetEvent) rt.fireWidgetEvent("onSearch", { searchTerm: v });
+            }
+          }}
           onFocus={() => fireWidgetEvent?.("onFocus", { value: local })}
           onBlur={() => fireWidgetEvent?.("onBlur", { value: local })}
           placeholder={placeholder}

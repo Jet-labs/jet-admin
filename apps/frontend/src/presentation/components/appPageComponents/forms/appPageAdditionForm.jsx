@@ -19,6 +19,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Undo } from "lucide-react";
 import { AppPageRuntimeProvider } from "../../../../logic/appPageRuntime/AppPageRuntimeProvider";
 import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootstrapper";
+import { AppPageWorkflowInputHost } from '../appPageWorkflowInputHost';
 
 import { PageHeader, Button } from "@jet-admin/ui";
 
@@ -122,6 +123,10 @@ export const AppPageAdditionForm = ({ tenantID }) => {
       ...appPageAdditionForm.values.appPageConfig,
       ...nextAppPageConfig,
     });
+    // Force a deterministic canvas re-seed with the new placement. The canvas
+    // otherwise only reacts to layout changes through a post-render effect,
+    // which can race with an onChangeLayout emission from the old tree.
+    setEditorKey((prev) => prev + 1);
   };
 
   return (
@@ -157,6 +162,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
             pageConfig={appPageAdditionForm.values.appPageConfig}
           >
             <AppPageDataSourceBootstrapper />
+            <AppPageWorkflowInputHost />
             <ResizablePanelGroup direction="vertical" className="!h-full !w-full">
               <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_ADD_TOP_PANEL} defaultSize={75} className="flex min-h-0 min-w-0">
                 <ResizablePanelGroup
@@ -201,6 +207,7 @@ export const AppPageAdditionForm = ({ tenantID }) => {
                         );
                       }}
                       appPageEditorForm={appPageAdditionForm}
+                      onAddWidget={handleAddWidgetToCanvas}
                     />
                   </ResizablePanel>
                 </ResizablePanelGroup>

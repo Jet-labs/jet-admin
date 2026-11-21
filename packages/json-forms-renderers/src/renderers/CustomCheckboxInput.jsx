@@ -31,7 +31,7 @@ export const CustomCheckboxInput = (props) => {
         {label || description || uischema.label}
       </Label>
       {errors && errors.length > 0 && (
-        <p className="text-red-500 text-xs mt-1 ml-2">{errors}</p>
+        <p className="text-destructive text-xs mt-1 ml-2">{errors}</p>
       )}
     </div>
   );

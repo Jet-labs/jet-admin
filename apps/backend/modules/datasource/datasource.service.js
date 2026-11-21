@@ -6,9 +6,8 @@ const { getCreationContextFromAuthContext } = require("../../utils/auth.context.
 const { vaultService } = require("../vault/vault.service");
 const { grantCreatorAccess, removePoliciesForResource } = require("../../config/casbin.config");
 const { encrypt, decrypt } = require("../../utils/encryption.util");
-// MASK_PLACEHOLDER is the sentinel written by mask() in sensitive.js.
-// Kept here as a safety fallback in mergeAndRestoreMaskedOptions.
-const { MASK_PLACEHOLDER } = require("../../utils/sensitive");
+const { mergeAndRestoreMaskedOptions } = require("../../utils/sensitive");
+const { findDataQueryReferences } = require("../dataQuery/dataQuery.references");
 
 function encryptOptions(options) {
   if (!options) return options;
@@ -18,6 +17,24 @@ function encryptOptions(options) {
     __encrypted: true,
     ...encrypted,
   };
+}
+
+/**
+ * Datasource types are executed by registry lookup. Accepting an unknown type
+ * creates a resource that can never run, and feeds an unvalidated string into
+ * that lookup. Reject it at the write boundary.
+ */
+function assertValidDatasourceType(datasourceType) {
+  if (
+    typeof datasourceType !== "string" ||
+    !Object.prototype.hasOwnProperty.call(DATASOURCE_LOGIC_COMPONENTS, datasourceType)
+  ) {
+    const error = new Error(`Unsupported datasource type: ${datasourceType}`);
+    error.name = "InvalidDatasourceTypeError";
+    error.code = "INVALID_DATASOURCE_TYPE";
+    error.statusCode = 400;
+    throw error;
+  }
 }
 
 function decryptOptions(options) {
@@ -38,47 +55,6 @@ function decryptOptions(options) {
     return options; // Fallback to raw options if decryption fails
   }
 }
-
-/**
- * Merge incoming (potentially partially-masked) options with the previously
- * decrypted values stored in the database.
- *
- * Any field whose value equals MASK_PLACEHOLDER was deliberately hidden from
- * the caller by mask() in the API response — they sent it back unchanged,
- * meaning "keep the existing secret". We restore the real value from the DB.
- *
- * This approach is key-name agnostic: it works for any credential field
- * regardless of naming convention, without maintaining a separate list.
- *
- * @param {object} incomingOptions       - Options as received from the API caller
- * @param {object} existingDecryptedOptions - Decrypted options currently in the DB
- * @returns {object} Merged options ready for re-encryption and storage
- */
-function mergeAndRestoreMaskedOptions(incomingOptions, existingDecryptedOptions) {
-  if (!incomingOptions) return incomingOptions;
-
-  const merged = { ...incomingOptions };
-
-  for (const k of Object.keys(merged)) {
-    if (merged[k] === MASK_PLACEHOLDER) {
-      // Caller sent back the placeholder — restore the real value from DB
-      if (existingDecryptedOptions && existingDecryptedOptions[k] !== undefined) {
-        merged[k] = existingDecryptedOptions[k];
-      }
-    } else if (
-      typeof merged[k] === "object" &&
-      merged[k] !== null &&
-      existingDecryptedOptions &&
-      typeof existingDecryptedOptions[k] === "object"
-    ) {
-      // Recurse into nested objects (e.g. OAuth credential sub-objects)
-      merged[k] = mergeAndRestoreMaskedOptions(merged[k], existingDecryptedOptions[k]);
-    }
-  }
-
-  return merged;
-}
-
 
 const datasourceService = {};
 
@@ -427,6 +403,8 @@ datasourceService.createDatasource = async ({
     },
   });
   try {
+    assertValidDatasourceType(datasourceType);
+
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
     const finalCreatorID = creatorID || userID;
     if (!finalCreatorID && !createdByApiKeyID) {
@@ -493,6 +471,40 @@ datasourceService.deleteDatasourceByID = async ({
     },
   });
   try {
+    // Deleting a datasource cascades its queries. Block the delete if any of
+    // those queries are referenced by app pages, workflows, or listeners;
+    // otherwise those automations would point at a query that no longer exists.
+    const relatedQueries = await prisma.tblDataQueries.findMany({
+      where: { tenantID, datasourceID },
+      select: { dataQueryID: true, dataQueryTitle: true },
+    });
+
+    const referencedQueries = [];
+    for (const query of relatedQueries) {
+      const references = await findDataQueryReferences({
+        tenantID,
+        dataQueryID: query.dataQueryID,
+      });
+      if (references.total > 0) {
+        referencedQueries.push({
+          dataQueryID: query.dataQueryID,
+          dataQueryTitle: query.dataQueryTitle,
+          references,
+        });
+      }
+    }
+
+    if (referencedQueries.length > 0) {
+      const error = new Error(
+        "Datasource contains queries that are still referenced by other resources. Remove those references before deleting it."
+      );
+      error.name = "DatasourceInUseError";
+      error.code = "DATASOURCE_IN_USE";
+      error.statusCode = 409;
+      error.details = { queries: referencedQueries };
+      throw error;
+    }
+
     // Prisma will cascade delete database tables based on the schema relation (onDelete: Cascade)
     const deleted = await prisma.tblDatasources.deleteMany({
       where: {
@@ -610,6 +622,10 @@ datasourceService.updateDatasourceByID = async ({
     },
   });
   try {
+    if (datasourceType !== undefined) {
+      assertValidDatasourceType(datasourceType);
+    }
+
     let finalOptions = datasourceOptions;
     if (datasourceOptions !== undefined) {
       const existing = await prisma.tblDatasources.findFirst({

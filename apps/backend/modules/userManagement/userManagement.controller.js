@@ -141,10 +141,10 @@ userManagementController.addUserToTenant = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { tenantUserEmail } = req.body;
+    const { tenantUserEmail, roleIDs = [] } = req.body;
     Logger.log("info", {
       message: "userManagementController:addUserToTenant:params",
-      params: { userID: user.userID, tenantID, tenantUserEmail },
+      params: { userID: user.userID, tenantID, tenantUserEmail, roleIDs },
     });
     const tenantUser = await authService.getUserFromEmailID({
       email: tenantUserEmail,
@@ -163,6 +163,7 @@ userManagementController.addUserToTenant = async (req, res) => {
         userID: user.userID,
         tenantID: tenantID,
         tenantUserID: tenantUser.userID,
+        roleIDs,
       });
     Logger.log("success", {
       message:

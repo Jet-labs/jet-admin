@@ -48,6 +48,7 @@ export const TenantRoleDeletionForm = ({ tenantID, tenantRoleID }) => {
       title: CONSTANTS.STRINGS.TENANT_ROLE_DELETION_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.TENANT_ROLE_DELETION_DIALOG_MESSAGE,
       confirmText: "Delete",
+      confirmVariant: "destructive",
       cancelText: "Cancel",
     });
     if (!confirmed) return;

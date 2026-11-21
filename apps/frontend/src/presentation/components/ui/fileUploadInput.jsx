@@ -55,7 +55,7 @@ export const FileUpload = ({
             flex items-center gap-2 w-full cursor-pointer
             ${
               uploadError
-                ? "border-red-400 bg-red-950/40 hover:bg-red-950/40"
+                ? "border-destructive bg-destructive/10 hover:bg-destructive/10"
                 : "border-border bg-background hover:bg-muted"
             }
             border rounded px-2 py-2 transition-colors duration-150
@@ -78,7 +78,7 @@ export const FileUpload = ({
       </div>
 
       {uploadError && (
-        <p className="mt-1 text-sm font-medium text-red-600">
+        <p className="mt-1 text-sm font-medium text-destructive">
           {CONSTANTS.STRINGS.ADD_TENANT_LOGO_UPLOAD_ERROR_MESSAGE}
         </p>
       )}

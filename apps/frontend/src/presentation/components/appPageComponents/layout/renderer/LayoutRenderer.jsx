@@ -87,6 +87,7 @@ export function LayoutWidgetSlot({
   onNodeClick,
   stateTree = null,
   isInRow = false,
+  repeatPath = [],
 }) {
   const spanClass = `col-span-${node.span || 6}`;
   const sizingClass = node.height != null && node.height !== "" ? "" : `sizing-${node.sizing || "fill"}`;
@@ -128,7 +129,7 @@ export function LayoutWidgetSlot({
           overflow: node.style?.borderRadius ? "hidden" : undefined,
         }}
       >
-        {renderWidget(node.widgetKey, node.sizing, stateTree)}
+        {renderWidget(node.widgetKey, node.sizing, stateTree, { repeatPath })}
       </div>
     </div>
   );
@@ -330,6 +331,7 @@ export default function LayoutRenderer({
   stateTree = null,
   resolveValue = null,
   isInRow = false,
+  repeatPath = [],
   ...rest
 }) {
   if (!node) return null;
@@ -342,6 +344,7 @@ export default function LayoutRenderer({
     stateTree,
     resolveValue,
     isInRow,
+    repeatPath,
     ...rest,
   };
 
@@ -356,12 +359,16 @@ export default function LayoutRenderer({
         item,
         index
       );
+      // F12/B24: accumulate the repeat trail so descendant widget placements
+      // derive per-iteration runtime instance IDs (isolated state/methods).
+      const childRepeatPath = [...(repeatPath || []), `${node.id}:${index}`];
 
       return (
         <LayoutRenderer
           key={`${node.id}_repeat_${index}`}
           node={{ ...node, repeat: undefined, id: `${node.id}_repeat_${index}` }}
           {...nodeProps}
+          repeatPath={childRepeatPath}
           stateTree={scopedStateTree}
         />
       );
@@ -412,6 +419,7 @@ export default function LayoutRenderer({
           onNodeClick={onNodeClick}
           stateTree={stateTree}
           isInRow={isInRow}
+          repeatPath={repeatPath}
         />
       );
 

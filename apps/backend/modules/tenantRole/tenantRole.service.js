@@ -494,6 +494,28 @@ tenantRoleService.syncRolePolicies = async (roleID, tenantID) => {
 };
 
 /**
+ * Sync every global role (tenantID = null) into one tenant domain. Called
+ * immediately after tenant creation so a new tenant's ADMIN/EDITOR/VIEWER
+ * roles work without a restart.
+ */
+tenantRoleService.syncGlobalRolesForTenant = async (tenantID) => {
+  if (!tenantID) return { rolesCount: 0 };
+  const roles = await prisma.tblRoles.findMany({
+    where: { tenantID: null },
+    select: { roleID: true },
+  });
+  for (const role of roles) {
+    await tenantRoleService.syncRolePolicies(role.roleID, tenantID);
+  }
+  await reloadPolicies();
+  Logger.log("success", {
+    message: "tenantRoleService:syncGlobalRolesForTenant:done",
+    params: { tenantID, rolesCount: roles.length },
+  });
+  return { rolesCount: roles.length };
+};
+
+/**
  * Re-syncs all Casbin policies for every role across all tenants.
  * Call this on startup to recover from stale rules in the casbin_rule table.
  */

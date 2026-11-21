@@ -13,6 +13,7 @@
     "dev-w": "set NODE_ENV=development&& nodemon --no-node-snapshot index.js",
     "dev": "export NODE_ENV=development&& nodemon --no-node-snapshot index.js",
     "seed": "cd scripts&& node seed.js",
+    "seed-marketplace": "node scripts/seed-marketplace.js",
     "auth-setup-w": "set NODE_ENV=development&& cd scripts&& node auth-setup.js",
     "auth-setup": "export NODE_ENV=development&& cd scripts&& node auth-setup.js",
     "module-setup-w": "set NODE_ENV=development&& cd scripts/dev&& node module-generation-template.js",

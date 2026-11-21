@@ -385,8 +385,10 @@ export const WIDGETS_MAP = {
     configEditor: FormConfigEditor,
     icon: ({ className }) => <FileText className={`!text-lg ${className}`} />,
     sampleConfig: {
-      fields: [],
+      fields: [{ key: "name", label: "Name", type: "text", required: true, placeholder: "Enter name..." }],
       submitLabel: "Submit",
+      layout: "vertical",
+      columns: 1,
       size: "default",
       showReset: false,
       isLoading: "",

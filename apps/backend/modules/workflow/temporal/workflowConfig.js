@@ -15,6 +15,7 @@
  */
 
 const { WORKFLOW_OPTIONS } = require('./config');
+const { normalizeNodeData } = require('@jet-admin/workflow-nodes-logic/runtime-contract');
 // Single source of truth for defaults/limits — see ./policyDefaults.json.
 // workflowPolicy.js (sandbox ESM) mirrors these values; parity is enforced by
 // apps/backend/__tests__/unit/workflow/temporalPolicyParity.test.js.
@@ -153,7 +154,7 @@ function applyWorkflowConfigToNodes(nodes, workflowConfig) {
     return {
       ...node,
       data: {
-        ...(node?.data || {}),
+        ...normalizeNodeData(node?.type, node?.data || {}),
         timeoutSeconds: isDefined(node?.data?.timeoutSeconds) ? node.data.timeoutSeconds : resolved.timeoutSeconds,
         retryLimit: isDefined(node?.data?.retryLimit) ? node.data.retryLimit : resolved.retryLimit,
         retryDelaySeconds: isDefined(node?.data?.retryDelaySeconds)

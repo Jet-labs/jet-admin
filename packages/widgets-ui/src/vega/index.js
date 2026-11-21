@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import vegaEmbed from 'vega-embed';
+import { attachVegaDrillListeners } from './drillListeners';
 
 /**
  * Vega/Vega-Lite Widget Component
@@ -11,9 +12,10 @@ export const VegaWidget = ({
   data,              // Processed Vega/Vega-Lite spec from processor
   widgetConfig,      // Widget-level config (showActions, renderer, theme)
   onSignal,          // Callback for selections/interactions
-  onMarkClick,       // Drill-down: fired with clicked datum { datum, event }
-  onBrush,           // Drill-down: fired with interval selection value
-  fireWidgetEvent,   // AppPage runtime event dispatcher (preferred for drill chains)
+  onMarkClick,       // Drill-down: fired with clicked datum { datum } (page route)
+  onBrush,           // Drill-down: fired with interval selection { value } (page route)
+  fireWidgetEvent,   // Accepted for embedding compatibility; the page route goes
+                     // through onMarkClick/onBrush so one gesture fires exactly once
   onError,           // Error handler
   onWidgetInit,      // Callback when widget initializes
   isLoadingWorkflows // Boolean indicating if a workflow is currently running
@@ -107,34 +109,17 @@ export const VegaWidget = ({
         // Call init callback
         onWidgetInitRef.current?.(result.view);
 
-        // Mark-click drill-down: Vega view click → datum (works with or without params)
-        try {
-          result.view.addEventListener('click', (event, item) => {
-            const datum = item?.datum;
-            if (datum) {
-              const payload = { datum };
-              try { fireWidgetEventRef.current?.("onMarkClick", payload); } catch { /* ignore */ }
-              onMarkClickRef.current?.(payload);
-            }
-          });
-        } catch { /* older vega versions may not support addEventListener */ }
-
-        // Setup signal listeners for interactivity
-        if (data.params) {
-          for (const param of data.params) {
-            if (param.name) {
-              result.view.addSignalListener(param.name, (name, value) => {
-                onSignalRef.current?.(name, value);
-                // Interval brush selection → onBrush for drill/filter chains
-                if (name === 'brush') {
-                  const payload = { value };
-                  try { fireWidgetEventRef.current?.("onBrush", payload); } catch { /* ignore */ }
-                  onBrushRef.current?.(payload);
-                }
-              });
-            }
-          }
-        }
+        // Mark-click drill-down + brush signals (works with or without params).
+        // Single dispatch route (B04/F02): the renderer notifies ONLY the
+        // direct onMarkClick/onBrush callbacks via attachVegaDrillListeners.
+        // The page slot wires those to exactly one fireWidgetEvent call each;
+        // dispatching page actions here too would execute the action chain
+        // twice with differing payloads.
+        attachVegaDrillListeners(result.view, data, {
+          onMarkClick: (payload) => onMarkClickRef.current?.(payload),
+          onBrush: (payload) => onBrushRef.current?.(payload),
+          onSignal: (name, value) => onSignalRef.current?.(name, value),
+        });
       } catch (err) {
         setError(err.message || 'Visualization error');
         setLoading(false);

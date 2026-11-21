@@ -61,6 +61,19 @@ describe('VegaWidgetBuilder (via processWorkflowDataForWidget)', () => {
 });
 
 describe('VegaWidgetBuilder.resolveData sanitization', () => {
+  test('adds renderable schema/defaults when the authored spec omits them', () => {
+    const result = resolveWidgetData({
+      widgetType: 'vega-lite',
+      widgetConfig: { vegaSpec: { mark: 'bar', data: { values: [{ x: 1 }] } } },
+      dataSourceResults: {},
+    });
+
+    expect(result.$schema).toBe('https://vega.github.io/schema/vega-lite/v5.json');
+    expect(result.width).toBe('container');
+    expect(result.height).toBe('container');
+    expect(result.mark).toBe('bar');
+  });
+
   test('sanitizes unresolved template strings and undefined/null data values', () => {
     const spec = {
       data: {

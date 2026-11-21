@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   ArrowRight,
@@ -65,6 +65,7 @@ export const ButtonWidget = ({
   widgetConfig,    // Widget-level config (text, variant, size, icon, alignment, ...)
   onClick,         // Callback to execute the attached event/workflow
   isLoadingWorkflows, // Loading state of the workflow
+  onWidgetInit,    // Runtime method registration (exposes click/focus)
 }) => {
   const [loading, setLoading] = useState(false);
   const text = widgetConfig?.text ?? widgetConfig?.label ?? "Click Me";
@@ -76,7 +77,8 @@ export const ButtonWidget = ({
   const iconPosition = widgetConfig?.iconPosition === "right" ? "right" : "left";
   const Icon = iconName ? ICONS[iconName] || ICONS[iconName.toLowerCase()] || null : null;
 
-  const configLoading = isTruthyTemplate(widgetConfig?.isLoading);
+  // Dual-read: canonical isLoading, legacy loading fallback (F04).
+  const configLoading = isTruthyTemplate(widgetConfig?.isLoading ?? widgetConfig?.loading);
   const configDisabled = isTruthyTemplate(widgetConfig?.disabled);
   const busy = loading || isLoadingWorkflows || configLoading;
   const disabled = busy || configDisabled;
@@ -96,6 +98,24 @@ export const ButtonWidget = ({
     }
   };
 
+  // Advertised `click`/`focus` methods (B17/E03): programmatic clicks run the
+  // same guarded path as mouse/keyboard (disabled/busy blocks all routes,
+  // exactly one execution). Method calls never fire unsupported onSubmit.
+  const buttonRef = useRef(null);
+  const guardedRef = useRef(handleClick);
+  guardedRef.current = handleClick;
+  const methodsRef = useRef(null);
+  if (!methodsRef.current) {
+    methodsRef.current = {
+      click: () => guardedRef.current(undefined),
+      focus: () => buttonRef.current?.focus?.(),
+    };
+  }
+
+  useEffect(() => {
+    if (onWidgetInit) onWidgetInit(methodsRef.current);
+  }, [onWidgetInit]);
+
   return (
     <div
       className={cn(
@@ -105,6 +125,7 @@ export const ButtonWidget = ({
       )}
     >
       <Button
+        ref={buttonRef}
         variant={variant}
         size={size}
         onClick={handleClick}
@@ -113,7 +134,7 @@ export const ButtonWidget = ({
         aria-live="polite"
         title={typeof text === "string" ? text : undefined}
         className={cn(
-          "relative inline-flex items-center justify-center gap-1.5 text-center",
+          "relative inline-flex max-w-full min-w-0 items-center justify-center gap-1.5 text-center",
           fullWidth && "w-full"
         )}
       >
@@ -128,7 +149,7 @@ export const ButtonWidget = ({
         )}
         {(loading || isLoadingWorkflows) && <Spinner className="h-4 w-4 shrink-0" />}
         {Icon && iconPosition === "left" && <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />}
-        <span className="truncate">{text}</span>
+        <span className="min-w-0 truncate">{text}</span>
         {Icon && iconPosition === "right" && <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />}
       </Button>
     </div>
@@ -141,6 +162,7 @@ ButtonWidget.propTypes = {
   widgetConfig: PropTypes.object,
   onClick: PropTypes.func,
   isLoadingWorkflows: PropTypes.bool,
+  onWidgetInit: PropTypes.func,
 };
 
 export default ButtonWidget;

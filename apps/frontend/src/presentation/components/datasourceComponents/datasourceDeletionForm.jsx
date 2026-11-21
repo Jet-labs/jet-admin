@@ -45,6 +45,7 @@ export const DatasourceDeletionForm = ({ tenantID, datasourceID }) => {
       title: CONSTANTS.STRINGS.DELETE_DATASOURCE_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_DATASOURCE_DIALOG_MESSAGE,
       confirmText: "Delete",
+      confirmVariant: "destructive",
       cancelText: "Cancel",
     });
     if (!confirmed) return;

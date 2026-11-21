@@ -9,6 +9,7 @@ import { getWorkflowRunStatusAPI } from "../../../data/apis/workflow";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { WorkflowRunStatusBadge } from "./workflowRunsHistoryGrid";
 import { Button, CodeEditor, Label } from "@jet-admin/ui";
+import { isWorkflowRunActive, workflowEventLabel } from "../../../logic/workflowRunPresentation";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -107,8 +108,7 @@ export const WorkflowRunDetails = ({ tenantID, runID }) => {
     queryFn: () => getWorkflowRunStatusAPI({ tenantID, instanceID: runID }),
     refetchOnWindowFocus: false,
     refetchInterval: (query) =>
-      query.state.data?.status === "RUNNING" ||
-      query.state.data?.status === "PENDING"
+      isWorkflowRunActive(query.state.data?.status)
         ? 4000
         : false,
   });
@@ -118,7 +118,7 @@ export const WorkflowRunDetails = ({ tenantID, runID }) => {
     return inputLog?.payload?.input ?? {};
   }, [run]);
 
-  const isRunning = run?.status === "RUNNING" || run?.status === "PENDING";
+  const isRunning = isWorkflowRunActive(run?.status);
 
   return (
     <ReactQueryLoadingErrorWrapper
@@ -241,7 +241,7 @@ export const WorkflowRunDetails = ({ tenantID, runID }) => {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-mono text-[11px] font-medium uppercase tracking-wider text-foreground">
-                            {log.eventType.replace(/_/g, " ")}
+                            {workflowEventLabel(log)}
                           </span>
                           {log.nodeID && (
                             <span className="font-mono text-[10px] text-muted-foreground">

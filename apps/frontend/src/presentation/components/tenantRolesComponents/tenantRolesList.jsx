@@ -22,11 +22,6 @@ export const TenantRolesList = () => {
 
   const columns = [
     {
-      field: "roleID",
-      flex: 1,
-      headerName: "Role ID",
-    },
-    {
       field: "roleTitle",
       flex: 1,
       headerName: "Role Name",
@@ -42,10 +37,10 @@ export const TenantRolesList = () => {
       flex: 1,
       renderCell: ({ value }) => (
         <Badge
-          variant={value ? "warning" : "outline"}
-          className={!value ? "border-primary/30 bg-primary/5 text-primary" : ""}
+          variant="outline"
+          className={!value ? "border-primary/30 bg-primary/10 text-primary" : ""}
         >
-          {value ? "Custom Role" : "Global Role"}
+          {value ? "Custom role" : "Global role"}
         </Badge>
       ),
     },

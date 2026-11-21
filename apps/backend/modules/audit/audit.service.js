@@ -123,7 +123,7 @@ auditService.exportAuditLogsCSV = async ({ tenantID, dateFrom, dateTo }) => {
         : {};
 
     const rows = await prisma.tblAuditLogs.findMany({
-      where: { tenantID: parseInt(tenantID), ...dateFilter },
+      where: { tenantID, ...dateFilter },
       orderBy: { createdAt: "desc" },
       include: {
         tblUsers: {

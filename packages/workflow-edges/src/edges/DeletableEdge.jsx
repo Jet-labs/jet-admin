@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, getSmoothStepPath, getStraightPath, getSimpleBezierPath } from 'reactflow';
 import { useWorkflowEdge } from '../context';
 import { Button, Input } from '@jet-admin/ui';
@@ -53,7 +53,11 @@ export default function DeletableEdge({
   const [edgePath, labelX, labelY] = getPath();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [edgeLabel, setEdgeLabel] = useState(label || data?.label || "");
+  const savedLabel = label ?? data?.label ?? "";
+  const [edgeLabel, setEdgeLabel] = useState(savedLabel);
+  useEffect(() => {
+    if (!isEditing) setEdgeLabel(savedLabel);
+  }, [savedLabel, isEditing]);
 
   const onEdgeClick = (evt) => {
     evt.stopPropagation();
@@ -80,7 +84,14 @@ export default function DeletableEdge({
 
   const onKeyDown = (evt) => {
     if (evt.key === 'Enter') {
+      evt.preventDefault();
+      evt.stopPropagation();
       onLabelBlur();
+    } else if (evt.key === 'Escape') {
+      evt.preventDefault();
+      evt.stopPropagation();
+      setEdgeLabel(savedLabel);
+      setIsEditing(false);
     }
   };
 
@@ -109,6 +120,7 @@ export default function DeletableEdge({
           ) : (
             <div className="flex items-center gap-1 group">
                 <Button
+                    type="button"
                   className="w-5 h-5 bg-brand-black border border-brand-border rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-red-50 hover:border-red-200 transition-colors text-brand-text-primary hover:text-red-500 text-xs"
                     onClick={onDeleteClick}
                     title="Delete Edge"

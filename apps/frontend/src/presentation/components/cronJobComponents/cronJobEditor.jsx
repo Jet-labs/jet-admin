@@ -21,6 +21,10 @@ function FieldError({ message }) {
   return <p className="mt-1 text-[11px] text-destructive">{message}</p>;
 }
 
+FieldError.propTypes = {
+  message: PropTypes.string,
+};
+
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export const CronJobEditor = ({ cronJobEditorForm, initialWorkflow }) => {
@@ -47,6 +51,7 @@ export const CronJobEditor = ({ cronJobEditorForm, initialWorkflow }) => {
 
   const _handleOnScheduleChange = useCallback(
     (value) => {
+      cronJobEditorForm?.setFieldTouched("cronJobSchedule", true, false);
       cronJobEditorForm?.setFieldValue("cronJobSchedule", value);
     },
     [cronJobEditorForm]
@@ -197,6 +202,7 @@ export const CronJobEditor = ({ cronJobEditorForm, initialWorkflow }) => {
           value={cronJobEditorForm.values.cronJobSchedule}
           handleChange={_handleOnScheduleChange}
         />
+        {touched.cronJobSchedule && <FieldError message={errors.cronJobSchedule} />}
       </Section>
 
       {/* ── Execution settings ────────────────────────────────────────────── */}
@@ -204,7 +210,7 @@ export const CronJobEditor = ({ cronJobEditorForm, initialWorkflow }) => {
         title="Execution"
         description="Control retry behaviour and per-run time limits."
       >
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <div className="space-y-1">
             <Label htmlFor="timeoutSeconds">Timeout (s)</Label>
             <Input

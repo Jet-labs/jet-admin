@@ -121,13 +121,14 @@ socketIO.on("connection", async (socket) => {
 
   socket.on(
     constants.SOCKET_RECEIVE_EVENTS.WORKFLOW_RUN_JOIN,
-    async (data) => {
+    async (data = {}, acknowledge) => {
       try {
-        await workflowSocketController.onWorkflowRunJoin({
+        const result = await workflowSocketController.onWorkflowRunJoin({
           socket,
           runId: data.runId,
           firebaseID: firebase_id,
         });
+        if (typeof acknowledge === 'function') acknowledge(result);
       } catch (error) {
         Logger.log("error", { message: "socket:workflow_run_join:error", params: { error: error.message } });
       }
@@ -210,19 +211,20 @@ socketIO.on("connection", async (socket) => {
   );
 
   // === Room Management (for listener test streaming, etc.) ===
-  socket.on('join_room', (room) => {
+  socket.on('join_room', async (room, acknowledge) => {
     try {
-      if (typeof room === 'string' && (room.startsWith('listener_test:') || room.startsWith('tenant:') || room.startsWith('listener:'))) {
-        socket.join(room);
-      }
+      const { joinAuthorizedRoom } = require('./modules/auth/socketAuthorization');
+      const result = await joinAuthorizedRoom({ socket, room });
+      if (typeof acknowledge === 'function') acknowledge(result);
     } catch (error) {
+      if (typeof acknowledge === 'function') acknowledge({ joined: false, error: 'PERMISSION_DENIED' });
       Logger.log("error", { message: "socket:join_room:error", params: { error: error.message } });
     }
   });
 
   socket.on('leave_room', (room) => {
     try {
-      if (typeof room === 'string' && (room.startsWith('listener_test:') || room.startsWith('listener:'))) {
+      if (typeof room === 'string' && room !== socket.id) {
         socket.leave(room);
       }
     } catch (error) {
@@ -260,6 +262,7 @@ httpServer.listen(port, async () => {
     params: { port },
   });
   cronJobService.scheduleAllCronJobs();
+  cronJobService.startCronSchedulerSync();
 
   // Start all listeners (workflow queue, subscription consumers, etc.)
   try {

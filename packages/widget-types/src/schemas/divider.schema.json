@@ -4,11 +4,48 @@
   "schema": {
     "type": "object",
     "properties": {
-      "label": { "type": "string", "description": "Optional centered label" },
-      "orientation": { "type": "string", "enum": ["horizontal", "vertical"], "default": "horizontal" },
-      "thickness": { "type": "string", "enum": ["thin", "medium", "thick"], "default": "thin" },
-      "spacing": { "type": "string", "enum": ["sm", "md", "lg"], "default": "md" }
+      "label": {
+        "type": "string",
+        "description": "Optional centered label"
+      },
+      "orientation": {
+        "type": "string",
+        "enum": [
+          "horizontal",
+          "vertical"
+        ],
+        "default": "horizontal"
+      },
+      "thickness": {
+        "type": "string",
+        "enum": [
+          "thin",
+          "medium",
+          "thick"
+        ],
+        "default": "thin"
+      },
+      "spacing": {
+        "type": "string",
+        "enum": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "default": "md"
+      },
+      "isLoading": {
+        "type": [
+          "boolean",
+          "string"
+        ],
+        "description": "Loading overlay — boolean or template expression (e.g. {{ state.queries.q.isLoading }})."
+      }
     }
   },
-  "events": ["onClick", "onRefresh", "onLoad"]
+  "events": [
+    "onClick",
+    "onRefresh",
+    "onLoad"
+  ]
 }

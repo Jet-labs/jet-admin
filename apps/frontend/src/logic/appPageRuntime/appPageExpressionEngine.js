@@ -15,18 +15,29 @@ export {
   resolveConfig,
   extractDependencies,
 } from "../evaluationEngine";
+import { parseResourceID } from "./widgetInstanceIdentity";
 
 /**
  * Build the namespaced state tree from the AppPage reducer state.
  * This is the object that `{{ }}` expressions resolve against.
  *
+ * Widget identity (B24): `widgetStates` is keyed by runtime instance ID
+ * (placement key, repeat-qualified inside repeats). `widgets` exposes every
+ * live instance key verbatim, plus a legacy `resourceID` alias ONLY when that
+ * resource has exactly one live instance (deterministic single-placement
+ * backward compat). Ambiguous resources are omitted — never silently rerouted
+ * — and listed under `widgetDiagnostics.ambiguousWidgetResources` with an
+ * explicit-instance migration hint. Prefer
+ * `{{ state.widgets.<placementKey>... }}` (see widgetInstanceIdentity.js).
+ *
  * Shape:
  * {
  *   queries:    { alias: { data, isLoading, error, lastUpdated } },
- *   widgets:    { widgetID: { ...widgetLocalState } },
+ *   widgets:    { instanceID: { ...widgetLocalState }, [resourceID]: alias },
  *   variables:  { key: value },
  *   listeners:  { listenerID: { data, lastUpdated } },
  *   globals:    { tenantID, currentUser, ... },
+ *   widgetDiagnostics: { ambiguousWidgetResources: { [resourceID]: string[] } },
  * }
  *
  * @param {object} reducerState - The raw state from appPageReducer
@@ -44,7 +55,7 @@ export const buildAppPageStateTree = (reducerState, dataSources = []) => {
   } = reducerState;
 
   const queries = {};
-  const workflows = {};
+  const workflows = { ...workflowResults };
   const listeners = {};
 
   for (const ds of dataSources) {
@@ -72,14 +83,42 @@ export const buildAppPageStateTree = (reducerState, dataSources = []) => {
     }
   }
 
+  // Direct TRIGGER_WORKFLOW actions use a stable `direct_workflow_<id>` alias
+  // that may not be declared as a page data source. Expose those results too,
+  // so status/result widgets can show loading, errors and the final context.
+  for (const [alias, result] of Object.entries(workflowResults)) {
+    if (!workflows[alias]) workflows[alias] = result;
+  }
+
+  // B24: instance keys are canonical. Legacy resource aliases apply only
+  // when unambiguous; ambiguous resources resolve to undefined with
+  // diagnostics instead of an arbitrary placement.
+  const widgets = { ...widgetStates };
+  const ambiguousWidgetResources = {};
+  const byResource = {};
+  for (const instanceID of Object.keys(widgetStates)) {
+    const resource = parseResourceID(instanceID);
+    if (!resource) continue;
+    if (!byResource[resource]) byResource[resource] = [];
+    byResource[resource].push(instanceID);
+  }
+  for (const [resource, instances] of Object.entries(byResource)) {
+    if (instances.length === 1 && widgets[resource] === undefined) {
+      widgets[resource] = widgets[instances[0]];
+    } else if (instances.length > 1 && widgets[resource] === undefined) {
+      ambiguousWidgetResources[resource] = [...instances].sort();
+    }
+  }
+
   return {
     queries,
     workflows,
     listeners,
-    widgets: widgetStates,
+    widgets,
     widgetMethods,
     variables,
     globals,
+    widgetDiagnostics: { ambiguousWidgetResources },
   };
 };
 

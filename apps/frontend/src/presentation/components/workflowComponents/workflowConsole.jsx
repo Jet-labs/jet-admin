@@ -27,15 +27,15 @@ export const WorkflowConsole = ({
   const getLogStyle = (log) => {
     switch (log.type) {
       case 'start':
-        return { icon: Play, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
+        return { icon: Play, color: 'text-primary', bgColor: 'bg-primary/10' };
       case 'node_start':
-        return { icon: ArrowRight, color: 'text-blue-500', bgColor: 'bg-blue-950/400/10' };
+        return { icon: ArrowRight, color: 'text-primary', bgColor: 'bg-primary/10' };
       case 'node_complete':
-        return { icon: Check, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
+        return { icon: Check, color: 'text-primary', bgColor: 'bg-primary/10' };
       case 'node_error':
         return { icon: X, color: 'text-destructive', bgColor: 'bg-destructive/10' };
       case 'workflow_complete':
-        return { icon: Check, color: 'text-emerald-600', bgColor: 'bg-emerald-600/10' };
+        return { icon: Check, color: 'text-primary', bgColor: 'bg-primary/10' };
       case 'workflow_error':
         return { icon: X, color: 'text-destructive', bgColor: 'bg-destructive/10' };
       case 'info':
@@ -60,12 +60,12 @@ export const WorkflowConsole = ({
   return (
     <div className={`flex flex-col bg-background overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-border">
+      <div className="flex items-center justify-between border-b border-border bg-muted/30 px-2 py-1">
         <div className="flex items-center gap-2">
           <Terminal className="size-4 text-muted-foreground" />
-          <span className="text-sm font-semibold text-foreground">Console</span>
+          <span className="text-sm font-medium text-foreground">Console</span>
           {isRunning && (
-            <span className="flex items-center gap-1.5 text-xs text-blue-500 font-medium">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-primary">
               <Loader className="size-3 animate-spin" />
               Running
             </span>

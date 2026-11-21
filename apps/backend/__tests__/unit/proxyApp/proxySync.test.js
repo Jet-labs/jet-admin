@@ -21,6 +21,7 @@ const mockRegistry = {
   heartbeat: jest.fn().mockResolvedValue({ ok: true, known: true }),
   listLiveProxies: jest.fn().mockResolvedValue([]),
   getShard: jest.fn().mockResolvedValue([]),
+  getAssignment: jest.fn(async () => ({ proxyID: proxyApp.proxyID, token: 'stable-assignment' })),
   getVersion: jest.fn().mockResolvedValue(0),
   rebalance: jest.fn().mockResolvedValue({ moved: 0, moves: [], version: 1 }),
 };
@@ -91,6 +92,7 @@ describe('proxy control filtering', () => {
   test('ASSIGNMENTS_CHANGED re-syncs to the registry shard', async () => {
     mockEngine.getStatus.mockReturnValue({});
     mockRegistry.getShard.mockResolvedValue(['new-1']);
+    mockPrismaFindMany.mockResolvedValue([{ listenerID: 'new-1' }]);
     await proxyApp.handleControlMessage({ type: 'ASSIGNMENTS_CHANGED', version: 7 });
     expect(mockRegistry.getShard).toHaveBeenCalled();
     expect(mockEngine.restartOne).toHaveBeenCalledWith('new-1');
@@ -102,6 +104,35 @@ describe('proxy control filtering', () => {
     ).resolves.toBeUndefined();
     expect(mockEngine.restartOne).not.toHaveBeenCalled();
     expect(mockEngine.stopOne).not.toHaveBeenCalled();
+  });
+
+  test('webhook registrations run on every proxy, even outside its stateful shard', async () => {
+    mockEngine.getStatus.mockReturnValue({});
+    mockRegistry.getShard.mockResolvedValue([]);
+    mockPrismaFindMany.mockResolvedValue([{ listenerID: 'anycast-webhook', listenerType: 'webhook' }]);
+    await proxyApp.syncSubscriptions();
+    expect(mockEngine.restartOne).toHaveBeenCalledWith('anycast-webhook');
+  });
+
+  test('stale shard membership cannot start a listener assigned to another proxy', async () => {
+    mockEngine.getStatus.mockReturnValue({});
+    mockRegistry.getShard.mockResolvedValue(['foreign']);
+    mockPrismaFindMany.mockResolvedValue([{ listenerID: 'foreign' }]);
+    mockRegistry.getAssignment.mockResolvedValueOnce({ proxyID: 'another-proxy', token: 'new-owner' });
+    await proxyApp.syncSubscriptions();
+    expect(mockEngine.restartOne).not.toHaveBeenCalled();
+  });
+
+  test('missed configuration reload is healed by revision comparison, not ownership version', async () => {
+    mockEngine.getStatus.mockReturnValue({});
+    mockRegistry.getShard.mockResolvedValue(['revisioned']);
+    mockPrismaFindMany.mockResolvedValue([{ listenerID: 'revisioned', updatedAt: 'v1' }]);
+    await proxyApp.syncSubscriptions();
+    mockEngine.getStatus.mockReturnValue({ revisioned: {} });
+    mockEngine.restartOne.mockClear();
+    mockPrismaFindMany.mockResolvedValue([{ listenerID: 'revisioned', updatedAt: 'v2' }]);
+    await proxyApp.syncSubscriptions();
+    expect(mockEngine.restartOne).toHaveBeenCalledWith('revisioned');
   });
 });
 

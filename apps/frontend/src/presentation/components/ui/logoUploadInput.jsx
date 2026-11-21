@@ -59,7 +59,7 @@ export const LogoUpload = ({ onLogoUpload }) => {
             flex items-center justify-center cursor-pointer  !h-12 !w-12
             ${
               uploadError
-                ? "border-red-400 bg-red-950/40 hover:bg-red-950/40"
+                ? "border-destructive bg-destructive/10 hover:bg-destructive/10"
                 : "border-border bg-muted hover:bg-foreground/10"
             }
                 rounded
@@ -84,7 +84,7 @@ export const LogoUpload = ({ onLogoUpload }) => {
       </div>
 
       {uploadError && (
-        <p className="mt-1 text-sm font-medium text-red-600">
+        <p className="mt-1 text-sm font-medium text-destructive">
           {String(uploadError) ||
             CONSTANTS.STRINGS.ADD_TENANT_LOGO_UPLOAD_ERROR_MESSAGE}
         </p>

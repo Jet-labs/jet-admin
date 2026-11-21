@@ -80,19 +80,19 @@ export const TenantStats = ({ tenants }) => {
   });
 
   return (
-    <div className="bg-background text-foreground h-full w-full overflow-y-auto px-8 py-8 flex flex-col justify-start">
+    <div className="bg-background text-foreground h-full w-full overflow-y-auto px-6 py-6 flex flex-col justify-start">
       {/* Title */}
       <div className="mb-6 flex flex-col">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground mb-1">
+        <h1 className="text-2xl font-medium tracking-tight text-foreground mb-1">
           {CONSTANTS.STRINGS.TENANTS_STATS_TITLE}
         </h1>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           Manage your application workspaces and databases.
         </p>
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 w-full mb-6">
         {/* Left Filters */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Search bar */}
@@ -133,7 +133,7 @@ export const TenantStats = ({ tenants }) => {
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* View Toggles */}
           <div className="flex items-center bg-muted/50 gap-1 h-8">
             <Button
@@ -175,7 +175,7 @@ export const TenantStats = ({ tenants }) => {
           <p className="text-muted-foreground text-sm">No projects found</p>
         </div>
       ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
           {sorted.map((tenant) => (
             <div
               key={tenant.tenantID}
@@ -184,7 +184,7 @@ export const TenantStats = ({ tenants }) => {
             >
               {/* Card Top Section */}
               <div className="flex justify-between items-start w-full">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <div className="flex-shrink-0 w-8 h-8 rounded border border-border bg-muted/50 flex justify-center items-center overflow-hidden">
                     {tenant.tenantLogoURL ? (
                       <TenantLogo
@@ -196,12 +196,12 @@ export const TenantStats = ({ tenants }) => {
                       <Store className="w-4 h-4 text-muted-foreground" />
                     )}
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                       {tenant.tenantTitle}
                     </h3>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">
-                      Created: {moment(tenant.createdAt).format("MMM Do YY")}
+                    <p className="mt-0.5 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                      Created {moment(tenant.createdAt).format("MMM D, YYYY")}
                     </p>
                   </div>
                 </div>
@@ -270,9 +270,9 @@ export const TenantStats = ({ tenants }) => {
               <div
                 key={tenant.tenantID}
                 onClick={() => handleTenantClick(tenant.tenantID)}
-                className="group relative bg-card border border-border hover:border-border/80 rounded p-4 flex items-center justify-between cursor-pointer transition-all duration-200"
+                className="group relative bg-card border border-border hover:border-border/80 rounded p-2 flex items-center justify-between cursor-pointer transition-all duration-200"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex min-w-0 items-center gap-2">
                   <div className="flex-shrink-0 w-8 h-8 rounded border border-border bg-muted/50 flex justify-center items-center overflow-hidden">
                     {tenant.tenantLogoURL ? (
                       <TenantLogo
@@ -284,17 +284,17 @@ export const TenantStats = ({ tenants }) => {
                       <Store className="w-4 h-4 text-muted-foreground" />
                     )}
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                       {tenant.tenantTitle}
                     </h3>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">
-                      Created: {moment(tenant.createdAt).format("MMM Do YY")}
+                    <p className="mt-0.5 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                      Created {moment(tenant.createdAt).format("MMM D, YYYY")}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   {tenant.isDisabled ? (
                     <span className="inline-flex items-center gap-1 bg-muted/50 text-muted-foreground text-xs font-medium px-2 py-0.5 rounded-full">
                       <PauseCircle className="h-3.5 w-3.5 text-muted-foreground" />

@@ -71,7 +71,7 @@ export function ArrayInput({
             type="button"
             variant="ghost"
             size="icon"
-            className="text-[#1c1c1e] hover:text-red-500 flex-shrink-0 mt-1"
+            className="text-foreground hover:text-destructive flex-shrink-0 mt-1"
             onClick={() => handleRemoveItem(index)}
             disabled={disabled || !canRemove}
           >
@@ -108,7 +108,7 @@ export function ArrayInput({
           type="button"
           variant="ghost"
           size="icon"
-          className="text-[#1c1c1e] hover:text-red-500 flex-shrink-0"
+          className="text-foreground hover:text-destructive flex-shrink-0"
           onClick={() => handleRemoveItem(index)}
           disabled={disabled || !canRemove}
         >
@@ -123,7 +123,7 @@ export function ArrayInput({
       {currentArray.length > 0 ? (
         <div className="space-y-2">{currentArray.map(renderItem)}</div>
       ) : (
-        <p className="text-xs text-[#1c1c1e] italic">No items added to array.</p>
+        <p className="text-xs text-foreground italic">No items added to array.</p>
       )}
       <div className="flex items-center gap-2">
         <Button

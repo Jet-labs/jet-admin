@@ -1,28 +1,36 @@
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
+import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { addTenantRoleAPI } from "../../../data/apis/tenantRole";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput";
 import { TenantAssetPermissionsInput } from "./tenantAssetPermissionsInput";
 import { formValidations } from "../../../utils/formValidation";
 
-import { Button, Spinner, Input, Label, PageHeader, Section } from "@jet-admin/ui";
+import { Input, Label, PageHeader, Section } from "@jet-admin/ui";
 
 
 
 function FieldError({ message }) {
   if (!message) return null;
-  return <p className="text-xs text-red-500">{message}</p>;
+  return <p className="text-xs text-destructive">{message}</p>;
 }
+
+FieldError.propTypes = {
+  message: PropTypes.string,
+};
 
 export const TenantRoleAdditionForm = () => {
   const { tenantID } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  // Synchronous lock: a slow mutation must not be submitted twice. React
+  // Query's isPending only disables the button on the next render.
+  const isSubmittingRef = useRef(false);
   const { isPending: isAddingTenantRole, mutate: addTenantRole } = useMutation({
     mutationFn: ({ roleTitle, roleDescription, permissionIDs, assetPermissions }) =>
       addTenantRoleAPI({
@@ -36,9 +44,14 @@ export const TenantRoleAdditionForm = () => {
         queryKey:
         [CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID)],
       });
-      navigate(-1);
+      // Deterministic destination. navigate(-1) sent fresh/new-tab sessions
+      // with no in-app history to about:blank while the role was created.
+      navigate(CONSTANTS.ROUTES.VIEW_TENANT_ROLES.path(tenantID), {
+        replace: true,
+      });
     },
     onError: (error) => {
+      isSubmittingRef.current = false;
       displayError(error);
     },
   });
@@ -52,6 +65,8 @@ export const TenantRoleAdditionForm = () => {
     },
     validationSchema: formValidations.addTenantRoleFormValidationSchema,
     onSubmit: ({ roleTitle, roleDescription, permissionIDs, assetPermissions }) => {
+      if (isSubmittingRef.current) return;
+      isSubmittingRef.current = true;
       addTenantRole({ roleTitle, roleDescription, permissionIDs, assetPermissions });
     },
   });
