@@ -245,11 +245,12 @@ operatorAdminController.unpublishWidget = async (req, res) => {
 
 operatorAdminController.listMarketplaceItems = async (req, res) => {
   try {
-    const { search, itemType, category, page, pageSize } = req.query;
+    const { search, itemType, category, includeLegacy, page, pageSize } = req.query;
     const result = await marketplaceService.listItems({
       search,
       itemType,
       category,
+      includeLegacy: includeLegacy !== "false",
       page,
       pageSize,
     });

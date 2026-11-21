@@ -50,7 +50,7 @@ function roundTrip(tree) {
 }
 
 test("real catalog pages carry explicit content heights that the Craft adapter keeps", () => {
-  expect(pages).toHaveLength(19);
+  expect(pages).toHaveLength(20);
   const seen = {};
   for (const { entry, config, widgetTypes } of pages) {
     for (const node of widgetNodes(config.layout)) {

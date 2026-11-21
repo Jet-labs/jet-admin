@@ -39,8 +39,11 @@ const ITEM_TYPE_FILTERS = [
 
 const TYPE_LABELS = {
   datasource: "Datasource",
+  dataQuery: "Query",
   widget: "Widget",
   workflow: "Workflow",
+  appPage: "App page",
+  listener: "Listener",
   appTemplate: "App template",
 };
 
@@ -55,6 +58,7 @@ export const MarketplaceGrid = ({ tenantID }) => {
   const [category, setCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [preview, setPreview] = useState(null);
+  const [selectedKeys, setSelectedKeys] = useState([]);
   const debouncedSearch = useDebounce(searchInput, 300);
 
   useEffect(() => {
@@ -96,12 +100,18 @@ export const MarketplaceGrid = ({ tenantID }) => {
   const previewMutation = useMutation({
     mutationFn: ({ itemID }) => previewMarketplaceInstallAPI({ tenantID, itemID }),
     retry: false,
-    onSuccess: (result, { itemID, title }) => setPreview({ itemID, title, ...result }),
+    onSuccess: (result, { itemID, title }) => {
+      setPreview({ itemID, title, ...result });
+      setSelectedKeys(
+        (result.selection || []).filter((asset) => asset.selected).map((asset) => asset.key)
+      );
+    },
     onError: (error) => displayError(error),
   });
 
   const installMutation = useMutation({
-    mutationFn: () => installMarketplaceItemAPI({ tenantID, itemID: preview.itemID }),
+    mutationFn: ({ selectedItemKeys }) =>
+      installMarketplaceItemAPI({ tenantID, itemID: preview.itemID, selectedItemKeys }),
     retry: false,
     onSuccess: ({ results }) => {
       displaySuccess(
@@ -116,11 +126,42 @@ export const MarketplaceGrid = ({ tenantID }) => {
         CONSTANTS.REACT_QUERY_KEYS.MARKETPLACE(tenantID),
       ].forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
       setPreview(null);
+      setSelectedKeys([]);
     },
     onError: (error) => displayError(error),
   });
 
   const isBusy = previewMutation.isPending || installMutation.isPending;
+  const assets = preview?.selection || [];
+  const assetsByKey = new Map(assets.map((asset) => [asset.key, asset]));
+  const selectedSet = new Set(selectedKeys);
+  const planByKey = new Map(
+    (preview?.items || []).map((item) => [`${item.type}:${item.id}`, item])
+  );
+  const missingByKey = new Map(
+    assets
+      .filter((asset) => selectedSet.has(asset.key))
+      .map((asset) => [
+        asset.key,
+        asset.dependsOn.filter((dependencyKey) => !selectedSet.has(dependencyKey)),
+      ])
+  );
+  const hasMissingAssets = [...missingByKey.values()].some((keys) => keys.length > 0);
+
+  const toggleAsset = (key, checked) => {
+    setSelectedKeys((current) => {
+      const next = new Set(current);
+      const visit = (assetKey, add) => {
+        if (add) next.add(assetKey);
+        else next.delete(assetKey);
+        const asset = assetsByKey.get(assetKey);
+        const related = add ? asset?.dependsOn : asset?.requiredBy;
+        (related || []).forEach((relatedKey) => visit(relatedKey, add));
+      };
+      visit(key, checked);
+      return [...next];
+    });
+  };
 
   return (
     <ReactQueryLoadingErrorWrapper
@@ -287,7 +328,10 @@ export const MarketplaceGrid = ({ tenantID }) => {
         <Dialog
           open={preview !== null}
           onOpenChange={(open) => {
-            if (!open) setPreview(null);
+            if (!open) {
+              setPreview(null);
+              setSelectedKeys([]);
+            }
           }}
         >
           <DialogContent>
@@ -303,41 +347,107 @@ export const MarketplaceGrid = ({ tenantID }) => {
             <DialogBody>
               {preview && (
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <p className="font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                      Preview
+                      Related assets
                     </p>
                     <Badge variant={preview.valid ? "secondary" : "destructive"}>
-                      {preview.summary?.createCount ?? 0} item
-                      {preview.summary?.createCount === 1 ? "" : "s"}
+                      {selectedKeys.length} of {assets.length} selected
                     </Badge>
                   </div>
-                  <div className="max-h-72 space-y-2 overflow-y-auto rounded border border-border/50 p-2">
-                    {preview.items.map((item) => (
-                      <div
-                        key={`${item.type}:${item.id}`}
-                        className="rounded bg-muted/40 px-2 py-1.5"
-                      >
-                        <span className="text-sm font-medium text-foreground">
-                          {item.title}
-                        </span>
-                        {(item.warnings?.length > 0 ||
-                          item.missingDependencies?.length > 0) && (
-                          <ul className="mt-1 space-y-0.5 pl-2">
-                            {item.warnings.map((warning, index) => (
-                              <li key={`w_${index}`} className="text-xs text-muted-foreground">
-                                • {warning}
-                              </li>
-                            ))}
-                            {(item.missingDependencies || []).map((dep) => (
-                              <li key={`d_${dep.type}_${dep.id}`} className="text-xs text-destructive">
-                                • Missing {dep.type}: will be absent after install
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
+                  <p className="text-xs text-muted-foreground">
+                    App templates include their widgets, queries, workflows and
+                    datasources. Clear any asset you do not want; dependent assets
+                    are cleared with it.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedKeys(assets.map((asset) => asset.key))}
+                    >
+                      Select all
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedKeys([])}
+                    >
+                      Clear all
+                    </Button>
+                  </div>
+                  {hasMissingAssets && (
+                    <p className="rounded border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-xs text-destructive">
+                      A selected asset still depends on an asset you cleared. The
+                      install will create missing references until you reconnect or
+                      replace them.
+                    </p>
+                  )}
+                  <div className="max-h-80 space-y-1.5 overflow-y-auto rounded border border-border/50 p-2">
+                    {assets.map((asset) => {
+                      const planItem = planByKey.get(asset.key);
+                      const missing = missingByKey.get(asset.key) || [];
+                      const checked = selectedSet.has(asset.key);
+                      return (
+                        <label
+                          key={asset.key}
+                          className={`flex cursor-pointer items-start gap-2 rounded px-2 py-1.5 ${
+                            checked ? "bg-muted/40" : "opacity-60"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            className="mt-0.5 h-3.5 w-3.5"
+                            checked={checked}
+                            onChange={(event) => toggleAsset(asset.key, event.target.checked)}
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="flex flex-wrap items-center gap-1.5">
+                              <span className="text-sm font-medium text-foreground">
+                                {asset.title}
+                              </span>
+                              <Badge variant="outline">
+                                {TYPE_LABELS[asset.type] || asset.type}
+                              </Badge>
+                              {asset.requiredBy.length === 0 && (
+                                <Badge variant="secondary">Primary</Badge>
+                              )}
+                            </span>
+                            <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                              {asset.dependsOn.length > 0
+                                ? `Requires ${asset.dependsOn.length} related asset${
+                                    asset.dependsOn.length === 1 ? "" : "s"
+                                  }`
+                                : "No dependencies"}
+                              {asset.requiredBy.length > 0
+                                ? ` · Used by ${asset.requiredBy.length}`
+                                : ""}
+                            </span>
+                            {missing.length > 0 && (
+                              <span className="mt-1 block text-[11px] text-destructive">
+                                Missing {missing.length} selected dependenc
+                                {missing.length === 1 ? "y" : "ies"}. Include them or
+                                expect broken references.
+                              </span>
+                            )}
+                            {planItem?.warnings?.length > 0 && (
+                              <ul className="mt-1 space-y-0.5 pl-2">
+                                {planItem.warnings.map((warning, index) => (
+                                  <li
+                                    key={`w_${index}`}
+                                    className="text-[11px] text-muted-foreground"
+                                  >
+                                    • {warning}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -346,7 +456,10 @@ export const MarketplaceGrid = ({ tenantID }) => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setPreview(null)}
+                onClick={() => {
+                  setPreview(null);
+                  setSelectedKeys([]);
+                }}
                 disabled={installMutation.isPending}
               >
                 Back
@@ -355,11 +468,17 @@ export const MarketplaceGrid = ({ tenantID }) => {
                 type="button"
                 onClick={(event) => {
                   event.stopPropagation();
-                  installMutation.mutate();
+                  installMutation.mutate({ selectedItemKeys: selectedKeys });
                 }}
-                disabled={!preview?.valid || installMutation.isPending}
+                disabled={
+                  !preview?.valid || installMutation.isPending || selectedKeys.length === 0
+                }
               >
-                {installMutation.isPending ? <Spinner size={14} /> : "Install"}
+                {installMutation.isPending ? (
+                  <Spinner size={14} />
+                ) : (
+                  `Install ${selectedKeys.length} asset${selectedKeys.length === 1 ? "" : "s"}`
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>

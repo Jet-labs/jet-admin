@@ -56,8 +56,8 @@ function payloadFor(type, row) {
     case "datasource": return {
       datasourceTitle: row.datasourceTitle, datasourceDescription: row.datasourceDescription,
       datasourceType: row.datasourceType, datasourceOptions: row.datasourceOptions,
-      datasourceTags: ["integration", "curated", ["duckdb", "sqlite"].includes(row.datasourceType) ? "demo" : "public-api", row.datasourceType],
-      requiresReconnect: false,
+      datasourceTags: ["integration", "curated", row.requiresReconnect ? "requires-connection" : ["duckdb", "sqlite"].includes(row.datasourceType) ? "demo" : "public-api", row.datasourceType],
+      requiresReconnect: row.requiresReconnect ?? false,
     };
     case "dataQuery": return {
       dataQueryTitle: row.dataQueryTitle, dataQueryDescription: row.dataQueryDescription,
@@ -219,11 +219,13 @@ const WIDGET_RECIPES = [
 ];
 
 function catalogEntry({ slug, itemType, title, description, category, icon = "TbPuzzle", features, bundle, root, mode, setup, sampleInputs }) {
+  const limitations = {
+    "public-api": ["Network access and provider availability are required; rate limits may apply.", "Read-only queries run manually; no background polling or external writes."],
+    "requires-connection": ["Requires your own database credentials; none are embedded in the bundle.", "Queries read information_schema only; visible tables depend on the database user's permissions."],
+    demo: ["Synthetic fixture data; not connected to your production systems.", "Human-input workflows wait for an explicit decision or timeout.", "Workflow transport and browser execution need separate end-to-end verification."],
+  }[mode] || ["Review this bundle's setup and limitations before use."];
   bundle.marketplace = {
-    root, mode, features, setup, sampleInputs: sampleInputs || {},
-    limitations: mode === "public-api"
-      ? ["Network access and provider availability are required; rate limits may apply.", "Read-only queries run manually; no background polling or external writes."]
-      : ["Synthetic fixture data; not connected to your production systems.", "Human-input workflows wait for an explicit decision or timeout.", "Workflow transport and browser execution need separate end-to-end verification."],
+    root, mode, features, setup, sampleInputs: sampleInputs || {}, limitations,
     verification: { status: "pending", schema: false, localRuntime: false, browser: false, liveProvider: false },
   };
   return {
@@ -234,10 +236,134 @@ function catalogEntry({ slug, itemType, title, description, category, icon = "Tb
   };
 }
 
+/**
+ * A real PostgreSQL starting workspace. It intentionally requires reconnect,
+ * but the page, widgets, queries and datasource are one dependency-complete
+ * bundle rather than the former blank app-page placeholder.
+ */
+function addPostgresAdminApp(manifest) {
+  const datasourceID = uuid("postgres-admin:datasource");
+  const tablesQueryID = uuid("postgres-admin:query:tables");
+  const countQueryID = uuid("postgres-admin:query:table-count");
+  const instructionsWidgetID = uuid("postgres-admin:widget:instructions");
+  const statWidgetID = uuid("postgres-admin:widget:table-count");
+  const tableWidgetID = uuid("postgres-admin:widget:tables");
+  const pageID = uuid("postgres-admin:page");
+  const tableFilter = "WHERE table_schema NOT IN ('pg_catalog', 'information_schema')";
+  const tableQuery = `SELECT table_schema, table_name FROM information_schema.tables ${tableFilter} ORDER BY table_schema, table_name LIMIT 200`;
+  const countQuery = `SELECT count(*)::int AS tables FROM information_schema.tables ${tableFilter}`;
+  manifest.datasources.push({
+    datasourceID,
+    datasourceTitle: "PostgreSQL · schema catalog",
+    datasourceType: "postgresql",
+    datasourceDescription: "Reconnect with your PostgreSQL host, database and user. Read-only information_schema queries are bundled.",
+    datasourceOptions: { host: "", port: 5432, database: "", user: "", password: "", ssl: false },
+    datasourceTags: ["integration", "curated", "postgresql", "read-only"],
+    requiresReconnect: true,
+  });
+  manifest.queries.push(
+    {
+      dataQueryID: tablesQueryID, datasourceID, datasourceType: "postgresql",
+      dataQueryTitle: "PostgreSQL · visible tables",
+      dataQueryDescription: "Lists visible user tables from information_schema. Read-only.",
+      dataQueryOptions: { queryType: "sql", query: tableQuery, inputDefinitions: [], timeoutSeconds: 20 },
+      runOnLoad: false,
+    },
+    {
+      dataQueryID: countQueryID, datasourceID, datasourceType: "postgresql",
+      dataQueryTitle: "PostgreSQL · visible table count",
+      dataQueryDescription: "Counts visible user tables. Read-only.",
+      dataQueryOptions: { queryType: "sql", query: countQuery, inputDefinitions: [], timeoutSeconds: 20 },
+      runOnLoad: false,
+    }
+  );
+  manifest.widgets.push(
+    {
+      widgetID: instructionsWidgetID, widgetTitle: "Connect PostgreSQL",
+      widgetDescription: "Setup checklist and scope of the read-only schema catalog.",
+      widgetType: "text", refreshInterval: null,
+      widgetConfig: {
+        showHeader: false, format: "markdown",
+        content: "# PostgreSQL admin app\n1. Open **Data sources → PostgreSQL · schema catalog**.\n2. Enter your host, port, database, user and password, then test the connection.\n3. Return to this page. The table catalog and count refresh from your database.\n\n> This app runs read-only `information_schema` queries. It does not modify your database.",
+      },
+    },
+    {
+      widgetID: statWidgetID, widgetTitle: "Visible tables", widgetDescription: "Count of tables visible to the connected user.",
+      widgetType: "stat", refreshInterval: null,
+      widgetConfig: {
+        showHeader: true, label: "Visible tables",
+        valueTemplate: expr("((state.queries.table_count || {}).data || [])[0]?.tables || 0"),
+      },
+    },
+    {
+      widgetID: tableWidgetID, widgetTitle: "Schema and table catalog",
+      widgetDescription: "Visible schemas and tables from information_schema.",
+      widgetType: "table", refreshInterval: null,
+      widgetConfig: {
+        showHeader: true,
+        dataArrayTemplate: expr("((state.queries.tables || {}).data || [])"),
+        columns: [
+          { key: "table_schema", label: "Schema", type: "text", sortable: true },
+          { key: "table_name", label: "Table", type: "text", sortable: true },
+        ],
+        pagination: { enabled: true, pageSize: 15 },
+        search: { enabled: true },
+        export: { enabled: true, format: "csv" },
+        editing: { enabled: false },
+        isLoading: expr("((state.queries.tables || {}).isLoading || false)"),
+        emptyText: "No tables returned. Confirm the connection and that the user can see application schemas.",
+      },
+    }
+  );
+  const widgetKeys = [instructionsWidgetID, statWidgetID, tableWidgetID].map((id) => `widget_${id}_1`);
+  const row = (index, children) => ({ id: uuid(`postgres-admin:row:${index}`), type: "row", sizing: "auto", children });
+  const widgetNode = (key, span, minHeight) => ({
+    id: uuid(`postgres-admin:slot:${key}`), type: "widget", widgetKey: key, span,
+    sizing: "fill", ...(minHeight ? { minHeight } : {}),
+  });
+  manifest.pages.push({
+    appPageID: pageID,
+    appPageTitle: "PostgreSQL Admin App",
+    appPageDescription: "Read-only PostgreSQL schema and table catalog. Reconnect the bundled datasource before use.",
+    appPageConfig: {
+      layoutVersion: 2,
+      layout: {
+        id: "root", type: "column", children: [
+          row(0, [widgetNode(widgetKeys[0], 8), widgetNode(widgetKeys[1], 4)]),
+          row(1, [widgetNode(widgetKeys[2], 12, 440)]),
+        ],
+      },
+      layouts: {},
+      widgets: widgetKeys,
+      variables: [],
+      dataSources: [
+        { alias: "tables", type: "query", queryID: tablesQueryID, triggerMode: "auto", inputValues: {}, refreshOn: [], refetchInterval: null },
+        { alias: "table_count", type: "query", queryID: countQueryID, triggerMode: "auto", inputValues: {}, refreshOn: [], refetchInterval: null },
+      ],
+    },
+  });
+  return {
+    root: { type: "appPage", id: pageID },
+    entry: {
+      slug: "curated-postgresql-admin-app", itemType: "appTemplate",
+      title: "PostgreSQL Admin App", category: "Databases", icon: "SiPostgresql",
+      description: "Reconnect your PostgreSQL database, then browse visible schemas and tables with a query-backed catalog, table count and setup checklist. Includes the datasource, two read-only queries and all page widgets.",
+      features: ["schema browser", "table catalog", "read-only SQL", "credential reconnect required", "dependency complete"],
+      mode: "requires-connection",
+      setup: [
+        "Install the full bundle: datasource, two queries, three widgets and the app page.",
+        "Open Data sources → PostgreSQL · schema catalog and enter host, port, database, user and password.",
+        "Test the connection, then open the App Page. The catalog and count run automatically.",
+      ],
+    },
+  };
+}
+
 function buildCuratedCatalog() {
   const manifest = buildManifest();
   preparePages(manifest);
   const advancedRecipes = addAdvancedScenarios(manifest);
+  const postgresApp = addPostgresAdminApp(manifest);
   const catalog = [];
   const demoSetup = ["Install the full bundle, then open its App Page or Workflow.", "Demo SQL runs against an embedded in-memory warehouse; no credentials are needed.", "Connect your own data before treating any result as a production decision."];
   for (const [key, title, category, icon, description, features] of APP_RECIPES) {
@@ -280,6 +406,11 @@ function buildCuratedCatalog() {
   for (const recipe of advancedRecipes) {
     catalog.push(catalogEntry({ ...recipe, setup: demoSetup, bundle: compileBundle(manifest, [recipe.root]) }));
   }
+  catalog.push(catalogEntry({
+    ...postgresApp.entry,
+    root: postgresApp.root,
+    bundle: compileBundle(manifest, [postgresApp.root]),
+  }));
   return catalog;
 }
 

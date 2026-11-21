@@ -38,7 +38,10 @@ router.get(
 
 router.post(
   "/:itemID/preview",
-  validate(marketplaceItemIdParamSchema, "params"),
+  validateAll({
+    params: marketplaceItemIdParamSchema,
+    body: installMarketplaceItemSchema,
+  }),
   authMiddleware.authorize(P.marketplace.preview),
   marketplaceController.previewInstall
 );

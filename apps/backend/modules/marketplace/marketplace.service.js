@@ -33,7 +33,14 @@ const LIST_SELECT = {
  * List marketplace items with server-side search and type/category filters.
  * @returns {Promise<{entries:Array, totalCount:number, page:number, pageSize:number, totalPages:number}>}
  */
-marketplaceService.listItems = async ({ search, itemType, category, page, pageSize } = {}) => {
+marketplaceService.listItems = async ({
+  search,
+  itemType,
+  category,
+  includeLegacy = false,
+  page,
+  pageSize,
+} = {}) => {
   try {
     const and = [];
     if (search) {
@@ -48,6 +55,17 @@ marketplaceService.listItems = async ({ search, itemType, category, page, pageSi
     }
     if (itemType) and.push({ itemType });
     if (category) and.push({ category: { equals: category, mode: "insensitive" } });
+    if (!includeLegacy) {
+      // The original generated placeholders are retained for operator review
+      // but must not be offered as working integrations in tenant stores.
+      and.push({
+        OR: [
+          { sourceFamily: "curated-playbooks" },
+          { sourceFamily: null },
+          { publisher: { not: "jet-admin" } },
+        ],
+      });
+    }
     const where = and.length ? { AND: and } : {};
 
     const findManyOptions = {

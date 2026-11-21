@@ -44,22 +44,45 @@ export const getMarketplaceItemAPI = async ({ tenantID, itemID }) => {
   throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
 };
 
-export const previewMarketplaceInstallAPI = async ({ tenantID, itemID }) => {
+export const previewMarketplaceInstallAPI = async ({
+  tenantID,
+  itemID,
+  selectedItemKeys,
+}) => {
   const url =
     CONSTANTS.SERVER_HOST + CONSTANTS.APIS.MARKETPLACE.previewInstallAPI(tenantID, itemID);
   const headers = await _getHeaders();
-  const response = await axios.post(url, {}, { headers });
+  const response = await axios.post(
+    url,
+    { ...(selectedItemKeys ? { selectedItemKeys } : {}) },
+    { headers }
+  );
   if (response.data && response.data.success === true) {
-    return { valid: response.data.valid, summary: response.data.summary, items: response.data.items || [] };
+    return {
+      valid: response.data.valid,
+      summary: response.data.summary,
+      items: response.data.items || [],
+      selection: response.data.selection || [],
+      selectedCount: response.data.selectedCount ?? 0,
+      totalCount: response.data.totalCount ?? 0,
+    };
   }
   if (response.data.error) throw response.data.error;
   throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
 };
 
-export const installMarketplaceItemAPI = async ({ tenantID, itemID }) => {
+export const installMarketplaceItemAPI = async ({
+  tenantID,
+  itemID,
+  selectedItemKeys,
+}) => {
   const url = CONSTANTS.SERVER_HOST + CONSTANTS.APIS.MARKETPLACE.installItemAPI(tenantID, itemID);
   const headers = await _getHeaders();
-  const response = await axios.post(url, {}, { headers });
+  const response = await axios.post(
+    url,
+    { ...(selectedItemKeys ? { selectedItemKeys } : {}) },
+    { headers }
+  );
   if (response.data && response.data.success === true) {
     return {
       results: response.data.results || [],

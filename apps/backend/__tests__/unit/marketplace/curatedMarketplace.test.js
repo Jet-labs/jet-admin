@@ -17,7 +17,7 @@ function runtimeFor(entry) {
 }
 
 test("curated bundles use real widget contracts, layouts and complete dependencies", () => {
-  expect(validateCuratedCatalog(catalog)).toEqual({ entries: 35, valid: true });
+  expect(validateCuratedCatalog(catalog)).toEqual({ entries: 36, valid: true });
   expect(buildCuratedCatalog()).toEqual(catalog);
   expect(new Set(catalog.map((e) => JSON.stringify(e.payload.items))).size).toBe(catalog.length);
 });
@@ -104,6 +104,26 @@ test("typed numeric filters reject injected SQL before execution", async () => {
   const { m, runtime } = runtimeFor(entry);
   const query = m.queries.find((q) => q.dataQueryOptions.inputDefinitions.some((d) => d.key === "minAge"));
   await expect(runtime.executeQuery(query.dataQueryID, { minAge: "0;DROP TABLE invoices" })).rejects.toThrow(/finite number/);
+});
+
+test("PostgreSQL app bundles its datasource, queries, widgets and page", () => {
+  const entry = catalog.find((e) => e.slug === "curated-postgresql-admin-app");
+  const items = entry.payload.items;
+  const byType = (type) => items.filter((i) => i.type === type);
+  expect(byType("datasource")).toHaveLength(1);
+  expect(byType("dataQuery")).toHaveLength(2);
+  expect(byType("widget")).toHaveLength(3);
+  expect(byType("appPage")).toHaveLength(1);
+  expect(byType("datasource")[0].payload).toMatchObject({
+    datasourceType: "postgresql",
+    requiresReconnect: true,
+  });
+  expect(byType("dataQuery").every((q) => q.payload.datasourceType === "postgresql")).toBe(true);
+  const page = byType("appPage")[0].payload.appPageConfig;
+  expect(page.layoutVersion).toBe(2);
+  expect(page.widgets).toHaveLength(3);
+  expect(page.dataSources).toHaveLength(2);
+  expect(page.dataSources.map((s) => s.alias).sort()).toEqual(["table_count", "tables"]);
 });
 
 module.exports = { runtimeFor };

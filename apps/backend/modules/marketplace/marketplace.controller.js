@@ -2,7 +2,7 @@
  * Marketplace Controller
  */
 const { marketplaceService } = require("./marketplace.service");
-const { bundleService } = require("../bundle/bundle.service");
+const { bundleService, selectBundleItems } = require("../bundle/bundle.service");
 const Logger = require("../../utils/logger");
 const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
@@ -15,13 +15,24 @@ const sendError = (res, error, label) => {
   return expressUtils.sendResponse(res, false, {}, error, constants.HTTP_STATUS.BAD_REQUEST);
 };
 
+function assertInstallable(item) {
+  // Old generated placeholders have no marketplace root metadata and are not
+  // dependency-complete. Never let them be installed again, even by direct ID.
+  if (!item.payload?.marketplace?.root) {
+    throw new Error(
+      "This legacy marketplace item is not installable. Install its curated replacement instead."
+    );
+  }
+}
+
 marketplaceController.listItems = async (req, res) => {
   try {
-    const { search, itemType, category, page, pageSize } = req.query;
+    const { search, itemType, category, includeLegacy, page, pageSize } = req.query;
     const result = await marketplaceService.listItems({
       search,
       itemType,
       category,
+      includeLegacy: includeLegacy === "true",
       page,
       pageSize,
     });
@@ -56,11 +67,22 @@ marketplaceController.previewInstall = async (req, res) => {
   try {
     const { tenantID, itemID } = req.params;
     const item = await marketplaceService.getItemByID({ itemID });
-    const preview = await bundleService.previewImport({ tenantID, bundle: item.payload });
+    assertInstallable(item);
+    const selection = selectBundleItems(item.payload, req.body?.selectedItemKeys);
+    const preview = await bundleService.previewImport({
+      tenantID,
+      bundle: selection.bundle,
+    });
     return expressUtils.sendResponse(
       res,
       true,
-      { ...preview, message: "Install preview generated." },
+      {
+        ...preview,
+        selection: selection.selection,
+        selectedCount: selection.selectedCount,
+        totalCount: selection.totalCount,
+        message: "Install preview generated.",
+      },
       null,
       constants.HTTP_STATUS.OK
     );
@@ -76,13 +98,17 @@ marketplaceController.installItem = async (req, res) => {
     const authContext = getServiceAuthContext(req);
 
     const item = await marketplaceService.getItemByID({ itemID });
+    assertInstallable(item);
+    const selection = selectBundleItems(item.payload, req.body?.selectedItemKeys);
     const result = await bundleService.executeImport({
       tenantID,
       userID: user.userID,
       authContext,
-      bundle: item.payload,
+      bundle: selection.bundle,
     });
-    await marketplaceService.recordInstall({ itemID }).catch(() => {});
+    if (result.results.length) {
+      await marketplaceService.recordInstall({ itemID }).catch(() => {});
+    }
 
     return expressUtils.sendResponse(
       res,

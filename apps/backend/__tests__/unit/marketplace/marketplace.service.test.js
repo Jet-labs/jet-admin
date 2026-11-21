@@ -23,6 +23,7 @@ test("listItems applies search, itemType and category filters with pagination", 
     search: "stripe",
     itemType: "widget",
     category: "Payments & Commerce",
+    includeLegacy: true,
     page: 2,
     pageSize: 12,
   });
@@ -38,9 +39,22 @@ test("listItems applies search, itemType and category filters with pagination", 
   expect(result).toMatchObject({ totalCount: 25, page: 2, pageSize: 12, totalPages: 3 });
 });
 
-test("listItems works with no filters", async () => {
-  const result = await marketplaceService.listItems({});
-  expect(model.findMany.mock.calls[0][0].where).toEqual({});
+test("listItems excludes legacy generated placeholders by default", async () => {
+  await marketplaceService.listItems({});
+  expect(model.findMany.mock.calls[0][0].where).toEqual({
+    AND: [
+      {
+        OR: [
+          { sourceFamily: "curated-playbooks" },
+          { sourceFamily: null },
+          { publisher: { not: "jet-admin" } },
+        ],
+      },
+    ],
+  });
+
+  const result = await marketplaceService.listItems({ includeLegacy: true });
+  expect(model.findMany.mock.calls[1][0].where).toEqual({});
   expect(result.page).toBe(1);
 });
 
