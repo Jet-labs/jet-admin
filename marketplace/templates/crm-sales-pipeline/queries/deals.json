@@ -1,0 +1,501 @@
+[
+  {
+    "slug": "crm.deals.list",
+    "title": "Deals · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"name\", \"account_id\", \"contact_id\", \"stage\", \"amount\", \"probability\", \"close_date\", \"owner_id\", \"source\", \"next_step\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:deals}}\nWHERE deleted_at IS NULL AND (coalesce(\"name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"next_step\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"stage\" = $2::text)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at >= NULLIF($7::text, '')::date)\n  AND (NULLIF($8::text, '')::date IS NULL OR created_at < (NULLIF($8::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $5::text = 'name' AND $6::text = 'asc' THEN \"name\" END ASC, CASE WHEN $5::text = 'name' AND $6::text = 'desc' THEN \"name\" END DESC, CASE WHEN $5::text = 'amount' AND $6::text = 'asc' THEN \"amount\" END ASC, CASE WHEN $5::text = 'amount' AND $6::text = 'desc' THEN \"amount\" END DESC, CASE WHEN $5::text = 'probability' AND $6::text = 'asc' THEN \"probability\" END ASC, CASE WHEN $5::text = 'probability' AND $6::text = 'desc' THEN \"probability\" END DESC, CASE WHEN $5::text = 'close_date' AND $6::text = 'asc' THEN \"close_date\" END ASC, CASE WHEN $5::text = 'close_date' AND $6::text = 'desc' THEN \"close_date\" END DESC, id DESC\nLIMIT $4::int OFFSET ((($3::int - 1) * $4::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "name"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.export",
+    "title": "Deals · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"name\", \"account_id\", \"contact_id\", \"stage\", \"amount\", \"probability\", \"close_date\", \"owner_id\", \"source\", \"next_step\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:deals}}\nWHERE deleted_at IS NULL AND (coalesce(\"name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"next_step\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"stage\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.detail",
+    "title": "Deals · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"name\", \"account_id\", \"contact_id\", \"stage\", \"amount\", \"probability\", \"close_date\", \"owner_id\", \"source\", \"next_step\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:deals}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.create",
+    "title": "Deals · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:deals}} (\"name\", \"account_id\", \"contact_id\", \"stage\", \"amount\", \"probability\", \"close_date\", \"owner_id\", \"source\", \"next_step\", created_at, updated_at)\nVALUES ($1::text, $2::int, $3::int, $4::text, $5::numeric, $6::int, $7::date, $8::int, $9::text, $10::text, now(), now())\nRETURNING \"id\", \"name\", \"account_id\", \"contact_id\", \"stage\", \"amount\", \"probability\", \"close_date\", \"owner_id\", \"source\", \"next_step\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "account_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "contact_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "stage",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "probability",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "close_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "source",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "next_step",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.update",
+    "title": "Deals · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:deals}}\nSET \"name\" = $2::text, \"account_id\" = $3::int, \"contact_id\" = $4::int, \"stage\" = $5::text, \"amount\" = $6::numeric, \"probability\" = $7::int, \"close_date\" = $8::date, \"owner_id\" = $9::int, \"source\" = $10::text, \"next_step\" = $11::text, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"name\", \"account_id\", \"contact_id\", \"stage\", \"amount\", \"probability\", \"close_date\", \"owner_id\", \"source\", \"next_step\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "account_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "contact_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "stage",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "probability",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "close_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "source",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "next_step",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.delete",
+    "title": "Deals · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:deals}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.restore",
+    "title": "Deals · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:deals}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.lookup",
+    "title": "Deals · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"name\"::text AS label FROM {{table:deals}} WHERE deleted_at IS NULL ORDER BY \"name\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.status",
+    "title": "Deals · change status",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:deals}} SET \"stage\" = $2::text, updated_at = now() WHERE id = $1::int RETURNING id, \"stage\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false,
+          "default": "prospecting"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.assign",
+    "title": "Deals · assign owner",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:deals}} SET \"owner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"owner_id\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.stats",
+    "title": "Deals · KPI totals",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT count(*)::int AS total, coalesce(sum(\"amount\"), 0)::numeric(14,2) AS total_value, coalesce(avg(\"amount\"), 0)::numeric(14,2) AS average_value, count(*) FILTER (WHERE \"stage\" = 'prospecting')::int AS status_prospecting, count(*) FILTER (WHERE \"stage\" = 'qualification')::int AS status_qualification, count(*) FILTER (WHERE \"stage\" = 'proposal')::int AS status_proposal, count(*) FILTER (WHERE \"stage\" = 'negotiation')::int AS status_negotiation, count(*) FILTER (WHERE \"stage\" = 'closed_won')::int AS status_closed_won, count(*) FILTER (WHERE \"stage\" = 'closed_lost')::int AS status_closed_lost\nFROM {{table:deals}}\nWHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date)\n  AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day'))",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.trend",
+    "title": "Deals · daily trend",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT date_trunc('day', created_at)::date AS day, count(*)::int AS count, coalesce(sum(\"amount\"), 0)::numeric(14,2) AS total\nFROM {{table:deals}}\nWHERE deleted_at IS NULL AND created_at >= coalesce(NULLIF($1::text, '')::date, now() - interval '90 days')\n  AND created_at < (coalesce(NULLIF($2::text, '')::date, now()::date) + interval '1 day')\nGROUP BY 1 ORDER BY 1",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.by_status",
+    "title": "Deals · by status",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"stage\" AS status, count(*)::int AS count FROM {{table:deals}} WHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date) AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day')) GROUP BY 1 ORDER BY 2 DESC",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.deals.overdue",
+    "title": "Deals · overdue",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "deals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"name\", \"account_id\", \"contact_id\", \"stage\", \"amount\", \"probability\", \"close_date\", \"owner_id\", \"source\", \"next_step\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:deals}}\nWHERE deleted_at IS NULL AND \"close_date\" IS NOT NULL\n  AND \"close_date\" < now() - ($1::int || ' days')::interval\n  AND \"stage\" NOT IN ('')\nORDER BY \"close_date\" ASC LIMIT 100",
+      "inputDefinitions": [
+        {
+          "key": "days",
+          "type": "number",
+          "required": false,
+          "default": 7
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

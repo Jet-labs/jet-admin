@@ -1,0 +1,290 @@
+[
+  {
+    "slug": "crm-accounts-create.heading",
+    "key": "heading",
+    "page": "crm-accounts-create",
+    "title": "Create Account",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Account\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-accounts-create.form",
+    "key": "form",
+    "page": "crm-accounts-create",
+    "title": "New Account",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Account",
+      "submitLabel": "Create Account",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "account_name",
+          "label": "Account name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Pioneer Digital"
+        },
+        {
+          "key": "industry",
+          "label": "Industry",
+          "type": "select",
+          "required": true,
+          "defaultValue": "financial_services",
+          "options": [
+            {
+              "label": "Saas",
+              "value": "saas"
+            },
+            {
+              "label": "Financial Services",
+              "value": "financial_services"
+            },
+            {
+              "label": "Healthcare",
+              "value": "healthcare"
+            },
+            {
+              "label": "Manufacturing",
+              "value": "manufacturing"
+            },
+            {
+              "label": "Retail",
+              "value": "retail"
+            },
+            {
+              "label": "Logistics",
+              "value": "logistics"
+            },
+            {
+              "label": "Public Sector",
+              "value": "public_sector"
+            }
+          ]
+        },
+        {
+          "key": "tier",
+          "label": "Tier",
+          "type": "select",
+          "required": true,
+          "defaultValue": "enterprise",
+          "options": [
+            {
+              "label": "Strategic",
+              "value": "strategic"
+            },
+            {
+              "label": "Enterprise",
+              "value": "enterprise"
+            },
+            {
+              "label": "Mid Market",
+              "value": "mid_market"
+            },
+            {
+              "label": "Smb",
+              "value": "smb"
+            }
+          ]
+        },
+        {
+          "key": "website",
+          "label": "Website",
+          "type": "text",
+          "required": false,
+          "defaultValue": "https://files.example.invalid/crm-sales-pipeline/accounts-1.pdf"
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text",
+          "required": false,
+          "defaultValue": "+1-555-585-8297"
+        },
+        {
+          "key": "city",
+          "label": "City",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Mumbai"
+        },
+        {
+          "key": "country",
+          "label": "Country",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Singapore"
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "type": "select",
+          "required": true,
+          "defaultValue": 7,
+          "options": [
+            {
+              "label": "Anika Osei",
+              "value": 1
+            },
+            {
+              "label": "Tomás Dubey",
+              "value": 2
+            },
+            {
+              "label": "Noah Chen",
+              "value": 3
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 4
+            },
+            {
+              "label": "Aarav Petrov",
+              "value": 5
+            },
+            {
+              "label": "Ravi Khan",
+              "value": 6
+            },
+            {
+              "label": "Elena Garcia",
+              "value": 7
+            },
+            {
+              "label": "Luca Fischer",
+              "value": 8
+            },
+            {
+              "label": "Noor Andersen",
+              "value": 9
+            },
+            {
+              "label": "Theo Nielsen",
+              "value": 10
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 11
+            },
+            {
+              "label": "Sofia Ivanova",
+              "value": 12
+            },
+            {
+              "label": "Tomás Sato",
+              "value": 13
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 14
+            },
+            {
+              "label": "Eli Meyer",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 16
+            },
+            {
+              "label": "Theo Petrov",
+              "value": 17
+            },
+            {
+              "label": "Noor Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Amara Khan",
+              "value": 19
+            },
+            {
+              "label": "Malik Müller",
+              "value": 20
+            },
+            {
+              "label": "Freya Tanaka",
+              "value": 21
+            },
+            {
+              "label": "Eli Chen",
+              "value": 22
+            },
+            {
+              "label": "Yuki Chen",
+              "value": 23
+            },
+            {
+              "label": "Anika Dubois",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "annual_revenue",
+          "label": "Annual revenue",
+          "type": "number",
+          "required": false,
+          "defaultValue": 3138.79,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "health_score",
+          "label": "Health score",
+          "type": "number",
+          "required": false,
+          "defaultValue": 75,
+          "validation": {
+            "min": 0
+          }
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "accounts_create",
+              "inputValues": {
+                "account_name": "{{ event.formData.account_name }}",
+                "industry": "{{ event.formData.industry }}",
+                "tier": "{{ event.formData.tier }}",
+                "website": "{{ event.formData.website }}",
+                "phone": "{{ event.formData.phone }}",
+                "city": "{{ event.formData.city }}",
+                "country": "{{ event.formData.country }}",
+                "owner_id": "{{ event.formData.owner_id }}",
+                "annual_revenue": "{{ event.formData.annual_revenue }}",
+                "health_score": "{{ event.formData.health_score }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-accounts-create.result",
+    "key": "result",
+    "page": "crm-accounts-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.accounts_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.accounts_create || {}).isLoading || false }}"
+    }
+  }
+]

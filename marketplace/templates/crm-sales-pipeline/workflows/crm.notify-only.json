@@ -1,0 +1,126 @@
+{
+  "slug": "crm.notify-only",
+  "key": "notify-only",
+  "title": "CRM & Sales Pipeline · notify only",
+  "description": "Minimal workflow used by inbound webhooks and manual demos: writes one notification.",
+  "tags": [
+    "automation",
+    "listener"
+  ],
+  "options": {
+    "description": "Minimal workflow used by inbound webhooks and manual demos: writes one notification.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      },
+      {
+        "key": "event",
+        "type": "object",
+        "required": false,
+        "defaultValue": {}
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "2045df09-335a-4c7c-b529-746ca4d4c56f",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "notify",
+      "nodeID": "e48d445b-723b-48d4-9b6d-78dc0af1a1b6",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notify",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "3b694978-816f-4fb5-8c10-ce5a1042b5de",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID || 1 }}",
+          "title": "CRM & Sales Pipeline event received",
+          "body": "Event {{ ctx.event.kind || 'record' }} received for record #{{ ctx.recordID }}.",
+          "category": "info",
+          "linkPage": "crm-notifications"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "a199d899-1e0d-407e-8fc6-289c12330042",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.notification }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "2045df09-335a-4c7c-b529-746ca4d4c56f",
+      "to": "e48d445b-723b-48d4-9b6d-78dc0af1a1b6",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "e48d445b-723b-48d4-9b6d-78dc0af1a1b6",
+      "to": "a199d899-1e0d-407e-8fc6-289c12330042",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

@@ -132,6 +132,14 @@ export const WIDGET_TYPES = {
     name: "Code Block",
     value: "code-block",
   },
+  KANBAN: {
+    name: "Kanban Board",
+    value: "kanban",
+  },
+  CALENDAR: {
+    name: "Calendar",
+    value: "calendar",
+  },
 };
 
 // Advanced options for Vega widgets (using JSON Schema + UI Schema for jsonforms)

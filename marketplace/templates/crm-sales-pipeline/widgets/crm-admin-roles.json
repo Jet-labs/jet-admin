@@ -1,0 +1,270 @@
+[
+  {
+    "slug": "crm-admin-roles.heading",
+    "key": "heading",
+    "page": "crm-admin-roles",
+    "title": "Roles and permissions",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Roles and permissions\nProvisioned Casbin roles are read-only here. The page matrix mirrors the package's role map and can be adjusted for internal review; platform permission mappings remain the enforcement source.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-admin-roles.roles",
+    "key": "roles",
+    "page": "crm-admin-roles",
+    "title": "Tenant roles",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.roles || {}).data || [])",
+      "columns": [
+        {
+          "key": "roleTitle",
+          "label": "Role",
+          "type": "text"
+        },
+        {
+          "key": "roleDescription",
+          "label": "Description",
+          "type": "text"
+        },
+        {
+          "key": "permission_count",
+          "label": "Permissions",
+          "type": "number"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No roles.",
+      "isLoading": "{{ (state.queries.roles || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-admin-roles.matrix",
+    "key": "matrix",
+    "page": "crm-admin-roles",
+    "title": "Page matrix",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.matrix || {}).data || [])",
+      "columns": [
+        {
+          "key": "role_key",
+          "label": "Role",
+          "type": "badge"
+        },
+        {
+          "key": "page_slug",
+          "label": "Page",
+          "type": "text"
+        },
+        {
+          "key": "can_view",
+          "label": "View",
+          "type": "boolean"
+        },
+        {
+          "key": "can_export",
+          "label": "Export",
+          "type": "boolean"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No matrix rows.",
+      "isLoading": "{{ (state.queries.matrix || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-admin-roles.toggle",
+    "key": "toggle",
+    "page": "crm-admin-roles",
+    "title": "Update matrix row",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Update matrix row",
+      "submitLabel": "Save matrix row",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "roleKey",
+          "label": "Role key",
+          "type": "select",
+          "required": true,
+          "options": []
+        },
+        {
+          "key": "pageSlug",
+          "label": "Page slug",
+          "type": "select",
+          "required": true,
+          "options": [
+            {
+              "label": "crm-deals-list",
+              "value": "crm-deals-list"
+            },
+            {
+              "label": "crm-deals-detail",
+              "value": "crm-deals-detail"
+            },
+            {
+              "label": "crm-deals-create",
+              "value": "crm-deals-create"
+            },
+            {
+              "label": "crm-leads-list",
+              "value": "crm-leads-list"
+            },
+            {
+              "label": "crm-leads-detail",
+              "value": "crm-leads-detail"
+            },
+            {
+              "label": "crm-leads-create",
+              "value": "crm-leads-create"
+            },
+            {
+              "label": "crm-accounts-list",
+              "value": "crm-accounts-list"
+            },
+            {
+              "label": "crm-accounts-detail",
+              "value": "crm-accounts-detail"
+            },
+            {
+              "label": "crm-accounts-create",
+              "value": "crm-accounts-create"
+            },
+            {
+              "label": "crm-contacts-list",
+              "value": "crm-contacts-list"
+            },
+            {
+              "label": "crm-contacts-detail",
+              "value": "crm-contacts-detail"
+            },
+            {
+              "label": "crm-contacts-create",
+              "value": "crm-contacts-create"
+            },
+            {
+              "label": "crm-dashboard",
+              "value": "crm-dashboard"
+            },
+            {
+              "label": "crm-reports-operations",
+              "value": "crm-reports-operations"
+            },
+            {
+              "label": "crm-reports-secondary",
+              "value": "crm-reports-secondary"
+            },
+            {
+              "label": "crm-reports-quality",
+              "value": "crm-reports-quality"
+            },
+            {
+              "label": "crm-deals-kanban",
+              "value": "crm-deals-kanban"
+            },
+            {
+              "label": "crm-deals-calendar",
+              "value": "crm-deals-calendar"
+            },
+            {
+              "label": "crm-search",
+              "value": "crm-search"
+            },
+            {
+              "label": "crm-profile",
+              "value": "crm-profile"
+            },
+            {
+              "label": "crm-notifications",
+              "value": "crm-notifications"
+            },
+            {
+              "label": "crm-settings",
+              "value": "crm-settings"
+            },
+            {
+              "label": "crm-portal",
+              "value": "crm-portal"
+            },
+            {
+              "label": "crm-admin-users",
+              "value": "crm-admin-users"
+            }
+          ]
+        },
+        {
+          "key": "canView",
+          "label": "Can view",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "key": "canExport",
+          "label": "Can export",
+          "type": "checkbox",
+          "defaultValue": false
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "roleKey": "{{ event.formData.roleKey }}",
+                "pageSlug": "{{ event.formData.pageSlug }}",
+                "canView": "{{ event.formData.canView }}",
+                "canExport": "{{ event.formData.canExport }}"
+              },
+              "successToast": "Matrix updated",
+              "errorToast": "Matrix update failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

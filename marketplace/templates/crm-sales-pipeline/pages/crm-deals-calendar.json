@@ -1,0 +1,164 @@
+{
+  "slug": "crm-deals-calendar",
+  "key": "deals-calendar",
+  "title": "Deals · calendar",
+  "description": "Calendar view of the primary date field.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "deals",
+      "type": "query",
+      "queryID": "6d5d1dca-a4af-4c7f-bc59-31638eb513f4",
+      "triggerMode": "auto",
+      "inputValues": {
+        "search": "",
+        "page": 1,
+        "limit": 300,
+        "sortBy": "close_date",
+        "sortDir": "asc",
+        "status": "",
+        "dateFrom": "",
+        "dateTo": ""
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_selected",
+      "type": "query",
+      "queryID": "e67ba7fe-6c07-4d21-bbac-158f8eea0513",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "f3cd8a57-286b-4ad9-94a4-6a62ab2c1ecd",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "1d64a22f-508e-4c2d-9266-2f75c7fb1b5d",
+              "type": "widget",
+              "widgetKey": "widget_e3010fd9-f3e9-42d8-a005-95dc7020c390_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "0c0948d8-5b72-418d-82d1-3cb6b3dac08c",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "7018573d-140c-4b22-9bcc-0c1def5d7ade",
+              "type": "widget",
+              "widgetKey": "widget_4b9b83fe-fdaf-4b64-a126-f09249aa12f1_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 540
+            },
+            {
+              "id": "5d194789-bc67-47ff-b5dd-e433e4d7a28d",
+              "type": "widget",
+              "widgetKey": "widget_0bd1e6af-e6e0-449b-a656-2fafc0dfcd86_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 540
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "1d64a22f-508e-4c2d-9266-2f75c7fb1b5d",
+        "type": "widget",
+        "widgetKey": "widget_e3010fd9-f3e9-42d8-a005-95dc7020c390_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "7018573d-140c-4b22-9bcc-0c1def5d7ade",
+        "type": "widget",
+        "widgetKey": "widget_4b9b83fe-fdaf-4b64-a126-f09249aa12f1_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 540
+      },
+      {
+        "id": "5d194789-bc67-47ff-b5dd-e433e4d7a28d",
+        "type": "widget",
+        "widgetKey": "widget_0bd1e6af-e6e0-449b-a656-2fafc0dfcd86_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 540
+      }
+    ],
+    "variables": [
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "deals",
+        "type": "query",
+        "queryID": "6d5d1dca-a4af-4c7f-bc59-31638eb513f4",
+        "triggerMode": "auto",
+        "inputValues": {
+          "search": "",
+          "page": 1,
+          "limit": 300,
+          "sortBy": "close_date",
+          "sortDir": "asc",
+          "status": "",
+          "dateFrom": "",
+          "dateTo": ""
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_selected",
+        "type": "query",
+        "queryID": "e67ba7fe-6c07-4d21-bbac-158f8eea0513",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

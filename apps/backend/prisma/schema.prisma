@@ -647,6 +647,25 @@ model tblMarketplaceItem {
   @@index([sourceFamily], map: "idx_tblMarketplaceItem_sourceFamily")
 }
 
+model tblMarketplaceTemplateInstalls {
+  installID         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantID          String   @db.Uuid
+  slug              String   @db.VarChar(160)
+  version           String   @db.VarChar(40)
+  tablePrefix       String   @db.VarChar(80)
+  options           Json     @default("{}")
+  resources         Json     @default("[]")
+  tables            Json     @default("[]")
+  status            String   @default("INSTALLED") @db.VarChar(32)
+  installedByUserID String?  @db.Uuid
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([tenantID, slug], map: "uq_tblMarketplaceTemplateInstalls_tenant_slug")
+  @@index([tenantID], map: "idx_tblMarketplaceTemplateInstalls_tenant")
+  @@map("tblMarketplaceTemplateInstalls")
+}
+
 model tblOperators {
   operatorID          String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email               String                @unique @db.VarChar

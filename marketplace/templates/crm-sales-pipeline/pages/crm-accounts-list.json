@@ -1,0 +1,478 @@
+{
+  "slug": "crm-accounts-list",
+  "key": "accounts-list",
+  "title": "Accounts · list",
+  "description": "Server-side list, filters, inline edit and bulk actions for accounts.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "search",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "status",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "page",
+      "type": "number",
+      "defaultValue": 1
+    },
+    {
+      "key": "sortBy",
+      "type": "string",
+      "defaultValue": "account_name"
+    },
+    {
+      "key": "sortDir",
+      "type": "string",
+      "defaultValue": "asc"
+    },
+    {
+      "key": "dateFrom",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "dateTo",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "accounts",
+      "type": "query",
+      "queryID": "a144ed14-6d3f-4b6f-a40b-e250a607d826",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "search": "{{ state.variables.search }}",
+        "page": "{{ state.variables.page }}",
+        "limit": 10,
+        "sortBy": "{{ state.variables.sortBy }}",
+        "sortDir": "{{ state.variables.sortDir }}",
+        "dateFrom": "{{ state.variables.dateFrom }}",
+        "dateTo": "{{ state.variables.dateTo }}"
+      },
+      "refreshOn": [
+        "variables.search",
+        "variables.status",
+        "variables.page",
+        "variables.sortBy",
+        "variables.sortDir",
+        "variables.dateFrom",
+        "variables.dateTo"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "accounts_views",
+      "type": "query",
+      "queryID": "0d8d32f2-5d65-4c2c-ba35-4549b4b3eedb",
+      "triggerMode": "auto",
+      "inputValues": {
+        "prefix": "saved_view.crm-accounts-list"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "accounts_selected",
+      "type": "query",
+      "queryID": "06f5aebb-e1cd-4efe-bcb4-f0bec1e57270",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "accounts_update",
+      "type": "query",
+      "queryID": "5bc0ea16-71c2-44ae-958b-1ef00d69be91",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "accounts_delete",
+      "type": "query",
+      "queryID": "0581c3df-7af8-409b-b384-0f66dac08caa",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "accounts_view_create",
+      "type": "query",
+      "queryID": "2d175b74-dbe8-4add-b366-539e1d10c26a",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "f3ecd6c1-9d81-4ea7-a1fc-b05fd0d77cc6",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "bedeaf3b-5ea1-48c3-82b3-3c600be940fd",
+              "type": "widget",
+              "widgetKey": "widget_a1eb465c-77b2-4595-8ce5-2b3b2fbce760_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "a442110c-e4e9-44f7-a244-69720a346f06",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "c8bf73ff-aa2b-4caf-8799-16e7fafd8dc0",
+              "type": "widget",
+              "widgetKey": "widget_b7019c09-7365-4720-9cbe-5d44e70ef2b4_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "1b3dd304-3539-4b44-bacb-081ffbba1b47",
+              "type": "widget",
+              "widgetKey": "widget_f132e590-cd51-48e3-bb31-243f88d04322_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "b835e7b0-16f0-4914-959c-8e6e76cf11d7",
+              "type": "widget",
+              "widgetKey": "widget_4ee7b58c-dc93-4d37-a268-29e7f6dff9e9_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 56
+            }
+          ]
+        },
+        {
+          "id": "8fecf309-5972-4912-b283-120634731b19",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "8f0850b4-60d9-4d1b-898e-4471e36b038b",
+              "type": "widget",
+              "widgetKey": "widget_9222008f-a155-4e62-b81d-64bd50ecb3d5_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 120
+            }
+          ]
+        },
+        {
+          "id": "ca40207b-af8d-4b92-9eb0-1358f95d2b5d",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "60887933-910d-4e10-b6df-795abde9f8ac",
+              "type": "widget",
+              "widgetKey": "widget_d5981544-1d4a-4b66-a68a-f04c361beed8_1",
+              "span": 9,
+              "sizing": "fill",
+              "minHeight": 460
+            },
+            {
+              "id": "05362335-4a26-472e-9f6a-976f5b6ac6d7",
+              "type": "widget",
+              "widgetKey": "widget_9ed0d785-85b2-4862-8573-4aa16494ea46_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 460
+            }
+          ]
+        },
+        {
+          "id": "875beeb7-6c9c-4566-90df-b0e35b45f139",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "57cd6f3b-8671-447c-9e10-653a67830602",
+              "type": "widget",
+              "widgetKey": "widget_9ea8c747-f549-4225-909a-1750a0425558_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 48
+            },
+            {
+              "id": "87afc6fb-ec49-47cc-931b-b70d51af861a",
+              "type": "widget",
+              "widgetKey": "widget_d8f78c1c-2ed6-484c-bd5e-fb6edd9bd1d3_1",
+              "span": 6,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "836b99ac-d69a-4b35-9ae3-fd0ed19d440f",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "d3866635-7c69-43ca-a20d-ca050b588424",
+              "type": "widget",
+              "widgetKey": "widget_d9045635-a7c7-42b6-a087-295710ad7e62_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 220
+            },
+            {
+              "id": "49f9b845-aebb-40c8-acb4-275baaaf3e64",
+              "type": "widget",
+              "widgetKey": "widget_4bccf5e6-f0f1-4708-bbe6-7fe246d726cc_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 220
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "bedeaf3b-5ea1-48c3-82b3-3c600be940fd",
+        "type": "widget",
+        "widgetKey": "widget_a1eb465c-77b2-4595-8ce5-2b3b2fbce760_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "c8bf73ff-aa2b-4caf-8799-16e7fafd8dc0",
+        "type": "widget",
+        "widgetKey": "widget_b7019c09-7365-4720-9cbe-5d44e70ef2b4_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "1b3dd304-3539-4b44-bacb-081ffbba1b47",
+        "type": "widget",
+        "widgetKey": "widget_f132e590-cd51-48e3-bb31-243f88d04322_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "b835e7b0-16f0-4914-959c-8e6e76cf11d7",
+        "type": "widget",
+        "widgetKey": "widget_4ee7b58c-dc93-4d37-a268-29e7f6dff9e9_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "8f0850b4-60d9-4d1b-898e-4471e36b038b",
+        "type": "widget",
+        "widgetKey": "widget_9222008f-a155-4e62-b81d-64bd50ecb3d5_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 120
+      },
+      {
+        "id": "60887933-910d-4e10-b6df-795abde9f8ac",
+        "type": "widget",
+        "widgetKey": "widget_d5981544-1d4a-4b66-a68a-f04c361beed8_1",
+        "span": 9,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "05362335-4a26-472e-9f6a-976f5b6ac6d7",
+        "type": "widget",
+        "widgetKey": "widget_9ed0d785-85b2-4862-8573-4aa16494ea46_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "57cd6f3b-8671-447c-9e10-653a67830602",
+        "type": "widget",
+        "widgetKey": "widget_9ea8c747-f549-4225-909a-1750a0425558_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 48
+      },
+      {
+        "id": "87afc6fb-ec49-47cc-931b-b70d51af861a",
+        "type": "widget",
+        "widgetKey": "widget_d8f78c1c-2ed6-484c-bd5e-fb6edd9bd1d3_1",
+        "span": 6,
+        "sizing": "fill"
+      },
+      {
+        "id": "d3866635-7c69-43ca-a20d-ca050b588424",
+        "type": "widget",
+        "widgetKey": "widget_d9045635-a7c7-42b6-a087-295710ad7e62_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 220
+      },
+      {
+        "id": "49f9b845-aebb-40c8-acb4-275baaaf3e64",
+        "type": "widget",
+        "widgetKey": "widget_4bccf5e6-f0f1-4708-bbe6-7fe246d726cc_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 220
+      }
+    ],
+    "variables": [
+      {
+        "key": "search",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "status",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "page",
+        "type": "number",
+        "defaultValue": 1
+      },
+      {
+        "key": "sortBy",
+        "type": "string",
+        "defaultValue": "account_name"
+      },
+      {
+        "key": "sortDir",
+        "type": "string",
+        "defaultValue": "asc"
+      },
+      {
+        "key": "dateFrom",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "dateTo",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "accounts",
+        "type": "query",
+        "queryID": "a144ed14-6d3f-4b6f-a40b-e250a607d826",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "search": "{{ state.variables.search }}",
+          "page": "{{ state.variables.page }}",
+          "limit": 10,
+          "sortBy": "{{ state.variables.sortBy }}",
+          "sortDir": "{{ state.variables.sortDir }}",
+          "dateFrom": "{{ state.variables.dateFrom }}",
+          "dateTo": "{{ state.variables.dateTo }}"
+        },
+        "refreshOn": [
+          "variables.search",
+          "variables.status",
+          "variables.page",
+          "variables.sortBy",
+          "variables.sortDir",
+          "variables.dateFrom",
+          "variables.dateTo"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "accounts_views",
+        "type": "query",
+        "queryID": "0d8d32f2-5d65-4c2c-ba35-4549b4b3eedb",
+        "triggerMode": "auto",
+        "inputValues": {
+          "prefix": "saved_view.crm-accounts-list"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "accounts_selected",
+        "type": "query",
+        "queryID": "06f5aebb-e1cd-4efe-bcb4-f0bec1e57270",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "accounts_update",
+        "type": "query",
+        "queryID": "5bc0ea16-71c2-44ae-958b-1ef00d69be91",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "accounts_delete",
+        "type": "query",
+        "queryID": "0581c3df-7af8-409b-b384-0f66dac08caa",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "accounts_view_create",
+        "type": "query",
+        "queryID": "2d175b74-dbe8-4add-b366-539e1d10c26a",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

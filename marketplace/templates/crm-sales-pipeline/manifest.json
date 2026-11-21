@@ -1,0 +1,940 @@
+{
+  "id": "jet.marketplace.crm-sales-pipeline",
+  "slug": "crm-sales-pipeline",
+  "alias": "crm",
+  "name": "CRM & Sales Pipeline",
+  "version": "1.0.0",
+  "category": "Sales & CRM",
+  "tags": [
+    "crm",
+    "sales",
+    "pipeline",
+    "forecast",
+    "accounts",
+    "deals"
+  ],
+  "shortDescription": "Run leads, accounts, deals and forecasting from one audited workspace.",
+  "longDescription": "A complete revenue workspace: lead intake and scoring, account and contact management, a stage-based deal pipeline, activity tracking, quota attainment and forecast reporting. Includes a sales admin area for users, roles, audit, imports and data quality.",
+  "author": "Jet Admin",
+  "license": "MIT",
+  "minPlatformVersion": "2.1.0-preview.1",
+  "icon": "assets/icon.svg",
+  "cover": "assets/cover.svg",
+  "accent": "#2563eb",
+  "screenshots": [
+    {
+      "title": "Dashboard",
+      "path": "assets/screenshots/dashboard.svg"
+    },
+    {
+      "title": "Deals · list",
+      "path": "assets/screenshots/deals-list.svg"
+    },
+    {
+      "title": "Deals · detail",
+      "path": "assets/screenshots/deals-detail.svg"
+    },
+    {
+      "title": "Reports · operations",
+      "path": "assets/screenshots/reports-operations.svg"
+    },
+    {
+      "title": "Admin � audit log",
+      "path": "assets/screenshots/admin-audit.svg"
+    },
+    {
+      "title": "Client portal",
+      "path": "assets/screenshots/portal.svg"
+    }
+  ],
+  "features": [
+    "Seeded, domain-specific data model with audit triggers",
+    "Parameterized SQL queries with server-side pagination and CSV export",
+    "Role-aware pages and Casbin asset permissions",
+    "Workflow automations for intake, approvals, assignments and SLA sweeps",
+    "In-app notification center, comments, attachments and saved views",
+    "Admin screens for users, roles, audit, operations and data quality"
+  ],
+  "requiredIntegrations": [
+    {
+      "key": "sendgrid-email",
+      "title": "SendGrid email",
+      "requiredFields": [
+        "API key",
+        "from address"
+      ],
+      "mock": "The packaged connector is disabled; use the notification center and email HTML samples for demos."
+    },
+    {
+      "key": "inbound-webhook",
+      "title": "Inbound lead webhook",
+      "requiredFields": [
+        "endpoint path",
+        "optional signature header"
+      ],
+      "mock": "POST { \"kind\": \"record.created\", \"record_id\": 1 } to the inactive webhook listener."
+    }
+  ],
+  "installOptions": [
+    {
+      "key": "includeSampleData",
+      "label": "Include sample data",
+      "type": "boolean",
+      "default": true,
+      "description": "Load the deterministic demo dataset (30-300 rows per core table)."
+    },
+    {
+      "key": "createDemoUsers",
+      "label": "Create demo staff directory",
+      "type": "boolean",
+      "default": false,
+      "description": "Mark seeded staff as demo identities. These are not Firebase logins."
+    },
+    {
+      "key": "enableAutomation",
+      "label": "Enable cron automations",
+      "type": "boolean",
+      "default": false,
+      "description": "Enable the packaged cron jobs. Leave off until listeners and integrations are reviewed."
+    }
+  ],
+  "counts": {
+    "tables": 18,
+    "domainTables": 8,
+    "supportTables": 10,
+    "seedRows": 1040,
+    "queries": 80,
+    "pages": 31,
+    "widgets": 209,
+    "workflows": 11,
+    "listeners": 8,
+    "cronJobs": 6,
+    "roles": 5
+  },
+  "pages": [
+    {
+      "slug": "crm-deals-list",
+      "title": "Deals · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for deals.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-deals-detail",
+      "title": "Deals · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-deals-create",
+      "title": "Create Deal",
+      "description": "Validated create form for Deals with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-leads-list",
+      "title": "Leads · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for leads.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-leads-detail",
+      "title": "Leads · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-leads-create",
+      "title": "Create Lead",
+      "description": "Validated create form for Leads with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-accounts-list",
+      "title": "Accounts · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for accounts.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-accounts-detail",
+      "title": "Accounts · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-accounts-create",
+      "title": "Create Account",
+      "description": "Validated create form for Accounts with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-contacts-list",
+      "title": "Contacts · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for contacts.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-contacts-detail",
+      "title": "Contacts · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-contacts-create",
+      "title": "Create Contact",
+      "description": "Validated create form for Contacts with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-dashboard",
+      "title": "Dashboard",
+      "description": "KPIs, trends, tasks, notifications and recent audit activity.",
+      "tags": [
+        "core",
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer"
+      ]
+    },
+    {
+      "slug": "crm-reports-operations",
+      "title": "Reports · operations",
+      "description": "Date-filtered operating trend, status mix and exportable record list.",
+      "tags": [
+        "report",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-reports-secondary",
+      "title": "Reports · secondary mix",
+      "description": "Secondary entity mix and value trend with exportable records.",
+      "tags": [
+        "report",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-reports-quality",
+      "title": "Reports · data quality",
+      "description": "Data quality checks, failing operations and aging work.",
+      "tags": [
+        "report",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-deals-kanban",
+      "title": "Deals · kanban",
+      "description": "Status board grouped by the primary workflow stage.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-deals-calendar",
+      "title": "Deals · calendar",
+      "description": "Calendar view of the primary date field.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-search",
+      "title": "Global search",
+      "description": "Cross-entity search across every core table.",
+      "tags": [
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer"
+      ]
+    },
+    {
+      "slug": "crm-profile",
+      "title": "My profile",
+      "description": "Staff profile and editable contact details.",
+      "tags": [
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer",
+        "portal"
+      ]
+    },
+    {
+      "slug": "crm-notifications",
+      "title": "Notifications",
+      "description": "In-app notification center with mark-as-read.",
+      "tags": [
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer",
+        "portal"
+      ]
+    },
+    {
+      "slug": "crm-settings",
+      "title": "Settings",
+      "description": "Branding, notification preferences, general settings and feature flags.",
+      "tags": [
+        "shared",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-portal",
+      "title": "Client portal",
+      "description": "External-facing record list scoped to the selected client owner.",
+      "tags": [
+        "portal",
+        "client",
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "crm-admin-users",
+      "title": "Admin � users",
+      "description": "Tenant users, platform roles and app-level role assignment overview.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "crm-admin-roles",
+      "title": "Admin � roles and permissions",
+      "description": "Provisioned tenant roles, permission counts and the app page matrix.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-admin-audit",
+      "title": "Admin � audit log",
+      "description": "Filterable audit log with old/new JSON diff.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "crm-admin-settings",
+      "title": "Admin � system settings",
+      "description": "Settings and feature flags with audited updates.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-admin-import",
+      "title": "Admin � import / export",
+      "description": "CSV import with validation summary and record export.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "crm-admin-integrations",
+      "title": "Admin � integration health",
+      "description": "Integration health and inbound webhook event log.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-admin-jobs",
+      "title": "Admin � jobs and workflow runs",
+      "description": "Workflow instance monitor, run logs and cron history.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "crm-admin-quality",
+      "title": "Admin � data quality",
+      "description": "Quality checks and operational failures.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "slug": "crm.intake-triage",
+      "title": "Deals · intake triage",
+      "description": "Loads a record, computes a deterministic risk/priority score, then routes to review or standard triage and notifies the owner.",
+      "nodeCount": 8,
+      "edgeCount": 8
+    },
+    {
+      "slug": "crm.round-robin-assignment",
+      "title": "Deals · round-robin assignment",
+      "description": "Picks the least-loaded active staff member and assigns the record, then sends an in-app notification.",
+      "nodeCount": 6,
+      "edgeCount": 5
+    },
+    {
+      "slug": "crm.approval-chain",
+      "title": "Deals · approval chain",
+      "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
+      "nodeCount": 8,
+      "edgeCount": 9
+    },
+    {
+      "slug": "crm.threshold-sweep",
+      "title": "Deals · threshold sweep",
+      "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
+      "nodeCount": 6,
+      "edgeCount": 5
+    },
+    {
+      "slug": "crm.daily-digest",
+      "title": "Deals · daily digest",
+      "description": "Builds a daily summary and writes a single in-app notification.",
+      "nodeCount": 5,
+      "edgeCount": 4
+    },
+    {
+      "slug": "crm.escalation",
+      "title": "Deals · escalation",
+      "description": "Waits for a configurable delay, then escalates high-priority records and notifies the manager.",
+      "nodeCount": 7,
+      "edgeCount": 7
+    },
+    {
+      "slug": "crm.integration-sync",
+      "title": "CRM & Sales Pipeline · integration sync",
+      "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
+      "nodeCount": 6,
+      "edgeCount": 6
+    },
+    {
+      "slug": "crm.document-generation",
+      "title": "Deals · document generation",
+      "description": "Builds an HTML document from record fields, links it as an attachment and notifies the owner.",
+      "nodeCount": 6,
+      "edgeCount": 5
+    },
+    {
+      "slug": "crm.data-collection",
+      "title": "Deals · supplier/customer follow-up",
+      "description": "Suspends for a structured follow-up form, then records the answer as a comment.",
+      "nodeCount": 4,
+      "edgeCount": 3
+    },
+    {
+      "slug": "crm.error-recovery",
+      "title": "CRM & Sales Pipeline · expected failure and recovery",
+      "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+      "nodeCount": 5,
+      "edgeCount": 4
+    },
+    {
+      "slug": "crm.notify-only",
+      "title": "CRM & Sales Pipeline · notify only",
+      "description": "Minimal workflow used by inbound webhooks and manual demos: writes one notification.",
+      "nodeCount": 3,
+      "edgeCount": 2
+    }
+  ],
+  "roles": [
+    {
+      "key": "admin",
+      "title": "CRM Administrator",
+      "scope": "all"
+    },
+    {
+      "key": "manager",
+      "title": "Sales Manager",
+      "scope": "staff"
+    },
+    {
+      "key": "sales_rep",
+      "title": "Sales Representative",
+      "scope": "staff"
+    },
+    {
+      "key": "analyst",
+      "title": "Revenue Analyst",
+      "scope": "staff"
+    },
+    {
+      "key": "client",
+      "title": "Client Contact",
+      "scope": "external"
+    }
+  ],
+  "entities": [
+    {
+      "key": "deals",
+      "title": "Deals",
+      "core": true,
+      "seedCount": 90,
+      "fields": [
+        {
+          "key": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "account_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "contact_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "stage",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "type": "money",
+          "required": true
+        },
+        {
+          "key": "probability",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "close_date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "source",
+          "type": "enum",
+          "required": false
+        },
+        {
+          "key": "next_step",
+          "type": "longtext",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "leads",
+      "title": "Leads",
+      "core": true,
+      "seedCount": 120,
+      "fields": [
+        {
+          "key": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "company",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "key": "phone",
+          "type": "phone",
+          "required": false
+        },
+        {
+          "key": "source",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "score",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "estimated_value",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "notes",
+          "type": "longtext",
+          "required": false
+        },
+        {
+          "key": "last_contact_at",
+          "type": "timestamptz",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "accounts",
+      "title": "Accounts",
+      "core": true,
+      "seedCount": 70,
+      "fields": [
+        {
+          "key": "account_name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "industry",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "tier",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "website",
+          "type": "url",
+          "required": false
+        },
+        {
+          "key": "phone",
+          "type": "phone",
+          "required": false
+        },
+        {
+          "key": "city",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "country",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "annual_revenue",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "health_score",
+          "type": "int",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "contacts",
+      "title": "Contacts",
+      "core": true,
+      "seedCount": 100,
+      "fields": [
+        {
+          "key": "full_name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "key": "phone",
+          "type": "phone",
+          "required": false
+        },
+        {
+          "key": "job_title",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "account_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "owner_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": false
+        },
+        {
+          "key": "last_touch_at",
+          "type": "timestamptz",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "activities",
+      "title": "Activities",
+      "core": false,
+      "seedCount": 140,
+      "fields": [
+        {
+          "key": "subject",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "activity_type",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "related_type",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "related_id",
+          "type": "int",
+          "required": false
+        },
+        {
+          "key": "due_at",
+          "type": "timestamptz",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "notes",
+          "type": "longtext",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "products",
+      "title": "Products",
+      "core": false,
+      "seedCount": 40,
+      "fields": [
+        {
+          "key": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "sku",
+          "type": "code",
+          "required": true
+        },
+        {
+          "key": "category",
+          "type": "enum",
+          "required": false
+        },
+        {
+          "key": "unit_price",
+          "type": "money",
+          "required": true
+        },
+        {
+          "key": "is_active",
+          "type": "bool",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "quotas",
+      "title": "Quotas",
+      "core": false,
+      "seedCount": 48,
+      "fields": [
+        {
+          "key": "rep_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "period",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "target_amount",
+          "type": "money",
+          "required": true
+        },
+        {
+          "key": "attained_amount",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "forecast_amount",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "campaigns",
+      "title": "Campaigns",
+      "core": false,
+      "seedCount": 36,
+      "fields": [
+        {
+          "key": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "channel",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": false
+        },
+        {
+          "key": "budget",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "start_date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "key": "end_date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "ref",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "categories": [
+    "Sales & CRM"
+  ]
+}

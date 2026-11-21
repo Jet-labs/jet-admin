@@ -1,0 +1,299 @@
+[
+  {
+    "slug": "crm-leads-create.heading",
+    "key": "heading",
+    "page": "crm-leads-create",
+    "title": "Create Lead",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Lead\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-leads-create.form",
+    "key": "form",
+    "page": "crm-leads-create",
+    "title": "New Lead",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Lead",
+      "submitLabel": "Create Lead",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "name",
+          "label": "Lead name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Ravi Andersen"
+        },
+        {
+          "key": "company",
+          "label": "Company",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Orbit Collective"
+        },
+        {
+          "key": "email",
+          "label": "Email",
+          "type": "email",
+          "required": true,
+          "defaultValue": "eli.hassan.1@example.com"
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text",
+          "required": false,
+          "defaultValue": "+1-555-351-4318"
+        },
+        {
+          "key": "source",
+          "label": "Source",
+          "type": "select",
+          "required": true,
+          "defaultValue": "event",
+          "options": [
+            {
+              "label": "Website",
+              "value": "website"
+            },
+            {
+              "label": "Event",
+              "value": "event"
+            },
+            {
+              "label": "Referral",
+              "value": "referral"
+            },
+            {
+              "label": "Paid Search",
+              "value": "paid_search"
+            },
+            {
+              "label": "Partner",
+              "value": "partner"
+            },
+            {
+              "label": "Outbound",
+              "value": "outbound"
+            }
+          ]
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "contacted",
+          "options": [
+            {
+              "label": "New",
+              "value": "new"
+            },
+            {
+              "label": "Contacted",
+              "value": "contacted"
+            },
+            {
+              "label": "Qualified",
+              "value": "qualified"
+            },
+            {
+              "label": "Unqualified",
+              "value": "unqualified"
+            },
+            {
+              "label": "Converted",
+              "value": "converted"
+            }
+          ]
+        },
+        {
+          "key": "score",
+          "label": "Fit score",
+          "type": "number",
+          "required": true,
+          "defaultValue": 57,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "estimated_value",
+          "label": "Estimated value",
+          "type": "number",
+          "required": false,
+          "defaultValue": 5090.92,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "type": "select",
+          "required": false,
+          "defaultValue": 6,
+          "options": [
+            {
+              "label": "Anika Osei",
+              "value": 1
+            },
+            {
+              "label": "Tomás Dubey",
+              "value": 2
+            },
+            {
+              "label": "Noah Chen",
+              "value": 3
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 4
+            },
+            {
+              "label": "Aarav Petrov",
+              "value": 5
+            },
+            {
+              "label": "Ravi Khan",
+              "value": 6
+            },
+            {
+              "label": "Elena Garcia",
+              "value": 7
+            },
+            {
+              "label": "Luca Fischer",
+              "value": 8
+            },
+            {
+              "label": "Noor Andersen",
+              "value": 9
+            },
+            {
+              "label": "Theo Nielsen",
+              "value": 10
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 11
+            },
+            {
+              "label": "Sofia Ivanova",
+              "value": 12
+            },
+            {
+              "label": "Tomás Sato",
+              "value": 13
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 14
+            },
+            {
+              "label": "Eli Meyer",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 16
+            },
+            {
+              "label": "Theo Petrov",
+              "value": 17
+            },
+            {
+              "label": "Noor Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Amara Khan",
+              "value": 19
+            },
+            {
+              "label": "Malik Müller",
+              "value": 20
+            },
+            {
+              "label": "Freya Tanaka",
+              "value": 21
+            },
+            {
+              "label": "Eli Chen",
+              "value": 22
+            },
+            {
+              "label": "Yuki Chen",
+              "value": 23
+            },
+            {
+              "label": "Anika Dubois",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "type": "textarea",
+          "required": false,
+          "defaultValue": "Regional availability approval renewal settlement handoff quarterly handoff documentation quarterly priority capacity.",
+          "help": "Plain text or short notes"
+        },
+        {
+          "key": "last_contact_at",
+          "label": "Last contact",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "leads_create",
+              "inputValues": {
+                "name": "{{ event.formData.name }}",
+                "company": "{{ event.formData.company }}",
+                "email": "{{ event.formData.email }}",
+                "phone": "{{ event.formData.phone }}",
+                "source": "{{ event.formData.source }}",
+                "status": "{{ event.formData.status }}",
+                "score": "{{ event.formData.score }}",
+                "estimated_value": "{{ event.formData.estimated_value }}",
+                "owner_id": "{{ event.formData.owner_id }}",
+                "notes": "{{ event.formData.notes }}",
+                "last_contact_at": "{{ event.formData.last_contact_at }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-leads-create.result",
+    "key": "result",
+    "page": "crm-leads-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.leads_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.leads_create || {}).isLoading || false }}"
+    }
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "slug": "crm-deals-calendar.heading",
+    "key": "heading",
+    "page": "crm-deals-calendar",
+    "title": "Deals calendar",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Deals calendar\nMonth view keyed on **close date**. Select an event to inspect the record.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-deals-calendar.calendar",
+    "key": "calendar",
+    "page": "crm-deals-calendar",
+    "title": "Calendar",
+    "type": "calendar",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.deals || {}).data || [])",
+      "dateKey": "close_date",
+      "titleKey": "name",
+      "subtitleKey": "owner_id",
+      "groupKey": "stage",
+      "emptyText": "No dated records.",
+      "isLoading": "{{ (state.queries.deals || {}).isLoading || false }}",
+      "events": {
+        "onEventSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.event.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-calendar.selected",
+    "key": "selected",
+    "page": "crm-deals-calendar",
+    "title": "Selected record",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record",
+      "dataTemplate": "{{ (((state.queries.deals_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select an event.",
+      "isLoading": "{{ (state.queries.deals_selected || {}).isLoading || false }}"
+    }
+  }
+]

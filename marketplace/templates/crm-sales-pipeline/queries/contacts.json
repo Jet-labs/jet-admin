@@ -1,0 +1,373 @@
+[
+  {
+    "slug": "crm.contacts.list",
+    "title": "Contacts · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"full_name\", \"email\", \"phone\", \"job_title\", \"account_id\", \"owner_id\", \"status\", \"last_touch_at\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:contacts}}\nWHERE deleted_at IS NULL AND (coalesce(\"full_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"email\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"phone\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"job_title\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at >= NULLIF($7::text, '')::date)\n  AND (NULLIF($8::text, '')::date IS NULL OR created_at < (NULLIF($8::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $5::text = 'full_name' AND $6::text = 'asc' THEN \"full_name\" END ASC, CASE WHEN $5::text = 'full_name' AND $6::text = 'desc' THEN \"full_name\" END DESC, CASE WHEN $5::text = 'job_title' AND $6::text = 'asc' THEN \"job_title\" END ASC, CASE WHEN $5::text = 'job_title' AND $6::text = 'desc' THEN \"job_title\" END DESC, CASE WHEN $5::text = 'last_touch_at' AND $6::text = 'asc' THEN \"last_touch_at\" END ASC, CASE WHEN $5::text = 'last_touch_at' AND $6::text = 'desc' THEN \"last_touch_at\" END DESC, id DESC\nLIMIT $4::int OFFSET ((($3::int - 1) * $4::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "full_name"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.contacts.export",
+    "title": "Contacts · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"full_name\", \"email\", \"phone\", \"job_title\", \"account_id\", \"owner_id\", \"status\", \"last_touch_at\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:contacts}}\nWHERE deleted_at IS NULL AND (coalesce(\"full_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"email\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"phone\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"job_title\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.contacts.detail",
+    "title": "Contacts · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"full_name\", \"email\", \"phone\", \"job_title\", \"account_id\", \"owner_id\", \"status\", \"last_touch_at\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:contacts}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.contacts.create",
+    "title": "Contacts · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:contacts}} (\"full_name\", \"email\", \"phone\", \"job_title\", \"account_id\", \"owner_id\", \"status\", \"last_touch_at\", created_at, updated_at)\nVALUES ($1::text, $2::text, $3::text, $4::text, $5::int, $6::int, $7::text, $8::timestamptz, now(), now())\nRETURNING \"id\", \"full_name\", \"email\", \"phone\", \"job_title\", \"account_id\", \"owner_id\", \"status\", \"last_touch_at\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "full_name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "email",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "phone",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "job_title",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "account_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "last_touch_at",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.contacts.update",
+    "title": "Contacts · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:contacts}}\nSET \"full_name\" = $2::text, \"email\" = $3::text, \"phone\" = $4::text, \"job_title\" = $5::text, \"account_id\" = $6::int, \"owner_id\" = $7::int, \"status\" = $8::text, \"last_touch_at\" = $9::timestamptz, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"full_name\", \"email\", \"phone\", \"job_title\", \"account_id\", \"owner_id\", \"status\", \"last_touch_at\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "full_name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "email",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "phone",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "job_title",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "account_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "last_touch_at",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.contacts.delete",
+    "title": "Contacts · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:contacts}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.contacts.restore",
+    "title": "Contacts · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:contacts}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.contacts.lookup",
+    "title": "Contacts · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"full_name\"::text AS label FROM {{table:contacts}} WHERE deleted_at IS NULL ORDER BY \"full_name\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.contacts.status",
+    "title": "Contacts · change status",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:contacts}} SET \"status\" = $2::text, updated_at = now() WHERE id = $1::int RETURNING id, \"status\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false,
+          "default": "active"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.contacts.assign",
+    "title": "Contacts · assign owner",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "contacts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:contacts}} SET \"owner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"owner_id\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

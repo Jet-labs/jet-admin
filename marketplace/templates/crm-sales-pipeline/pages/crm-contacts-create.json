@@ -1,0 +1,120 @@
+{
+  "slug": "crm-contacts-create",
+  "key": "contacts-create",
+  "title": "Create Contact",
+  "description": "Validated create form for Contacts with audit-logged writes.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "createdID",
+      "type": "number",
+      "defaultValue": 0
+    }
+  ],
+  "sources": [
+    {
+      "alias": "contacts_create",
+      "type": "query",
+      "queryID": "0b2041ed-a42a-4f1d-aa75-9e3e2f2663a5",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "37fe9df3-a456-401e-b933-e2224913b27e",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "153561a7-2296-4bf0-ae32-b608c436e0a8",
+              "type": "widget",
+              "widgetKey": "widget_995214bf-9cad-43e2-b74f-4bc6d3fe842b_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "70672131-e8c1-4e1a-82c2-b281012a3fa4",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f1c6b447-efe9-4e9d-a633-19b887ddacfe",
+              "type": "widget",
+              "widgetKey": "widget_caaa162c-0068-4785-90fb-285759ab3dce_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "6a0f2c05-eabc-4b09-aee2-abb5e680b8b1",
+              "type": "widget",
+              "widgetKey": "widget_4f17be65-d84b-4b41-a189-86c8c6b2a758_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "153561a7-2296-4bf0-ae32-b608c436e0a8",
+        "type": "widget",
+        "widgetKey": "widget_995214bf-9cad-43e2-b74f-4bc6d3fe842b_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "f1c6b447-efe9-4e9d-a633-19b887ddacfe",
+        "type": "widget",
+        "widgetKey": "widget_caaa162c-0068-4785-90fb-285759ab3dce_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "6a0f2c05-eabc-4b09-aee2-abb5e680b8b1",
+        "type": "widget",
+        "widgetKey": "widget_4f17be65-d84b-4b41-a189-86c8c6b2a758_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "createdID",
+        "type": "number",
+        "defaultValue": 0
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "contacts_create",
+        "type": "query",
+        "queryID": "0b2041ed-a42a-4f1d-aa75-9e3e2f2663a5",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

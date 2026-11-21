@@ -1,0 +1,504 @@
+[
+  {
+    "slug": "crm-dashboard.heading",
+    "key": "heading",
+    "page": "crm-dashboard",
+    "title": "Dashboard",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# CRM & Sales Pipeline\nOperational overview for the current team. Use the date range to scope the metrics; tasks and notifications are filtered by the selected staff member.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-dashboard.range",
+    "key": "range",
+    "page": "crm-dashboard",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "Reporting window",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-dashboard.staff",
+    "key": "staff",
+    "page": "crm-dashboard",
+    "title": "Tasks for",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Tasks for",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Anika Osei",
+          "value": 1
+        },
+        {
+          "label": "Tomás Dubey",
+          "value": 2
+        },
+        {
+          "label": "Noah Chen",
+          "value": 3
+        },
+        {
+          "label": "Hugo Novak",
+          "value": 4
+        },
+        {
+          "label": "Aarav Petrov",
+          "value": 5
+        },
+        {
+          "label": "Ravi Khan",
+          "value": 6
+        },
+        {
+          "label": "Elena Garcia",
+          "value": 7
+        },
+        {
+          "label": "Luca Fischer",
+          "value": 8
+        },
+        {
+          "label": "Noor Andersen",
+          "value": 9
+        },
+        {
+          "label": "Theo Nielsen",
+          "value": 10
+        },
+        {
+          "label": "Zara Nielsen",
+          "value": 11
+        },
+        {
+          "label": "Sofia Ivanova",
+          "value": 12
+        },
+        {
+          "label": "Tomás Sato",
+          "value": 13
+        },
+        {
+          "label": "Priya Larsen",
+          "value": 14
+        },
+        {
+          "label": "Eli Meyer",
+          "value": 15
+        },
+        {
+          "label": "Ishaan Okafor",
+          "value": 16
+        },
+        {
+          "label": "Theo Petrov",
+          "value": 17
+        },
+        {
+          "label": "Noor Tanaka",
+          "value": 18
+        },
+        {
+          "label": "Amara Khan",
+          "value": 19
+        },
+        {
+          "label": "Malik Müller",
+          "value": 20
+        },
+        {
+          "label": "Freya Tanaka",
+          "value": 21
+        },
+        {
+          "label": "Eli Chen",
+          "value": 22
+        },
+        {
+          "label": "Yuki Chen",
+          "value": 23
+        },
+        {
+          "label": "Anika Dubois",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-dashboard.qualityBadge",
+    "key": "qualityBadge",
+    "page": "crm-dashboard",
+    "title": "Data quality issues",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ String(((state.queries.quality || {}).data || []).reduce(function (n, r) { return n + Number(r.affected_rows || 0); }, 0)) + \" issues\" }}",
+      "variant": "warning"
+    }
+  },
+  {
+    "slug": "crm-dashboard.kpiTotal",
+    "key": "kpiTotal",
+    "page": "crm-dashboard",
+    "title": "Deals",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Deals",
+      "valueTemplate": "{{ ((((state.queries.deals_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.deals_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-dashboard.kpiValue",
+    "key": "kpiValue",
+    "page": "crm-dashboard",
+    "title": "Total value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total value",
+      "prefix": "$",
+      "valueTemplate": "{{ ((((state.queries.deals_summary || {}).data || [])[0] || {}).total_value) }}",
+      "isLoading": "{{ (state.queries.deals_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-dashboard.kpiSecond",
+    "key": "kpiSecond",
+    "page": "crm-dashboard",
+    "title": "Leads",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Leads",
+      "valueTemplate": "{{ ((((state.queries.leads_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.leads_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-dashboard.kpiTasks",
+    "key": "kpiTasks",
+    "page": "crm-dashboard",
+    "title": "Tasks for me",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Tasks for me",
+      "valueTemplate": "{{ (((state.queries.my_tasks || {}).data || []).length) }}",
+      "isLoading": "{{ (state.queries.my_tasks || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-dashboard.trend",
+    "key": "trend",
+    "page": "crm-dashboard",
+    "title": "Volume trend",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Volume trend",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.deals_trend || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "line",
+          "tooltip": true,
+          "point": true
+        },
+        "encoding": {
+          "x": {
+            "field": "day",
+            "type": "temporal",
+            "axis": {
+              "labelAngle": 0
+            }
+          },
+          "y": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "value": "#2563eb"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.deals_trend || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-dashboard.statusChart",
+    "key": "statusChart",
+    "page": "crm-dashboard",
+    "title": "By status",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "By status",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.deals_status_chart || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "arc",
+          "innerRadius": 55,
+          "tooltip": true
+        },
+        "encoding": {
+          "theta": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "status",
+            "type": "nominal"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.deals_status_chart || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-dashboard.tasks",
+    "key": "tasks",
+    "page": "crm-dashboard",
+    "title": "Tasks for me",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.my_tasks || {}).data || [])",
+      "columns": [
+        {
+          "key": "name",
+          "label": "Deal name",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "account_id",
+          "label": "Account",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "contact_id",
+          "label": "Primary contact",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "stage",
+          "label": "Stage",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "probability",
+          "label": "Probability %",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "close_date",
+          "label": "Expected close",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "source",
+          "label": "Source",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "next_step",
+          "label": "Next step",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No open tasks for this staff member.",
+      "isLoading": "{{ (state.queries.my_tasks || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-dashboard.notifications",
+    "key": "notifications",
+    "page": "crm-dashboard",
+    "title": "Notifications",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.notifications || {}).data || [])",
+      "columns": [
+        {
+          "key": "title",
+          "label": "Notification",
+          "type": "text"
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "badge"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No notifications.",
+      "isLoading": "{{ (state.queries.notifications || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-dashboard.activity",
+    "key": "activity",
+    "page": "crm-dashboard",
+    "title": "Recent activity",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Recent activity",
+      "dataTemplate": "{{ (state.queries.recent_activity || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No activity yet.",
+      "isLoading": "{{ (state.queries.recent_activity || {}).isLoading || false }}"
+    }
+  }
+]

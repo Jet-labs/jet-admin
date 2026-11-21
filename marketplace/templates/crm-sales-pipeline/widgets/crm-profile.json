@@ -1,0 +1,211 @@
+[
+  {
+    "slug": "crm-profile.heading",
+    "key": "heading",
+    "page": "crm-profile",
+    "title": "My profile",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# My profile\nUpdate your directory details. Role and permission changes are managed by an administrator.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-profile.picker",
+    "key": "picker",
+    "page": "crm-profile",
+    "title": "Profile",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Profile",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Anika Osei",
+          "value": 1
+        },
+        {
+          "label": "Tomás Dubey",
+          "value": 2
+        },
+        {
+          "label": "Noah Chen",
+          "value": 3
+        },
+        {
+          "label": "Hugo Novak",
+          "value": 4
+        },
+        {
+          "label": "Aarav Petrov",
+          "value": 5
+        },
+        {
+          "label": "Ravi Khan",
+          "value": 6
+        },
+        {
+          "label": "Elena Garcia",
+          "value": 7
+        },
+        {
+          "label": "Luca Fischer",
+          "value": 8
+        },
+        {
+          "label": "Noor Andersen",
+          "value": 9
+        },
+        {
+          "label": "Theo Nielsen",
+          "value": 10
+        },
+        {
+          "label": "Zara Nielsen",
+          "value": 11
+        },
+        {
+          "label": "Sofia Ivanova",
+          "value": 12
+        },
+        {
+          "label": "Tomás Sato",
+          "value": 13
+        },
+        {
+          "label": "Priya Larsen",
+          "value": 14
+        },
+        {
+          "label": "Eli Meyer",
+          "value": 15
+        },
+        {
+          "label": "Ishaan Okafor",
+          "value": 16
+        },
+        {
+          "label": "Theo Petrov",
+          "value": 17
+        },
+        {
+          "label": "Noor Tanaka",
+          "value": 18
+        },
+        {
+          "label": "Amara Khan",
+          "value": 19
+        },
+        {
+          "label": "Malik Müller",
+          "value": 20
+        },
+        {
+          "label": "Freya Tanaka",
+          "value": 21
+        },
+        {
+          "label": "Eli Chen",
+          "value": 22
+        },
+        {
+          "label": "Yuki Chen",
+          "value": 23
+        },
+        {
+          "label": "Anika Dubois",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-profile.profile",
+    "key": "profile",
+    "page": "crm-profile",
+    "title": "Profile",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Profile",
+      "dataTemplate": "{{ (((state.queries.profile || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "isLoading": "{{ (state.queries.profile || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-profile.form",
+    "key": "form",
+    "page": "crm-profile",
+    "title": "Edit profile",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Edit profile",
+      "submitLabel": "Save profile",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "fullName",
+          "label": "Full name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "department",
+          "label": "Department",
+          "type": "text"
+        },
+        {
+          "key": "jobTitle",
+          "label": "Job title",
+          "type": "text"
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text"
+        },
+        {
+          "key": "city",
+          "label": "City",
+          "type": "text"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "id": "{{ state.variables.staffID }}",
+                "fullName": "{{ event.formData.fullName }}",
+                "department": "{{ event.formData.department }}",
+                "jobTitle": "{{ event.formData.jobTitle }}",
+                "phone": "{{ event.formData.phone }}",
+                "city": "{{ event.formData.city }}"
+              },
+              "successToast": "Profile saved",
+              "errorToast": "Profile update failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

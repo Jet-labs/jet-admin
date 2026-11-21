@@ -69,6 +69,8 @@ export * from "./progress";
 export * from "./timeline";
 export * from "./video";
 export * from "./code-block";
+export * from "./kanban";
+export * from "./calendar";
 
 // Shared pure contracts (F05/E08/E11/E12): field coercion/validation,
 // date parsing/validation/presets, instance-scoped a11y identities.

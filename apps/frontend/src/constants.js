@@ -695,8 +695,6 @@ export const CONSTANTS = {
     CLONE_API_KEY_DIALOG_MESSAGE:
       "Are you sure you want to clone this API key? This action cannot be undone.",
 
-    UPDATE_WORKFLOW_FORM_TITLE: "Update workflow",
-    UPDATE_WORKFLOW_BUTTON_TEXT: "Update workflow",
     MAIN_DRAWER_ENGINES_TITLE: "Engines",
   },
 
@@ -1062,6 +1060,14 @@ export const CONSTANTS = {
       installItemAPI: (tenantID, itemID) =>
         `/api/v1/tenants/${tenantID}/marketplace/${itemID}/install`,
     },
+    TEMPLATES: {
+      listAPI: (tenantID) => `/api/v1/tenants/${tenantID}/templates`,
+      getAPI: (tenantID, slug) => `/api/v1/tenants/${tenantID}/templates/${slug}`,
+      installAPI: (tenantID, slug) => `/api/v1/tenants/${tenantID}/templates/${slug}/install`,
+      uninstallAPI: (tenantID, slug) => `/api/v1/tenants/${tenantID}/templates/${slug}`,
+      assetAPI: (tenantID, slug, assetPath) =>
+        `/api/v1/tenants/${tenantID}/templates/${slug}/assets/${assetPath}`,
+    },
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",
       getUserConfigAPI: (tenantID) => `/api/v1/auth/config/${tenantID}`,
@@ -1341,6 +1347,7 @@ export const CONSTANTS = {
     FOLDERS: (tenantID, entityType) => `${tenantID}-FOLDERS-${entityType}`,
     WIDGET_LIBRARY: "WIDGET_LIBRARY",
     MARKETPLACE: (tenantID) => `${tenantID}-MARKETPLACE`,
+    TEMPLATES: (tenantID) => `${tenantID}-TEMPLATES`,
   },
 
   DATA_TYPES: {

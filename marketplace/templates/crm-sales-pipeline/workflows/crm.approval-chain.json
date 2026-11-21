@@ -1,0 +1,283 @@
+{
+  "slug": "crm.approval-chain",
+  "key": "approval-chain",
+  "title": "Deals · approval chain",
+  "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
+  "tags": [
+    "core",
+    "approval"
+  ],
+  "options": {
+    "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      },
+      {
+        "key": "staffID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "a123dc30-1218-4679-8256-9082757069ed",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadRecord",
+      "nodeID": "91de6778-c0a6-4f49-9a88-8807853b7c75",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadRecord",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "e67ba7fe-6c07-4d21-bbac-158f8eea0513",
+        "outputVariable": "recordRows",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}"
+        }
+      }
+    },
+    {
+      "key": "approval",
+      "nodeID": "d6048501-a9f4-477d-a428-eb9ad06b7253",
+      "type": "approval",
+      "timeoutSeconds": 900,
+      "retryLimit": 0,
+      "config": {
+        "title": "Approve Deal #{{ ctx.recordID }}",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "description": "Review the record, then approve or reject with a comment.",
+        "requireComment": true,
+        "expiryMinutes": 1440,
+        "onTimeout": "expired",
+        "outputVariable": "approval"
+      }
+    },
+    {
+      "key": "setApproved",
+      "nodeID": "a5dc6cc3-ee50-4a23-96cf-cfd72e299709",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "setApproved",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "54f4129c-46d1-456a-8546-1317c4702bc2",
+        "outputVariable": "approvedResult",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}",
+          "status": "qualification"
+        }
+      }
+    },
+    {
+      "key": "setRejected",
+      "nodeID": "fedc606d-7180-4732-98aa-58a869352e85",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "setRejected",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "dataQueryID": "54f4129c-46d1-456a-8546-1317c4702bc2",
+        "outputVariable": "rejectedResult",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}",
+          "status": "closed_lost"
+        }
+      }
+    },
+    {
+      "key": "setExpired",
+      "nodeID": "8a2d789e-c397-4ee9-82ee-94b61042b103",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "setExpired",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "dataQueryID": "54f4129c-46d1-456a-8546-1317c4702bc2",
+        "outputVariable": "expiredResult",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}",
+          "status": "prospecting"
+        }
+      }
+    },
+    {
+      "key": "notifyDecision",
+      "nodeID": "96a410b5-4359-4d8b-b40d-be9ffc8c1114",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyDecision",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 220
+        },
+        "dataQueryID": "3b694978-816f-4fb5-8c10-ce5a1042b5de",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID }}",
+          "title": "Deals approval decision",
+          "body": "Record #{{ ctx.recordID }} decision: {{ ctx.approval.decision || \"expired\" }}.",
+          "category": "info",
+          "linkPage": "crm-notifications"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "a7aa16d6-5b92-4d84-aa41-95a4904d1b9f",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.approval }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "a123dc30-1218-4679-8256-9082757069ed",
+      "to": "91de6778-c0a6-4f49-9a88-8807853b7c75",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "91de6778-c0a6-4f49-9a88-8807853b7c75",
+      "to": "d6048501-a9f4-477d-a428-eb9ad06b7253",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "d6048501-a9f4-477d-a428-eb9ad06b7253",
+      "to": "a5dc6cc3-ee50-4a23-96cf-cfd72e299709",
+      "handle": "approved",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "d6048501-a9f4-477d-a428-eb9ad06b7253",
+      "to": "fedc606d-7180-4732-98aa-58a869352e85",
+      "handle": "rejected",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "d6048501-a9f4-477d-a428-eb9ad06b7253",
+      "to": "8a2d789e-c397-4ee9-82ee-94b61042b103",
+      "handle": "expired",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "a5dc6cc3-ee50-4a23-96cf-cfd72e299709",
+      "to": "96a410b5-4359-4d8b-b40d-be9ffc8c1114",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "fedc606d-7180-4732-98aa-58a869352e85",
+      "to": "96a410b5-4359-4d8b-b40d-be9ffc8c1114",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "8a2d789e-c397-4ee9-82ee-94b61042b103",
+      "to": "96a410b5-4359-4d8b-b40d-be9ffc8c1114",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "96a410b5-4359-4d8b-b40d-be9ffc8c1114",
+      "to": "a7aa16d6-5b92-4d84-aa41-95a4904d1b9f",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

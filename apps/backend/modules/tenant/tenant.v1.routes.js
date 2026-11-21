@@ -35,7 +35,8 @@ let
   bundleRouter,
   folderRouter,
   widgetLibraryTenantRouter,
-  marketplaceTenantRouter;
+  marketplaceTenantRouter,
+  templateTenantRouter;
 const { isModuleEnabled } = require("../../config/module.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
@@ -111,6 +112,7 @@ bundleRouter = require("../bundle/bundle.v1.routes");
 folderRouter = require("../folder/folder.v1.routes");
 widgetLibraryTenantRouter = require("../widgetLibrary/widgetLibrary.tenant.v1.routes");
 marketplaceTenantRouter = require("../marketplace/marketplace.tenant.v1.routes");
+templateTenantRouter = require("../marketplace/template.tenant.v1.routes");
 
 // Tenant routes
 router.use(authMiddleware.authProvider);
@@ -317,6 +319,13 @@ router.use(
   "/:tenantID/marketplace",
     validate(tenantIdParamSchema, "params"),
   marketplaceTenantRouter
+);
+
+// Nested Marketplace App Template routes
+router.use(
+  "/:tenantID/templates",
+  validate(tenantIdParamSchema, "params"),
+  templateTenantRouter
 );
 
 // Nested audit log routes

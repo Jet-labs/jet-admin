@@ -32,6 +32,8 @@ import { ProgressConfigEditor } from "./progress/progressConfigEditor";
 import { TimelineConfigEditor } from "./timeline/timelineConfigEditor";
 import { VideoConfigEditor } from "./video/videoConfigEditor";
 import { CodeBlockConfigEditor } from "./code-block/codeBlockConfigEditor";
+import { KanbanConfigEditor } from "./kanban/kanbanConfigEditor";
+import { CalendarConfigEditor } from "./calendar/calendarConfigEditor";
 import { BarChart, Component, Table, Type, TrendingUp, AlertTriangle, FileText, Image, Globe, Calendar, CalendarRange, Code, PenLine, ChevronDown, ListChecks, Check, CircleDot, ToggleRight, SlidersHorizontal, Search, Upload, Minus, Layers, Info, Braces, List, Tag, Activity, History, Video, TerminalSquare } from 'lucide-react';
 
 
@@ -162,6 +164,14 @@ const LazyVideoWidget = React.lazy(() =>
 
 const LazyCodeBlockWidget = React.lazy(() =>
   import("./code-block/index.js").then(module => ({ default: module.CodeBlockWidget }))
+);
+
+const LazyKanbanWidget = React.lazy(() =>
+  import("./kanban/index.js").then(module => ({ default: module.KanbanWidget }))
+);
+
+const LazyCalendarWidget = React.lazy(() =>
+  import("./calendar/index.js").then(module => ({ default: module.CalendarWidget }))
 );
 
 
@@ -808,6 +818,36 @@ export const WIDGETS_MAP = {
     configEditor: CodeBlockConfigEditor,
     icon: ({ className }) => <TerminalSquare className={`!text-lg ${className}`} />,
     sampleConfig: { code: "SELECT * FROM orders LIMIT 10;", language: "sql", showCopy: true, isLoading: "", showHeader: true },
+  },
+  'kanban': {
+    label: "Kanban Board",
+    value: WIDGET_TYPES.KANBAN.value,
+    datasetFields: [],
+    defaultAutoRun: true,
+    description: "Status board grouped by a field",
+    component: ({ data, ...props }) => (
+      <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading...</div>}>
+        <LazyKanbanWidget data={data} {...props} />
+      </React.Suspense>
+    ),
+    configEditor: KanbanConfigEditor,
+    icon: ({ className }) => <Layers className={`!text-lg ${className}`} />,
+    sampleConfig: { dataArrayTemplate: "{{ctx.data}}", groupBy: "status", titleKey: "name", subtitleKey: "owner", valueKey: "amount", dateKey: "due_date", badgeKey: "status", columns: [], emptyText: "No cards in this pipeline.", isLoading: "", showHeader: true },
+  },
+  'calendar': {
+    label: "Calendar",
+    value: WIDGET_TYPES.CALENDAR.value,
+    datasetFields: [],
+    defaultAutoRun: true,
+    description: "Month calendar from a date field",
+    component: ({ data, ...props }) => (
+      <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading...</div>}>
+        <LazyCalendarWidget data={data} {...props} />
+      </React.Suspense>
+    ),
+    configEditor: CalendarConfigEditor,
+    icon: ({ className }) => <Calendar className={`!text-lg ${className}`} />,
+    sampleConfig: { dataArrayTemplate: "{{ctx.data}}", dateKey: "due_date", titleKey: "name", subtitleKey: "owner", groupKey: "status", emptyText: "No dated records.", isLoading: "", showHeader: true },
   },
 };
 

@@ -1,0 +1,396 @@
+[
+  {
+    "slug": "crm-contacts-create.heading",
+    "key": "heading",
+    "page": "crm-contacts-create",
+    "title": "Create Contact",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Contact\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-contacts-create.form",
+    "key": "form",
+    "page": "crm-contacts-create",
+    "title": "New Contact",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Contact",
+      "submitLabel": "Create Contact",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "full_name",
+          "label": "Full name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Priya Sharma"
+        },
+        {
+          "key": "email",
+          "label": "Email",
+          "type": "email",
+          "required": true,
+          "defaultValue": "hugo.novak.1@example.com"
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text",
+          "required": false,
+          "defaultValue": "+1-555-560-9087"
+        },
+        {
+          "key": "job_title",
+          "label": "Job title",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Quarterly Request"
+        },
+        {
+          "key": "account_id",
+          "label": "Account",
+          "type": "select",
+          "required": true,
+          "defaultValue": 38,
+          "options": [
+            {
+              "label": "#1",
+              "value": 1
+            },
+            {
+              "label": "#2",
+              "value": 2
+            },
+            {
+              "label": "#3",
+              "value": 3
+            },
+            {
+              "label": "#4",
+              "value": 4
+            },
+            {
+              "label": "#5",
+              "value": 5
+            },
+            {
+              "label": "#6",
+              "value": 6
+            },
+            {
+              "label": "#7",
+              "value": 7
+            },
+            {
+              "label": "#8",
+              "value": 8
+            },
+            {
+              "label": "#9",
+              "value": 9
+            },
+            {
+              "label": "#10",
+              "value": 10
+            },
+            {
+              "label": "#11",
+              "value": 11
+            },
+            {
+              "label": "#12",
+              "value": 12
+            },
+            {
+              "label": "#13",
+              "value": 13
+            },
+            {
+              "label": "#14",
+              "value": 14
+            },
+            {
+              "label": "#15",
+              "value": 15
+            },
+            {
+              "label": "#16",
+              "value": 16
+            },
+            {
+              "label": "#17",
+              "value": 17
+            },
+            {
+              "label": "#18",
+              "value": 18
+            },
+            {
+              "label": "#19",
+              "value": 19
+            },
+            {
+              "label": "#20",
+              "value": 20
+            },
+            {
+              "label": "#21",
+              "value": 21
+            },
+            {
+              "label": "#22",
+              "value": 22
+            },
+            {
+              "label": "#23",
+              "value": 23
+            },
+            {
+              "label": "#24",
+              "value": 24
+            },
+            {
+              "label": "#25",
+              "value": 25
+            },
+            {
+              "label": "#26",
+              "value": 26
+            },
+            {
+              "label": "#27",
+              "value": 27
+            },
+            {
+              "label": "#28",
+              "value": 28
+            },
+            {
+              "label": "#29",
+              "value": 29
+            },
+            {
+              "label": "#30",
+              "value": 30
+            },
+            {
+              "label": "#31",
+              "value": 31
+            },
+            {
+              "label": "#32",
+              "value": 32
+            },
+            {
+              "label": "#33",
+              "value": 33
+            },
+            {
+              "label": "#34",
+              "value": 34
+            },
+            {
+              "label": "#35",
+              "value": 35
+            },
+            {
+              "label": "#36",
+              "value": 36
+            },
+            {
+              "label": "#37",
+              "value": 37
+            },
+            {
+              "label": "#38",
+              "value": 38
+            },
+            {
+              "label": "#39",
+              "value": 39
+            },
+            {
+              "label": "#40",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "type": "select",
+          "required": false,
+          "defaultValue": 6,
+          "options": [
+            {
+              "label": "Anika Osei",
+              "value": 1
+            },
+            {
+              "label": "Tomás Dubey",
+              "value": 2
+            },
+            {
+              "label": "Noah Chen",
+              "value": 3
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 4
+            },
+            {
+              "label": "Aarav Petrov",
+              "value": 5
+            },
+            {
+              "label": "Ravi Khan",
+              "value": 6
+            },
+            {
+              "label": "Elena Garcia",
+              "value": 7
+            },
+            {
+              "label": "Luca Fischer",
+              "value": 8
+            },
+            {
+              "label": "Noor Andersen",
+              "value": 9
+            },
+            {
+              "label": "Theo Nielsen",
+              "value": 10
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 11
+            },
+            {
+              "label": "Sofia Ivanova",
+              "value": 12
+            },
+            {
+              "label": "Tomás Sato",
+              "value": 13
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 14
+            },
+            {
+              "label": "Eli Meyer",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 16
+            },
+            {
+              "label": "Theo Petrov",
+              "value": 17
+            },
+            {
+              "label": "Noor Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Amara Khan",
+              "value": 19
+            },
+            {
+              "label": "Malik Müller",
+              "value": 20
+            },
+            {
+              "label": "Freya Tanaka",
+              "value": 21
+            },
+            {
+              "label": "Eli Chen",
+              "value": 22
+            },
+            {
+              "label": "Yuki Chen",
+              "value": 23
+            },
+            {
+              "label": "Anika Dubois",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": false,
+          "defaultValue": "inactive",
+          "options": [
+            {
+              "label": "Active",
+              "value": "active"
+            },
+            {
+              "label": "Inactive",
+              "value": "inactive"
+            },
+            {
+              "label": "Bounced",
+              "value": "bounced"
+            }
+          ]
+        },
+        {
+          "key": "last_touch_at",
+          "label": "Last touch",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "contacts_create",
+              "inputValues": {
+                "full_name": "{{ event.formData.full_name }}",
+                "email": "{{ event.formData.email }}",
+                "phone": "{{ event.formData.phone }}",
+                "job_title": "{{ event.formData.job_title }}",
+                "account_id": "{{ event.formData.account_id }}",
+                "owner_id": "{{ event.formData.owner_id }}",
+                "status": "{{ event.formData.status }}",
+                "last_touch_at": "{{ event.formData.last_touch_at }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-contacts-create.result",
+    "key": "result",
+    "page": "crm-contacts-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.contacts_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.contacts_create || {}).isLoading || false }}"
+    }
+  }
+]

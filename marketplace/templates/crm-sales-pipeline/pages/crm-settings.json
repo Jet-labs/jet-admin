@@ -1,0 +1,188 @@
+{
+  "slug": "crm-settings",
+  "key": "settings",
+  "title": "Settings",
+  "description": "Branding, notification preferences, general settings and feature flags.",
+  "accessTags": [
+    "shared",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "settings",
+      "type": "string",
+      "defaultValue": ""
+    }
+  ],
+  "sources": [
+    {
+      "alias": "settings",
+      "type": "query",
+      "queryID": "f06eeb3d-95c2-46fd-bfe6-3d0179426274",
+      "triggerMode": "auto",
+      "inputValues": {
+        "kinds": [
+          "setting",
+          "branding",
+          "feature_flag"
+        ]
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "update",
+      "type": "query",
+      "queryID": "def4eb96-3b45-4486-a026-efd929f301dc",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "821452e4-4077-4159-817e-95aca79c9c78",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f5f043f8-135f-4a7b-8222-d65282cfd8ff",
+              "type": "widget",
+              "widgetKey": "widget_031289a1-be87-4591-b96c-5578719518ac_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "88bf8310-1224-476e-8503-e76fb1f690ff",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "430767ca-5551-476f-877a-019090e171f3",
+              "type": "widget",
+              "widgetKey": "widget_563f4a03-da50-4237-ae50-25925aa34ef8_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 240
+            },
+            {
+              "id": "c0dec9b0-43d2-4158-b8da-d4717ece7046",
+              "type": "widget",
+              "widgetKey": "widget_dd489d82-b857-42c8-b55b-b4f515cfbe84_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 240
+            },
+            {
+              "id": "72dc37b3-e203-438e-9a3a-8e5605b6ed1f",
+              "type": "widget",
+              "widgetKey": "widget_412678c9-c7d1-44c6-9938-27f8b0c3152b_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 240
+            }
+          ]
+        },
+        {
+          "id": "8273f380-dc57-4759-b36c-0ee80b09d9b0",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "6e274d60-4d40-42e9-ad59-c88ea726e1fb",
+              "type": "widget",
+              "widgetKey": "widget_93a2f4a4-d585-4484-8c09-791c93dc1150_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 320
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "f5f043f8-135f-4a7b-8222-d65282cfd8ff",
+        "type": "widget",
+        "widgetKey": "widget_031289a1-be87-4591-b96c-5578719518ac_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "430767ca-5551-476f-877a-019090e171f3",
+        "type": "widget",
+        "widgetKey": "widget_563f4a03-da50-4237-ae50-25925aa34ef8_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 240
+      },
+      {
+        "id": "c0dec9b0-43d2-4158-b8da-d4717ece7046",
+        "type": "widget",
+        "widgetKey": "widget_dd489d82-b857-42c8-b55b-b4f515cfbe84_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 240
+      },
+      {
+        "id": "72dc37b3-e203-438e-9a3a-8e5605b6ed1f",
+        "type": "widget",
+        "widgetKey": "widget_412678c9-c7d1-44c6-9938-27f8b0c3152b_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 240
+      },
+      {
+        "id": "6e274d60-4d40-42e9-ad59-c88ea726e1fb",
+        "type": "widget",
+        "widgetKey": "widget_93a2f4a4-d585-4484-8c09-791c93dc1150_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 320
+      }
+    ],
+    "variables": [
+      {
+        "key": "settings",
+        "type": "string",
+        "defaultValue": ""
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "settings",
+        "type": "query",
+        "queryID": "f06eeb3d-95c2-46fd-bfe6-3d0179426274",
+        "triggerMode": "auto",
+        "inputValues": {
+          "kinds": [
+            "setting",
+            "branding",
+            "feature_flag"
+          ]
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "update",
+        "type": "query",
+        "queryID": "def4eb96-3b45-4486-a026-efd929f301dc",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

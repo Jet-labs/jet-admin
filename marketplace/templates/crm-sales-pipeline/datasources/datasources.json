@@ -1,0 +1,45 @@
+[
+  {
+    "slug": "primary",
+    "title": "CRM & Sales Pipeline · primary PostgreSQL",
+    "type": "postgresql",
+    "description": "Binds the installed template tables on the platform database. Credentials are injected server-side; none are committed.",
+    "options": {
+      "connectionOption": "connectionString",
+      "connectionString": "{{PLATFORM_DATABASE_URL}}"
+    },
+    "requiresReconnect": true,
+    "installStrategy": "platformDatabase"
+  },
+  {
+    "slug": "webhook",
+    "title": "CRM & Sales Pipeline · inbound webhook",
+    "type": "webhook",
+    "description": "Inbound webhook connector for partner and internal events. Listeners are installed inactive and must be activated after review.",
+    "options": {
+      "connectionName": "crm-inbound",
+      "allowedMethods": "POST",
+      "authType": "none"
+    },
+    "requiresReconnect": false,
+    "installStrategy": "asIs"
+  },
+  {
+    "slug": "integration",
+    "title": "CRM & Sales Pipeline · mock REST integration",
+    "type": "restapi",
+    "description": "Deliberately unreachable mock REST endpoint used by the integration-sync workflow to prove the error path. Reconnect to a real provider in production.",
+    "options": {
+      "baseUrl": "http://127.0.0.1:9",
+      "timeout": 5,
+      "authType": "none",
+      "headers": [],
+      "queryParams": [],
+      "contentType": "application/json",
+      "followRedirects": false,
+      "sslVerify": true
+    },
+    "requiresReconnect": true,
+    "installStrategy": "asIs"
+  }
+]

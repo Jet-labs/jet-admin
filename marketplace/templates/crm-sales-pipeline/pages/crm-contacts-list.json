@@ -1,0 +1,530 @@
+{
+  "slug": "crm-contacts-list",
+  "key": "contacts-list",
+  "title": "Contacts · list",
+  "description": "Server-side list, filters, inline edit and bulk actions for contacts.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "search",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "status",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "page",
+      "type": "number",
+      "defaultValue": 1
+    },
+    {
+      "key": "sortBy",
+      "type": "string",
+      "defaultValue": "full_name"
+    },
+    {
+      "key": "sortDir",
+      "type": "string",
+      "defaultValue": "asc"
+    },
+    {
+      "key": "dateFrom",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "dateTo",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "contacts",
+      "type": "query",
+      "queryID": "f2979ba4-07f3-41b2-ada3-aefad22589f7",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "search": "{{ state.variables.search }}",
+        "page": "{{ state.variables.page }}",
+        "limit": 10,
+        "sortBy": "{{ state.variables.sortBy }}",
+        "sortDir": "{{ state.variables.sortDir }}",
+        "dateFrom": "{{ state.variables.dateFrom }}",
+        "dateTo": "{{ state.variables.dateTo }}",
+        "status": "{{ state.variables.status }}"
+      },
+      "refreshOn": [
+        "variables.search",
+        "variables.status",
+        "variables.page",
+        "variables.sortBy",
+        "variables.sortDir",
+        "variables.dateFrom",
+        "variables.dateTo"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "contacts_views",
+      "type": "query",
+      "queryID": "0d8d32f2-5d65-4c2c-ba35-4549b4b3eedb",
+      "triggerMode": "auto",
+      "inputValues": {
+        "prefix": "saved_view.crm-contacts-list"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "contacts_selected",
+      "type": "query",
+      "queryID": "785a2c41-3282-404f-b512-103d115469d6",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "contacts_update",
+      "type": "query",
+      "queryID": "5a89274c-d142-45e0-b7a4-5baf7148327e",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "contacts_delete",
+      "type": "query",
+      "queryID": "fede289e-706c-484c-ba64-758c11eca606",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "contacts_status",
+      "type": "query",
+      "queryID": "e78171a0-36dc-48f3-8bd3-eeefad401865",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "contacts_view_create",
+      "type": "query",
+      "queryID": "2d175b74-dbe8-4add-b366-539e1d10c26a",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "42886455-4370-404a-aa4c-18f2bc015185",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f4abb927-36e0-4a01-8fc4-b16bede12eca",
+              "type": "widget",
+              "widgetKey": "widget_2df6f4cd-011c-48c7-9e02-79ccc71d281b_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "25d75e86-54f3-4efd-b5de-717ef0d02ade",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "21c2afc8-9f8e-41d0-af9e-a15903b309a4",
+              "type": "widget",
+              "widgetKey": "widget_a71cd6df-c5f4-497d-b106-6bb8c40a7ab8_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "e5fcd288-f66d-4714-83ec-6978205cedfc",
+              "type": "widget",
+              "widgetKey": "widget_83d8798c-5c32-452a-bc96-53cc456358e7_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "90dde7f5-1503-47e6-bae7-4d870a57d312",
+              "type": "widget",
+              "widgetKey": "widget_b652dcbc-a5a2-4c76-adcb-6563eb13a80a_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "f7031a46-f57d-4c50-b8c8-7b233cf167d9",
+              "type": "widget",
+              "widgetKey": "widget_9f95975a-fb6e-4a03-9f51-4f1b21c3e716_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 56
+            }
+          ]
+        },
+        {
+          "id": "a90119fb-9b1f-4282-bab4-a803f8494ab7",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "30715164-2175-4e94-90ac-90d768388b45",
+              "type": "widget",
+              "widgetKey": "widget_bed17458-c186-46e6-b9db-0af1a712fae3_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 120
+            }
+          ]
+        },
+        {
+          "id": "6301ea49-6c48-4d67-8e72-de5ee1b342a4",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "d5e3d194-b62b-4a79-9d29-45883577e8e2",
+              "type": "widget",
+              "widgetKey": "widget_bf9c9089-71b7-43e2-a3f1-342f4a87b204_1",
+              "span": 9,
+              "sizing": "fill",
+              "minHeight": 460
+            },
+            {
+              "id": "9f6a7d1e-2ab1-4640-a8f0-f3af293b21e6",
+              "type": "widget",
+              "widgetKey": "widget_52c16ab1-21e0-4c33-ac46-2a292a7a2729_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 460
+            }
+          ]
+        },
+        {
+          "id": "6a35bb3f-599c-4e7f-9a19-082923f5e343",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "b7010b77-0223-4c39-9639-4d60b92bfc87",
+              "type": "widget",
+              "widgetKey": "widget_8fa1a823-9607-4f53-ad24-44d8c568e277_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 48
+            },
+            {
+              "id": "52df74fd-e2e4-4475-ac76-ee5daa7d9ef1",
+              "type": "widget",
+              "widgetKey": "widget_918ff5a7-8540-4954-883c-55597ed6d20b_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 48
+            },
+            {
+              "id": "fbfe23ed-812f-41c5-932d-86d54d4add6c",
+              "type": "widget",
+              "widgetKey": "widget_41d04432-94c5-492c-9b36-551c75b588ab_1",
+              "span": 6,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "37c03d9f-f634-4540-892c-194a45fdd462",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "94b0bd05-e1c4-4bf4-b4c3-e41869df3573",
+              "type": "widget",
+              "widgetKey": "widget_3d9017ee-db24-472a-8e76-f0537c63efd3_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 220
+            },
+            {
+              "id": "eeefe942-60eb-4263-950e-7f01a3137478",
+              "type": "widget",
+              "widgetKey": "widget_0a0e3bfc-dbbc-43e9-9b4a-a77d86e52b86_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 220
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "f4abb927-36e0-4a01-8fc4-b16bede12eca",
+        "type": "widget",
+        "widgetKey": "widget_2df6f4cd-011c-48c7-9e02-79ccc71d281b_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "21c2afc8-9f8e-41d0-af9e-a15903b309a4",
+        "type": "widget",
+        "widgetKey": "widget_a71cd6df-c5f4-497d-b106-6bb8c40a7ab8_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "e5fcd288-f66d-4714-83ec-6978205cedfc",
+        "type": "widget",
+        "widgetKey": "widget_83d8798c-5c32-452a-bc96-53cc456358e7_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "90dde7f5-1503-47e6-bae7-4d870a57d312",
+        "type": "widget",
+        "widgetKey": "widget_b652dcbc-a5a2-4c76-adcb-6563eb13a80a_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "f7031a46-f57d-4c50-b8c8-7b233cf167d9",
+        "type": "widget",
+        "widgetKey": "widget_9f95975a-fb6e-4a03-9f51-4f1b21c3e716_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "30715164-2175-4e94-90ac-90d768388b45",
+        "type": "widget",
+        "widgetKey": "widget_bed17458-c186-46e6-b9db-0af1a712fae3_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 120
+      },
+      {
+        "id": "d5e3d194-b62b-4a79-9d29-45883577e8e2",
+        "type": "widget",
+        "widgetKey": "widget_bf9c9089-71b7-43e2-a3f1-342f4a87b204_1",
+        "span": 9,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "9f6a7d1e-2ab1-4640-a8f0-f3af293b21e6",
+        "type": "widget",
+        "widgetKey": "widget_52c16ab1-21e0-4c33-ac46-2a292a7a2729_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "b7010b77-0223-4c39-9639-4d60b92bfc87",
+        "type": "widget",
+        "widgetKey": "widget_8fa1a823-9607-4f53-ad24-44d8c568e277_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 48
+      },
+      {
+        "id": "52df74fd-e2e4-4475-ac76-ee5daa7d9ef1",
+        "type": "widget",
+        "widgetKey": "widget_918ff5a7-8540-4954-883c-55597ed6d20b_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 48
+      },
+      {
+        "id": "fbfe23ed-812f-41c5-932d-86d54d4add6c",
+        "type": "widget",
+        "widgetKey": "widget_41d04432-94c5-492c-9b36-551c75b588ab_1",
+        "span": 6,
+        "sizing": "fill"
+      },
+      {
+        "id": "94b0bd05-e1c4-4bf4-b4c3-e41869df3573",
+        "type": "widget",
+        "widgetKey": "widget_3d9017ee-db24-472a-8e76-f0537c63efd3_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 220
+      },
+      {
+        "id": "eeefe942-60eb-4263-950e-7f01a3137478",
+        "type": "widget",
+        "widgetKey": "widget_0a0e3bfc-dbbc-43e9-9b4a-a77d86e52b86_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 220
+      }
+    ],
+    "variables": [
+      {
+        "key": "search",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "status",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "page",
+        "type": "number",
+        "defaultValue": 1
+      },
+      {
+        "key": "sortBy",
+        "type": "string",
+        "defaultValue": "full_name"
+      },
+      {
+        "key": "sortDir",
+        "type": "string",
+        "defaultValue": "asc"
+      },
+      {
+        "key": "dateFrom",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "dateTo",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "contacts",
+        "type": "query",
+        "queryID": "f2979ba4-07f3-41b2-ada3-aefad22589f7",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "search": "{{ state.variables.search }}",
+          "page": "{{ state.variables.page }}",
+          "limit": 10,
+          "sortBy": "{{ state.variables.sortBy }}",
+          "sortDir": "{{ state.variables.sortDir }}",
+          "dateFrom": "{{ state.variables.dateFrom }}",
+          "dateTo": "{{ state.variables.dateTo }}",
+          "status": "{{ state.variables.status }}"
+        },
+        "refreshOn": [
+          "variables.search",
+          "variables.status",
+          "variables.page",
+          "variables.sortBy",
+          "variables.sortDir",
+          "variables.dateFrom",
+          "variables.dateTo"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "contacts_views",
+        "type": "query",
+        "queryID": "0d8d32f2-5d65-4c2c-ba35-4549b4b3eedb",
+        "triggerMode": "auto",
+        "inputValues": {
+          "prefix": "saved_view.crm-contacts-list"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "contacts_selected",
+        "type": "query",
+        "queryID": "785a2c41-3282-404f-b512-103d115469d6",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "contacts_update",
+        "type": "query",
+        "queryID": "5a89274c-d142-45e0-b7a4-5baf7148327e",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "contacts_delete",
+        "type": "query",
+        "queryID": "fede289e-706c-484c-ba64-758c11eca606",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "contacts_status",
+        "type": "query",
+        "queryID": "e78171a0-36dc-48f3-8bd3-eeefad401865",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "contacts_view_create",
+        "type": "query",
+        "queryID": "2d175b74-dbe8-4add-b366-539e1d10c26a",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,314 @@
+[
+  {
+    "slug": "crm-reports-operations.heading",
+    "key": "heading",
+    "page": "crm-reports-operations",
+    "title": "Operations report",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Operations report\nUse the date range to scope totals. The export button downloads the filtered record list as CSV.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-reports-operations.range",
+    "key": "range",
+    "page": "crm-reports-operations",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "Date range",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-reports-operations.total",
+    "key": "total",
+    "page": "crm-reports-operations",
+    "title": "Records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Records",
+      "valueTemplate": "{{ ((((state.queries.report_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.report_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-reports-operations.value",
+    "key": "value",
+    "page": "crm-reports-operations",
+    "title": "Value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Value",
+      "prefix": "$",
+      "valueTemplate": "{{ ((((state.queries.report_summary || {}).data || [])[0] || {}).total_value) }}",
+      "isLoading": "{{ (state.queries.report_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-reports-operations.trend",
+    "key": "trend",
+    "page": "crm-reports-operations",
+    "title": "Daily trend",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Daily trend",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.report_trend || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "bar",
+          "tooltip": true
+        },
+        "encoding": {
+          "x": {
+            "field": "day",
+            "type": "temporal",
+            "axis": {
+              "labelAngle": 0
+            }
+          },
+          "y": {
+            "field": "total",
+            "type": "quantitative"
+          },
+          "color": {
+            "value": "#2563eb"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.report_trend || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-reports-operations.status",
+    "key": "status",
+    "page": "crm-reports-operations",
+    "title": "Status mix",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Status mix",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.report_status || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "bar",
+          "tooltip": true
+        },
+        "encoding": {
+          "y": {
+            "field": "status",
+            "type": "nominal",
+            "sort": "-x"
+          },
+          "x": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "status",
+            "type": "nominal"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.report_status || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-reports-operations.data",
+    "key": "data",
+    "page": "crm-reports-operations",
+    "title": "Filtered records",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.report_list || {}).data || [])",
+      "columns": [
+        {
+          "key": "name",
+          "label": "Deal name",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "account_id",
+          "label": "Account",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "contact_id",
+          "label": "Primary contact",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "stage",
+          "label": "Stage",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "probability",
+          "label": "Probability %",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "close_date",
+          "label": "Expected close",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "source",
+          "label": "Source",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "next_step",
+          "label": "Next step",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No records in this range.",
+      "isLoading": "{{ (state.queries.report_list || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-reports-operations.run",
+    "key": "run",
+    "page": "crm-reports-operations",
+    "title": "Load export set",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Load filtered rows",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "report_list",
+              "inputValues": {
+                "search": "",
+                "status": "",
+                "dateFrom": "{{ state.variables.dateFrom }}",
+                "dateTo": "{{ state.variables.dateTo }}"
+              },
+              "successToast": "Report loaded",
+              "errorToast": "Report failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

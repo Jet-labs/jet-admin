@@ -47,12 +47,15 @@ export function buildPostgresClientConfig(datasourceOptions = {}) {
 }
 
 export default class PostgreSQLDataSource extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions, context, helpers) {
     Logger.log("info", {
       message: "postgresql:PostgreSQLDataSource:execute:params",
       params: { dataQueryOptions, config: this.config },
     });
     const { query } = dataQueryOptions;
+    const parameterValues = dataQueryOptions.parameterized === true
+      ? (context?.inputs ?? helpers?.inputs ?? [])
+      : undefined;
     const client = new Client(buildPostgresClientConfig(this.config.datasourceOptions));
     try {
       await client.connect();
@@ -60,7 +63,7 @@ export default class PostgreSQLDataSource extends DataSource {
         message: "postgresql:PostgreSQLDataSource:execute:connected",
         params: { datasourceID: this.config.datasourceID },
       });
-      const result = await client.query(query);
+      const result = await client.query(query, parameterValues);
       return result.rows;
     } catch (error) {
       Logger.log("error", {

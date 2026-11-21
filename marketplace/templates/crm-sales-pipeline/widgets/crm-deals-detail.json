@@ -1,0 +1,655 @@
+[
+  {
+    "slug": "crm-deals-detail.heading",
+    "key": "heading",
+    "page": "crm-deals-detail",
+    "title": "Record detail",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Deal detail\nRecord #{{ state.variables.recordID }} · every change is captured in the audit timeline.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-deals-detail.status",
+    "key": "status",
+    "page": "crm-deals-detail",
+    "title": "Status",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ ((((state.queries.deals_detail || {}).data || [])[0] || {}).stage) }}",
+      "variant": "default"
+    }
+  },
+  {
+    "slug": "crm-deals-detail.statusForm",
+    "key": "statusForm",
+    "page": "crm-deals-detail",
+    "title": "Change status",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Select status",
+      "defaultValue": "prospecting",
+      "options": [
+        {
+          "label": "Prospecting",
+          "value": "prospecting"
+        },
+        {
+          "label": "Qualification",
+          "value": "qualification"
+        },
+        {
+          "label": "Proposal",
+          "value": "proposal"
+        },
+        {
+          "label": "Negotiation",
+          "value": "negotiation"
+        },
+        {
+          "label": "Closed Won",
+          "value": "closed_won"
+        },
+        {
+          "label": "Closed Lost",
+          "value": "closed_lost"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "overview"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-detail.statusButton",
+    "key": "statusButton",
+    "page": "crm-deals-detail",
+    "title": "Apply status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Apply status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "deals_status",
+              "inputValues": {
+                "id": "{{ state.variables.recordID }}",
+                "status": "{{ (state.widgets[\"widget_75e2dc0a-c81b-4a43-aa7d-943576b80da5_1\"] || {}).value || \"prospecting\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-detail.delete",
+    "key": "delete",
+    "page": "crm-deals-detail",
+    "title": "Archive",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive record",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "deals_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-detail.restore",
+    "key": "restore",
+    "page": "crm-deals-detail",
+    "title": "Restore",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Restore record",
+      "variant": "outline",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "deals_restore",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record restored",
+              "errorToast": "Restore failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-detail.tabs",
+    "key": "tabs",
+    "page": "crm-deals-detail",
+    "title": "Record sections",
+    "type": "tabs",
+    "config": {
+      "showHeader": false,
+      "tabs": [
+        {
+          "label": "Overview",
+          "value": "overview"
+        },
+        {
+          "label": "Comments",
+          "value": "comments"
+        },
+        {
+          "label": "Attachments",
+          "value": "attachments"
+        },
+        {
+          "label": "Activity",
+          "value": "activity"
+        }
+      ],
+      "defaultTab": "overview",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-detail.record",
+    "key": "record",
+    "page": "crm-deals-detail",
+    "title": "Record fields",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record fields",
+      "dataTemplate": "{{ (((state.queries.deals_detail || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "emptyText": "Record not found.",
+      "isLoading": "{{ (state.queries.deals_detail || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-deals-detail.editTable",
+    "key": "editTable",
+    "page": "crm-deals-detail",
+    "title": "Inline edit",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.deals_detail || {}).data || [])",
+      "columns": [
+        {
+          "key": "name",
+          "label": "Deal name",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "account_id",
+          "label": "Account",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "contact_id",
+          "label": "Primary contact",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "stage",
+          "label": "Stage",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "probability",
+          "label": "Probability %",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "close_date",
+          "label": "Expected close",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "source",
+          "label": "Source",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "next_step",
+          "label": "Next step",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 1
+      },
+      "search": {
+        "enabled": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": true
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No record loaded.",
+      "isLoading": "{{ (state.queries.deals_detail || {}).isLoading || false }}",
+      "events": {
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "deals_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "name": "{{ event.updatedRow.name }}",
+                "account_id": "{{ event.updatedRow.account_id }}",
+                "contact_id": "{{ event.updatedRow.contact_id }}",
+                "stage": "{{ event.updatedRow.stage }}",
+                "amount": "{{ event.updatedRow.amount }}",
+                "probability": "{{ event.updatedRow.probability }}",
+                "close_date": "{{ event.updatedRow.close_date }}",
+                "owner_id": "{{ event.updatedRow.owner_id }}",
+                "source": "{{ event.updatedRow.source }}",
+                "next_step": "{{ event.updatedRow.next_step }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-detail.comments",
+    "key": "comments",
+    "page": "crm-deals-detail",
+    "title": "Comments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.deals_comments || {}).data || [])",
+      "columns": [
+        {
+          "key": "author",
+          "label": "Author",
+          "type": "text"
+        },
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No comments yet.",
+      "isLoading": "{{ (state.queries.deals_comments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-deals-detail.commentForm",
+    "key": "commentForm",
+    "page": "crm-deals-detail",
+    "title": "Add comment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add comment",
+      "submitLabel": "Post comment",
+      "fields": [
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Add context, decisions or next steps"
+        },
+        {
+          "key": "authorID",
+          "label": "Author",
+          "type": "select",
+          "required": true,
+          "defaultValue": 1,
+          "options": [
+            {
+              "label": "Anika Osei",
+              "value": 1
+            },
+            {
+              "label": "Tomás Dubey",
+              "value": 2
+            },
+            {
+              "label": "Noah Chen",
+              "value": 3
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 4
+            },
+            {
+              "label": "Aarav Petrov",
+              "value": 5
+            },
+            {
+              "label": "Ravi Khan",
+              "value": 6
+            },
+            {
+              "label": "Elena Garcia",
+              "value": 7
+            },
+            {
+              "label": "Luca Fischer",
+              "value": 8
+            },
+            {
+              "label": "Noor Andersen",
+              "value": 9
+            },
+            {
+              "label": "Theo Nielsen",
+              "value": 10
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 11
+            },
+            {
+              "label": "Sofia Ivanova",
+              "value": 12
+            },
+            {
+              "label": "Tomás Sato",
+              "value": 13
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 14
+            },
+            {
+              "label": "Eli Meyer",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 16
+            },
+            {
+              "label": "Theo Petrov",
+              "value": 17
+            },
+            {
+              "label": "Noor Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Amara Khan",
+              "value": 19
+            },
+            {
+              "label": "Malik Müller",
+              "value": 20
+            },
+            {
+              "label": "Freya Tanaka",
+              "value": 21
+            },
+            {
+              "label": "Eli Chen",
+              "value": 22
+            },
+            {
+              "label": "Yuki Chen",
+              "value": 23
+            },
+            {
+              "label": "Anika Dubois",
+              "value": 24
+            }
+          ]
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "deals_comment_create",
+              "inputValues": {
+                "entity": "deals",
+                "entityID": "{{ state.variables.recordID }}",
+                "authorID": "{{ Number(event.formData.authorID || 1) }}",
+                "body": "{{ event.formData.body }}"
+              },
+              "successToast": "Comment added",
+              "errorToast": "Comment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-detail.attachments",
+    "key": "attachments",
+    "page": "crm-deals-detail",
+    "title": "Attachments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.deals_attachments || {}).data || [])",
+      "columns": [
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "link"
+        },
+        {
+          "key": "file_url",
+          "label": "URL",
+          "type": "link"
+        },
+        {
+          "key": "mime_type",
+          "label": "Type",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Uploaded",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No attachments yet.",
+      "isLoading": "{{ (state.queries.deals_attachments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-deals-detail.attachmentForm",
+    "key": "attachmentForm",
+    "page": "crm-deals-detail",
+    "title": "Add attachment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add attachment",
+      "submitLabel": "Attach file",
+      "fields": [
+        {
+          "key": "fileName",
+          "label": "File name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "document.pdf"
+        },
+        {
+          "key": "fileURL",
+          "label": "File URL",
+          "type": "text",
+          "required": true,
+          "defaultValue": "https://files.example.invalid/document.pdf"
+        },
+        {
+          "key": "mimeType",
+          "label": "MIME type",
+          "type": "text",
+          "defaultValue": "application/pdf"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "deals_attachment_create",
+              "inputValues": {
+                "entity": "deals",
+                "entityID": "{{ state.variables.recordID }}",
+                "fileName": "{{ event.formData.fileName }}",
+                "fileURL": "{{ event.formData.fileURL }}",
+                "mimeType": "{{ event.formData.mimeType }}",
+                "uploadedBy": "{{ 1 }}"
+              },
+              "successToast": "Attachment linked",
+              "errorToast": "Attachment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-detail.activity",
+    "key": "activity",
+    "page": "crm-deals-detail",
+    "title": "Audit timeline",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Audit timeline",
+      "dataTemplate": "{{ (state.queries.deals_audit || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No audit entries yet.",
+      "isLoading": "{{ (state.queries.deals_audit || {}).isLoading || false }}"
+    }
+  }
+]

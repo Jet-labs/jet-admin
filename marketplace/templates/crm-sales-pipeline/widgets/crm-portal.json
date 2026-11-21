@@ -1,0 +1,263 @@
+[
+  {
+    "slug": "crm-portal.heading",
+    "key": "heading",
+    "page": "crm-portal",
+    "title": "Client portal",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Client portal\nA restricted view of deals owned by the selected client contact. External roles only receive this page, their profile and notifications.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-portal.client",
+    "key": "client",
+    "page": "crm-portal",
+    "title": "Client contact",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Client contact",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Anika Osei",
+          "value": 1
+        },
+        {
+          "label": "Tomás Dubey",
+          "value": 2
+        },
+        {
+          "label": "Noah Chen",
+          "value": 3
+        },
+        {
+          "label": "Hugo Novak",
+          "value": 4
+        },
+        {
+          "label": "Aarav Petrov",
+          "value": 5
+        },
+        {
+          "label": "Ravi Khan",
+          "value": 6
+        },
+        {
+          "label": "Elena Garcia",
+          "value": 7
+        },
+        {
+          "label": "Luca Fischer",
+          "value": 8
+        },
+        {
+          "label": "Noor Andersen",
+          "value": 9
+        },
+        {
+          "label": "Theo Nielsen",
+          "value": 10
+        },
+        {
+          "label": "Zara Nielsen",
+          "value": 11
+        },
+        {
+          "label": "Sofia Ivanova",
+          "value": 12
+        },
+        {
+          "label": "Tomás Sato",
+          "value": 13
+        },
+        {
+          "label": "Priya Larsen",
+          "value": 14
+        },
+        {
+          "label": "Eli Meyer",
+          "value": 15
+        },
+        {
+          "label": "Ishaan Okafor",
+          "value": 16
+        },
+        {
+          "label": "Theo Petrov",
+          "value": 17
+        },
+        {
+          "label": "Noor Tanaka",
+          "value": 18
+        },
+        {
+          "label": "Amara Khan",
+          "value": 19
+        },
+        {
+          "label": "Malik Müller",
+          "value": 20
+        },
+        {
+          "label": "Freya Tanaka",
+          "value": 21
+        },
+        {
+          "label": "Eli Chen",
+          "value": 22
+        },
+        {
+          "label": "Yuki Chen",
+          "value": 23
+        },
+        {
+          "label": "Anika Dubois",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-portal.table",
+    "key": "table",
+    "page": "crm-portal",
+    "title": "My records",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.portal || {}).data || [])",
+      "columns": [
+        {
+          "key": "name",
+          "label": "Deal name",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "account_id",
+          "label": "Account",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "contact_id",
+          "label": "Primary contact",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "stage",
+          "label": "Stage",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "probability",
+          "label": "Probability %",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "close_date",
+          "label": "Expected close",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "source",
+          "label": "Source",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "next_step",
+          "label": "Next step",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No records are assigned to this contact.",
+      "isLoading": "{{ (state.queries.portal || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-portal.detail",
+    "key": "detail",
+    "page": "crm-portal",
+    "title": "Record summary",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record summary",
+      "dataTemplate": "{{ (((state.queries.detail || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "isLoading": "{{ (state.queries.detail || {}).isLoading || false }}"
+    }
+  }
+]

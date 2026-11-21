@@ -1,0 +1,171 @@
+{
+  "slug": "crm.daily-digest",
+  "key": "daily-digest",
+  "title": "Deals · daily digest",
+  "description": "Builds a daily summary and writes a single in-app notification.",
+  "tags": [
+    "automation",
+    "digest"
+  ],
+  "options": {
+    "description": "Builds a daily summary and writes a single in-app notification.",
+    "inputDefinitions": [
+      {
+        "key": "staffID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "24c813e8-5ba3-4e5c-a94e-d1220c138219",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadStats",
+      "nodeID": "f50e91e0-0a60-485b-a975-fbe12ee625d4",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadStats",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "689e3cdd-c52c-467d-a9b8-6af5182f6554",
+        "outputVariable": "summary",
+        "inputValues": {}
+      }
+    },
+    {
+      "key": "composeDigest",
+      "nodeID": "9149d8cf-9008-4de7-9e5a-d6501cd3171c",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "composeDigest",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "\nvar s = (ctx.summary || [])[0] || {};\nreturn { total: Number(s.total || 0), value: Number(s.total_value || 0), staffID: ctx.staffID || 1 };\n",
+        "outputVariable": "digest"
+      }
+    },
+    {
+      "key": "sendDigest",
+      "nodeID": "dde5b2a5-70c4-4d80-80a3-366b2797b3ba",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "sendDigest",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "3b694978-816f-4fb5-8c10-ce5a1042b5de",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.digest.staffID }}",
+          "title": "CRM & Sales Pipeline daily digest",
+          "body": "{{ ctx.digest.total }} records · value {{ ctx.digest.value }}",
+          "category": "info",
+          "linkPage": "crm-dashboard"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "95277f7f-bcb3-4eac-92ac-56f24a4004f9",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.digest }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "24c813e8-5ba3-4e5c-a94e-d1220c138219",
+      "to": "f50e91e0-0a60-485b-a975-fbe12ee625d4",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "f50e91e0-0a60-485b-a975-fbe12ee625d4",
+      "to": "9149d8cf-9008-4de7-9e5a-d6501cd3171c",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "9149d8cf-9008-4de7-9e5a-d6501cd3171c",
+      "to": "dde5b2a5-70c4-4d80-80a3-366b2797b3ba",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "dde5b2a5-70c4-4d80-80a3-366b2797b3ba",
+      "to": "95277f7f-bcb3-4eac-92ac-56f24a4004f9",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

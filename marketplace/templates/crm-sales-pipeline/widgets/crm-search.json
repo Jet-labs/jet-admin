@@ -1,0 +1,116 @@
+[
+  {
+    "slug": "crm-search.heading",
+    "key": "heading",
+    "page": "crm-search",
+    "title": "Global search",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Global search\nSearch names, subjects and reference codes across every core table. Results are capped at 50 and are tenant-isolated.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-search.search",
+    "key": "search",
+    "page": "crm-search",
+    "title": "Search",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Search records...",
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-search.results",
+    "key": "results",
+    "page": "crm-search",
+    "title": "Results",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.search || {}).data || [])",
+      "columns": [
+        {
+          "key": "entity",
+          "label": "Entity",
+          "type": "badge"
+        },
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text"
+        },
+        {
+          "key": "subtitle",
+          "label": "Subtitle",
+          "type": "text"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "badge"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No matches. Try a different term.",
+      "isLoading": "{{ (state.queries.search || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selected",
+              "value": "{{ event.row.entity + ' #' + event.row.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-search.selected",
+    "key": "selected",
+    "page": "crm-search",
+    "title": "Selection",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ state.variables.selected || 'None' }}",
+      "variant": "outline"
+    }
+  }
+]

@@ -1,0 +1,132 @@
+{
+  "slug": "crm-admin-quality",
+  "key": "admin-quality",
+  "title": "Admin � data quality",
+  "description": "Quality checks and operational failures.",
+  "accessTags": [
+    "admin",
+    "manager"
+  ],
+  "variables": [],
+  "sources": [
+    {
+      "alias": "quality",
+      "type": "query",
+      "queryID": "49f330ca-067c-4260-80e1-3c4686c6aa38",
+      "triggerMode": "auto",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "ops",
+      "type": "query",
+      "queryID": "28d33cda-86ff-41ee-ab0c-cbe68545a6a5",
+      "triggerMode": "auto",
+      "inputValues": {
+        "kinds": [
+          "data_quality"
+        ]
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "10cba3b3-82dd-42ac-995e-54d61777d0b7",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "0e7a621b-1e44-4acb-86a1-65ddec0101b6",
+              "type": "widget",
+              "widgetKey": "widget_c5686e1d-5c0c-4bc1-b9b3-5bb4b438e634_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "25ced2c9-e85e-4f74-8c5a-ebe5c34bb7fd",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "21f032cc-34bc-43b4-b72d-d3e01601990e",
+              "type": "widget",
+              "widgetKey": "widget_322e1021-029a-419b-94d0-3aa550c1d378_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 320
+            },
+            {
+              "id": "a855b0cb-a107-4684-ae00-19b6373d977c",
+              "type": "widget",
+              "widgetKey": "widget_5fb1cf0d-04f6-48dc-82df-53acb41b47e4_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 320
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "0e7a621b-1e44-4acb-86a1-65ddec0101b6",
+        "type": "widget",
+        "widgetKey": "widget_c5686e1d-5c0c-4bc1-b9b3-5bb4b438e634_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "21f032cc-34bc-43b4-b72d-d3e01601990e",
+        "type": "widget",
+        "widgetKey": "widget_322e1021-029a-419b-94d0-3aa550c1d378_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 320
+      },
+      {
+        "id": "a855b0cb-a107-4684-ae00-19b6373d977c",
+        "type": "widget",
+        "widgetKey": "widget_5fb1cf0d-04f6-48dc-82df-53acb41b47e4_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 320
+      }
+    ],
+    "variables": [],
+    "dataSources": [
+      {
+        "alias": "quality",
+        "type": "query",
+        "queryID": "49f330ca-067c-4260-80e1-3c4686c6aa38",
+        "triggerMode": "auto",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "ops",
+        "type": "query",
+        "queryID": "28d33cda-86ff-41ee-ab0c-cbe68545a6a5",
+        "triggerMode": "auto",
+        "inputValues": {
+          "kinds": [
+            "data_quality"
+          ]
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,5883 @@
+[
+  {
+    "key": "admin",
+    "title": "CRM Administrator",
+    "description": "Full access to every page, query and workflow plus the admin panel.",
+    "scope": "all",
+    "pageTags": [
+      "*"
+    ],
+    "queryTags": [
+      "*"
+    ],
+    "workflowTags": [
+      "*"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list",
+      "tenant:apppage:create",
+      "tenant:apppage:update",
+      "tenant:dataquery:create",
+      "tenant:workflow:create",
+      "tenant:user:list"
+    ],
+    "pages": [
+      {
+        "page": "crm-deals-list",
+        "pageTitle": "Deals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-deals-detail",
+        "pageTitle": "Deals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-deals-create",
+        "pageTitle": "Create Deal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-leads-list",
+        "pageTitle": "Leads · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-leads-detail",
+        "pageTitle": "Leads · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-leads-create",
+        "pageTitle": "Create Lead",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-accounts-list",
+        "pageTitle": "Accounts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-accounts-detail",
+        "pageTitle": "Accounts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-accounts-create",
+        "pageTitle": "Create Account",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-contacts-list",
+        "pageTitle": "Contacts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-contacts-detail",
+        "pageTitle": "Contacts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-contacts-create",
+        "pageTitle": "Create Contact",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-deals-kanban",
+        "pageTitle": "Deals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-deals-calendar",
+        "pageTitle": "Deals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-users",
+        "pageTitle": "Admin � users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-roles",
+        "pageTitle": "Admin � roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-audit",
+        "pageTitle": "Admin � audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-settings",
+        "pageTitle": "Admin � system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-import",
+        "pageTitle": "Admin � import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-integrations",
+        "pageTitle": "Admin � integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-jobs",
+        "pageTitle": "Admin � jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-quality",
+        "pageTitle": "Admin � data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "crm.deals.list",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.export",
+        "tags": [
+          "read",
+          "export",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.detail",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.create",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.update",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.delete",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.restore",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.status",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.assign",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.stats",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.trend",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.list",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.export",
+        "tags": [
+          "read",
+          "export",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.detail",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.create",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.update",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.delete",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.restore",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.status",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.assign",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.score",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.stats",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.trend",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.by_status",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.overdue",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.list",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.export",
+        "tags": [
+          "read",
+          "export",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.detail",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.create",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.update",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.delete",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.restore",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.assign",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.score",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.list",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.export",
+        "tags": [
+          "read",
+          "export",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.detail",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.create",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.update",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.delete",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.restore",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.status",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.assign",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "crm.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": true
+      }
+    ]
+  },
+  {
+    "key": "manager",
+    "title": "Sales Manager",
+    "description": "Pipeline, forecast, team and approval access; no platform role administration.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report",
+      "admin",
+      "portal"
+    ],
+    "queryTags": [
+      "read",
+      "write",
+      "shared",
+      "report",
+      "export",
+      "admin"
+    ],
+    "workflowTags": [
+      "*"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "crm-deals-list",
+        "pageTitle": "Deals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-detail",
+        "pageTitle": "Deals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-create",
+        "pageTitle": "Create Deal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-leads-list",
+        "pageTitle": "Leads · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-leads-detail",
+        "pageTitle": "Leads · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-leads-create",
+        "pageTitle": "Create Lead",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-accounts-list",
+        "pageTitle": "Accounts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-accounts-detail",
+        "pageTitle": "Accounts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-accounts-create",
+        "pageTitle": "Create Account",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-contacts-list",
+        "pageTitle": "Contacts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-contacts-detail",
+        "pageTitle": "Contacts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-contacts-create",
+        "pageTitle": "Create Contact",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-kanban",
+        "pageTitle": "Deals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-calendar",
+        "pageTitle": "Deals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-users",
+        "pageTitle": "Admin � users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-roles",
+        "pageTitle": "Admin � roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-audit",
+        "pageTitle": "Admin � audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-settings",
+        "pageTitle": "Admin � system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-import",
+        "pageTitle": "Admin � import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-integrations",
+        "pageTitle": "Admin � integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-jobs",
+        "pageTitle": "Admin � jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-quality",
+        "pageTitle": "Admin � data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      }
+    ],
+    "queries": [
+      {
+        "query": "crm.deals.list",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.export",
+        "tags": [
+          "read",
+          "export",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.detail",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.create",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.update",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.delete",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.restore",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.status",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.assign",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.stats",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.trend",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.list",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.export",
+        "tags": [
+          "read",
+          "export",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.detail",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.create",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.update",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.delete",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.restore",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.status",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.assign",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.score",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.stats",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.trend",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.by_status",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.overdue",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.list",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.export",
+        "tags": [
+          "read",
+          "export",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.detail",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.create",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.update",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.delete",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.restore",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.assign",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.score",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.list",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.export",
+        "tags": [
+          "read",
+          "export",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.detail",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.create",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.update",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.delete",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.restore",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.status",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.assign",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "crm.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": true
+      }
+    ]
+  },
+  {
+    "key": "sales_rep",
+    "title": "Sales Representative",
+    "description": "Owns leads and deals; can comment, attach files and run sales workflows.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report",
+      "portal"
+    ],
+    "queryTags": [
+      "read",
+      "write",
+      "shared",
+      "report",
+      "export"
+    ],
+    "workflowTags": [
+      "core",
+      "automation"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "crm-deals-list",
+        "pageTitle": "Deals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-detail",
+        "pageTitle": "Deals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-create",
+        "pageTitle": "Create Deal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-leads-list",
+        "pageTitle": "Leads · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-leads-detail",
+        "pageTitle": "Leads · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-leads-create",
+        "pageTitle": "Create Lead",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-accounts-list",
+        "pageTitle": "Accounts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-accounts-detail",
+        "pageTitle": "Accounts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-accounts-create",
+        "pageTitle": "Create Account",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-contacts-list",
+        "pageTitle": "Contacts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-contacts-detail",
+        "pageTitle": "Contacts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-contacts-create",
+        "pageTitle": "Create Contact",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-kanban",
+        "pageTitle": "Deals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-calendar",
+        "pageTitle": "Deals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-users",
+        "pageTitle": "Admin � users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-roles",
+        "pageTitle": "Admin � roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-audit",
+        "pageTitle": "Admin � audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-settings",
+        "pageTitle": "Admin � system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-import",
+        "pageTitle": "Admin � import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-integrations",
+        "pageTitle": "Admin � integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-jobs",
+        "pageTitle": "Admin � jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-quality",
+        "pageTitle": "Admin � data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "crm.deals.list",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.export",
+        "tags": [
+          "read",
+          "export",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.detail",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.create",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.update",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.delete",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.restore",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.status",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.assign",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.stats",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.trend",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.list",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.export",
+        "tags": [
+          "read",
+          "export",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.detail",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.create",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.update",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.delete",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.restore",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.status",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.assign",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.score",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.stats",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.trend",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.by_status",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.overdue",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.list",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.export",
+        "tags": [
+          "read",
+          "export",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.detail",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.create",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.update",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.delete",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.restore",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.assign",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.score",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.list",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.export",
+        "tags": [
+          "read",
+          "export",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.detail",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.create",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.update",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.delete",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.restore",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.status",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.assign",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "crm.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "crm.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": true
+      }
+    ]
+  },
+  {
+    "key": "analyst",
+    "title": "Revenue Analyst",
+    "description": "Read-only pipeline and report access with export rights.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report",
+      "portal"
+    ],
+    "queryTags": [
+      "read",
+      "shared",
+      "report",
+      "export"
+    ],
+    "workflowTags": [],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "crm-deals-list",
+        "pageTitle": "Deals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-detail",
+        "pageTitle": "Deals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-create",
+        "pageTitle": "Create Deal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-leads-list",
+        "pageTitle": "Leads · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-leads-detail",
+        "pageTitle": "Leads · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-leads-create",
+        "pageTitle": "Create Lead",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-accounts-list",
+        "pageTitle": "Accounts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-accounts-detail",
+        "pageTitle": "Accounts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-accounts-create",
+        "pageTitle": "Create Account",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-contacts-list",
+        "pageTitle": "Contacts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-contacts-detail",
+        "pageTitle": "Contacts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-contacts-create",
+        "pageTitle": "Create Contact",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-kanban",
+        "pageTitle": "Deals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-deals-calendar",
+        "pageTitle": "Deals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "crm-admin-users",
+        "pageTitle": "Admin � users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-roles",
+        "pageTitle": "Admin � roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-audit",
+        "pageTitle": "Admin � audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-settings",
+        "pageTitle": "Admin � system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-import",
+        "pageTitle": "Admin � import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-integrations",
+        "pageTitle": "Admin � integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-jobs",
+        "pageTitle": "Admin � jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-quality",
+        "pageTitle": "Admin � data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "crm.deals.list",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.export",
+        "tags": [
+          "read",
+          "export",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.detail",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.create",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.update",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.delete",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.restore",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.status",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.assign",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.stats",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.trend",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.list",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.export",
+        "tags": [
+          "read",
+          "export",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.detail",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.create",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.update",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.delete",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.restore",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.status",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.assign",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.score",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.stats",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.trend",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.by_status",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.overdue",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.list",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.export",
+        "tags": [
+          "read",
+          "export",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.detail",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.create",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.update",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.delete",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.restore",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.assign",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.score",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.list",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.export",
+        "tags": [
+          "read",
+          "export",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.detail",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.create",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.update",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.delete",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.restore",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.status",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.assign",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": false
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "crm.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": false
+      }
+    ]
+  },
+  {
+    "key": "client",
+    "title": "Client Contact",
+    "description": "External portal access to owned records, profile and notifications only.",
+    "scope": "external",
+    "pageTags": [
+      "portal",
+      "shared"
+    ],
+    "queryTags": [
+      "portal",
+      "read"
+    ],
+    "workflowTags": [],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "crm-deals-list",
+        "pageTitle": "Deals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-deals-detail",
+        "pageTitle": "Deals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-deals-create",
+        "pageTitle": "Create Deal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-leads-list",
+        "pageTitle": "Leads · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-leads-detail",
+        "pageTitle": "Leads · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-leads-create",
+        "pageTitle": "Create Lead",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-accounts-list",
+        "pageTitle": "Accounts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-accounts-detail",
+        "pageTitle": "Accounts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-accounts-create",
+        "pageTitle": "Create Account",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-contacts-list",
+        "pageTitle": "Contacts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-contacts-detail",
+        "pageTitle": "Contacts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-contacts-create",
+        "pageTitle": "Create Contact",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-deals-kanban",
+        "pageTitle": "Deals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-deals-calendar",
+        "pageTitle": "Deals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-users",
+        "pageTitle": "Admin � users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-roles",
+        "pageTitle": "Admin � roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-audit",
+        "pageTitle": "Admin � audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-settings",
+        "pageTitle": "Admin � system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-import",
+        "pageTitle": "Admin � import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-integrations",
+        "pageTitle": "Admin � integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-jobs",
+        "pageTitle": "Admin � jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "crm-admin-quality",
+        "pageTitle": "Admin � data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "crm.deals.list",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.export",
+        "tags": [
+          "read",
+          "export",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.detail",
+        "tags": [
+          "read",
+          "core",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.create",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.update",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.delete",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.restore",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.status",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.assign",
+        "tags": [
+          "write",
+          "core",
+          "deals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.deals.stats",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.trend",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.deals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "deals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.list",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.export",
+        "tags": [
+          "read",
+          "export",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.detail",
+        "tags": [
+          "read",
+          "core",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.create",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.update",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.delete",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.restore",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.status",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.assign",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.score",
+        "tags": [
+          "write",
+          "core",
+          "leads"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.leads.stats",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.trend",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.by_status",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.leads.overdue",
+        "tags": [
+          "read",
+          "report",
+          "leads"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.list",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.export",
+        "tags": [
+          "read",
+          "export",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.detail",
+        "tags": [
+          "read",
+          "core",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.create",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.update",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.delete",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.restore",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "accounts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.accounts.assign",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.accounts.score",
+        "tags": [
+          "write",
+          "core",
+          "accounts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.list",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.export",
+        "tags": [
+          "read",
+          "export",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.detail",
+        "tags": [
+          "read",
+          "core",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.create",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.update",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.delete",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.restore",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "contacts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.contacts.status",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.contacts.assign",
+        "tags": [
+          "write",
+          "core",
+          "contacts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "crm.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "crm.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": false
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "crm.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "crm.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": false
+      }
+    ]
+  }
+]

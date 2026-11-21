@@ -1,0 +1,337 @@
+[
+  {
+    "slug": "crm-record-created",
+    "key": "record-created",
+    "title": "Deals · record created",
+    "description": "Inbound record-created event triggers intake triage.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "crm-record-created",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "crm-record-created",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"record.created\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "75ba035e-0392-455e-9777-82ff217b7b32",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "staffID": "{{ event.staff_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "crm_record-created",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "crm-record-status-changed",
+    "key": "record-status-changed",
+    "title": "Deals · status changed",
+    "description": "Status changes run the notification-only automation.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "crm-record-status-changed",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "crm-record-status-changed",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"record.status_changed\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "69470e0c-4c73-436b-b441-832e27a2766b",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "crm_record-status-changed",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "crm-webhook-received",
+    "key": "webhook-received",
+    "title": "CRM & Sales Pipeline · inbound webhook",
+    "description": "Generic inbound webhook for partner updates.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "crm-webhook-received",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "crm-webhook-received",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"webhook.received\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "02e7f811-a78a-4cf7-b2f6-4c93e9772797",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "crm_webhook-received",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "crm-threshold-breach",
+    "key": "threshold-breach",
+    "title": "CRM & Sales Pipeline · threshold breach",
+    "description": "Threshold breach sweep for overdue records.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "crm-threshold-breach",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "crm-threshold-breach",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"threshold.breached\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "2339aab3-b3ad-460e-9f87-c531889b27f5",
+          "inputValues": {
+            "days": "{{ event.days }}",
+            "staffID": "{{ event.staff_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "crm_threshold-breach",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "crm-sla-nearing",
+    "key": "sla-nearing",
+    "title": "CRM & Sales Pipeline · SLA nearing breach",
+    "description": "SLA pre-breach event triggers the escalation workflow.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "crm-sla-nearing",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "crm-sla-nearing",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"sla.nearing_breach\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "c13dd66d-d9de-4ed1-9c4d-70e501d96da5",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "staffID": "{{ event.staff_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "crm_sla-nearing",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "crm-comment-created",
+    "key": "comment-created",
+    "title": "CRM & Sales Pipeline · comment created",
+    "description": "New comment notification.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "crm-comment-created",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "crm-comment-created",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"comment.created\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "69470e0c-4c73-436b-b441-832e27a2766b",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "crm_comment-created",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "crm-import-completed",
+    "key": "import-completed",
+    "title": "CRM & Sales Pipeline · import completed",
+    "description": "Import completion triggers a digest notification.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "crm-import-completed",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "crm-import-completed",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"import.completed\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "62619632-05ca-4120-b703-e10d585d2193",
+          "inputValues": {
+            "staffID": "{{ event.staff_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "crm_import-completed",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "crm-integration-failed",
+    "key": "integration-failed",
+    "title": "CRM & Sales Pipeline · integration failed",
+    "description": "Integration failure follows the recovery workflow.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "crm-integration-failed",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "crm-integration-failed",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"integration.failed\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "139af1f7-97e4-4565-8a34-9f4cfbabffae",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "crm_integration-failed",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  }
+]

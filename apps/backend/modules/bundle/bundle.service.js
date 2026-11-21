@@ -86,6 +86,7 @@ const REF_KEY_TO_TYPE = {
   childWorkflowID: "workflow",
   listenerID: "listener",
   datasourceID: "datasource",
+  appPageID: "appPage",
 };
 
 // Extra explicit strips beyond SENSITIVE_KEY_PATTERNS.

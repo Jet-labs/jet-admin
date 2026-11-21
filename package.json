@@ -47,6 +47,8 @@
         "dev:all": "npm run temporal:up && concurrently \"npm run start:f\" \"npm run start:b\" \"npm run dev:all-packages\"",
         "dev": "npm run dev:all",
         "seed": "cd apps/backend && npm run seed",
+        "templates:generate": "node marketplace/scripts/generate-templates.js",
+        "templates:validate": "node marketplace/scripts/validate-templates.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "start:a": "cd apps/admin && npm run dev",
         "build:a": "cd apps/admin && npm run build",

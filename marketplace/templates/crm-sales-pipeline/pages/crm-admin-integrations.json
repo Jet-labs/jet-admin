@@ -1,0 +1,156 @@
+{
+  "slug": "crm-admin-integrations",
+  "key": "admin-integrations",
+  "title": "Admin � integration health",
+  "description": "Integration health and inbound webhook event log.",
+  "accessTags": [
+    "admin"
+  ],
+  "variables": [],
+  "sources": [
+    {
+      "alias": "ops",
+      "type": "query",
+      "queryID": "28d33cda-86ff-41ee-ab0c-cbe68545a6a5",
+      "triggerMode": "auto",
+      "inputValues": {
+        "kinds": [
+          "integration_health",
+          "webhook"
+        ]
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "ping",
+      "type": "query",
+      "queryID": "a092240f-6929-4303-8de7-7066723667fd",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "25503d78-dbf0-4326-8d16-43692445f596",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "1c21b943-5a2b-4df5-80cf-2642d3818668",
+              "type": "widget",
+              "widgetKey": "widget_210127d3-c501-4114-8c88-fbd7355a61b4_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "94de32c6-04dc-4b92-9d2d-827fbefbe6c0",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "84f40122-8d9f-4680-b66e-6d15e4084fb2",
+              "type": "widget",
+              "widgetKey": "widget_03e2e022-a956-476b-bab6-0e984b0ed9cc_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 52
+            },
+            {
+              "id": "7156610c-8c4b-432e-90d5-93bdf26943e3",
+              "type": "widget",
+              "widgetKey": "widget_5686d684-ade0-48eb-805b-882d33e61351_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 120
+            }
+          ]
+        },
+        {
+          "id": "b75c7997-451d-4141-8ede-003e9a55adad",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "9b4be9c4-c311-43d7-9d0e-9503c846cc91",
+              "type": "widget",
+              "widgetKey": "widget_d0fa61f8-e642-4992-a2dc-5b57aa8da6c5_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 380
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "1c21b943-5a2b-4df5-80cf-2642d3818668",
+        "type": "widget",
+        "widgetKey": "widget_210127d3-c501-4114-8c88-fbd7355a61b4_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "84f40122-8d9f-4680-b66e-6d15e4084fb2",
+        "type": "widget",
+        "widgetKey": "widget_03e2e022-a956-476b-bab6-0e984b0ed9cc_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "7156610c-8c4b-432e-90d5-93bdf26943e3",
+        "type": "widget",
+        "widgetKey": "widget_5686d684-ade0-48eb-805b-882d33e61351_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 120
+      },
+      {
+        "id": "9b4be9c4-c311-43d7-9d0e-9503c846cc91",
+        "type": "widget",
+        "widgetKey": "widget_d0fa61f8-e642-4992-a2dc-5b57aa8da6c5_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 380
+      }
+    ],
+    "variables": [],
+    "dataSources": [
+      {
+        "alias": "ops",
+        "type": "query",
+        "queryID": "28d33cda-86ff-41ee-ab0c-cbe68545a6a5",
+        "triggerMode": "auto",
+        "inputValues": {
+          "kinds": [
+            "integration_health",
+            "webhook"
+          ]
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "ping",
+        "type": "query",
+        "queryID": "a092240f-6929-4303-8de7-7066723667fd",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

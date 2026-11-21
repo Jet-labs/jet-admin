@@ -1,0 +1,171 @@
+{
+  "slug": "crm.error-recovery",
+  "key": "error-recovery",
+  "title": "CRM & Sales Pipeline · expected failure and recovery",
+  "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+  "tags": [
+    "automation",
+    "reliability"
+  ],
+  "options": {
+    "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "5114e9b0-b7cd-4b74-b167-690ebf4f8376",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "injectFailure",
+      "nodeID": "eb383588-5e80-4a95-84af-b5cef5c6fd29",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "injectFailure",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "code": "throw new Error(\"Synthetic upstream unavailable\");",
+        "outputVariable": "failure",
+        "retryLimit": 0
+      }
+    },
+    {
+      "key": "compensate",
+      "nodeID": "3676a10d-59c0-4f24-a430-b8b4fb61bdfe",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "compensate",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "return { recovered: true, fallback: \"cached snapshot\", recordID: ctx.recordID || 1 };",
+        "outputVariable": "recovery"
+      }
+    },
+    {
+      "key": "notifyRecovery",
+      "nodeID": "6a1157fb-ef16-4113-b8e8-87cb3717c926",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyRecovery",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "3b694978-816f-4fb5-8c10-ce5a1042b5de",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID || 1 }}",
+          "title": "CRM & Sales Pipeline recovery completed",
+          "body": "A failed upstream call was compensated without losing the record.",
+          "category": "warning",
+          "linkPage": "crm-admin-jobs"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "e96a59bb-0a2e-46d1-ac46-3f05c57aa1a3",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.recovery }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "5114e9b0-b7cd-4b74-b167-690ebf4f8376",
+      "to": "eb383588-5e80-4a95-84af-b5cef5c6fd29",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "eb383588-5e80-4a95-84af-b5cef5c6fd29",
+      "to": "3676a10d-59c0-4f24-a430-b8b4fb61bdfe",
+      "handle": "error",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "3676a10d-59c0-4f24-a430-b8b4fb61bdfe",
+      "to": "6a1157fb-ef16-4113-b8e8-87cb3717c926",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "6a1157fb-ef16-4113-b8e8-87cb3717c926",
+      "to": "e96a59bb-0a2e-46d1-ac46-3f05c57aa1a3",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

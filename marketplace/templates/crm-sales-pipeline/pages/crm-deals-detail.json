@@ -1,0 +1,559 @@
+{
+  "slug": "crm-deals-detail",
+  "key": "deals-detail",
+  "title": "Deals · detail",
+  "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "recordID",
+      "type": "number",
+      "defaultValue": 1
+    },
+    {
+      "key": "tab",
+      "type": "string",
+      "defaultValue": "overview"
+    }
+  ],
+  "sources": [
+    {
+      "alias": "deals_detail",
+      "type": "query",
+      "queryID": "e67ba7fe-6c07-4d21-bbac-158f8eea0513",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.recordID }}"
+      },
+      "refreshOn": [
+        "variables.recordID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_comments",
+      "type": "query",
+      "queryID": "e7a8fb43-93f7-43a1-b1a7-542914d7cfbb",
+      "triggerMode": "auto",
+      "inputValues": {
+        "entity": "deals",
+        "entityID": "{{ state.variables.recordID }}"
+      },
+      "refreshOn": [
+        "variables.recordID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_attachments",
+      "type": "query",
+      "queryID": "bb25fa57-187c-4a50-a0b0-9759727c9b33",
+      "triggerMode": "auto",
+      "inputValues": {
+        "entity": "deals",
+        "entityID": "{{ state.variables.recordID }}"
+      },
+      "refreshOn": [
+        "variables.recordID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_audit",
+      "type": "query",
+      "queryID": "a0d3d94f-514f-4f35-998d-429a04896cce",
+      "triggerMode": "auto",
+      "inputValues": {
+        "entity": "deals",
+        "entityID": "{{ state.variables.recordID }}",
+        "actor": "",
+        "dateFrom": "",
+        "dateTo": ""
+      },
+      "refreshOn": [
+        "variables.recordID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_status",
+      "type": "query",
+      "queryID": "54f4129c-46d1-456a-8546-1317c4702bc2",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_update",
+      "type": "query",
+      "queryID": "23493eee-f518-47bf-8411-090fbb6df3ea",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_delete",
+      "type": "query",
+      "queryID": "6412a592-f3b4-45f8-830d-8e246041acaa",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_restore",
+      "type": "query",
+      "queryID": "0bffbfb5-f060-41dd-b9de-74227844c98a",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_comment_create",
+      "type": "query",
+      "queryID": "9a189335-712d-48ed-820a-ddd0dbdabe7f",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "deals_attachment_create",
+      "type": "query",
+      "queryID": "ee33b2fa-4e90-4b66-83a7-8290af5401f2",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "8076b64c-006e-412a-966b-56cf29c5cd05",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "22fe11f2-fbb7-4014-a86a-baa83b32061f",
+              "type": "widget",
+              "widgetKey": "widget_300519e8-58c8-4bf0-8f4d-89a3cecf437b_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "16ba0ec5-9fd0-4ad0-80a3-b1a234cb181e",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "0c227fbd-1854-4f22-99d0-3573eedce5d2",
+              "type": "widget",
+              "widgetKey": "widget_13f8c848-3ecb-4210-af60-f83473640fde_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 44
+            },
+            {
+              "id": "b09736b6-e0db-41ed-9146-a97b8611611f",
+              "type": "widget",
+              "widgetKey": "widget_75e2dc0a-c81b-4a43-aa7d-943576b80da5_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 44
+            },
+            {
+              "id": "cb236b9e-2f22-494e-9e38-e11f919a5092",
+              "type": "widget",
+              "widgetKey": "widget_399ec9d1-8558-44d5-b179-69a2fca0c03e_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 44
+            },
+            {
+              "id": "721f45c1-3a06-410c-a500-f6c82ac099a1",
+              "type": "widget",
+              "widgetKey": "widget_7886406a-34bd-4074-9303-eda34bae4419_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 44
+            },
+            {
+              "id": "b6a70afa-8402-42a5-9861-32dc5066a1e5",
+              "type": "widget",
+              "widgetKey": "widget_8e919fb2-d0b3-45fa-ba11-46476387ca6e_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 44
+            }
+          ]
+        },
+        {
+          "id": "5250ed8f-a153-477b-a910-7c252fd617fe",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "8da413f3-d020-4430-8a8b-7a00fc977f47",
+              "type": "widget",
+              "widgetKey": "widget_eb321308-503a-49c4-b9f6-4e6ed628e307_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 52
+            }
+          ]
+        },
+        {
+          "id": "44c1e37f-d4e4-4cf2-a47f-b9419bb37a2f",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "a52a1bd5-439c-4a9a-9d54-3f2a3f6de8dd",
+              "type": "widget",
+              "widgetKey": "widget_17b93b90-51db-49ec-a3ac-0a6262906ac6_1",
+              "span": 8,
+              "sizing": "fill",
+              "condition": "{{ state.variables.tab === 'overview' }}"
+            },
+            {
+              "id": "ee12a87f-7403-40ec-95c1-287c54546ee0",
+              "type": "widget",
+              "widgetKey": "widget_f992f37c-1944-4984-b3e5-e91bc764ffd6_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 300,
+              "condition": "{{ state.variables.tab === 'overview' }}"
+            }
+          ]
+        },
+        {
+          "id": "a19f3112-9257-4979-afe3-d978b572ac9c",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "0bf840f6-14e4-41af-9a1b-15c2fc4faefa",
+              "type": "widget",
+              "widgetKey": "widget_c3c5411d-8be4-42bf-a029-58ab53aa1dff_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 280,
+              "condition": "{{ state.variables.tab === 'comments' }}"
+            },
+            {
+              "id": "6cc5c4dc-f6d4-4535-a547-7c9853ad5ed6",
+              "type": "widget",
+              "widgetKey": "widget_5ccbfa62-2e01-4464-aed7-9d876a92e808_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 280,
+              "condition": "{{ state.variables.tab === 'comments' }}"
+            }
+          ]
+        },
+        {
+          "id": "4ed95fa8-0e7c-4739-97cb-256339012506",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "9e37ff7d-1a97-48b7-a6e8-db081276a5dd",
+              "type": "widget",
+              "widgetKey": "widget_937b0478-6d23-483c-8659-556b7804bb25_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 280,
+              "condition": "{{ state.variables.tab === 'attachments' }}"
+            },
+            {
+              "id": "81af252a-d7fd-4cd6-8dfa-1fa8e7a86537",
+              "type": "widget",
+              "widgetKey": "widget_d9ae57c3-ca10-4626-808b-45cb33127e6d_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 280,
+              "condition": "{{ state.variables.tab === 'attachments' }}"
+            }
+          ]
+        },
+        {
+          "id": "c4952a7d-14dd-43e0-a8e0-14369750b1d9",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "fc00c086-329a-4aff-9be8-046774cb5f13",
+              "type": "widget",
+              "widgetKey": "widget_d80a3c60-de78-4e9b-a7b3-1dd0b01c53d4_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 300,
+              "condition": "{{ state.variables.tab === 'activity' }}"
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "22fe11f2-fbb7-4014-a86a-baa83b32061f",
+        "type": "widget",
+        "widgetKey": "widget_300519e8-58c8-4bf0-8f4d-89a3cecf437b_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "0c227fbd-1854-4f22-99d0-3573eedce5d2",
+        "type": "widget",
+        "widgetKey": "widget_13f8c848-3ecb-4210-af60-f83473640fde_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "b09736b6-e0db-41ed-9146-a97b8611611f",
+        "type": "widget",
+        "widgetKey": "widget_75e2dc0a-c81b-4a43-aa7d-943576b80da5_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "cb236b9e-2f22-494e-9e38-e11f919a5092",
+        "type": "widget",
+        "widgetKey": "widget_399ec9d1-8558-44d5-b179-69a2fca0c03e_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "721f45c1-3a06-410c-a500-f6c82ac099a1",
+        "type": "widget",
+        "widgetKey": "widget_7886406a-34bd-4074-9303-eda34bae4419_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "b6a70afa-8402-42a5-9861-32dc5066a1e5",
+        "type": "widget",
+        "widgetKey": "widget_8e919fb2-d0b3-45fa-ba11-46476387ca6e_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "8da413f3-d020-4430-8a8b-7a00fc977f47",
+        "type": "widget",
+        "widgetKey": "widget_eb321308-503a-49c4-b9f6-4e6ed628e307_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "a52a1bd5-439c-4a9a-9d54-3f2a3f6de8dd",
+        "type": "widget",
+        "widgetKey": "widget_17b93b90-51db-49ec-a3ac-0a6262906ac6_1",
+        "span": 8,
+        "sizing": "fill",
+        "condition": "{{ state.variables.tab === 'overview' }}"
+      },
+      {
+        "id": "ee12a87f-7403-40ec-95c1-287c54546ee0",
+        "type": "widget",
+        "widgetKey": "widget_f992f37c-1944-4984-b3e5-e91bc764ffd6_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 300,
+        "condition": "{{ state.variables.tab === 'overview' }}"
+      },
+      {
+        "id": "0bf840f6-14e4-41af-9a1b-15c2fc4faefa",
+        "type": "widget",
+        "widgetKey": "widget_c3c5411d-8be4-42bf-a029-58ab53aa1dff_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 280,
+        "condition": "{{ state.variables.tab === 'comments' }}"
+      },
+      {
+        "id": "6cc5c4dc-f6d4-4535-a547-7c9853ad5ed6",
+        "type": "widget",
+        "widgetKey": "widget_5ccbfa62-2e01-4464-aed7-9d876a92e808_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 280,
+        "condition": "{{ state.variables.tab === 'comments' }}"
+      },
+      {
+        "id": "9e37ff7d-1a97-48b7-a6e8-db081276a5dd",
+        "type": "widget",
+        "widgetKey": "widget_937b0478-6d23-483c-8659-556b7804bb25_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 280,
+        "condition": "{{ state.variables.tab === 'attachments' }}"
+      },
+      {
+        "id": "81af252a-d7fd-4cd6-8dfa-1fa8e7a86537",
+        "type": "widget",
+        "widgetKey": "widget_d9ae57c3-ca10-4626-808b-45cb33127e6d_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 280,
+        "condition": "{{ state.variables.tab === 'attachments' }}"
+      },
+      {
+        "id": "fc00c086-329a-4aff-9be8-046774cb5f13",
+        "type": "widget",
+        "widgetKey": "widget_d80a3c60-de78-4e9b-a7b3-1dd0b01c53d4_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 300,
+        "condition": "{{ state.variables.tab === 'activity' }}"
+      }
+    ],
+    "variables": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "defaultValue": 1
+      },
+      {
+        "key": "tab",
+        "type": "string",
+        "defaultValue": "overview"
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "deals_detail",
+        "type": "query",
+        "queryID": "e67ba7fe-6c07-4d21-bbac-158f8eea0513",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.recordID }}"
+        },
+        "refreshOn": [
+          "variables.recordID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_comments",
+        "type": "query",
+        "queryID": "e7a8fb43-93f7-43a1-b1a7-542914d7cfbb",
+        "triggerMode": "auto",
+        "inputValues": {
+          "entity": "deals",
+          "entityID": "{{ state.variables.recordID }}"
+        },
+        "refreshOn": [
+          "variables.recordID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_attachments",
+        "type": "query",
+        "queryID": "bb25fa57-187c-4a50-a0b0-9759727c9b33",
+        "triggerMode": "auto",
+        "inputValues": {
+          "entity": "deals",
+          "entityID": "{{ state.variables.recordID }}"
+        },
+        "refreshOn": [
+          "variables.recordID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_audit",
+        "type": "query",
+        "queryID": "a0d3d94f-514f-4f35-998d-429a04896cce",
+        "triggerMode": "auto",
+        "inputValues": {
+          "entity": "deals",
+          "entityID": "{{ state.variables.recordID }}",
+          "actor": "",
+          "dateFrom": "",
+          "dateTo": ""
+        },
+        "refreshOn": [
+          "variables.recordID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_status",
+        "type": "query",
+        "queryID": "54f4129c-46d1-456a-8546-1317c4702bc2",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_update",
+        "type": "query",
+        "queryID": "23493eee-f518-47bf-8411-090fbb6df3ea",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_delete",
+        "type": "query",
+        "queryID": "6412a592-f3b4-45f8-830d-8e246041acaa",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_restore",
+        "type": "query",
+        "queryID": "0bffbfb5-f060-41dd-b9de-74227844c98a",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_comment_create",
+        "type": "query",
+        "queryID": "9a189335-712d-48ed-820a-ddd0dbdabe7f",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "deals_attachment_create",
+        "type": "query",
+        "queryID": "ee33b2fa-4e90-4b66-83a7-8290af5401f2",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

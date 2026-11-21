@@ -1,0 +1,659 @@
+[
+  {
+    "slug": "crm-leads-list.heading",
+    "key": "heading",
+    "page": "crm-leads-list",
+    "title": "Leads",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Leads\nBrowse, filter and update leads. All edits are audit-logged and soft-deleted records can be restored from the record detail page.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-leads-list.search",
+    "key": "search",
+    "page": "crm-leads-list",
+    "title": "Search",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Search leads...",
+      "debounceMs": 350,
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-leads-list.status",
+    "key": "status",
+    "page": "crm-leads-list",
+    "title": "Status filter",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "All statuses",
+      "defaultValue": "all",
+      "options": [
+        {
+          "label": "All statuses",
+          "value": "all"
+        },
+        {
+          "label": "New",
+          "value": "new"
+        },
+        {
+          "label": "Contacted",
+          "value": "contacted"
+        },
+        {
+          "label": "Qualified",
+          "value": "qualified"
+        },
+        {
+          "label": "Unqualified",
+          "value": "unqualified"
+        },
+        {
+          "label": "Converted",
+          "value": "converted"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.value === 'all' ? '' : event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-leads-list.range",
+    "key": "range",
+    "page": "crm-leads-list",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-leads-list.sort",
+    "key": "sort",
+    "page": "crm-leads-list",
+    "title": "Sort",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Sort by",
+      "defaultValue": "name",
+      "options": [
+        {
+          "label": "Name",
+          "value": "name"
+        },
+        {
+          "label": "Company",
+          "value": "company"
+        },
+        {
+          "label": "Score",
+          "value": "score"
+        },
+        {
+          "label": "Estimated Value",
+          "value": "estimated_value"
+        },
+        {
+          "label": "Last Contact At",
+          "value": "last_contact_at"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.sortBy",
+              "value": "{{ event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-leads-list.total",
+    "key": "total",
+    "page": "crm-leads-list",
+    "title": "Total records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total records",
+      "valueTemplate": "{{ ((((state.queries.leads_stats || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.leads_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-leads-list.value",
+    "key": "value",
+    "page": "crm-leads-list",
+    "title": "Total value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total value",
+      "valueTemplate": "{{ ((((state.queries.leads_stats || {}).data || [])[0] || {}).total_value) }}",
+      "prefix": "$",
+      "isLoading": "{{ (state.queries.leads_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-leads-list.avg",
+    "key": "avg",
+    "page": "crm-leads-list",
+    "title": "Average",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Average value",
+      "valueTemplate": "{{ ((((state.queries.leads_stats || {}).data || [])[0] || {}).average_value) }}",
+      "prefix": "$",
+      "isLoading": "{{ (state.queries.leads_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-leads-list.selected",
+    "key": "selected",
+    "page": "crm-leads-list",
+    "title": "Selected record",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record",
+      "dataTemplate": "{{ (((state.queries.leads_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row to inspect it.",
+      "isLoading": "{{ (state.queries.leads_selected || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-leads-list.table",
+    "key": "table",
+    "page": "crm-leads-list",
+    "title": "Leads",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.leads || {}).data || [])",
+      "columns": [
+        {
+          "key": "name",
+          "label": "Lead name",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "company",
+          "label": "Company",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "email",
+          "label": "Email",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "source",
+          "label": "Source",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "score",
+          "label": "Fit score",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "estimated_value",
+          "label": "Estimated value",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "last_contact_at",
+          "label": "Last contact",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageParam": "page",
+        "pageSize": 10,
+        "totalTemplate": "{{ ((state.queries.leads || {}).data && (state.queries.leads || {}).data[0] ? (state.queries.leads || {}).data[0].total_count : 0) }}"
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": true,
+        "placeholder": "Search leads..."
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv",
+        "serverSide": false,
+        "buttonLabel": "Export CSV"
+      },
+      "editing": {
+        "enabled": true
+      },
+      "bulkEdit": {
+        "enabled": false,
+        "saveLabel": "Save changes"
+      },
+      "multiSelect": {
+        "enabled": true,
+        "showSelectAll": true,
+        "actions": [
+          {
+            "label": "Archive selected",
+            "actionKey": "archive",
+            "variant": "destructive"
+          }
+        ]
+      },
+      "emptyText": "No leads found.",
+      "emptyHint": "Adjust the filters or create a new record.",
+      "isLoading": "{{ (state.queries.leads || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ],
+        "onPageChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": "{{ event.page }}"
+            }
+          }
+        ],
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "leads_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "name": "{{ event.updatedRow.name }}",
+                "company": "{{ event.updatedRow.company }}",
+                "email": "{{ event.updatedRow.email }}",
+                "phone": "{{ event.updatedRow.phone }}",
+                "source": "{{ event.updatedRow.source }}",
+                "status": "{{ event.updatedRow.status }}",
+                "score": "{{ event.updatedRow.score }}",
+                "estimated_value": "{{ event.updatedRow.estimated_value }}",
+                "owner_id": "{{ event.updatedRow.owner_id }}",
+                "notes": "{{ event.updatedRow.notes }}",
+                "last_contact_at": "{{ event.updatedRow.last_contact_at }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ],
+        "onBulkAction": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "leads_delete",
+              "inputValues": {
+                "ids": "{{ event.selectedRows.map(function (r) { return r.id; }) }}"
+              },
+              "successToast": "Records archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-leads-list.actions",
+    "key": "actions",
+    "page": "crm-leads-list",
+    "title": "Selected record actions",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record actions",
+      "dataTemplate": "{{ (((state.queries.leads_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row, then use the buttons below."
+    }
+  },
+  {
+    "slug": "crm-leads-list.archive",
+    "key": "archive",
+    "page": "crm-leads-list",
+    "title": "Archive selected",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive selected",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "leads_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.selectedID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-leads-list.advance",
+    "key": "advance",
+    "page": "crm-leads-list",
+    "title": "Advance status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Advance status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "leads_status",
+              "inputValues": {
+                "id": "{{ state.variables.selectedID }}",
+                "status": "{{ \"contacted\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-leads-list.explain",
+    "key": "explain",
+    "page": "crm-leads-list",
+    "title": "List notes",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "Rows are loaded server-side. Use the table toolbar to search, sort and export the current view. Inline edits and bulk actions run the template's parameterized update queries and write to the audit log.",
+      "format": "plain"
+    }
+  },
+  {
+    "slug": "crm-leads-list.views",
+    "key": "views",
+    "page": "crm-leads-list",
+    "title": "Saved views",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.leads_views || {}).data || [])",
+      "columns": [
+        {
+          "key": "label",
+          "label": "View",
+          "type": "text",
+          "sortable": false
+        },
+        {
+          "key": "config_key",
+          "label": "Key",
+          "type": "text",
+          "sortable": false
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false,
+        "placeholder": "Filter saved views"
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No saved views yet.",
+      "isLoading": "{{ (state.queries.leads_views || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.row.config_value.search || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.row.config_value.status || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-leads-list.saveView",
+    "key": "saveView",
+    "page": "crm-leads-list",
+    "title": "Save current view",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Save current view",
+      "submitLabel": "Save view",
+      "fields": [
+        {
+          "key": "name",
+          "label": "View name",
+          "type": "text",
+          "required": true,
+          "placeholder": "e.g. My open leads"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "leads_view_create",
+              "inputValues": {
+                "configKey": "{{ \"saved_view.crm-leads-list.\" + String(event.formData.name || \"view\").toLowerCase().replace(/[^a-z0-9]+/g, \"-\") }}",
+                "value": "{{ ({ search: state.variables.search, status: state.variables.status, page: 1 }) }}",
+                "label": "{{ event.formData.name }}"
+              },
+              "successToast": "View saved",
+              "errorToast": "Could not save view"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

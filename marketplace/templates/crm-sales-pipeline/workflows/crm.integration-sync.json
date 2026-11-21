@@ -1,0 +1,203 @@
+{
+  "slug": "crm.integration-sync",
+  "key": "integration-sync",
+  "title": "CRM & Sales Pipeline · integration sync",
+  "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
+  "tags": [
+    "automation",
+    "integration"
+  ],
+  "options": {
+    "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "0a351b89-8447-49a0-a38d-f27e5fc1e7b4",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "callIntegration",
+      "nodeID": "6b2822cc-cae6-4e02-b731-c875656c77a6",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "callIntegration",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "a092240f-6929-4303-8de7-7066723667fd",
+        "outputVariable": "integrationResponse",
+        "inputValues": {}
+      }
+    },
+    {
+      "key": "normalizeResponse",
+      "nodeID": "ce978720-90cc-4fbe-908d-8de42b938ba6",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "normalizeResponse",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "\nreturn { ok: true, response: ctx.integrationResponse || null, recordID: ctx.recordID || 1 };\n",
+        "outputVariable": "sync"
+      }
+    },
+    {
+      "key": "recover",
+      "nodeID": "79f903a6-1329-4ece-8e13-3f0e67bb9e37",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "recover",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "code": "\nreturn { ok: false, recovered: true, reason: \"Mock integration unreachable; queued for retry\", recordID: ctx.recordID || 1 };\n",
+        "outputVariable": "sync"
+      }
+    },
+    {
+      "key": "notifyFailure",
+      "nodeID": "21bfa184-eb28-4ce5-9ec4-0cfc64bc4f76",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyFailure",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "dataQueryID": "3b694978-816f-4fb5-8c10-ce5a1042b5de",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID || 1 }}",
+          "title": "CRM & Sales Pipeline integration sync recovered",
+          "body": "The mock integration failed and the workflow took the compensation path.",
+          "category": "warning",
+          "linkPage": "crm-admin-integrations"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "07934edf-5ad4-4fdd-8c33-b26c724f8de6",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.sync }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "0a351b89-8447-49a0-a38d-f27e5fc1e7b4",
+      "to": "6b2822cc-cae6-4e02-b731-c875656c77a6",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "6b2822cc-cae6-4e02-b731-c875656c77a6",
+      "to": "ce978720-90cc-4fbe-908d-8de42b938ba6",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "6b2822cc-cae6-4e02-b731-c875656c77a6",
+      "to": "79f903a6-1329-4ece-8e13-3f0e67bb9e37",
+      "handle": "error",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "ce978720-90cc-4fbe-908d-8de42b938ba6",
+      "to": "07934edf-5ad4-4fdd-8c33-b26c724f8de6",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "79f903a6-1329-4ece-8e13-3f0e67bb9e37",
+      "to": "21bfa184-eb28-4ce5-9ec4-0cfc64bc4f76",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "21bfa184-eb28-4ce5-9ec4-0cfc64bc4f76",
+      "to": "07934edf-5ad4-4fdd-8c33-b26c724f8de6",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

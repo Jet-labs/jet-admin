@@ -1,0 +1,383 @@
+[
+  {
+    "slug": "crm.accounts.list",
+    "title": "Accounts · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"account_name\", \"industry\", \"tier\", \"website\", \"phone\", \"city\", \"country\", \"owner_id\", \"annual_revenue\", \"health_score\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:accounts}}\nWHERE deleted_at IS NULL AND (coalesce(\"account_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"website\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"phone\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"city\"::text, '') ILIKE '%' || $1::text || '%')\n  \n  AND (NULLIF($6::text, '')::date IS NULL OR created_at >= NULLIF($6::text, '')::date)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at < (NULLIF($7::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $4::text = 'account_name' AND $5::text = 'asc' THEN \"account_name\" END ASC, CASE WHEN $4::text = 'account_name' AND $5::text = 'desc' THEN \"account_name\" END DESC, CASE WHEN $4::text = 'city' AND $5::text = 'asc' THEN \"city\" END ASC, CASE WHEN $4::text = 'city' AND $5::text = 'desc' THEN \"city\" END DESC, CASE WHEN $4::text = 'country' AND $5::text = 'asc' THEN \"country\" END ASC, CASE WHEN $4::text = 'country' AND $5::text = 'desc' THEN \"country\" END DESC, CASE WHEN $4::text = 'annual_revenue' AND $5::text = 'asc' THEN \"annual_revenue\" END ASC, CASE WHEN $4::text = 'annual_revenue' AND $5::text = 'desc' THEN \"annual_revenue\" END DESC, id DESC\nLIMIT $3::int OFFSET ((($2::int - 1) * $3::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "account_name"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.accounts.export",
+    "title": "Accounts · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"account_name\", \"industry\", \"tier\", \"website\", \"phone\", \"city\", \"country\", \"owner_id\", \"annual_revenue\", \"health_score\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:accounts}}\nWHERE deleted_at IS NULL AND (coalesce(\"account_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"website\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"phone\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"city\"::text, '') ILIKE '%' || $1::text || '%')\n  \n  AND (NULLIF($2::text, '')::date IS NULL OR created_at >= NULLIF($2::text, '')::date)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at < (NULLIF($3::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.accounts.detail",
+    "title": "Accounts · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"account_name\", \"industry\", \"tier\", \"website\", \"phone\", \"city\", \"country\", \"owner_id\", \"annual_revenue\", \"health_score\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:accounts}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.accounts.create",
+    "title": "Accounts · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:accounts}} (\"account_name\", \"industry\", \"tier\", \"website\", \"phone\", \"city\", \"country\", \"owner_id\", \"annual_revenue\", \"health_score\", created_at, updated_at)\nVALUES ($1::text, $2::text, $3::text, $4::text, $5::text, $6::text, $7::text, $8::int, $9::numeric, $10::int, now(), now())\nRETURNING \"id\", \"account_name\", \"industry\", \"tier\", \"website\", \"phone\", \"city\", \"country\", \"owner_id\", \"annual_revenue\", \"health_score\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "account_name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "industry",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "tier",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "website",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "phone",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "city",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "country",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "annual_revenue",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "health_score",
+          "type": "number",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.accounts.update",
+    "title": "Accounts · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:accounts}}\nSET \"account_name\" = $2::text, \"industry\" = $3::text, \"tier\" = $4::text, \"website\" = $5::text, \"phone\" = $6::text, \"city\" = $7::text, \"country\" = $8::text, \"owner_id\" = $9::int, \"annual_revenue\" = $10::numeric, \"health_score\" = $11::int, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"account_name\", \"industry\", \"tier\", \"website\", \"phone\", \"city\", \"country\", \"owner_id\", \"annual_revenue\", \"health_score\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "account_name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "industry",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "tier",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "website",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "phone",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "city",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "country",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "annual_revenue",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "health_score",
+          "type": "number",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.accounts.delete",
+    "title": "Accounts · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:accounts}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.accounts.restore",
+    "title": "Accounts · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:accounts}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.accounts.lookup",
+    "title": "Accounts · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"account_name\"::text AS label FROM {{table:accounts}} WHERE deleted_at IS NULL ORDER BY \"account_name\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.accounts.assign",
+    "title": "Accounts · assign owner",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:accounts}} SET \"owner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"owner_id\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "crm.accounts.score",
+    "title": "Accounts · save score",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "accounts"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:accounts}} SET \"health_score\" = $2::numeric, updated_at = now() WHERE id = $1::int RETURNING id, \"health_score\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "score",
+          "type": "number",
+          "required": false,
+          "default": 0
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

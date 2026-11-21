@@ -1,0 +1,615 @@
+[
+  {
+    "slug": "crm-deals-create.heading",
+    "key": "heading",
+    "page": "crm-deals-create",
+    "title": "Create Deal",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Deal\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-deals-create.form",
+    "key": "form",
+    "page": "crm-deals-create",
+    "title": "New Deal",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Deal",
+      "submitLabel": "Create Deal",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "name",
+          "label": "Deal name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Cedar Studio renewal"
+        },
+        {
+          "key": "account_id",
+          "label": "Account",
+          "type": "select",
+          "required": true,
+          "defaultValue": 41,
+          "options": [
+            {
+              "label": "#1",
+              "value": 1
+            },
+            {
+              "label": "#2",
+              "value": 2
+            },
+            {
+              "label": "#3",
+              "value": 3
+            },
+            {
+              "label": "#4",
+              "value": 4
+            },
+            {
+              "label": "#5",
+              "value": 5
+            },
+            {
+              "label": "#6",
+              "value": 6
+            },
+            {
+              "label": "#7",
+              "value": 7
+            },
+            {
+              "label": "#8",
+              "value": 8
+            },
+            {
+              "label": "#9",
+              "value": 9
+            },
+            {
+              "label": "#10",
+              "value": 10
+            },
+            {
+              "label": "#11",
+              "value": 11
+            },
+            {
+              "label": "#12",
+              "value": 12
+            },
+            {
+              "label": "#13",
+              "value": 13
+            },
+            {
+              "label": "#14",
+              "value": 14
+            },
+            {
+              "label": "#15",
+              "value": 15
+            },
+            {
+              "label": "#16",
+              "value": 16
+            },
+            {
+              "label": "#17",
+              "value": 17
+            },
+            {
+              "label": "#18",
+              "value": 18
+            },
+            {
+              "label": "#19",
+              "value": 19
+            },
+            {
+              "label": "#20",
+              "value": 20
+            },
+            {
+              "label": "#21",
+              "value": 21
+            },
+            {
+              "label": "#22",
+              "value": 22
+            },
+            {
+              "label": "#23",
+              "value": 23
+            },
+            {
+              "label": "#24",
+              "value": 24
+            },
+            {
+              "label": "#25",
+              "value": 25
+            },
+            {
+              "label": "#26",
+              "value": 26
+            },
+            {
+              "label": "#27",
+              "value": 27
+            },
+            {
+              "label": "#28",
+              "value": 28
+            },
+            {
+              "label": "#29",
+              "value": 29
+            },
+            {
+              "label": "#30",
+              "value": 30
+            },
+            {
+              "label": "#31",
+              "value": 31
+            },
+            {
+              "label": "#32",
+              "value": 32
+            },
+            {
+              "label": "#33",
+              "value": 33
+            },
+            {
+              "label": "#34",
+              "value": 34
+            },
+            {
+              "label": "#35",
+              "value": 35
+            },
+            {
+              "label": "#36",
+              "value": 36
+            },
+            {
+              "label": "#37",
+              "value": 37
+            },
+            {
+              "label": "#38",
+              "value": 38
+            },
+            {
+              "label": "#39",
+              "value": 39
+            },
+            {
+              "label": "#40",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "contact_id",
+          "label": "Primary contact",
+          "type": "select",
+          "required": false,
+          "defaultValue": 49,
+          "options": [
+            {
+              "label": "Priya Sharma",
+              "value": 1
+            },
+            {
+              "label": "Theo Petrov",
+              "value": 2
+            },
+            {
+              "label": "Priya Müller",
+              "value": 3
+            },
+            {
+              "label": "Sofia Garcia",
+              "value": 4
+            },
+            {
+              "label": "Eli Müller",
+              "value": 5
+            },
+            {
+              "label": "Elena Novak",
+              "value": 6
+            },
+            {
+              "label": "Sofia Nielsen",
+              "value": 7
+            },
+            {
+              "label": "Aarav Kim",
+              "value": 8
+            },
+            {
+              "label": "Sofia Sato",
+              "value": 9
+            },
+            {
+              "label": "Iris Lindqvist",
+              "value": 10
+            },
+            {
+              "label": "Yuki Tanaka",
+              "value": 11
+            },
+            {
+              "label": "Ravi Fischer",
+              "value": 12
+            },
+            {
+              "label": "Freya Lindqvist",
+              "value": 13
+            },
+            {
+              "label": "Yuki Dubois",
+              "value": 14
+            },
+            {
+              "label": "Samir Meyer",
+              "value": 15
+            },
+            {
+              "label": "Priya Rossi",
+              "value": 16
+            },
+            {
+              "label": "Noah Larsen",
+              "value": 17
+            },
+            {
+              "label": "Leila Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Zara Sato",
+              "value": 19
+            },
+            {
+              "label": "Samir Okafor",
+              "value": 20
+            },
+            {
+              "label": "Owen Moreau",
+              "value": 21
+            },
+            {
+              "label": "Theo Ivanova",
+              "value": 22
+            },
+            {
+              "label": "Sofia Lindqvist",
+              "value": 23
+            },
+            {
+              "label": "Jonas Lindqvist",
+              "value": 24
+            },
+            {
+              "label": "Mira Nielsen",
+              "value": 25
+            },
+            {
+              "label": "Malik Larsen",
+              "value": 26
+            },
+            {
+              "label": "Noah Khan",
+              "value": 27
+            },
+            {
+              "label": "Theo Chen",
+              "value": 28
+            },
+            {
+              "label": "Amara Dubey",
+              "value": 29
+            },
+            {
+              "label": "Samir Wright",
+              "value": 30
+            },
+            {
+              "label": "Sofia Dubey",
+              "value": 31
+            },
+            {
+              "label": "Samir Silva",
+              "value": 32
+            },
+            {
+              "label": "Hana Hassan",
+              "value": 33
+            },
+            {
+              "label": "Priya Meyer",
+              "value": 34
+            },
+            {
+              "label": "Mateo Hassan",
+              "value": 35
+            },
+            {
+              "label": "Elena Dubey",
+              "value": 36
+            },
+            {
+              "label": "Jonas Sharma",
+              "value": 37
+            },
+            {
+              "label": "Elena Novak",
+              "value": 38
+            },
+            {
+              "label": "Ishaan Hassan",
+              "value": 39
+            },
+            {
+              "label": "Samir Lindqvist",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "stage",
+          "label": "Stage",
+          "type": "select",
+          "required": true,
+          "defaultValue": "qualification",
+          "options": [
+            {
+              "label": "Prospecting",
+              "value": "prospecting"
+            },
+            {
+              "label": "Qualification",
+              "value": "qualification"
+            },
+            {
+              "label": "Proposal",
+              "value": "proposal"
+            },
+            {
+              "label": "Negotiation",
+              "value": "negotiation"
+            },
+            {
+              "label": "Closed Won",
+              "value": "closed_won"
+            },
+            {
+              "label": "Closed Lost",
+              "value": "closed_lost"
+            }
+          ]
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "number",
+          "required": true,
+          "defaultValue": 2617.79,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "probability",
+          "label": "Probability %",
+          "type": "number",
+          "required": true,
+          "defaultValue": 80,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "close_date",
+          "label": "Expected close",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "type": "select",
+          "required": true,
+          "defaultValue": 9,
+          "options": [
+            {
+              "label": "Anika Osei",
+              "value": 1
+            },
+            {
+              "label": "Tomás Dubey",
+              "value": 2
+            },
+            {
+              "label": "Noah Chen",
+              "value": 3
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 4
+            },
+            {
+              "label": "Aarav Petrov",
+              "value": 5
+            },
+            {
+              "label": "Ravi Khan",
+              "value": 6
+            },
+            {
+              "label": "Elena Garcia",
+              "value": 7
+            },
+            {
+              "label": "Luca Fischer",
+              "value": 8
+            },
+            {
+              "label": "Noor Andersen",
+              "value": 9
+            },
+            {
+              "label": "Theo Nielsen",
+              "value": 10
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 11
+            },
+            {
+              "label": "Sofia Ivanova",
+              "value": 12
+            },
+            {
+              "label": "Tomás Sato",
+              "value": 13
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 14
+            },
+            {
+              "label": "Eli Meyer",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 16
+            },
+            {
+              "label": "Theo Petrov",
+              "value": 17
+            },
+            {
+              "label": "Noor Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Amara Khan",
+              "value": 19
+            },
+            {
+              "label": "Malik Müller",
+              "value": 20
+            },
+            {
+              "label": "Freya Tanaka",
+              "value": 21
+            },
+            {
+              "label": "Eli Chen",
+              "value": 22
+            },
+            {
+              "label": "Yuki Chen",
+              "value": 23
+            },
+            {
+              "label": "Anika Dubois",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "source",
+          "label": "Source",
+          "type": "select",
+          "required": false,
+          "defaultValue": "outbound",
+          "options": [
+            {
+              "label": "Inbound",
+              "value": "inbound"
+            },
+            {
+              "label": "Outbound",
+              "value": "outbound"
+            },
+            {
+              "label": "Partner",
+              "value": "partner"
+            },
+            {
+              "label": "Referral",
+              "value": "referral"
+            },
+            {
+              "label": "Expansion",
+              "value": "expansion"
+            }
+          ]
+        },
+        {
+          "key": "next_step",
+          "label": "Next step",
+          "type": "textarea",
+          "required": false,
+          "defaultValue": "Compliance renewal maintenance onboarding renewal.",
+          "help": "Plain text or short notes"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "deals_create",
+              "inputValues": {
+                "name": "{{ event.formData.name }}",
+                "account_id": "{{ event.formData.account_id }}",
+                "contact_id": "{{ event.formData.contact_id }}",
+                "stage": "{{ event.formData.stage }}",
+                "amount": "{{ event.formData.amount }}",
+                "probability": "{{ event.formData.probability }}",
+                "close_date": "{{ event.formData.close_date }}",
+                "owner_id": "{{ event.formData.owner_id }}",
+                "source": "{{ event.formData.source }}",
+                "next_step": "{{ event.formData.next_step }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-deals-create.result",
+    "key": "result",
+    "page": "crm-deals-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.deals_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.deals_create || {}).isLoading || false }}"
+    }
+  }
+]

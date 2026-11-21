@@ -1,0 +1,626 @@
+[
+  {
+    "slug": "crm-contacts-detail.heading",
+    "key": "heading",
+    "page": "crm-contacts-detail",
+    "title": "Record detail",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Contact detail\nRecord #{{ state.variables.recordID }} · every change is captured in the audit timeline.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.status",
+    "key": "status",
+    "page": "crm-contacts-detail",
+    "title": "Status",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ ((((state.queries.contacts_detail || {}).data || [])[0] || {}).status) }}",
+      "variant": "default"
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.statusForm",
+    "key": "statusForm",
+    "page": "crm-contacts-detail",
+    "title": "Change status",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Select status",
+      "defaultValue": "active",
+      "options": [
+        {
+          "label": "Active",
+          "value": "active"
+        },
+        {
+          "label": "Inactive",
+          "value": "inactive"
+        },
+        {
+          "label": "Bounced",
+          "value": "bounced"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "overview"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.statusButton",
+    "key": "statusButton",
+    "page": "crm-contacts-detail",
+    "title": "Apply status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Apply status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "contacts_status",
+              "inputValues": {
+                "id": "{{ state.variables.recordID }}",
+                "status": "{{ (state.widgets[\"widget_1207cfc9-1b02-4d43-b1c3-e8a959ce4404_1\"] || {}).value || \"active\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.delete",
+    "key": "delete",
+    "page": "crm-contacts-detail",
+    "title": "Archive",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive record",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "contacts_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.restore",
+    "key": "restore",
+    "page": "crm-contacts-detail",
+    "title": "Restore",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Restore record",
+      "variant": "outline",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "contacts_restore",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record restored",
+              "errorToast": "Restore failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.tabs",
+    "key": "tabs",
+    "page": "crm-contacts-detail",
+    "title": "Record sections",
+    "type": "tabs",
+    "config": {
+      "showHeader": false,
+      "tabs": [
+        {
+          "label": "Overview",
+          "value": "overview"
+        },
+        {
+          "label": "Comments",
+          "value": "comments"
+        },
+        {
+          "label": "Attachments",
+          "value": "attachments"
+        },
+        {
+          "label": "Activity",
+          "value": "activity"
+        }
+      ],
+      "defaultTab": "overview",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.record",
+    "key": "record",
+    "page": "crm-contacts-detail",
+    "title": "Record fields",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record fields",
+      "dataTemplate": "{{ (((state.queries.contacts_detail || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "emptyText": "Record not found.",
+      "isLoading": "{{ (state.queries.contacts_detail || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.editTable",
+    "key": "editTable",
+    "page": "crm-contacts-detail",
+    "title": "Inline edit",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.contacts_detail || {}).data || [])",
+      "columns": [
+        {
+          "key": "full_name",
+          "label": "Full name",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "email",
+          "label": "Email",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "job_title",
+          "label": "Job title",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "account_id",
+          "label": "Account",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "last_touch_at",
+          "label": "Last touch",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 1
+      },
+      "search": {
+        "enabled": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": true
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No record loaded.",
+      "isLoading": "{{ (state.queries.contacts_detail || {}).isLoading || false }}",
+      "events": {
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "contacts_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "full_name": "{{ event.updatedRow.full_name }}",
+                "email": "{{ event.updatedRow.email }}",
+                "phone": "{{ event.updatedRow.phone }}",
+                "job_title": "{{ event.updatedRow.job_title }}",
+                "account_id": "{{ event.updatedRow.account_id }}",
+                "owner_id": "{{ event.updatedRow.owner_id }}",
+                "status": "{{ event.updatedRow.status }}",
+                "last_touch_at": "{{ event.updatedRow.last_touch_at }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.comments",
+    "key": "comments",
+    "page": "crm-contacts-detail",
+    "title": "Comments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.contacts_comments || {}).data || [])",
+      "columns": [
+        {
+          "key": "author",
+          "label": "Author",
+          "type": "text"
+        },
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No comments yet.",
+      "isLoading": "{{ (state.queries.contacts_comments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.commentForm",
+    "key": "commentForm",
+    "page": "crm-contacts-detail",
+    "title": "Add comment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add comment",
+      "submitLabel": "Post comment",
+      "fields": [
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Add context, decisions or next steps"
+        },
+        {
+          "key": "authorID",
+          "label": "Author",
+          "type": "select",
+          "required": true,
+          "defaultValue": 1,
+          "options": [
+            {
+              "label": "Anika Osei",
+              "value": 1
+            },
+            {
+              "label": "Tomás Dubey",
+              "value": 2
+            },
+            {
+              "label": "Noah Chen",
+              "value": 3
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 4
+            },
+            {
+              "label": "Aarav Petrov",
+              "value": 5
+            },
+            {
+              "label": "Ravi Khan",
+              "value": 6
+            },
+            {
+              "label": "Elena Garcia",
+              "value": 7
+            },
+            {
+              "label": "Luca Fischer",
+              "value": 8
+            },
+            {
+              "label": "Noor Andersen",
+              "value": 9
+            },
+            {
+              "label": "Theo Nielsen",
+              "value": 10
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 11
+            },
+            {
+              "label": "Sofia Ivanova",
+              "value": 12
+            },
+            {
+              "label": "Tomás Sato",
+              "value": 13
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 14
+            },
+            {
+              "label": "Eli Meyer",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 16
+            },
+            {
+              "label": "Theo Petrov",
+              "value": 17
+            },
+            {
+              "label": "Noor Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Amara Khan",
+              "value": 19
+            },
+            {
+              "label": "Malik Müller",
+              "value": 20
+            },
+            {
+              "label": "Freya Tanaka",
+              "value": 21
+            },
+            {
+              "label": "Eli Chen",
+              "value": 22
+            },
+            {
+              "label": "Yuki Chen",
+              "value": 23
+            },
+            {
+              "label": "Anika Dubois",
+              "value": 24
+            }
+          ]
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "contacts_comment_create",
+              "inputValues": {
+                "entity": "contacts",
+                "entityID": "{{ state.variables.recordID }}",
+                "authorID": "{{ Number(event.formData.authorID || 1) }}",
+                "body": "{{ event.formData.body }}"
+              },
+              "successToast": "Comment added",
+              "errorToast": "Comment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.attachments",
+    "key": "attachments",
+    "page": "crm-contacts-detail",
+    "title": "Attachments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.contacts_attachments || {}).data || [])",
+      "columns": [
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "link"
+        },
+        {
+          "key": "file_url",
+          "label": "URL",
+          "type": "link"
+        },
+        {
+          "key": "mime_type",
+          "label": "Type",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Uploaded",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No attachments yet.",
+      "isLoading": "{{ (state.queries.contacts_attachments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.attachmentForm",
+    "key": "attachmentForm",
+    "page": "crm-contacts-detail",
+    "title": "Add attachment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add attachment",
+      "submitLabel": "Attach file",
+      "fields": [
+        {
+          "key": "fileName",
+          "label": "File name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "document.pdf"
+        },
+        {
+          "key": "fileURL",
+          "label": "File URL",
+          "type": "text",
+          "required": true,
+          "defaultValue": "https://files.example.invalid/document.pdf"
+        },
+        {
+          "key": "mimeType",
+          "label": "MIME type",
+          "type": "text",
+          "defaultValue": "application/pdf"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "contacts_attachment_create",
+              "inputValues": {
+                "entity": "contacts",
+                "entityID": "{{ state.variables.recordID }}",
+                "fileName": "{{ event.formData.fileName }}",
+                "fileURL": "{{ event.formData.fileURL }}",
+                "mimeType": "{{ event.formData.mimeType }}",
+                "uploadedBy": "{{ 1 }}"
+              },
+              "successToast": "Attachment linked",
+              "errorToast": "Attachment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-contacts-detail.activity",
+    "key": "activity",
+    "page": "crm-contacts-detail",
+    "title": "Audit timeline",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Audit timeline",
+      "dataTemplate": "{{ (state.queries.contacts_audit || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No audit entries yet.",
+      "isLoading": "{{ (state.queries.contacts_audit || {}).isLoading || false }}"
+    }
+  }
+]

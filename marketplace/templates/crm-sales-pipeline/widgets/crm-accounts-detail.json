@@ -1,0 +1,603 @@
+[
+  {
+    "slug": "crm-accounts-detail.heading",
+    "key": "heading",
+    "page": "crm-accounts-detail",
+    "title": "Record detail",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Account detail\nRecord #{{ state.variables.recordID }} · every change is captured in the audit timeline.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.status",
+    "key": "status",
+    "page": "crm-accounts-detail",
+    "title": "Status",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "—",
+      "variant": "default"
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.statusForm",
+    "key": "statusForm",
+    "page": "crm-accounts-detail",
+    "title": "Change status",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Select status",
+      "defaultValue": "",
+      "options": [],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "overview"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.delete",
+    "key": "delete",
+    "page": "crm-accounts-detail",
+    "title": "Archive",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive record",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "accounts_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.restore",
+    "key": "restore",
+    "page": "crm-accounts-detail",
+    "title": "Restore",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Restore record",
+      "variant": "outline",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "accounts_restore",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record restored",
+              "errorToast": "Restore failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.tabs",
+    "key": "tabs",
+    "page": "crm-accounts-detail",
+    "title": "Record sections",
+    "type": "tabs",
+    "config": {
+      "showHeader": false,
+      "tabs": [
+        {
+          "label": "Overview",
+          "value": "overview"
+        },
+        {
+          "label": "Comments",
+          "value": "comments"
+        },
+        {
+          "label": "Attachments",
+          "value": "attachments"
+        },
+        {
+          "label": "Activity",
+          "value": "activity"
+        }
+      ],
+      "defaultTab": "overview",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.record",
+    "key": "record",
+    "page": "crm-accounts-detail",
+    "title": "Record fields",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record fields",
+      "dataTemplate": "{{ (((state.queries.accounts_detail || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "emptyText": "Record not found.",
+      "isLoading": "{{ (state.queries.accounts_detail || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.editTable",
+    "key": "editTable",
+    "page": "crm-accounts-detail",
+    "title": "Inline edit",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.accounts_detail || {}).data || [])",
+      "columns": [
+        {
+          "key": "account_name",
+          "label": "Account name",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "industry",
+          "label": "Industry",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "tier",
+          "label": "Tier",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "website",
+          "label": "Website",
+          "sortable": false,
+          "type": "link",
+          "editable": true
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "city",
+          "label": "City",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "country",
+          "label": "Country",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "annual_revenue",
+          "label": "Annual revenue",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "health_score",
+          "label": "Health score",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 1
+      },
+      "search": {
+        "enabled": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": true
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No record loaded.",
+      "isLoading": "{{ (state.queries.accounts_detail || {}).isLoading || false }}",
+      "events": {
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "accounts_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "account_name": "{{ event.updatedRow.account_name }}",
+                "industry": "{{ event.updatedRow.industry }}",
+                "tier": "{{ event.updatedRow.tier }}",
+                "website": "{{ event.updatedRow.website }}",
+                "phone": "{{ event.updatedRow.phone }}",
+                "city": "{{ event.updatedRow.city }}",
+                "country": "{{ event.updatedRow.country }}",
+                "owner_id": "{{ event.updatedRow.owner_id }}",
+                "annual_revenue": "{{ event.updatedRow.annual_revenue }}",
+                "health_score": "{{ event.updatedRow.health_score }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.comments",
+    "key": "comments",
+    "page": "crm-accounts-detail",
+    "title": "Comments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.accounts_comments || {}).data || [])",
+      "columns": [
+        {
+          "key": "author",
+          "label": "Author",
+          "type": "text"
+        },
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No comments yet.",
+      "isLoading": "{{ (state.queries.accounts_comments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.commentForm",
+    "key": "commentForm",
+    "page": "crm-accounts-detail",
+    "title": "Add comment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add comment",
+      "submitLabel": "Post comment",
+      "fields": [
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Add context, decisions or next steps"
+        },
+        {
+          "key": "authorID",
+          "label": "Author",
+          "type": "select",
+          "required": true,
+          "defaultValue": 1,
+          "options": [
+            {
+              "label": "Anika Osei",
+              "value": 1
+            },
+            {
+              "label": "Tomás Dubey",
+              "value": 2
+            },
+            {
+              "label": "Noah Chen",
+              "value": 3
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 4
+            },
+            {
+              "label": "Aarav Petrov",
+              "value": 5
+            },
+            {
+              "label": "Ravi Khan",
+              "value": 6
+            },
+            {
+              "label": "Elena Garcia",
+              "value": 7
+            },
+            {
+              "label": "Luca Fischer",
+              "value": 8
+            },
+            {
+              "label": "Noor Andersen",
+              "value": 9
+            },
+            {
+              "label": "Theo Nielsen",
+              "value": 10
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 11
+            },
+            {
+              "label": "Sofia Ivanova",
+              "value": 12
+            },
+            {
+              "label": "Tomás Sato",
+              "value": 13
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 14
+            },
+            {
+              "label": "Eli Meyer",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 16
+            },
+            {
+              "label": "Theo Petrov",
+              "value": 17
+            },
+            {
+              "label": "Noor Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Amara Khan",
+              "value": 19
+            },
+            {
+              "label": "Malik Müller",
+              "value": 20
+            },
+            {
+              "label": "Freya Tanaka",
+              "value": 21
+            },
+            {
+              "label": "Eli Chen",
+              "value": 22
+            },
+            {
+              "label": "Yuki Chen",
+              "value": 23
+            },
+            {
+              "label": "Anika Dubois",
+              "value": 24
+            }
+          ]
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "accounts_comment_create",
+              "inputValues": {
+                "entity": "accounts",
+                "entityID": "{{ state.variables.recordID }}",
+                "authorID": "{{ Number(event.formData.authorID || 1) }}",
+                "body": "{{ event.formData.body }}"
+              },
+              "successToast": "Comment added",
+              "errorToast": "Comment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.attachments",
+    "key": "attachments",
+    "page": "crm-accounts-detail",
+    "title": "Attachments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.accounts_attachments || {}).data || [])",
+      "columns": [
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "link"
+        },
+        {
+          "key": "file_url",
+          "label": "URL",
+          "type": "link"
+        },
+        {
+          "key": "mime_type",
+          "label": "Type",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Uploaded",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No attachments yet.",
+      "isLoading": "{{ (state.queries.accounts_attachments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.attachmentForm",
+    "key": "attachmentForm",
+    "page": "crm-accounts-detail",
+    "title": "Add attachment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add attachment",
+      "submitLabel": "Attach file",
+      "fields": [
+        {
+          "key": "fileName",
+          "label": "File name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "document.pdf"
+        },
+        {
+          "key": "fileURL",
+          "label": "File URL",
+          "type": "text",
+          "required": true,
+          "defaultValue": "https://files.example.invalid/document.pdf"
+        },
+        {
+          "key": "mimeType",
+          "label": "MIME type",
+          "type": "text",
+          "defaultValue": "application/pdf"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "accounts_attachment_create",
+              "inputValues": {
+                "entity": "accounts",
+                "entityID": "{{ state.variables.recordID }}",
+                "fileName": "{{ event.formData.fileName }}",
+                "fileURL": "{{ event.formData.fileURL }}",
+                "mimeType": "{{ event.formData.mimeType }}",
+                "uploadedBy": "{{ 1 }}"
+              },
+              "successToast": "Attachment linked",
+              "errorToast": "Attachment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "crm-accounts-detail.activity",
+    "key": "activity",
+    "page": "crm-accounts-detail",
+    "title": "Audit timeline",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Audit timeline",
+      "dataTemplate": "{{ (state.queries.accounts_audit || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No audit entries yet.",
+      "isLoading": "{{ (state.queries.accounts_audit || {}).isLoading || false }}"
+    }
+  }
+]

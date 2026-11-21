@@ -261,13 +261,18 @@ class QueryEngine {
 
     let result;
     try {
+      const orderedInputs = (query.dataQueryOptions?.inputDefinitions || []).map((def) =>
+        runtimeInputs && runtimeInputs[def.key] !== undefined ? runtimeInputs[def.key] : null
+      );
       result = await Promise.race([
         datasource.execute(
           resolvedTemplate,
-          {},
+          { inputs: orderedInputs },
           {
             fileStorage: fileStorageUtil,
             signal: abortController.signal,
+            inputs: orderedInputs,
+            tenantID,
             getCredential: async (vaultCredentialID) => {
               return await vaultService.getCredential({
                 tenantID: query.tenantID,

@@ -1,0 +1,11 @@
+name,email,role_key,department
+"Anika Osei","staff.1@example.com","manager","Support"
+"Tomás Dubey","staff.2@example.com","sales_rep","Operations"
+"Noah Chen","staff.3@example.com","analyst","Finance"
+"Hugo Novak","staff.4@example.com","client","People"
+"Aarav Petrov","staff.5@example.com","admin","Engineering"
+"Ravi Khan","staff.6@example.com","manager","Procurement"
+"Elena Garcia","staff.7@example.com","sales_rep","Security"
+"Luca Fischer","staff.8@example.com","analyst","Fleet"
+"Noor Andersen","staff.9@example.com","client","Success"
+"Theo Nielsen","staff.10@example.com","admin","Sales"
