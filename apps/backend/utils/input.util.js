@@ -40,6 +40,8 @@ function normalizeDefinitions(inputDefinitions, options = {}) {
       type: input.type || 'string',
       required: input.required === true,
       default: input.default !== undefined ? input.default : (input.defaultValue !== undefined ? input.defaultValue : undefined),
+      pattern: input.pattern,
+      maxLength: input.maxLength,
       supportsTemplate,
       definitionSource,
     }));
@@ -320,6 +322,29 @@ async function resolveInputs({
     if (def.required && (value === undefined || value === null || value === '')) {
       errors[def.key] = `"${def.key}" is required`;
       hasError = true;
+    }
+
+    if (hasError) continue;
+
+    // Stage 5: Constrained string validation. This is the guard used before
+    // identifiers/search terms are interpolated into SQL templates.
+    if (typeof value === 'string') {
+      if (def.maxLength && value.length > def.maxLength) {
+        errors[def.key] = `"${def.key}" exceeds maximum length ${def.maxLength}`;
+        hasError = true;
+      } else if (def.pattern) {
+        let matcher;
+        try {
+          matcher = new RegExp(def.pattern);
+        } catch {
+          errors[def.key] = `"${def.key}" has an invalid validation pattern`;
+          hasError = true;
+        }
+        if (matcher && !matcher.test(value)) {
+          errors[def.key] = `"${def.key}" does not match the required format`;
+          hasError = true;
+        }
+      }
     }
 
     if (hasError) continue;

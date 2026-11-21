@@ -106,49 +106,107 @@ test("typed numeric filters reject injected SQL before execution", async () => {
   await expect(runtime.executeQuery(query.dataQueryID, { minAge: "0;DROP TABLE invoices" })).rejects.toThrow(/finite number/);
 });
 
-test("PostgreSQL app bundles its datasource, queries, widgets and page", () => {
+test("PostgreSQL admin console bundles catalog, rows, schema, constraints, indexes and size", () => {
   const entry = catalog.find((e) => e.slug === "curated-postgresql-admin-app");
   const items = entry.payload.items;
   const byType = (type) => items.filter((i) => i.type === type);
   expect(byType("datasource")).toHaveLength(1);
-  expect(byType("dataQuery")).toHaveLength(2);
-  expect(byType("widget")).toHaveLength(3);
+  expect(byType("dataQuery")).toHaveLength(8);
+  expect(byType("widget")).toHaveLength(11);
   expect(byType("appPage")).toHaveLength(1);
   expect(byType("datasource")[0].payload).toMatchObject({
     datasourceType: "postgresql",
     requiresReconnect: true,
   });
   expect(byType("dataQuery").every((q) => q.payload.datasourceType === "postgresql")).toBe(true);
-  const tablesQuery = byType("dataQuery").find((q) => /visible tables/.test(q.payload.dataQueryTitle));
+
+  const query = (title) =>
+    byType("dataQuery").find((q) => q.payload.dataQueryTitle.includes(title));
+  const tablesQuery = query("visible tables");
   expect(tablesQuery.payload.dataQueryOptions.query).toContain(
     "LIMIT {{ inputs.limit }} OFFSET {{ inputs.offset }}"
   );
   expect(tablesQuery.payload.dataQueryOptions.inputDefinitions.map((d) => d.key)).toEqual([
+    "search",
     "limit",
     "offset",
   ]);
-  const tableWidget = byType("widget").find((w) => w.payload.widgetType === "table");
-  expect(tableWidget.payload.widgetConfig.pagination).toMatchObject({
+  expect(tablesQuery.payload.dataQueryOptions.inputDefinitions[0].pattern).toBeTruthy();
+  const rowsQuery = query("selected table rows");
+  expect(rowsQuery.payload.dataQueryOptions.query).toContain(
+    `FROM "{{ inputs.schema }}"."{{ inputs.table }}"`
+  );
+  expect(rowsQuery.payload.dataQueryOptions.inputDefinitions[0]).toMatchObject({
+    key: "schema",
+    pattern: expect.stringContaining("A-Za-z_"),
+  });
+  expect(rowsQuery.payload.dataQueryOptions.inputDefinitions[1]).toMatchObject({
+    key: "table",
+    pattern: expect.stringContaining("A-Za-z_"),
+  });
+  for (const title of ["selected table row count", "selected table columns", "selected table constraints", "selected table indexes", "selected table size"]) {
+    expect(query(title)).toBeTruthy();
+  }
+
+  const widgets = byType("widget").map((w) => w.payload);
+  const catalogTable = widgets.find((w) => w.widgetTitle === "Table catalog");
+  expect(catalogTable.widgetConfig.pagination).toMatchObject({
     enabled: true,
     mode: "server",
     pageSize: 15,
     totalTemplate: expect.stringContaining("table_count"),
   });
-  expect(
-    tableWidget.payload.widgetConfig.events.onPageChange[0].config.inputValues
-  ).toEqual({
-    limit: "{{ event.pageSize }}",
-    offset: "{{ event.offset }}",
+  expect(catalogTable.widgetConfig.search).toMatchObject({ enabled: true, serverSide: true });
+  expect(catalogTable.widgetConfig.events.onRowSelect.map((a) => a.actionType)).toEqual([
+    "SET_VARIABLE",
+    "SET_VARIABLE",
+    "EXECUTE_QUERY",
+    "EXECUTE_QUERY",
+  ]);
+  expect(catalogTable.widgetConfig.events.onSearch[1].config).toMatchObject({
+    alias: "tables",
+    inputValues: { limit: 15, offset: 0 },
   });
+
+  const rowsTable = widgets.find((w) => w.widgetTitle === "Table data");
+  expect(rowsTable.widgetConfig.pagination.totalTemplate).toContain("row_count");
+  expect(rowsTable.widgetConfig.events.onPageChange[0].config).toMatchObject({
+    alias: "rows",
+    inputValues: {
+      schema: "{{ state.variables.selectedSchema }}",
+      table: "{{ state.variables.selectedTable }}",
+      limit: "{{ event.pageSize }}",
+      offset: "{{ event.offset }}",
+    },
+  });
+
+  const viewSchema = widgets.find((w) => w.widgetTitle === "View schema");
+  expect(viewSchema.widgetConfig.events.onClick.map((a) => a.config.alias)).toEqual([
+    "columns",
+    "constraints",
+    "indexes",
+    "size",
+  ]);
+
   const page = byType("appPage")[0].payload.appPageConfig;
   expect(page.layoutVersion).toBe(2);
-  expect(page.widgets).toHaveLength(3);
-  expect(page.dataSources).toHaveLength(2);
-  expect(page.dataSources.map((s) => s.alias).sort()).toEqual(["table_count", "tables"]);
-  expect(page.dataSources.find((s) => s.alias === "tables").inputValues).toEqual({
-    limit: 15,
-    offset: 0,
-  });
+  expect(page.widgets).toHaveLength(11);
+  expect(page.dataSources).toHaveLength(8);
+  expect(page.dataSources.map((s) => s.alias).sort()).toEqual([
+    "columns",
+    "constraints",
+    "indexes",
+    "row_count",
+    "rows",
+    "size",
+    "table_count",
+    "tables",
+  ]);
+  expect(page.variables.map((v) => v.key).sort()).toEqual([
+    "catalogSearch",
+    "selectedSchema",
+    "selectedTable",
+  ]);
 });
 
 module.exports = { runtimeFor };

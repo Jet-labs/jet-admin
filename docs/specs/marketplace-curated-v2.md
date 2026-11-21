@@ -35,6 +35,11 @@ widget comes with a small companion page rather than an orphaned expression.
     page defaults are `15`/`0`, the table emits `onPageChange`, and that action
     re-runs the `tables` query with `event.pageSize`/`event.offset`. The total
     page count comes from the separate table-count query via `totalTemplate`.
+  - The admin console also includes a clickable catalog that loads table rows,
+    plus explicit **View schema** actions for columns, constraints, indexes and
+    table size. Dynamic schema/table identifiers and catalog search terms use
+    declared `pattern` validation before SQL interpolation; identifiers are
+    double-quoted. `run inputs` rejects unsafe values with a 400.
 
 These are not 36 independent SaaS connectors. They are a mixture of reusable
 operational components, playbooks and complete applications.

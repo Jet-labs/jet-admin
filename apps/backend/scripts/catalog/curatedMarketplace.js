@@ -242,161 +242,535 @@ function catalogEntry({ slug, itemType, title, description, category, icon = "Tb
  * bundle rather than the former blank app-page placeholder.
  */
 function addPostgresAdminApp(manifest) {
-  const datasourceID = uuid("postgres-admin:datasource");
-  const tablesQueryID = uuid("postgres-admin:query:tables");
-  const countQueryID = uuid("postgres-admin:query:table-count");
-  const instructionsWidgetID = uuid("postgres-admin:widget:instructions");
-  const statWidgetID = uuid("postgres-admin:widget:table-count");
-  const tableWidgetID = uuid("postgres-admin:widget:tables");
-  const pageID = uuid("postgres-admin:page");
-  const tableFilter = "WHERE table_schema NOT IN ('pg_catalog', 'information_schema')";
-  const tableQuery = `SELECT table_schema, table_name FROM information_schema.tables ${tableFilter} ORDER BY table_schema, table_name LIMIT {{ inputs.limit }} OFFSET {{ inputs.offset }}`;
-  const countQuery = `SELECT count(*)::int AS tables FROM information_schema.tables ${tableFilter}`;
+  const id = (key) => uuid(`postgres-admin:${key}`);
+  const datasourceID = id("datasource");
+  const queryIDs = {
+    tables: id("query:tables"),
+    tableCount: id("query:table-count"),
+    rows: id("query:rows"),
+    rowCount: id("query:row-count"),
+    columns: id("query:columns"),
+    constraints: id("query:constraints"),
+    indexes: id("query:indexes"),
+    size: id("query:size"),
+  };
+  const widgetIDs = {
+    instructions: id("widget:instructions"),
+    refresh: id("widget:refresh"),
+    loadRows: id("widget:load-rows"),
+    viewSchema: id("widget:view-schema"),
+    rowCount: id("widget:row-count"),
+    catalog: id("widget:catalog"),
+    rows: id("widget:rows"),
+    columns: id("widget:columns"),
+    constraints: id("widget:constraints"),
+    indexes: id("widget:indexes"),
+    size: id("widget:size"),
+  };
+  const pageID = id("page");
+  const IDENT = "^[A-Za-z_][A-Za-z0-9_]*$";
+  const SEARCH = "^[A-Za-z0-9_ .-]{0,64}$";
+  const identInput = (key, defaultValue = "") => ({
+    key,
+    type: "string",
+    required: key !== "search",
+    defaultValue,
+    pattern: IDENT,
+    maxLength: 63,
+  });
+  const limitInput = { key: "limit", type: "number", required: false, defaultValue: 15 };
+  const offsetInput = { key: "offset", type: "number", required: false, defaultValue: 0 };
+  const searchInput = {
+    key: "search",
+    type: "string",
+    required: false,
+    defaultValue: "",
+    pattern: SEARCH,
+    maxLength: 64,
+  };
+  const tableFilter = `WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+      AND (table_schema ILIKE '%' || '{{ inputs.search }}' || '%'
+        OR table_name ILIKE '%' || '{{ inputs.search }}' || '%')`;
+
   manifest.datasources.push({
     datasourceID,
     datasourceTitle: "PostgreSQL · schema catalog",
     datasourceType: "postgresql",
-    datasourceDescription: "Reconnect with your PostgreSQL host, database and user. Read-only information_schema queries are bundled.",
+    datasourceDescription:
+      "Reconnect with your PostgreSQL host, database and user. The bundled admin console runs read-only catalog and table queries.",
     datasourceOptions: { host: "", port: 5432, database: "", user: "", password: "", ssl: false },
-    datasourceTags: ["integration", "curated", "postgresql", "read-only"],
+    datasourceTags: ["integration", "curated", "postgresql", "read-only", "admin"],
     requiresReconnect: true,
   });
-  manifest.queries.push(
-    {
-      dataQueryID: tablesQueryID, datasourceID, datasourceType: "postgresql",
-      dataQueryTitle: "PostgreSQL · visible tables",
-      dataQueryDescription: "Lists visible user tables from information_schema with server-side limit/offset pagination. Read-only.",
-      dataQueryOptions: {
-        queryType: "sql",
-        query: tableQuery,
-        inputDefinitions: [
-          { key: "limit", type: "number", required: false, defaultValue: 15 },
-          { key: "offset", type: "number", required: false, defaultValue: 0 },
-        ],
-        timeoutSeconds: 20,
-      },
+
+  const addQuery = (key, title, description, sql, inputDefinitions) => {
+    manifest.queries.push({
+      dataQueryID: queryIDs[key],
+      datasourceID,
+      datasourceType: "postgresql",
+      dataQueryTitle: title,
+      dataQueryDescription: description,
+      dataQueryOptions: { queryType: "sql", query: sql, inputDefinitions, timeoutSeconds: 30 },
       runOnLoad: false,
-    },
+    });
+  };
+
+  addQuery(
+    "tables",
+    "PostgreSQL · visible tables",
+    "Lists visible user tables with safe search and server-side limit/offset pagination. Read-only.",
+    `SELECT table_schema, table_name
+     FROM information_schema.tables
+     ${tableFilter}
+     ORDER BY table_schema, table_name
+     LIMIT {{ inputs.limit }} OFFSET {{ inputs.offset }}`,
+    [searchInput, limitInput, offsetInput]
+  );
+  addQuery(
+    "tableCount",
+    "PostgreSQL · visible table count",
+    "Counts visible user tables for the current catalog search. Read-only.",
+    `SELECT count(*)::int AS tables FROM information_schema.tables ${tableFilter}`,
+    [searchInput]
+  );
+  addQuery(
+    "rows",
+    "PostgreSQL · selected table rows",
+    "Returns a page of rows from the selected table. Identifiers are pattern-validated and quoted. Read-only.",
+    `SELECT * FROM "{{ inputs.schema }}"."{{ inputs.table }}"
+     LIMIT {{ inputs.limit }} OFFSET {{ inputs.offset }}`,
+    [identInput("schema"), identInput("table"), limitInput, offsetInput]
+  );
+  addQuery(
+    "rowCount",
+    "PostgreSQL · selected table row count",
+    "Exact row count for the selected table. Read-only.",
+    `SELECT count(*)::bigint AS total FROM "{{ inputs.schema }}"."{{ inputs.table }}"`,
+    [identInput("schema"), identInput("table")]
+  );
+  addQuery(
+    "columns",
+    "PostgreSQL · selected table columns",
+    "Column names, types, nullability and defaults for the selected table. Read-only.",
+    `SELECT ordinal_position, column_name, data_type, is_nullable, column_default
+     FROM information_schema.columns
+     WHERE table_schema = '{{ inputs.schema }}' AND table_name = '{{ inputs.table }}'
+     ORDER BY ordinal_position`,
+    [identInput("schema"), identInput("table")]
+  );
+  addQuery(
+    "constraints",
+    "PostgreSQL · selected table constraints",
+    "Primary keys, foreign keys, unique and check constraints for the selected table. Read-only.",
+    `SELECT tc.constraint_name, tc.constraint_type, kcu.column_name, kcu.ordinal_position
+     FROM information_schema.table_constraints tc
+     LEFT JOIN information_schema.key_column_usage kcu
+       ON tc.constraint_schema = kcu.constraint_schema
+      AND tc.constraint_name = kcu.constraint_name
+      AND tc.table_schema = kcu.table_schema
+      AND tc.table_name = kcu.table_name
+     WHERE tc.table_schema = '{{ inputs.schema }}' AND tc.table_name = '{{ inputs.table }}'
+     ORDER BY tc.constraint_type, tc.constraint_name, kcu.ordinal_position`,
+    [identInput("schema"), identInput("table")]
+  );
+  addQuery(
+    "indexes",
+    "PostgreSQL · selected table indexes",
+    "Index definitions for the selected table. Read-only.",
+    `SELECT indexname, indexdef
+     FROM pg_indexes
+     WHERE schemaname = '{{ inputs.schema }}' AND tablename = '{{ inputs.table }}'
+     ORDER BY indexname`,
+    [identInput("schema"), identInput("table")]
+  );
+  addQuery(
+    "size",
+    "PostgreSQL · selected table size",
+    "Formatted total size and estimated row count from pg_class. Read-only.",
+    `SELECT pg_size_pretty(pg_total_relation_size(c.oid)) AS total_size,
+            c.reltuples::bigint AS estimated_rows
+     FROM pg_class c
+     JOIN pg_namespace n ON n.oid = c.relnamespace
+     WHERE n.nspname = '{{ inputs.schema }}' AND c.relname = '{{ inputs.table }}'`,
+    [identInput("schema"), identInput("table")]
+  );
+
+  const addWidget = (key, title, widgetType, widgetConfig) => {
+    manifest.widgets.push({
+      widgetID: widgetIDs[key],
+      widgetTitle: title,
+      widgetDescription: `PostgreSQL admin · ${title}`,
+      widgetType,
+      widgetConfig: { showHeader: true, ...widgetConfig },
+      refreshInterval: null,
+    });
+    return `widget_${widgetIDs[key]}_1`;
+  };
+
+  const setVar = (key, value) => ({
+    actionType: "SET_VARIABLE",
+    config: { key: `state.variables.${key}`, value },
+  });
+  const execute = (alias, inputValues) => ({
+    actionType: "EXECUTE_QUERY",
+    config: { alias, ...(inputValues ? { inputValues } : {}) },
+  });
+  const tableConfig = (alias, columns, extra = {}) => ({
+    dataArrayTemplate: expr(`((state.queries.${alias} || {}).data || [])`),
+    columns,
+    search: { enabled: false },
+    export: { enabled: true, format: "csv" },
+    editing: { enabled: false },
+    isLoading: expr(`((state.queries.${alias} || {}).isLoading || false)`),
+    ...extra,
+  });
+
+  const instructionsKey = addWidget(
+    "instructions",
+    "PostgreSQL admin",
+    "text",
     {
-      dataQueryID: countQueryID, datasourceID, datasourceType: "postgresql",
-      dataQueryTitle: "PostgreSQL · visible table count",
-      dataQueryDescription: "Counts visible user tables. Read-only.",
-      dataQueryOptions: { queryType: "sql", query: countQuery, inputDefinitions: [], timeoutSeconds: 20 },
-      runOnLoad: false,
+      showHeader: false,
+      format: "markdown",
+      content:
+        "# PostgreSQL admin console\n1. Connect **Data sources → PostgreSQL · schema catalog**.\n2. The catalog loads automatically; use **Refresh catalog** after DDL changes.\n3. Select a table to load its rows; use **View schema** for columns, constraints and indexes.\n\n> Read-only catalog and table queries. Identifiers are validated and quoted; no writes are performed.",
     }
   );
-  manifest.widgets.push(
-    {
-      widgetID: instructionsWidgetID, widgetTitle: "Connect PostgreSQL",
-      widgetDescription: "Setup checklist and scope of the read-only schema catalog.",
-      widgetType: "text", refreshInterval: null,
-      widgetConfig: {
-        showHeader: false, format: "markdown",
-        content: "# PostgreSQL admin app\n1. Open **Data sources → PostgreSQL · schema catalog**.\n2. Enter your host, port, database, user and password, then test the connection.\n3. Return to this page. The table catalog and count refresh from your database.\n\n> This app runs read-only `information_schema` queries. It does not modify your database.",
-      },
+  const refreshKey = addWidget("refresh", "Refresh catalog", "button", {
+    text: "Refresh catalog",
+    variant: "outline",
+    events: {
+      onClick: [
+        execute("tables", {
+          search: expr("state.variables.catalogSearch"),
+          limit: 15,
+          offset: 0,
+        }),
+        execute("table_count", { search: expr("state.variables.catalogSearch") }),
+      ],
     },
-    {
-      widgetID: statWidgetID, widgetTitle: "Visible tables", widgetDescription: "Count of tables visible to the connected user.",
-      widgetType: "stat", refreshInterval: null,
-      widgetConfig: {
-        showHeader: true, label: "Visible tables",
-        valueTemplate: expr("((((state.queries.table_count || {}).data || [])[0] || {}).tables || 0)"),
-      },
+  });
+  const loadRowsKey = addWidget("loadRows", "Load rows", "button", {
+    text: "Load selected rows",
+    events: {
+      onClick: [
+        execute("rows", {
+          schema: expr("state.variables.selectedSchema"),
+          table: expr("state.variables.selectedTable"),
+          limit: 15,
+          offset: 0,
+        }),
+        execute("row_count", {
+          schema: expr("state.variables.selectedSchema"),
+          table: expr("state.variables.selectedTable"),
+        }),
+      ],
     },
+  });
+  const viewSchemaKey = addWidget("viewSchema", "View schema", "button", {
+    text: "View schema",
+    variant: "outline",
+    events: {
+      onClick: [
+        execute("columns", {
+          schema: expr("state.variables.selectedSchema"),
+          table: expr("state.variables.selectedTable"),
+        }),
+        execute("constraints", {
+          schema: expr("state.variables.selectedSchema"),
+          table: expr("state.variables.selectedTable"),
+        }),
+        execute("indexes", {
+          schema: expr("state.variables.selectedSchema"),
+          table: expr("state.variables.selectedTable"),
+        }),
+        execute("size", {
+          schema: expr("state.variables.selectedSchema"),
+          table: expr("state.variables.selectedTable"),
+        }),
+      ],
+    },
+  });
+  const rowCountKey = addWidget("rowCount", "Rows in selected table", "stat", {
+    label: "Rows (exact)",
+    valueTemplate: expr(
+      "((((state.queries.row_count || {}).data || [])[0] || {}).total || 0)"
+    ),
+  });
+  const catalogKey = addWidget("catalog", "Table catalog", "table", tableConfig(
+    "tables",
+    [
+      { key: "table_schema", label: "Schema", type: "text", sortable: true },
+      { key: "table_name", label: "Table", type: "text", sortable: true },
+    ],
     {
-      widgetID: tableWidgetID, widgetTitle: "Schema and table catalog",
-      widgetDescription: "Visible schemas and tables from information_schema.",
-      widgetType: "table", refreshInterval: null,
-      widgetConfig: {
-        showHeader: true,
-        dataArrayTemplate: expr("((state.queries.tables || {}).data || [])"),
-        columns: [
-          { key: "table_schema", label: "Schema", type: "text", sortable: true },
-          { key: "table_name", label: "Table", type: "text", sortable: true },
+      pagination: {
+        enabled: true,
+        mode: "server",
+        pageSize: 15,
+        pageParam: "page",
+        pageSizeParam: "limit",
+        totalTemplate: expr(
+          "((((state.queries.table_count || {}).data || [])[0] || {}).tables || 0)"
+        ),
+      },
+      search: { enabled: true, serverSide: true, placeholder: "Filter tables..." },
+      emptyText: "No tables yet. Connect the datasource, then click Refresh catalog.",
+      events: {
+        onPageChange: [
+          execute("tables", {
+            search: expr("state.variables.catalogSearch"),
+            limit: expr("event.pageSize"),
+            offset: expr("event.offset"),
+          }),
         ],
-        pagination: {
-          enabled: true,
-          mode: "server",
-          pageSize: 15,
-          pageParam: "page",
-          pageSizeParam: "limit",
-          totalTemplate: expr(
-            "((((state.queries.table_count || {}).data || [])[0] || {}).tables || 0)"
-          ),
-        },
-        events: {
-          onPageChange: [
-            {
-              actionType: "EXECUTE_QUERY",
-              config: {
-                alias: "tables",
-                inputValues: {
-                  limit: expr("event.pageSize"),
-                  offset: expr("event.offset"),
-                },
-              },
-            },
-          ],
-        },
-        search: { enabled: true },
-        export: { enabled: true, format: "csv" },
-        editing: { enabled: false },
-        isLoading: expr("((state.queries.tables || {}).isLoading || false)"),
-        emptyText: "No tables returned. Confirm the connection and that the user can see application schemas.",
+        onSearch: [
+          setVar("catalogSearch", expr("event.searchTerm")),
+          execute("tables", {
+            search: expr("event.searchTerm"),
+            limit: 15,
+            offset: 0,
+          }),
+          execute("table_count", { search: expr("event.searchTerm") }),
+        ],
+        onRowSelect: [
+          setVar("selectedSchema", expr("event.row.table_schema")),
+          setVar("selectedTable", expr("event.row.table_name")),
+          execute("rows", {
+            schema: expr("event.row.table_schema"),
+            table: expr("event.row.table_name"),
+            limit: 15,
+            offset: 0,
+          }),
+          execute("row_count", {
+            schema: expr("event.row.table_schema"),
+            table: expr("event.row.table_name"),
+          }),
+        ],
       },
     }
-  );
-  const widgetKeys = [instructionsWidgetID, statWidgetID, tableWidgetID].map((id) => `widget_${id}_1`);
-  const row = (index, children) => ({ id: uuid(`postgres-admin:row:${index}`), type: "row", sizing: "auto", children });
-  const widgetNode = (key, span, minHeight) => ({
-    id: uuid(`postgres-admin:slot:${key}`), type: "widget", widgetKey: key, span,
-    sizing: "fill", ...(minHeight ? { minHeight } : {}),
+  ));
+  const rowsKey = addWidget("rows", "Table data", "table", tableConfig("rows", [], {
+    pagination: {
+      enabled: true,
+      mode: "server",
+      pageSize: 15,
+      pageParam: "page",
+      pageSizeParam: "limit",
+      totalTemplate: expr(
+        "((((state.queries.row_count || {}).data || [])[0] || {}).total || 0)"
+      ),
+    },
+    emptyText: "Select a table to preview its rows.",
+    emptyHint: "Row data is read with the selected schema and table identifiers.",
+    events: {
+      onPageChange: [
+        execute("rows", {
+          schema: expr("state.variables.selectedSchema"),
+          table: expr("state.variables.selectedTable"),
+          limit: expr("event.pageSize"),
+          offset: expr("event.offset"),
+        }),
+      ],
+    },
+  }));
+  const columnsKey = addWidget("columns", "Columns", "table", tableConfig(
+    "columns",
+    [
+      { key: "ordinal_position", label: "#", type: "number", width: 56 },
+      { key: "column_name", label: "Column", type: "text" },
+      { key: "data_type", label: "Type", type: "text" },
+      { key: "is_nullable", label: "Nullable", type: "text" },
+      { key: "column_default", label: "Default", type: "text" },
+    ],
+    { emptyText: "Select a table and choose View schema." }
+  ));
+  const constraintsKey = addWidget("constraints", "Constraints", "table", tableConfig(
+    "constraints",
+    [
+      { key: "constraint_name", label: "Constraint", type: "text" },
+      { key: "constraint_type", label: "Type", type: "text" },
+      { key: "column_name", label: "Column", type: "text" },
+    ],
+    { emptyText: "Select a table and choose View schema." }
+  ));
+  const indexesKey = addWidget("indexes", "Indexes", "table", tableConfig(
+    "indexes",
+    [
+      { key: "indexname", label: "Index", type: "text" },
+      { key: "indexdef", label: "Definition", type: "text" },
+    ],
+    { emptyText: "Select a table and choose View schema." }
+  ));
+  const sizeKey = addWidget("size", "Table size", "key-value", {
+    dataTemplate: expr("((state.queries.size || {}).data || [])[0] || {}"),
+    columns: 1,
+  });
+
+  const row = (index, children) => ({
+    id: id(`row:${index}`),
+    type: "row",
+    sizing: "auto",
+    children,
+  });
+  const slot = (key, span, height) => ({
+    id: id(`slot:${key}`),
+    type: "widget",
+    widgetKey: key,
+    span,
+    sizing: height ? "fixed" : "fill",
+    ...(height ? { height, fixedHeight: height } : {}),
   });
   manifest.pages.push({
     appPageID: pageID,
     appPageTitle: "PostgreSQL Admin App",
-    appPageDescription: "Read-only PostgreSQL schema and table catalog. Reconnect the bundled datasource before use.",
+    appPageDescription:
+      "Professional read-only PostgreSQL admin: table catalog, rows, columns, constraints, indexes and table size.",
     appPageConfig: {
       layoutVersion: 2,
       layout: {
-        id: "root", type: "column", children: [
-          row(0, [widgetNode(widgetKeys[0], 8), widgetNode(widgetKeys[1], 4)]),
-          row(1, [widgetNode(widgetKeys[2], 12, 440)]),
+        id: "root",
+        type: "column",
+        children: [
+          row(0, [slot(instructionsKey, 12)]),
+          row(1, [
+            slot(refreshKey, 3, 120),
+            slot(loadRowsKey, 3, 120),
+            slot(viewSchemaKey, 3, 120),
+            slot(rowCountKey, 3, 120),
+          ]),
+          row(2, [slot(catalogKey, 5, 520), slot(rowsKey, 7, 520)]),
+          row(3, [slot(columnsKey, 7, 440), slot(constraintsKey, 5, 440)]),
+          row(4, [slot(indexesKey, 7, 380), slot(sizeKey, 5, 240)]),
         ],
       },
       layouts: {},
-      widgets: widgetKeys,
-      variables: [],
+      widgets: [
+        instructionsKey,
+        refreshKey,
+        loadRowsKey,
+        viewSchemaKey,
+        rowCountKey,
+        catalogKey,
+        rowsKey,
+        columnsKey,
+        constraintsKey,
+        indexesKey,
+        sizeKey,
+      ],
+      variables: [
+        { key: "catalogSearch", type: "string", required: false, defaultValue: "" },
+        { key: "selectedSchema", type: "string", required: false, defaultValue: "public" },
+        { key: "selectedTable", type: "string", required: false, defaultValue: "" },
+      ],
       dataSources: [
         {
           alias: "tables",
           type: "query",
-          queryID: tablesQueryID,
+          queryID: queryIDs.tables,
           triggerMode: "auto",
-          inputValues: { limit: 15, offset: 0 },
+          inputValues: { search: "", limit: 15, offset: 0 },
           refreshOn: [],
           refetchInterval: null,
         },
-        { alias: "table_count", type: "query", queryID: countQueryID, triggerMode: "auto", inputValues: {}, refreshOn: [], refetchInterval: null },
+        {
+          alias: "table_count",
+          type: "query",
+          queryID: queryIDs.tableCount,
+          triggerMode: "auto",
+          inputValues: { search: "" },
+          refreshOn: [],
+          refetchInterval: null,
+        },
+        {
+          alias: "rows",
+          type: "query",
+          queryID: queryIDs.rows,
+          triggerMode: "manual",
+          inputValues: { schema: "public", table: "", limit: 15, offset: 0 },
+          refreshOn: [],
+          refetchInterval: null,
+        },
+        {
+          alias: "row_count",
+          type: "query",
+          queryID: queryIDs.rowCount,
+          triggerMode: "manual",
+          inputValues: { schema: "public", table: "" },
+          refreshOn: [],
+          refetchInterval: null,
+        },
+        {
+          alias: "columns",
+          type: "query",
+          queryID: queryIDs.columns,
+          triggerMode: "manual",
+          inputValues: { schema: "public", table: "" },
+          refreshOn: [],
+          refetchInterval: null,
+        },
+        {
+          alias: "constraints",
+          type: "query",
+          queryID: queryIDs.constraints,
+          triggerMode: "manual",
+          inputValues: { schema: "public", table: "" },
+          refreshOn: [],
+          refetchInterval: null,
+        },
+        {
+          alias: "indexes",
+          type: "query",
+          queryID: queryIDs.indexes,
+          triggerMode: "manual",
+          inputValues: { schema: "public", table: "" },
+          refreshOn: [],
+          refetchInterval: null,
+        },
+        {
+          alias: "size",
+          type: "query",
+          queryID: queryIDs.size,
+          triggerMode: "manual",
+          inputValues: { schema: "public", table: "" },
+          refreshOn: [],
+          refetchInterval: null,
+        },
       ],
     },
   });
   return {
     root: { type: "appPage", id: pageID },
     entry: {
-      slug: "curated-postgresql-admin-app", itemType: "appTemplate",
-      title: "PostgreSQL Admin App", category: "Databases", icon: "SiPostgresql",
-      description: "Reconnect your PostgreSQL database, then browse visible schemas and tables with a query-backed catalog, table count and setup checklist. Includes the datasource, two read-only queries and all page widgets.",
-      features: ["schema browser", "table catalog", "read-only SQL", "credential reconnect required", "dependency complete"],
+      slug: "curated-postgresql-admin-app",
+      itemType: "appTemplate",
+      title: "PostgreSQL Admin App",
+      category: "Databases",
+      icon: "SiPostgresql",
+      description:
+        "Professional read-only PostgreSQL admin console: searchable table catalog, click-to-load rows with server pagination, columns, constraints, indexes and table size. Includes the datasource, eight queries and all page widgets.",
+      features: [
+        "table catalog",
+        "row browser",
+        "schema columns",
+        "constraints",
+        "indexes",
+        "table size",
+        "server pagination",
+        "pattern-validated identifiers",
+        "credential reconnect required",
+        "dependency complete",
+      ],
       mode: "requires-connection",
       setup: [
-        "Install the full bundle: datasource, two queries, three widgets and the app page.",
+        "Install the full bundle: datasource, catalog queries, row/schema widgets and the admin page.",
         "Open Data sources → PostgreSQL · schema catalog and enter host, port, database, user and password.",
-        "Test the connection, then open the App Page. The catalog and count run automatically.",
+        "Test the connection, then open the App Page. Select a table to load rows; use View schema for columns, constraints and indexes.",
       ],
     },
   };
 }
+
 
 function buildCuratedCatalog() {
   const manifest = buildManifest();

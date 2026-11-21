@@ -227,6 +227,39 @@ describe('resolveInputs', () => {
 
   // ─── Definition fetching fallback ─────────────────────────────────────
 
+  it('rejects string values that do not match a declared pattern', async () => {
+    const result = await resolveInputs({
+      inputDefinitions: [
+        { key: 'schema', type: 'string', required: true, pattern: '^[A-Za-z_][A-Za-z0-9_]*$' },
+        { key: 'table', type: 'string', required: true, pattern: '^[A-Za-z_][A-Za-z0-9_]*$' },
+      ],
+      inputValues: { schema: 'public', table: 'users"; DROP TABLE x; --' },
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors.table).toMatch(/required format/);
+    expect(result.resolved.table).toBeUndefined();
+  });
+
+  it('accepts safe identifiers and enforces maxLength', async () => {
+    const ok = await resolveInputs({
+      inputDefinitions: [
+        { key: 'table', type: 'string', pattern: '^[A-Za-z_][A-Za-z0-9_]*$', maxLength: 20 },
+      ],
+      inputValues: { table: 'tblUsers' },
+    });
+    expect(ok.valid).toBe(true);
+    expect(ok.resolved.table).toBe('tblUsers');
+
+    const tooLong = await resolveInputs({
+      inputDefinitions: [
+        { key: 'table', type: 'string', pattern: '^[A-Za-z_][A-Za-z0-9_]*$', maxLength: 5 },
+      ],
+      inputValues: { table: 'tblUsers' },
+    });
+    expect(tooLong.valid).toBe(false);
+    expect(tooLong.errors.table).toMatch(/maximum length/);
+  });
+
   it('calls getInputDefinitions when type and id are provided but definitions are not', async () => {
     const { prisma } = require('../../../config/prisma.config');
     jest.spyOn(prisma.tblWorkflows, 'findUnique').mockResolvedValueOnce({
