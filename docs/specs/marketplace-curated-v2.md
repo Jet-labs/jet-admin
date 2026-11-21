@@ -31,6 +31,10 @@ widget comes with a small companion page rather than an orphaned expression.
   read-only `information_schema` queries, instructions, a count widget and a
   table catalog. It requires reconnect, but is dependency-complete and never
   renders as an empty page.
+  - Table pagination is server-side: the query accepts numeric `limit`/`offset`,
+    page defaults are `15`/`0`, the table emits `onPageChange`, and that action
+    re-runs the `tables` query with `event.pageSize`/`event.offset`. The total
+    page count comes from the separate table-count query via `totalTemplate`.
 
 These are not 36 independent SaaS connectors. They are a mixture of reusable
 operational components, playbooks and complete applications.

@@ -119,11 +119,36 @@ test("PostgreSQL app bundles its datasource, queries, widgets and page", () => {
     requiresReconnect: true,
   });
   expect(byType("dataQuery").every((q) => q.payload.datasourceType === "postgresql")).toBe(true);
+  const tablesQuery = byType("dataQuery").find((q) => /visible tables/.test(q.payload.dataQueryTitle));
+  expect(tablesQuery.payload.dataQueryOptions.query).toContain(
+    "LIMIT {{ inputs.limit }} OFFSET {{ inputs.offset }}"
+  );
+  expect(tablesQuery.payload.dataQueryOptions.inputDefinitions.map((d) => d.key)).toEqual([
+    "limit",
+    "offset",
+  ]);
+  const tableWidget = byType("widget").find((w) => w.payload.widgetType === "table");
+  expect(tableWidget.payload.widgetConfig.pagination).toMatchObject({
+    enabled: true,
+    mode: "server",
+    pageSize: 15,
+    totalTemplate: expect.stringContaining("table_count"),
+  });
+  expect(
+    tableWidget.payload.widgetConfig.events.onPageChange[0].config.inputValues
+  ).toEqual({
+    limit: "{{ event.pageSize }}",
+    offset: "{{ event.offset }}",
+  });
   const page = byType("appPage")[0].payload.appPageConfig;
   expect(page.layoutVersion).toBe(2);
   expect(page.widgets).toHaveLength(3);
   expect(page.dataSources).toHaveLength(2);
   expect(page.dataSources.map((s) => s.alias).sort()).toEqual(["table_count", "tables"]);
+  expect(page.dataSources.find((s) => s.alias === "tables").inputValues).toEqual({
+    limit: 15,
+    offset: 0,
+  });
 });
 
 module.exports = { runtimeFor };

@@ -250,7 +250,7 @@ function addPostgresAdminApp(manifest) {
   const tableWidgetID = uuid("postgres-admin:widget:tables");
   const pageID = uuid("postgres-admin:page");
   const tableFilter = "WHERE table_schema NOT IN ('pg_catalog', 'information_schema')";
-  const tableQuery = `SELECT table_schema, table_name FROM information_schema.tables ${tableFilter} ORDER BY table_schema, table_name LIMIT 200`;
+  const tableQuery = `SELECT table_schema, table_name FROM information_schema.tables ${tableFilter} ORDER BY table_schema, table_name LIMIT {{ inputs.limit }} OFFSET {{ inputs.offset }}`;
   const countQuery = `SELECT count(*)::int AS tables FROM information_schema.tables ${tableFilter}`;
   manifest.datasources.push({
     datasourceID,
@@ -265,8 +265,16 @@ function addPostgresAdminApp(manifest) {
     {
       dataQueryID: tablesQueryID, datasourceID, datasourceType: "postgresql",
       dataQueryTitle: "PostgreSQL · visible tables",
-      dataQueryDescription: "Lists visible user tables from information_schema. Read-only.",
-      dataQueryOptions: { queryType: "sql", query: tableQuery, inputDefinitions: [], timeoutSeconds: 20 },
+      dataQueryDescription: "Lists visible user tables from information_schema with server-side limit/offset pagination. Read-only.",
+      dataQueryOptions: {
+        queryType: "sql",
+        query: tableQuery,
+        inputDefinitions: [
+          { key: "limit", type: "number", required: false, defaultValue: 15 },
+          { key: "offset", type: "number", required: false, defaultValue: 0 },
+        ],
+        timeoutSeconds: 20,
+      },
       runOnLoad: false,
     },
     {
@@ -292,7 +300,7 @@ function addPostgresAdminApp(manifest) {
       widgetType: "stat", refreshInterval: null,
       widgetConfig: {
         showHeader: true, label: "Visible tables",
-        valueTemplate: expr("((state.queries.table_count || {}).data || [])[0]?.tables || 0"),
+        valueTemplate: expr("((((state.queries.table_count || {}).data || [])[0] || {}).tables || 0)"),
       },
     },
     {
@@ -306,7 +314,30 @@ function addPostgresAdminApp(manifest) {
           { key: "table_schema", label: "Schema", type: "text", sortable: true },
           { key: "table_name", label: "Table", type: "text", sortable: true },
         ],
-        pagination: { enabled: true, pageSize: 15 },
+        pagination: {
+          enabled: true,
+          mode: "server",
+          pageSize: 15,
+          pageParam: "page",
+          pageSizeParam: "limit",
+          totalTemplate: expr(
+            "((((state.queries.table_count || {}).data || [])[0] || {}).tables || 0)"
+          ),
+        },
+        events: {
+          onPageChange: [
+            {
+              actionType: "EXECUTE_QUERY",
+              config: {
+                alias: "tables",
+                inputValues: {
+                  limit: expr("event.pageSize"),
+                  offset: expr("event.offset"),
+                },
+              },
+            },
+          ],
+        },
         search: { enabled: true },
         export: { enabled: true, format: "csv" },
         editing: { enabled: false },
@@ -337,7 +368,15 @@ function addPostgresAdminApp(manifest) {
       widgets: widgetKeys,
       variables: [],
       dataSources: [
-        { alias: "tables", type: "query", queryID: tablesQueryID, triggerMode: "auto", inputValues: {}, refreshOn: [], refetchInterval: null },
+        {
+          alias: "tables",
+          type: "query",
+          queryID: tablesQueryID,
+          triggerMode: "auto",
+          inputValues: { limit: 15, offset: 0 },
+          refreshOn: [],
+          refetchInterval: null,
+        },
         { alias: "table_count", type: "query", queryID: countQueryID, triggerMode: "auto", inputValues: {}, refreshOn: [], refetchInterval: null },
       ],
     },
