@@ -35,9 +35,10 @@ widget comes with a small companion page rather than an orphaned expression.
     page defaults are `15`/`0`, the table emits `onPageChange`, and that action
     re-runs the `tables` query with `event.pageSize`/`event.offset`. The total
     page count comes from the separate table-count query via `totalTemplate`.
-  - The admin console also includes a clickable catalog that loads table rows,
-    plus explicit **View schema** actions for columns, constraints, indexes and
-    table size. Dynamic schema/table identifiers and catalog search terms use
+  - The admin console also includes a clickable catalog that loads table rows
+    and refreshes columns, constraints, indexes and table size in the same
+    selection, so metadata never goes stale; **View schema** re-runs those
+    queries on demand. Dynamic schema/table identifiers and catalog search terms use
     declared `pattern` validation before SQL interpolation; identifiers are
     double-quoted. `run inputs` rejects unsafe values with a 400.
 

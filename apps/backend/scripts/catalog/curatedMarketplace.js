@@ -546,6 +546,22 @@ function addPostgresAdminApp(manifest) {
             schema: expr("event.row.table_schema"),
             table: expr("event.row.table_name"),
           }),
+          execute("columns", {
+            schema: expr("event.row.table_schema"),
+            table: expr("event.row.table_name"),
+          }),
+          execute("constraints", {
+            schema: expr("event.row.table_schema"),
+            table: expr("event.row.table_name"),
+          }),
+          execute("indexes", {
+            schema: expr("event.row.table_schema"),
+            table: expr("event.row.table_name"),
+          }),
+          execute("size", {
+            schema: expr("event.row.table_schema"),
+            table: expr("event.row.table_name"),
+          }),
         ],
       },
     }

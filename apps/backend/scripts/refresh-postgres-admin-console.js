@@ -4,11 +4,20 @@
  */
 const fs = require("fs");
 const path = require("path");
+const { buildCuratedCatalog } = require("./catalog/curatedMarketplace");
 
 const TENANT_ID = "97ca7876-7c73-4578-bccb-6d56b98a0113";
 const PAGE_ID = "47be057e-ccaa-40ff-ad48-3134f5b043d1";
-const INSTRUCTIONS = "# PostgreSQL admin console\n1. Connect **Data sources → PostgreSQL · schema catalog**.\n2. The catalog loads automatically; use **Refresh catalog** after DDL changes.\n3. Select a table to load its rows; use **View schema** for columns, constraints and indexes.\n\n> Read-only catalog and table queries. Identifiers are validated and quoted; no writes are performed.";
-const EMPTY_TEXT = "No tables yet. Connect the datasource, then click Refresh catalog.";
+
+function curatedAdminConfig() {
+  const item = buildCuratedCatalog().find((entry) => entry.slug === "curated-postgresql-admin-app");
+  if (!item) throw new Error("Curated PostgreSQL item is missing.");
+  const widgets = item.payload.items.filter((entry) => entry.type === "widget").map((entry) => entry.payload);
+  const instructions = widgets.find((widget) => widget.widgetTitle === "PostgreSQL admin");
+  const catalog = widgets.find((widget) => widget.widgetTitle === "Table catalog");
+  if (!instructions || !catalog) throw new Error("Curated admin widgets are missing.");
+  return { instructions, catalog };
+}
 
 async function main(argv = process.argv.slice(2), deps = {}) {
   const apply = argv.includes("--apply");
@@ -47,8 +56,16 @@ async function main(argv = process.argv.slice(2), deps = {}) {
       if (!source) throw new Error(`Missing page data source ${alias}.`);
       source.triggerMode = "auto";
     }
-    const nextInstructions = { ...instructions.widgetConfig, content: INSTRUCTIONS };
-    const nextCatalog = { ...catalog.widgetConfig, emptyText: EMPTY_TEXT };
+    const curated = curatedAdminConfig();
+    const nextInstructions = {
+      ...instructions.widgetConfig,
+      content: curated.instructions.widgetConfig.content,
+    };
+    const nextCatalog = {
+      ...catalog.widgetConfig,
+      emptyText: curated.catalog.widgetConfig.emptyText,
+      events: curated.catalog.widgetConfig.events,
+    };
     const backupFile = writeBackup({ page, instructions, catalog });
 
     const result = await prisma.$transaction(async (tx) => {

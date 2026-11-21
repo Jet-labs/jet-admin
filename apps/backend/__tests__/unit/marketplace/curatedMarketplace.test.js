@@ -162,7 +162,16 @@ test("PostgreSQL admin console bundles catalog, rows, schema, constraints, index
     "SET_VARIABLE",
     "EXECUTE_QUERY",
     "EXECUTE_QUERY",
+    "EXECUTE_QUERY",
+    "EXECUTE_QUERY",
+    "EXECUTE_QUERY",
+    "EXECUTE_QUERY",
   ]);
+  expect(
+    catalogTable.widgetConfig.events.onRowSelect
+      .filter((a) => a.actionType === "EXECUTE_QUERY")
+      .map((a) => a.config.alias)
+  ).toEqual(["rows", "row_count", "columns", "constraints", "indexes", "size"]);
   expect(catalogTable.widgetConfig.events.onSearch[1].config).toMatchObject({
     alias: "tables",
     inputValues: { limit: 15, offset: 0 },
