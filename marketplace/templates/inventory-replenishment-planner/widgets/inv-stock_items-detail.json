@@ -1,0 +1,675 @@
+[
+  {
+    "slug": "inv-stock_items-detail.heading",
+    "key": "heading",
+    "page": "inv-stock_items-detail",
+    "title": "Record detail",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Stock item detail\nRecord #{{ state.variables.recordID }} · every change is captured in the audit timeline.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.status",
+    "key": "status",
+    "page": "inv-stock_items-detail",
+    "title": "Status",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ ((((state.queries.stock_items_detail || {}).data || [])[0] || {}).status) }}",
+      "variant": "default"
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.statusForm",
+    "key": "statusForm",
+    "page": "inv-stock_items-detail",
+    "title": "Change status",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Select status",
+      "defaultValue": "healthy",
+      "options": [
+        {
+          "label": "Healthy",
+          "value": "healthy"
+        },
+        {
+          "label": "Low",
+          "value": "low"
+        },
+        {
+          "label": "Critical",
+          "value": "critical"
+        },
+        {
+          "label": "Out Of Stock",
+          "value": "out_of_stock"
+        },
+        {
+          "label": "Overstock",
+          "value": "overstock"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "overview"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.statusButton",
+    "key": "statusButton",
+    "page": "inv-stock_items-detail",
+    "title": "Apply status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Apply status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_status",
+              "inputValues": {
+                "id": "{{ state.variables.recordID }}",
+                "status": "{{ (state.widgets[\"widget_ddb8827c-acae-4ee5-8070-62925e59063e_1\"] || {}).value || \"healthy\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.delete",
+    "key": "delete",
+    "page": "inv-stock_items-detail",
+    "title": "Archive",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive record",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.restore",
+    "key": "restore",
+    "page": "inv-stock_items-detail",
+    "title": "Restore",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Restore record",
+      "variant": "outline",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_restore",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record restored",
+              "errorToast": "Restore failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.tabs",
+    "key": "tabs",
+    "page": "inv-stock_items-detail",
+    "title": "Record sections",
+    "type": "tabs",
+    "config": {
+      "showHeader": false,
+      "tabs": [
+        {
+          "label": "Overview",
+          "value": "overview"
+        },
+        {
+          "label": "Comments",
+          "value": "comments"
+        },
+        {
+          "label": "Attachments",
+          "value": "attachments"
+        },
+        {
+          "label": "Activity",
+          "value": "activity"
+        }
+      ],
+      "defaultTab": "overview",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.record",
+    "key": "record",
+    "page": "inv-stock_items-detail",
+    "title": "Record fields",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record fields",
+      "dataTemplate": "{{ (((state.queries.stock_items_detail || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "emptyText": "Record not found.",
+      "isLoading": "{{ (state.queries.stock_items_detail || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.editTable",
+    "key": "editTable",
+    "page": "inv-stock_items-detail",
+    "title": "Inline edit",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.stock_items_detail || {}).data || [])",
+      "columns": [
+        {
+          "key": "product_name",
+          "label": "Product",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "sku_id",
+          "label": "SKU",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Stock status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "planner_id",
+          "label": "Planner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "on_hand",
+          "label": "On hand",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "reserved",
+          "label": "Reserved",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "reorder_point",
+          "label": "Reorder point",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "safety_stock",
+          "label": "Safety stock",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "target_stock",
+          "label": "Target stock",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "unit_cost",
+          "label": "Unit cost",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "last_counted_at",
+          "label": "Last counted",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "next_review_at",
+          "label": "Next review",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 1
+      },
+      "search": {
+        "enabled": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": true
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No record loaded.",
+      "isLoading": "{{ (state.queries.stock_items_detail || {}).isLoading || false }}",
+      "events": {
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "product_name": "{{ event.updatedRow.product_name }}",
+                "sku_id": "{{ event.updatedRow.sku_id }}",
+                "warehouse_id": "{{ event.updatedRow.warehouse_id }}",
+                "status": "{{ event.updatedRow.status }}",
+                "planner_id": "{{ event.updatedRow.planner_id }}",
+                "on_hand": "{{ event.updatedRow.on_hand }}",
+                "reserved": "{{ event.updatedRow.reserved }}",
+                "reorder_point": "{{ event.updatedRow.reorder_point }}",
+                "safety_stock": "{{ event.updatedRow.safety_stock }}",
+                "target_stock": "{{ event.updatedRow.target_stock }}",
+                "unit_cost": "{{ event.updatedRow.unit_cost }}",
+                "last_counted_at": "{{ event.updatedRow.last_counted_at }}",
+                "next_review_at": "{{ event.updatedRow.next_review_at }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.comments",
+    "key": "comments",
+    "page": "inv-stock_items-detail",
+    "title": "Comments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.stock_items_comments || {}).data || [])",
+      "columns": [
+        {
+          "key": "author",
+          "label": "Author",
+          "type": "text"
+        },
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No comments yet.",
+      "isLoading": "{{ (state.queries.stock_items_comments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.commentForm",
+    "key": "commentForm",
+    "page": "inv-stock_items-detail",
+    "title": "Add comment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add comment",
+      "submitLabel": "Post comment",
+      "fields": [
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Add context, decisions or next steps"
+        },
+        {
+          "key": "authorID",
+          "label": "Author",
+          "type": "select",
+          "required": true,
+          "defaultValue": 1,
+          "options": [
+            {
+              "label": "Ravi Fischer",
+              "value": 1
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 2
+            },
+            {
+              "label": "Sofia Rossi",
+              "value": 3
+            },
+            {
+              "label": "Diego Tanaka",
+              "value": 4
+            },
+            {
+              "label": "Zara Meyer",
+              "value": 5
+            },
+            {
+              "label": "Iris Novak",
+              "value": 6
+            },
+            {
+              "label": "Kai Meyer",
+              "value": 7
+            },
+            {
+              "label": "Eli Wright",
+              "value": 8
+            },
+            {
+              "label": "Leila Silva",
+              "value": 9
+            },
+            {
+              "label": "Tomás Osei",
+              "value": 10
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 11
+            },
+            {
+              "label": "Mira Dubey",
+              "value": 12
+            },
+            {
+              "label": "Clara Rossi",
+              "value": 13
+            },
+            {
+              "label": "Owen Hassan",
+              "value": 14
+            },
+            {
+              "label": "Clara Bennett",
+              "value": 15
+            },
+            {
+              "label": "Kai Osei",
+              "value": 16
+            },
+            {
+              "label": "Luca Patel",
+              "value": 17
+            },
+            {
+              "label": "Elena Wright",
+              "value": 18
+            },
+            {
+              "label": "Malik Alvarez",
+              "value": 19
+            },
+            {
+              "label": "Iris Andersen",
+              "value": 20
+            },
+            {
+              "label": "Jonas Wright",
+              "value": 21
+            },
+            {
+              "label": "Noah Larsen",
+              "value": 22
+            },
+            {
+              "label": "Kai Dubey",
+              "value": 23
+            },
+            {
+              "label": "Jonas Silva",
+              "value": 24
+            }
+          ]
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_comment_create",
+              "inputValues": {
+                "entity": "stock_items",
+                "entityID": "{{ state.variables.recordID }}",
+                "authorID": "{{ Number(event.formData.authorID || 1) }}",
+                "body": "{{ event.formData.body }}"
+              },
+              "successToast": "Comment added",
+              "errorToast": "Comment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.attachments",
+    "key": "attachments",
+    "page": "inv-stock_items-detail",
+    "title": "Attachments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.stock_items_attachments || {}).data || [])",
+      "columns": [
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "link"
+        },
+        {
+          "key": "file_url",
+          "label": "URL",
+          "type": "link"
+        },
+        {
+          "key": "mime_type",
+          "label": "Type",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Uploaded",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No attachments yet.",
+      "isLoading": "{{ (state.queries.stock_items_attachments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.attachmentForm",
+    "key": "attachmentForm",
+    "page": "inv-stock_items-detail",
+    "title": "Add attachment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add attachment",
+      "submitLabel": "Attach file",
+      "fields": [
+        {
+          "key": "fileName",
+          "label": "File name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "document.pdf"
+        },
+        {
+          "key": "fileURL",
+          "label": "File URL",
+          "type": "text",
+          "required": true,
+          "defaultValue": "https://files.example.invalid/document.pdf"
+        },
+        {
+          "key": "mimeType",
+          "label": "MIME type",
+          "type": "text",
+          "defaultValue": "application/pdf"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_attachment_create",
+              "inputValues": {
+                "entity": "stock_items",
+                "entityID": "{{ state.variables.recordID }}",
+                "fileName": "{{ event.formData.fileName }}",
+                "fileURL": "{{ event.formData.fileURL }}",
+                "mimeType": "{{ event.formData.mimeType }}",
+                "uploadedBy": "{{ 1 }}"
+              },
+              "successToast": "Attachment linked",
+              "errorToast": "Attachment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-detail.activity",
+    "key": "activity",
+    "page": "inv-stock_items-detail",
+    "title": "Audit timeline",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Audit timeline",
+      "dataTemplate": "{{ (state.queries.stock_items_audit || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No audit entries yet.",
+      "isLoading": "{{ (state.queries.stock_items_audit || {}).isLoading || false }}"
+    }
+  }
+]

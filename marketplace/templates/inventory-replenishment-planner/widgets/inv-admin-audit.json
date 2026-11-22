@@ -1,0 +1,224 @@
+[
+  {
+    "slug": "inv-admin-audit.heading",
+    "key": "heading",
+    "page": "inv-admin-audit",
+    "title": "Audit log",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Audit log\nEvery template write is captured by database triggers, including writes from workflows, listeners and cron jobs. Select an event to inspect the old/new snapshots.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-admin-audit.entity",
+    "key": "entity",
+    "page": "inv-admin-audit",
+    "title": "Entity",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Entity",
+      "defaultValue": "",
+      "options": [
+        {
+          "label": "All entities",
+          "value": ""
+        },
+        {
+          "label": "Replenishment Proposals",
+          "value": "replenishment_proposals"
+        },
+        {
+          "label": "Stock Items",
+          "value": "stock_items"
+        },
+        {
+          "label": "Suppliers",
+          "value": "suppliers"
+        },
+        {
+          "label": "Purchase Orders",
+          "value": "purchase_orders"
+        },
+        {
+          "label": "SKUs",
+          "value": "skus"
+        },
+        {
+          "label": "Warehouses",
+          "value": "warehouses"
+        },
+        {
+          "label": "Demand Forecasts",
+          "value": "demand_forecasts"
+        },
+        {
+          "label": "Stock Movements",
+          "value": "stock_movements"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.entity",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-admin-audit.actor",
+    "key": "actor",
+    "page": "inv-admin-audit",
+    "title": "Actor",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Filter by actor",
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.actor",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-admin-audit.range",
+    "key": "range",
+    "page": "inv-admin-audit",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-admin-audit.table",
+    "key": "table",
+    "page": "inv-admin-audit",
+    "title": "Audit events",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.audit || {}).data || [])",
+      "columns": [
+        {
+          "key": "created_at",
+          "label": "When",
+          "type": "date"
+        },
+        {
+          "key": "entity",
+          "label": "Entity",
+          "type": "badge"
+        },
+        {
+          "key": "entity_id",
+          "label": "Record",
+          "type": "number"
+        },
+        {
+          "key": "action",
+          "label": "Action",
+          "type": "badge"
+        },
+        {
+          "key": "actor",
+          "label": "Actor",
+          "type": "text"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No audit events.",
+      "isLoading": "{{ (state.queries.audit || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.auditID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-admin-audit.diff",
+    "key": "diff",
+    "page": "inv-admin-audit",
+    "title": "Selected event",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Selected event (old/new)",
+      "dataTemplate": "{{ (state.widgets[\"widget_53318db2-e581-4ee8-b582-89e0b27e74ad_1\"] || {}).selectedRow || null }}",
+      "collapsed": false,
+      "isLoading": false
+    }
+  }
+]

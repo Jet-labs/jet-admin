@@ -1,0 +1,187 @@
+[
+  {
+    "slug": "inv-suppliers-create.heading",
+    "key": "heading",
+    "page": "inv-suppliers-create",
+    "title": "Create Supplier",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Supplier\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-suppliers-create.form",
+    "key": "form",
+    "page": "inv-suppliers-create",
+    "title": "New Supplier",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Supplier",
+      "submitLabel": "Create Supplier",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "name",
+          "label": "Supplier",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Cedar Partners"
+        },
+        {
+          "key": "code",
+          "label": "Code",
+          "type": "text",
+          "required": true,
+          "defaultValue": "SUP-00001"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "on_hold",
+          "options": [
+            {
+              "label": "Active",
+              "value": "active"
+            },
+            {
+              "label": "On Hold",
+              "value": "on_hold"
+            },
+            {
+              "label": "Inactive",
+              "value": "inactive"
+            }
+          ]
+        },
+        {
+          "key": "contact_name",
+          "label": "Contact",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Iris Chen"
+        },
+        {
+          "key": "email",
+          "label": "Email",
+          "type": "email",
+          "required": false,
+          "defaultValue": "amara.fischer.1@example.com"
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text",
+          "required": false,
+          "defaultValue": "+1-555-538-4694"
+        },
+        {
+          "key": "lead_time_days",
+          "label": "Lead time (days)",
+          "type": "number",
+          "required": true,
+          "defaultValue": 45,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "min_order_value",
+          "label": "Minimum order",
+          "type": "number",
+          "required": false,
+          "defaultValue": 8222.32,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "reliability_score",
+          "label": "Reliability",
+          "type": "number",
+          "required": false,
+          "defaultValue": 55,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "payment_terms",
+          "label": "Payment terms",
+          "type": "select",
+          "required": true,
+          "defaultValue": "net_45",
+          "options": [
+            {
+              "label": "Net 30",
+              "value": "net_30"
+            },
+            {
+              "label": "Net 45",
+              "value": "net_45"
+            },
+            {
+              "label": "Net 60",
+              "value": "net_60"
+            },
+            {
+              "label": "Prepaid",
+              "value": "prepaid"
+            }
+          ]
+        },
+        {
+          "key": "country",
+          "label": "Country",
+          "type": "text",
+          "required": false,
+          "defaultValue": "United Kingdom"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "suppliers_create",
+              "inputValues": {
+                "name": "{{ event.formData.name }}",
+                "code": "{{ event.formData.code }}",
+                "status": "{{ event.formData.status }}",
+                "contact_name": "{{ event.formData.contact_name }}",
+                "email": "{{ event.formData.email }}",
+                "phone": "{{ event.formData.phone }}",
+                "lead_time_days": "{{ event.formData.lead_time_days }}",
+                "min_order_value": "{{ event.formData.min_order_value }}",
+                "reliability_score": "{{ event.formData.reliability_score }}",
+                "payment_terms": "{{ event.formData.payment_terms }}",
+                "country": "{{ event.formData.country }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-suppliers-create.result",
+    "key": "result",
+    "page": "inv-suppliers-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.suppliers_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.suppliers_create || {}).isLoading || false }}"
+    }
+  }
+]

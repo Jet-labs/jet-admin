@@ -1,0 +1,242 @@
+{
+  "slug": "inv.escalation",
+  "key": "escalation",
+  "title": "Replenishment Proposals · escalation",
+  "description": "Waits for a configurable delay, then escalates high-priority records and notifies the manager.",
+  "tags": [
+    "automation",
+    "escalation"
+  ],
+  "options": {
+    "description": "Waits for a configurable delay, then escalates high-priority records and notifies the manager.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      },
+      {
+        "key": "staffID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "b67bda8a-cd12-4beb-a4dc-fe8dcce0b176",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "waitForResponse",
+      "nodeID": "bbc9d4b2-b583-4c54-ad3c-19882cdafd6a",
+      "type": "delay",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "waitForResponse",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "delayType": "fixed",
+        "delayMs": 250
+      }
+    },
+    {
+      "key": "loadRecord",
+      "nodeID": "a618fda5-ee48-4ded-acbe-3470b2682ee3",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadRecord",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "dataQueryID": "7ab4826a-95b7-480e-9417-cfa8b242bbe9",
+        "outputVariable": "recordRows",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}"
+        }
+      }
+    },
+    {
+      "key": "readPriority",
+      "nodeID": "8095b2a8-4eb9-48a0-89a6-8f6761833506",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "readPriority",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "code": "\nvar r = (ctx.recordRows || [])[0] || {};\nreturn { id: r.id || ctx.recordID, priority: String(r.status || \"\"), ownerID: Number(r.owner_id || ctx.staffID) };\n",
+        "outputVariable": "record"
+      }
+    },
+    {
+      "key": "needsEscalation",
+      "nodeID": "4b887b14-660c-4974-a16c-9c9d0bd70721",
+      "type": "condition",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "needsEscalation",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "branches": [
+          {
+            "id": "escalate",
+            "label": "Escalate",
+            "condition": "['urgent','high','critical','overdue'].indexOf(String(ctx.record.priority).toLowerCase()) >= 0"
+          }
+        ],
+        "defaultBranch": "normal"
+      }
+    },
+    {
+      "key": "notifyEscalation",
+      "nodeID": "6ef9105f-0cfa-4e36-9a78-d1c521f4b667",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyEscalation",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "dataQueryID": "c651fab5-e242-4ec0-97eb-83772b19408a",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.record.ownerID }}",
+          "title": "Replenishment Proposals escalation",
+          "body": "Record #{{ ctx.record.id }} was escalated after the response window.",
+          "category": "warning",
+          "linkPage": "inv-replenishment_proposals-list"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "eb76f292-9808-4cda-9a62-83964c1ce40c",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.record }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "b67bda8a-cd12-4beb-a4dc-fe8dcce0b176",
+      "to": "bbc9d4b2-b583-4c54-ad3c-19882cdafd6a",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "bbc9d4b2-b583-4c54-ad3c-19882cdafd6a",
+      "to": "a618fda5-ee48-4ded-acbe-3470b2682ee3",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "a618fda5-ee48-4ded-acbe-3470b2682ee3",
+      "to": "8095b2a8-4eb9-48a0-89a6-8f6761833506",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "8095b2a8-4eb9-48a0-89a6-8f6761833506",
+      "to": "4b887b14-660c-4974-a16c-9c9d0bd70721",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "4b887b14-660c-4974-a16c-9c9d0bd70721",
+      "to": "6ef9105f-0cfa-4e36-9a78-d1c521f4b667",
+      "handle": "escalate",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "4b887b14-660c-4974-a16c-9c9d0bd70721",
+      "to": "eb76f292-9808-4cda-9a62-83964c1ce40c",
+      "handle": "normal",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "6ef9105f-0cfa-4e36-9a78-d1c521f4b667",
+      "to": "eb76f292-9808-4cda-9a62-83964c1ce40c",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

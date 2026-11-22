@@ -1,0 +1,530 @@
+{
+  "slug": "inv-suppliers-list",
+  "key": "suppliers-list",
+  "title": "Suppliers · list",
+  "description": "Server-side list, filters, inline edit and bulk actions for suppliers.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "search",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "status",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "page",
+      "type": "number",
+      "defaultValue": 1
+    },
+    {
+      "key": "sortBy",
+      "type": "string",
+      "defaultValue": "name"
+    },
+    {
+      "key": "sortDir",
+      "type": "string",
+      "defaultValue": "asc"
+    },
+    {
+      "key": "dateFrom",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "dateTo",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "suppliers",
+      "type": "query",
+      "queryID": "4fc47214-cd58-4c38-a184-d599e132bd9a",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "search": "{{ state.variables.search }}",
+        "page": "{{ state.variables.page }}",
+        "limit": 10,
+        "sortBy": "{{ state.variables.sortBy }}",
+        "sortDir": "{{ state.variables.sortDir }}",
+        "dateFrom": "{{ state.variables.dateFrom }}",
+        "dateTo": "{{ state.variables.dateTo }}",
+        "status": "{{ state.variables.status }}"
+      },
+      "refreshOn": [
+        "variables.search",
+        "variables.status",
+        "variables.page",
+        "variables.sortBy",
+        "variables.sortDir",
+        "variables.dateFrom",
+        "variables.dateTo"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "suppliers_views",
+      "type": "query",
+      "queryID": "299efcef-9c77-44f2-9b63-7f0fd5494b80",
+      "triggerMode": "auto",
+      "inputValues": {
+        "prefix": "saved_view.inv-suppliers-list"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "suppliers_selected",
+      "type": "query",
+      "queryID": "c87b39f1-c2b3-4b1e-b778-fcd943f2ab84",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "suppliers_update",
+      "type": "query",
+      "queryID": "c80039e2-ccd1-48c2-ac87-194e2c72b1b5",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "suppliers_delete",
+      "type": "query",
+      "queryID": "6c10caa8-31ff-44b7-aa37-6992e390ee3b",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "suppliers_status",
+      "type": "query",
+      "queryID": "f0186e9d-a037-440e-9466-19151a1fe67f",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "suppliers_view_create",
+      "type": "query",
+      "queryID": "9d60ee0a-898a-4888-9430-d746d3ea33f0",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "4151051c-03d6-45b3-a85e-677a82a2f219",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "5c8cb5f8-0215-432d-9961-8ff397eb1348",
+              "type": "widget",
+              "widgetKey": "widget_b7d6cede-0cf8-4e5a-8606-e050dfdf09a9_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "9792e689-5e88-41e2-b2d0-c2ef0e74c8ba",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f9559228-f1c2-4753-b9f6-efc619fcde42",
+              "type": "widget",
+              "widgetKey": "widget_7d90ac2c-e955-4e5b-8f95-40a6f54c1adc_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "a1ad833d-1850-45dd-b1de-f042e01e1d72",
+              "type": "widget",
+              "widgetKey": "widget_4481b108-0128-42c1-9621-a5ffbe0ea5f5_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "72645b3d-ed6a-4e4f-8e59-d5f0ec3c53c3",
+              "type": "widget",
+              "widgetKey": "widget_c22c04ea-7c40-4aee-b74e-4032788b6e0b_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "431a85c2-29ba-4ceb-af94-f44696619235",
+              "type": "widget",
+              "widgetKey": "widget_d7281577-a2f0-45a4-af56-484824979099_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 56
+            }
+          ]
+        },
+        {
+          "id": "e4abeb71-a437-41df-93c3-62ccdfa292a3",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "ce8505da-c31f-44ce-a7bf-e5487f4aa6b0",
+              "type": "widget",
+              "widgetKey": "widget_af20cc90-b444-4864-98a6-2978458ab9e7_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 120
+            }
+          ]
+        },
+        {
+          "id": "a14c3fb7-28af-4faf-b999-06338ef0e7b0",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "bc0aaf35-ae30-4f2f-a92a-c7bfc55e9d5b",
+              "type": "widget",
+              "widgetKey": "widget_491e403b-2e7f-4238-bbc9-8f32d8a30c1c_1",
+              "span": 9,
+              "sizing": "fill",
+              "minHeight": 460
+            },
+            {
+              "id": "31fa4409-7609-4497-ab98-cd96bbf17036",
+              "type": "widget",
+              "widgetKey": "widget_413b8229-1305-413b-adf6-e64328d681fa_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 460
+            }
+          ]
+        },
+        {
+          "id": "0038d53e-df25-4ab6-8370-7044e6850520",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f1f230bb-268a-467c-95d7-7511f9b6caf6",
+              "type": "widget",
+              "widgetKey": "widget_7c40e9af-83d2-445d-9a8d-d651a00586cb_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 48
+            },
+            {
+              "id": "9ad90cf2-056a-4c5b-98d4-48593c08fe4a",
+              "type": "widget",
+              "widgetKey": "widget_662342dc-1658-4b89-a1dd-48b78f078ef4_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 48
+            },
+            {
+              "id": "2338f4d6-3440-489a-a321-64ffa61833aa",
+              "type": "widget",
+              "widgetKey": "widget_9569e8aa-d9b7-439e-bedf-e2265bf065eb_1",
+              "span": 6,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "7c9519b9-d3ad-469c-9cbc-9a171af05fb7",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "cca179b8-2930-4296-9191-842848ca7aeb",
+              "type": "widget",
+              "widgetKey": "widget_585aa432-6568-4431-a4b2-57b349a80b14_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 220
+            },
+            {
+              "id": "86fa9b3b-c3b6-4208-a57b-b54af95398fe",
+              "type": "widget",
+              "widgetKey": "widget_d9dcfc0d-e8be-4e36-bba0-ddd6b7d683e8_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 220
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "5c8cb5f8-0215-432d-9961-8ff397eb1348",
+        "type": "widget",
+        "widgetKey": "widget_b7d6cede-0cf8-4e5a-8606-e050dfdf09a9_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "f9559228-f1c2-4753-b9f6-efc619fcde42",
+        "type": "widget",
+        "widgetKey": "widget_7d90ac2c-e955-4e5b-8f95-40a6f54c1adc_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "a1ad833d-1850-45dd-b1de-f042e01e1d72",
+        "type": "widget",
+        "widgetKey": "widget_4481b108-0128-42c1-9621-a5ffbe0ea5f5_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "72645b3d-ed6a-4e4f-8e59-d5f0ec3c53c3",
+        "type": "widget",
+        "widgetKey": "widget_c22c04ea-7c40-4aee-b74e-4032788b6e0b_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "431a85c2-29ba-4ceb-af94-f44696619235",
+        "type": "widget",
+        "widgetKey": "widget_d7281577-a2f0-45a4-af56-484824979099_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "ce8505da-c31f-44ce-a7bf-e5487f4aa6b0",
+        "type": "widget",
+        "widgetKey": "widget_af20cc90-b444-4864-98a6-2978458ab9e7_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 120
+      },
+      {
+        "id": "bc0aaf35-ae30-4f2f-a92a-c7bfc55e9d5b",
+        "type": "widget",
+        "widgetKey": "widget_491e403b-2e7f-4238-bbc9-8f32d8a30c1c_1",
+        "span": 9,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "31fa4409-7609-4497-ab98-cd96bbf17036",
+        "type": "widget",
+        "widgetKey": "widget_413b8229-1305-413b-adf6-e64328d681fa_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "f1f230bb-268a-467c-95d7-7511f9b6caf6",
+        "type": "widget",
+        "widgetKey": "widget_7c40e9af-83d2-445d-9a8d-d651a00586cb_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 48
+      },
+      {
+        "id": "9ad90cf2-056a-4c5b-98d4-48593c08fe4a",
+        "type": "widget",
+        "widgetKey": "widget_662342dc-1658-4b89-a1dd-48b78f078ef4_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 48
+      },
+      {
+        "id": "2338f4d6-3440-489a-a321-64ffa61833aa",
+        "type": "widget",
+        "widgetKey": "widget_9569e8aa-d9b7-439e-bedf-e2265bf065eb_1",
+        "span": 6,
+        "sizing": "fill"
+      },
+      {
+        "id": "cca179b8-2930-4296-9191-842848ca7aeb",
+        "type": "widget",
+        "widgetKey": "widget_585aa432-6568-4431-a4b2-57b349a80b14_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 220
+      },
+      {
+        "id": "86fa9b3b-c3b6-4208-a57b-b54af95398fe",
+        "type": "widget",
+        "widgetKey": "widget_d9dcfc0d-e8be-4e36-bba0-ddd6b7d683e8_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 220
+      }
+    ],
+    "variables": [
+      {
+        "key": "search",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "status",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "page",
+        "type": "number",
+        "defaultValue": 1
+      },
+      {
+        "key": "sortBy",
+        "type": "string",
+        "defaultValue": "name"
+      },
+      {
+        "key": "sortDir",
+        "type": "string",
+        "defaultValue": "asc"
+      },
+      {
+        "key": "dateFrom",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "dateTo",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "suppliers",
+        "type": "query",
+        "queryID": "4fc47214-cd58-4c38-a184-d599e132bd9a",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "search": "{{ state.variables.search }}",
+          "page": "{{ state.variables.page }}",
+          "limit": 10,
+          "sortBy": "{{ state.variables.sortBy }}",
+          "sortDir": "{{ state.variables.sortDir }}",
+          "dateFrom": "{{ state.variables.dateFrom }}",
+          "dateTo": "{{ state.variables.dateTo }}",
+          "status": "{{ state.variables.status }}"
+        },
+        "refreshOn": [
+          "variables.search",
+          "variables.status",
+          "variables.page",
+          "variables.sortBy",
+          "variables.sortDir",
+          "variables.dateFrom",
+          "variables.dateTo"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "suppliers_views",
+        "type": "query",
+        "queryID": "299efcef-9c77-44f2-9b63-7f0fd5494b80",
+        "triggerMode": "auto",
+        "inputValues": {
+          "prefix": "saved_view.inv-suppliers-list"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "suppliers_selected",
+        "type": "query",
+        "queryID": "c87b39f1-c2b3-4b1e-b778-fcd943f2ab84",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "suppliers_update",
+        "type": "query",
+        "queryID": "c80039e2-ccd1-48c2-ac87-194e2c72b1b5",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "suppliers_delete",
+        "type": "query",
+        "queryID": "6c10caa8-31ff-44b7-aa37-6992e390ee3b",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "suppliers_status",
+        "type": "query",
+        "queryID": "f0186e9d-a037-440e-9466-19151a1fe67f",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "suppliers_view_create",
+        "type": "query",
+        "queryID": "9d60ee0a-898a-4888-9430-d746d3ea33f0",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

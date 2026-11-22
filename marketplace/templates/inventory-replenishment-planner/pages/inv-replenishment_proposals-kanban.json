@@ -1,0 +1,164 @@
+{
+  "slug": "inv-replenishment_proposals-kanban",
+  "key": "replenishment_proposals-kanban",
+  "title": "Replenishment Proposals · kanban",
+  "description": "Status board grouped by the primary workflow stage.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "replenishment_proposals",
+      "type": "query",
+      "queryID": "2b076ad4-4a2e-4c6f-9fe8-4bba580123ff",
+      "triggerMode": "auto",
+      "inputValues": {
+        "search": "",
+        "page": 1,
+        "limit": 200,
+        "sortBy": "proposal_code",
+        "sortDir": "asc",
+        "status": "",
+        "dateFrom": "",
+        "dateTo": ""
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "replenishment_proposals_selected",
+      "type": "query",
+      "queryID": "7ab4826a-95b7-480e-9417-cfa8b242bbe9",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "0938d641-d05e-44a1-8734-0b218f46fac5",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "7b496271-c478-4e41-8347-1ed36c4d1c32",
+              "type": "widget",
+              "widgetKey": "widget_5bbdf3d0-b75f-4199-abf8-554b9404cd5d_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "7a4e37e4-3858-4f16-8ad2-28a36671e040",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "ae6e6700-e7bd-4133-9617-86586be7c3b9",
+              "type": "widget",
+              "widgetKey": "widget_8cf40721-cbc7-487b-9434-a2fd2e9966da_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "ff073a9c-9222-401e-be8a-c6cd333f8163",
+              "type": "widget",
+              "widgetKey": "widget_246ba29a-39f0-4dd0-9794-0c0e8a4e66e7_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "7b496271-c478-4e41-8347-1ed36c4d1c32",
+        "type": "widget",
+        "widgetKey": "widget_5bbdf3d0-b75f-4199-abf8-554b9404cd5d_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "ae6e6700-e7bd-4133-9617-86586be7c3b9",
+        "type": "widget",
+        "widgetKey": "widget_8cf40721-cbc7-487b-9434-a2fd2e9966da_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "ff073a9c-9222-401e-be8a-c6cd333f8163",
+        "type": "widget",
+        "widgetKey": "widget_246ba29a-39f0-4dd0-9794-0c0e8a4e66e7_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "replenishment_proposals",
+        "type": "query",
+        "queryID": "2b076ad4-4a2e-4c6f-9fe8-4bba580123ff",
+        "triggerMode": "auto",
+        "inputValues": {
+          "search": "",
+          "page": 1,
+          "limit": 200,
+          "sortBy": "proposal_code",
+          "sortDir": "asc",
+          "status": "",
+          "dateFrom": "",
+          "dateTo": ""
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "replenishment_proposals_selected",
+        "type": "query",
+        "queryID": "7ab4826a-95b7-480e-9417-cfa8b242bbe9",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

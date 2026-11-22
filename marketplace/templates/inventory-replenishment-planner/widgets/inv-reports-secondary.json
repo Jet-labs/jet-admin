@@ -1,0 +1,259 @@
+[
+  {
+    "slug": "inv-reports-secondary.heading",
+    "key": "heading",
+    "page": "inv-reports-secondary",
+    "title": "Stock Items report",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Stock Items report\nCompare volume and value by status. This report uses the same parameterized query contract as the live list.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-reports-secondary.range",
+    "key": "range",
+    "page": "inv-reports-secondary",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "Date range",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-reports-secondary.total",
+    "key": "total",
+    "page": "inv-reports-secondary",
+    "title": "Records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Records",
+      "valueTemplate": "{{ ((((state.queries.second_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.second_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-reports-secondary.value",
+    "key": "value",
+    "page": "inv-reports-secondary",
+    "title": "Value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Value",
+      "prefix": "$",
+      "valueTemplate": "{{ ((((state.queries.second_summary || {}).data || [])[0] || {}).total_value) }}",
+      "isLoading": "{{ (state.queries.second_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-reports-secondary.status",
+    "key": "status",
+    "page": "inv-reports-secondary",
+    "title": "By status",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "By status",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.second_status || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "bar",
+          "tooltip": true
+        },
+        "encoding": {
+          "x": {
+            "field": "status",
+            "type": "nominal",
+            "axis": {
+              "labelAngle": 0
+            }
+          },
+          "y": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "status",
+            "type": "nominal"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.second_status || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-reports-secondary.data",
+    "key": "data",
+    "page": "inv-reports-secondary",
+    "title": "Stock Items",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.second_list || {}).data || [])",
+      "columns": [
+        {
+          "key": "product_name",
+          "label": "Product",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "sku_id",
+          "label": "SKU",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Stock status",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "planner_id",
+          "label": "Planner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "on_hand",
+          "label": "On hand",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "reserved",
+          "label": "Reserved",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "reorder_point",
+          "label": "Reorder point",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "safety_stock",
+          "label": "Safety stock",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "target_stock",
+          "label": "Target stock",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "unit_cost",
+          "label": "Unit cost",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "last_counted_at",
+          "label": "Last counted",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "next_review_at",
+          "label": "Next review",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No records.",
+      "isLoading": "{{ (state.queries.second_list || {}).isLoading || false }}"
+    }
+  }
+]

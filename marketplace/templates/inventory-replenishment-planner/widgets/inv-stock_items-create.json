@@ -1,0 +1,512 @@
+[
+  {
+    "slug": "inv-stock_items-create.heading",
+    "key": "heading",
+    "page": "inv-stock_items-create",
+    "title": "Create Stock item",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Stock item\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-stock_items-create.form",
+    "key": "form",
+    "page": "inv-stock_items-create",
+    "title": "New Stock item",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Stock item",
+      "submitLabel": "Create Stock item",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "product_name",
+          "label": "Product",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Filter cartridge Pro"
+        },
+        {
+          "key": "sku_id",
+          "label": "SKU",
+          "type": "select",
+          "required": true,
+          "defaultValue": 24,
+          "options": [
+            {
+              "label": "Steel fastener X7",
+              "value": 1
+            },
+            {
+              "label": "Steel fastener X7",
+              "value": 2
+            },
+            {
+              "label": "Thermal sensor Pro",
+              "value": 3
+            },
+            {
+              "label": "Safety panel B2",
+              "value": 4
+            },
+            {
+              "label": "Hydraulic valve B2",
+              "value": 5
+            },
+            {
+              "label": "Thermal sensor X7",
+              "value": 6
+            },
+            {
+              "label": "Steel fastener Pro",
+              "value": 7
+            },
+            {
+              "label": "Thermal sensor A1",
+              "value": 8
+            },
+            {
+              "label": "Steel fastener X7",
+              "value": 9
+            },
+            {
+              "label": "Control cable X7",
+              "value": 10
+            },
+            {
+              "label": "Precision bearing X7",
+              "value": 11
+            },
+            {
+              "label": "Steel fastener A1",
+              "value": 12
+            },
+            {
+              "label": "Precision bearing A1",
+              "value": 13
+            },
+            {
+              "label": "Thermal sensor X7",
+              "value": 14
+            },
+            {
+              "label": "Safety panel Pro",
+              "value": 15
+            },
+            {
+              "label": "Precision bearing Pro",
+              "value": 16
+            },
+            {
+              "label": "Control cable A1",
+              "value": 17
+            },
+            {
+              "label": "Safety panel B2",
+              "value": 18
+            },
+            {
+              "label": "Control cable X7",
+              "value": 19
+            },
+            {
+              "label": "Thermal sensor B2",
+              "value": 20
+            },
+            {
+              "label": "Control cable X7",
+              "value": 21
+            },
+            {
+              "label": "Precision bearing A1",
+              "value": 22
+            },
+            {
+              "label": "Hydraulic valve B2",
+              "value": 23
+            },
+            {
+              "label": "Safety panel Pro",
+              "value": 24
+            },
+            {
+              "label": "Hydraulic valve Pro",
+              "value": 25
+            },
+            {
+              "label": "Thermal sensor Pro",
+              "value": 26
+            },
+            {
+              "label": "Steel fastener Pro",
+              "value": 27
+            },
+            {
+              "label": "Precision bearing B2",
+              "value": 28
+            },
+            {
+              "label": "Control cable X7",
+              "value": 29
+            },
+            {
+              "label": "Thermal sensor A1",
+              "value": 30
+            },
+            {
+              "label": "Precision bearing X7",
+              "value": 31
+            },
+            {
+              "label": "Thermal sensor B2",
+              "value": 32
+            },
+            {
+              "label": "Thermal sensor X7",
+              "value": 33
+            },
+            {
+              "label": "Safety panel B2",
+              "value": 34
+            },
+            {
+              "label": "Thermal sensor A1",
+              "value": 35
+            },
+            {
+              "label": "Hydraulic valve X7",
+              "value": 36
+            },
+            {
+              "label": "Thermal sensor B2",
+              "value": 37
+            },
+            {
+              "label": "Precision bearing B2",
+              "value": 38
+            },
+            {
+              "label": "Hydraulic valve Pro",
+              "value": 39
+            },
+            {
+              "label": "Hydraulic valve X7",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "type": "select",
+          "required": true,
+          "defaultValue": 5,
+          "options": [
+            {
+              "label": "Central Distribution Center",
+              "value": 1
+            },
+            {
+              "label": "North Distribution Center",
+              "value": 2
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 3
+            },
+            {
+              "label": "Harbor Distribution Center",
+              "value": 4
+            },
+            {
+              "label": "North Distribution Center",
+              "value": 5
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 6
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 7
+            },
+            {
+              "label": "North Distribution Center",
+              "value": 8
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 9
+            },
+            {
+              "label": "South Distribution Center",
+              "value": 10
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 11
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "key": "status",
+          "label": "Stock status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "low",
+          "options": [
+            {
+              "label": "Healthy",
+              "value": "healthy"
+            },
+            {
+              "label": "Low",
+              "value": "low"
+            },
+            {
+              "label": "Critical",
+              "value": "critical"
+            },
+            {
+              "label": "Out Of Stock",
+              "value": "out_of_stock"
+            },
+            {
+              "label": "Overstock",
+              "value": "overstock"
+            }
+          ]
+        },
+        {
+          "key": "planner_id",
+          "label": "Planner",
+          "type": "select",
+          "required": false,
+          "defaultValue": 8,
+          "options": [
+            {
+              "label": "Ravi Fischer",
+              "value": 1
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 2
+            },
+            {
+              "label": "Sofia Rossi",
+              "value": 3
+            },
+            {
+              "label": "Diego Tanaka",
+              "value": 4
+            },
+            {
+              "label": "Zara Meyer",
+              "value": 5
+            },
+            {
+              "label": "Iris Novak",
+              "value": 6
+            },
+            {
+              "label": "Kai Meyer",
+              "value": 7
+            },
+            {
+              "label": "Eli Wright",
+              "value": 8
+            },
+            {
+              "label": "Leila Silva",
+              "value": 9
+            },
+            {
+              "label": "Tomás Osei",
+              "value": 10
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 11
+            },
+            {
+              "label": "Mira Dubey",
+              "value": 12
+            },
+            {
+              "label": "Clara Rossi",
+              "value": 13
+            },
+            {
+              "label": "Owen Hassan",
+              "value": 14
+            },
+            {
+              "label": "Clara Bennett",
+              "value": 15
+            },
+            {
+              "label": "Kai Osei",
+              "value": 16
+            },
+            {
+              "label": "Luca Patel",
+              "value": 17
+            },
+            {
+              "label": "Elena Wright",
+              "value": 18
+            },
+            {
+              "label": "Malik Alvarez",
+              "value": 19
+            },
+            {
+              "label": "Iris Andersen",
+              "value": 20
+            },
+            {
+              "label": "Jonas Wright",
+              "value": 21
+            },
+            {
+              "label": "Noah Larsen",
+              "value": 22
+            },
+            {
+              "label": "Kai Dubey",
+              "value": 23
+            },
+            {
+              "label": "Jonas Silva",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "on_hand",
+          "label": "On hand",
+          "type": "number",
+          "required": true,
+          "defaultValue": 18,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "reserved",
+          "label": "Reserved",
+          "type": "number",
+          "required": false,
+          "defaultValue": 43,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "reorder_point",
+          "label": "Reorder point",
+          "type": "number",
+          "required": true,
+          "defaultValue": 71,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "safety_stock",
+          "label": "Safety stock",
+          "type": "number",
+          "required": true,
+          "defaultValue": 236,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "target_stock",
+          "label": "Target stock",
+          "type": "number",
+          "required": true,
+          "defaultValue": 47,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "unit_cost",
+          "label": "Unit cost",
+          "type": "number",
+          "required": false,
+          "defaultValue": 8190.08,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "last_counted_at",
+          "label": "Last counted",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "next_review_at",
+          "label": "Next review",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_create",
+              "inputValues": {
+                "product_name": "{{ event.formData.product_name }}",
+                "sku_id": "{{ event.formData.sku_id }}",
+                "warehouse_id": "{{ event.formData.warehouse_id }}",
+                "status": "{{ event.formData.status }}",
+                "planner_id": "{{ event.formData.planner_id }}",
+                "on_hand": "{{ event.formData.on_hand }}",
+                "reserved": "{{ event.formData.reserved }}",
+                "reorder_point": "{{ event.formData.reorder_point }}",
+                "safety_stock": "{{ event.formData.safety_stock }}",
+                "target_stock": "{{ event.formData.target_stock }}",
+                "unit_cost": "{{ event.formData.unit_cost }}",
+                "last_counted_at": "{{ event.formData.last_counted_at }}",
+                "next_review_at": "{{ event.formData.next_review_at }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-create.result",
+    "key": "result",
+    "page": "inv-stock_items-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.stock_items_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.stock_items_create || {}).isLoading || false }}"
+    }
+  }
+]

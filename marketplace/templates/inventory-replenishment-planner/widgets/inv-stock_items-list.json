@@ -1,0 +1,679 @@
+[
+  {
+    "slug": "inv-stock_items-list.heading",
+    "key": "heading",
+    "page": "inv-stock_items-list",
+    "title": "Stock Items",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Stock Items\nBrowse, filter and update stock items. All edits are audit-logged and soft-deleted records can be restored from the record detail page.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.search",
+    "key": "search",
+    "page": "inv-stock_items-list",
+    "title": "Search",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Search stock items...",
+      "debounceMs": 350,
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.status",
+    "key": "status",
+    "page": "inv-stock_items-list",
+    "title": "Status filter",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "All statuses",
+      "defaultValue": "all",
+      "options": [
+        {
+          "label": "All statuses",
+          "value": "all"
+        },
+        {
+          "label": "Healthy",
+          "value": "healthy"
+        },
+        {
+          "label": "Low",
+          "value": "low"
+        },
+        {
+          "label": "Critical",
+          "value": "critical"
+        },
+        {
+          "label": "Out Of Stock",
+          "value": "out_of_stock"
+        },
+        {
+          "label": "Overstock",
+          "value": "overstock"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.value === 'all' ? '' : event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.range",
+    "key": "range",
+    "page": "inv-stock_items-list",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.sort",
+    "key": "sort",
+    "page": "inv-stock_items-list",
+    "title": "Sort",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Sort by",
+      "defaultValue": "product_name",
+      "options": [
+        {
+          "label": "Product Name",
+          "value": "product_name"
+        },
+        {
+          "label": "On Hand",
+          "value": "on_hand"
+        },
+        {
+          "label": "Reserved",
+          "value": "reserved"
+        },
+        {
+          "label": "Reorder Point",
+          "value": "reorder_point"
+        },
+        {
+          "label": "Safety Stock",
+          "value": "safety_stock"
+        },
+        {
+          "label": "Target Stock",
+          "value": "target_stock"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.sortBy",
+              "value": "{{ event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.total",
+    "key": "total",
+    "page": "inv-stock_items-list",
+    "title": "Total records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total records",
+      "valueTemplate": "{{ ((((state.queries.stock_items_stats || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.stock_items_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.value",
+    "key": "value",
+    "page": "inv-stock_items-list",
+    "title": "Total value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total value",
+      "valueTemplate": "{{ ((((state.queries.stock_items_stats || {}).data || [])[0] || {}).total_value) }}",
+      "prefix": "$",
+      "isLoading": "{{ (state.queries.stock_items_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.avg",
+    "key": "avg",
+    "page": "inv-stock_items-list",
+    "title": "Average",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Average value",
+      "valueTemplate": "{{ ((((state.queries.stock_items_stats || {}).data || [])[0] || {}).average_value) }}",
+      "prefix": "$",
+      "isLoading": "{{ (state.queries.stock_items_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.selected",
+    "key": "selected",
+    "page": "inv-stock_items-list",
+    "title": "Selected record",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record",
+      "dataTemplate": "{{ (((state.queries.stock_items_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row to inspect it.",
+      "isLoading": "{{ (state.queries.stock_items_selected || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.table",
+    "key": "table",
+    "page": "inv-stock_items-list",
+    "title": "Stock Items",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.stock_items || {}).data || [])",
+      "columns": [
+        {
+          "key": "product_name",
+          "label": "Product",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "sku_id",
+          "label": "SKU",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Stock status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "planner_id",
+          "label": "Planner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "on_hand",
+          "label": "On hand",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "reserved",
+          "label": "Reserved",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "reorder_point",
+          "label": "Reorder point",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "safety_stock",
+          "label": "Safety stock",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "target_stock",
+          "label": "Target stock",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "unit_cost",
+          "label": "Unit cost",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "last_counted_at",
+          "label": "Last counted",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "next_review_at",
+          "label": "Next review",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageParam": "page",
+        "pageSize": 10,
+        "totalTemplate": "{{ ((state.queries.stock_items || {}).data && (state.queries.stock_items || {}).data[0] ? (state.queries.stock_items || {}).data[0].total_count : 0) }}"
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": true,
+        "placeholder": "Search stock items..."
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv",
+        "serverSide": false,
+        "buttonLabel": "Export CSV"
+      },
+      "editing": {
+        "enabled": true
+      },
+      "bulkEdit": {
+        "enabled": false,
+        "saveLabel": "Save changes"
+      },
+      "multiSelect": {
+        "enabled": true,
+        "showSelectAll": true,
+        "actions": [
+          {
+            "label": "Archive selected",
+            "actionKey": "archive",
+            "variant": "destructive"
+          }
+        ]
+      },
+      "emptyText": "No stock items found.",
+      "emptyHint": "Adjust the filters or create a new record.",
+      "isLoading": "{{ (state.queries.stock_items || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ],
+        "onPageChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": "{{ event.page }}"
+            }
+          }
+        ],
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "product_name": "{{ event.updatedRow.product_name }}",
+                "sku_id": "{{ event.updatedRow.sku_id }}",
+                "warehouse_id": "{{ event.updatedRow.warehouse_id }}",
+                "status": "{{ event.updatedRow.status }}",
+                "planner_id": "{{ event.updatedRow.planner_id }}",
+                "on_hand": "{{ event.updatedRow.on_hand }}",
+                "reserved": "{{ event.updatedRow.reserved }}",
+                "reorder_point": "{{ event.updatedRow.reorder_point }}",
+                "safety_stock": "{{ event.updatedRow.safety_stock }}",
+                "target_stock": "{{ event.updatedRow.target_stock }}",
+                "unit_cost": "{{ event.updatedRow.unit_cost }}",
+                "last_counted_at": "{{ event.updatedRow.last_counted_at }}",
+                "next_review_at": "{{ event.updatedRow.next_review_at }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ],
+        "onBulkAction": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_delete",
+              "inputValues": {
+                "ids": "{{ event.selectedRows.map(function (r) { return r.id; }) }}"
+              },
+              "successToast": "Records archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.actions",
+    "key": "actions",
+    "page": "inv-stock_items-list",
+    "title": "Selected record actions",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record actions",
+      "dataTemplate": "{{ (((state.queries.stock_items_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row, then use the buttons below."
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.archive",
+    "key": "archive",
+    "page": "inv-stock_items-list",
+    "title": "Archive selected",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive selected",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.selectedID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.advance",
+    "key": "advance",
+    "page": "inv-stock_items-list",
+    "title": "Advance status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Advance status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_status",
+              "inputValues": {
+                "id": "{{ state.variables.selectedID }}",
+                "status": "{{ \"low\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.explain",
+    "key": "explain",
+    "page": "inv-stock_items-list",
+    "title": "List notes",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "Rows are loaded server-side. Use the table toolbar to search, sort and export the current view. Inline edits and bulk actions run the template's parameterized update queries and write to the audit log.",
+      "format": "plain"
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.views",
+    "key": "views",
+    "page": "inv-stock_items-list",
+    "title": "Saved views",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.stock_items_views || {}).data || [])",
+      "columns": [
+        {
+          "key": "label",
+          "label": "View",
+          "type": "text",
+          "sortable": false
+        },
+        {
+          "key": "config_key",
+          "label": "Key",
+          "type": "text",
+          "sortable": false
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false,
+        "placeholder": "Filter saved views"
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No saved views yet.",
+      "isLoading": "{{ (state.queries.stock_items_views || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.row.config_value.search || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.row.config_value.status || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-stock_items-list.saveView",
+    "key": "saveView",
+    "page": "inv-stock_items-list",
+    "title": "Save current view",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Save current view",
+      "submitLabel": "Save view",
+      "fields": [
+        {
+          "key": "name",
+          "label": "View name",
+          "type": "text",
+          "required": true,
+          "placeholder": "e.g. My open stock items"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "stock_items_view_create",
+              "inputValues": {
+                "configKey": "{{ \"saved_view.inv-stock_items-list.\" + String(event.formData.name || \"view\").toLowerCase().replace(/[^a-z0-9]+/g, \"-\") }}",
+                "value": "{{ ({ search: state.variables.search, status: state.variables.status, page: 1 }) }}",
+                "label": "{{ event.formData.name }}"
+              },
+              "successToast": "View saved",
+              "errorToast": "Could not save view"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

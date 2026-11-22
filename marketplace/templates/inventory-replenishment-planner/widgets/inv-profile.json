@@ -1,0 +1,211 @@
+[
+  {
+    "slug": "inv-profile.heading",
+    "key": "heading",
+    "page": "inv-profile",
+    "title": "My profile",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# My profile\nUpdate your directory details. Role and permission changes are managed by an administrator.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-profile.picker",
+    "key": "picker",
+    "page": "inv-profile",
+    "title": "Profile",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Profile",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Ravi Fischer",
+          "value": 1
+        },
+        {
+          "label": "Ishaan Lindqvist",
+          "value": 2
+        },
+        {
+          "label": "Sofia Rossi",
+          "value": 3
+        },
+        {
+          "label": "Diego Tanaka",
+          "value": 4
+        },
+        {
+          "label": "Zara Meyer",
+          "value": 5
+        },
+        {
+          "label": "Iris Novak",
+          "value": 6
+        },
+        {
+          "label": "Kai Meyer",
+          "value": 7
+        },
+        {
+          "label": "Eli Wright",
+          "value": 8
+        },
+        {
+          "label": "Leila Silva",
+          "value": 9
+        },
+        {
+          "label": "Tomás Osei",
+          "value": 10
+        },
+        {
+          "label": "Ishaan Lindqvist",
+          "value": 11
+        },
+        {
+          "label": "Mira Dubey",
+          "value": 12
+        },
+        {
+          "label": "Clara Rossi",
+          "value": 13
+        },
+        {
+          "label": "Owen Hassan",
+          "value": 14
+        },
+        {
+          "label": "Clara Bennett",
+          "value": 15
+        },
+        {
+          "label": "Kai Osei",
+          "value": 16
+        },
+        {
+          "label": "Luca Patel",
+          "value": 17
+        },
+        {
+          "label": "Elena Wright",
+          "value": 18
+        },
+        {
+          "label": "Malik Alvarez",
+          "value": 19
+        },
+        {
+          "label": "Iris Andersen",
+          "value": 20
+        },
+        {
+          "label": "Jonas Wright",
+          "value": 21
+        },
+        {
+          "label": "Noah Larsen",
+          "value": 22
+        },
+        {
+          "label": "Kai Dubey",
+          "value": 23
+        },
+        {
+          "label": "Jonas Silva",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-profile.profile",
+    "key": "profile",
+    "page": "inv-profile",
+    "title": "Profile",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Profile",
+      "dataTemplate": "{{ (((state.queries.profile || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "isLoading": "{{ (state.queries.profile || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-profile.form",
+    "key": "form",
+    "page": "inv-profile",
+    "title": "Edit profile",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Edit profile",
+      "submitLabel": "Save profile",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "fullName",
+          "label": "Full name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "department",
+          "label": "Department",
+          "type": "text"
+        },
+        {
+          "key": "jobTitle",
+          "label": "Job title",
+          "type": "text"
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text"
+        },
+        {
+          "key": "city",
+          "label": "City",
+          "type": "text"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "id": "{{ state.variables.staffID }}",
+                "fullName": "{{ event.formData.fullName }}",
+                "department": "{{ event.formData.department }}",
+                "jobTitle": "{{ event.formData.jobTitle }}",
+                "phone": "{{ event.formData.phone }}",
+                "city": "{{ event.formData.city }}"
+              },
+              "successToast": "Profile saved",
+              "errorToast": "Profile update failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

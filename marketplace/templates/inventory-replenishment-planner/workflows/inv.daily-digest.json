@@ -1,0 +1,171 @@
+{
+  "slug": "inv.daily-digest",
+  "key": "daily-digest",
+  "title": "Replenishment Proposals · daily digest",
+  "description": "Builds a daily summary and writes a single in-app notification.",
+  "tags": [
+    "automation",
+    "digest"
+  ],
+  "options": {
+    "description": "Builds a daily summary and writes a single in-app notification.",
+    "inputDefinitions": [
+      {
+        "key": "staffID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "cc1555d2-624f-4da1-8e43-819ebad55359",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadStats",
+      "nodeID": "83348180-eef1-4195-a833-a65f393b23d8",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadStats",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "ef547a4a-d55e-4d4a-be37-fff5a8743d4c",
+        "outputVariable": "summary",
+        "inputValues": {}
+      }
+    },
+    {
+      "key": "composeDigest",
+      "nodeID": "905a87c9-9c5b-4231-b174-ca15f8ebc74f",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "composeDigest",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "\nvar s = (ctx.summary || [])[0] || {};\nreturn { total: Number(s.total || 0), value: Number(s.total_value || 0), staffID: ctx.staffID || 1 };\n",
+        "outputVariable": "digest"
+      }
+    },
+    {
+      "key": "sendDigest",
+      "nodeID": "4e045272-a5b9-408a-9150-7386ef3dba18",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "sendDigest",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "c651fab5-e242-4ec0-97eb-83772b19408a",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.digest.staffID }}",
+          "title": "Inventory Replenishment Planner daily digest",
+          "body": "{{ ctx.digest.total }} records · value {{ ctx.digest.value }}",
+          "category": "info",
+          "linkPage": "inv-dashboard"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "dd882d51-dde1-42d6-bd4f-f18f7a1e7b56",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.digest }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "cc1555d2-624f-4da1-8e43-819ebad55359",
+      "to": "83348180-eef1-4195-a833-a65f393b23d8",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "83348180-eef1-4195-a833-a65f393b23d8",
+      "to": "905a87c9-9c5b-4231-b174-ca15f8ebc74f",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "905a87c9-9c5b-4231-b174-ca15f8ebc74f",
+      "to": "4e045272-a5b9-408a-9150-7386ef3dba18",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "4e045272-a5b9-408a-9150-7386ef3dba18",
+      "to": "dd882d51-dde1-42d6-bd4f-f18f7a1e7b56",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

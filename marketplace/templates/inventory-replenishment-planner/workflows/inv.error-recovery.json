@@ -1,0 +1,171 @@
+{
+  "slug": "inv.error-recovery",
+  "key": "error-recovery",
+  "title": "Inventory Replenishment Planner · expected failure and recovery",
+  "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+  "tags": [
+    "automation",
+    "reliability"
+  ],
+  "options": {
+    "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "843b099b-a762-4a57-a792-3546bfc5e290",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "injectFailure",
+      "nodeID": "67812e4e-b4c3-42ab-921c-44c5d70a53e2",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "injectFailure",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "code": "throw new Error(\"Synthetic upstream unavailable\");",
+        "outputVariable": "failure",
+        "retryLimit": 0
+      }
+    },
+    {
+      "key": "compensate",
+      "nodeID": "1e3069d5-62dc-4a4d-a7f1-5b3950058fdb",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "compensate",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "return { recovered: true, fallback: \"cached snapshot\", recordID: ctx.recordID || 1 };",
+        "outputVariable": "recovery"
+      }
+    },
+    {
+      "key": "notifyRecovery",
+      "nodeID": "fa189880-9a8a-4150-87f7-6e1fe90a25d5",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyRecovery",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "c651fab5-e242-4ec0-97eb-83772b19408a",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID || 1 }}",
+          "title": "Inventory Replenishment Planner recovery completed",
+          "body": "A failed upstream call was compensated without losing the record.",
+          "category": "warning",
+          "linkPage": "inv-admin-jobs"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "c4650001-236f-4809-aeac-b2964d2674a8",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.recovery }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "843b099b-a762-4a57-a792-3546bfc5e290",
+      "to": "67812e4e-b4c3-42ab-921c-44c5d70a53e2",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "67812e4e-b4c3-42ab-921c-44c5d70a53e2",
+      "to": "1e3069d5-62dc-4a4d-a7f1-5b3950058fdb",
+      "handle": "error",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "1e3069d5-62dc-4a4d-a7f1-5b3950058fdb",
+      "to": "fa189880-9a8a-4150-87f7-6e1fe90a25d5",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "fa189880-9a8a-4150-87f7-6e1fe90a25d5",
+      "to": "c4650001-236f-4809-aeac-b2964d2674a8",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

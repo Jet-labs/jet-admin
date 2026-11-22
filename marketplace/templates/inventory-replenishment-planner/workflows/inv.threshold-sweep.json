@@ -1,0 +1,208 @@
+{
+  "slug": "inv.threshold-sweep",
+  "key": "threshold-sweep",
+  "title": "Replenishment Proposals · threshold sweep",
+  "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
+  "tags": [
+    "core",
+    "automation",
+    "sla"
+  ],
+  "options": {
+    "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
+    "inputDefinitions": [
+      {
+        "key": "days",
+        "type": "number",
+        "required": false,
+        "defaultValue": 7
+      },
+      {
+        "key": "staffID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "e0182806-be16-4138-a938-c4db82a68f95",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadOverdue",
+      "nodeID": "e670135b-c9e2-468d-809c-c9a0e9f48b9f",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadOverdue",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "d496c50c-7d70-48f3-86d0-9970144f0411",
+        "outputVariable": "overdueRows",
+        "inputValues": {
+          "days": "{{ ctx.days }}"
+        }
+      }
+    },
+    {
+      "key": "boundBatch",
+      "nodeID": "fb34a544-e90b-4493-95c6-13d4d8a3b93a",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "boundBatch",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "return (ctx.overdueRows || []).slice(0, 20);",
+        "outputVariable": "batch"
+      }
+    },
+    {
+      "key": "loopOverdue",
+      "nodeID": "cbf93a44-8ad3-4a38-a2cb-7cc4353f44a3",
+      "type": "loop",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loopOverdue",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "sourceVariable": "batch",
+        "itemVariable": "record",
+        "indexVariable": "index",
+        "outputVariable": "reminders",
+        "maxIterations": 20
+      }
+    },
+    {
+      "key": "notifyOverdue",
+      "nodeID": "1e821302-ac3d-4859-a07c-d1bf6e0b903c",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyOverdue",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "dataQueryID": "c651fab5-e242-4ec0-97eb-83772b19408a",
+        "outputVariable": "reminder",
+        "inputValues": {
+          "staffID": "{{ ctx.record.${owner ? owner.key : 'id'} || ctx.staffID }}",
+          "title": "Replenishment Proposals overdue",
+          "body": "Record #{{ ctx.record.id }} is past its due date and needs attention.",
+          "category": "warning",
+          "linkPage": "inv-replenishment_proposals-list"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "c9f5ebef-16d5-4f5b-b6f5-35fa7b67ab7e",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.reminders }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "e0182806-be16-4138-a938-c4db82a68f95",
+      "to": "e670135b-c9e2-468d-809c-c9a0e9f48b9f",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "e670135b-c9e2-468d-809c-c9a0e9f48b9f",
+      "to": "fb34a544-e90b-4493-95c6-13d4d8a3b93a",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "fb34a544-e90b-4493-95c6-13d4d8a3b93a",
+      "to": "cbf93a44-8ad3-4a38-a2cb-7cc4353f44a3",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "cbf93a44-8ad3-4a38-a2cb-7cc4353f44a3",
+      "to": "1e821302-ac3d-4859-a07c-d1bf6e0b903c",
+      "handle": "loop",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "cbf93a44-8ad3-4a38-a2cb-7cc4353f44a3",
+      "to": "c9f5ebef-16d5-4f5b-b6f5-35fa7b67ab7e",
+      "handle": "completed",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

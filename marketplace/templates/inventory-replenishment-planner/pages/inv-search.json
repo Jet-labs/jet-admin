@@ -1,0 +1,167 @@
+{
+  "slug": "inv-search",
+  "key": "search",
+  "title": "Global search",
+  "description": "Cross-entity search across every core table.",
+  "accessTags": [
+    "shared",
+    "staff",
+    "manager",
+    "admin",
+    "viewer"
+  ],
+  "variables": [
+    {
+      "key": "search",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "selected",
+      "type": "string",
+      "defaultValue": ""
+    }
+  ],
+  "sources": [
+    {
+      "alias": "search",
+      "type": "query",
+      "queryID": "591f89ea-0352-4740-a7f5-604dd04ce38a",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "search": "{{ state.variables.search }}"
+      },
+      "refreshOn": [
+        "variables.search"
+      ],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "97958183-f2e8-4fa3-82db-39a04edada35",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "ab3f1105-421a-4d0f-9fe7-e38617e4213f",
+              "type": "widget",
+              "widgetKey": "widget_c0a970e9-d66b-4797-ac4d-fc74950c415c_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "91d998e1-5cb7-43cb-bc5e-ba7f91d88440",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "dd3a8ee1-2aba-4bf1-a3b3-da78d1035c7e",
+              "type": "widget",
+              "widgetKey": "widget_8ae11c2d-e7cb-4f2e-8331-59f2dc4ec60c_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 52
+            }
+          ]
+        },
+        {
+          "id": "3503bccd-9ffc-4471-b16b-8787cf2c84aa",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "32c68252-b8ea-4c9c-adc6-22af94359e2a",
+              "type": "widget",
+              "widgetKey": "widget_102da6be-3b6a-4d37-895c-a2014c544b95_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 380
+            }
+          ]
+        },
+        {
+          "id": "d14dcb26-5878-4779-aabe-7db95e77c2bf",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "679d3843-a1df-4a42-8b29-d0b7971f933c",
+              "type": "widget",
+              "widgetKey": "widget_29a26ef0-633b-414f-97af-6a0e39d86b4d_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "ab3f1105-421a-4d0f-9fe7-e38617e4213f",
+        "type": "widget",
+        "widgetKey": "widget_c0a970e9-d66b-4797-ac4d-fc74950c415c_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "dd3a8ee1-2aba-4bf1-a3b3-da78d1035c7e",
+        "type": "widget",
+        "widgetKey": "widget_8ae11c2d-e7cb-4f2e-8331-59f2dc4ec60c_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "32c68252-b8ea-4c9c-adc6-22af94359e2a",
+        "type": "widget",
+        "widgetKey": "widget_102da6be-3b6a-4d37-895c-a2014c544b95_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 380
+      },
+      {
+        "id": "679d3843-a1df-4a42-8b29-d0b7971f933c",
+        "type": "widget",
+        "widgetKey": "widget_29a26ef0-633b-414f-97af-6a0e39d86b4d_1",
+        "span": 12,
+        "sizing": "fill"
+      }
+    ],
+    "variables": [
+      {
+        "key": "search",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "selected",
+        "type": "string",
+        "defaultValue": ""
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "search",
+        "type": "query",
+        "queryID": "591f89ea-0352-4740-a7f5-604dd04ce38a",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "search": "{{ state.variables.search }}"
+        },
+        "refreshOn": [
+          "variables.search"
+        ],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

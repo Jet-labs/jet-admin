@@ -1,0 +1,112 @@
+[
+  {
+    "key": "daily-digest",
+    "title": "Inventory Replenishment Planner · Daily operations digest",
+    "description": "Daily operations digest. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "0 8 * * *",
+    "timezone": "UTC",
+    "workflow": "0bd8b9b5-6b1d-4b43-a089-589de1211c83",
+    "workflowConfig": {
+      "inputValues": {
+        "staffID": 1
+      },
+      "idempotencyKey": "inv:daily-digest:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "threshold-sweep",
+    "title": "Inventory Replenishment Planner · Overdue and threshold sweep",
+    "description": "Overdue and threshold sweep. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "0 */4 * * *",
+    "timezone": "UTC",
+    "workflow": "126d1363-387e-4783-b216-e24d8e794740",
+    "workflowConfig": {
+      "inputValues": {
+        "days": 7,
+        "staffID": 1
+      },
+      "idempotencyKey": "inv:threshold-sweep:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "intake-triage",
+    "title": "Inventory Replenishment Planner · Weekday intake triage rehearsal",
+    "description": "Weekday intake triage rehearsal. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "15 9 * * 1-5",
+    "timezone": "UTC",
+    "workflow": "2abc0b6c-d55d-4f50-9484-aa7357b8716d",
+    "workflowConfig": {
+      "inputValues": {
+        "recordID": 1,
+        "staffID": 1
+      },
+      "idempotencyKey": "inv:intake-triage:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "document-generation",
+    "title": "Inventory Replenishment Planner · End-of-day document generation",
+    "description": "End-of-day document generation. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "30 18 * * 1-5",
+    "timezone": "UTC",
+    "workflow": "cd3fc15d-c1d2-4437-9991-e64747fa4f66",
+    "workflowConfig": {
+      "inputValues": {
+        "recordID": 1
+      },
+      "idempotencyKey": "inv:document-generation:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "round-robin-assignment",
+    "title": "Inventory Replenishment Planner · Daily assignment rebalance",
+    "description": "Daily assignment rebalance. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "0 7 * * *",
+    "timezone": "UTC",
+    "workflow": "b788fd19-1ab8-4a31-af87-adf5d8d52fd7",
+    "workflowConfig": {
+      "inputValues": {
+        "recordID": 1
+      },
+      "idempotencyKey": "inv:round-robin-assignment:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "integration-sync",
+    "title": "Inventory Replenishment Planner · Integration sync health cycle",
+    "description": "Integration sync health cycle. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "0 */6 * * *",
+    "timezone": "UTC",
+    "workflow": "118e30ae-187e-421b-bd59-0996ba775741",
+    "workflowConfig": {
+      "inputValues": {
+        "recordID": 1
+      },
+      "idempotencyKey": "inv:integration-sync:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  }
+]

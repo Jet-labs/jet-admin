@@ -1,0 +1,710 @@
+[
+  {
+    "slug": "inv-replenishment_proposals-create.heading",
+    "key": "heading",
+    "page": "inv-replenishment_proposals-create",
+    "title": "Create Proposal",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Proposal\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-create.form",
+    "key": "form",
+    "page": "inv-replenishment_proposals-create",
+    "title": "New Proposal",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Proposal",
+      "submitLabel": "Create Proposal",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "proposal_code",
+          "label": "Proposal",
+          "type": "text",
+          "required": true,
+          "defaultValue": "RPL-00001"
+        },
+        {
+          "key": "sku_id",
+          "label": "SKU",
+          "type": "select",
+          "required": true,
+          "defaultValue": 80,
+          "options": [
+            {
+              "label": "Steel fastener X7",
+              "value": 1
+            },
+            {
+              "label": "Steel fastener X7",
+              "value": 2
+            },
+            {
+              "label": "Thermal sensor Pro",
+              "value": 3
+            },
+            {
+              "label": "Safety panel B2",
+              "value": 4
+            },
+            {
+              "label": "Hydraulic valve B2",
+              "value": 5
+            },
+            {
+              "label": "Thermal sensor X7",
+              "value": 6
+            },
+            {
+              "label": "Steel fastener Pro",
+              "value": 7
+            },
+            {
+              "label": "Thermal sensor A1",
+              "value": 8
+            },
+            {
+              "label": "Steel fastener X7",
+              "value": 9
+            },
+            {
+              "label": "Control cable X7",
+              "value": 10
+            },
+            {
+              "label": "Precision bearing X7",
+              "value": 11
+            },
+            {
+              "label": "Steel fastener A1",
+              "value": 12
+            },
+            {
+              "label": "Precision bearing A1",
+              "value": 13
+            },
+            {
+              "label": "Thermal sensor X7",
+              "value": 14
+            },
+            {
+              "label": "Safety panel Pro",
+              "value": 15
+            },
+            {
+              "label": "Precision bearing Pro",
+              "value": 16
+            },
+            {
+              "label": "Control cable A1",
+              "value": 17
+            },
+            {
+              "label": "Safety panel B2",
+              "value": 18
+            },
+            {
+              "label": "Control cable X7",
+              "value": 19
+            },
+            {
+              "label": "Thermal sensor B2",
+              "value": 20
+            },
+            {
+              "label": "Control cable X7",
+              "value": 21
+            },
+            {
+              "label": "Precision bearing A1",
+              "value": 22
+            },
+            {
+              "label": "Hydraulic valve B2",
+              "value": 23
+            },
+            {
+              "label": "Safety panel Pro",
+              "value": 24
+            },
+            {
+              "label": "Hydraulic valve Pro",
+              "value": 25
+            },
+            {
+              "label": "Thermal sensor Pro",
+              "value": 26
+            },
+            {
+              "label": "Steel fastener Pro",
+              "value": 27
+            },
+            {
+              "label": "Precision bearing B2",
+              "value": 28
+            },
+            {
+              "label": "Control cable X7",
+              "value": 29
+            },
+            {
+              "label": "Thermal sensor A1",
+              "value": 30
+            },
+            {
+              "label": "Precision bearing X7",
+              "value": 31
+            },
+            {
+              "label": "Thermal sensor B2",
+              "value": 32
+            },
+            {
+              "label": "Thermal sensor X7",
+              "value": 33
+            },
+            {
+              "label": "Safety panel B2",
+              "value": 34
+            },
+            {
+              "label": "Thermal sensor A1",
+              "value": 35
+            },
+            {
+              "label": "Hydraulic valve X7",
+              "value": 36
+            },
+            {
+              "label": "Thermal sensor B2",
+              "value": 37
+            },
+            {
+              "label": "Precision bearing B2",
+              "value": 38
+            },
+            {
+              "label": "Hydraulic valve Pro",
+              "value": 39
+            },
+            {
+              "label": "Hydraulic valve X7",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "type": "select",
+          "required": true,
+          "defaultValue": 5,
+          "options": [
+            {
+              "label": "Central Distribution Center",
+              "value": 1
+            },
+            {
+              "label": "North Distribution Center",
+              "value": 2
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 3
+            },
+            {
+              "label": "Harbor Distribution Center",
+              "value": 4
+            },
+            {
+              "label": "North Distribution Center",
+              "value": 5
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 6
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 7
+            },
+            {
+              "label": "North Distribution Center",
+              "value": 8
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 9
+            },
+            {
+              "label": "South Distribution Center",
+              "value": 10
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 11
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "type": "select",
+          "required": true,
+          "defaultValue": 3,
+          "options": [
+            {
+              "label": "Cedar Partners",
+              "value": 1
+            },
+            {
+              "label": "Terra Supply",
+              "value": 2
+            },
+            {
+              "label": "Aster Group",
+              "value": 3
+            },
+            {
+              "label": "Kinetic Studio",
+              "value": 4
+            },
+            {
+              "label": "Pioneer Partners",
+              "value": 5
+            },
+            {
+              "label": "Pioneer Partners",
+              "value": 6
+            },
+            {
+              "label": "Meridian Group",
+              "value": 7
+            },
+            {
+              "label": "Vela Collective",
+              "value": 8
+            },
+            {
+              "label": "Zephyr Systems",
+              "value": 9
+            },
+            {
+              "label": "Northstar Labs",
+              "value": 10
+            },
+            {
+              "label": "Pioneer Collective",
+              "value": 11
+            },
+            {
+              "label": "Aster Industries",
+              "value": 12
+            },
+            {
+              "label": "Bluebird Group",
+              "value": 13
+            },
+            {
+              "label": "Vantage Collective",
+              "value": 14
+            },
+            {
+              "label": "Aster Labs",
+              "value": 15
+            },
+            {
+              "label": "Summit Group",
+              "value": 16
+            },
+            {
+              "label": "Northstar Labs",
+              "value": 17
+            },
+            {
+              "label": "Aster Digital",
+              "value": 18
+            },
+            {
+              "label": "Aster Works",
+              "value": 19
+            },
+            {
+              "label": "Summit Collective",
+              "value": 20
+            },
+            {
+              "label": "Vela Supply",
+              "value": 21
+            },
+            {
+              "label": "Northstar Works",
+              "value": 22
+            },
+            {
+              "label": "Bluebird Collective",
+              "value": 23
+            },
+            {
+              "label": "Cedar Digital",
+              "value": 24
+            },
+            {
+              "label": "Cedar Industries",
+              "value": 25
+            },
+            {
+              "label": "Terra Studio",
+              "value": 26
+            },
+            {
+              "label": "Bluebird Works",
+              "value": 27
+            },
+            {
+              "label": "Meridian Works",
+              "value": 28
+            },
+            {
+              "label": "Lumen Works",
+              "value": 29
+            },
+            {
+              "label": "Summit Systems",
+              "value": 30
+            },
+            {
+              "label": "Zephyr Group",
+              "value": 31
+            },
+            {
+              "label": "Zephyr Digital",
+              "value": 32
+            },
+            {
+              "label": "Lumen Partners",
+              "value": 33
+            },
+            {
+              "label": "Willow Labs",
+              "value": 34
+            },
+            {
+              "label": "Lumen Partners",
+              "value": 35
+            },
+            {
+              "label": "Meridian Works",
+              "value": 36
+            },
+            {
+              "label": "Copper Industries",
+              "value": 37
+            },
+            {
+              "label": "Harbor Group",
+              "value": 38
+            },
+            {
+              "label": "Meridian Partners",
+              "value": 39
+            },
+            {
+              "label": "Willow Works",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "pending_approval",
+          "options": [
+            {
+              "label": "Draft",
+              "value": "draft"
+            },
+            {
+              "label": "Pending Approval",
+              "value": "pending_approval"
+            },
+            {
+              "label": "Approved",
+              "value": "approved"
+            },
+            {
+              "label": "Ordered",
+              "value": "ordered"
+            },
+            {
+              "label": "Received",
+              "value": "received"
+            },
+            {
+              "label": "Cancelled",
+              "value": "cancelled"
+            }
+          ]
+        },
+        {
+          "key": "urgency",
+          "label": "Urgency",
+          "type": "select",
+          "required": true,
+          "defaultValue": "normal",
+          "options": [
+            {
+              "label": "Low",
+              "value": "low"
+            },
+            {
+              "label": "Normal",
+              "value": "normal"
+            },
+            {
+              "label": "High",
+              "value": "high"
+            },
+            {
+              "label": "Critical",
+              "value": "critical"
+            }
+          ]
+        },
+        {
+          "key": "owner_id",
+          "label": "Planner",
+          "type": "select",
+          "required": false,
+          "defaultValue": 9,
+          "options": [
+            {
+              "label": "Ravi Fischer",
+              "value": 1
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 2
+            },
+            {
+              "label": "Sofia Rossi",
+              "value": 3
+            },
+            {
+              "label": "Diego Tanaka",
+              "value": 4
+            },
+            {
+              "label": "Zara Meyer",
+              "value": 5
+            },
+            {
+              "label": "Iris Novak",
+              "value": 6
+            },
+            {
+              "label": "Kai Meyer",
+              "value": 7
+            },
+            {
+              "label": "Eli Wright",
+              "value": 8
+            },
+            {
+              "label": "Leila Silva",
+              "value": 9
+            },
+            {
+              "label": "Tomás Osei",
+              "value": 10
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 11
+            },
+            {
+              "label": "Mira Dubey",
+              "value": 12
+            },
+            {
+              "label": "Clara Rossi",
+              "value": 13
+            },
+            {
+              "label": "Owen Hassan",
+              "value": 14
+            },
+            {
+              "label": "Clara Bennett",
+              "value": 15
+            },
+            {
+              "label": "Kai Osei",
+              "value": 16
+            },
+            {
+              "label": "Luca Patel",
+              "value": 17
+            },
+            {
+              "label": "Elena Wright",
+              "value": 18
+            },
+            {
+              "label": "Malik Alvarez",
+              "value": 19
+            },
+            {
+              "label": "Iris Andersen",
+              "value": 20
+            },
+            {
+              "label": "Jonas Wright",
+              "value": 21
+            },
+            {
+              "label": "Noah Larsen",
+              "value": 22
+            },
+            {
+              "label": "Kai Dubey",
+              "value": 23
+            },
+            {
+              "label": "Jonas Silva",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "requested_qty",
+          "label": "Requested qty",
+          "type": "number",
+          "required": true,
+          "defaultValue": 90,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "suggested_qty",
+          "label": "Suggested qty",
+          "type": "number",
+          "required": true,
+          "defaultValue": 83,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "unit_cost",
+          "label": "Unit cost",
+          "type": "number",
+          "required": false,
+          "defaultValue": 3240,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "estimated_total",
+          "label": "Estimated total",
+          "type": "number",
+          "required": false,
+          "defaultValue": 366.03,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "confidence_score",
+          "label": "Confidence",
+          "type": "number",
+          "required": false,
+          "defaultValue": 53,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "needed_by_date",
+          "label": "Needed by",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "approved_at",
+          "label": "Approved at",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "rationale",
+          "label": "Rationale",
+          "type": "textarea",
+          "required": false,
+          "defaultValue": "Renewal renewal compliance handoff quarterly availability approval regional routing inventory documentation capacity review variance follow-up settlement availability approval.",
+          "help": "Plain text or short notes"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "replenishment_proposals_create",
+              "inputValues": {
+                "proposal_code": "{{ event.formData.proposal_code }}",
+                "sku_id": "{{ event.formData.sku_id }}",
+                "warehouse_id": "{{ event.formData.warehouse_id }}",
+                "supplier_id": "{{ event.formData.supplier_id }}",
+                "status": "{{ event.formData.status }}",
+                "urgency": "{{ event.formData.urgency }}",
+                "owner_id": "{{ event.formData.owner_id }}",
+                "requested_qty": "{{ event.formData.requested_qty }}",
+                "suggested_qty": "{{ event.formData.suggested_qty }}",
+                "unit_cost": "{{ event.formData.unit_cost }}",
+                "estimated_total": "{{ event.formData.estimated_total }}",
+                "confidence_score": "{{ event.formData.confidence_score }}",
+                "needed_by_date": "{{ event.formData.needed_by_date }}",
+                "approved_at": "{{ event.formData.approved_at }}",
+                "rationale": "{{ event.formData.rationale }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-create.result",
+    "key": "result",
+    "page": "inv-replenishment_proposals-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.replenishment_proposals_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.replenishment_proposals_create || {}).isLoading || false }}"
+    }
+  }
+]

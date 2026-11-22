@@ -1,0 +1,655 @@
+[
+  {
+    "slug": "inv-purchase_orders-detail.heading",
+    "key": "heading",
+    "page": "inv-purchase_orders-detail",
+    "title": "Record detail",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Purchase order detail\nRecord #{{ state.variables.recordID }} · every change is captured in the audit timeline.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.status",
+    "key": "status",
+    "page": "inv-purchase_orders-detail",
+    "title": "Status",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ ((((state.queries.purchase_orders_detail || {}).data || [])[0] || {}).status) }}",
+      "variant": "default"
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.statusForm",
+    "key": "statusForm",
+    "page": "inv-purchase_orders-detail",
+    "title": "Change status",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Select status",
+      "defaultValue": "draft",
+      "options": [
+        {
+          "label": "Draft",
+          "value": "draft"
+        },
+        {
+          "label": "Sent",
+          "value": "sent"
+        },
+        {
+          "label": "Confirmed",
+          "value": "confirmed"
+        },
+        {
+          "label": "Partially Received",
+          "value": "partially_received"
+        },
+        {
+          "label": "Received",
+          "value": "received"
+        },
+        {
+          "label": "Cancelled",
+          "value": "cancelled"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "overview"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.statusButton",
+    "key": "statusButton",
+    "page": "inv-purchase_orders-detail",
+    "title": "Apply status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Apply status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "purchase_orders_status",
+              "inputValues": {
+                "id": "{{ state.variables.recordID }}",
+                "status": "{{ (state.widgets[\"widget_5c20b295-1c6c-4b14-b850-250c547cebd0_1\"] || {}).value || \"draft\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.delete",
+    "key": "delete",
+    "page": "inv-purchase_orders-detail",
+    "title": "Archive",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive record",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "purchase_orders_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.restore",
+    "key": "restore",
+    "page": "inv-purchase_orders-detail",
+    "title": "Restore",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Restore record",
+      "variant": "outline",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "purchase_orders_restore",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record restored",
+              "errorToast": "Restore failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.tabs",
+    "key": "tabs",
+    "page": "inv-purchase_orders-detail",
+    "title": "Record sections",
+    "type": "tabs",
+    "config": {
+      "showHeader": false,
+      "tabs": [
+        {
+          "label": "Overview",
+          "value": "overview"
+        },
+        {
+          "label": "Comments",
+          "value": "comments"
+        },
+        {
+          "label": "Attachments",
+          "value": "attachments"
+        },
+        {
+          "label": "Activity",
+          "value": "activity"
+        }
+      ],
+      "defaultTab": "overview",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.record",
+    "key": "record",
+    "page": "inv-purchase_orders-detail",
+    "title": "Record fields",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record fields",
+      "dataTemplate": "{{ (((state.queries.purchase_orders_detail || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "emptyText": "Record not found.",
+      "isLoading": "{{ (state.queries.purchase_orders_detail || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.editTable",
+    "key": "editTable",
+    "page": "inv-purchase_orders-detail",
+    "title": "Inline edit",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.purchase_orders_detail || {}).data || [])",
+      "columns": [
+        {
+          "key": "po_number",
+          "label": "PO number",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "total_value",
+          "label": "Total value",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "expected_date",
+          "label": "Expected",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "ordered_at",
+          "label": "Ordered",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "received_at",
+          "label": "Received",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "buyer_id",
+          "label": "Buyer",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 1
+      },
+      "search": {
+        "enabled": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": true
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No record loaded.",
+      "isLoading": "{{ (state.queries.purchase_orders_detail || {}).isLoading || false }}",
+      "events": {
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "purchase_orders_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "po_number": "{{ event.updatedRow.po_number }}",
+                "supplier_id": "{{ event.updatedRow.supplier_id }}",
+                "warehouse_id": "{{ event.updatedRow.warehouse_id }}",
+                "status": "{{ event.updatedRow.status }}",
+                "total_value": "{{ event.updatedRow.total_value }}",
+                "expected_date": "{{ event.updatedRow.expected_date }}",
+                "ordered_at": "{{ event.updatedRow.ordered_at }}",
+                "received_at": "{{ event.updatedRow.received_at }}",
+                "buyer_id": "{{ event.updatedRow.buyer_id }}",
+                "notes": "{{ event.updatedRow.notes }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.comments",
+    "key": "comments",
+    "page": "inv-purchase_orders-detail",
+    "title": "Comments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.purchase_orders_comments || {}).data || [])",
+      "columns": [
+        {
+          "key": "author",
+          "label": "Author",
+          "type": "text"
+        },
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No comments yet.",
+      "isLoading": "{{ (state.queries.purchase_orders_comments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.commentForm",
+    "key": "commentForm",
+    "page": "inv-purchase_orders-detail",
+    "title": "Add comment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add comment",
+      "submitLabel": "Post comment",
+      "fields": [
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Add context, decisions or next steps"
+        },
+        {
+          "key": "authorID",
+          "label": "Author",
+          "type": "select",
+          "required": true,
+          "defaultValue": 1,
+          "options": [
+            {
+              "label": "Ravi Fischer",
+              "value": 1
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 2
+            },
+            {
+              "label": "Sofia Rossi",
+              "value": 3
+            },
+            {
+              "label": "Diego Tanaka",
+              "value": 4
+            },
+            {
+              "label": "Zara Meyer",
+              "value": 5
+            },
+            {
+              "label": "Iris Novak",
+              "value": 6
+            },
+            {
+              "label": "Kai Meyer",
+              "value": 7
+            },
+            {
+              "label": "Eli Wright",
+              "value": 8
+            },
+            {
+              "label": "Leila Silva",
+              "value": 9
+            },
+            {
+              "label": "Tomás Osei",
+              "value": 10
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 11
+            },
+            {
+              "label": "Mira Dubey",
+              "value": 12
+            },
+            {
+              "label": "Clara Rossi",
+              "value": 13
+            },
+            {
+              "label": "Owen Hassan",
+              "value": 14
+            },
+            {
+              "label": "Clara Bennett",
+              "value": 15
+            },
+            {
+              "label": "Kai Osei",
+              "value": 16
+            },
+            {
+              "label": "Luca Patel",
+              "value": 17
+            },
+            {
+              "label": "Elena Wright",
+              "value": 18
+            },
+            {
+              "label": "Malik Alvarez",
+              "value": 19
+            },
+            {
+              "label": "Iris Andersen",
+              "value": 20
+            },
+            {
+              "label": "Jonas Wright",
+              "value": 21
+            },
+            {
+              "label": "Noah Larsen",
+              "value": 22
+            },
+            {
+              "label": "Kai Dubey",
+              "value": 23
+            },
+            {
+              "label": "Jonas Silva",
+              "value": 24
+            }
+          ]
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "purchase_orders_comment_create",
+              "inputValues": {
+                "entity": "purchase_orders",
+                "entityID": "{{ state.variables.recordID }}",
+                "authorID": "{{ Number(event.formData.authorID || 1) }}",
+                "body": "{{ event.formData.body }}"
+              },
+              "successToast": "Comment added",
+              "errorToast": "Comment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.attachments",
+    "key": "attachments",
+    "page": "inv-purchase_orders-detail",
+    "title": "Attachments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.purchase_orders_attachments || {}).data || [])",
+      "columns": [
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "link"
+        },
+        {
+          "key": "file_url",
+          "label": "URL",
+          "type": "link"
+        },
+        {
+          "key": "mime_type",
+          "label": "Type",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Uploaded",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No attachments yet.",
+      "isLoading": "{{ (state.queries.purchase_orders_attachments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.attachmentForm",
+    "key": "attachmentForm",
+    "page": "inv-purchase_orders-detail",
+    "title": "Add attachment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add attachment",
+      "submitLabel": "Attach file",
+      "fields": [
+        {
+          "key": "fileName",
+          "label": "File name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "document.pdf"
+        },
+        {
+          "key": "fileURL",
+          "label": "File URL",
+          "type": "text",
+          "required": true,
+          "defaultValue": "https://files.example.invalid/document.pdf"
+        },
+        {
+          "key": "mimeType",
+          "label": "MIME type",
+          "type": "text",
+          "defaultValue": "application/pdf"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "purchase_orders_attachment_create",
+              "inputValues": {
+                "entity": "purchase_orders",
+                "entityID": "{{ state.variables.recordID }}",
+                "fileName": "{{ event.formData.fileName }}",
+                "fileURL": "{{ event.formData.fileURL }}",
+                "mimeType": "{{ event.formData.mimeType }}",
+                "uploadedBy": "{{ 1 }}"
+              },
+              "successToast": "Attachment linked",
+              "errorToast": "Attachment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-detail.activity",
+    "key": "activity",
+    "page": "inv-purchase_orders-detail",
+    "title": "Audit timeline",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Audit timeline",
+      "dataTemplate": "{{ (state.queries.purchase_orders_audit || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No audit entries yet.",
+      "isLoading": "{{ (state.queries.purchase_orders_audit || {}).isLoading || false }}"
+    }
+  }
+]

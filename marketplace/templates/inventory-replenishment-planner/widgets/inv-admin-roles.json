@@ -1,0 +1,270 @@
+[
+  {
+    "slug": "inv-admin-roles.heading",
+    "key": "heading",
+    "page": "inv-admin-roles",
+    "title": "Roles and permissions",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Roles and permissions\nProvisioned Casbin roles are read-only here. The page matrix mirrors the package's role map and can be adjusted for internal review; platform permission mappings remain the enforcement source.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-admin-roles.roles",
+    "key": "roles",
+    "page": "inv-admin-roles",
+    "title": "Tenant roles",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.roles || {}).data || [])",
+      "columns": [
+        {
+          "key": "roleTitle",
+          "label": "Role",
+          "type": "text"
+        },
+        {
+          "key": "roleDescription",
+          "label": "Description",
+          "type": "text"
+        },
+        {
+          "key": "permission_count",
+          "label": "Permissions",
+          "type": "number"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No roles.",
+      "isLoading": "{{ (state.queries.roles || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-admin-roles.matrix",
+    "key": "matrix",
+    "page": "inv-admin-roles",
+    "title": "Page matrix",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.matrix || {}).data || [])",
+      "columns": [
+        {
+          "key": "role_key",
+          "label": "Role",
+          "type": "badge"
+        },
+        {
+          "key": "page_slug",
+          "label": "Page",
+          "type": "text"
+        },
+        {
+          "key": "can_view",
+          "label": "View",
+          "type": "boolean"
+        },
+        {
+          "key": "can_export",
+          "label": "Export",
+          "type": "boolean"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No matrix rows.",
+      "isLoading": "{{ (state.queries.matrix || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-admin-roles.toggle",
+    "key": "toggle",
+    "page": "inv-admin-roles",
+    "title": "Update matrix row",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Update matrix row",
+      "submitLabel": "Save matrix row",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "roleKey",
+          "label": "Role key",
+          "type": "select",
+          "required": true,
+          "options": []
+        },
+        {
+          "key": "pageSlug",
+          "label": "Page slug",
+          "type": "select",
+          "required": true,
+          "options": [
+            {
+              "label": "inv-replenishment_proposals-list",
+              "value": "inv-replenishment_proposals-list"
+            },
+            {
+              "label": "inv-replenishment_proposals-detail",
+              "value": "inv-replenishment_proposals-detail"
+            },
+            {
+              "label": "inv-replenishment_proposals-create",
+              "value": "inv-replenishment_proposals-create"
+            },
+            {
+              "label": "inv-stock_items-list",
+              "value": "inv-stock_items-list"
+            },
+            {
+              "label": "inv-stock_items-detail",
+              "value": "inv-stock_items-detail"
+            },
+            {
+              "label": "inv-stock_items-create",
+              "value": "inv-stock_items-create"
+            },
+            {
+              "label": "inv-suppliers-list",
+              "value": "inv-suppliers-list"
+            },
+            {
+              "label": "inv-suppliers-detail",
+              "value": "inv-suppliers-detail"
+            },
+            {
+              "label": "inv-suppliers-create",
+              "value": "inv-suppliers-create"
+            },
+            {
+              "label": "inv-purchase_orders-list",
+              "value": "inv-purchase_orders-list"
+            },
+            {
+              "label": "inv-purchase_orders-detail",
+              "value": "inv-purchase_orders-detail"
+            },
+            {
+              "label": "inv-purchase_orders-create",
+              "value": "inv-purchase_orders-create"
+            },
+            {
+              "label": "inv-dashboard",
+              "value": "inv-dashboard"
+            },
+            {
+              "label": "inv-reports-operations",
+              "value": "inv-reports-operations"
+            },
+            {
+              "label": "inv-reports-secondary",
+              "value": "inv-reports-secondary"
+            },
+            {
+              "label": "inv-reports-quality",
+              "value": "inv-reports-quality"
+            },
+            {
+              "label": "inv-replenishment_proposals-kanban",
+              "value": "inv-replenishment_proposals-kanban"
+            },
+            {
+              "label": "inv-replenishment_proposals-calendar",
+              "value": "inv-replenishment_proposals-calendar"
+            },
+            {
+              "label": "inv-search",
+              "value": "inv-search"
+            },
+            {
+              "label": "inv-profile",
+              "value": "inv-profile"
+            },
+            {
+              "label": "inv-notifications",
+              "value": "inv-notifications"
+            },
+            {
+              "label": "inv-settings",
+              "value": "inv-settings"
+            },
+            {
+              "label": "inv-portal",
+              "value": "inv-portal"
+            },
+            {
+              "label": "inv-admin-users",
+              "value": "inv-admin-users"
+            }
+          ]
+        },
+        {
+          "key": "canView",
+          "label": "Can view",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "key": "canExport",
+          "label": "Can export",
+          "type": "checkbox",
+          "defaultValue": false
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "roleKey": "{{ event.formData.roleKey }}",
+                "pageSlug": "{{ event.formData.pageSlug }}",
+                "canView": "{{ event.formData.canView }}",
+                "canExport": "{{ event.formData.canExport }}"
+              },
+              "successToast": "Matrix updated",
+              "errorToast": "Matrix update failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

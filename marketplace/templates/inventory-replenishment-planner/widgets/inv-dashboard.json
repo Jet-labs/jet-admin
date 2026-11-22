@@ -1,0 +1,540 @@
+[
+  {
+    "slug": "inv-dashboard.heading",
+    "key": "heading",
+    "page": "inv-dashboard",
+    "title": "Dashboard",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Inventory Replenishment Planner\nOperational overview for the current team. Use the date range to scope the metrics; tasks and notifications are filtered by the selected staff member.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-dashboard.range",
+    "key": "range",
+    "page": "inv-dashboard",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "Reporting window",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-dashboard.staff",
+    "key": "staff",
+    "page": "inv-dashboard",
+    "title": "Tasks for",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Tasks for",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Ravi Fischer",
+          "value": 1
+        },
+        {
+          "label": "Ishaan Lindqvist",
+          "value": 2
+        },
+        {
+          "label": "Sofia Rossi",
+          "value": 3
+        },
+        {
+          "label": "Diego Tanaka",
+          "value": 4
+        },
+        {
+          "label": "Zara Meyer",
+          "value": 5
+        },
+        {
+          "label": "Iris Novak",
+          "value": 6
+        },
+        {
+          "label": "Kai Meyer",
+          "value": 7
+        },
+        {
+          "label": "Eli Wright",
+          "value": 8
+        },
+        {
+          "label": "Leila Silva",
+          "value": 9
+        },
+        {
+          "label": "Tomás Osei",
+          "value": 10
+        },
+        {
+          "label": "Ishaan Lindqvist",
+          "value": 11
+        },
+        {
+          "label": "Mira Dubey",
+          "value": 12
+        },
+        {
+          "label": "Clara Rossi",
+          "value": 13
+        },
+        {
+          "label": "Owen Hassan",
+          "value": 14
+        },
+        {
+          "label": "Clara Bennett",
+          "value": 15
+        },
+        {
+          "label": "Kai Osei",
+          "value": 16
+        },
+        {
+          "label": "Luca Patel",
+          "value": 17
+        },
+        {
+          "label": "Elena Wright",
+          "value": 18
+        },
+        {
+          "label": "Malik Alvarez",
+          "value": 19
+        },
+        {
+          "label": "Iris Andersen",
+          "value": 20
+        },
+        {
+          "label": "Jonas Wright",
+          "value": 21
+        },
+        {
+          "label": "Noah Larsen",
+          "value": 22
+        },
+        {
+          "label": "Kai Dubey",
+          "value": 23
+        },
+        {
+          "label": "Jonas Silva",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-dashboard.qualityBadge",
+    "key": "qualityBadge",
+    "page": "inv-dashboard",
+    "title": "Data quality issues",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ String(((state.queries.quality || {}).data || []).reduce(function (n, r) { return n + Number(r.affected_rows || 0); }, 0)) + \" issues\" }}",
+      "variant": "warning"
+    }
+  },
+  {
+    "slug": "inv-dashboard.kpiTotal",
+    "key": "kpiTotal",
+    "page": "inv-dashboard",
+    "title": "Replenishment Proposals",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Replenishment Proposals",
+      "valueTemplate": "{{ ((((state.queries.replenishment_proposals_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.replenishment_proposals_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-dashboard.kpiValue",
+    "key": "kpiValue",
+    "page": "inv-dashboard",
+    "title": "Total value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total value",
+      "prefix": "$",
+      "valueTemplate": "{{ ((((state.queries.replenishment_proposals_summary || {}).data || [])[0] || {}).total_value) }}",
+      "isLoading": "{{ (state.queries.replenishment_proposals_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-dashboard.kpiSecond",
+    "key": "kpiSecond",
+    "page": "inv-dashboard",
+    "title": "Stock Items",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Stock Items",
+      "valueTemplate": "{{ ((((state.queries.stock_items_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.stock_items_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-dashboard.kpiTasks",
+    "key": "kpiTasks",
+    "page": "inv-dashboard",
+    "title": "Tasks for me",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Tasks for me",
+      "valueTemplate": "{{ (((state.queries.my_tasks || {}).data || []).length) }}",
+      "isLoading": "{{ (state.queries.my_tasks || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-dashboard.trend",
+    "key": "trend",
+    "page": "inv-dashboard",
+    "title": "Volume trend",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Volume trend",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.replenishment_proposals_trend || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "line",
+          "tooltip": true,
+          "point": true
+        },
+        "encoding": {
+          "x": {
+            "field": "day",
+            "type": "temporal",
+            "axis": {
+              "labelAngle": 0
+            }
+          },
+          "y": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "value": "#16a34a"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.replenishment_proposals_trend || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-dashboard.statusChart",
+    "key": "statusChart",
+    "page": "inv-dashboard",
+    "title": "By status",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "By status",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.replenishment_proposals_status_chart || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "arc",
+          "innerRadius": 55,
+          "tooltip": true
+        },
+        "encoding": {
+          "theta": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "status",
+            "type": "nominal"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.replenishment_proposals_status_chart || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-dashboard.tasks",
+    "key": "tasks",
+    "page": "inv-dashboard",
+    "title": "Tasks for me",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.my_tasks || {}).data || [])",
+      "columns": [
+        {
+          "key": "proposal_code",
+          "label": "Proposal",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "sku_id",
+          "label": "SKU",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "urgency",
+          "label": "Urgency",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "owner_id",
+          "label": "Planner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "requested_qty",
+          "label": "Requested qty",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "suggested_qty",
+          "label": "Suggested qty",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "unit_cost",
+          "label": "Unit cost",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "estimated_total",
+          "label": "Estimated total",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "confidence_score",
+          "label": "Confidence",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "needed_by_date",
+          "label": "Needed by",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "approved_at",
+          "label": "Approved at",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "rationale",
+          "label": "Rationale",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No open tasks for this staff member.",
+      "isLoading": "{{ (state.queries.my_tasks || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-dashboard.notifications",
+    "key": "notifications",
+    "page": "inv-dashboard",
+    "title": "Notifications",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.notifications || {}).data || [])",
+      "columns": [
+        {
+          "key": "title",
+          "label": "Notification",
+          "type": "text"
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "badge"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No notifications.",
+      "isLoading": "{{ (state.queries.notifications || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-dashboard.activity",
+    "key": "activity",
+    "page": "inv-dashboard",
+    "title": "Recent activity",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Recent activity",
+      "dataTemplate": "{{ (state.queries.recent_activity || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No activity yet.",
+      "isLoading": "{{ (state.queries.recent_activity || {}).isLoading || false }}"
+    }
+  }
+]

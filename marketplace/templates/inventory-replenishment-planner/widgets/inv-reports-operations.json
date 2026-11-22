@@ -1,0 +1,350 @@
+[
+  {
+    "slug": "inv-reports-operations.heading",
+    "key": "heading",
+    "page": "inv-reports-operations",
+    "title": "Operations report",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Operations report\nUse the date range to scope totals. The export button downloads the filtered record list as CSV.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-reports-operations.range",
+    "key": "range",
+    "page": "inv-reports-operations",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "Date range",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-reports-operations.total",
+    "key": "total",
+    "page": "inv-reports-operations",
+    "title": "Records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Records",
+      "valueTemplate": "{{ ((((state.queries.report_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.report_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-reports-operations.value",
+    "key": "value",
+    "page": "inv-reports-operations",
+    "title": "Value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Value",
+      "prefix": "$",
+      "valueTemplate": "{{ ((((state.queries.report_summary || {}).data || [])[0] || {}).total_value) }}",
+      "isLoading": "{{ (state.queries.report_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-reports-operations.trend",
+    "key": "trend",
+    "page": "inv-reports-operations",
+    "title": "Daily trend",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Daily trend",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.report_trend || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "bar",
+          "tooltip": true
+        },
+        "encoding": {
+          "x": {
+            "field": "day",
+            "type": "temporal",
+            "axis": {
+              "labelAngle": 0
+            }
+          },
+          "y": {
+            "field": "total",
+            "type": "quantitative"
+          },
+          "color": {
+            "value": "#16a34a"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.report_trend || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-reports-operations.status",
+    "key": "status",
+    "page": "inv-reports-operations",
+    "title": "Status mix",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Status mix",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.report_status || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "bar",
+          "tooltip": true
+        },
+        "encoding": {
+          "y": {
+            "field": "status",
+            "type": "nominal",
+            "sort": "-x"
+          },
+          "x": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "status",
+            "type": "nominal"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.report_status || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-reports-operations.data",
+    "key": "data",
+    "page": "inv-reports-operations",
+    "title": "Filtered records",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.report_list || {}).data || [])",
+      "columns": [
+        {
+          "key": "proposal_code",
+          "label": "Proposal",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "sku_id",
+          "label": "SKU",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "urgency",
+          "label": "Urgency",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "owner_id",
+          "label": "Planner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "requested_qty",
+          "label": "Requested qty",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "suggested_qty",
+          "label": "Suggested qty",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "unit_cost",
+          "label": "Unit cost",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "estimated_total",
+          "label": "Estimated total",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "confidence_score",
+          "label": "Confidence",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "needed_by_date",
+          "label": "Needed by",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "approved_at",
+          "label": "Approved at",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "rationale",
+          "label": "Rationale",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No records in this range.",
+      "isLoading": "{{ (state.queries.report_list || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-reports-operations.run",
+    "key": "run",
+    "page": "inv-reports-operations",
+    "title": "Load export set",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Load filtered rows",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "report_list",
+              "inputValues": {
+                "search": "",
+                "status": "",
+                "dateFrom": "{{ state.variables.dateFrom }}",
+                "dateTo": "{{ state.variables.dateTo }}"
+              },
+              "successToast": "Report loaded",
+              "errorToast": "Report failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

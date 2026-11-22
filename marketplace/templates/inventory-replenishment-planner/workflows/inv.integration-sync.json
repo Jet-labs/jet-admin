@@ -1,0 +1,203 @@
+{
+  "slug": "inv.integration-sync",
+  "key": "integration-sync",
+  "title": "Inventory Replenishment Planner · integration sync",
+  "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
+  "tags": [
+    "automation",
+    "integration"
+  ],
+  "options": {
+    "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "68a36da3-078a-4fc6-baf7-f06cdb65507a",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "callIntegration",
+      "nodeID": "59bb4dd3-a0b2-46cf-aefb-6248644fc3ef",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "callIntegration",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "60638436-44a1-496a-86c6-69f57eae75a9",
+        "outputVariable": "integrationResponse",
+        "inputValues": {}
+      }
+    },
+    {
+      "key": "normalizeResponse",
+      "nodeID": "b31acca0-c9fe-429c-aab7-a13cdb657d3b",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "normalizeResponse",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "\nreturn { ok: true, response: ctx.integrationResponse || null, recordID: ctx.recordID || 1 };\n",
+        "outputVariable": "sync"
+      }
+    },
+    {
+      "key": "recover",
+      "nodeID": "c8fe5215-2161-43db-93ae-7aca1ddf8cc9",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "recover",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "code": "\nreturn { ok: false, recovered: true, reason: \"Mock integration unreachable; queued for retry\", recordID: ctx.recordID || 1 };\n",
+        "outputVariable": "sync"
+      }
+    },
+    {
+      "key": "notifyFailure",
+      "nodeID": "fe674a79-2f6d-40a9-a49b-4e32c21c201b",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyFailure",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "dataQueryID": "c651fab5-e242-4ec0-97eb-83772b19408a",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID || 1 }}",
+          "title": "Inventory Replenishment Planner integration sync recovered",
+          "body": "The mock integration failed and the workflow took the compensation path.",
+          "category": "warning",
+          "linkPage": "inv-admin-integrations"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "85bc0893-e626-416e-aafb-fed6cd765a87",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.sync }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "68a36da3-078a-4fc6-baf7-f06cdb65507a",
+      "to": "59bb4dd3-a0b2-46cf-aefb-6248644fc3ef",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "59bb4dd3-a0b2-46cf-aefb-6248644fc3ef",
+      "to": "b31acca0-c9fe-429c-aab7-a13cdb657d3b",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "59bb4dd3-a0b2-46cf-aefb-6248644fc3ef",
+      "to": "c8fe5215-2161-43db-93ae-7aca1ddf8cc9",
+      "handle": "error",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "b31acca0-c9fe-429c-aab7-a13cdb657d3b",
+      "to": "85bc0893-e626-416e-aafb-fed6cd765a87",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "c8fe5215-2161-43db-93ae-7aca1ddf8cc9",
+      "to": "fe674a79-2f6d-40a9-a49b-4e32c21c201b",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "fe674a79-2f6d-40a9-a49b-4e32c21c201b",
+      "to": "85bc0893-e626-416e-aafb-fed6cd765a87",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

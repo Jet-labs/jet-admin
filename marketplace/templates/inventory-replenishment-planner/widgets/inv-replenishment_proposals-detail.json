@@ -1,0 +1,696 @@
+[
+  {
+    "slug": "inv-replenishment_proposals-detail.heading",
+    "key": "heading",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Record detail",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Proposal detail\nRecord #{{ state.variables.recordID }} · every change is captured in the audit timeline.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.status",
+    "key": "status",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Status",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ ((((state.queries.replenishment_proposals_detail || {}).data || [])[0] || {}).status) }}",
+      "variant": "default"
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.statusForm",
+    "key": "statusForm",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Change status",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Select status",
+      "defaultValue": "draft",
+      "options": [
+        {
+          "label": "Draft",
+          "value": "draft"
+        },
+        {
+          "label": "Pending Approval",
+          "value": "pending_approval"
+        },
+        {
+          "label": "Approved",
+          "value": "approved"
+        },
+        {
+          "label": "Ordered",
+          "value": "ordered"
+        },
+        {
+          "label": "Received",
+          "value": "received"
+        },
+        {
+          "label": "Cancelled",
+          "value": "cancelled"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "overview"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.statusButton",
+    "key": "statusButton",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Apply status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Apply status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "replenishment_proposals_status",
+              "inputValues": {
+                "id": "{{ state.variables.recordID }}",
+                "status": "{{ (state.widgets[\"widget_8d9b656c-f249-4ec1-af3b-ef15ada012d3_1\"] || {}).value || \"draft\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.delete",
+    "key": "delete",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Archive",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive record",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "replenishment_proposals_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.restore",
+    "key": "restore",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Restore",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Restore record",
+      "variant": "outline",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "replenishment_proposals_restore",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record restored",
+              "errorToast": "Restore failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.tabs",
+    "key": "tabs",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Record sections",
+    "type": "tabs",
+    "config": {
+      "showHeader": false,
+      "tabs": [
+        {
+          "label": "Overview",
+          "value": "overview"
+        },
+        {
+          "label": "Comments",
+          "value": "comments"
+        },
+        {
+          "label": "Attachments",
+          "value": "attachments"
+        },
+        {
+          "label": "Activity",
+          "value": "activity"
+        }
+      ],
+      "defaultTab": "overview",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.record",
+    "key": "record",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Record fields",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record fields",
+      "dataTemplate": "{{ (((state.queries.replenishment_proposals_detail || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "emptyText": "Record not found.",
+      "isLoading": "{{ (state.queries.replenishment_proposals_detail || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.editTable",
+    "key": "editTable",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Inline edit",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.replenishment_proposals_detail || {}).data || [])",
+      "columns": [
+        {
+          "key": "proposal_code",
+          "label": "Proposal",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "sku_id",
+          "label": "SKU",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "urgency",
+          "label": "Urgency",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "owner_id",
+          "label": "Planner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "requested_qty",
+          "label": "Requested qty",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "suggested_qty",
+          "label": "Suggested qty",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "unit_cost",
+          "label": "Unit cost",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "estimated_total",
+          "label": "Estimated total",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "confidence_score",
+          "label": "Confidence",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "needed_by_date",
+          "label": "Needed by",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "approved_at",
+          "label": "Approved at",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "rationale",
+          "label": "Rationale",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 1
+      },
+      "search": {
+        "enabled": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": true
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No record loaded.",
+      "isLoading": "{{ (state.queries.replenishment_proposals_detail || {}).isLoading || false }}",
+      "events": {
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "replenishment_proposals_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "proposal_code": "{{ event.updatedRow.proposal_code }}",
+                "sku_id": "{{ event.updatedRow.sku_id }}",
+                "warehouse_id": "{{ event.updatedRow.warehouse_id }}",
+                "supplier_id": "{{ event.updatedRow.supplier_id }}",
+                "status": "{{ event.updatedRow.status }}",
+                "urgency": "{{ event.updatedRow.urgency }}",
+                "owner_id": "{{ event.updatedRow.owner_id }}",
+                "requested_qty": "{{ event.updatedRow.requested_qty }}",
+                "suggested_qty": "{{ event.updatedRow.suggested_qty }}",
+                "unit_cost": "{{ event.updatedRow.unit_cost }}",
+                "estimated_total": "{{ event.updatedRow.estimated_total }}",
+                "confidence_score": "{{ event.updatedRow.confidence_score }}",
+                "needed_by_date": "{{ event.updatedRow.needed_by_date }}",
+                "approved_at": "{{ event.updatedRow.approved_at }}",
+                "rationale": "{{ event.updatedRow.rationale }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.comments",
+    "key": "comments",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Comments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.replenishment_proposals_comments || {}).data || [])",
+      "columns": [
+        {
+          "key": "author",
+          "label": "Author",
+          "type": "text"
+        },
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No comments yet.",
+      "isLoading": "{{ (state.queries.replenishment_proposals_comments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.commentForm",
+    "key": "commentForm",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Add comment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add comment",
+      "submitLabel": "Post comment",
+      "fields": [
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Add context, decisions or next steps"
+        },
+        {
+          "key": "authorID",
+          "label": "Author",
+          "type": "select",
+          "required": true,
+          "defaultValue": 1,
+          "options": [
+            {
+              "label": "Ravi Fischer",
+              "value": 1
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 2
+            },
+            {
+              "label": "Sofia Rossi",
+              "value": 3
+            },
+            {
+              "label": "Diego Tanaka",
+              "value": 4
+            },
+            {
+              "label": "Zara Meyer",
+              "value": 5
+            },
+            {
+              "label": "Iris Novak",
+              "value": 6
+            },
+            {
+              "label": "Kai Meyer",
+              "value": 7
+            },
+            {
+              "label": "Eli Wright",
+              "value": 8
+            },
+            {
+              "label": "Leila Silva",
+              "value": 9
+            },
+            {
+              "label": "Tomás Osei",
+              "value": 10
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 11
+            },
+            {
+              "label": "Mira Dubey",
+              "value": 12
+            },
+            {
+              "label": "Clara Rossi",
+              "value": 13
+            },
+            {
+              "label": "Owen Hassan",
+              "value": 14
+            },
+            {
+              "label": "Clara Bennett",
+              "value": 15
+            },
+            {
+              "label": "Kai Osei",
+              "value": 16
+            },
+            {
+              "label": "Luca Patel",
+              "value": 17
+            },
+            {
+              "label": "Elena Wright",
+              "value": 18
+            },
+            {
+              "label": "Malik Alvarez",
+              "value": 19
+            },
+            {
+              "label": "Iris Andersen",
+              "value": 20
+            },
+            {
+              "label": "Jonas Wright",
+              "value": 21
+            },
+            {
+              "label": "Noah Larsen",
+              "value": 22
+            },
+            {
+              "label": "Kai Dubey",
+              "value": 23
+            },
+            {
+              "label": "Jonas Silva",
+              "value": 24
+            }
+          ]
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "replenishment_proposals_comment_create",
+              "inputValues": {
+                "entity": "replenishment_proposals",
+                "entityID": "{{ state.variables.recordID }}",
+                "authorID": "{{ Number(event.formData.authorID || 1) }}",
+                "body": "{{ event.formData.body }}"
+              },
+              "successToast": "Comment added",
+              "errorToast": "Comment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.attachments",
+    "key": "attachments",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Attachments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.replenishment_proposals_attachments || {}).data || [])",
+      "columns": [
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "link"
+        },
+        {
+          "key": "file_url",
+          "label": "URL",
+          "type": "link"
+        },
+        {
+          "key": "mime_type",
+          "label": "Type",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Uploaded",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No attachments yet.",
+      "isLoading": "{{ (state.queries.replenishment_proposals_attachments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.attachmentForm",
+    "key": "attachmentForm",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Add attachment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add attachment",
+      "submitLabel": "Attach file",
+      "fields": [
+        {
+          "key": "fileName",
+          "label": "File name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "document.pdf"
+        },
+        {
+          "key": "fileURL",
+          "label": "File URL",
+          "type": "text",
+          "required": true,
+          "defaultValue": "https://files.example.invalid/document.pdf"
+        },
+        {
+          "key": "mimeType",
+          "label": "MIME type",
+          "type": "text",
+          "defaultValue": "application/pdf"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "replenishment_proposals_attachment_create",
+              "inputValues": {
+                "entity": "replenishment_proposals",
+                "entityID": "{{ state.variables.recordID }}",
+                "fileName": "{{ event.formData.fileName }}",
+                "fileURL": "{{ event.formData.fileURL }}",
+                "mimeType": "{{ event.formData.mimeType }}",
+                "uploadedBy": "{{ 1 }}"
+              },
+              "successToast": "Attachment linked",
+              "errorToast": "Attachment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-detail.activity",
+    "key": "activity",
+    "page": "inv-replenishment_proposals-detail",
+    "title": "Audit timeline",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Audit timeline",
+      "dataTemplate": "{{ (state.queries.replenishment_proposals_audit || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No audit entries yet.",
+      "isLoading": "{{ (state.queries.replenishment_proposals_audit || {}).isLoading || false }}"
+    }
+  }
+]

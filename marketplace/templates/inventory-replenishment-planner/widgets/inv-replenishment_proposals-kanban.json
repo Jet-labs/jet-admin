@@ -1,0 +1,67 @@
+[
+  {
+    "slug": "inv-replenishment_proposals-kanban.heading",
+    "key": "heading",
+    "page": "inv-replenishment_proposals-kanban",
+    "title": "Replenishment Proposals board",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Replenishment Proposals board\nCards are grouped by **status**. Select a card to inspect the record; drag-and-drop is intentionally not enabled because status changes must run through the audited transition query.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-kanban.board",
+    "key": "board",
+    "page": "inv-replenishment_proposals-kanban",
+    "title": "Pipeline board",
+    "type": "kanban",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.replenishment_proposals || {}).data || [])",
+      "groupBy": "status",
+      "titleKey": "proposal_code",
+      "subtitleKey": "owner_id",
+      "valueKey": "unit_cost",
+      "dateKey": "needed_by_date",
+      "badgeKey": "status",
+      "columns": [
+        "draft",
+        "pending_approval",
+        "approved",
+        "ordered",
+        "received",
+        "cancelled"
+      ],
+      "emptyText": "No cards in this pipeline.",
+      "isLoading": "{{ (state.queries.replenishment_proposals || {}).isLoading || false }}",
+      "events": {
+        "onCardSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.card.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-replenishment_proposals-kanban.selected",
+    "key": "selected",
+    "page": "inv-replenishment_proposals-kanban",
+    "title": "Selected card",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected card",
+      "dataTemplate": "{{ (((state.queries.replenishment_proposals_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a card.",
+      "isLoading": "{{ (state.queries.replenishment_proposals_selected || {}).isLoading || false }}"
+    }
+  }
+]

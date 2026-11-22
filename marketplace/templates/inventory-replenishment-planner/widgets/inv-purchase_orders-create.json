@@ -1,0 +1,478 @@
+[
+  {
+    "slug": "inv-purchase_orders-create.heading",
+    "key": "heading",
+    "page": "inv-purchase_orders-create",
+    "title": "Create Purchase order",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Purchase order\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-create.form",
+    "key": "form",
+    "page": "inv-purchase_orders-create",
+    "title": "New Purchase order",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Purchase order",
+      "submitLabel": "Create Purchase order",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "po_number",
+          "label": "PO number",
+          "type": "text",
+          "required": true,
+          "defaultValue": "PO-00001"
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "type": "select",
+          "required": true,
+          "defaultValue": 22,
+          "options": [
+            {
+              "label": "Cedar Partners",
+              "value": 1
+            },
+            {
+              "label": "Terra Supply",
+              "value": 2
+            },
+            {
+              "label": "Aster Group",
+              "value": 3
+            },
+            {
+              "label": "Kinetic Studio",
+              "value": 4
+            },
+            {
+              "label": "Pioneer Partners",
+              "value": 5
+            },
+            {
+              "label": "Pioneer Partners",
+              "value": 6
+            },
+            {
+              "label": "Meridian Group",
+              "value": 7
+            },
+            {
+              "label": "Vela Collective",
+              "value": 8
+            },
+            {
+              "label": "Zephyr Systems",
+              "value": 9
+            },
+            {
+              "label": "Northstar Labs",
+              "value": 10
+            },
+            {
+              "label": "Pioneer Collective",
+              "value": 11
+            },
+            {
+              "label": "Aster Industries",
+              "value": 12
+            },
+            {
+              "label": "Bluebird Group",
+              "value": 13
+            },
+            {
+              "label": "Vantage Collective",
+              "value": 14
+            },
+            {
+              "label": "Aster Labs",
+              "value": 15
+            },
+            {
+              "label": "Summit Group",
+              "value": 16
+            },
+            {
+              "label": "Northstar Labs",
+              "value": 17
+            },
+            {
+              "label": "Aster Digital",
+              "value": 18
+            },
+            {
+              "label": "Aster Works",
+              "value": 19
+            },
+            {
+              "label": "Summit Collective",
+              "value": 20
+            },
+            {
+              "label": "Vela Supply",
+              "value": 21
+            },
+            {
+              "label": "Northstar Works",
+              "value": 22
+            },
+            {
+              "label": "Bluebird Collective",
+              "value": 23
+            },
+            {
+              "label": "Cedar Digital",
+              "value": 24
+            },
+            {
+              "label": "Cedar Industries",
+              "value": 25
+            },
+            {
+              "label": "Terra Studio",
+              "value": 26
+            },
+            {
+              "label": "Bluebird Works",
+              "value": 27
+            },
+            {
+              "label": "Meridian Works",
+              "value": 28
+            },
+            {
+              "label": "Lumen Works",
+              "value": 29
+            },
+            {
+              "label": "Summit Systems",
+              "value": 30
+            },
+            {
+              "label": "Zephyr Group",
+              "value": 31
+            },
+            {
+              "label": "Zephyr Digital",
+              "value": 32
+            },
+            {
+              "label": "Lumen Partners",
+              "value": 33
+            },
+            {
+              "label": "Willow Labs",
+              "value": 34
+            },
+            {
+              "label": "Lumen Partners",
+              "value": 35
+            },
+            {
+              "label": "Meridian Works",
+              "value": 36
+            },
+            {
+              "label": "Copper Industries",
+              "value": 37
+            },
+            {
+              "label": "Harbor Group",
+              "value": 38
+            },
+            {
+              "label": "Meridian Partners",
+              "value": 39
+            },
+            {
+              "label": "Willow Works",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "type": "select",
+          "required": true,
+          "defaultValue": 2,
+          "options": [
+            {
+              "label": "Central Distribution Center",
+              "value": 1
+            },
+            {
+              "label": "North Distribution Center",
+              "value": 2
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 3
+            },
+            {
+              "label": "Harbor Distribution Center",
+              "value": 4
+            },
+            {
+              "label": "North Distribution Center",
+              "value": 5
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 6
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 7
+            },
+            {
+              "label": "North Distribution Center",
+              "value": 8
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 9
+            },
+            {
+              "label": "South Distribution Center",
+              "value": 10
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 11
+            },
+            {
+              "label": "East Distribution Center",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "sent",
+          "options": [
+            {
+              "label": "Draft",
+              "value": "draft"
+            },
+            {
+              "label": "Sent",
+              "value": "sent"
+            },
+            {
+              "label": "Confirmed",
+              "value": "confirmed"
+            },
+            {
+              "label": "Partially Received",
+              "value": "partially_received"
+            },
+            {
+              "label": "Received",
+              "value": "received"
+            },
+            {
+              "label": "Cancelled",
+              "value": "cancelled"
+            }
+          ]
+        },
+        {
+          "key": "total_value",
+          "label": "Total value",
+          "type": "number",
+          "required": true,
+          "defaultValue": 5457.06,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "expected_date",
+          "label": "Expected",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "ordered_at",
+          "label": "Ordered",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "received_at",
+          "label": "Received",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "buyer_id",
+          "label": "Buyer",
+          "type": "select",
+          "required": false,
+          "defaultValue": 12,
+          "options": [
+            {
+              "label": "Ravi Fischer",
+              "value": 1
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 2
+            },
+            {
+              "label": "Sofia Rossi",
+              "value": 3
+            },
+            {
+              "label": "Diego Tanaka",
+              "value": 4
+            },
+            {
+              "label": "Zara Meyer",
+              "value": 5
+            },
+            {
+              "label": "Iris Novak",
+              "value": 6
+            },
+            {
+              "label": "Kai Meyer",
+              "value": 7
+            },
+            {
+              "label": "Eli Wright",
+              "value": 8
+            },
+            {
+              "label": "Leila Silva",
+              "value": 9
+            },
+            {
+              "label": "Tomás Osei",
+              "value": 10
+            },
+            {
+              "label": "Ishaan Lindqvist",
+              "value": 11
+            },
+            {
+              "label": "Mira Dubey",
+              "value": 12
+            },
+            {
+              "label": "Clara Rossi",
+              "value": 13
+            },
+            {
+              "label": "Owen Hassan",
+              "value": 14
+            },
+            {
+              "label": "Clara Bennett",
+              "value": 15
+            },
+            {
+              "label": "Kai Osei",
+              "value": 16
+            },
+            {
+              "label": "Luca Patel",
+              "value": 17
+            },
+            {
+              "label": "Elena Wright",
+              "value": 18
+            },
+            {
+              "label": "Malik Alvarez",
+              "value": 19
+            },
+            {
+              "label": "Iris Andersen",
+              "value": 20
+            },
+            {
+              "label": "Jonas Wright",
+              "value": 21
+            },
+            {
+              "label": "Noah Larsen",
+              "value": 22
+            },
+            {
+              "label": "Kai Dubey",
+              "value": 23
+            },
+            {
+              "label": "Jonas Silva",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "type": "textarea",
+          "required": false,
+          "defaultValue": "Compliance regional approval regional regional retention forecast routing priority capacity renewal quarterly inspection forecast.",
+          "help": "Plain text or short notes"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "purchase_orders_create",
+              "inputValues": {
+                "po_number": "{{ event.formData.po_number }}",
+                "supplier_id": "{{ event.formData.supplier_id }}",
+                "warehouse_id": "{{ event.formData.warehouse_id }}",
+                "status": "{{ event.formData.status }}",
+                "total_value": "{{ event.formData.total_value }}",
+                "expected_date": "{{ event.formData.expected_date }}",
+                "ordered_at": "{{ event.formData.ordered_at }}",
+                "received_at": "{{ event.formData.received_at }}",
+                "buyer_id": "{{ event.formData.buyer_id }}",
+                "notes": "{{ event.formData.notes }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-purchase_orders-create.result",
+    "key": "result",
+    "page": "inv-purchase_orders-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.purchase_orders_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.purchase_orders_create || {}).isLoading || false }}"
+    }
+  }
+]

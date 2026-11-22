@@ -1,0 +1,581 @@
+[
+  {
+    "slug": "inv.replenishment_proposals.list",
+    "title": "Replenishment Proposals · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:replenishment_proposals}}\nWHERE deleted_at IS NULL AND (coalesce(\"proposal_code\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"rationale\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at >= NULLIF($7::text, '')::date)\n  AND (NULLIF($8::text, '')::date IS NULL OR created_at < (NULLIF($8::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $5::text = 'proposal_code' AND $6::text = 'asc' THEN \"proposal_code\" END ASC, CASE WHEN $5::text = 'proposal_code' AND $6::text = 'desc' THEN \"proposal_code\" END DESC, CASE WHEN $5::text = 'requested_qty' AND $6::text = 'asc' THEN \"requested_qty\" END ASC, CASE WHEN $5::text = 'requested_qty' AND $6::text = 'desc' THEN \"requested_qty\" END DESC, CASE WHEN $5::text = 'suggested_qty' AND $6::text = 'asc' THEN \"suggested_qty\" END ASC, CASE WHEN $5::text = 'suggested_qty' AND $6::text = 'desc' THEN \"suggested_qty\" END DESC, CASE WHEN $5::text = 'unit_cost' AND $6::text = 'asc' THEN \"unit_cost\" END ASC, CASE WHEN $5::text = 'unit_cost' AND $6::text = 'desc' THEN \"unit_cost\" END DESC, id DESC\nLIMIT $4::int OFFSET ((($3::int - 1) * $4::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "proposal_code"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.export",
+    "title": "Replenishment Proposals · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:replenishment_proposals}}\nWHERE deleted_at IS NULL AND (coalesce(\"proposal_code\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"rationale\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.detail",
+    "title": "Replenishment Proposals · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:replenishment_proposals}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.create",
+    "title": "Replenishment Proposals · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:replenishment_proposals}} (\"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", created_at, updated_at)\nVALUES ($1::text, $2::int, $3::int, $4::int, $5::text, $6::text, $7::int, $8::int, $9::int, $10::numeric, $11::numeric, $12::int, $13::date, $14::timestamptz, $15::text, now(), now())\nRETURNING \"id\", \"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "proposal_code",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "sku_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "warehouse_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "supplier_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "urgency",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "requested_qty",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "suggested_qty",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "unit_cost",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "estimated_total",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "confidence_score",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "needed_by_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "approved_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "rationale",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.update",
+    "title": "Replenishment Proposals · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:replenishment_proposals}}\nSET \"proposal_code\" = $2::text, \"sku_id\" = $3::int, \"warehouse_id\" = $4::int, \"supplier_id\" = $5::int, \"status\" = $6::text, \"urgency\" = $7::text, \"owner_id\" = $8::int, \"requested_qty\" = $9::int, \"suggested_qty\" = $10::int, \"unit_cost\" = $11::numeric, \"estimated_total\" = $12::numeric, \"confidence_score\" = $13::int, \"needed_by_date\" = $14::date, \"approved_at\" = $15::timestamptz, \"rationale\" = $16::text, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "proposal_code",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "sku_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "warehouse_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "supplier_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "urgency",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "requested_qty",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "suggested_qty",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "unit_cost",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "estimated_total",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "confidence_score",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "needed_by_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "approved_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "rationale",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.delete",
+    "title": "Replenishment Proposals · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:replenishment_proposals}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.restore",
+    "title": "Replenishment Proposals · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:replenishment_proposals}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.lookup",
+    "title": "Replenishment Proposals · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"proposal_code\"::text AS label FROM {{table:replenishment_proposals}} WHERE deleted_at IS NULL ORDER BY \"proposal_code\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.status",
+    "title": "Replenishment Proposals · change status",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:replenishment_proposals}} SET \"status\" = $2::text, updated_at = now() WHERE id = $1::int RETURNING id, \"status\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false,
+          "default": "draft"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.assign",
+    "title": "Replenishment Proposals · assign owner",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:replenishment_proposals}} SET \"owner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"owner_id\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.score",
+    "title": "Replenishment Proposals · save score",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:replenishment_proposals}} SET \"confidence_score\" = $2::numeric, updated_at = now() WHERE id = $1::int RETURNING id, \"confidence_score\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "score",
+          "type": "number",
+          "required": false,
+          "default": 0
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.stats",
+    "title": "Replenishment Proposals · KPI totals",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT count(*)::int AS total, coalesce(sum(\"unit_cost\"), 0)::numeric(14,2) AS total_value, coalesce(avg(\"unit_cost\"), 0)::numeric(14,2) AS average_value, count(*) FILTER (WHERE \"status\" = 'draft')::int AS status_draft, count(*) FILTER (WHERE \"status\" = 'pending_approval')::int AS status_pending_approval, count(*) FILTER (WHERE \"status\" = 'approved')::int AS status_approved, count(*) FILTER (WHERE \"status\" = 'ordered')::int AS status_ordered, count(*) FILTER (WHERE \"status\" = 'received')::int AS status_received, count(*) FILTER (WHERE \"status\" = 'cancelled')::int AS status_cancelled\nFROM {{table:replenishment_proposals}}\nWHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date)\n  AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day'))",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.trend",
+    "title": "Replenishment Proposals · daily trend",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT date_trunc('day', created_at)::date AS day, count(*)::int AS count, coalesce(sum(\"unit_cost\"), 0)::numeric(14,2) AS total\nFROM {{table:replenishment_proposals}}\nWHERE deleted_at IS NULL AND created_at >= coalesce(NULLIF($1::text, '')::date, now() - interval '90 days')\n  AND created_at < (coalesce(NULLIF($2::text, '')::date, now()::date) + interval '1 day')\nGROUP BY 1 ORDER BY 1",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.by_status",
+    "title": "Replenishment Proposals · by status",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"status\" AS status, count(*)::int AS count FROM {{table:replenishment_proposals}} WHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date) AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day')) GROUP BY 1 ORDER BY 2 DESC",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.replenishment_proposals.overdue",
+    "title": "Replenishment Proposals · overdue",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "replenishment_proposals"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:replenishment_proposals}}\nWHERE deleted_at IS NULL AND \"needed_by_date\" IS NOT NULL\n  AND \"needed_by_date\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('cancelled')\nORDER BY \"needed_by_date\" ASC LIMIT 100",
+      "inputDefinitions": [
+        {
+          "key": "days",
+          "type": "number",
+          "required": false,
+          "default": 7
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

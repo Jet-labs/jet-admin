@@ -1,0 +1,140 @@
+{
+  "slug": "inv-admin-users",
+  "key": "admin-users",
+  "title": "Admin · users",
+  "description": "Tenant users, platform roles and app-level role assignment overview.",
+  "accessTags": [
+    "admin",
+    "manager"
+  ],
+  "variables": [
+    {
+      "key": "search",
+      "type": "string",
+      "defaultValue": ""
+    }
+  ],
+  "sources": [
+    {
+      "alias": "users",
+      "type": "query",
+      "queryID": "e8a7a5b2-1908-4209-9c3e-cd718a10d137",
+      "triggerMode": "auto",
+      "inputValues": {
+        "tenantID": "{{ state.globals.tenantID }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "staff",
+      "type": "query",
+      "queryID": "93aa9b54-241b-44ca-a655-761be514c6fc",
+      "triggerMode": "auto",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "9fd893e1-df70-4182-9386-7689e9c3edf1",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "30e83b14-390a-481f-87d4-5e656afea522",
+              "type": "widget",
+              "widgetKey": "widget_45b8ac52-456c-4e1c-9037-e41cd8162f74_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "5a478b03-24a1-4c8d-888d-cd406b7bc465",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "5d191642-54c4-426a-b029-bfdc3df601d3",
+              "type": "widget",
+              "widgetKey": "widget_965ee7a5-d066-494b-a3e2-feedd3d099b4_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 380
+            },
+            {
+              "id": "18bb8d32-712e-4b0c-b44b-31a7d57a17d6",
+              "type": "widget",
+              "widgetKey": "widget_9f747781-a245-4065-ab97-fd3c61144376_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 380
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "30e83b14-390a-481f-87d4-5e656afea522",
+        "type": "widget",
+        "widgetKey": "widget_45b8ac52-456c-4e1c-9037-e41cd8162f74_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "5d191642-54c4-426a-b029-bfdc3df601d3",
+        "type": "widget",
+        "widgetKey": "widget_965ee7a5-d066-494b-a3e2-feedd3d099b4_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 380
+      },
+      {
+        "id": "18bb8d32-712e-4b0c-b44b-31a7d57a17d6",
+        "type": "widget",
+        "widgetKey": "widget_9f747781-a245-4065-ab97-fd3c61144376_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 380
+      }
+    ],
+    "variables": [
+      {
+        "key": "search",
+        "type": "string",
+        "defaultValue": ""
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "users",
+        "type": "query",
+        "queryID": "e8a7a5b2-1908-4209-9c3e-cd718a10d137",
+        "triggerMode": "auto",
+        "inputValues": {
+          "tenantID": "{{ state.globals.tenantID }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "staff",
+        "type": "query",
+        "queryID": "93aa9b54-241b-44ca-a655-761be514c6fc",
+        "triggerMode": "auto",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

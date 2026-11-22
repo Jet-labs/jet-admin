@@ -1,0 +1,299 @@
+[
+  {
+    "slug": "inv-portal.heading",
+    "key": "heading",
+    "page": "inv-portal",
+    "title": "Client portal",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Client portal\nA restricted view of replenishment proposals owned by the selected client contact. External roles only receive this page, their profile and notifications.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "inv-portal.client",
+    "key": "client",
+    "page": "inv-portal",
+    "title": "Client contact",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Client contact",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Ravi Fischer",
+          "value": 1
+        },
+        {
+          "label": "Ishaan Lindqvist",
+          "value": 2
+        },
+        {
+          "label": "Sofia Rossi",
+          "value": 3
+        },
+        {
+          "label": "Diego Tanaka",
+          "value": 4
+        },
+        {
+          "label": "Zara Meyer",
+          "value": 5
+        },
+        {
+          "label": "Iris Novak",
+          "value": 6
+        },
+        {
+          "label": "Kai Meyer",
+          "value": 7
+        },
+        {
+          "label": "Eli Wright",
+          "value": 8
+        },
+        {
+          "label": "Leila Silva",
+          "value": 9
+        },
+        {
+          "label": "Tomás Osei",
+          "value": 10
+        },
+        {
+          "label": "Ishaan Lindqvist",
+          "value": 11
+        },
+        {
+          "label": "Mira Dubey",
+          "value": 12
+        },
+        {
+          "label": "Clara Rossi",
+          "value": 13
+        },
+        {
+          "label": "Owen Hassan",
+          "value": 14
+        },
+        {
+          "label": "Clara Bennett",
+          "value": 15
+        },
+        {
+          "label": "Kai Osei",
+          "value": 16
+        },
+        {
+          "label": "Luca Patel",
+          "value": 17
+        },
+        {
+          "label": "Elena Wright",
+          "value": 18
+        },
+        {
+          "label": "Malik Alvarez",
+          "value": 19
+        },
+        {
+          "label": "Iris Andersen",
+          "value": 20
+        },
+        {
+          "label": "Jonas Wright",
+          "value": 21
+        },
+        {
+          "label": "Noah Larsen",
+          "value": 22
+        },
+        {
+          "label": "Kai Dubey",
+          "value": 23
+        },
+        {
+          "label": "Jonas Silva",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-portal.table",
+    "key": "table",
+    "page": "inv-portal",
+    "title": "My records",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.portal || {}).data || [])",
+      "columns": [
+        {
+          "key": "proposal_code",
+          "label": "Proposal",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "sku_id",
+          "label": "SKU",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "warehouse_id",
+          "label": "Warehouse",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "urgency",
+          "label": "Urgency",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "owner_id",
+          "label": "Planner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "requested_qty",
+          "label": "Requested qty",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "suggested_qty",
+          "label": "Suggested qty",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "unit_cost",
+          "label": "Unit cost",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "estimated_total",
+          "label": "Estimated total",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "confidence_score",
+          "label": "Confidence",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "needed_by_date",
+          "label": "Needed by",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "approved_at",
+          "label": "Approved at",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "rationale",
+          "label": "Rationale",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No records are assigned to this contact.",
+      "isLoading": "{{ (state.queries.portal || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "inv-portal.detail",
+    "key": "detail",
+    "page": "inv-portal",
+    "title": "Record summary",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record summary",
+      "dataTemplate": "{{ (((state.queries.detail || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "isLoading": "{{ (state.queries.detail || {}).isLoading || false }}"
+    }
+  }
+]

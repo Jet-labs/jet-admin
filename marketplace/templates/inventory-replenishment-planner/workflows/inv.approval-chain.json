@@ -1,0 +1,283 @@
+{
+  "slug": "inv.approval-chain",
+  "key": "approval-chain",
+  "title": "Replenishment Proposals · approval chain",
+  "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
+  "tags": [
+    "core",
+    "approval"
+  ],
+  "options": {
+    "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      },
+      {
+        "key": "staffID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "727a6d0e-d233-49a3-9e01-c3aae6dd163e",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadRecord",
+      "nodeID": "9291301a-11ec-4225-be75-ddeec9ce9a85",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadRecord",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "7ab4826a-95b7-480e-9417-cfa8b242bbe9",
+        "outputVariable": "recordRows",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}"
+        }
+      }
+    },
+    {
+      "key": "approval",
+      "nodeID": "0826b34b-15e1-468d-80e1-6812d255a0f7",
+      "type": "approval",
+      "timeoutSeconds": 900,
+      "retryLimit": 0,
+      "config": {
+        "title": "Approve Proposal #{{ ctx.recordID }}",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "description": "Review the record, then approve or reject with a comment.",
+        "requireComment": true,
+        "expiryMinutes": 1440,
+        "onTimeout": "expired",
+        "outputVariable": "approval"
+      }
+    },
+    {
+      "key": "setApproved",
+      "nodeID": "9faa181f-d1b1-487b-b1a1-dde9c9f1b3e3",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "setApproved",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "3a57ec1d-4ddd-4bd6-ab5e-e6eef4a7829c",
+        "outputVariable": "approvedResult",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}",
+          "status": "pending_approval"
+        }
+      }
+    },
+    {
+      "key": "setRejected",
+      "nodeID": "7258e90d-c6b7-4b63-93cc-b3887ee9d3af",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "setRejected",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "dataQueryID": "3a57ec1d-4ddd-4bd6-ab5e-e6eef4a7829c",
+        "outputVariable": "rejectedResult",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}",
+          "status": "cancelled"
+        }
+      }
+    },
+    {
+      "key": "setExpired",
+      "nodeID": "d940da9b-9dd8-4ca7-8a0e-a1c33a4bc488",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "setExpired",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "dataQueryID": "3a57ec1d-4ddd-4bd6-ab5e-e6eef4a7829c",
+        "outputVariable": "expiredResult",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}",
+          "status": "draft"
+        }
+      }
+    },
+    {
+      "key": "notifyDecision",
+      "nodeID": "2930e44a-64c9-4d8f-b3c2-33b84817e4e6",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyDecision",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 220
+        },
+        "dataQueryID": "c651fab5-e242-4ec0-97eb-83772b19408a",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID }}",
+          "title": "Replenishment Proposals approval decision",
+          "body": "Record #{{ ctx.recordID }} decision: {{ ctx.approval.decision || \"expired\" }}.",
+          "category": "info",
+          "linkPage": "inv-notifications"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "f8b15141-dbd0-4e54-bfd6-0585795ab046",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.approval }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "727a6d0e-d233-49a3-9e01-c3aae6dd163e",
+      "to": "9291301a-11ec-4225-be75-ddeec9ce9a85",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "9291301a-11ec-4225-be75-ddeec9ce9a85",
+      "to": "0826b34b-15e1-468d-80e1-6812d255a0f7",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "0826b34b-15e1-468d-80e1-6812d255a0f7",
+      "to": "9faa181f-d1b1-487b-b1a1-dde9c9f1b3e3",
+      "handle": "approved",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "0826b34b-15e1-468d-80e1-6812d255a0f7",
+      "to": "7258e90d-c6b7-4b63-93cc-b3887ee9d3af",
+      "handle": "rejected",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "0826b34b-15e1-468d-80e1-6812d255a0f7",
+      "to": "d940da9b-9dd8-4ca7-8a0e-a1c33a4bc488",
+      "handle": "expired",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "9faa181f-d1b1-487b-b1a1-dde9c9f1b3e3",
+      "to": "2930e44a-64c9-4d8f-b3c2-33b84817e4e6",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "7258e90d-c6b7-4b63-93cc-b3887ee9d3af",
+      "to": "2930e44a-64c9-4d8f-b3c2-33b84817e4e6",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "d940da9b-9dd8-4ca7-8a0e-a1c33a4bc488",
+      "to": "2930e44a-64c9-4d8f-b3c2-33b84817e4e6",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "2930e44a-64c9-4d8f-b3c2-33b84817e4e6",
+      "to": "f8b15141-dbd0-4e54-bfd6-0585795ab046",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

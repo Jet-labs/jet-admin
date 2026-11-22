@@ -1,0 +1,5882 @@
+[
+  {
+    "key": "admin",
+    "title": "Inventory Administrator",
+    "description": "Full access to every page, query, workflow and admin panel.",
+    "scope": "all",
+    "pageTags": [
+      "*"
+    ],
+    "queryTags": [
+      "*"
+    ],
+    "workflowTags": [
+      "*"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list",
+      "tenant:apppage:create",
+      "tenant:apppage:update",
+      "tenant:dataquery:create",
+      "tenant:workflow:create",
+      "tenant:user:list"
+    ],
+    "pages": [
+      {
+        "page": "inv-replenishment_proposals-list",
+        "pageTitle": "Replenishment Proposals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-replenishment_proposals-detail",
+        "pageTitle": "Replenishment Proposals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-replenishment_proposals-create",
+        "pageTitle": "Create Proposal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-stock_items-list",
+        "pageTitle": "Stock Items · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-stock_items-detail",
+        "pageTitle": "Stock Items · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-stock_items-create",
+        "pageTitle": "Create Stock item",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-replenishment_proposals-kanban",
+        "pageTitle": "Replenishment Proposals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-replenishment_proposals-calendar",
+        "pageTitle": "Replenishment Proposals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "inv.replenishment_proposals.list",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.export",
+        "tags": [
+          "read",
+          "export",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.detail",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.create",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.update",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.delete",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.restore",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.status",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.assign",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.score",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.stats",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.trend",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.list",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.export",
+        "tags": [
+          "read",
+          "export",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.detail",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.create",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.update",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.delete",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.restore",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.status",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.assign",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.stats",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.trend",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.by_status",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.overdue",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.score",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "inv.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": true
+      }
+    ]
+  },
+  {
+    "key": "manager",
+    "title": "Replenishment Manager",
+    "description": "Owns replenishment policy, approvals, supplier performance and admin monitoring.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report",
+      "admin"
+    ],
+    "queryTags": [
+      "read",
+      "write",
+      "shared",
+      "report",
+      "export",
+      "admin"
+    ],
+    "workflowTags": [
+      "*"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "inv-replenishment_proposals-list",
+        "pageTitle": "Replenishment Proposals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-detail",
+        "pageTitle": "Replenishment Proposals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-create",
+        "pageTitle": "Create Proposal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-stock_items-list",
+        "pageTitle": "Stock Items · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-stock_items-detail",
+        "pageTitle": "Stock Items · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-stock_items-create",
+        "pageTitle": "Create Stock item",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-kanban",
+        "pageTitle": "Replenishment Proposals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-calendar",
+        "pageTitle": "Replenishment Proposals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      }
+    ],
+    "queries": [
+      {
+        "query": "inv.replenishment_proposals.list",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.export",
+        "tags": [
+          "read",
+          "export",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.detail",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.create",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.update",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.delete",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.restore",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.status",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.assign",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.score",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.stats",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.trend",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.list",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.export",
+        "tags": [
+          "read",
+          "export",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.detail",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.create",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.update",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.delete",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.restore",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.status",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.assign",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.stats",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.trend",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.by_status",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.overdue",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.score",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "inv.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": true
+      }
+    ]
+  },
+  {
+    "key": "planner",
+    "title": "Inventory Planner",
+    "description": "Works the low-stock queue, drafts proposals and runs replenishment automations.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report"
+    ],
+    "queryTags": [
+      "read",
+      "write",
+      "shared",
+      "report",
+      "export"
+    ],
+    "workflowTags": [
+      "core",
+      "automation"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "inv-replenishment_proposals-list",
+        "pageTitle": "Replenishment Proposals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-detail",
+        "pageTitle": "Replenishment Proposals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-create",
+        "pageTitle": "Create Proposal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-stock_items-list",
+        "pageTitle": "Stock Items · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-stock_items-detail",
+        "pageTitle": "Stock Items · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-stock_items-create",
+        "pageTitle": "Create Stock item",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-kanban",
+        "pageTitle": "Replenishment Proposals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-calendar",
+        "pageTitle": "Replenishment Proposals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "inv.replenishment_proposals.list",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.export",
+        "tags": [
+          "read",
+          "export",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.detail",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.create",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.update",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.delete",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.restore",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.status",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.assign",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.score",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.stats",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.trend",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.list",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.export",
+        "tags": [
+          "read",
+          "export",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.detail",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.create",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.update",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.delete",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.restore",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.status",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.assign",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.stats",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.trend",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.by_status",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.overdue",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.score",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "inv.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "inv.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": true
+      }
+    ]
+  },
+  {
+    "key": "analyst",
+    "title": "Demand Analyst",
+    "description": "Read-only forecasting, stock-health and supplier reporting.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report"
+    ],
+    "queryTags": [
+      "read",
+      "shared",
+      "report",
+      "export"
+    ],
+    "workflowTags": [],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "inv-replenishment_proposals-list",
+        "pageTitle": "Replenishment Proposals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-detail",
+        "pageTitle": "Replenishment Proposals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-create",
+        "pageTitle": "Create Proposal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-stock_items-list",
+        "pageTitle": "Stock Items · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-stock_items-detail",
+        "pageTitle": "Stock Items · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-stock_items-create",
+        "pageTitle": "Create Stock item",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-kanban",
+        "pageTitle": "Replenishment Proposals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-replenishment_proposals-calendar",
+        "pageTitle": "Replenishment Proposals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "inv-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "inv.replenishment_proposals.list",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.export",
+        "tags": [
+          "read",
+          "export",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.detail",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.create",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.update",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.delete",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.restore",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.status",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.assign",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.score",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.stats",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.trend",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.list",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.export",
+        "tags": [
+          "read",
+          "export",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.detail",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.create",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.update",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.delete",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.restore",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.status",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.assign",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.stats",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.trend",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.by_status",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.overdue",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.score",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": false
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "inv.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": false
+      }
+    ]
+  },
+  {
+    "key": "readonly",
+    "title": "Read-only Viewer",
+    "description": "Read-only stock and proposal context without workflow execution.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report"
+    ],
+    "queryTags": [
+      "read",
+      "shared",
+      "report"
+    ],
+    "workflowTags": [],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "inv-replenishment_proposals-list",
+        "pageTitle": "Replenishment Proposals · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-replenishment_proposals-detail",
+        "pageTitle": "Replenishment Proposals · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-replenishment_proposals-create",
+        "pageTitle": "Create Proposal",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-stock_items-list",
+        "pageTitle": "Stock Items · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-stock_items-detail",
+        "pageTitle": "Stock Items · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-stock_items-create",
+        "pageTitle": "Create Stock item",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-replenishment_proposals-kanban",
+        "pageTitle": "Replenishment Proposals · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-replenishment_proposals-calendar",
+        "pageTitle": "Replenishment Proposals · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "inv-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "inv-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "inv.replenishment_proposals.list",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.export",
+        "tags": [
+          "read",
+          "export",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.detail",
+        "tags": [
+          "read",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.create",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.update",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.delete",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.restore",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.status",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.assign",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.score",
+        "tags": [
+          "write",
+          "core",
+          "replenishment_proposals"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.replenishment_proposals.stats",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.trend",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.by_status",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.replenishment_proposals.overdue",
+        "tags": [
+          "read",
+          "report",
+          "replenishment_proposals"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.list",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.export",
+        "tags": [
+          "read",
+          "export",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.detail",
+        "tags": [
+          "read",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.create",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.update",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.delete",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.restore",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.status",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.assign",
+        "tags": [
+          "write",
+          "core",
+          "stock_items"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.stock_items.stats",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.trend",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.by_status",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.stock_items.overdue",
+        "tags": [
+          "read",
+          "report",
+          "stock_items"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.suppliers.score",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "inv.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "inv.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": false
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "inv.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "inv.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": false
+      }
+    ]
+  }
+]

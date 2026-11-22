@@ -36,8 +36,8 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | crm-sales-pipeline | [x] | [x] | [x] | [x] | [x] | `ee548d46` |
 | 2 | customer-support-console | [x] | [x] | [x] | [~] Temporal unavailable | [x] | this commit |
-| 3 | inventory-replenishment-planner | [~] in progress | — | — | — | — | — |
-| 4 | invoice-matching-desk | [ ] not started | — | — | — | — | — |
+| 3 | inventory-replenishment-planner | [x] | [x] | [x] | [~] Temporal unavailable | [x] | this commit |
+| 4 | invoice-matching-desk | [~] in progress | — | — | — | — | — |
 | 5 | ecommerce-operations | [ ] deferred | — | — | — | — | — |
 | 6 | hrms-people | [ ] deferred | — | — | — | — | — |
 | 7 | project-management | [ ] deferred | — | — | — | — | — |
@@ -69,6 +69,16 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 - Role smoke — admin, manager, agent, analyst and readonly all match their page/query/workflow allow-deny matrix; 0 leftover demo users or roles.
 - Workflow smoke — **BLOCKED**: no Temporal server is reachable at `temporal:7233` in the current Docker environment. All 11 workflow graphs pass the package validator; re-run `node marketplace/scripts/test-workflows.js customer-support-console` once Temporal is available.
 
+### Inventory Replenishment Planner evidence
+
+- `templates:validate` — 18 tables, 80 queries, 31 pages, 11 workflows, 8 listeners, 6 cron, 5 roles, 102 files.
+- SQL smoke — 18 tables, 2,948 seed rows, 45 read queries, 0 failures.
+- DB registration — 80 queries, 31 pages, 11 workflows, 16 assets.
+- Fresh-tenant install — 361 bundle/install resources, 0 warnings, 18 tables, 31 pages, 80 queries, 5 roles, 6 cron jobs.
+- Page read-query smoke — 69 queries, 0 failures; 0 orphan tables and 0 ledger rows after uninstall.
+- Role smoke — admin, manager, planner, analyst and readonly match their page/query/workflow allow-deny matrix; 0 leftover demo users or roles.
+- Workflow smoke — **BLOCKED** for the same Temporal/Docker reason. All 11 graphs pass the package validator.
+
 ## Phase 3 — Validation
 
 - [x] `templates:validate` CRM
@@ -82,6 +92,11 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 - [x] Uninstall orphan check Customer Support Console
 - [x] Role allow/deny tests Customer Support Console
 - [ ] Workflow run/log assertions Customer Support Console — blocked on Temporal
+- [x] `templates:validate` Inventory Replenishment Planner
+- [x] Fresh-tenant install + page query smoke Inventory Replenishment Planner
+- [x] Uninstall orphan check Inventory Replenishment Planner
+- [x] Role allow/deny tests Inventory Replenishment Planner
+- [ ] Workflow run/log assertions Inventory Replenishment Planner — blocked on Temporal
 - [x] Frontend lint/build for changed files
 - [x] `marketplace/README.md` catalogue + authoring guide
 - [ ] Full 12-template validation — deferred by explicit user scope change

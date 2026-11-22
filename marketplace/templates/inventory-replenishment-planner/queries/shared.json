@@ -1,0 +1,833 @@
+[
+  {
+    "slug": "inv.shared.staff_list",
+    "title": "Team · directory",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared",
+      "lookup"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, full_name AS label, role_key, department, job_title, email FROM {{table:staff}} WHERE is_active = true ORDER BY full_name",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.staff_detail",
+    "title": "Team · profile",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, full_name, email, role_key, department, job_title, phone, city, is_active, created_at FROM {{table:staff}} WHERE id = $1::int",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.staff_update",
+    "title": "Team · update profile",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:staff}} SET full_name = $2::text, department = $3::text, job_title = $4::text, phone = $5::text, city = $6::text, updated_at = now() WHERE id = $1::int RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "fullName",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "department",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "jobTitle",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "phone",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "city",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.portal_records",
+    "title": "Client portal · my records",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "portal"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:replenishment_proposals}}\nWHERE deleted_at IS NULL AND \"owner_id\" = $1::int ORDER BY created_at DESC LIMIT 100",
+      "inputDefinitions": [
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.integration_ping",
+    "title": "Integrations · health probe",
+    "datasource": "integration",
+    "tags": [
+      "read",
+      "integration"
+    ],
+    "options": {
+      "method": "GET",
+      "path": "/status",
+      "headers": [],
+      "queryParams": [],
+      "timeoutSeconds": 5
+    }
+  },
+  {
+    "slug": "inv.shared.notifications",
+    "title": "Notifications · inbox",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT n.id, n.title, n.body, n.category, n.is_read, n.link_page, n.created_at, s.full_name AS staff_name\nFROM {{table:notifications}} n LEFT JOIN {{table:staff}} s ON s.id = n.staff_id\nWHERE n.staff_id = $1::int\nORDER BY n.is_read ASC, n.created_at DESC LIMIT 200",
+      "inputDefinitions": [
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.notifications_read",
+    "title": "Notifications · mark read",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:notifications}} SET is_read = true WHERE id = ANY($1::int[]) RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.notification_create",
+    "title": "Notifications · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:notifications}} (staff_id, title, body, category, is_read, link_page, created_at)\nVALUES ($1::int, $2::text, $3::text, $4::text, false, $5::text, now())\nRETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "body",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "category",
+          "type": "string",
+          "required": false,
+          "default": "info"
+        },
+        {
+          "key": "linkPage",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.settings",
+    "title": "Settings · configuration",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, kind, config_key, config_value, label, updated_at FROM {{table:app_config}} WHERE kind = ANY($1::text[]) ORDER BY kind, config_key",
+      "inputDefinitions": [
+        {
+          "key": "kinds",
+          "type": "array",
+          "required": false,
+          "default": [
+            "setting",
+            "branding",
+            "feature_flag"
+          ]
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.settings_update",
+    "title": "Settings · update value",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:app_config}} SET config_value = $3::jsonb, updated_at = now() WHERE kind = $1::text AND config_key = $2::text RETURNING id, config_key, config_value",
+      "inputDefinitions": [
+        {
+          "key": "kind",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "configKey",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "value",
+          "type": "object",
+          "required": true
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.saved_views",
+    "title": "Saved views · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, config_key, config_value, label, updated_at FROM {{table:app_config}} WHERE kind = 'saved_view' AND config_key LIKE $1::text || '%' ORDER BY label",
+      "inputDefinitions": [
+        {
+          "key": "prefix",
+          "type": "string",
+          "required": false,
+          "default": "saved_view.inv-"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.saved_view_create",
+    "title": "Saved views · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:app_config}} (kind, config_key, config_value, label, updated_at)\nVALUES ('saved_view', $1::text, $2::jsonb, $3::text, now())\nON CONFLICT (kind, config_key) DO UPDATE SET config_value = EXCLUDED.config_value, label = EXCLUDED.label, updated_at = now()\nRETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "configKey",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "value",
+          "type": "object",
+          "required": true
+        },
+        {
+          "key": "label",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.comments",
+    "title": "Comments · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT c.id, c.entity, c.entity_id, c.body, c.created_at, c.updated_at, s.full_name AS author\nFROM {{table:comments}} c LEFT JOIN {{table:staff}} s ON s.id = c.author_id\nWHERE c.entity = $1::text AND c.entity_id = $2::int AND c.deleted_at IS NULL\nORDER BY c.created_at DESC LIMIT 100",
+      "inputDefinitions": [
+        {
+          "key": "entity",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "entityID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.comment_create",
+    "title": "Comments · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:comments}} (entity, entity_id, author_id, body, created_at, updated_at)\nVALUES ($1::text, $2::int, $3::int, $4::text, now(), now()) RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "entity",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "entityID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "authorID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "body",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.attachments",
+    "title": "Attachments · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT a.id, a.entity, a.entity_id, a.file_name, a.file_url, a.mime_type, a.created_at, s.full_name AS uploaded_by_name\nFROM {{table:attachments}} a LEFT JOIN {{table:staff}} s ON s.id = a.uploaded_by\nWHERE a.entity = $1::text AND a.entity_id = $2::int ORDER BY a.created_at DESC",
+      "inputDefinitions": [
+        {
+          "key": "entity",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "entityID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.attachment_create",
+    "title": "Attachments · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:attachments}} (entity, entity_id, file_name, file_url, mime_type, uploaded_by, created_at)\nVALUES ($1::text, $2::int, $3::text, $4::text, $5::text, $6::int, now()) RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "entity",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "entityID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "fileName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "fileURL",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "mimeType",
+          "type": "string",
+          "required": false,
+          "default": "application/pdf"
+        },
+        {
+          "key": "uploadedBy",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.audit",
+    "title": "Audit log · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, entity, entity_id, action, actor, old_data, new_data, created_at,\n  (action || ' · ' || entity) AS title,\n  COALESCE(actor, 'system') AS description\nFROM {{table:audit_log}}\nWHERE ($1::text = '' OR entity = $1::text)\n  AND ($2::int IS NULL OR entity_id = $2::int)\n  AND ($3::text = '' OR actor ILIKE '%' || $3::text || '%')\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at >= NULLIF($4::text, '')::date)\n  AND (NULLIF($5::text, '')::date IS NULL OR created_at < (NULLIF($5::text, '')::date + interval '1 day'))\nORDER BY created_at DESC LIMIT 500",
+      "inputDefinitions": [
+        {
+          "key": "entity",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "entityID",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "actor",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.import_jobs",
+    "title": "Import center · jobs",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, entity, file_name, status, total_rows, success_rows, error_rows, error_report, created_at, completed_at FROM {{table:import_jobs}} ORDER BY created_at DESC LIMIT 100",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.ops",
+    "title": "Operations · event log",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, kind, source, status, severity, message, payload, created_at FROM {{table:ops_events}} WHERE kind = ANY($1::text[]) ORDER BY created_at DESC LIMIT 200",
+      "inputDefinitions": [
+        {
+          "key": "kinds",
+          "type": "array",
+          "required": false,
+          "default": [
+            "integration_health",
+            "webhook",
+            "job_run",
+            "data_quality"
+          ]
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.operational_staff",
+    "title": "Staff · workload assignment",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared",
+      "report"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT s.id, s.full_name, s.role_key, count(t.id)::int AS assigned\nFROM {{table:staff}} s LEFT JOIN {{table:replenishment_proposals}} t ON t.\"owner_id\" = s.id AND t.deleted_at IS NULL\nGROUP BY s.id, s.full_name, s.role_key ORDER BY assigned ASC, s.full_name",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.search",
+    "title": "Global search · records",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT * FROM (\nSELECT 'replenishment_proposals' AS entity, id, \"proposal_code\"::text AS title, coalesce(\"proposal_code\"::text, '') AS subtitle, \"status\" AS status, created_at FROM {{table:replenishment_proposals}} WHERE deleted_at IS NULL AND \"proposal_code\"::text ILIKE '%' || $1 || '%'\nUNION ALL\nSELECT 'stock_items' AS entity, id, \"product_name\"::text AS title, coalesce(\"product_name\"::text, '') AS subtitle, \"status\" AS status, created_at FROM {{table:stock_items}} WHERE deleted_at IS NULL AND \"product_name\"::text ILIKE '%' || $1 || '%'\nUNION ALL\nSELECT 'suppliers' AS entity, id, \"name\"::text AS title, coalesce(\"email\"::text, '') AS subtitle, \"status\" AS status, created_at FROM {{table:suppliers}} WHERE deleted_at IS NULL AND \"name\"::text ILIKE '%' || $1 || '%'\nUNION ALL\nSELECT 'purchase_orders' AS entity, id, \"po_number\"::text AS title, coalesce(\"po_number\"::text, '') AS subtitle, \"status\" AS status, created_at FROM {{table:purchase_orders}} WHERE deleted_at IS NULL AND \"po_number\"::text ILIKE '%' || $1 || '%'\n) results ORDER BY created_at DESC LIMIT 50",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false,
+          "default": ""
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.my_tasks",
+    "title": "Dashboard · tasks for me",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:replenishment_proposals}}\nWHERE deleted_at IS NULL AND \"owner_id\" = $1::int\nAND \"status\" NOT IN ('cancelled')\nORDER BY \"needed_by_date\" ASC LIMIT 12",
+      "inputDefinitions": [
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.admin_users",
+    "title": "Admin · tenant users",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT u.\"userID\" AS \"userID\", u.email, u.\"firstName\", u.\"lastName\", utr.role, utr.\"createdAt\" AS joined_at, r.\"roleTitle\" AS primary_role\nFROM \"tblUsersTenantsRelationship\" utr\nJOIN \"tblUsers\" u ON u.\"userID\" = utr.\"userID\"\nLEFT JOIN \"tblUserTenantRoleMappings\" utm ON utm.\"tenantID\" = utr.\"tenantID\" AND utm.\"userID\" = utr.\"userID\"\nLEFT JOIN \"tblRoles\" r ON r.\"roleID\" = utm.\"roleID\"\nWHERE utr.\"tenantID\" = $1::uuid\nORDER BY u.email LIMIT 200",
+      "inputDefinitions": [
+        {
+          "key": "tenantID",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.admin_roles",
+    "title": "Admin · roles and permissions",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT r.\"roleID\" AS \"roleID\", r.\"roleTitle\", r.\"roleDescription\", count(rpm.\"permissionID\")::int AS permission_count\nFROM \"tblRoles\" r\nLEFT JOIN \"tblRolePermissionMappings\" rpm ON rpm.\"roleID\" = r.\"roleID\"\nWHERE r.\"tenantID\" = $1::uuid\nGROUP BY r.\"roleID\", r.\"roleTitle\", r.\"roleDescription\"\nORDER BY r.\"roleTitle\"",
+      "inputDefinitions": [
+        {
+          "key": "tenantID",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.admin_workflow_runs",
+    "title": "Admin · workflow runs",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT i.\"instanceID\" AS id, i.status, i.\"startedAt\" AS started_at, i.\"completedAt\" AS completed_at, i.version, i.\"isTest\" AS is_test, w.title AS workflow_title\nFROM \"tblWorkflowInstances\" i LEFT JOIN \"tblWorkflows\" w ON w.\"workflowID\" = i.\"workflowID\"\nWHERE i.\"tenantID\" = $1::uuid ORDER BY i.\"createdAt\" DESC LIMIT 200",
+      "inputDefinitions": [
+        {
+          "key": "tenantID",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.admin_workflow_logs",
+    "title": "Admin · workflow run logs",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT l.\"logID\" AS id, l.\"instanceID\" AS instance_id, l.\"nodeID\" AS node_id, l.\"eventType\" AS event_type, l.\"nodeStatus\" AS node_status, l.\"errorMessage\" AS error_message, l.payload, l.\"createdAt\" AS created_at\nFROM \"tblWorkflowInstanceLogs\" l JOIN \"tblWorkflowInstances\" i ON i.\"instanceID\" = l.\"instanceID\"\nWHERE i.\"tenantID\" = $1::uuid ORDER BY l.\"createdAt\" DESC LIMIT 300",
+      "inputDefinitions": [
+        {
+          "key": "tenantID",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.admin_cron_history",
+    "title": "Admin · cron job history",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT h.\"cronJobHistoryID\" AS id, c.\"cronJobTitle\" AS job_title, h.status, h.\"scheduledAt\" AS scheduled_at, h.\"startTime\" AS start_time, h.\"endTime\" AS end_time, h.\"durationMs\" AS duration_ms, h.result\nFROM \"tblCronJobHistory\" h JOIN \"tblCronJobs\" c ON c.\"cronJobID\" = h.\"cronJobID\"\nWHERE c.\"tenantID\" = $1::uuid ORDER BY h.\"createdAt\" DESC LIMIT 200",
+      "inputDefinitions": [
+        {
+          "key": "tenantID",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.data_quality",
+    "title": "Admin · data quality checks",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "admin",
+      "report"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT * FROM (\nSELECT 'replenishment_proposals' AS entity, 'missing_label' AS check_name, count(*)::int AS affected_rows, 'Records with an empty display label' AS detail FROM {{table:replenishment_proposals}} WHERE deleted_at IS NULL AND (\"proposal_code\" IS NULL OR btrim(\"proposal_code\"::text) = '')\nUNION ALL\nSELECT 'replenishment_proposals', 'negative_amount', count(*)::int, 'Records with a negative financial amount' FROM {{table:replenishment_proposals}} WHERE deleted_at IS NULL AND \"unit_cost\" < 0\nUNION ALL\nSELECT 'stock_items' AS entity, 'missing_label' AS check_name, count(*)::int AS affected_rows, 'Records with an empty display label' AS detail FROM {{table:stock_items}} WHERE deleted_at IS NULL AND (\"product_name\" IS NULL OR btrim(\"product_name\"::text) = '')\nUNION ALL\nSELECT 'stock_items', 'negative_amount', count(*)::int, 'Records with a negative financial amount' FROM {{table:stock_items}} WHERE deleted_at IS NULL AND \"unit_cost\" < 0\nUNION ALL\nSELECT 'suppliers' AS entity, 'missing_label' AS check_name, count(*)::int AS affected_rows, 'Records with an empty display label' AS detail FROM {{table:suppliers}} WHERE deleted_at IS NULL AND (\"name\" IS NULL OR btrim(\"name\"::text) = '')\nUNION ALL\nSELECT 'suppliers', 'negative_amount', count(*)::int, 'Records with a negative financial amount' FROM {{table:suppliers}} WHERE deleted_at IS NULL AND \"min_order_value\" < 0\nUNION ALL\nSELECT 'purchase_orders' AS entity, 'missing_label' AS check_name, count(*)::int AS affected_rows, 'Records with an empty display label' AS detail FROM {{table:purchase_orders}} WHERE deleted_at IS NULL AND (\"po_number\" IS NULL OR btrim(\"po_number\"::text) = '')\nUNION ALL\nSELECT 'purchase_orders', 'negative_amount', count(*)::int, 'Records with a negative financial amount' FROM {{table:purchase_orders}} WHERE deleted_at IS NULL AND \"total_value\" < 0\n) checks ORDER BY affected_rows DESC, entity",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.import_csv",
+    "title": "Import center · import CSV",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "admin",
+      "shared"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "WITH source AS (\n  SELECT btrim(line) AS line, row_number() OVER () AS line_no\n  FROM regexp_split_to_table($1::text, E'\\n') AS line\n  WHERE btrim(line) <> ''\n), parsed AS (\n  SELECT line_no, string_to_array(line, ',') AS cols FROM source\n), valid AS (\n  SELECT line_no, cols FROM parsed WHERE array_length(cols, 1) >= 1\n), inserted AS (\n  INSERT INTO {{table:replenishment_proposals}} (\"proposal_code\")\n  SELECT btrim(cols[1]) FROM valid\n  ON CONFLICT DO NOTHING\n  RETURNING id\n)\n, stats AS (\n  SELECT (SELECT count(*)::int FROM source) - 1 AS total_rows, (SELECT count(*)::int FROM inserted) AS success_rows\n), job AS (\n  INSERT INTO {{table:import_jobs}} (entity, file_name, status, total_rows, success_rows, error_rows, error_report, created_at, completed_at)\n  SELECT 'replenishment_proposals', 'inline-import.csv',\n    CASE WHEN stats.total_rows = stats.success_rows THEN 'completed' ELSE 'completed_with_errors' END,\n    stats.total_rows, stats.success_rows, stats.total_rows - stats.success_rows, '[]'::jsonb, now(), now()\n  FROM stats RETURNING id\n)\nSELECT stats.total_rows, stats.success_rows, stats.total_rows - stats.success_rows AS error_rows, (SELECT id FROM job) AS job_id FROM stats",
+      "inputDefinitions": [
+        {
+          "key": "csv",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.role_matrix",
+    "title": "Admin · role/page matrix",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, role_key, page_slug, can_view, can_export, updated_at FROM {{table:role_matrix}} ORDER BY role_key, page_slug",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "inv.shared.role_matrix_update",
+    "title": "Admin · update role/page matrix",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "admin"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:role_matrix}} SET can_view = $3::boolean, can_export = $4::boolean, updated_at = now() WHERE role_key = $1::text AND page_slug = $2::text RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "roleKey",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "pageSlug",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "canView",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "key": "canExport",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

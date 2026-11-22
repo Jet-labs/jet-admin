@@ -1,0 +1,180 @@
+{
+  "slug": "inv-admin-roles",
+  "key": "admin-roles",
+  "title": "Admin · roles and permissions",
+  "description": "Provisioned tenant roles, permission counts and the app page matrix.",
+  "accessTags": [
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "roleKey",
+      "type": "string",
+      "defaultValue": "admin"
+    }
+  ],
+  "sources": [
+    {
+      "alias": "roles",
+      "type": "query",
+      "queryID": "edf7a27d-1fbf-4296-8199-8b8f2be0647d",
+      "triggerMode": "auto",
+      "inputValues": {
+        "tenantID": "{{ state.globals.tenantID }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "matrix",
+      "type": "query",
+      "queryID": "a8bb2282-3e35-463f-8941-436ceb4db5aa",
+      "triggerMode": "auto",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "update",
+      "type": "query",
+      "queryID": "84f86ee1-3371-4155-a4b1-afb4ea55f31a",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "1a8f915c-19ca-4f1e-9412-b472ec713be5",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "997e02d0-2ddd-4549-97fb-cbdb54b72ceb",
+              "type": "widget",
+              "widgetKey": "widget_5a27fb01-8745-4055-9887-aafbb45668fe_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "95dc8019-4c9c-4255-90cb-11bf524b7207",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "be2b7ce4-f879-4721-bb71-f3a78aa58cd8",
+              "type": "widget",
+              "widgetKey": "widget_b492a2f2-ccac-4718-b0ee-054d59036664_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 320
+            },
+            {
+              "id": "9b4207e6-093f-4d82-b569-f8f0783f4b63",
+              "type": "widget",
+              "widgetKey": "widget_f479a872-cae5-4ffd-b595-06338dc58bfc_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 320
+            }
+          ]
+        },
+        {
+          "id": "3dd3c1a4-3c3a-4db6-a5ad-033da223636c",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "fef15074-cf55-4e31-be88-fd73ef89c74e",
+              "type": "widget",
+              "widgetKey": "widget_aa150c8f-13a3-4a75-b965-4ad1aee1be0a_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 220
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "997e02d0-2ddd-4549-97fb-cbdb54b72ceb",
+        "type": "widget",
+        "widgetKey": "widget_5a27fb01-8745-4055-9887-aafbb45668fe_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "be2b7ce4-f879-4721-bb71-f3a78aa58cd8",
+        "type": "widget",
+        "widgetKey": "widget_b492a2f2-ccac-4718-b0ee-054d59036664_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 320
+      },
+      {
+        "id": "9b4207e6-093f-4d82-b569-f8f0783f4b63",
+        "type": "widget",
+        "widgetKey": "widget_f479a872-cae5-4ffd-b595-06338dc58bfc_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 320
+      },
+      {
+        "id": "fef15074-cf55-4e31-be88-fd73ef89c74e",
+        "type": "widget",
+        "widgetKey": "widget_aa150c8f-13a3-4a75-b965-4ad1aee1be0a_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 220
+      }
+    ],
+    "variables": [
+      {
+        "key": "roleKey",
+        "type": "string",
+        "defaultValue": "admin"
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "roles",
+        "type": "query",
+        "queryID": "edf7a27d-1fbf-4296-8199-8b8f2be0647d",
+        "triggerMode": "auto",
+        "inputValues": {
+          "tenantID": "{{ state.globals.tenantID }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "matrix",
+        "type": "query",
+        "queryID": "a8bb2282-3e35-463f-8941-436ceb4db5aa",
+        "triggerMode": "auto",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "update",
+        "type": "query",
+        "queryID": "84f86ee1-3371-4155-a4b1-afb4ea55f31a",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

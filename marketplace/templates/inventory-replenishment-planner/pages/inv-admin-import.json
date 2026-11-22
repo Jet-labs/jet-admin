@@ -1,0 +1,187 @@
+{
+  "slug": "inv-admin-import",
+  "key": "admin-import",
+  "title": "Admin · import / export",
+  "description": "CSV import with validation summary and record export.",
+  "accessTags": [
+    "admin",
+    "manager"
+  ],
+  "variables": [
+    {
+      "key": "entity",
+      "type": "string",
+      "defaultValue": "replenishment_proposals"
+    },
+    {
+      "key": "csv",
+      "type": "string",
+      "defaultValue": ""
+    }
+  ],
+  "sources": [
+    {
+      "alias": "jobs",
+      "type": "query",
+      "queryID": "1998d996-418b-4ef4-935b-4087bd61ffaa",
+      "triggerMode": "auto",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "import",
+      "type": "query",
+      "queryID": "d39adf73-2a8a-4418-b44d-1b4e0b465251",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "export",
+      "type": "query",
+      "queryID": "00ee2b78-2997-4e9f-a9c0-c2b6b5dcd620",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "152666a8-7e69-47ad-a29d-c6aa519bc0b3",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "c47445f0-0140-4a1c-959d-3b7a4389b0b8",
+              "type": "widget",
+              "widgetKey": "widget_9c5f382d-48b4-4c1f-91fe-58d7c2e606e1_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "07a0eb15-3051-4b4f-ae1e-a2556b449d11",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "92b83d9b-01e3-42dd-9543-8daf12fb913b",
+              "type": "widget",
+              "widgetKey": "widget_c1ee9d34-911d-4a60-bb3c-e904b889bcbe_1",
+              "span": 6,
+              "sizing": "fill",
+              "minHeight": 280
+            },
+            {
+              "id": "63f25414-fc0d-4b03-8d99-968318de303d",
+              "type": "widget",
+              "widgetKey": "widget_06cc0e87-54e3-4a08-be0f-dc9415ca174a_1",
+              "span": 6,
+              "sizing": "fill",
+              "minHeight": 280
+            }
+          ]
+        },
+        {
+          "id": "11657924-d222-4719-8011-fb789f0249da",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "0fa1f1ad-2159-459a-a216-9a50fd6d4872",
+              "type": "widget",
+              "widgetKey": "widget_dfd66251-a1a2-48cf-8ada-370190e586c8_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 320
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "c47445f0-0140-4a1c-959d-3b7a4389b0b8",
+        "type": "widget",
+        "widgetKey": "widget_9c5f382d-48b4-4c1f-91fe-58d7c2e606e1_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "92b83d9b-01e3-42dd-9543-8daf12fb913b",
+        "type": "widget",
+        "widgetKey": "widget_c1ee9d34-911d-4a60-bb3c-e904b889bcbe_1",
+        "span": 6,
+        "sizing": "fill",
+        "minHeight": 280
+      },
+      {
+        "id": "63f25414-fc0d-4b03-8d99-968318de303d",
+        "type": "widget",
+        "widgetKey": "widget_06cc0e87-54e3-4a08-be0f-dc9415ca174a_1",
+        "span": 6,
+        "sizing": "fill",
+        "minHeight": 280
+      },
+      {
+        "id": "0fa1f1ad-2159-459a-a216-9a50fd6d4872",
+        "type": "widget",
+        "widgetKey": "widget_dfd66251-a1a2-48cf-8ada-370190e586c8_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 320
+      }
+    ],
+    "variables": [
+      {
+        "key": "entity",
+        "type": "string",
+        "defaultValue": "replenishment_proposals"
+      },
+      {
+        "key": "csv",
+        "type": "string",
+        "defaultValue": ""
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "jobs",
+        "type": "query",
+        "queryID": "1998d996-418b-4ef4-935b-4087bd61ffaa",
+        "triggerMode": "auto",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "import",
+        "type": "query",
+        "queryID": "d39adf73-2a8a-4418-b44d-1b4e0b465251",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "export",
+        "type": "query",
+        "queryID": "00ee2b78-2997-4e9f-a9c0-c2b6b5dcd620",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

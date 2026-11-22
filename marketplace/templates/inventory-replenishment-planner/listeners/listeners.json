@@ -1,0 +1,337 @@
+[
+  {
+    "slug": "inv-record-created",
+    "key": "record-created",
+    "title": "Replenishment Proposals · record created",
+    "description": "Inbound record-created event triggers intake triage.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "inv-record-created",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "inv-record-created",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"record.created\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "2abc0b6c-d55d-4f50-9484-aa7357b8716d",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "staffID": "{{ event.staff_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "inv_record-created",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "inv-record-status-changed",
+    "key": "record-status-changed",
+    "title": "Replenishment Proposals · status changed",
+    "description": "Status changes run the notification-only automation.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "inv-record-status-changed",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "inv-record-status-changed",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"record.status_changed\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "dad56398-a189-4518-b361-d1019124ae8f",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "inv_record-status-changed",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "inv-webhook-received",
+    "key": "webhook-received",
+    "title": "Inventory Replenishment Planner · inbound webhook",
+    "description": "Generic inbound webhook for partner updates.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "inv-webhook-received",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "inv-webhook-received",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"webhook.received\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "118e30ae-187e-421b-bd59-0996ba775741",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "inv_webhook-received",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "inv-threshold-breach",
+    "key": "threshold-breach",
+    "title": "Inventory Replenishment Planner · threshold breach",
+    "description": "Threshold breach sweep for overdue records.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "inv-threshold-breach",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "inv-threshold-breach",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"threshold.breached\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "126d1363-387e-4783-b216-e24d8e794740",
+          "inputValues": {
+            "days": "{{ event.days }}",
+            "staffID": "{{ event.staff_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "inv_threshold-breach",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "inv-sla-nearing",
+    "key": "sla-nearing",
+    "title": "Inventory Replenishment Planner · SLA nearing breach",
+    "description": "SLA pre-breach event triggers the escalation workflow.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "inv-sla-nearing",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "inv-sla-nearing",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"sla.nearing_breach\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "2adf847a-22e7-42c8-927b-59f338c99514",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "staffID": "{{ event.staff_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "inv_sla-nearing",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "inv-comment-created",
+    "key": "comment-created",
+    "title": "Inventory Replenishment Planner · comment created",
+    "description": "New comment notification.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "inv-comment-created",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "inv-comment-created",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"comment.created\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "dad56398-a189-4518-b361-d1019124ae8f",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "inv_comment-created",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "inv-import-completed",
+    "key": "import-completed",
+    "title": "Inventory Replenishment Planner · import completed",
+    "description": "Import completion triggers a digest notification.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "inv-import-completed",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "inv-import-completed",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"import.completed\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "0bd8b9b5-6b1d-4b43-a089-589de1211c83",
+          "inputValues": {
+            "staffID": "{{ event.staff_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "inv_import-completed",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "inv-integration-failed",
+    "key": "integration-failed",
+    "title": "Inventory Replenishment Planner · integration failed",
+    "description": "Integration failure follows the recovery workflow.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "inv-integration-failed",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "inv-integration-failed",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"integration.failed\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "b3cc4973-d18f-4695-9899-e2994d4582f2",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "inv_integration-failed",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  }
+]

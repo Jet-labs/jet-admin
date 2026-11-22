@@ -1,0 +1,120 @@
+{
+  "slug": "inv-stock_items-create",
+  "key": "stock_items-create",
+  "title": "Create Stock item",
+  "description": "Validated create form for Stock Items with audit-logged writes.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "createdID",
+      "type": "number",
+      "defaultValue": 0
+    }
+  ],
+  "sources": [
+    {
+      "alias": "stock_items_create",
+      "type": "query",
+      "queryID": "92333c41-5320-4552-9f73-8d6d62626fe5",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "bbafa7df-0ac0-4108-8f20-df97a2afdb3c",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "037a52ca-73bc-41b8-9e9d-80cf8081bf63",
+              "type": "widget",
+              "widgetKey": "widget_bbe665d0-073a-4016-bbbc-5a40ec2f7d9d_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "7cf26806-99f4-4111-acb3-9926512111ea",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "2465bccd-aaf6-44e0-95eb-66bd650fdffc",
+              "type": "widget",
+              "widgetKey": "widget_b6bcb466-15ad-4727-8ff6-ca89ebf74e4f_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "1805a61c-3392-4a5b-8280-1228310c7b3d",
+              "type": "widget",
+              "widgetKey": "widget_8144d3e8-8550-43e5-a3aa-5fc80be6cafa_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "037a52ca-73bc-41b8-9e9d-80cf8081bf63",
+        "type": "widget",
+        "widgetKey": "widget_bbe665d0-073a-4016-bbbc-5a40ec2f7d9d_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "2465bccd-aaf6-44e0-95eb-66bd650fdffc",
+        "type": "widget",
+        "widgetKey": "widget_b6bcb466-15ad-4727-8ff6-ca89ebf74e4f_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "1805a61c-3392-4a5b-8280-1228310c7b3d",
+        "type": "widget",
+        "widgetKey": "widget_8144d3e8-8550-43e5-a3aa-5fc80be6cafa_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "createdID",
+        "type": "number",
+        "defaultValue": 0
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "stock_items_create",
+        "type": "query",
+        "queryID": "92333c41-5320-4552-9f73-8d6d62626fe5",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}
