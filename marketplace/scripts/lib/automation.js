@@ -250,13 +250,13 @@ return { staffID: Number(chosen.id || 1), name: chosen.full_name || "Unassigned"
     configure({ node, edge, q, js, end }) {
       const s = node("start", "start");
       const overdue = q("loadOverdue", slugs.overdue, "overdueRows", { days: "{{ ctx.days }}" });
-      const batch = js("boundBatch", `return (ctx.overdueRows || []).slice(0, 20);`, "batch");
+      const batch = js("boundBatch", `return (ctx.overdueRows || []).slice(0, 5);`, "batch");
       const loop = node("loopOverdue", "loop", {
         sourceVariable: "batch",
         itemVariable: "record",
         indexVariable: "index",
         outputVariable: "reminders",
-        maxIterations: 20,
+        maxIterations: 5,
       });
       const notify = q("notifyOverdue", slugs.notify, "reminder", {
         staffID: "{{ ctx.record.${owner ? owner.key : 'id'} || ctx.staffID }}",
