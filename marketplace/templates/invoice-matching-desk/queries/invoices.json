@@ -1,0 +1,561 @@
+[
+  {
+    "slug": "ap.invoices.list",
+    "title": "Invoices · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"invoice_number\", \"supplier_id\", \"po_id\", \"status\", \"total_amount\", \"currency\", \"invoice_date\", \"due_date\", \"received_at\", \"match_score\", \"discrepancy_count\", \"owner_id\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:invoices}}\nWHERE deleted_at IS NULL AND (coalesce(\"invoice_number\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"notes\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at >= NULLIF($7::text, '')::date)\n  AND (NULLIF($8::text, '')::date IS NULL OR created_at < (NULLIF($8::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $5::text = 'invoice_number' AND $6::text = 'asc' THEN \"invoice_number\" END ASC, CASE WHEN $5::text = 'invoice_number' AND $6::text = 'desc' THEN \"invoice_number\" END DESC, CASE WHEN $5::text = 'total_amount' AND $6::text = 'asc' THEN \"total_amount\" END ASC, CASE WHEN $5::text = 'total_amount' AND $6::text = 'desc' THEN \"total_amount\" END DESC, CASE WHEN $5::text = 'invoice_date' AND $6::text = 'asc' THEN \"invoice_date\" END ASC, CASE WHEN $5::text = 'invoice_date' AND $6::text = 'desc' THEN \"invoice_date\" END DESC, CASE WHEN $5::text = 'due_date' AND $6::text = 'asc' THEN \"due_date\" END ASC, CASE WHEN $5::text = 'due_date' AND $6::text = 'desc' THEN \"due_date\" END DESC, id DESC\nLIMIT $4::int OFFSET ((($3::int - 1) * $4::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "invoice_number"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.export",
+    "title": "Invoices · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"invoice_number\", \"supplier_id\", \"po_id\", \"status\", \"total_amount\", \"currency\", \"invoice_date\", \"due_date\", \"received_at\", \"match_score\", \"discrepancy_count\", \"owner_id\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:invoices}}\nWHERE deleted_at IS NULL AND (coalesce(\"invoice_number\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"notes\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.detail",
+    "title": "Invoices · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"invoice_number\", \"supplier_id\", \"po_id\", \"status\", \"total_amount\", \"currency\", \"invoice_date\", \"due_date\", \"received_at\", \"match_score\", \"discrepancy_count\", \"owner_id\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:invoices}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.create",
+    "title": "Invoices · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:invoices}} (\"invoice_number\", \"supplier_id\", \"po_id\", \"status\", \"total_amount\", \"currency\", \"invoice_date\", \"due_date\", \"received_at\", \"match_score\", \"discrepancy_count\", \"owner_id\", \"notes\", created_at, updated_at)\nVALUES ($1::text, $2::int, $3::int, $4::text, $5::numeric, $6::text, $7::date, $8::date, $9::timestamptz, $10::int, $11::int, $12::int, $13::text, now(), now())\nRETURNING \"id\", \"invoice_number\", \"supplier_id\", \"po_id\", \"status\", \"total_amount\", \"currency\", \"invoice_date\", \"due_date\", \"received_at\", \"match_score\", \"discrepancy_count\", \"owner_id\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "invoice_number",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "supplier_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "po_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "total_amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "currency",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "invoice_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "due_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "received_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "match_score",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "discrepancy_count",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "notes",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.update",
+    "title": "Invoices · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:invoices}}\nSET \"invoice_number\" = $2::text, \"supplier_id\" = $3::int, \"po_id\" = $4::int, \"status\" = $5::text, \"total_amount\" = $6::numeric, \"currency\" = $7::text, \"invoice_date\" = $8::date, \"due_date\" = $9::date, \"received_at\" = $10::timestamptz, \"match_score\" = $11::int, \"discrepancy_count\" = $12::int, \"owner_id\" = $13::int, \"notes\" = $14::text, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"invoice_number\", \"supplier_id\", \"po_id\", \"status\", \"total_amount\", \"currency\", \"invoice_date\", \"due_date\", \"received_at\", \"match_score\", \"discrepancy_count\", \"owner_id\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "invoice_number",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "supplier_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "po_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "total_amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "currency",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "invoice_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "due_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "received_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "match_score",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "discrepancy_count",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "notes",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.delete",
+    "title": "Invoices · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:invoices}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.restore",
+    "title": "Invoices · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:invoices}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.lookup",
+    "title": "Invoices · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"invoice_number\"::text AS label FROM {{table:invoices}} WHERE deleted_at IS NULL ORDER BY \"invoice_number\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.status",
+    "title": "Invoices · change status",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:invoices}} SET \"status\" = $2::text, updated_at = now() WHERE id = $1::int RETURNING id, \"status\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false,
+          "default": "received"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.assign",
+    "title": "Invoices · assign owner",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:invoices}} SET \"owner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"owner_id\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.score",
+    "title": "Invoices · save score",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:invoices}} SET \"match_score\" = $2::numeric, updated_at = now() WHERE id = $1::int RETURNING id, \"match_score\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "score",
+          "type": "number",
+          "required": false,
+          "default": 0
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.stats",
+    "title": "Invoices · KPI totals",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT count(*)::int AS total, coalesce(sum(\"total_amount\"), 0)::numeric(14,2) AS total_value, coalesce(avg(\"total_amount\"), 0)::numeric(14,2) AS average_value, count(*) FILTER (WHERE \"status\" = 'received')::int AS status_received, count(*) FILTER (WHERE \"status\" = 'matching')::int AS status_matching, count(*) FILTER (WHERE \"status\" = 'exception')::int AS status_exception, count(*) FILTER (WHERE \"status\" = 'approved')::int AS status_approved, count(*) FILTER (WHERE \"status\" = 'scheduled')::int AS status_scheduled, count(*) FILTER (WHERE \"status\" = 'paid')::int AS status_paid, count(*) FILTER (WHERE \"status\" = 'void')::int AS status_void\nFROM {{table:invoices}}\nWHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date)\n  AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day'))",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.trend",
+    "title": "Invoices · daily trend",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT date_trunc('day', created_at)::date AS day, count(*)::int AS count, coalesce(sum(\"total_amount\"), 0)::numeric(14,2) AS total\nFROM {{table:invoices}}\nWHERE deleted_at IS NULL AND created_at >= coalesce(NULLIF($1::text, '')::date, now() - interval '90 days')\n  AND created_at < (coalesce(NULLIF($2::text, '')::date, now()::date) + interval '1 day')\nGROUP BY 1 ORDER BY 1",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.by_status",
+    "title": "Invoices · by status",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"status\" AS status, count(*)::int AS count FROM {{table:invoices}} WHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date) AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day')) GROUP BY 1 ORDER BY 2 DESC",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.invoices.overdue",
+    "title": "Invoices · overdue",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "invoices"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"invoice_number\", \"supplier_id\", \"po_id\", \"status\", \"total_amount\", \"currency\", \"invoice_date\", \"due_date\", \"received_at\", \"match_score\", \"discrepancy_count\", \"owner_id\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:invoices}}\nWHERE deleted_at IS NULL AND \"invoice_date\" IS NOT NULL\n  AND \"invoice_date\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('paid')\nORDER BY \"invoice_date\" ASC LIMIT 100",
+      "inputDefinitions": [
+        {
+          "key": "days",
+          "type": "number",
+          "required": false,
+          "default": 7
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

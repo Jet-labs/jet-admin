@@ -37,7 +37,7 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 | 1 | crm-sales-pipeline | [x] | [x] | [x] | [x] | [x] | `ee548d46` |
 | 2 | customer-support-console | [x] | [x] | [x] | [~] Temporal unavailable | [x] | this commit |
 | 3 | inventory-replenishment-planner | [x] | [x] | [x] | [~] Temporal unavailable | [x] | this commit |
-| 4 | invoice-matching-desk | [~] in progress | — | — | — | — | — |
+| 4 | invoice-matching-desk | [x] | [x] | [x] | [~] Temporal unavailable | [x] | this commit |
 | 5 | ecommerce-operations | [ ] deferred | — | — | — | — | — |
 | 6 | hrms-people | [ ] deferred | — | — | — | — | — |
 | 7 | project-management | [ ] deferred | — | — | — | — | — |
@@ -79,6 +79,17 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 - Role smoke — admin, manager, planner, analyst and readonly match their page/query/workflow allow-deny matrix; 0 leftover demo users or roles.
 - Workflow smoke — **BLOCKED** for the same Temporal/Docker reason. All 11 graphs pass the package validator.
 
+### Invoice Matching Desk evidence
+
+- `templates:validate` — 18 tables, 78 queries, 31 pages, 11 workflows, 8 listeners, 6 cron, 5 roles, 102 files.
+- SQL smoke — 18 tables, 3,380 seed rows, 45 read queries, 0 failures.
+- DB registration — 78 queries, 31 pages, 11 workflows, 16 assets.
+- Fresh-tenant install — 359 bundle/install resources, 0 warnings, 18 tables, 31 pages, 78 queries, 5 roles, 6 cron jobs.
+- Page read-query smoke — 69 queries, 0 failures; 0 orphan tables and 0 ledger rows after uninstall.
+- Role smoke — admin, manager, specialist, approver and readonly match their page/query/workflow allow-deny matrix; 0 leftover demo users or roles.
+- Jest package suite — 20/20 pass across all four templates (manifest, validator, counts, parameterized SQL, deterministic Bundle v1).
+- Workflow smoke — **BLOCKED** for the same Temporal/Docker reason. All 11 graphs pass the package validator.
+
 ## Phase 3 — Validation
 
 - [x] `templates:validate` CRM
@@ -97,6 +108,11 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 - [x] Uninstall orphan check Inventory Replenishment Planner
 - [x] Role allow/deny tests Inventory Replenishment Planner
 - [ ] Workflow run/log assertions Inventory Replenishment Planner — blocked on Temporal
+- [x] `templates:validate` Invoice Matching Desk
+- [x] Fresh-tenant install + page query smoke Invoice Matching Desk
+- [x] Uninstall orphan check Invoice Matching Desk
+- [x] Role allow/deny tests Invoice Matching Desk
+- [ ] Workflow run/log assertions Invoice Matching Desk — blocked on Temporal
 - [x] Frontend lint/build for changed files
 - [x] `marketplace/README.md` catalogue + authoring guide
 - [ ] Full 12-template validation — deferred by explicit user scope change

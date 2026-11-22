@@ -1,0 +1,112 @@
+[
+  {
+    "key": "daily-digest",
+    "title": "Invoice Matching Desk · Daily operations digest",
+    "description": "Daily operations digest. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "0 8 * * *",
+    "timezone": "UTC",
+    "workflow": "bbf183c0-eb66-42a1-a13e-d588ad93659f",
+    "workflowConfig": {
+      "inputValues": {
+        "staffID": 1
+      },
+      "idempotencyKey": "ap:daily-digest:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "threshold-sweep",
+    "title": "Invoice Matching Desk · Overdue and threshold sweep",
+    "description": "Overdue and threshold sweep. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "0 */4 * * *",
+    "timezone": "UTC",
+    "workflow": "579f9450-7743-4233-8bfc-cfc51fc57dd6",
+    "workflowConfig": {
+      "inputValues": {
+        "days": 7,
+        "staffID": 1
+      },
+      "idempotencyKey": "ap:threshold-sweep:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "intake-triage",
+    "title": "Invoice Matching Desk · Weekday intake triage rehearsal",
+    "description": "Weekday intake triage rehearsal. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "15 9 * * 1-5",
+    "timezone": "UTC",
+    "workflow": "84c12cb9-fa4f-4e68-ab0f-a730db73ea15",
+    "workflowConfig": {
+      "inputValues": {
+        "recordID": 1,
+        "staffID": 1
+      },
+      "idempotencyKey": "ap:intake-triage:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "document-generation",
+    "title": "Invoice Matching Desk · End-of-day document generation",
+    "description": "End-of-day document generation. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "30 18 * * 1-5",
+    "timezone": "UTC",
+    "workflow": "954d43da-1073-4110-816f-b50b64357a86",
+    "workflowConfig": {
+      "inputValues": {
+        "recordID": 1
+      },
+      "idempotencyKey": "ap:document-generation:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "round-robin-assignment",
+    "title": "Invoice Matching Desk · Daily assignment rebalance",
+    "description": "Daily assignment rebalance. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "0 7 * * *",
+    "timezone": "UTC",
+    "workflow": "a3c6b704-be37-46fd-bcc9-01e31ff3621a",
+    "workflowConfig": {
+      "inputValues": {
+        "recordID": 1
+      },
+      "idempotencyKey": "ap:round-robin-assignment:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  },
+  {
+    "key": "integration-sync",
+    "title": "Invoice Matching Desk · Integration sync health cycle",
+    "description": "Integration sync health cycle. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
+    "schedule": "0 */6 * * *",
+    "timezone": "UTC",
+    "workflow": "9d23e8c7-f93d-4809-beab-aaa0823e9aa3",
+    "workflowConfig": {
+      "inputValues": {
+        "recordID": 1
+      },
+      "idempotencyKey": "ap:integration-sync:{{ scheduledFor }}"
+    },
+    "isDisabled": true,
+    "timeoutSeconds": 300,
+    "retryAttempts": 2,
+    "retryDelaySeconds": 60
+  }
+]

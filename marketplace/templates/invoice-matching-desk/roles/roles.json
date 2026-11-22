@@ -1,0 +1,5796 @@
+[
+  {
+    "key": "admin",
+    "title": "AP Administrator",
+    "description": "Full access to every page, query, workflow and admin panel.",
+    "scope": "all",
+    "pageTags": [
+      "*"
+    ],
+    "queryTags": [
+      "*"
+    ],
+    "workflowTags": [
+      "*"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list",
+      "tenant:apppage:create",
+      "tenant:apppage:update",
+      "tenant:dataquery:create",
+      "tenant:workflow:create",
+      "tenant:user:list"
+    ],
+    "pages": [
+      {
+        "page": "ap-invoices-list",
+        "pageTitle": "Invoices · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-invoices-detail",
+        "pageTitle": "Invoices · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-invoices-create",
+        "pageTitle": "Create Invoice",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-receipts-list",
+        "pageTitle": "Receipts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-receipts-detail",
+        "pageTitle": "Receipts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-receipts-create",
+        "pageTitle": "Create Receipt",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-invoices-kanban",
+        "pageTitle": "Invoices · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-invoices-calendar",
+        "pageTitle": "Invoices · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "ap.invoices.list",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.export",
+        "tags": [
+          "read",
+          "export",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.detail",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.create",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.update",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.delete",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.restore",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.status",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.assign",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.score",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.stats",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.trend",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.by_status",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.overdue",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.stats",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.trend",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.by_status",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.overdue",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.list",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.export",
+        "tags": [
+          "read",
+          "export",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.detail",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.create",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.update",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.delete",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.restore",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.status",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "ap.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": true
+      }
+    ]
+  },
+  {
+    "key": "manager",
+    "title": "AP Manager",
+    "description": "Owns matching policy, exceptions, approvals and AP reporting.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report",
+      "admin"
+    ],
+    "queryTags": [
+      "read",
+      "write",
+      "shared",
+      "report",
+      "export",
+      "admin"
+    ],
+    "workflowTags": [
+      "*"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "ap-invoices-list",
+        "pageTitle": "Invoices · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-detail",
+        "pageTitle": "Invoices · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-create",
+        "pageTitle": "Create Invoice",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-receipts-list",
+        "pageTitle": "Receipts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-receipts-detail",
+        "pageTitle": "Receipts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-receipts-create",
+        "pageTitle": "Create Receipt",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-kanban",
+        "pageTitle": "Invoices · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-calendar",
+        "pageTitle": "Invoices · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": true,
+        "canExport": true
+      }
+    ],
+    "queries": [
+      {
+        "query": "ap.invoices.list",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.export",
+        "tags": [
+          "read",
+          "export",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.detail",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.create",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.update",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.delete",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.restore",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.status",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.assign",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.score",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.stats",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.trend",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.by_status",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.overdue",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.stats",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.trend",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.by_status",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.overdue",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.list",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.export",
+        "tags": [
+          "read",
+          "export",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.detail",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.create",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.update",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.delete",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.restore",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.status",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "ap.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": true
+      }
+    ]
+  },
+  {
+    "key": "specialist",
+    "title": "Invoice Matching Specialist",
+    "description": "Works the invoice queue, runs matches and investigates discrepancies.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report"
+    ],
+    "queryTags": [
+      "read",
+      "write",
+      "shared",
+      "report",
+      "export"
+    ],
+    "workflowTags": [
+      "core",
+      "automation"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "ap-invoices-list",
+        "pageTitle": "Invoices · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-detail",
+        "pageTitle": "Invoices · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-create",
+        "pageTitle": "Create Invoice",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-receipts-list",
+        "pageTitle": "Receipts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-receipts-detail",
+        "pageTitle": "Receipts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-receipts-create",
+        "pageTitle": "Create Receipt",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-kanban",
+        "pageTitle": "Invoices · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-calendar",
+        "pageTitle": "Invoices · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "ap.invoices.list",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.export",
+        "tags": [
+          "read",
+          "export",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.detail",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.create",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.update",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.delete",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.restore",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.status",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.assign",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.score",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.stats",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.trend",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.by_status",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.overdue",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.stats",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.trend",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.by_status",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.overdue",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.list",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.export",
+        "tags": [
+          "read",
+          "export",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.detail",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.create",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.update",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.delete",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.restore",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.status",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "ap.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": true
+      }
+    ]
+  },
+  {
+    "key": "approver",
+    "title": "AP Approver",
+    "description": "Reviews approved matches and signs off exceptions and payment holds.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report"
+    ],
+    "queryTags": [
+      "read",
+      "write",
+      "shared",
+      "report",
+      "export"
+    ],
+    "workflowTags": [
+      "core",
+      "approval"
+    ],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "ap-invoices-list",
+        "pageTitle": "Invoices · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-detail",
+        "pageTitle": "Invoices · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-create",
+        "pageTitle": "Create Invoice",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-receipts-list",
+        "pageTitle": "Receipts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-receipts-detail",
+        "pageTitle": "Receipts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-receipts-create",
+        "pageTitle": "Create Receipt",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-kanban",
+        "pageTitle": "Invoices · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-invoices-calendar",
+        "pageTitle": "Invoices · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": true
+      },
+      {
+        "page": "ap-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "ap.invoices.list",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.export",
+        "tags": [
+          "read",
+          "export",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.detail",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.create",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.update",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.delete",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.restore",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.status",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.assign",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.score",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.stats",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.trend",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.by_status",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.overdue",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.stats",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.trend",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.by_status",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.overdue",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.list",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.export",
+        "tags": [
+          "read",
+          "export",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.detail",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.create",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.update",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.delete",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.restore",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.status",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": true
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "ap.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": true
+      },
+      {
+        "workflow": "ap.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": false
+      }
+    ]
+  },
+  {
+    "key": "readonly",
+    "title": "Read-only Viewer",
+    "description": "Read-only invoice, match and supplier context without workflow execution.",
+    "scope": "staff",
+    "pageTags": [
+      "core",
+      "shared",
+      "report"
+    ],
+    "queryTags": [
+      "read",
+      "shared",
+      "report"
+    ],
+    "workflowTags": [],
+    "generalPermissions": [
+      "tenant:apppage:list",
+      "tenant:dataquery:list",
+      "tenant:workflow:list",
+      "tenant:cronjob:list",
+      "tenant:listener:list",
+      "tenant:audit:list",
+      "tenant:marketplace:list",
+      "tenant:role:list"
+    ],
+    "pages": [
+      {
+        "page": "ap-invoices-list",
+        "pageTitle": "Invoices · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-invoices-detail",
+        "pageTitle": "Invoices · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-invoices-create",
+        "pageTitle": "Create Invoice",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-purchase_orders-list",
+        "pageTitle": "Purchase Orders · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-purchase_orders-detail",
+        "pageTitle": "Purchase Orders · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-purchase_orders-create",
+        "pageTitle": "Create Purchase order",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-receipts-list",
+        "pageTitle": "Receipts · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-receipts-detail",
+        "pageTitle": "Receipts · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-receipts-create",
+        "pageTitle": "Create Receipt",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-suppliers-list",
+        "pageTitle": "Suppliers · list",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-suppliers-detail",
+        "pageTitle": "Suppliers · detail",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-suppliers-create",
+        "pageTitle": "Create Supplier",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-dashboard",
+        "pageTitle": "Dashboard",
+        "tags": [
+          "core",
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-reports-operations",
+        "pageTitle": "Reports · operations",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-reports-secondary",
+        "pageTitle": "Reports · secondary mix",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-reports-quality",
+        "pageTitle": "Reports · data quality",
+        "tags": [
+          "report",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-invoices-kanban",
+        "pageTitle": "Invoices · kanban",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-invoices-calendar",
+        "pageTitle": "Invoices · calendar",
+        "tags": [
+          "core",
+          "staff",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-search",
+        "pageTitle": "Global search",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-profile",
+        "pageTitle": "My profile",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-notifications",
+        "pageTitle": "Notifications",
+        "tags": [
+          "shared",
+          "staff",
+          "manager",
+          "admin",
+          "viewer",
+          "portal"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-settings",
+        "pageTitle": "Settings",
+        "tags": [
+          "shared",
+          "manager",
+          "admin"
+        ],
+        "canView": true,
+        "canExport": false
+      },
+      {
+        "page": "ap-portal",
+        "pageTitle": "Client portal",
+        "tags": [
+          "portal",
+          "client",
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-users",
+        "pageTitle": "Admin · users",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-roles",
+        "pageTitle": "Admin · roles and permissions",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-audit",
+        "pageTitle": "Admin · audit log",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-settings",
+        "pageTitle": "Admin · system settings",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-import",
+        "pageTitle": "Admin · import / export",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-integrations",
+        "pageTitle": "Admin · integration health",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-jobs",
+        "pageTitle": "Admin · jobs and workflow runs",
+        "tags": [
+          "admin"
+        ],
+        "canView": false,
+        "canExport": false
+      },
+      {
+        "page": "ap-admin-quality",
+        "pageTitle": "Admin · data quality",
+        "tags": [
+          "admin",
+          "manager"
+        ],
+        "canView": false,
+        "canExport": false
+      }
+    ],
+    "queries": [
+      {
+        "query": "ap.invoices.list",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.export",
+        "tags": [
+          "read",
+          "export",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.detail",
+        "tags": [
+          "read",
+          "core",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.create",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.invoices.update",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.invoices.delete",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.invoices.restore",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.invoices.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.status",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.invoices.assign",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.invoices.score",
+        "tags": [
+          "write",
+          "core",
+          "invoices"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.invoices.stats",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.trend",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.by_status",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.invoices.overdue",
+        "tags": [
+          "read",
+          "report",
+          "invoices"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.list",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.export",
+        "tags": [
+          "read",
+          "export",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.detail",
+        "tags": [
+          "read",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.create",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.purchase_orders.update",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.purchase_orders.delete",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.purchase_orders.restore",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.purchase_orders.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.status",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.purchase_orders.assign",
+        "tags": [
+          "write",
+          "core",
+          "purchase_orders"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.purchase_orders.stats",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.trend",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.by_status",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.purchase_orders.overdue",
+        "tags": [
+          "read",
+          "report",
+          "purchase_orders"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.list",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.export",
+        "tags": [
+          "read",
+          "export",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.detail",
+        "tags": [
+          "read",
+          "core",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.create",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.receipts.update",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.receipts.delete",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.receipts.restore",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.receipts.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "receipts"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.receipts.status",
+        "tags": [
+          "write",
+          "core",
+          "receipts"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.suppliers.list",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.export",
+        "tags": [
+          "read",
+          "export",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.detail",
+        "tags": [
+          "read",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.create",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.suppliers.update",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.suppliers.delete",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.suppliers.restore",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.suppliers.lookup",
+        "tags": [
+          "read",
+          "lookup",
+          "suppliers"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.suppliers.status",
+        "tags": [
+          "write",
+          "core",
+          "suppliers"
+        ],
+        "canExecute": false
+      },
+      {
+        "query": "ap.shared.staff_list",
+        "tags": [
+          "read",
+          "shared",
+          "lookup"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_detail",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.staff_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.portal_records",
+        "tags": [
+          "read",
+          "portal"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.integration_ping",
+        "tags": [
+          "read",
+          "integration"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notifications_read",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.notification_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.settings_update",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_views",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.saved_view_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.comment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachments",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.attachment_create",
+        "tags": [
+          "write",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.audit",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_jobs",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.ops",
+        "tags": [
+          "read",
+          "shared",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.operational_staff",
+        "tags": [
+          "read",
+          "shared",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.search",
+        "tags": [
+          "read",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.my_tasks",
+        "tags": [
+          "read",
+          "core"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_users",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_roles",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_runs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_workflow_logs",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.admin_cron_history",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.data_quality",
+        "tags": [
+          "read",
+          "admin",
+          "report"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.import_csv",
+        "tags": [
+          "write",
+          "admin",
+          "shared"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix",
+        "tags": [
+          "read",
+          "admin"
+        ],
+        "canExecute": true
+      },
+      {
+        "query": "ap.shared.role_matrix_update",
+        "tags": [
+          "write",
+          "admin"
+        ],
+        "canExecute": false
+      }
+    ],
+    "workflows": [
+      {
+        "workflow": "ap.intake-triage",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.round-robin-assignment",
+        "tags": [
+          "core",
+          "automation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.approval-chain",
+        "tags": [
+          "core",
+          "approval"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.threshold-sweep",
+        "tags": [
+          "core",
+          "automation",
+          "sla"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.daily-digest",
+        "tags": [
+          "automation",
+          "digest"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.escalation",
+        "tags": [
+          "automation",
+          "escalation"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.integration-sync",
+        "tags": [
+          "automation",
+          "integration"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.document-generation",
+        "tags": [
+          "automation",
+          "documents"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.data-collection",
+        "tags": [
+          "automation",
+          "data-collection"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.error-recovery",
+        "tags": [
+          "automation",
+          "reliability"
+        ],
+        "canTrigger": false
+      },
+      {
+        "workflow": "ap.notify-only",
+        "tags": [
+          "automation",
+          "listener"
+        ],
+        "canTrigger": false
+      }
+    ]
+  }
+]

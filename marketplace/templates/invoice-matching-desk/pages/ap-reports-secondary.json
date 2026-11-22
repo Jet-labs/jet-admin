@@ -1,0 +1,239 @@
+{
+  "slug": "ap-reports-secondary",
+  "key": "reports-secondary",
+  "title": "Reports · secondary mix",
+  "description": "Secondary entity mix and value trend with exportable records.",
+  "accessTags": [
+    "report",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "dateFrom",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "dateTo",
+      "type": "string",
+      "defaultValue": ""
+    }
+  ],
+  "sources": [
+    {
+      "alias": "second_summary",
+      "type": "query",
+      "queryID": "6bc7f9e9-2bb0-446b-8c1a-c977b444d5e4",
+      "triggerMode": "auto",
+      "inputValues": {
+        "dateFrom": "{{ state.variables.dateFrom }}",
+        "dateTo": "{{ state.variables.dateTo }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "second_status",
+      "type": "query",
+      "queryID": "e3f36748-5d53-4b87-8c78-ddb2778c3f99",
+      "triggerMode": "auto",
+      "inputValues": {
+        "dateFrom": "{{ state.variables.dateFrom }}",
+        "dateTo": "{{ state.variables.dateTo }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "second_list",
+      "type": "query",
+      "queryID": "6a07b36a-18ea-44ed-aa37-c23e7a33d11b",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "ab3bd02e-d30e-4d47-b5b9-e8bab6b4b2b9",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "a47d6d4b-4705-4934-a8bd-ab903d7b839b",
+              "type": "widget",
+              "widgetKey": "widget_8b0b1e4f-2ef2-40c9-a983-d2e2682beb55_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "5b1a6997-800a-49d1-9268-e4af1b0cfa5b",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "155fa36f-1325-4936-af90-1511385ed6e1",
+              "type": "widget",
+              "widgetKey": "widget_605ba258-d2b0-42b0-bd51-031a475e84cc_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 52
+            },
+            {
+              "id": "9192f6ee-0c85-42cd-8034-ed6a1416c294",
+              "type": "widget",
+              "widgetKey": "widget_ad2d456f-1509-4f99-bf60-4b12f0c87948_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 52
+            },
+            {
+              "id": "e3bd5d95-cf3c-41f3-86a4-ccb7491671e8",
+              "type": "widget",
+              "widgetKey": "widget_79920121-beb5-494b-8da6-8c2c385cc13a_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 52
+            }
+          ]
+        },
+        {
+          "id": "976dd697-4832-403d-a0ee-5f201d3f3ad1",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "ba39d82a-9553-4a0f-82a4-5f700f7c7813",
+              "type": "widget",
+              "widgetKey": "widget_49b59165-3a23-43bf-80f2-f084d05863fe_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 320
+            }
+          ]
+        },
+        {
+          "id": "535e5d9b-d535-49ca-b51b-3e98c92879fd",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "67dc84eb-7369-451a-96eb-641dab38def7",
+              "type": "widget",
+              "widgetKey": "widget_78e1a5c4-f5cd-4faf-b264-a926b3c917bf_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 340
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "a47d6d4b-4705-4934-a8bd-ab903d7b839b",
+        "type": "widget",
+        "widgetKey": "widget_8b0b1e4f-2ef2-40c9-a983-d2e2682beb55_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "155fa36f-1325-4936-af90-1511385ed6e1",
+        "type": "widget",
+        "widgetKey": "widget_605ba258-d2b0-42b0-bd51-031a475e84cc_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "9192f6ee-0c85-42cd-8034-ed6a1416c294",
+        "type": "widget",
+        "widgetKey": "widget_ad2d456f-1509-4f99-bf60-4b12f0c87948_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "e3bd5d95-cf3c-41f3-86a4-ccb7491671e8",
+        "type": "widget",
+        "widgetKey": "widget_79920121-beb5-494b-8da6-8c2c385cc13a_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "ba39d82a-9553-4a0f-82a4-5f700f7c7813",
+        "type": "widget",
+        "widgetKey": "widget_49b59165-3a23-43bf-80f2-f084d05863fe_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 320
+      },
+      {
+        "id": "67dc84eb-7369-451a-96eb-641dab38def7",
+        "type": "widget",
+        "widgetKey": "widget_78e1a5c4-f5cd-4faf-b264-a926b3c917bf_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 340
+      }
+    ],
+    "variables": [
+      {
+        "key": "dateFrom",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "dateTo",
+        "type": "string",
+        "defaultValue": ""
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "second_summary",
+        "type": "query",
+        "queryID": "6bc7f9e9-2bb0-446b-8c1a-c977b444d5e4",
+        "triggerMode": "auto",
+        "inputValues": {
+          "dateFrom": "{{ state.variables.dateFrom }}",
+          "dateTo": "{{ state.variables.dateTo }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "second_status",
+        "type": "query",
+        "queryID": "e3f36748-5d53-4b87-8c78-ddb2778c3f99",
+        "triggerMode": "auto",
+        "inputValues": {
+          "dateFrom": "{{ state.variables.dateFrom }}",
+          "dateTo": "{{ state.variables.dateTo }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "second_list",
+        "type": "query",
+        "queryID": "6a07b36a-18ea-44ed-aa37-c23e7a33d11b",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

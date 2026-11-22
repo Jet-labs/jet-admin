@@ -1,0 +1,200 @@
+{
+  "slug": "ap.round-robin-assignment",
+  "key": "round-robin-assignment",
+  "title": "Invoices · round-robin assignment",
+  "description": "Picks the least-loaded active staff member and assigns the record, then sends an in-app notification.",
+  "tags": [
+    "core",
+    "automation"
+  ],
+  "options": {
+    "description": "Picks the least-loaded active staff member and assigns the record, then sends an in-app notification.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "a9fbfd05-f035-4457-bd8d-24d36c3f5ac5",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadStaff",
+      "nodeID": "b34917f4-a864-4782-a077-0430ab78de5e",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadStaff",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "c03cd3e8-e21f-4988-861b-1877fea3c2a4",
+        "outputVariable": "staffRows",
+        "inputValues": {}
+      }
+    },
+    {
+      "key": "pickAssignee",
+      "nodeID": "f6840c9a-f1c5-4f34-bdd2-1d6b894d8154",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "pickAssignee",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "\nvar list = (ctx.staffRows || []);\nvar chosen = list.length ? list[0] : { id: 1, full_name: \"Unassigned\" };\nreturn { staffID: Number(chosen.id || 1), name: chosen.full_name || \"Unassigned\", load: Number(chosen.assigned || 0) };\n",
+        "outputVariable": "assignment"
+      }
+    },
+    {
+      "key": "assignOwner",
+      "nodeID": "48aef347-754e-4072-adcf-c611b0ccac92",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "assignOwner",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "43f8b924-3744-4bd8-855f-ad8425478b3c",
+        "outputVariable": "assignmentResult",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}",
+          "staffID": "{{ ctx.assignment.staffID }}"
+        }
+      }
+    },
+    {
+      "key": "notifyOwner",
+      "nodeID": "c0304af2-ecc8-4b30-aee3-9c595778d07c",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyOwner",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "dataQueryID": "4420a46e-e8fb-4399-aced-522e8cf2299f",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.assignment.staffID }}",
+          "title": "Invoices assigned",
+          "body": "Record #{{ ctx.recordID }} was assigned to {{ ctx.assignment.name }} ({{ ctx.assignment.load }} open items).",
+          "category": "action",
+          "linkPage": "ap-invoices-list"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "adb5944a-97c0-4665-bb72-42e9d63d35cc",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.assignment }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "a9fbfd05-f035-4457-bd8d-24d36c3f5ac5",
+      "to": "b34917f4-a864-4782-a077-0430ab78de5e",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "b34917f4-a864-4782-a077-0430ab78de5e",
+      "to": "f6840c9a-f1c5-4f34-bdd2-1d6b894d8154",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "f6840c9a-f1c5-4f34-bdd2-1d6b894d8154",
+      "to": "48aef347-754e-4072-adcf-c611b0ccac92",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "48aef347-754e-4072-adcf-c611b0ccac92",
+      "to": "c0304af2-ecc8-4b30-aee3-9c595778d07c",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "c0304af2-ecc8-4b30-aee3-9c595778d07c",
+      "to": "adb5944a-97c0-4665-bb72-42e9d63d35cc",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

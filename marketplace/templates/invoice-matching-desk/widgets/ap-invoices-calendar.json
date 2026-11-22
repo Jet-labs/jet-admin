@@ -1,0 +1,57 @@
+[
+  {
+    "slug": "ap-invoices-calendar.heading",
+    "key": "heading",
+    "page": "ap-invoices-calendar",
+    "title": "Invoices calendar",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Invoices calendar\nMonth view keyed on **invoice date**. Select an event to inspect the record.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-invoices-calendar.calendar",
+    "key": "calendar",
+    "page": "ap-invoices-calendar",
+    "title": "Calendar",
+    "type": "calendar",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.invoices || {}).data || [])",
+      "dateKey": "invoice_date",
+      "titleKey": "invoice_number",
+      "subtitleKey": "owner_id",
+      "groupKey": "status",
+      "emptyText": "No dated records.",
+      "isLoading": "{{ (state.queries.invoices || {}).isLoading || false }}",
+      "events": {
+        "onEventSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.event.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-calendar.selected",
+    "key": "selected",
+    "page": "ap-invoices-calendar",
+    "title": "Selected record",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record",
+      "dataTemplate": "{{ (((state.queries.invoices_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select an event.",
+      "isLoading": "{{ (state.queries.invoices_selected || {}).isLoading || false }}"
+    }
+  }
+]

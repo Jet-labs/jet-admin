@@ -1,0 +1,120 @@
+{
+  "slug": "ap-invoices-create",
+  "key": "invoices-create",
+  "title": "Create Invoice",
+  "description": "Validated create form for Invoices with audit-logged writes.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "createdID",
+      "type": "number",
+      "defaultValue": 0
+    }
+  ],
+  "sources": [
+    {
+      "alias": "invoices_create",
+      "type": "query",
+      "queryID": "7e57ffca-b714-4591-b41c-6c01414c010a",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "096708c7-2f5d-4fe1-8dda-83c34fe11704",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "afe3c05f-2b9a-471d-af8b-cc54709fb932",
+              "type": "widget",
+              "widgetKey": "widget_1411485f-00bd-4c78-b7a3-be5fdbdf5f97_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "88467894-1008-467c-9ff0-3b8ad39c7842",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "185a9747-99e9-435e-aeff-77ad2f6609fd",
+              "type": "widget",
+              "widgetKey": "widget_f5820b49-1e3b-45ad-9fd3-4f94e9f4243a_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "7eb9b0b3-7be9-4e89-bb4c-0cf22610fb5c",
+              "type": "widget",
+              "widgetKey": "widget_ab0000bc-ba7d-449b-b358-0fad78e97e25_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "afe3c05f-2b9a-471d-af8b-cc54709fb932",
+        "type": "widget",
+        "widgetKey": "widget_1411485f-00bd-4c78-b7a3-be5fdbdf5f97_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "185a9747-99e9-435e-aeff-77ad2f6609fd",
+        "type": "widget",
+        "widgetKey": "widget_f5820b49-1e3b-45ad-9fd3-4f94e9f4243a_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "7eb9b0b3-7be9-4e89-bb4c-0cf22610fb5c",
+        "type": "widget",
+        "widgetKey": "widget_ab0000bc-ba7d-449b-b358-0fad78e97e25_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "createdID",
+        "type": "number",
+        "defaultValue": 0
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "invoices_create",
+        "type": "query",
+        "queryID": "7e57ffca-b714-4591-b41c-6c01414c010a",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

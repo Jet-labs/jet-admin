@@ -1,0 +1,178 @@
+[
+  {
+    "slug": "ap-settings.heading",
+    "key": "heading",
+    "page": "ap-settings",
+    "title": "Settings",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Settings\nUpdate branding, notification and general preferences. Each form writes a single JSON value through the parameterized settings query.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-settings.branding",
+    "key": "branding",
+    "page": "ap-settings",
+    "title": "Branding",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Branding",
+      "submitLabel": "Save branding",
+      "fields": [
+        {
+          "key": "value",
+          "label": "Application name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Invoice Matching Desk"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "kind": "branding",
+                "configKey": "brand.name",
+                "value": "{{ ({ value: event.formData.value }) }}"
+              },
+              "successToast": "Branding saved",
+              "errorToast": "Branding failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-settings.notifications",
+    "key": "notifications",
+    "page": "ap-settings",
+    "title": "Notifications",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Notifications",
+      "submitLabel": "Save preferences",
+      "fields": [
+        {
+          "key": "value",
+          "label": "In-app notifications",
+          "type": "checkbox",
+          "defaultValue": true
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "kind": "setting",
+                "configKey": "notifications.inApp",
+                "value": "{{ ({ value: event.formData.value }) }}"
+              },
+              "successToast": "Preferences saved",
+              "errorToast": "Preferences failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-settings.feature",
+    "key": "feature",
+    "page": "ap-settings",
+    "title": "Automation flag",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Automation flag",
+      "submitLabel": "Save flag",
+      "fields": [
+        {
+          "key": "value",
+          "label": "Enable workflow automation",
+          "type": "checkbox",
+          "defaultValue": false
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "kind": "feature_flag",
+                "configKey": "flags.workflowAutomation",
+                "value": "{{ ({ value: event.formData.value }) }}"
+              },
+              "successToast": "Flag saved",
+              "errorToast": "Flag failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-settings.all",
+    "key": "all",
+    "page": "ap-settings",
+    "title": "All settings",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.settings || {}).data || [])",
+      "columns": [
+        {
+          "key": "kind",
+          "label": "Kind",
+          "type": "badge"
+        },
+        {
+          "key": "config_key",
+          "label": "Key",
+          "type": "text"
+        },
+        {
+          "key": "label",
+          "label": "Label",
+          "type": "text"
+        },
+        {
+          "key": "updated_at",
+          "label": "Updated",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No settings.",
+      "isLoading": "{{ (state.queries.settings || {}).isLoading || false }}"
+    }
+  }
+]

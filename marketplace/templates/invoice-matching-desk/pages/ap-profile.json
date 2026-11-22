@@ -1,0 +1,185 @@
+{
+  "slug": "ap-profile",
+  "key": "profile",
+  "title": "My profile",
+  "description": "Staff profile and editable contact details.",
+  "accessTags": [
+    "shared",
+    "staff",
+    "manager",
+    "admin",
+    "viewer",
+    "portal"
+  ],
+  "variables": [
+    {
+      "key": "staffID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "profile",
+      "type": "query",
+      "queryID": "159628fc-5c18-4faf-bd85-42b394dacbbf",
+      "triggerMode": "auto",
+      "inputValues": {
+        "id": "{{ state.variables.staffID }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "staff",
+      "type": "query",
+      "queryID": "59b74c91-2b2a-41cd-8b2b-e2dfc9016566",
+      "triggerMode": "auto",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "update",
+      "type": "query",
+      "queryID": "b256d70f-770e-4178-9716-36c89aaa0638",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "6a2e41ec-a061-4157-bb50-5c9a523a125f",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "8a927855-7532-452c-b1bf-4d95c471a924",
+              "type": "widget",
+              "widgetKey": "widget_22c3f9ec-c1cb-4b93-9f16-88ea670f545c_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "35faa377-4b09-4fb7-8273-fcccd74cca87",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "c0e9e8e2-49c1-4b9f-8221-2508d7ff8a82",
+              "type": "widget",
+              "widgetKey": "widget_aa9cc90e-c39f-4895-87b3-429fdfeaef3c_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 52
+            },
+            {
+              "id": "b2d91396-74ce-45f9-b6df-25f547c19bdd",
+              "type": "widget",
+              "widgetKey": "widget_27993280-9a14-4b99-9226-d98869def53d_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 220
+            }
+          ]
+        },
+        {
+          "id": "e51f265e-b71d-469f-8d78-546c08a0f073",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "bfffbbac-1ad0-4eb6-a677-d5b6386dbbbe",
+              "type": "widget",
+              "widgetKey": "widget_4f7d378e-00f4-4093-9f6b-8a7714c05e8a_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 300
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "8a927855-7532-452c-b1bf-4d95c471a924",
+        "type": "widget",
+        "widgetKey": "widget_22c3f9ec-c1cb-4b93-9f16-88ea670f545c_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "c0e9e8e2-49c1-4b9f-8221-2508d7ff8a82",
+        "type": "widget",
+        "widgetKey": "widget_aa9cc90e-c39f-4895-87b3-429fdfeaef3c_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "b2d91396-74ce-45f9-b6df-25f547c19bdd",
+        "type": "widget",
+        "widgetKey": "widget_27993280-9a14-4b99-9226-d98869def53d_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 220
+      },
+      {
+        "id": "bfffbbac-1ad0-4eb6-a677-d5b6386dbbbe",
+        "type": "widget",
+        "widgetKey": "widget_4f7d378e-00f4-4093-9f6b-8a7714c05e8a_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 300
+      }
+    ],
+    "variables": [
+      {
+        "key": "staffID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "profile",
+        "type": "query",
+        "queryID": "159628fc-5c18-4faf-bd85-42b394dacbbf",
+        "triggerMode": "auto",
+        "inputValues": {
+          "id": "{{ state.variables.staffID }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "staff",
+        "type": "query",
+        "queryID": "59b74c91-2b2a-41cd-8b2b-e2dfc9016566",
+        "triggerMode": "auto",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "update",
+        "type": "query",
+        "queryID": "b256d70f-770e-4178-9716-36c89aaa0638",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

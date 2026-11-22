@@ -1,0 +1,238 @@
+[
+  {
+    "slug": "ap-reports-secondary.heading",
+    "key": "heading",
+    "page": "ap-reports-secondary",
+    "title": "Purchase Orders report",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Purchase Orders report\nCompare volume and value by status. This report uses the same parameterized query contract as the live list.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-reports-secondary.range",
+    "key": "range",
+    "page": "ap-reports-secondary",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "Date range",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-reports-secondary.total",
+    "key": "total",
+    "page": "ap-reports-secondary",
+    "title": "Records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Records",
+      "valueTemplate": "{{ ((((state.queries.second_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.second_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-reports-secondary.value",
+    "key": "value",
+    "page": "ap-reports-secondary",
+    "title": "Value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Value",
+      "prefix": "$",
+      "valueTemplate": "{{ ((((state.queries.second_summary || {}).data || [])[0] || {}).total_value) }}",
+      "isLoading": "{{ (state.queries.second_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-reports-secondary.status",
+    "key": "status",
+    "page": "ap-reports-secondary",
+    "title": "By status",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "By status",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.second_status || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "bar",
+          "tooltip": true
+        },
+        "encoding": {
+          "x": {
+            "field": "status",
+            "type": "nominal",
+            "axis": {
+              "labelAngle": 0
+            }
+          },
+          "y": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "status",
+            "type": "nominal"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.second_status || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-reports-secondary.data",
+    "key": "data",
+    "page": "ap-reports-secondary",
+    "title": "Purchase Orders",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.second_list || {}).data || [])",
+      "columns": [
+        {
+          "key": "po_number",
+          "label": "PO number",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "total_amount",
+          "label": "Total amount",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "currency",
+          "label": "Currency",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "issued_at",
+          "label": "Issued",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "expected_date",
+          "label": "Expected",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "buyer_id",
+          "label": "Buyer",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "department",
+          "label": "Department",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No records.",
+      "isLoading": "{{ (state.queries.second_list || {}).isLoading || false }}"
+    }
+  }
+]

@@ -1,0 +1,646 @@
+[
+  {
+    "slug": "ap-invoices-create.heading",
+    "key": "heading",
+    "page": "ap-invoices-create",
+    "title": "Create Invoice",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Invoice\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-invoices-create.form",
+    "key": "form",
+    "page": "ap-invoices-create",
+    "title": "New Invoice",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Invoice",
+      "submitLabel": "Create Invoice",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "invoice_number",
+          "label": "Invoice number",
+          "type": "text",
+          "required": true,
+          "defaultValue": "INV-00001"
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "type": "select",
+          "required": true,
+          "defaultValue": 16,
+          "options": [
+            {
+              "label": "Atlas Digital",
+              "value": 1
+            },
+            {
+              "label": "Northstar Works",
+              "value": 2
+            },
+            {
+              "label": "Vantage Works",
+              "value": 3
+            },
+            {
+              "label": "Northstar Works",
+              "value": 4
+            },
+            {
+              "label": "Harbor Supply",
+              "value": 5
+            },
+            {
+              "label": "Aster Labs",
+              "value": 6
+            },
+            {
+              "label": "Northstar Group",
+              "value": 7
+            },
+            {
+              "label": "Vela Industries",
+              "value": 8
+            },
+            {
+              "label": "Terra Works",
+              "value": 9
+            },
+            {
+              "label": "Northstar Group",
+              "value": 10
+            },
+            {
+              "label": "Atlas Industries",
+              "value": 11
+            },
+            {
+              "label": "Vantage Labs",
+              "value": 12
+            },
+            {
+              "label": "Kinetic Works",
+              "value": 13
+            },
+            {
+              "label": "Vela Digital",
+              "value": 14
+            },
+            {
+              "label": "Vela Systems",
+              "value": 15
+            },
+            {
+              "label": "Summit Studio",
+              "value": 16
+            },
+            {
+              "label": "Harbor Group",
+              "value": 17
+            },
+            {
+              "label": "Northstar Group",
+              "value": 18
+            },
+            {
+              "label": "Terra Collective",
+              "value": 19
+            },
+            {
+              "label": "Terra Industries",
+              "value": 20
+            },
+            {
+              "label": "Orbit Industries",
+              "value": 21
+            },
+            {
+              "label": "Meridian Works",
+              "value": 22
+            },
+            {
+              "label": "Pioneer Labs",
+              "value": 23
+            },
+            {
+              "label": "Kinetic Group",
+              "value": 24
+            },
+            {
+              "label": "Copper Labs",
+              "value": 25
+            },
+            {
+              "label": "Meridian Group",
+              "value": 26
+            },
+            {
+              "label": "Northstar Digital",
+              "value": 27
+            },
+            {
+              "label": "Zephyr Works",
+              "value": 28
+            },
+            {
+              "label": "Kinetic Studio",
+              "value": 29
+            },
+            {
+              "label": "Cedar Collective",
+              "value": 30
+            },
+            {
+              "label": "Cedar Digital",
+              "value": 31
+            },
+            {
+              "label": "Terra Partners",
+              "value": 32
+            },
+            {
+              "label": "Cedar Collective",
+              "value": 33
+            },
+            {
+              "label": "Harbor Industries",
+              "value": 34
+            },
+            {
+              "label": "Northstar Collective",
+              "value": 35
+            },
+            {
+              "label": "Bluebird Collective",
+              "value": 36
+            },
+            {
+              "label": "Copper Works",
+              "value": 37
+            },
+            {
+              "label": "Vela Digital",
+              "value": 38
+            },
+            {
+              "label": "Terra Group",
+              "value": 39
+            },
+            {
+              "label": "Terra Works",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "po_id",
+          "label": "Purchase order",
+          "type": "select",
+          "required": false,
+          "defaultValue": 76,
+          "options": [
+            {
+              "label": "#1",
+              "value": 1
+            },
+            {
+              "label": "#2",
+              "value": 2
+            },
+            {
+              "label": "#3",
+              "value": 3
+            },
+            {
+              "label": "#4",
+              "value": 4
+            },
+            {
+              "label": "#5",
+              "value": 5
+            },
+            {
+              "label": "#6",
+              "value": 6
+            },
+            {
+              "label": "#7",
+              "value": 7
+            },
+            {
+              "label": "#8",
+              "value": 8
+            },
+            {
+              "label": "#9",
+              "value": 9
+            },
+            {
+              "label": "#10",
+              "value": 10
+            },
+            {
+              "label": "#11",
+              "value": 11
+            },
+            {
+              "label": "#12",
+              "value": 12
+            },
+            {
+              "label": "#13",
+              "value": 13
+            },
+            {
+              "label": "#14",
+              "value": 14
+            },
+            {
+              "label": "#15",
+              "value": 15
+            },
+            {
+              "label": "#16",
+              "value": 16
+            },
+            {
+              "label": "#17",
+              "value": 17
+            },
+            {
+              "label": "#18",
+              "value": 18
+            },
+            {
+              "label": "#19",
+              "value": 19
+            },
+            {
+              "label": "#20",
+              "value": 20
+            },
+            {
+              "label": "#21",
+              "value": 21
+            },
+            {
+              "label": "#22",
+              "value": 22
+            },
+            {
+              "label": "#23",
+              "value": 23
+            },
+            {
+              "label": "#24",
+              "value": 24
+            },
+            {
+              "label": "#25",
+              "value": 25
+            },
+            {
+              "label": "#26",
+              "value": 26
+            },
+            {
+              "label": "#27",
+              "value": 27
+            },
+            {
+              "label": "#28",
+              "value": 28
+            },
+            {
+              "label": "#29",
+              "value": 29
+            },
+            {
+              "label": "#30",
+              "value": 30
+            },
+            {
+              "label": "#31",
+              "value": 31
+            },
+            {
+              "label": "#32",
+              "value": 32
+            },
+            {
+              "label": "#33",
+              "value": 33
+            },
+            {
+              "label": "#34",
+              "value": 34
+            },
+            {
+              "label": "#35",
+              "value": 35
+            },
+            {
+              "label": "#36",
+              "value": 36
+            },
+            {
+              "label": "#37",
+              "value": 37
+            },
+            {
+              "label": "#38",
+              "value": 38
+            },
+            {
+              "label": "#39",
+              "value": 39
+            },
+            {
+              "label": "#40",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "matching",
+          "options": [
+            {
+              "label": "Received",
+              "value": "received"
+            },
+            {
+              "label": "Matching",
+              "value": "matching"
+            },
+            {
+              "label": "Exception",
+              "value": "exception"
+            },
+            {
+              "label": "Approved",
+              "value": "approved"
+            },
+            {
+              "label": "Scheduled",
+              "value": "scheduled"
+            },
+            {
+              "label": "Paid",
+              "value": "paid"
+            },
+            {
+              "label": "Void",
+              "value": "void"
+            }
+          ]
+        },
+        {
+          "key": "total_amount",
+          "label": "Total amount",
+          "type": "number",
+          "required": true,
+          "defaultValue": 3118.07,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "currency",
+          "label": "Currency",
+          "type": "select",
+          "required": true,
+          "defaultValue": "EUR",
+          "options": [
+            {
+              "label": "USD",
+              "value": "USD"
+            },
+            {
+              "label": "EUR",
+              "value": "EUR"
+            },
+            {
+              "label": "GBP",
+              "value": "GBP"
+            },
+            {
+              "label": "SGD",
+              "value": "SGD"
+            },
+            {
+              "label": "JPY",
+              "value": "JPY"
+            }
+          ]
+        },
+        {
+          "key": "invoice_date",
+          "label": "Invoice date",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "due_date",
+          "label": "Due date",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "received_at",
+          "label": "Received at",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "match_score",
+          "label": "Match score",
+          "type": "number",
+          "required": false,
+          "defaultValue": 94,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "discrepancy_count",
+          "label": "Discrepancies",
+          "type": "number",
+          "required": false,
+          "defaultValue": 225,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "type": "select",
+          "required": false,
+          "defaultValue": 10,
+          "options": [
+            {
+              "label": "Ravi Rossi",
+              "value": 1
+            },
+            {
+              "label": "Eli Rossi",
+              "value": 2
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 3
+            },
+            {
+              "label": "Malik Costa",
+              "value": 4
+            },
+            {
+              "label": "Malik Costa",
+              "value": 5
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 6
+            },
+            {
+              "label": "Luca Osei",
+              "value": 7
+            },
+            {
+              "label": "Kai Chen",
+              "value": 8
+            },
+            {
+              "label": "Anika Garcia",
+              "value": 9
+            },
+            {
+              "label": "Iris Patel",
+              "value": 10
+            },
+            {
+              "label": "Owen Ivanova",
+              "value": 11
+            },
+            {
+              "label": "Mateo Petrov",
+              "value": 12
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 13
+            },
+            {
+              "label": "Priya Kim",
+              "value": 14
+            },
+            {
+              "label": "Clara Wright",
+              "value": 15
+            },
+            {
+              "label": "Yuki Petrov",
+              "value": 16
+            },
+            {
+              "label": "Iris Moreau",
+              "value": 17
+            },
+            {
+              "label": "Sofia Khan",
+              "value": 18
+            },
+            {
+              "label": "Clara Nielsen",
+              "value": 19
+            },
+            {
+              "label": "Elena Chen",
+              "value": 20
+            },
+            {
+              "label": "Theo Lindqvist",
+              "value": 21
+            },
+            {
+              "label": "Malik Fischer",
+              "value": 22
+            },
+            {
+              "label": "Noah Patel",
+              "value": 23
+            },
+            {
+              "label": "Elena Rossi",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "type": "textarea",
+          "required": false,
+          "defaultValue": "Exception onboarding variance documentation quarterly regional quarterly routing retention documentation renewal review exception inspection approval exception.",
+          "help": "Plain text or short notes"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_create",
+              "inputValues": {
+                "invoice_number": "{{ event.formData.invoice_number }}",
+                "supplier_id": "{{ event.formData.supplier_id }}",
+                "po_id": "{{ event.formData.po_id }}",
+                "status": "{{ event.formData.status }}",
+                "total_amount": "{{ event.formData.total_amount }}",
+                "currency": "{{ event.formData.currency }}",
+                "invoice_date": "{{ event.formData.invoice_date }}",
+                "due_date": "{{ event.formData.due_date }}",
+                "received_at": "{{ event.formData.received_at }}",
+                "match_score": "{{ event.formData.match_score }}",
+                "discrepancy_count": "{{ event.formData.discrepancy_count }}",
+                "owner_id": "{{ event.formData.owner_id }}",
+                "notes": "{{ event.formData.notes }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-create.result",
+    "key": "result",
+    "page": "ap-invoices-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.invoices_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.invoices_create || {}).isLoading || false }}"
+    }
+  }
+]

@@ -1,0 +1,180 @@
+[
+  {
+    "slug": "ap-admin-jobs.heading",
+    "key": "heading",
+    "page": "ap-admin-jobs",
+    "title": "Jobs and workflow runs",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Jobs and workflow runs\nTenant-scoped platform workflow instances, node logs and cron history. This page is read-only; retries are managed by the platform engine.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-admin-jobs.runs",
+    "key": "runs",
+    "page": "ap-admin-jobs",
+    "title": "Workflow runs",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.runs || {}).data || [])",
+      "columns": [
+        {
+          "key": "workflow_title",
+          "label": "Workflow",
+          "type": "text"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "badge"
+        },
+        {
+          "key": "started_at",
+          "label": "Started",
+          "type": "date"
+        },
+        {
+          "key": "completed_at",
+          "label": "Completed",
+          "type": "date"
+        },
+        {
+          "key": "is_test",
+          "label": "Test",
+          "type": "boolean"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 8
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No workflow runs.",
+      "isLoading": "{{ (state.queries.runs || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-admin-jobs.logs",
+    "key": "logs",
+    "page": "ap-admin-jobs",
+    "title": "Run logs",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.logs || {}).data || [])",
+      "columns": [
+        {
+          "key": "event_type",
+          "label": "Event",
+          "type": "badge"
+        },
+        {
+          "key": "node_id",
+          "label": "Node",
+          "type": "text"
+        },
+        {
+          "key": "node_status",
+          "label": "Status",
+          "type": "badge"
+        },
+        {
+          "key": "error_message",
+          "label": "Error",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "When",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 8
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No run logs.",
+      "isLoading": "{{ (state.queries.logs || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-admin-jobs.cron",
+    "key": "cron",
+    "page": "ap-admin-jobs",
+    "title": "Cron history",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.cron || {}).data || [])",
+      "columns": [
+        {
+          "key": "job_title",
+          "label": "Job",
+          "type": "text"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "badge"
+        },
+        {
+          "key": "scheduled_at",
+          "label": "Scheduled",
+          "type": "date"
+        },
+        {
+          "key": "duration_ms",
+          "label": "Duration (ms)",
+          "type": "number"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 8
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No cron history.",
+      "isLoading": "{{ (state.queries.cron || {}).isLoading || false }}"
+    }
+  }
+]

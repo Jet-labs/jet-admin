@@ -1,0 +1,999 @@
+{
+  "id": "jet.marketplace.invoice-matching-desk",
+  "slug": "invoice-matching-desk",
+  "alias": "ap",
+  "name": "Invoice Matching Desk",
+  "version": "1.0.0",
+  "category": "Finance & Accounting",
+  "tags": [
+    "invoices",
+    "accounts-payable",
+    "matching",
+    "purchase-orders",
+    "receipts",
+    "discrepancies"
+  ],
+  "shortDescription": "Compare invoices, purchase orders and receipts; route discrepancies for review.",
+  "longDescription": "An accounts-payable matching workspace: invoice intake, three-way match against purchase orders and receipts, variance detection, discrepancy triage, approval routing, supplier context and an admin panel for audit, imports, integrations and data quality.",
+  "author": "Jet Admin",
+  "license": "MIT",
+  "minPlatformVersion": "2.1.0-preview.1",
+  "icon": "assets/icon.svg",
+  "cover": "assets/cover.svg",
+  "accent": "#7c3aed",
+  "screenshots": [
+    {
+      "title": "Dashboard",
+      "path": "assets/screenshots/dashboard.svg"
+    },
+    {
+      "title": "Invoices · list",
+      "path": "assets/screenshots/invoices-list.svg"
+    },
+    {
+      "title": "Invoices · detail",
+      "path": "assets/screenshots/invoices-detail.svg"
+    },
+    {
+      "title": "Reports · operations",
+      "path": "assets/screenshots/reports-operations.svg"
+    },
+    {
+      "title": "Admin · audit log",
+      "path": "assets/screenshots/admin-audit.svg"
+    },
+    {
+      "title": "Client portal",
+      "path": "assets/screenshots/portal.svg"
+    }
+  ],
+  "features": [
+    "Seeded, domain-specific data model with audit triggers",
+    "Parameterized SQL queries with server-side pagination and CSV export",
+    "Role-aware pages and Casbin asset permissions",
+    "Workflow automations for intake, approvals, assignments and SLA sweeps",
+    "In-app notification center, comments, attachments and saved views",
+    "Admin screens for users, roles, audit, operations and data quality"
+  ],
+  "requiredIntegrations": [
+    {
+      "key": "erp-ap-rest",
+      "title": "ERP accounts-payable REST",
+      "requiredFields": [
+        "base URL",
+        "API token"
+      ],
+      "mock": "Connector ships disabled with no credentials; seeded invoices and purchase orders are the demo source of truth."
+    },
+    {
+      "key": "supplier-invoice-webhook",
+      "title": "Supplier invoice webhook",
+      "requiredFields": [
+        "endpoint path",
+        "optional signature header"
+      ],
+      "mock": "POST { \"kind\": \"webhook.received\", \"record_id\": 1 } to the inactive listener to simulate a supplier invoice."
+    },
+    {
+      "key": "ocr-document-service",
+      "title": "OCR document service",
+      "requiredFields": [
+        "endpoint URL",
+        "API key"
+      ],
+      "mock": "Invoice files are represented by seeded metadata and attachment URLs until an OCR provider is connected."
+    }
+  ],
+  "installOptions": [
+    {
+      "key": "includeSampleData",
+      "label": "Include sample data",
+      "type": "boolean",
+      "default": true,
+      "description": "Load the deterministic demo dataset (30-300 rows per core table)."
+    },
+    {
+      "key": "createDemoUsers",
+      "label": "Create demo staff directory",
+      "type": "boolean",
+      "default": false,
+      "description": "Mark seeded staff as demo identities. These are not Firebase logins."
+    },
+    {
+      "key": "enableAutomation",
+      "label": "Enable cron automations",
+      "type": "boolean",
+      "default": false,
+      "description": "Enable the packaged cron jobs. Leave off until listeners and integrations are reviewed."
+    }
+  ],
+  "counts": {
+    "tables": 18,
+    "domainTables": 8,
+    "supportTables": 10,
+    "seedRows": 1535,
+    "queries": 78,
+    "pages": 31,
+    "widgets": 212,
+    "workflows": 11,
+    "listeners": 8,
+    "cronJobs": 6,
+    "roles": 5
+  },
+  "pages": [
+    {
+      "slug": "ap-invoices-list",
+      "title": "Invoices · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for invoices.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-invoices-detail",
+      "title": "Invoices · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-invoices-create",
+      "title": "Create Invoice",
+      "description": "Validated create form for Invoices with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-purchase_orders-list",
+      "title": "Purchase Orders · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for purchase orders.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-purchase_orders-detail",
+      "title": "Purchase Orders · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-purchase_orders-create",
+      "title": "Create Purchase order",
+      "description": "Validated create form for Purchase Orders with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-receipts-list",
+      "title": "Receipts · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for receipts.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-receipts-detail",
+      "title": "Receipts · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-receipts-create",
+      "title": "Create Receipt",
+      "description": "Validated create form for Receipts with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-suppliers-list",
+      "title": "Suppliers · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for suppliers.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-suppliers-detail",
+      "title": "Suppliers · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-suppliers-create",
+      "title": "Create Supplier",
+      "description": "Validated create form for Suppliers with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-dashboard",
+      "title": "Dashboard",
+      "description": "KPIs, trends, tasks, notifications and recent audit activity.",
+      "tags": [
+        "core",
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer"
+      ]
+    },
+    {
+      "slug": "ap-reports-operations",
+      "title": "Reports · operations",
+      "description": "Date-filtered operating trend, status mix and exportable record list.",
+      "tags": [
+        "report",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-reports-secondary",
+      "title": "Reports · secondary mix",
+      "description": "Secondary entity mix and value trend with exportable records.",
+      "tags": [
+        "report",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-reports-quality",
+      "title": "Reports · data quality",
+      "description": "Data quality checks, failing operations and aging work.",
+      "tags": [
+        "report",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-invoices-kanban",
+      "title": "Invoices · kanban",
+      "description": "Status board grouped by the primary workflow stage.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-invoices-calendar",
+      "title": "Invoices · calendar",
+      "description": "Calendar view of the primary date field.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-search",
+      "title": "Global search",
+      "description": "Cross-entity search across every core table.",
+      "tags": [
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer"
+      ]
+    },
+    {
+      "slug": "ap-profile",
+      "title": "My profile",
+      "description": "Staff profile and editable contact details.",
+      "tags": [
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer",
+        "portal"
+      ]
+    },
+    {
+      "slug": "ap-notifications",
+      "title": "Notifications",
+      "description": "In-app notification center with mark-as-read.",
+      "tags": [
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer",
+        "portal"
+      ]
+    },
+    {
+      "slug": "ap-settings",
+      "title": "Settings",
+      "description": "Branding, notification preferences, general settings and feature flags.",
+      "tags": [
+        "shared",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-portal",
+      "title": "Client portal",
+      "description": "External-facing record list scoped to the selected client owner.",
+      "tags": [
+        "portal",
+        "client",
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "ap-admin-users",
+      "title": "Admin · users",
+      "description": "Tenant users, platform roles and app-level role assignment overview.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "ap-admin-roles",
+      "title": "Admin · roles and permissions",
+      "description": "Provisioned tenant roles, permission counts and the app page matrix.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-admin-audit",
+      "title": "Admin · audit log",
+      "description": "Filterable audit log with old/new JSON diff.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "ap-admin-settings",
+      "title": "Admin · system settings",
+      "description": "Settings and feature flags with audited updates.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-admin-import",
+      "title": "Admin · import / export",
+      "description": "CSV import with validation summary and record export.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "ap-admin-integrations",
+      "title": "Admin · integration health",
+      "description": "Integration health and inbound webhook event log.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-admin-jobs",
+      "title": "Admin · jobs and workflow runs",
+      "description": "Workflow instance monitor, run logs and cron history.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "ap-admin-quality",
+      "title": "Admin · data quality",
+      "description": "Quality checks and operational failures.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "slug": "ap.intake-triage",
+      "title": "Invoices · intake triage",
+      "description": "Loads a record, computes a deterministic risk/priority score, then routes to review or standard triage and notifies the owner.",
+      "nodeCount": 8,
+      "edgeCount": 8
+    },
+    {
+      "slug": "ap.round-robin-assignment",
+      "title": "Invoices · round-robin assignment",
+      "description": "Picks the least-loaded active staff member and assigns the record, then sends an in-app notification.",
+      "nodeCount": 6,
+      "edgeCount": 5
+    },
+    {
+      "slug": "ap.approval-chain",
+      "title": "Invoices · approval chain",
+      "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
+      "nodeCount": 8,
+      "edgeCount": 9
+    },
+    {
+      "slug": "ap.threshold-sweep",
+      "title": "Invoices · threshold sweep",
+      "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
+      "nodeCount": 6,
+      "edgeCount": 5
+    },
+    {
+      "slug": "ap.daily-digest",
+      "title": "Invoices · daily digest",
+      "description": "Builds a daily summary and writes a single in-app notification.",
+      "nodeCount": 5,
+      "edgeCount": 4
+    },
+    {
+      "slug": "ap.escalation",
+      "title": "Invoices · escalation",
+      "description": "Waits for a configurable delay, then escalates high-priority records and notifies the manager.",
+      "nodeCount": 7,
+      "edgeCount": 7
+    },
+    {
+      "slug": "ap.integration-sync",
+      "title": "Invoice Matching Desk · integration sync",
+      "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
+      "nodeCount": 6,
+      "edgeCount": 6
+    },
+    {
+      "slug": "ap.document-generation",
+      "title": "Invoices · document generation",
+      "description": "Builds an HTML document from record fields, links it as an attachment and notifies the owner.",
+      "nodeCount": 6,
+      "edgeCount": 5
+    },
+    {
+      "slug": "ap.data-collection",
+      "title": "Invoices · supplier/customer follow-up",
+      "description": "Suspends for a structured follow-up form, then records the answer as a comment.",
+      "nodeCount": 4,
+      "edgeCount": 3
+    },
+    {
+      "slug": "ap.error-recovery",
+      "title": "Invoice Matching Desk · expected failure and recovery",
+      "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+      "nodeCount": 5,
+      "edgeCount": 4
+    },
+    {
+      "slug": "ap.notify-only",
+      "title": "Invoice Matching Desk · notify only",
+      "description": "Minimal workflow used by inbound webhooks and manual demos: writes one notification.",
+      "nodeCount": 3,
+      "edgeCount": 2
+    }
+  ],
+  "roles": [
+    {
+      "key": "admin",
+      "title": "AP Administrator",
+      "scope": "all"
+    },
+    {
+      "key": "manager",
+      "title": "AP Manager",
+      "scope": "staff"
+    },
+    {
+      "key": "specialist",
+      "title": "Invoice Matching Specialist",
+      "scope": "staff"
+    },
+    {
+      "key": "approver",
+      "title": "AP Approver",
+      "scope": "staff"
+    },
+    {
+      "key": "readonly",
+      "title": "Read-only Viewer",
+      "scope": "staff"
+    }
+  ],
+  "entities": [
+    {
+      "key": "invoices",
+      "title": "Invoices",
+      "core": true,
+      "seedCount": 140,
+      "fields": [
+        {
+          "key": "invoice_number",
+          "type": "code",
+          "required": true
+        },
+        {
+          "key": "supplier_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "po_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "total_amount",
+          "type": "money",
+          "required": true
+        },
+        {
+          "key": "currency",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "invoice_date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "key": "due_date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "key": "received_at",
+          "type": "timestamptz",
+          "required": false
+        },
+        {
+          "key": "match_score",
+          "type": "int",
+          "required": false
+        },
+        {
+          "key": "discrepancy_count",
+          "type": "int",
+          "required": false
+        },
+        {
+          "key": "owner_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "notes",
+          "type": "longtext",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "purchase_orders",
+      "title": "Purchase Orders",
+      "core": true,
+      "seedCount": 100,
+      "fields": [
+        {
+          "key": "po_number",
+          "type": "code",
+          "required": true
+        },
+        {
+          "key": "supplier_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "total_amount",
+          "type": "money",
+          "required": true
+        },
+        {
+          "key": "currency",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "issued_at",
+          "type": "timestamptz",
+          "required": false
+        },
+        {
+          "key": "expected_date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "key": "buyer_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "department",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "notes",
+          "type": "longtext",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "receipts",
+      "title": "Receipts",
+      "core": true,
+      "seedCount": 120,
+      "fields": [
+        {
+          "key": "receipt_number",
+          "type": "code",
+          "required": true
+        },
+        {
+          "key": "po_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "supplier_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "received_date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "key": "total_amount",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "warehouse",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "notes",
+          "type": "longtext",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "suppliers",
+      "title": "Suppliers",
+      "core": true,
+      "seedCount": 50,
+      "fields": [
+        {
+          "key": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "code",
+          "type": "code",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "contact_name",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "email",
+          "type": "email",
+          "required": false
+        },
+        {
+          "key": "phone",
+          "type": "phone",
+          "required": false
+        },
+        {
+          "key": "payment_terms",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "lead_time_days",
+          "type": "int",
+          "required": false
+        },
+        {
+          "key": "tax_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "address",
+          "type": "longtext",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "invoice_lines",
+      "title": "Invoice Lines",
+      "core": false,
+      "seedCount": 260,
+      "fields": [
+        {
+          "key": "invoice_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "line_number",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "description",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "quantity",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "unit_price",
+          "type": "money",
+          "required": true
+        },
+        {
+          "key": "line_total",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "tax_amount",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "po_line_ref",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "purchase_order_lines",
+      "title": "PO Lines",
+      "core": false,
+      "seedCount": 240,
+      "fields": [
+        {
+          "key": "po_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "line_number",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "sku",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "description",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "quantity",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "unit_price",
+          "type": "money",
+          "required": true
+        },
+        {
+          "key": "line_total",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "received_qty",
+          "type": "int",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "match_results",
+      "title": "Match Results",
+      "core": false,
+      "seedCount": 150,
+      "fields": [
+        {
+          "key": "invoice_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "po_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "receipt_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "match_type",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "variance_amount",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "variance_pct",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "key": "checked_at",
+          "type": "timestamptz",
+          "required": false
+        },
+        {
+          "key": "checked_by_id",
+          "type": "ref",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "discrepancies",
+      "title": "Discrepancies",
+      "core": false,
+      "seedCount": 90,
+      "fields": [
+        {
+          "key": "invoice_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "match_result_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "severity",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "category",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "assigned_to_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "amount_impact",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "description",
+          "type": "longtext",
+          "required": false
+        },
+        {
+          "key": "resolved_at",
+          "type": "timestamptz",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "categories": [
+    "Finance & Accounting"
+  ]
+}

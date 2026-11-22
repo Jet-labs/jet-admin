@@ -1,0 +1,147 @@
+{
+  "slug": "ap-admin-settings",
+  "key": "admin-settings",
+  "title": "Admin · system settings",
+  "description": "Settings and feature flags with audited updates.",
+  "accessTags": [
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "kind",
+      "type": "string",
+      "defaultValue": "feature_flag"
+    }
+  ],
+  "sources": [
+    {
+      "alias": "settings",
+      "type": "query",
+      "queryID": "e6775ace-edf4-49f5-8513-91177c2e5ed2",
+      "triggerMode": "auto",
+      "inputValues": {
+        "kinds": [
+          "setting",
+          "branding",
+          "feature_flag"
+        ]
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "update",
+      "type": "query",
+      "queryID": "63c13545-ec86-4f97-bccf-2a2834910833",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "ecd03a0c-98a4-47c8-8608-207e312e4039",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f37955e6-fd6c-4e84-b393-3daf0217f9fe",
+              "type": "widget",
+              "widgetKey": "widget_f1d546c4-1188-4f09-9287-f23e37afd052_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "78650def-ed26-436f-9077-e8eb234d3d98",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "33cdbf57-49e4-40c5-9d2b-3abd9d292112",
+              "type": "widget",
+              "widgetKey": "widget_2097af42-38c7-4122-8054-15b2f243e333_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 340
+            },
+            {
+              "id": "f3e34852-4414-42ec-8a5c-7969e3009d91",
+              "type": "widget",
+              "widgetKey": "widget_9eed1c4f-47d1-4827-84e2-480bb0028ab9_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 340
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "f37955e6-fd6c-4e84-b393-3daf0217f9fe",
+        "type": "widget",
+        "widgetKey": "widget_f1d546c4-1188-4f09-9287-f23e37afd052_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "33cdbf57-49e4-40c5-9d2b-3abd9d292112",
+        "type": "widget",
+        "widgetKey": "widget_2097af42-38c7-4122-8054-15b2f243e333_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 340
+      },
+      {
+        "id": "f3e34852-4414-42ec-8a5c-7969e3009d91",
+        "type": "widget",
+        "widgetKey": "widget_9eed1c4f-47d1-4827-84e2-480bb0028ab9_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 340
+      }
+    ],
+    "variables": [
+      {
+        "key": "kind",
+        "type": "string",
+        "defaultValue": "feature_flag"
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "settings",
+        "type": "query",
+        "queryID": "e6775ace-edf4-49f5-8513-91177c2e5ed2",
+        "triggerMode": "auto",
+        "inputValues": {
+          "kinds": [
+            "setting",
+            "branding",
+            "feature_flag"
+          ]
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "update",
+        "type": "query",
+        "queryID": "63c13545-ec86-4f97-bccf-2a2834910833",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

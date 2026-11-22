@@ -1,0 +1,120 @@
+{
+  "slug": "ap-receipts-create",
+  "key": "receipts-create",
+  "title": "Create Receipt",
+  "description": "Validated create form for Receipts with audit-logged writes.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "createdID",
+      "type": "number",
+      "defaultValue": 0
+    }
+  ],
+  "sources": [
+    {
+      "alias": "receipts_create",
+      "type": "query",
+      "queryID": "07746906-928d-493f-a9be-e033fce6caae",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "86cc56c5-7d9d-4d9e-a051-97858f7c7209",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "a37d8842-cb2d-4cc6-af22-796acc2aaecb",
+              "type": "widget",
+              "widgetKey": "widget_c3c3c47e-44cd-45a5-b77b-8170b4bb29d7_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "5215cb70-4a4e-4ce5-b5ac-65d13ad40bd8",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "0783853f-3a5d-4d43-becf-173489d8b2ef",
+              "type": "widget",
+              "widgetKey": "widget_2e05bb93-60a9-48c0-8e16-8f25a28bc3ec_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "8a5fce11-9a40-499f-bd51-1fe8207582f6",
+              "type": "widget",
+              "widgetKey": "widget_3de85256-906f-4b2f-809a-2fb19f8f172e_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "a37d8842-cb2d-4cc6-af22-796acc2aaecb",
+        "type": "widget",
+        "widgetKey": "widget_c3c3c47e-44cd-45a5-b77b-8170b4bb29d7_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "0783853f-3a5d-4d43-becf-173489d8b2ef",
+        "type": "widget",
+        "widgetKey": "widget_2e05bb93-60a9-48c0-8e16-8f25a28bc3ec_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "8a5fce11-9a40-499f-bd51-1fe8207582f6",
+        "type": "widget",
+        "widgetKey": "widget_3de85256-906f-4b2f-809a-2fb19f8f172e_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "createdID",
+        "type": "number",
+        "defaultValue": 0
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "receipts_create",
+        "type": "query",
+        "queryID": "07746906-928d-493f-a9be-e033fce6caae",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

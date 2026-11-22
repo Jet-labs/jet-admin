@@ -1,0 +1,337 @@
+[
+  {
+    "slug": "ap-record-created",
+    "key": "record-created",
+    "title": "Invoices · record created",
+    "description": "Inbound record-created event triggers intake triage.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "ap-record-created",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "ap-record-created",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"record.created\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "84c12cb9-fa4f-4e68-ab0f-a730db73ea15",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "staffID": "{{ event.staff_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "ap_record-created",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "ap-record-status-changed",
+    "key": "record-status-changed",
+    "title": "Invoices · status changed",
+    "description": "Status changes run the notification-only automation.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "ap-record-status-changed",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "ap-record-status-changed",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"record.status_changed\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "02f964cf-cf3c-45ad-acf8-9d9e11426663",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "ap_record-status-changed",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "ap-webhook-received",
+    "key": "webhook-received",
+    "title": "Invoice Matching Desk · inbound webhook",
+    "description": "Generic inbound webhook for partner updates.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "ap-webhook-received",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "ap-webhook-received",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"webhook.received\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "9d23e8c7-f93d-4809-beab-aaa0823e9aa3",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "ap_webhook-received",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "ap-threshold-breach",
+    "key": "threshold-breach",
+    "title": "Invoice Matching Desk · threshold breach",
+    "description": "Threshold breach sweep for overdue records.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "ap-threshold-breach",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "ap-threshold-breach",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"threshold.breached\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "579f9450-7743-4233-8bfc-cfc51fc57dd6",
+          "inputValues": {
+            "days": "{{ event.days }}",
+            "staffID": "{{ event.staff_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "ap_threshold-breach",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "ap-sla-nearing",
+    "key": "sla-nearing",
+    "title": "Invoice Matching Desk · SLA nearing breach",
+    "description": "SLA pre-breach event triggers the escalation workflow.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "ap-sla-nearing",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "ap-sla-nearing",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"sla.nearing_breach\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "5f294baf-7e5f-4a63-9321-e61806d0d220",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "staffID": "{{ event.staff_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "ap_sla-nearing",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "ap-comment-created",
+    "key": "comment-created",
+    "title": "Invoice Matching Desk · comment created",
+    "description": "New comment notification.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "ap-comment-created",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "ap-comment-created",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"comment.created\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "02f964cf-cf3c-45ad-acf8-9d9e11426663",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}",
+            "event": "{{ event }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "ap_comment-created",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "ap-import-completed",
+    "key": "import-completed",
+    "title": "Invoice Matching Desk · import completed",
+    "description": "Import completion triggers a digest notification.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "ap-import-completed",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "ap-import-completed",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"import.completed\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "bbf183c0-eb66-42a1-a13e-d588ad93659f",
+          "inputValues": {
+            "staffID": "{{ event.staff_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "ap_import-completed",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  },
+  {
+    "slug": "ap-integration-failed",
+    "key": "integration-failed",
+    "title": "Invoice Matching Desk · integration failed",
+    "description": "Integration failure follows the recovery workflow.",
+    "type": "webhook",
+    "datasource": "webhook",
+    "endpointPath": "ap-integration-failed",
+    "status": "inactive",
+    "config": {
+      "pathSuffix": "ap-integration-failed",
+      "responseStatusCode": 202,
+      "responseBody": "{\"accepted\":true}"
+    },
+    "actions": [
+      {
+        "actionType": "transform",
+        "actionConfig": {
+          "script": "var e = event && event.body ? event.body : event; if (!e || e.kind !== \"integration.failed\") { return null; } return e;"
+        }
+      },
+      {
+        "actionType": "trigger_workflow",
+        "actionConfig": {
+          "workflowID": "2a5f9275-044a-41c1-8173-bfcd669dec36",
+          "inputValues": {
+            "recordID": "{{ event.record_id }}"
+          }
+        }
+      },
+      {
+        "actionType": "save_to_buffer",
+        "actionConfig": {
+          "bufferName": "ap_integration-failed",
+          "maxRecords": 200,
+          "maxAgeHours": 72,
+          "retentionPolicy": "both"
+        }
+      }
+    ]
+  }
+]

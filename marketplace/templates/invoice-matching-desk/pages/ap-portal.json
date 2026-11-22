@@ -1,0 +1,183 @@
+{
+  "slug": "ap-portal",
+  "key": "portal",
+  "title": "Client portal",
+  "description": "External-facing record list scoped to the selected client owner.",
+  "accessTags": [
+    "portal",
+    "client",
+    "admin",
+    "manager"
+  ],
+  "variables": [
+    {
+      "key": "staffID",
+      "type": "number",
+      "defaultValue": 1
+    },
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "portal",
+      "type": "query",
+      "queryID": "9c8034c1-38c3-4a89-b0cf-2d5e8bb28f29",
+      "triggerMode": "auto",
+      "inputValues": {
+        "staffID": "{{ state.variables.staffID }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "detail",
+      "type": "query",
+      "queryID": "aeb98a5c-052e-4535-89f6-6acfb820e2ce",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "7715c4a6-96cd-4dcb-b8e4-b15f28bde516",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f92702e5-0413-445d-9f35-821695da6206",
+              "type": "widget",
+              "widgetKey": "widget_08387329-3bbc-41c9-ada5-28307b49c394_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "ff50d3f2-f73e-46f3-86a4-01b642c8fdef",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "024e8226-04c9-47bd-8166-14b9008a94d3",
+              "type": "widget",
+              "widgetKey": "widget_e9472d79-4a54-4b36-85b5-173a4ad45381_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 52
+            },
+            {
+              "id": "981abe56-b784-44bd-8cb7-131ad8a192cf",
+              "type": "widget",
+              "widgetKey": "widget_02f3f2ba-cc87-4f97-a770-862253fccb05_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 360
+            }
+          ]
+        },
+        {
+          "id": "45beae35-9985-4015-b342-8d2086487ebc",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "9faf066f-0d31-4cc3-9387-686abcf6d542",
+              "type": "widget",
+              "widgetKey": "widget_538bd664-576d-466c-90a6-6b7934f49530_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 220
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "f92702e5-0413-445d-9f35-821695da6206",
+        "type": "widget",
+        "widgetKey": "widget_08387329-3bbc-41c9-ada5-28307b49c394_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "024e8226-04c9-47bd-8166-14b9008a94d3",
+        "type": "widget",
+        "widgetKey": "widget_e9472d79-4a54-4b36-85b5-173a4ad45381_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "981abe56-b784-44bd-8cb7-131ad8a192cf",
+        "type": "widget",
+        "widgetKey": "widget_02f3f2ba-cc87-4f97-a770-862253fccb05_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 360
+      },
+      {
+        "id": "9faf066f-0d31-4cc3-9387-686abcf6d542",
+        "type": "widget",
+        "widgetKey": "widget_538bd664-576d-466c-90a6-6b7934f49530_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 220
+      }
+    ],
+    "variables": [
+      {
+        "key": "staffID",
+        "type": "number",
+        "defaultValue": 1
+      },
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "portal",
+        "type": "query",
+        "queryID": "9c8034c1-38c3-4a89-b0cf-2d5e8bb28f29",
+        "triggerMode": "auto",
+        "inputValues": {
+          "staffID": "{{ state.variables.staffID }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "detail",
+        "type": "query",
+        "queryID": "aeb98a5c-052e-4535-89f6-6acfb820e2ce",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

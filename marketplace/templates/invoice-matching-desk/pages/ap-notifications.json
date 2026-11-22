@@ -1,0 +1,128 @@
+{
+  "slug": "ap-notifications",
+  "key": "notifications",
+  "title": "Notifications",
+  "description": "In-app notification center with mark-as-read.",
+  "accessTags": [
+    "shared",
+    "staff",
+    "manager",
+    "admin",
+    "viewer",
+    "portal"
+  ],
+  "variables": [
+    {
+      "key": "staffID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "notifications",
+      "type": "query",
+      "queryID": "c1307e2c-1472-4247-bf82-487d8b29ac32",
+      "triggerMode": "auto",
+      "inputValues": {
+        "staffID": "{{ state.variables.staffID }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "read",
+      "type": "query",
+      "queryID": "d7bf168c-3cab-4108-9c9f-374bbc8a0c1b",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "bce8a3d3-5c48-46b7-a1a0-48407846cbf1",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "44189454-69a2-42b5-b087-82f5925c7369",
+              "type": "widget",
+              "widgetKey": "widget_c9298bcb-0379-4df1-8508-4d4abfcd7fbc_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "2fcd5e7d-12fe-4ff0-aad6-484b46f04f58",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "1c4f7dab-b5a7-4bf8-9986-5741737a1487",
+              "type": "widget",
+              "widgetKey": "widget_8c811349-0c43-4adb-b9d0-f410867efca0_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 420
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "44189454-69a2-42b5-b087-82f5925c7369",
+        "type": "widget",
+        "widgetKey": "widget_c9298bcb-0379-4df1-8508-4d4abfcd7fbc_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "1c4f7dab-b5a7-4bf8-9986-5741737a1487",
+        "type": "widget",
+        "widgetKey": "widget_8c811349-0c43-4adb-b9d0-f410867efca0_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 420
+      }
+    ],
+    "variables": [
+      {
+        "key": "staffID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "notifications",
+        "type": "query",
+        "queryID": "c1307e2c-1472-4247-bf82-487d8b29ac32",
+        "triggerMode": "auto",
+        "inputValues": {
+          "staffID": "{{ state.variables.staffID }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "read",
+        "type": "query",
+        "queryID": "d7bf168c-3cab-4108-9c9f-374bbc8a0c1b",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

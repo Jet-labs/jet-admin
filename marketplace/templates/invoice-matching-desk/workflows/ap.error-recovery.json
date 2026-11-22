@@ -1,0 +1,171 @@
+{
+  "slug": "ap.error-recovery",
+  "key": "error-recovery",
+  "title": "Invoice Matching Desk · expected failure and recovery",
+  "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+  "tags": [
+    "automation",
+    "reliability"
+  ],
+  "options": {
+    "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "7b345a36-a188-450b-aaba-779e9664ef1e",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "injectFailure",
+      "nodeID": "1724f6f0-9010-4645-83f6-7e21f31a3a50",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "injectFailure",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "code": "throw new Error(\"Synthetic upstream unavailable\");",
+        "outputVariable": "failure",
+        "retryLimit": 0
+      }
+    },
+    {
+      "key": "compensate",
+      "nodeID": "928c4991-39b4-4a0d-be6c-55f397df163b",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "compensate",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "return { recovered: true, fallback: \"cached snapshot\", recordID: ctx.recordID || 1 };",
+        "outputVariable": "recovery"
+      }
+    },
+    {
+      "key": "notifyRecovery",
+      "nodeID": "61e289b1-c6c9-42ea-843f-58a34de2fd56",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyRecovery",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "4420a46e-e8fb-4399-aced-522e8cf2299f",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID || 1 }}",
+          "title": "Invoice Matching Desk recovery completed",
+          "body": "A failed upstream call was compensated without losing the record.",
+          "category": "warning",
+          "linkPage": "ap-admin-jobs"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "ccde1fdc-57e6-4477-b8a0-47a2973233b0",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.recovery }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "7b345a36-a188-450b-aaba-779e9664ef1e",
+      "to": "1724f6f0-9010-4645-83f6-7e21f31a3a50",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "1724f6f0-9010-4645-83f6-7e21f31a3a50",
+      "to": "928c4991-39b4-4a0d-be6c-55f397df163b",
+      "handle": "error",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "928c4991-39b4-4a0d-be6c-55f397df163b",
+      "to": "61e289b1-c6c9-42ea-843f-58a34de2fd56",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "61e289b1-c6c9-42ea-843f-58a34de2fd56",
+      "to": "ccde1fdc-57e6-4477-b8a0-47a2973233b0",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

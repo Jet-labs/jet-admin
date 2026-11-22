@@ -1,0 +1,156 @@
+{
+  "slug": "ap-admin-integrations",
+  "key": "admin-integrations",
+  "title": "Admin · integration health",
+  "description": "Integration health and inbound webhook event log.",
+  "accessTags": [
+    "admin"
+  ],
+  "variables": [],
+  "sources": [
+    {
+      "alias": "ops",
+      "type": "query",
+      "queryID": "ecb22f07-1c4c-4af6-99b0-a17fbbce338b",
+      "triggerMode": "auto",
+      "inputValues": {
+        "kinds": [
+          "integration_health",
+          "webhook"
+        ]
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "ping",
+      "type": "query",
+      "queryID": "62369821-a720-440a-a349-d60c4455a9f7",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "84f03177-01f4-4daa-8d76-0b1e2a192b35",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f693307d-59a1-45a8-81d1-82a2b5cff0e1",
+              "type": "widget",
+              "widgetKey": "widget_a85c9622-adfa-4a07-8167-a9638cf7d7a0_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "6e96476b-a19a-419a-812b-98edf2a5e18a",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "342033f8-5ccb-4f2f-afbe-b05397343311",
+              "type": "widget",
+              "widgetKey": "widget_90364ff6-22ad-463e-91ec-c4f3b4c246f4_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 52
+            },
+            {
+              "id": "ae5948c9-467f-44fc-8340-388c895aaf08",
+              "type": "widget",
+              "widgetKey": "widget_44ab66a9-4ab0-4232-966f-15c3478b17d4_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 120
+            }
+          ]
+        },
+        {
+          "id": "cf7f9415-18d5-4d83-9194-1ab0692c27c8",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "cc71473f-d4e3-4bab-b371-3061672273d1",
+              "type": "widget",
+              "widgetKey": "widget_acde5765-f6bf-448e-b5be-8324050aac13_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 380
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "f693307d-59a1-45a8-81d1-82a2b5cff0e1",
+        "type": "widget",
+        "widgetKey": "widget_a85c9622-adfa-4a07-8167-a9638cf7d7a0_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "342033f8-5ccb-4f2f-afbe-b05397343311",
+        "type": "widget",
+        "widgetKey": "widget_90364ff6-22ad-463e-91ec-c4f3b4c246f4_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "ae5948c9-467f-44fc-8340-388c895aaf08",
+        "type": "widget",
+        "widgetKey": "widget_44ab66a9-4ab0-4232-966f-15c3478b17d4_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 120
+      },
+      {
+        "id": "cc71473f-d4e3-4bab-b371-3061672273d1",
+        "type": "widget",
+        "widgetKey": "widget_acde5765-f6bf-448e-b5be-8324050aac13_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 380
+      }
+    ],
+    "variables": [],
+    "dataSources": [
+      {
+        "alias": "ops",
+        "type": "query",
+        "queryID": "ecb22f07-1c4c-4af6-99b0-a17fbbce338b",
+        "triggerMode": "auto",
+        "inputValues": {
+          "kinds": [
+            "integration_health",
+            "webhook"
+          ]
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "ping",
+        "type": "query",
+        "queryID": "62369821-a720-440a-a349-d60c4455a9f7",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

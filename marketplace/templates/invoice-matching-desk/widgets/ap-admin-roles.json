@@ -1,0 +1,270 @@
+[
+  {
+    "slug": "ap-admin-roles.heading",
+    "key": "heading",
+    "page": "ap-admin-roles",
+    "title": "Roles and permissions",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Roles and permissions\nProvisioned Casbin roles are read-only here. The page matrix mirrors the package's role map and can be adjusted for internal review; platform permission mappings remain the enforcement source.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-admin-roles.roles",
+    "key": "roles",
+    "page": "ap-admin-roles",
+    "title": "Tenant roles",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.roles || {}).data || [])",
+      "columns": [
+        {
+          "key": "roleTitle",
+          "label": "Role",
+          "type": "text"
+        },
+        {
+          "key": "roleDescription",
+          "label": "Description",
+          "type": "text"
+        },
+        {
+          "key": "permission_count",
+          "label": "Permissions",
+          "type": "number"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No roles.",
+      "isLoading": "{{ (state.queries.roles || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-admin-roles.matrix",
+    "key": "matrix",
+    "page": "ap-admin-roles",
+    "title": "Page matrix",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.matrix || {}).data || [])",
+      "columns": [
+        {
+          "key": "role_key",
+          "label": "Role",
+          "type": "badge"
+        },
+        {
+          "key": "page_slug",
+          "label": "Page",
+          "type": "text"
+        },
+        {
+          "key": "can_view",
+          "label": "View",
+          "type": "boolean"
+        },
+        {
+          "key": "can_export",
+          "label": "Export",
+          "type": "boolean"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No matrix rows.",
+      "isLoading": "{{ (state.queries.matrix || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-admin-roles.toggle",
+    "key": "toggle",
+    "page": "ap-admin-roles",
+    "title": "Update matrix row",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Update matrix row",
+      "submitLabel": "Save matrix row",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "roleKey",
+          "label": "Role key",
+          "type": "select",
+          "required": true,
+          "options": []
+        },
+        {
+          "key": "pageSlug",
+          "label": "Page slug",
+          "type": "select",
+          "required": true,
+          "options": [
+            {
+              "label": "ap-invoices-list",
+              "value": "ap-invoices-list"
+            },
+            {
+              "label": "ap-invoices-detail",
+              "value": "ap-invoices-detail"
+            },
+            {
+              "label": "ap-invoices-create",
+              "value": "ap-invoices-create"
+            },
+            {
+              "label": "ap-purchase_orders-list",
+              "value": "ap-purchase_orders-list"
+            },
+            {
+              "label": "ap-purchase_orders-detail",
+              "value": "ap-purchase_orders-detail"
+            },
+            {
+              "label": "ap-purchase_orders-create",
+              "value": "ap-purchase_orders-create"
+            },
+            {
+              "label": "ap-receipts-list",
+              "value": "ap-receipts-list"
+            },
+            {
+              "label": "ap-receipts-detail",
+              "value": "ap-receipts-detail"
+            },
+            {
+              "label": "ap-receipts-create",
+              "value": "ap-receipts-create"
+            },
+            {
+              "label": "ap-suppliers-list",
+              "value": "ap-suppliers-list"
+            },
+            {
+              "label": "ap-suppliers-detail",
+              "value": "ap-suppliers-detail"
+            },
+            {
+              "label": "ap-suppliers-create",
+              "value": "ap-suppliers-create"
+            },
+            {
+              "label": "ap-dashboard",
+              "value": "ap-dashboard"
+            },
+            {
+              "label": "ap-reports-operations",
+              "value": "ap-reports-operations"
+            },
+            {
+              "label": "ap-reports-secondary",
+              "value": "ap-reports-secondary"
+            },
+            {
+              "label": "ap-reports-quality",
+              "value": "ap-reports-quality"
+            },
+            {
+              "label": "ap-invoices-kanban",
+              "value": "ap-invoices-kanban"
+            },
+            {
+              "label": "ap-invoices-calendar",
+              "value": "ap-invoices-calendar"
+            },
+            {
+              "label": "ap-search",
+              "value": "ap-search"
+            },
+            {
+              "label": "ap-profile",
+              "value": "ap-profile"
+            },
+            {
+              "label": "ap-notifications",
+              "value": "ap-notifications"
+            },
+            {
+              "label": "ap-settings",
+              "value": "ap-settings"
+            },
+            {
+              "label": "ap-portal",
+              "value": "ap-portal"
+            },
+            {
+              "label": "ap-admin-users",
+              "value": "ap-admin-users"
+            }
+          ]
+        },
+        {
+          "key": "canView",
+          "label": "Can view",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "key": "canExport",
+          "label": "Can export",
+          "type": "checkbox",
+          "defaultValue": false
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "roleKey": "{{ event.formData.roleKey }}",
+                "pageSlug": "{{ event.formData.pageSlug }}",
+                "canView": "{{ event.formData.canView }}",
+                "canExport": "{{ event.formData.canExport }}"
+              },
+              "successToast": "Matrix updated",
+              "errorToast": "Matrix update failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

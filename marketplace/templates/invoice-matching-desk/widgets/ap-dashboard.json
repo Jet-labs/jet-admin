@@ -1,0 +1,525 @@
+[
+  {
+    "slug": "ap-dashboard.heading",
+    "key": "heading",
+    "page": "ap-dashboard",
+    "title": "Dashboard",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Invoice Matching Desk\nOperational overview for the current team. Use the date range to scope the metrics; tasks and notifications are filtered by the selected staff member.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-dashboard.range",
+    "key": "range",
+    "page": "ap-dashboard",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "Reporting window",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-dashboard.staff",
+    "key": "staff",
+    "page": "ap-dashboard",
+    "title": "Tasks for",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Tasks for",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Ravi Rossi",
+          "value": 1
+        },
+        {
+          "label": "Eli Rossi",
+          "value": 2
+        },
+        {
+          "label": "Zara Nielsen",
+          "value": 3
+        },
+        {
+          "label": "Malik Costa",
+          "value": 4
+        },
+        {
+          "label": "Malik Costa",
+          "value": 5
+        },
+        {
+          "label": "Hugo Novak",
+          "value": 6
+        },
+        {
+          "label": "Luca Osei",
+          "value": 7
+        },
+        {
+          "label": "Kai Chen",
+          "value": 8
+        },
+        {
+          "label": "Anika Garcia",
+          "value": 9
+        },
+        {
+          "label": "Iris Patel",
+          "value": 10
+        },
+        {
+          "label": "Owen Ivanova",
+          "value": 11
+        },
+        {
+          "label": "Mateo Petrov",
+          "value": 12
+        },
+        {
+          "label": "Ishaan Okafor",
+          "value": 13
+        },
+        {
+          "label": "Priya Kim",
+          "value": 14
+        },
+        {
+          "label": "Clara Wright",
+          "value": 15
+        },
+        {
+          "label": "Yuki Petrov",
+          "value": 16
+        },
+        {
+          "label": "Iris Moreau",
+          "value": 17
+        },
+        {
+          "label": "Sofia Khan",
+          "value": 18
+        },
+        {
+          "label": "Clara Nielsen",
+          "value": 19
+        },
+        {
+          "label": "Elena Chen",
+          "value": 20
+        },
+        {
+          "label": "Theo Lindqvist",
+          "value": 21
+        },
+        {
+          "label": "Malik Fischer",
+          "value": 22
+        },
+        {
+          "label": "Noah Patel",
+          "value": 23
+        },
+        {
+          "label": "Elena Rossi",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-dashboard.qualityBadge",
+    "key": "qualityBadge",
+    "page": "ap-dashboard",
+    "title": "Data quality issues",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ String(((state.queries.quality || {}).data || []).reduce(function (n, r) { return n + Number(r.affected_rows || 0); }, 0)) + \" issues\" }}",
+      "variant": "warning"
+    }
+  },
+  {
+    "slug": "ap-dashboard.kpiTotal",
+    "key": "kpiTotal",
+    "page": "ap-dashboard",
+    "title": "Invoices",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Invoices",
+      "valueTemplate": "{{ ((((state.queries.invoices_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.invoices_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-dashboard.kpiValue",
+    "key": "kpiValue",
+    "page": "ap-dashboard",
+    "title": "Total value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total value",
+      "prefix": "$",
+      "valueTemplate": "{{ ((((state.queries.invoices_summary || {}).data || [])[0] || {}).total_value) }}",
+      "isLoading": "{{ (state.queries.invoices_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-dashboard.kpiSecond",
+    "key": "kpiSecond",
+    "page": "ap-dashboard",
+    "title": "Purchase Orders",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Purchase Orders",
+      "valueTemplate": "{{ ((((state.queries.purchase_orders_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.purchase_orders_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-dashboard.kpiTasks",
+    "key": "kpiTasks",
+    "page": "ap-dashboard",
+    "title": "Tasks for me",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Tasks for me",
+      "valueTemplate": "{{ (((state.queries.my_tasks || {}).data || []).length) }}",
+      "isLoading": "{{ (state.queries.my_tasks || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-dashboard.trend",
+    "key": "trend",
+    "page": "ap-dashboard",
+    "title": "Volume trend",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Volume trend",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.invoices_trend || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "line",
+          "tooltip": true,
+          "point": true
+        },
+        "encoding": {
+          "x": {
+            "field": "day",
+            "type": "temporal",
+            "axis": {
+              "labelAngle": 0
+            }
+          },
+          "y": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "value": "#7c3aed"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.invoices_trend || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-dashboard.statusChart",
+    "key": "statusChart",
+    "page": "ap-dashboard",
+    "title": "By status",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "By status",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.invoices_status_chart || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "arc",
+          "innerRadius": 55,
+          "tooltip": true
+        },
+        "encoding": {
+          "theta": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "status",
+            "type": "nominal"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.invoices_status_chart || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-dashboard.tasks",
+    "key": "tasks",
+    "page": "ap-dashboard",
+    "title": "Tasks for me",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.my_tasks || {}).data || [])",
+      "columns": [
+        {
+          "key": "invoice_number",
+          "label": "Invoice number",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "po_id",
+          "label": "Purchase order",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "total_amount",
+          "label": "Total amount",
+          "sortable": true,
+          "type": "number",
+          "editable": false,
+          "format": "0,0.00"
+        },
+        {
+          "key": "currency",
+          "label": "Currency",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "invoice_date",
+          "label": "Invoice date",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "due_date",
+          "label": "Due date",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "received_at",
+          "label": "Received at",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "match_score",
+          "label": "Match score",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "discrepancy_count",
+          "label": "Discrepancies",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No open tasks for this staff member.",
+      "isLoading": "{{ (state.queries.my_tasks || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-dashboard.notifications",
+    "key": "notifications",
+    "page": "ap-dashboard",
+    "title": "Notifications",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.notifications || {}).data || [])",
+      "columns": [
+        {
+          "key": "title",
+          "label": "Notification",
+          "type": "text"
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "badge"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No notifications.",
+      "isLoading": "{{ (state.queries.notifications || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-dashboard.activity",
+    "key": "activity",
+    "page": "ap-dashboard",
+    "title": "Recent activity",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Recent activity",
+      "dataTemplate": "{{ (state.queries.recent_activity || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No activity yet.",
+      "isLoading": "{{ (state.queries.recent_activity || {}).isLoading || false }}"
+    }
+  }
+]

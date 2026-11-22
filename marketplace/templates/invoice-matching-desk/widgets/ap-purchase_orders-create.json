@@ -1,0 +1,446 @@
+[
+  {
+    "slug": "ap-purchase_orders-create.heading",
+    "key": "heading",
+    "page": "ap-purchase_orders-create",
+    "title": "Create Purchase order",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Purchase order\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-purchase_orders-create.form",
+    "key": "form",
+    "page": "ap-purchase_orders-create",
+    "title": "New Purchase order",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Purchase order",
+      "submitLabel": "Create Purchase order",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "po_number",
+          "label": "PO number",
+          "type": "text",
+          "required": true,
+          "defaultValue": "PO-00001"
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "type": "select",
+          "required": true,
+          "defaultValue": 3,
+          "options": [
+            {
+              "label": "Atlas Digital",
+              "value": 1
+            },
+            {
+              "label": "Northstar Works",
+              "value": 2
+            },
+            {
+              "label": "Vantage Works",
+              "value": 3
+            },
+            {
+              "label": "Northstar Works",
+              "value": 4
+            },
+            {
+              "label": "Harbor Supply",
+              "value": 5
+            },
+            {
+              "label": "Aster Labs",
+              "value": 6
+            },
+            {
+              "label": "Northstar Group",
+              "value": 7
+            },
+            {
+              "label": "Vela Industries",
+              "value": 8
+            },
+            {
+              "label": "Terra Works",
+              "value": 9
+            },
+            {
+              "label": "Northstar Group",
+              "value": 10
+            },
+            {
+              "label": "Atlas Industries",
+              "value": 11
+            },
+            {
+              "label": "Vantage Labs",
+              "value": 12
+            },
+            {
+              "label": "Kinetic Works",
+              "value": 13
+            },
+            {
+              "label": "Vela Digital",
+              "value": 14
+            },
+            {
+              "label": "Vela Systems",
+              "value": 15
+            },
+            {
+              "label": "Summit Studio",
+              "value": 16
+            },
+            {
+              "label": "Harbor Group",
+              "value": 17
+            },
+            {
+              "label": "Northstar Group",
+              "value": 18
+            },
+            {
+              "label": "Terra Collective",
+              "value": 19
+            },
+            {
+              "label": "Terra Industries",
+              "value": 20
+            },
+            {
+              "label": "Orbit Industries",
+              "value": 21
+            },
+            {
+              "label": "Meridian Works",
+              "value": 22
+            },
+            {
+              "label": "Pioneer Labs",
+              "value": 23
+            },
+            {
+              "label": "Kinetic Group",
+              "value": 24
+            },
+            {
+              "label": "Copper Labs",
+              "value": 25
+            },
+            {
+              "label": "Meridian Group",
+              "value": 26
+            },
+            {
+              "label": "Northstar Digital",
+              "value": 27
+            },
+            {
+              "label": "Zephyr Works",
+              "value": 28
+            },
+            {
+              "label": "Kinetic Studio",
+              "value": 29
+            },
+            {
+              "label": "Cedar Collective",
+              "value": 30
+            },
+            {
+              "label": "Cedar Digital",
+              "value": 31
+            },
+            {
+              "label": "Terra Partners",
+              "value": 32
+            },
+            {
+              "label": "Cedar Collective",
+              "value": 33
+            },
+            {
+              "label": "Harbor Industries",
+              "value": 34
+            },
+            {
+              "label": "Northstar Collective",
+              "value": 35
+            },
+            {
+              "label": "Bluebird Collective",
+              "value": 36
+            },
+            {
+              "label": "Copper Works",
+              "value": 37
+            },
+            {
+              "label": "Vela Digital",
+              "value": 38
+            },
+            {
+              "label": "Terra Group",
+              "value": 39
+            },
+            {
+              "label": "Terra Works",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "partially_received",
+          "options": [
+            {
+              "label": "Open",
+              "value": "open"
+            },
+            {
+              "label": "Partially Received",
+              "value": "partially_received"
+            },
+            {
+              "label": "Fully Received",
+              "value": "fully_received"
+            },
+            {
+              "label": "Closed",
+              "value": "closed"
+            },
+            {
+              "label": "Cancelled",
+              "value": "cancelled"
+            }
+          ]
+        },
+        {
+          "key": "total_amount",
+          "label": "Total amount",
+          "type": "number",
+          "required": true,
+          "defaultValue": 578.95,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "currency",
+          "label": "Currency",
+          "type": "select",
+          "required": true,
+          "defaultValue": "EUR",
+          "options": [
+            {
+              "label": "USD",
+              "value": "USD"
+            },
+            {
+              "label": "EUR",
+              "value": "EUR"
+            },
+            {
+              "label": "GBP",
+              "value": "GBP"
+            },
+            {
+              "label": "SGD",
+              "value": "SGD"
+            },
+            {
+              "label": "JPY",
+              "value": "JPY"
+            }
+          ]
+        },
+        {
+          "key": "issued_at",
+          "label": "Issued",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "expected_date",
+          "label": "Expected",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "buyer_id",
+          "label": "Buyer",
+          "type": "select",
+          "required": false,
+          "defaultValue": 18,
+          "options": [
+            {
+              "label": "Ravi Rossi",
+              "value": 1
+            },
+            {
+              "label": "Eli Rossi",
+              "value": 2
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 3
+            },
+            {
+              "label": "Malik Costa",
+              "value": 4
+            },
+            {
+              "label": "Malik Costa",
+              "value": 5
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 6
+            },
+            {
+              "label": "Luca Osei",
+              "value": 7
+            },
+            {
+              "label": "Kai Chen",
+              "value": 8
+            },
+            {
+              "label": "Anika Garcia",
+              "value": 9
+            },
+            {
+              "label": "Iris Patel",
+              "value": 10
+            },
+            {
+              "label": "Owen Ivanova",
+              "value": 11
+            },
+            {
+              "label": "Mateo Petrov",
+              "value": 12
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 13
+            },
+            {
+              "label": "Priya Kim",
+              "value": 14
+            },
+            {
+              "label": "Clara Wright",
+              "value": 15
+            },
+            {
+              "label": "Yuki Petrov",
+              "value": 16
+            },
+            {
+              "label": "Iris Moreau",
+              "value": 17
+            },
+            {
+              "label": "Sofia Khan",
+              "value": 18
+            },
+            {
+              "label": "Clara Nielsen",
+              "value": 19
+            },
+            {
+              "label": "Elena Chen",
+              "value": 20
+            },
+            {
+              "label": "Theo Lindqvist",
+              "value": 21
+            },
+            {
+              "label": "Malik Fischer",
+              "value": 22
+            },
+            {
+              "label": "Noah Patel",
+              "value": 23
+            },
+            {
+              "label": "Elena Rossi",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "department",
+          "label": "Department",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Finance"
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "type": "textarea",
+          "required": false,
+          "defaultValue": "Compliance compliance maintenance escalation availability renewal quarterly escalation retention compliance escalation regional handoff capacity.",
+          "help": "Plain text or short notes"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "purchase_orders_create",
+              "inputValues": {
+                "po_number": "{{ event.formData.po_number }}",
+                "supplier_id": "{{ event.formData.supplier_id }}",
+                "status": "{{ event.formData.status }}",
+                "total_amount": "{{ event.formData.total_amount }}",
+                "currency": "{{ event.formData.currency }}",
+                "issued_at": "{{ event.formData.issued_at }}",
+                "expected_date": "{{ event.formData.expected_date }}",
+                "buyer_id": "{{ event.formData.buyer_id }}",
+                "department": "{{ event.formData.department }}",
+                "notes": "{{ event.formData.notes }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-purchase_orders-create.result",
+    "key": "result",
+    "page": "ap-purchase_orders-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.purchase_orders_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.purchase_orders_create || {}).isLoading || false }}"
+    }
+  }
+]

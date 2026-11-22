@@ -1,0 +1,120 @@
+{
+  "slug": "ap-purchase_orders-create",
+  "key": "purchase_orders-create",
+  "title": "Create Purchase order",
+  "description": "Validated create form for Purchase Orders with audit-logged writes.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "createdID",
+      "type": "number",
+      "defaultValue": 0
+    }
+  ],
+  "sources": [
+    {
+      "alias": "purchase_orders_create",
+      "type": "query",
+      "queryID": "640bf540-2c40-47db-9bc2-3decc947ebe0",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "a458bc29-8446-4fdf-914a-ca5d95091867",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "7424140a-0e56-4752-b532-8e7274aba794",
+              "type": "widget",
+              "widgetKey": "widget_1327c973-d0eb-4555-ae6c-aa4cfe50f640_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "9fb0ce9c-1118-4a58-8f6b-d75afd0340a0",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "5bd9f449-97e0-4102-8da2-92e86e40ba38",
+              "type": "widget",
+              "widgetKey": "widget_efe67aa3-cdbc-4a13-92cc-6e91678c687e_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "98eb6b3e-230f-41c6-8f4b-03bb11293eec",
+              "type": "widget",
+              "widgetKey": "widget_db11a69b-1793-4d4d-8a04-6fd1b0aafa56_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "7424140a-0e56-4752-b532-8e7274aba794",
+        "type": "widget",
+        "widgetKey": "widget_1327c973-d0eb-4555-ae6c-aa4cfe50f640_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "5bd9f449-97e0-4102-8da2-92e86e40ba38",
+        "type": "widget",
+        "widgetKey": "widget_efe67aa3-cdbc-4a13-92cc-6e91678c687e_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "98eb6b3e-230f-41c6-8f4b-03bb11293eec",
+        "type": "widget",
+        "widgetKey": "widget_db11a69b-1793-4d4d-8a04-6fd1b0aafa56_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "createdID",
+        "type": "number",
+        "defaultValue": 0
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "purchase_orders_create",
+        "type": "query",
+        "queryID": "640bf540-2c40-47db-9bc2-3decc947ebe0",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

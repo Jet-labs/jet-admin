@@ -1,0 +1,120 @@
+{
+  "slug": "ap-suppliers-create",
+  "key": "suppliers-create",
+  "title": "Create Supplier",
+  "description": "Validated create form for Suppliers with audit-logged writes.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "createdID",
+      "type": "number",
+      "defaultValue": 0
+    }
+  ],
+  "sources": [
+    {
+      "alias": "suppliers_create",
+      "type": "query",
+      "queryID": "c1da9f14-7553-401c-806a-461059eeff2f",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "2e9386f7-32b4-4a58-a133-d3bc38b7132d",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "b5af3332-f97c-4473-b9b3-8d8998759f4d",
+              "type": "widget",
+              "widgetKey": "widget_95ffa5c4-e803-421d-bd55-97a71959adf7_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "94dd0b5e-bb19-45b4-80f9-3074fe89d08c",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "a8a941b1-9631-4470-a1ac-1d7cb75b0272",
+              "type": "widget",
+              "widgetKey": "widget_12eecf39-6eb5-45d5-a5d9-15075062fb42_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "dba2aab0-ddc0-4882-89e4-d29db37d3527",
+              "type": "widget",
+              "widgetKey": "widget_cd10c468-6ffc-4ecd-8d94-8b42514eb487_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "b5af3332-f97c-4473-b9b3-8d8998759f4d",
+        "type": "widget",
+        "widgetKey": "widget_95ffa5c4-e803-421d-bd55-97a71959adf7_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "a8a941b1-9631-4470-a1ac-1d7cb75b0272",
+        "type": "widget",
+        "widgetKey": "widget_12eecf39-6eb5-45d5-a5d9-15075062fb42_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "dba2aab0-ddc0-4882-89e4-d29db37d3527",
+        "type": "widget",
+        "widgetKey": "widget_cd10c468-6ffc-4ecd-8d94-8b42514eb487_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "createdID",
+        "type": "number",
+        "defaultValue": 0
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "suppliers_create",
+        "type": "query",
+        "queryID": "c1da9f14-7553-401c-806a-461059eeff2f",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

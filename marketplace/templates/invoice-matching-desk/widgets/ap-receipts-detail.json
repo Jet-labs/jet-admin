@@ -1,0 +1,631 @@
+[
+  {
+    "slug": "ap-receipts-detail.heading",
+    "key": "heading",
+    "page": "ap-receipts-detail",
+    "title": "Record detail",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Receipt detail\nRecord #{{ state.variables.recordID }} · every change is captured in the audit timeline.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.status",
+    "key": "status",
+    "page": "ap-receipts-detail",
+    "title": "Status",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ ((((state.queries.receipts_detail || {}).data || [])[0] || {}).status) }}",
+      "variant": "default"
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.statusForm",
+    "key": "statusForm",
+    "page": "ap-receipts-detail",
+    "title": "Change status",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Select status",
+      "defaultValue": "complete",
+      "options": [
+        {
+          "label": "Complete",
+          "value": "complete"
+        },
+        {
+          "label": "Partial",
+          "value": "partial"
+        },
+        {
+          "label": "Damaged",
+          "value": "damaged"
+        },
+        {
+          "label": "Returned",
+          "value": "returned"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "overview"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.statusButton",
+    "key": "statusButton",
+    "page": "ap-receipts-detail",
+    "title": "Apply status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Apply status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "receipts_status",
+              "inputValues": {
+                "id": "{{ state.variables.recordID }}",
+                "status": "{{ (state.widgets[\"widget_7eced5f7-84be-495e-90b7-228f3eb6b06d_1\"] || {}).value || \"complete\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.delete",
+    "key": "delete",
+    "page": "ap-receipts-detail",
+    "title": "Archive",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive record",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "receipts_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.restore",
+    "key": "restore",
+    "page": "ap-receipts-detail",
+    "title": "Restore",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Restore record",
+      "variant": "outline",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "receipts_restore",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record restored",
+              "errorToast": "Restore failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.tabs",
+    "key": "tabs",
+    "page": "ap-receipts-detail",
+    "title": "Record sections",
+    "type": "tabs",
+    "config": {
+      "showHeader": false,
+      "tabs": [
+        {
+          "label": "Overview",
+          "value": "overview"
+        },
+        {
+          "label": "Comments",
+          "value": "comments"
+        },
+        {
+          "label": "Attachments",
+          "value": "attachments"
+        },
+        {
+          "label": "Activity",
+          "value": "activity"
+        }
+      ],
+      "defaultTab": "overview",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.record",
+    "key": "record",
+    "page": "ap-receipts-detail",
+    "title": "Record fields",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record fields",
+      "dataTemplate": "{{ (((state.queries.receipts_detail || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "emptyText": "Record not found.",
+      "isLoading": "{{ (state.queries.receipts_detail || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.editTable",
+    "key": "editTable",
+    "page": "ap-receipts-detail",
+    "title": "Inline edit",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.receipts_detail || {}).data || [])",
+      "columns": [
+        {
+          "key": "receipt_number",
+          "label": "Receipt number",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "po_id",
+          "label": "Purchase order",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "received_date",
+          "label": "Received date",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "total_amount",
+          "label": "Received value",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "warehouse",
+          "label": "Warehouse",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 1
+      },
+      "search": {
+        "enabled": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": true
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No record loaded.",
+      "isLoading": "{{ (state.queries.receipts_detail || {}).isLoading || false }}",
+      "events": {
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "receipts_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "receipt_number": "{{ event.updatedRow.receipt_number }}",
+                "po_id": "{{ event.updatedRow.po_id }}",
+                "supplier_id": "{{ event.updatedRow.supplier_id }}",
+                "status": "{{ event.updatedRow.status }}",
+                "received_date": "{{ event.updatedRow.received_date }}",
+                "total_amount": "{{ event.updatedRow.total_amount }}",
+                "warehouse": "{{ event.updatedRow.warehouse }}",
+                "notes": "{{ event.updatedRow.notes }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.comments",
+    "key": "comments",
+    "page": "ap-receipts-detail",
+    "title": "Comments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.receipts_comments || {}).data || [])",
+      "columns": [
+        {
+          "key": "author",
+          "label": "Author",
+          "type": "text"
+        },
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No comments yet.",
+      "isLoading": "{{ (state.queries.receipts_comments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.commentForm",
+    "key": "commentForm",
+    "page": "ap-receipts-detail",
+    "title": "Add comment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add comment",
+      "submitLabel": "Post comment",
+      "fields": [
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Add context, decisions or next steps"
+        },
+        {
+          "key": "authorID",
+          "label": "Author",
+          "type": "select",
+          "required": true,
+          "defaultValue": 1,
+          "options": [
+            {
+              "label": "Ravi Rossi",
+              "value": 1
+            },
+            {
+              "label": "Eli Rossi",
+              "value": 2
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 3
+            },
+            {
+              "label": "Malik Costa",
+              "value": 4
+            },
+            {
+              "label": "Malik Costa",
+              "value": 5
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 6
+            },
+            {
+              "label": "Luca Osei",
+              "value": 7
+            },
+            {
+              "label": "Kai Chen",
+              "value": 8
+            },
+            {
+              "label": "Anika Garcia",
+              "value": 9
+            },
+            {
+              "label": "Iris Patel",
+              "value": 10
+            },
+            {
+              "label": "Owen Ivanova",
+              "value": 11
+            },
+            {
+              "label": "Mateo Petrov",
+              "value": 12
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 13
+            },
+            {
+              "label": "Priya Kim",
+              "value": 14
+            },
+            {
+              "label": "Clara Wright",
+              "value": 15
+            },
+            {
+              "label": "Yuki Petrov",
+              "value": 16
+            },
+            {
+              "label": "Iris Moreau",
+              "value": 17
+            },
+            {
+              "label": "Sofia Khan",
+              "value": 18
+            },
+            {
+              "label": "Clara Nielsen",
+              "value": 19
+            },
+            {
+              "label": "Elena Chen",
+              "value": 20
+            },
+            {
+              "label": "Theo Lindqvist",
+              "value": 21
+            },
+            {
+              "label": "Malik Fischer",
+              "value": 22
+            },
+            {
+              "label": "Noah Patel",
+              "value": 23
+            },
+            {
+              "label": "Elena Rossi",
+              "value": 24
+            }
+          ]
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "receipts_comment_create",
+              "inputValues": {
+                "entity": "receipts",
+                "entityID": "{{ state.variables.recordID }}",
+                "authorID": "{{ Number(event.formData.authorID || 1) }}",
+                "body": "{{ event.formData.body }}"
+              },
+              "successToast": "Comment added",
+              "errorToast": "Comment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.attachments",
+    "key": "attachments",
+    "page": "ap-receipts-detail",
+    "title": "Attachments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.receipts_attachments || {}).data || [])",
+      "columns": [
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "link"
+        },
+        {
+          "key": "file_url",
+          "label": "URL",
+          "type": "link"
+        },
+        {
+          "key": "mime_type",
+          "label": "Type",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Uploaded",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No attachments yet.",
+      "isLoading": "{{ (state.queries.receipts_attachments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.attachmentForm",
+    "key": "attachmentForm",
+    "page": "ap-receipts-detail",
+    "title": "Add attachment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add attachment",
+      "submitLabel": "Attach file",
+      "fields": [
+        {
+          "key": "fileName",
+          "label": "File name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "document.pdf"
+        },
+        {
+          "key": "fileURL",
+          "label": "File URL",
+          "type": "text",
+          "required": true,
+          "defaultValue": "https://files.example.invalid/document.pdf"
+        },
+        {
+          "key": "mimeType",
+          "label": "MIME type",
+          "type": "text",
+          "defaultValue": "application/pdf"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "receipts_attachment_create",
+              "inputValues": {
+                "entity": "receipts",
+                "entityID": "{{ state.variables.recordID }}",
+                "fileName": "{{ event.formData.fileName }}",
+                "fileURL": "{{ event.formData.fileURL }}",
+                "mimeType": "{{ event.formData.mimeType }}",
+                "uploadedBy": "{{ 1 }}"
+              },
+              "successToast": "Attachment linked",
+              "errorToast": "Attachment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-receipts-detail.activity",
+    "key": "activity",
+    "page": "ap-receipts-detail",
+    "title": "Audit timeline",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Audit timeline",
+      "dataTemplate": "{{ (state.queries.receipts_audit || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No audit entries yet.",
+      "isLoading": "{{ (state.queries.receipts_audit || {}).isLoading || false }}"
+    }
+  }
+]

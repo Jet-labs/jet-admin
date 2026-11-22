@@ -1,0 +1,501 @@
+[
+  {
+    "slug": "ap.purchase_orders.list",
+    "title": "Purchase Orders · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"po_number\", \"supplier_id\", \"status\", \"total_amount\", \"currency\", \"issued_at\", \"expected_date\", \"buyer_id\", \"department\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:purchase_orders}}\nWHERE deleted_at IS NULL AND (coalesce(\"po_number\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"department\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"notes\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at >= NULLIF($7::text, '')::date)\n  AND (NULLIF($8::text, '')::date IS NULL OR created_at < (NULLIF($8::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $5::text = 'po_number' AND $6::text = 'asc' THEN \"po_number\" END ASC, CASE WHEN $5::text = 'po_number' AND $6::text = 'desc' THEN \"po_number\" END DESC, CASE WHEN $5::text = 'total_amount' AND $6::text = 'asc' THEN \"total_amount\" END ASC, CASE WHEN $5::text = 'total_amount' AND $6::text = 'desc' THEN \"total_amount\" END DESC, CASE WHEN $5::text = 'issued_at' AND $6::text = 'asc' THEN \"issued_at\" END ASC, CASE WHEN $5::text = 'issued_at' AND $6::text = 'desc' THEN \"issued_at\" END DESC, CASE WHEN $5::text = 'expected_date' AND $6::text = 'asc' THEN \"expected_date\" END ASC, CASE WHEN $5::text = 'expected_date' AND $6::text = 'desc' THEN \"expected_date\" END DESC, id DESC\nLIMIT $4::int OFFSET ((($3::int - 1) * $4::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "po_number"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.export",
+    "title": "Purchase Orders · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"po_number\", \"supplier_id\", \"status\", \"total_amount\", \"currency\", \"issued_at\", \"expected_date\", \"buyer_id\", \"department\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:purchase_orders}}\nWHERE deleted_at IS NULL AND (coalesce(\"po_number\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"department\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"notes\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.detail",
+    "title": "Purchase Orders · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"po_number\", \"supplier_id\", \"status\", \"total_amount\", \"currency\", \"issued_at\", \"expected_date\", \"buyer_id\", \"department\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:purchase_orders}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.create",
+    "title": "Purchase Orders · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:purchase_orders}} (\"po_number\", \"supplier_id\", \"status\", \"total_amount\", \"currency\", \"issued_at\", \"expected_date\", \"buyer_id\", \"department\", \"notes\", created_at, updated_at)\nVALUES ($1::text, $2::int, $3::text, $4::numeric, $5::text, $6::timestamptz, $7::date, $8::int, $9::text, $10::text, now(), now())\nRETURNING \"id\", \"po_number\", \"supplier_id\", \"status\", \"total_amount\", \"currency\", \"issued_at\", \"expected_date\", \"buyer_id\", \"department\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "po_number",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "supplier_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "total_amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "currency",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "issued_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "expected_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "buyer_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "department",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "notes",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.update",
+    "title": "Purchase Orders · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:purchase_orders}}\nSET \"po_number\" = $2::text, \"supplier_id\" = $3::int, \"status\" = $4::text, \"total_amount\" = $5::numeric, \"currency\" = $6::text, \"issued_at\" = $7::timestamptz, \"expected_date\" = $8::date, \"buyer_id\" = $9::int, \"department\" = $10::text, \"notes\" = $11::text, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"po_number\", \"supplier_id\", \"status\", \"total_amount\", \"currency\", \"issued_at\", \"expected_date\", \"buyer_id\", \"department\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "po_number",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "supplier_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "total_amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "currency",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "issued_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "expected_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "buyer_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "department",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "notes",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.delete",
+    "title": "Purchase Orders · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:purchase_orders}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.restore",
+    "title": "Purchase Orders · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:purchase_orders}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.lookup",
+    "title": "Purchase Orders · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"po_number\"::text AS label FROM {{table:purchase_orders}} WHERE deleted_at IS NULL ORDER BY \"po_number\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.status",
+    "title": "Purchase Orders · change status",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:purchase_orders}} SET \"status\" = $2::text, updated_at = now() WHERE id = $1::int RETURNING id, \"status\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false,
+          "default": "open"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.assign",
+    "title": "Purchase Orders · assign owner",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:purchase_orders}} SET \"buyer_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"buyer_id\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.stats",
+    "title": "Purchase Orders · KPI totals",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT count(*)::int AS total, coalesce(sum(\"total_amount\"), 0)::numeric(14,2) AS total_value, coalesce(avg(\"total_amount\"), 0)::numeric(14,2) AS average_value, count(*) FILTER (WHERE \"status\" = 'open')::int AS status_open, count(*) FILTER (WHERE \"status\" = 'partially_received')::int AS status_partially_received, count(*) FILTER (WHERE \"status\" = 'fully_received')::int AS status_fully_received, count(*) FILTER (WHERE \"status\" = 'closed')::int AS status_closed, count(*) FILTER (WHERE \"status\" = 'cancelled')::int AS status_cancelled\nFROM {{table:purchase_orders}}\nWHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date)\n  AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day'))",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.trend",
+    "title": "Purchase Orders · daily trend",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT date_trunc('day', created_at)::date AS day, count(*)::int AS count, coalesce(sum(\"total_amount\"), 0)::numeric(14,2) AS total\nFROM {{table:purchase_orders}}\nWHERE deleted_at IS NULL AND created_at >= coalesce(NULLIF($1::text, '')::date, now() - interval '90 days')\n  AND created_at < (coalesce(NULLIF($2::text, '')::date, now()::date) + interval '1 day')\nGROUP BY 1 ORDER BY 1",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.by_status",
+    "title": "Purchase Orders · by status",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"status\" AS status, count(*)::int AS count FROM {{table:purchase_orders}} WHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date) AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day')) GROUP BY 1 ORDER BY 2 DESC",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "ap.purchase_orders.overdue",
+    "title": "Purchase Orders · overdue",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "purchase_orders"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"po_number\", \"supplier_id\", \"status\", \"total_amount\", \"currency\", \"issued_at\", \"expected_date\", \"buyer_id\", \"department\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:purchase_orders}}\nWHERE deleted_at IS NULL AND \"issued_at\" IS NOT NULL\n  AND \"issued_at\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('closed', 'cancelled')\nORDER BY \"issued_at\" ASC LIMIT 100",
+      "inputDefinitions": [
+        {
+          "key": "days",
+          "type": "number",
+          "required": false,
+          "default": 7
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

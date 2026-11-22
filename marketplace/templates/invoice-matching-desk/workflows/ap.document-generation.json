@@ -1,0 +1,206 @@
+{
+  "slug": "ap.document-generation",
+  "key": "document-generation",
+  "title": "Invoices · document generation",
+  "description": "Builds an HTML document from record fields, links it as an attachment and notifies the owner.",
+  "tags": [
+    "automation",
+    "documents"
+  ],
+  "options": {
+    "description": "Builds an HTML document from record fields, links it as an attachment and notifies the owner.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "79ba3b55-8e29-4206-8066-547abcfee63c",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadRecord",
+      "nodeID": "b2da96db-0326-4b37-94f3-06431ecdff22",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadRecord",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "aeb98a5c-052e-4535-89f6-6acfb820e2ce",
+        "outputVariable": "recordRows",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}"
+        }
+      }
+    },
+    {
+      "key": "buildDocument",
+      "nodeID": "ef03202c-3f9d-438f-aea6-bde9018455f1",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "buildDocument",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "\nvar r = (ctx.recordRows || [])[0] || {};\nvar html = \"<h1>\" + String(r.invoice_number || \"Record\") + \"</h1><p>Record #\" + String(r.id) + \"</p>\";\nreturn { fileName: \"invoices-\" + String(r.id || ctx.recordID) + \".pdf\", fileURL: \"https://files.example.invalid/invoice-matching-desk/\" + String(r.id || ctx.recordID) + \".pdf\", mimeType: \"application/pdf\", html: html };\n",
+        "outputVariable": "document"
+      }
+    },
+    {
+      "key": "linkDocument",
+      "nodeID": "98866992-d5fc-4275-93a7-18a6d90b31ad",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "linkDocument",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "bd544d12-8543-47b8-8a80-b3a204f91ab4",
+        "outputVariable": "attachment",
+        "inputValues": {
+          "entity": "invoices",
+          "entityID": "{{ ctx.recordID }}",
+          "fileName": "{{ ctx.document.fileName }}",
+          "fileURL": "{{ ctx.document.fileURL }}",
+          "mimeType": "{{ ctx.document.mimeType }}",
+          "uploadedBy": "{{ ctx.staffID || 1 }}"
+        }
+      }
+    },
+    {
+      "key": "notifyDocument",
+      "nodeID": "b9fb2015-2213-4e7e-84c4-2925b5209994",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyDocument",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "dataQueryID": "4420a46e-e8fb-4399-aced-522e8cf2299f",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID || 1 }}",
+          "title": "Invoices document ready",
+          "body": "Document {{ ctx.document.fileName }} was generated for record #{{ ctx.recordID }}.",
+          "category": "success",
+          "linkPage": "ap-invoices-detail"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "35305725-9712-4d86-8b65-362b432baedf",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.document }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "79ba3b55-8e29-4206-8066-547abcfee63c",
+      "to": "b2da96db-0326-4b37-94f3-06431ecdff22",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "b2da96db-0326-4b37-94f3-06431ecdff22",
+      "to": "ef03202c-3f9d-438f-aea6-bde9018455f1",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "ef03202c-3f9d-438f-aea6-bde9018455f1",
+      "to": "98866992-d5fc-4275-93a7-18a6d90b31ad",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "98866992-d5fc-4275-93a7-18a6d90b31ad",
+      "to": "b9fb2015-2213-4e7e-84c4-2925b5209994",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "b9fb2015-2213-4e7e-84c4-2925b5209994",
+      "to": "35305725-9712-4d86-8b65-362b432baedf",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

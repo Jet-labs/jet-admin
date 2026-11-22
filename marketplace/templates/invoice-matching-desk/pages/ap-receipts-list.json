@@ -1,0 +1,530 @@
+{
+  "slug": "ap-receipts-list",
+  "key": "receipts-list",
+  "title": "Receipts · list",
+  "description": "Server-side list, filters, inline edit and bulk actions for receipts.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "search",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "status",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "page",
+      "type": "number",
+      "defaultValue": 1
+    },
+    {
+      "key": "sortBy",
+      "type": "string",
+      "defaultValue": "receipt_number"
+    },
+    {
+      "key": "sortDir",
+      "type": "string",
+      "defaultValue": "asc"
+    },
+    {
+      "key": "dateFrom",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "dateTo",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "receipts",
+      "type": "query",
+      "queryID": "d527de18-28c1-4548-9f72-3fc9d9ee08d4",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "search": "{{ state.variables.search }}",
+        "page": "{{ state.variables.page }}",
+        "limit": 10,
+        "sortBy": "{{ state.variables.sortBy }}",
+        "sortDir": "{{ state.variables.sortDir }}",
+        "dateFrom": "{{ state.variables.dateFrom }}",
+        "dateTo": "{{ state.variables.dateTo }}",
+        "status": "{{ state.variables.status }}"
+      },
+      "refreshOn": [
+        "variables.search",
+        "variables.status",
+        "variables.page",
+        "variables.sortBy",
+        "variables.sortDir",
+        "variables.dateFrom",
+        "variables.dateTo"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "receipts_views",
+      "type": "query",
+      "queryID": "7f112503-72d8-4591-b2c7-6816fc4815ec",
+      "triggerMode": "auto",
+      "inputValues": {
+        "prefix": "saved_view.ap-receipts-list"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "receipts_selected",
+      "type": "query",
+      "queryID": "95c8f4a8-1f06-41a3-aee8-2169bc947b54",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "receipts_update",
+      "type": "query",
+      "queryID": "dd3c494c-2416-4726-9a97-f700cb9c6ac8",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "receipts_delete",
+      "type": "query",
+      "queryID": "b68fbc1e-d31b-49ba-ae33-1b8d438d5753",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "receipts_status",
+      "type": "query",
+      "queryID": "55740a21-9d00-45de-a561-fc0660e72ad3",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "receipts_view_create",
+      "type": "query",
+      "queryID": "3a875c45-0b75-4e27-999d-94e55762aa3c",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "db0e0641-14b0-4f47-8040-5bf805f0e419",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "a5b9f22c-0c9d-4de4-9e35-934f6a009f87",
+              "type": "widget",
+              "widgetKey": "widget_24ff607c-f8b0-4b87-b3c6-de511f06a996_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "6569d90c-2462-494d-8a91-02bd70d25f8c",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "4d7c0df4-24a0-4d22-bb5b-55bd8a3f73f0",
+              "type": "widget",
+              "widgetKey": "widget_70af6a7b-c1a2-4fe1-b314-78a79ded4be9_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "aa39d79b-504a-494f-84a5-77243059fb5b",
+              "type": "widget",
+              "widgetKey": "widget_fa007bc5-422a-43e2-bc2c-576cf7161528_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "2aaaf206-93f7-4ef6-91bd-257a4330f544",
+              "type": "widget",
+              "widgetKey": "widget_0d254952-a91e-4f82-b6b6-1e5137d4a26f_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "54d61937-503d-4b77-9b45-0677ec046b83",
+              "type": "widget",
+              "widgetKey": "widget_71570715-826a-4321-9ac6-4f9da9530f7e_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 56
+            }
+          ]
+        },
+        {
+          "id": "27babeac-c1b4-4e99-9e93-04cdcf578f49",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "15c81a20-852d-4dda-a58a-9cbe85f2bfd0",
+              "type": "widget",
+              "widgetKey": "widget_0cb9f288-b4f3-48c0-b731-369045902b64_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 120
+            }
+          ]
+        },
+        {
+          "id": "6deb9174-9cc3-4f2d-892c-214c933e69ed",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "0f719642-dcfe-40e9-a96b-ce4514b1b45c",
+              "type": "widget",
+              "widgetKey": "widget_afd102cc-848b-4d0a-a3c9-69ddb9ef5b4c_1",
+              "span": 9,
+              "sizing": "fill",
+              "minHeight": 460
+            },
+            {
+              "id": "ad6f03f3-5d91-414f-8c6d-c4be65438001",
+              "type": "widget",
+              "widgetKey": "widget_40f77f1b-5adf-4aae-9889-ed9b16f264d4_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 460
+            }
+          ]
+        },
+        {
+          "id": "61639fcf-c6b0-4c0b-8a0a-c260f0668bc9",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "659a53a4-8d9a-4163-9d09-501d4c8adcde",
+              "type": "widget",
+              "widgetKey": "widget_3bafafd7-341f-4843-a51e-8d9eabda4b2b_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 48
+            },
+            {
+              "id": "9e2702cf-16ec-48c7-83f3-4e4d41b09d62",
+              "type": "widget",
+              "widgetKey": "widget_b9dcf90a-0703-4050-b73a-ea3632e0145b_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 48
+            },
+            {
+              "id": "80c05445-9373-4e77-9f49-815993a3fec2",
+              "type": "widget",
+              "widgetKey": "widget_6899eabf-9041-4d7f-a469-124132eb6390_1",
+              "span": 6,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "af8f63e6-593d-4c55-85f0-1edfa2ce5e0c",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "6e753c0b-14b8-4cad-9766-4b38c495f31f",
+              "type": "widget",
+              "widgetKey": "widget_2e79dd90-caf4-4a33-8693-ea67b6bb5ae8_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 220
+            },
+            {
+              "id": "d455e15e-982b-4c75-87bb-4535f301a99c",
+              "type": "widget",
+              "widgetKey": "widget_b9738ed1-a691-44ba-8f11-acea18c175cf_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 220
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "a5b9f22c-0c9d-4de4-9e35-934f6a009f87",
+        "type": "widget",
+        "widgetKey": "widget_24ff607c-f8b0-4b87-b3c6-de511f06a996_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "4d7c0df4-24a0-4d22-bb5b-55bd8a3f73f0",
+        "type": "widget",
+        "widgetKey": "widget_70af6a7b-c1a2-4fe1-b314-78a79ded4be9_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "aa39d79b-504a-494f-84a5-77243059fb5b",
+        "type": "widget",
+        "widgetKey": "widget_fa007bc5-422a-43e2-bc2c-576cf7161528_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "2aaaf206-93f7-4ef6-91bd-257a4330f544",
+        "type": "widget",
+        "widgetKey": "widget_0d254952-a91e-4f82-b6b6-1e5137d4a26f_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "54d61937-503d-4b77-9b45-0677ec046b83",
+        "type": "widget",
+        "widgetKey": "widget_71570715-826a-4321-9ac6-4f9da9530f7e_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "15c81a20-852d-4dda-a58a-9cbe85f2bfd0",
+        "type": "widget",
+        "widgetKey": "widget_0cb9f288-b4f3-48c0-b731-369045902b64_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 120
+      },
+      {
+        "id": "0f719642-dcfe-40e9-a96b-ce4514b1b45c",
+        "type": "widget",
+        "widgetKey": "widget_afd102cc-848b-4d0a-a3c9-69ddb9ef5b4c_1",
+        "span": 9,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "ad6f03f3-5d91-414f-8c6d-c4be65438001",
+        "type": "widget",
+        "widgetKey": "widget_40f77f1b-5adf-4aae-9889-ed9b16f264d4_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "659a53a4-8d9a-4163-9d09-501d4c8adcde",
+        "type": "widget",
+        "widgetKey": "widget_3bafafd7-341f-4843-a51e-8d9eabda4b2b_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 48
+      },
+      {
+        "id": "9e2702cf-16ec-48c7-83f3-4e4d41b09d62",
+        "type": "widget",
+        "widgetKey": "widget_b9dcf90a-0703-4050-b73a-ea3632e0145b_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 48
+      },
+      {
+        "id": "80c05445-9373-4e77-9f49-815993a3fec2",
+        "type": "widget",
+        "widgetKey": "widget_6899eabf-9041-4d7f-a469-124132eb6390_1",
+        "span": 6,
+        "sizing": "fill"
+      },
+      {
+        "id": "6e753c0b-14b8-4cad-9766-4b38c495f31f",
+        "type": "widget",
+        "widgetKey": "widget_2e79dd90-caf4-4a33-8693-ea67b6bb5ae8_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 220
+      },
+      {
+        "id": "d455e15e-982b-4c75-87bb-4535f301a99c",
+        "type": "widget",
+        "widgetKey": "widget_b9738ed1-a691-44ba-8f11-acea18c175cf_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 220
+      }
+    ],
+    "variables": [
+      {
+        "key": "search",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "status",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "page",
+        "type": "number",
+        "defaultValue": 1
+      },
+      {
+        "key": "sortBy",
+        "type": "string",
+        "defaultValue": "receipt_number"
+      },
+      {
+        "key": "sortDir",
+        "type": "string",
+        "defaultValue": "asc"
+      },
+      {
+        "key": "dateFrom",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "dateTo",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "receipts",
+        "type": "query",
+        "queryID": "d527de18-28c1-4548-9f72-3fc9d9ee08d4",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "search": "{{ state.variables.search }}",
+          "page": "{{ state.variables.page }}",
+          "limit": 10,
+          "sortBy": "{{ state.variables.sortBy }}",
+          "sortDir": "{{ state.variables.sortDir }}",
+          "dateFrom": "{{ state.variables.dateFrom }}",
+          "dateTo": "{{ state.variables.dateTo }}",
+          "status": "{{ state.variables.status }}"
+        },
+        "refreshOn": [
+          "variables.search",
+          "variables.status",
+          "variables.page",
+          "variables.sortBy",
+          "variables.sortDir",
+          "variables.dateFrom",
+          "variables.dateTo"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "receipts_views",
+        "type": "query",
+        "queryID": "7f112503-72d8-4591-b2c7-6816fc4815ec",
+        "triggerMode": "auto",
+        "inputValues": {
+          "prefix": "saved_view.ap-receipts-list"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "receipts_selected",
+        "type": "query",
+        "queryID": "95c8f4a8-1f06-41a3-aee8-2169bc947b54",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "receipts_update",
+        "type": "query",
+        "queryID": "dd3c494c-2416-4726-9a97-f700cb9c6ac8",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "receipts_delete",
+        "type": "query",
+        "queryID": "b68fbc1e-d31b-49ba-ae33-1b8d438d5753",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "receipts_status",
+        "type": "query",
+        "queryID": "55740a21-9d00-45de-a561-fc0660e72ad3",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "receipts_view_create",
+        "type": "query",
+        "queryID": "3a875c45-0b75-4e27-999d-94e55762aa3c",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

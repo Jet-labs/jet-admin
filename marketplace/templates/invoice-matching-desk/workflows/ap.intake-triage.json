@@ -1,0 +1,275 @@
+{
+  "slug": "ap.intake-triage",
+  "key": "intake-triage",
+  "title": "Invoices · intake triage",
+  "description": "Loads a record, computes a deterministic risk/priority score, then routes to review or standard triage and notifies the owner.",
+  "tags": [
+    "core",
+    "automation"
+  ],
+  "options": {
+    "description": "Loads a record, computes a deterministic risk/priority score, then routes to review or standard triage and notifies the owner.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      },
+      {
+        "key": "staffID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "ef1407ac-e815-4060-bd76-539309d45e36",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadRecord",
+      "nodeID": "91681088-fe87-4142-8b0b-fa5eac8666b2",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadRecord",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "aeb98a5c-052e-4535-89f6-6acfb820e2ce",
+        "outputVariable": "recordRows",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}"
+        }
+      }
+    },
+    {
+      "key": "scoreRecord",
+      "nodeID": "8dbc9fd1-1a20-4def-9eb0-be2a361654f8",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "scoreRecord",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "\nvar r = (ctx.recordRows || [])[0] || {};\nvar amount = Number(r.total_amount || 0);\nvar score = Math.min(100, Math.round((amount > 50000 ? 60 : 20) + (String(r.status) === \"new\" ? 20 : 5)));\nreturn { recordID: Number(r.id || ctx.recordID), score: score, decision: score >= 70 ? \"review\" : \"standard\", ownerID: Number(r.owner_id || ctx.staffID) };\n",
+        "outputVariable": "score"
+      }
+    },
+    {
+      "key": "highValue",
+      "nodeID": "44da87d8-510b-4947-be99-c1cc00430ef0",
+      "type": "condition",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "highValue",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "branches": [
+          {
+            "id": "review",
+            "label": "Needs review",
+            "condition": "ctx.score.score >= 70"
+          }
+        ],
+        "defaultBranch": "standard"
+      }
+    },
+    {
+      "key": "setReview",
+      "nodeID": "03cc2338-fcd9-4b42-b97a-220acc0394f5",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "setReview",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "dataQueryID": "3fee9a9b-ae0a-467b-afdf-21b3360e11e0",
+        "outputVariable": "reviewResult",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}",
+          "status": "matching"
+        }
+      }
+    },
+    {
+      "key": "setStandard",
+      "nodeID": "aa757980-ec1f-43c4-ab0f-511704945b65",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "setStandard",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "dataQueryID": "3fee9a9b-ae0a-467b-afdf-21b3360e11e0",
+        "outputVariable": "standardResult",
+        "inputValues": {
+          "id": "{{ ctx.recordID }}",
+          "status": "received"
+        }
+      }
+    },
+    {
+      "key": "notifyReview",
+      "nodeID": "9a503bf8-470d-41f2-b0aa-3a2cd139319d",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyReview",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 220
+        },
+        "dataQueryID": "4420a46e-e8fb-4399-aced-522e8cf2299f",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.score.ownerID || ctx.staffID }}",
+          "title": "Invoices needs review",
+          "body": "Record #{{ ctx.recordID }} scored {{ ctx.score.score }} and was routed for review.",
+          "category": "warning",
+          "linkPage": "ap-notifications"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "f67c5b48-4d64-4ddb-b45e-f84ec1221cfe",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.score }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "ef1407ac-e815-4060-bd76-539309d45e36",
+      "to": "91681088-fe87-4142-8b0b-fa5eac8666b2",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "91681088-fe87-4142-8b0b-fa5eac8666b2",
+      "to": "8dbc9fd1-1a20-4def-9eb0-be2a361654f8",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "8dbc9fd1-1a20-4def-9eb0-be2a361654f8",
+      "to": "44da87d8-510b-4947-be99-c1cc00430ef0",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "44da87d8-510b-4947-be99-c1cc00430ef0",
+      "to": "03cc2338-fcd9-4b42-b97a-220acc0394f5",
+      "handle": "review",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "44da87d8-510b-4947-be99-c1cc00430ef0",
+      "to": "aa757980-ec1f-43c4-ab0f-511704945b65",
+      "handle": "standard",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "03cc2338-fcd9-4b42-b97a-220acc0394f5",
+      "to": "9a503bf8-470d-41f2-b0aa-3a2cd139319d",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "9a503bf8-470d-41f2-b0aa-3a2cd139319d",
+      "to": "f67c5b48-4d64-4ddb-b45e-f84ec1221cfe",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "aa757980-ec1f-43c4-ab0f-511704945b65",
+      "to": "f67c5b48-4d64-4ddb-b45e-f84ec1221cfe",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

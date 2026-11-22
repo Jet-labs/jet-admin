@@ -1,0 +1,211 @@
+[
+  {
+    "slug": "ap-profile.heading",
+    "key": "heading",
+    "page": "ap-profile",
+    "title": "My profile",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# My profile\nUpdate your directory details. Role and permission changes are managed by an administrator.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-profile.picker",
+    "key": "picker",
+    "page": "ap-profile",
+    "title": "Profile",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Profile",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Ravi Rossi",
+          "value": 1
+        },
+        {
+          "label": "Eli Rossi",
+          "value": 2
+        },
+        {
+          "label": "Zara Nielsen",
+          "value": 3
+        },
+        {
+          "label": "Malik Costa",
+          "value": 4
+        },
+        {
+          "label": "Malik Costa",
+          "value": 5
+        },
+        {
+          "label": "Hugo Novak",
+          "value": 6
+        },
+        {
+          "label": "Luca Osei",
+          "value": 7
+        },
+        {
+          "label": "Kai Chen",
+          "value": 8
+        },
+        {
+          "label": "Anika Garcia",
+          "value": 9
+        },
+        {
+          "label": "Iris Patel",
+          "value": 10
+        },
+        {
+          "label": "Owen Ivanova",
+          "value": 11
+        },
+        {
+          "label": "Mateo Petrov",
+          "value": 12
+        },
+        {
+          "label": "Ishaan Okafor",
+          "value": 13
+        },
+        {
+          "label": "Priya Kim",
+          "value": 14
+        },
+        {
+          "label": "Clara Wright",
+          "value": 15
+        },
+        {
+          "label": "Yuki Petrov",
+          "value": 16
+        },
+        {
+          "label": "Iris Moreau",
+          "value": 17
+        },
+        {
+          "label": "Sofia Khan",
+          "value": 18
+        },
+        {
+          "label": "Clara Nielsen",
+          "value": 19
+        },
+        {
+          "label": "Elena Chen",
+          "value": 20
+        },
+        {
+          "label": "Theo Lindqvist",
+          "value": 21
+        },
+        {
+          "label": "Malik Fischer",
+          "value": 22
+        },
+        {
+          "label": "Noah Patel",
+          "value": 23
+        },
+        {
+          "label": "Elena Rossi",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-profile.profile",
+    "key": "profile",
+    "page": "ap-profile",
+    "title": "Profile",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Profile",
+      "dataTemplate": "{{ (((state.queries.profile || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "isLoading": "{{ (state.queries.profile || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-profile.form",
+    "key": "form",
+    "page": "ap-profile",
+    "title": "Edit profile",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Edit profile",
+      "submitLabel": "Save profile",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "fullName",
+          "label": "Full name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "department",
+          "label": "Department",
+          "type": "text"
+        },
+        {
+          "key": "jobTitle",
+          "label": "Job title",
+          "type": "text"
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text"
+        },
+        {
+          "key": "city",
+          "label": "City",
+          "type": "text"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "id": "{{ state.variables.staffID }}",
+                "fullName": "{{ event.formData.fullName }}",
+                "department": "{{ event.formData.department }}",
+                "jobTitle": "{{ event.formData.jobTitle }}",
+                "phone": "{{ event.formData.phone }}",
+                "city": "{{ event.formData.city }}"
+              },
+              "successToast": "Profile saved",
+              "errorToast": "Profile update failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

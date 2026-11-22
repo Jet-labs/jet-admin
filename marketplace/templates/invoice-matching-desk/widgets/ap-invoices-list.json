@@ -1,0 +1,687 @@
+[
+  {
+    "slug": "ap-invoices-list.heading",
+    "key": "heading",
+    "page": "ap-invoices-list",
+    "title": "Invoices",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Invoices\nBrowse, filter and update invoices. All edits are audit-logged and soft-deleted records can be restored from the record detail page.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-invoices-list.search",
+    "key": "search",
+    "page": "ap-invoices-list",
+    "title": "Search",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Search invoices...",
+      "debounceMs": 350,
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-list.status",
+    "key": "status",
+    "page": "ap-invoices-list",
+    "title": "Status filter",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "All statuses",
+      "defaultValue": "all",
+      "options": [
+        {
+          "label": "All statuses",
+          "value": "all"
+        },
+        {
+          "label": "Received",
+          "value": "received"
+        },
+        {
+          "label": "Matching",
+          "value": "matching"
+        },
+        {
+          "label": "Exception",
+          "value": "exception"
+        },
+        {
+          "label": "Approved",
+          "value": "approved"
+        },
+        {
+          "label": "Scheduled",
+          "value": "scheduled"
+        },
+        {
+          "label": "Paid",
+          "value": "paid"
+        },
+        {
+          "label": "Void",
+          "value": "void"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.value === 'all' ? '' : event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-list.range",
+    "key": "range",
+    "page": "ap-invoices-list",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-list.sort",
+    "key": "sort",
+    "page": "ap-invoices-list",
+    "title": "Sort",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Sort by",
+      "defaultValue": "invoice_number",
+      "options": [
+        {
+          "label": "Invoice Number",
+          "value": "invoice_number"
+        },
+        {
+          "label": "Total Amount",
+          "value": "total_amount"
+        },
+        {
+          "label": "Invoice Date",
+          "value": "invoice_date"
+        },
+        {
+          "label": "Due Date",
+          "value": "due_date"
+        },
+        {
+          "label": "Received At",
+          "value": "received_at"
+        },
+        {
+          "label": "Match Score",
+          "value": "match_score"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.sortBy",
+              "value": "{{ event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-list.total",
+    "key": "total",
+    "page": "ap-invoices-list",
+    "title": "Total records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total records",
+      "valueTemplate": "{{ ((((state.queries.invoices_stats || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.invoices_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-invoices-list.value",
+    "key": "value",
+    "page": "ap-invoices-list",
+    "title": "Total value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total value",
+      "valueTemplate": "{{ ((((state.queries.invoices_stats || {}).data || [])[0] || {}).total_value) }}",
+      "prefix": "$",
+      "isLoading": "{{ (state.queries.invoices_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-invoices-list.avg",
+    "key": "avg",
+    "page": "ap-invoices-list",
+    "title": "Average",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Average value",
+      "valueTemplate": "{{ ((((state.queries.invoices_stats || {}).data || [])[0] || {}).average_value) }}",
+      "prefix": "$",
+      "isLoading": "{{ (state.queries.invoices_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-invoices-list.selected",
+    "key": "selected",
+    "page": "ap-invoices-list",
+    "title": "Selected record",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record",
+      "dataTemplate": "{{ (((state.queries.invoices_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row to inspect it.",
+      "isLoading": "{{ (state.queries.invoices_selected || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-invoices-list.table",
+    "key": "table",
+    "page": "ap-invoices-list",
+    "title": "Invoices",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.invoices || {}).data || [])",
+      "columns": [
+        {
+          "key": "invoice_number",
+          "label": "Invoice number",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "po_id",
+          "label": "Purchase order",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "total_amount",
+          "label": "Total amount",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "currency",
+          "label": "Currency",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "invoice_date",
+          "label": "Invoice date",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "due_date",
+          "label": "Due date",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "received_at",
+          "label": "Received at",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "match_score",
+          "label": "Match score",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "discrepancy_count",
+          "label": "Discrepancies",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageParam": "page",
+        "pageSize": 10,
+        "totalTemplate": "{{ ((state.queries.invoices || {}).data && (state.queries.invoices || {}).data[0] ? (state.queries.invoices || {}).data[0].total_count : 0) }}"
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": true,
+        "placeholder": "Search invoices..."
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv",
+        "serverSide": false,
+        "buttonLabel": "Export CSV"
+      },
+      "editing": {
+        "enabled": true
+      },
+      "bulkEdit": {
+        "enabled": false,
+        "saveLabel": "Save changes"
+      },
+      "multiSelect": {
+        "enabled": true,
+        "showSelectAll": true,
+        "actions": [
+          {
+            "label": "Archive selected",
+            "actionKey": "archive",
+            "variant": "destructive"
+          }
+        ]
+      },
+      "emptyText": "No invoices found.",
+      "emptyHint": "Adjust the filters or create a new record.",
+      "isLoading": "{{ (state.queries.invoices || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ],
+        "onPageChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": "{{ event.page }}"
+            }
+          }
+        ],
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "invoice_number": "{{ event.updatedRow.invoice_number }}",
+                "supplier_id": "{{ event.updatedRow.supplier_id }}",
+                "po_id": "{{ event.updatedRow.po_id }}",
+                "status": "{{ event.updatedRow.status }}",
+                "total_amount": "{{ event.updatedRow.total_amount }}",
+                "currency": "{{ event.updatedRow.currency }}",
+                "invoice_date": "{{ event.updatedRow.invoice_date }}",
+                "due_date": "{{ event.updatedRow.due_date }}",
+                "received_at": "{{ event.updatedRow.received_at }}",
+                "match_score": "{{ event.updatedRow.match_score }}",
+                "discrepancy_count": "{{ event.updatedRow.discrepancy_count }}",
+                "owner_id": "{{ event.updatedRow.owner_id }}",
+                "notes": "{{ event.updatedRow.notes }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ],
+        "onBulkAction": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_delete",
+              "inputValues": {
+                "ids": "{{ event.selectedRows.map(function (r) { return r.id; }) }}"
+              },
+              "successToast": "Records archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-list.actions",
+    "key": "actions",
+    "page": "ap-invoices-list",
+    "title": "Selected record actions",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record actions",
+      "dataTemplate": "{{ (((state.queries.invoices_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row, then use the buttons below."
+    }
+  },
+  {
+    "slug": "ap-invoices-list.archive",
+    "key": "archive",
+    "page": "ap-invoices-list",
+    "title": "Archive selected",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive selected",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.selectedID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-list.advance",
+    "key": "advance",
+    "page": "ap-invoices-list",
+    "title": "Advance status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Advance status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_status",
+              "inputValues": {
+                "id": "{{ state.variables.selectedID }}",
+                "status": "{{ \"matching\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-list.explain",
+    "key": "explain",
+    "page": "ap-invoices-list",
+    "title": "List notes",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "Rows are loaded server-side. Use the table toolbar to search, sort and export the current view. Inline edits and bulk actions run the template's parameterized update queries and write to the audit log.",
+      "format": "plain"
+    }
+  },
+  {
+    "slug": "ap-invoices-list.views",
+    "key": "views",
+    "page": "ap-invoices-list",
+    "title": "Saved views",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.invoices_views || {}).data || [])",
+      "columns": [
+        {
+          "key": "label",
+          "label": "View",
+          "type": "text",
+          "sortable": false
+        },
+        {
+          "key": "config_key",
+          "label": "Key",
+          "type": "text",
+          "sortable": false
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false,
+        "placeholder": "Filter saved views"
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No saved views yet.",
+      "isLoading": "{{ (state.queries.invoices_views || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.row.config_value.search || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.row.config_value.status || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-list.saveView",
+    "key": "saveView",
+    "page": "ap-invoices-list",
+    "title": "Save current view",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Save current view",
+      "submitLabel": "Save view",
+      "fields": [
+        {
+          "key": "name",
+          "label": "View name",
+          "type": "text",
+          "required": true,
+          "placeholder": "e.g. My open invoices"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_view_create",
+              "inputValues": {
+                "configKey": "{{ \"saved_view.ap-invoices-list.\" + String(event.formData.name || \"view\").toLowerCase().replace(/[^a-z0-9]+/g, \"-\") }}",
+                "value": "{{ ({ search: state.variables.search, status: state.variables.status, page: 1 }) }}",
+                "label": "{{ event.formData.name }}"
+              },
+              "successToast": "View saved",
+              "errorToast": "Could not save view"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

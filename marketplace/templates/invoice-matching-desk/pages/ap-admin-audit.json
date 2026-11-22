@@ -1,0 +1,235 @@
+{
+  "slug": "ap-admin-audit",
+  "key": "admin-audit",
+  "title": "Admin · audit log",
+  "description": "Filterable audit log with old/new JSON diff.",
+  "accessTags": [
+    "admin",
+    "manager"
+  ],
+  "variables": [
+    {
+      "key": "entity",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "actor",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "dateFrom",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "dateTo",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "auditID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "audit",
+      "type": "query",
+      "queryID": "814f36a5-d096-4bf2-8894-c92bd827f115",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "entity": "{{ state.variables.entity }}",
+        "entityID": "",
+        "actor": "{{ state.variables.actor }}",
+        "dateFrom": "{{ state.variables.dateFrom }}",
+        "dateTo": "{{ state.variables.dateTo }}"
+      },
+      "refreshOn": [
+        "variables.entity",
+        "variables.actor",
+        "variables.dateFrom",
+        "variables.dateTo"
+      ],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "b18b2973-25c5-4ce5-b3c9-6eb2a495f032",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "281cb41c-da37-4f71-b240-d1fa53017e55",
+              "type": "widget",
+              "widgetKey": "widget_a21a99cd-3d2a-4fae-96ac-aea268f5b310_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "d2877d30-19fd-4d6d-8920-c4a2e4cf69a0",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "15d12c21-8683-4f5a-99da-bbf88cca0d79",
+              "type": "widget",
+              "widgetKey": "widget_00802481-1fca-46e0-889d-b772006fa343_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 52
+            },
+            {
+              "id": "04bb660d-8ac9-4b61-9a69-8b278d10c7fb",
+              "type": "widget",
+              "widgetKey": "widget_b8577bab-8045-4744-9c21-4a9ae9bd8fbc_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 52
+            },
+            {
+              "id": "5daf2119-74b9-4eea-8693-46d1e9004f5e",
+              "type": "widget",
+              "widgetKey": "widget_e3ede668-c440-47c1-ab4a-609cdc6f15d6_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 52
+            }
+          ]
+        },
+        {
+          "id": "1e35299e-c26e-4294-bb5a-1b79afdf2176",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "cd2d49c7-07a9-4022-9bad-8b3f60e9dfe9",
+              "type": "widget",
+              "widgetKey": "widget_ca8e923e-abbd-4562-82d2-eba872f541c0_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 380
+            },
+            {
+              "id": "231fede7-8717-4d45-b8f1-c4bc981688be",
+              "type": "widget",
+              "widgetKey": "widget_fe26e8b9-5cf5-43cc-929d-2b96a99e0c54_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 380
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "281cb41c-da37-4f71-b240-d1fa53017e55",
+        "type": "widget",
+        "widgetKey": "widget_a21a99cd-3d2a-4fae-96ac-aea268f5b310_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "15d12c21-8683-4f5a-99da-bbf88cca0d79",
+        "type": "widget",
+        "widgetKey": "widget_00802481-1fca-46e0-889d-b772006fa343_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "04bb660d-8ac9-4b61-9a69-8b278d10c7fb",
+        "type": "widget",
+        "widgetKey": "widget_b8577bab-8045-4744-9c21-4a9ae9bd8fbc_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "5daf2119-74b9-4eea-8693-46d1e9004f5e",
+        "type": "widget",
+        "widgetKey": "widget_e3ede668-c440-47c1-ab4a-609cdc6f15d6_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "cd2d49c7-07a9-4022-9bad-8b3f60e9dfe9",
+        "type": "widget",
+        "widgetKey": "widget_ca8e923e-abbd-4562-82d2-eba872f541c0_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 380
+      },
+      {
+        "id": "231fede7-8717-4d45-b8f1-c4bc981688be",
+        "type": "widget",
+        "widgetKey": "widget_fe26e8b9-5cf5-43cc-929d-2b96a99e0c54_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 380
+      }
+    ],
+    "variables": [
+      {
+        "key": "entity",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "actor",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "dateFrom",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "dateTo",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "auditID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "audit",
+        "type": "query",
+        "queryID": "814f36a5-d096-4bf2-8894-c92bd827f115",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "entity": "{{ state.variables.entity }}",
+          "entityID": "",
+          "actor": "{{ state.variables.actor }}",
+          "dateFrom": "{{ state.variables.dateFrom }}",
+          "dateTo": "{{ state.variables.dateTo }}"
+        },
+        "refreshOn": [
+          "variables.entity",
+          "variables.actor",
+          "variables.dateFrom",
+          "variables.dateTo"
+        ],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

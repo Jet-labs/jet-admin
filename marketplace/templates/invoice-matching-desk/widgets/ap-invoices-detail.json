@@ -1,0 +1,683 @@
+[
+  {
+    "slug": "ap-invoices-detail.heading",
+    "key": "heading",
+    "page": "ap-invoices-detail",
+    "title": "Record detail",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Invoice detail\nRecord #{{ state.variables.recordID }} · every change is captured in the audit timeline.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.status",
+    "key": "status",
+    "page": "ap-invoices-detail",
+    "title": "Status",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ ((((state.queries.invoices_detail || {}).data || [])[0] || {}).status) }}",
+      "variant": "default"
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.statusForm",
+    "key": "statusForm",
+    "page": "ap-invoices-detail",
+    "title": "Change status",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Select status",
+      "defaultValue": "received",
+      "options": [
+        {
+          "label": "Received",
+          "value": "received"
+        },
+        {
+          "label": "Matching",
+          "value": "matching"
+        },
+        {
+          "label": "Exception",
+          "value": "exception"
+        },
+        {
+          "label": "Approved",
+          "value": "approved"
+        },
+        {
+          "label": "Scheduled",
+          "value": "scheduled"
+        },
+        {
+          "label": "Paid",
+          "value": "paid"
+        },
+        {
+          "label": "Void",
+          "value": "void"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "overview"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.statusButton",
+    "key": "statusButton",
+    "page": "ap-invoices-detail",
+    "title": "Apply status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Apply status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_status",
+              "inputValues": {
+                "id": "{{ state.variables.recordID }}",
+                "status": "{{ (state.widgets[\"widget_603294d1-a513-4387-9593-d7702661b1c0_1\"] || {}).value || \"received\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.delete",
+    "key": "delete",
+    "page": "ap-invoices-detail",
+    "title": "Archive",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive record",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.restore",
+    "key": "restore",
+    "page": "ap-invoices-detail",
+    "title": "Restore",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Restore record",
+      "variant": "outline",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_restore",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record restored",
+              "errorToast": "Restore failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.tabs",
+    "key": "tabs",
+    "page": "ap-invoices-detail",
+    "title": "Record sections",
+    "type": "tabs",
+    "config": {
+      "showHeader": false,
+      "tabs": [
+        {
+          "label": "Overview",
+          "value": "overview"
+        },
+        {
+          "label": "Comments",
+          "value": "comments"
+        },
+        {
+          "label": "Attachments",
+          "value": "attachments"
+        },
+        {
+          "label": "Activity",
+          "value": "activity"
+        }
+      ],
+      "defaultTab": "overview",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.record",
+    "key": "record",
+    "page": "ap-invoices-detail",
+    "title": "Record fields",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record fields",
+      "dataTemplate": "{{ (((state.queries.invoices_detail || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "emptyText": "Record not found.",
+      "isLoading": "{{ (state.queries.invoices_detail || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.editTable",
+    "key": "editTable",
+    "page": "ap-invoices-detail",
+    "title": "Inline edit",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.invoices_detail || {}).data || [])",
+      "columns": [
+        {
+          "key": "invoice_number",
+          "label": "Invoice number",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "supplier_id",
+          "label": "Supplier",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "po_id",
+          "label": "Purchase order",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "total_amount",
+          "label": "Total amount",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "currency",
+          "label": "Currency",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "invoice_date",
+          "label": "Invoice date",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "due_date",
+          "label": "Due date",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "received_at",
+          "label": "Received at",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "match_score",
+          "label": "Match score",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "discrepancy_count",
+          "label": "Discrepancies",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "owner_id",
+          "label": "Owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 1
+      },
+      "search": {
+        "enabled": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": true
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No record loaded.",
+      "isLoading": "{{ (state.queries.invoices_detail || {}).isLoading || false }}",
+      "events": {
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "invoice_number": "{{ event.updatedRow.invoice_number }}",
+                "supplier_id": "{{ event.updatedRow.supplier_id }}",
+                "po_id": "{{ event.updatedRow.po_id }}",
+                "status": "{{ event.updatedRow.status }}",
+                "total_amount": "{{ event.updatedRow.total_amount }}",
+                "currency": "{{ event.updatedRow.currency }}",
+                "invoice_date": "{{ event.updatedRow.invoice_date }}",
+                "due_date": "{{ event.updatedRow.due_date }}",
+                "received_at": "{{ event.updatedRow.received_at }}",
+                "match_score": "{{ event.updatedRow.match_score }}",
+                "discrepancy_count": "{{ event.updatedRow.discrepancy_count }}",
+                "owner_id": "{{ event.updatedRow.owner_id }}",
+                "notes": "{{ event.updatedRow.notes }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.comments",
+    "key": "comments",
+    "page": "ap-invoices-detail",
+    "title": "Comments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.invoices_comments || {}).data || [])",
+      "columns": [
+        {
+          "key": "author",
+          "label": "Author",
+          "type": "text"
+        },
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No comments yet.",
+      "isLoading": "{{ (state.queries.invoices_comments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.commentForm",
+    "key": "commentForm",
+    "page": "ap-invoices-detail",
+    "title": "Add comment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add comment",
+      "submitLabel": "Post comment",
+      "fields": [
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Add context, decisions or next steps"
+        },
+        {
+          "key": "authorID",
+          "label": "Author",
+          "type": "select",
+          "required": true,
+          "defaultValue": 1,
+          "options": [
+            {
+              "label": "Ravi Rossi",
+              "value": 1
+            },
+            {
+              "label": "Eli Rossi",
+              "value": 2
+            },
+            {
+              "label": "Zara Nielsen",
+              "value": 3
+            },
+            {
+              "label": "Malik Costa",
+              "value": 4
+            },
+            {
+              "label": "Malik Costa",
+              "value": 5
+            },
+            {
+              "label": "Hugo Novak",
+              "value": 6
+            },
+            {
+              "label": "Luca Osei",
+              "value": 7
+            },
+            {
+              "label": "Kai Chen",
+              "value": 8
+            },
+            {
+              "label": "Anika Garcia",
+              "value": 9
+            },
+            {
+              "label": "Iris Patel",
+              "value": 10
+            },
+            {
+              "label": "Owen Ivanova",
+              "value": 11
+            },
+            {
+              "label": "Mateo Petrov",
+              "value": 12
+            },
+            {
+              "label": "Ishaan Okafor",
+              "value": 13
+            },
+            {
+              "label": "Priya Kim",
+              "value": 14
+            },
+            {
+              "label": "Clara Wright",
+              "value": 15
+            },
+            {
+              "label": "Yuki Petrov",
+              "value": 16
+            },
+            {
+              "label": "Iris Moreau",
+              "value": 17
+            },
+            {
+              "label": "Sofia Khan",
+              "value": 18
+            },
+            {
+              "label": "Clara Nielsen",
+              "value": 19
+            },
+            {
+              "label": "Elena Chen",
+              "value": 20
+            },
+            {
+              "label": "Theo Lindqvist",
+              "value": 21
+            },
+            {
+              "label": "Malik Fischer",
+              "value": 22
+            },
+            {
+              "label": "Noah Patel",
+              "value": 23
+            },
+            {
+              "label": "Elena Rossi",
+              "value": 24
+            }
+          ]
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_comment_create",
+              "inputValues": {
+                "entity": "invoices",
+                "entityID": "{{ state.variables.recordID }}",
+                "authorID": "{{ Number(event.formData.authorID || 1) }}",
+                "body": "{{ event.formData.body }}"
+              },
+              "successToast": "Comment added",
+              "errorToast": "Comment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.attachments",
+    "key": "attachments",
+    "page": "ap-invoices-detail",
+    "title": "Attachments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.invoices_attachments || {}).data || [])",
+      "columns": [
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "link"
+        },
+        {
+          "key": "file_url",
+          "label": "URL",
+          "type": "link"
+        },
+        {
+          "key": "mime_type",
+          "label": "Type",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Uploaded",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No attachments yet.",
+      "isLoading": "{{ (state.queries.invoices_attachments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.attachmentForm",
+    "key": "attachmentForm",
+    "page": "ap-invoices-detail",
+    "title": "Add attachment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add attachment",
+      "submitLabel": "Attach file",
+      "fields": [
+        {
+          "key": "fileName",
+          "label": "File name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "document.pdf"
+        },
+        {
+          "key": "fileURL",
+          "label": "File URL",
+          "type": "text",
+          "required": true,
+          "defaultValue": "https://files.example.invalid/document.pdf"
+        },
+        {
+          "key": "mimeType",
+          "label": "MIME type",
+          "type": "text",
+          "defaultValue": "application/pdf"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "invoices_attachment_create",
+              "inputValues": {
+                "entity": "invoices",
+                "entityID": "{{ state.variables.recordID }}",
+                "fileName": "{{ event.formData.fileName }}",
+                "fileURL": "{{ event.formData.fileURL }}",
+                "mimeType": "{{ event.formData.mimeType }}",
+                "uploadedBy": "{{ 1 }}"
+              },
+              "successToast": "Attachment linked",
+              "errorToast": "Attachment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "ap-invoices-detail.activity",
+    "key": "activity",
+    "page": "ap-invoices-detail",
+    "title": "Audit timeline",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Audit timeline",
+      "dataTemplate": "{{ (state.queries.invoices_audit || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No audit entries yet.",
+      "isLoading": "{{ (state.queries.invoices_audit || {}).isLoading || false }}"
+    }
+  }
+]

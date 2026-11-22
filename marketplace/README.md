@@ -13,9 +13,10 @@ layer, role provisioning and an install ledger.
 | `crm-sales-pipeline` | Sales & CRM | 18 | 2,390 | 80 | 31 | 11 | 8 | 6 | 5 |
 | `customer-support-console` | Customer Support | 18 | 2,640 | 78 | 31 | 11 | 8 | 6 | 5 |
 | `inventory-replenishment-planner` | Inventory & Operations | 18 | 2,948 | 80 | 31 | 11 | 8 | 6 | 5 |
+| `invoice-matching-desk` | Finance & Accounting | 18 | 3,380 | 78 | 31 | 11 | 8 | 6 | 5 |
 
-Customer Support Console and Inventory Replenishment Planner are the second and
-third deliveries. Invoice Matching Desk is next; the remaining original
+Customer Support Console, Inventory Replenishment Planner and Invoice Matching
+Desk are the second, third and fourth deliveries. The remaining original
 template ideas stay deferred.
 
 ## What the CRM template includes
@@ -69,6 +70,26 @@ template ideas stay deferred.
 - 11 workflows covering stock triage, proposal approval, supplier escalation,
   reorder sweeps, digests, ERP sync, document generation, data collection,
   error recovery and notification-only.
+- 8 inactive webhook listeners, 6 disabled cron jobs and 5 Casbin roles with
+  per-page, per-query and per-workflow asset permissions.
+
+## What the Invoice Matching Desk includes
+
+- Invoices with supplier, PO and receipt links, match score, discrepancy count,
+  currency, dates and owner.
+- Purchase orders and receipt records for two-way and three-way matching.
+- Invoice lines and PO lines for line-level context, plus match results with
+  price/quantity variance amounts and percentages.
+- Discrepancy queue with severity, category, owner, amount impact and
+  resolution state; approval and escalation routing on top.
+- Invoice queue, invoice detail, match kanban, PO calendar, dashboards, three
+  reports, global search, profile, notifications and settings.
+- Admin panel: users, roles/permissions, audit diff viewer, settings and
+  feature flags, import/export, integration health, job/workflow monitor,
+  webhook log and data quality.
+- 11 workflows covering intake triage, automated matching, approval, exception
+  escalation, aging sweeps, digests, ERP sync, document generation, data
+  collection, error recovery and notification-only.
 - 8 inactive webhook listeners, 6 disabled cron jobs and 5 Casbin roles with
   per-page, per-query and per-workflow asset permissions.
 
@@ -204,9 +225,9 @@ installer, gallery and asset endpoint read only those rows.
 
 ## Validation status
 
-- `npm run templates:validate` — passes for CRM, Customer Support and
-  Inventory Replenishment.
-- `npm run templates:seed:db` — registers all three packages and 16 assets each
+- `npm run templates:validate` — passes for CRM, Customer Support, Inventory
+  Replenishment and Invoice Matching.
+- `npm run templates:seed:db` — registers all four packages and 16 assets each
   in the database.
 - CRM: SQL DDL + 2,390 seed rows + 45 read queries — pass in a rolled-back
   transaction; 342 bundle resources + 16 cron/role resources; 69 page queries,
@@ -219,13 +240,17 @@ installer, gallery and asset endpoint read only those rows.
   in a rolled-back transaction; 361 bundle/install resources; 18 tables,
   31 pages, 80 queries, 5 roles and 6 cron jobs; 69 page queries, 0 failures;
   0 orphan tables/ledger rows.
+- Invoice Matching: SQL DDL + 3,380 seed rows + 45 read queries — pass in a
+  rolled-back transaction; 359 bundle/install resources; 18 tables, 31 pages,
+  78 queries, 5 roles and 6 cron jobs; 69 page queries, 0 failures; 0 orphan
+  tables/ledger rows.
 - Workflows — CRM 6/6 tested pass (5 complete, approval suspends as intended).
   Customer Support graphs validate; runtime execution is currently blocked
   because Temporal is not running in the local Docker environment.
-- Roles — 5/5 allow/deny matrix pass for all three templates; demo users and
+- Roles — 5/5 allow/deny matrix pass for all four templates; demo users and
   roles removed on uninstall. Query and workflow execution is granted per
   asset.
-- Jest package tests — pass.
+- Jest package tests — 20/20 pass across all four templates.
 - Frontend production build — passes.
 
 Known pre-existing repository test failures (not introduced by this work):
