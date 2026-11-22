@@ -17,6 +17,7 @@ const PAYMENT_TERMS = ["net_30", "net_45", "net_60", "prepaid"];
 
 module.exports = {
   slug: "invoice-matching-desk",
+  compact: true,
   name: "Invoice Matching Desk",
   alias: "ap",
   category: "Finance & Accounting",

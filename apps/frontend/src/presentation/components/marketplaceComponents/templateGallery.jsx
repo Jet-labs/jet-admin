@@ -69,6 +69,7 @@ export const TemplateGallery = ({ tenantID, search = "", category = "" }) => {
   const [selectedSlug, setSelectedSlug] = useState(null);
   const [installOptions, setInstallOptions] = useState({ includeSampleData: true, createDemoUsers: false, enableAutomation: false });
   const [confirmUninstall, setConfirmUninstall] = useState(false);
+  const [uninstallKeys, setUninstallKeys] = useState([]);
 
   const listQuery = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.TEMPLATES(tenantID), search, category],
@@ -117,19 +118,32 @@ export const TemplateGallery = ({ tenantID, search = "", category = "" }) => {
   });
 
   const uninstallMutation = useMutation({
-    mutationFn: ({ slug }) => uninstallTemplateAPI({ tenantID, slug }),
-    onSuccess: () => {
-      displaySuccess("Template uninstalled.");
+    mutationFn: ({ slug, assetKeys }) => uninstallTemplateAPI({ tenantID, slug, assetKeys }),
+    onSuccess: (result) => {
+      displaySuccess(
+        result?.mode === "partial"
+          ? `Removed ${result.deleted.resources} resources and ${result.deleted.tables} tables. Unselected assets remain installed.`
+          : "Template uninstalled."
+      );
       invalidate();
       setConfirmUninstall(false);
-      setSelectedSlug(null);
+      if (result?.mode !== "partial") setSelectedSlug(null);
     },
     onError: (error) => displayError(error),
   });
 
   const entries = listQuery.data?.entries || [];
   const selected = detailQuery.data;
+  const uninstallPlan = selected?.install?.uninstallPlan;
+  const uninstallAssets = useMemo(
+    () => [...(uninstallPlan?.resources || []), ...(uninstallPlan?.tables || [])],
+    [uninstallPlan]
+  );
   const isBusy = installMutation.isPending || uninstallMutation.isPending;
+
+  useEffect(() => {
+    if (confirmUninstall) setUninstallKeys(uninstallAssets.map((asset) => asset.key));
+  }, [confirmUninstall, uninstallAssets]);
 
   const stats = useMemo(() => {
     if (!selected?.manifest) return null;
@@ -291,17 +305,96 @@ export const TemplateGallery = ({ tenantID, search = "", category = "" }) => {
       </Dialog>
 
       <Dialog open={confirmUninstall} onOpenChange={setConfirmUninstall}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Uninstall {selected?.manifest?.name}?</DialogTitle>
             <DialogDescription>
-              This deletes the template pages, widgets, queries, workflows, roles, cron jobs and the tenant-isolated tables. It cannot be undone.
+              Selected assets and database tables are deleted. Unselected assets stay installed.
+              This cannot be undone.
             </DialogDescription>
           </DialogHeader>
+          <DialogBody className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Assets to delete
+              </p>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">
+                  {uninstallKeys.length} of {uninstallAssets.length} selected
+                </Badge>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={isBusy}
+                  onClick={() => setUninstallKeys(uninstallAssets.map((asset) => asset.key))}
+                >
+                  Select all
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={isBusy}
+                  onClick={() => setUninstallKeys([])}
+                >
+                  Clear
+                </Button>
+              </div>
+            </div>
+            <div className="max-h-72 space-y-3 overflow-y-auto rounded border border-border/50 p-2">
+              {Object.entries(
+                uninstallAssets.reduce((groups, asset) => {
+                  const key = asset.typeLabel || asset.type;
+                  groups[key] = groups[key] || [];
+                  groups[key].push(asset);
+                  return groups;
+                }, {})
+              ).map(([group, assets]) => (
+                <div key={group}>
+                  <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {group} ({assets.length})
+                  </p>
+                  <div className="space-y-1">
+                    {assets.map((asset) => (
+                      <label key={asset.key} className="flex items-start gap-2 rounded px-1 py-0.5 text-xs text-foreground">
+                        <input
+                          type="checkbox"
+                          className="mt-0.5"
+                          checked={uninstallKeys.includes(asset.key)}
+                          disabled={isBusy}
+                          onChange={(event) =>
+                            setUninstallKeys((current) =>
+                              event.target.checked
+                                ? [...current, asset.key]
+                                : current.filter((key) => key !== asset.key)
+                            )
+                          }
+                        />
+                        <span className="min-w-0 break-words">{asset.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {uninstallAssets.length === 0 && (
+                <p className="text-xs text-muted-foreground">No installed assets were recorded for this template.</p>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Unselecting an asset keeps it in the tenant and keeps the install ledger active.
+              Unselecting a database table preserves its data.
+            </p>
+          </DialogBody>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setConfirmUninstall(false)} disabled={isBusy}>Cancel</Button>
-            <Button type="button" variant="destructive" disabled={isBusy} onClick={() => uninstallMutation.mutate({ slug: selected.manifest.slug })}>
-              {uninstallMutation.isPending ? <Spinner className="h-4 w-4" /> : "Uninstall"}
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={isBusy || uninstallKeys.length === 0}
+              onClick={() => uninstallMutation.mutate({ slug: selected.manifest.slug, assetKeys: uninstallKeys })}
+            >
+              {uninstallMutation.isPending ? <Spinner className="h-4 w-4" /> : `Delete selected (${uninstallKeys.length})`}
             </Button>
           </DialogFooter>
         </DialogContent>

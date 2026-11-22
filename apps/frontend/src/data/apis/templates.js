@@ -41,9 +41,12 @@ export const installTemplateAPI = async ({ tenantID, slug, options }) => {
   throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
 };
 
-export const uninstallTemplateAPI = async ({ tenantID, slug }) => {
+export const uninstallTemplateAPI = async ({ tenantID, slug, assetKeys }) => {
   const url = CONSTANTS.SERVER_HOST + CONSTANTS.APIS.TEMPLATES.uninstallAPI(tenantID, slug);
-  const response = await axios.delete(url, { headers: await getHeaders() });
+  const response = await axios.delete(url, {
+    headers: await getHeaders(),
+    data: Array.isArray(assetKeys) ? { assetKeys } : undefined,
+  });
   if (response.data?.success === true) return response.data;
   if (response.data?.error) throw response.data.error;
   throw CONSTANTS.ERROR_CODES.SERVER_ERROR;

@@ -314,23 +314,6 @@
     }
   },
   {
-    "slug": "crm.deals.lookup",
-    "title": "Deals · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "deals"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"name\"::text AS label FROM {{table:deals}} WHERE deleted_at IS NULL ORDER BY \"name\" LIMIT 500",
-      "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "crm.deals.status",
     "title": "Deals · change status",
     "datasource": "primary",
@@ -354,36 +337,6 @@
           "type": "string",
           "required": false,
           "default": "prospecting"
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "crm.deals.assign",
-    "title": "Deals · assign owner",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "deals"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:deals}} SET \"owner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"owner_id\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "staffID",
-          "type": "number",
-          "required": false,
-          "default": 1
         }
       ],
       "parameterized": true,
@@ -468,30 +421,6 @@
           "key": "dateTo",
           "type": "string",
           "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "crm.deals.overdue",
-    "title": "Deals · overdue",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "deals"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"name\", \"account_id\", \"contact_id\", \"stage\", \"amount\", \"probability\", \"close_date\", \"owner_id\", \"source\", \"next_step\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:deals}}\nWHERE deleted_at IS NULL AND \"close_date\" IS NOT NULL\n  AND \"close_date\" < now() - ($1::int || ' days')::interval\n  AND \"stage\" NOT IN ('')\nORDER BY \"close_date\" ASC LIMIT 100",
-      "inputDefinitions": [
-        {
-          "key": "days",
-          "type": "number",
-          "required": false,
-          "default": 7
         }
       ],
       "parameterized": true,

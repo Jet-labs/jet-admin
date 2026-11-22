@@ -17,6 +17,7 @@ const COUNTRIES = ["United States", "Germany", "Singapore", "United Kingdom", "J
 
 module.exports = {
   slug: "inventory-replenishment-planner",
+  compact: true,
   name: "Inventory Replenishment Planner",
   alias: "inv",
   category: "Inventory & Operations",

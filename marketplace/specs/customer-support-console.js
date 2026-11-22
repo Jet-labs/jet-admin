@@ -11,6 +11,7 @@ const PLANS = ["starter", "growth", "scale", "enterprise"];
 
 module.exports = {
   slug: "customer-support-console",
+  compact: true,
   name: "Customer Support Console",
   alias: "support",
   category: "Customer Support",

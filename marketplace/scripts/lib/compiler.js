@@ -18,7 +18,7 @@ function json(value) {
 }
 
 function buildDatasources(spec) {
-  return [
+  const datasources = [
     {
       slug: "primary",
       title: `${spec.name} · primary PostgreSQL`,
@@ -44,25 +44,27 @@ function buildDatasources(spec) {
       requiresReconnect: false,
       installStrategy: "asIs",
     },
-    {
-      slug: "integration",
-      title: `${spec.name} · mock REST integration`,
-      type: "restapi",
-      description: "Deliberately unreachable mock REST endpoint used by the integration-sync workflow to prove the error path. Reconnect to a real provider in production.",
-      options: {
-        baseUrl: "http://127.0.0.1:9",
-        timeout: 5,
-        authType: "none",
-        headers: [],
-        queryParams: [],
-        contentType: "application/json",
-        followRedirects: false,
-        sslVerify: true,
-      },
-      requiresReconnect: true,
-      installStrategy: "asIs",
-    },
   ];
+  if (spec.compact) return datasources;
+  datasources.push({
+    slug: "integration",
+    title: `${spec.name} · mock REST integration`,
+    type: "restapi",
+    description: "Deliberately unreachable mock REST endpoint used by the integration-sync workflow to prove the error path. Reconnect to a real provider in production.",
+    options: {
+      baseUrl: "http://127.0.0.1:9",
+      timeout: 5,
+      authType: "none",
+      headers: [],
+      queryParams: [],
+      contentType: "application/json",
+      followRedirects: false,
+      sslVerify: true,
+    },
+    requiresReconnect: true,
+    installStrategy: "asIs",
+  });
+  return datasources;
 }
 
 function buildManifest(spec, ctx) {
@@ -79,7 +81,10 @@ function buildManifest(spec, ctx) {
     nodeCount: wf.nodes.length,
     edgeCount: wf.edges.length,
   }));
-  const screenshots = ["dashboard", `${coreEntities(spec)[0].key}-list`, `${coreEntities(spec)[0].key}-detail`, "reports-operations", "admin-audit", "portal"];
+  const screenshotKeys = spec.compact
+    ? ["dashboard", `${coreEntities(spec)[0].key}-list`, `${coreEntities(spec)[0].key}-detail`, "reports-operations"]
+    : ["dashboard", `${coreEntities(spec)[0].key}-list`, `${coreEntities(spec)[0].key}-detail`, "reports-operations", "admin-audit", "portal"];
+  const screenshots = screenshotKeys;
   const integrations = spec.integrations || [
     { key: "webhook", title: "Inbound webhook", requiredFields: ["endpoint path", "signature header (optional)"], mock: "Send any JSON body with kind=webhook.received to the inactive listener." },
     { key: "integration", title: "Mock REST integration", requiredFields: ["baseUrl", "auth token"], mock: "The packaged endpoint is intentionally unreachable; reconnect to a real provider." },
@@ -365,7 +370,109 @@ function groupWidgets(ctx) {
   }));
 }
 
-function buildPackage(spec) {
+function compactSpec(spec) {
+  if (!spec.compact) return spec;
+  const byKey = new Map(spec.entities.map((entity) => [entity.key, entity]));
+  const keep = new Set(spec.entities.filter((entity) => entity.core !== false).map((entity) => entity.key));
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const key of [...keep]) {
+      const entity = byKey.get(key);
+      for (const field of entity?.fields || []) {
+        if (field.type !== "ref" || field.ref === "staff") continue;
+        if (byKey.has(field.ref) && !keep.has(field.ref)) {
+          keep.add(field.ref);
+          changed = true;
+        }
+      }
+    }
+  }
+  return {
+    ...spec,
+    entities: spec.entities.filter((entity) => keep.has(entity.key)),
+    integrations: [
+      {
+        key: "webhook",
+        title: "Inbound webhook",
+        requiredFields: ["endpoint path", "signature header (optional)"],
+        mock: "Send a JSON body with kind=webhook.received to the inactive listener.",
+      },
+    ],
+  };
+}
+
+function applyCompactResources(spec, ctx) {
+  if (!spec.compact) return;
+  const { deterministicUUID } = require("./util");
+  const core = coreEntities(spec);
+  const pageSlugs = new Set([
+    `${spec.alias}-dashboard`,
+    `${spec.alias}-reports-operations`,
+    `${spec.alias}-profile`,
+    `${spec.alias}-notifications`,
+    `${spec.alias}-settings`,
+    `${spec.alias}-portal`,
+    `${spec.alias}-admin-roles`,
+  ]);
+  for (const entity of core) {
+    for (const suffix of ["list", "detail", "create"]) {
+      pageSlugs.add(`${spec.alias}-${entity.key}-${suffix}`);
+    }
+  }
+  ctx.pages = ctx.pages.filter((page) => pageSlugs.has(page.slug));
+
+  const workflowSuffixes = new Set(["intake-triage", "approval-chain", "daily-digest", "data-collection", "error-recovery"]);
+  ctx.workflows = ctx.workflows.filter((workflow) =>
+    workflowSuffixes.has(workflow.slug.split(".").pop())
+  );
+  const workflowIDs = new Set(
+    ctx.workflows.map((workflow) => deterministicUUID(`${spec.slug}:workflow:${workflow.slug}`))
+  );
+
+  const queryIDs = new Set();
+  for (const page of ctx.pages) {
+    for (const source of page.sources || []) {
+      if (source.queryID) queryIDs.add(source.queryID);
+    }
+  }
+  const collectQueryIDs = (value) => {
+    if (!value || typeof value !== "object") return;
+    for (const [key, child] of Object.entries(value)) {
+      if (key === "dataQueryID" && typeof child === "string") queryIDs.add(child);
+      else collectQueryIDs(child);
+    }
+  };
+  for (const workflow of ctx.workflows) collectQueryIDs(workflow.nodes || []);
+  for (const listener of ctx.listeners) collectQueryIDs(listener.actions || []);
+  ctx.queries = ctx.queries.filter((query) =>
+    queryIDs.has(deterministicUUID(`${spec.slug}:dataQuery:${query.slug}`))
+  );
+
+  ctx.listeners = ctx.listeners
+    .filter((listener) => {
+      const ids = new Set();
+      const visit = (value) => {
+        if (!value || typeof value !== "object") return;
+        for (const [key, child] of Object.entries(value)) {
+          if (key === "workflowID" && typeof child === "string") ids.add(child);
+          else visit(child);
+        }
+      };
+      visit(listener.actions || []);
+      return ids.size === 0 || [...ids].some((id) => workflowIDs.has(id));
+    })
+    .slice(0, 3);
+
+  ctx.cronJobs = ctx.cronJobs
+    .filter((cron) => workflowIDs.has(cron.workflow))
+    .slice(0, 2);
+
+  ctx.widgets = ctx.widgets.filter((widget) => pageSlugs.has(widget.page));
+}
+
+function buildPackage(originalSpec) {
+  const spec = compactSpec(originalSpec);
   const ctx = {
     spec,
     rng: require("./util").createRandom(`seed:${spec.slug}`),
@@ -393,6 +500,7 @@ function buildPackage(spec) {
   buildKanbanCalendarSpec(spec, ctx);
   buildSharedPagesSpec(spec, ctx);
   buildAdminPagesSpec(spec, ctx);
+  applyCompactResources(spec, ctx);
   buildRoles(spec, ctx);
   seed += `\n\n${buildRoleMatrixSeed(spec, ctx)}`;
   ctx.supportTableCount = 10;

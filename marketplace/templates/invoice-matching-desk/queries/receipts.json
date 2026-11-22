@@ -62,44 +62,6 @@
     }
   },
   {
-    "slug": "ap.receipts.export",
-    "title": "Receipts · export",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "export",
-      "receipts"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"receipt_number\", \"po_id\", \"supplier_id\", \"status\", \"received_date\", \"total_amount\", \"warehouse\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:receipts}}\nWHERE deleted_at IS NULL AND (coalesce(\"receipt_number\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"warehouse\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"notes\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
-      "inputDefinitions": [
-        {
-          "key": "search",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "status",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "ap.receipts.detail",
     "title": "Receipts · detail",
     "datasource": "primary",
@@ -289,23 +251,6 @@
           "default": []
         }
       ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "ap.receipts.lookup",
-    "title": "Receipts · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "receipts"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"receipt_number\"::text AS label FROM {{table:receipts}} WHERE deleted_at IS NULL ORDER BY \"receipt_number\" LIMIT 500",
-      "inputDefinitions": [],
       "parameterized": true,
       "timeoutSeconds": 20
     }

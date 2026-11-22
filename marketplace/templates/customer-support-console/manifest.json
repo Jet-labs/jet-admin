@@ -37,14 +37,6 @@
     {
       "title": "Reports · operations",
       "path": "assets/screenshots/reports-operations.svg"
-    },
-    {
-      "title": "Admin · audit log",
-      "path": "assets/screenshots/admin-audit.svg"
-    },
-    {
-      "title": "Client portal",
-      "path": "assets/screenshots/portal.svg"
     }
   ],
   "features": [
@@ -57,31 +49,13 @@
   ],
   "requiredIntegrations": [
     {
-      "key": "sendgrid-email",
-      "title": "SendGrid email",
-      "requiredFields": [
-        "API key",
-        "from address"
-      ],
-      "mock": "Connector ships disabled; use the notification center and packaged email HTML for demos."
-    },
-    {
-      "key": "stripe-billing",
-      "title": "Stripe billing",
-      "requiredFields": [
-        "secret key",
-        "webhook signing secret"
-      ],
-      "mock": "Payment history is seeded locally; the packaged REST connector is a mock until reconnected."
-    },
-    {
-      "key": "inbound-webhook",
-      "title": "Inbound support webhook",
+      "key": "webhook",
+      "title": "Inbound webhook",
       "requiredFields": [
         "endpoint path",
-        "optional signature header"
+        "signature header (optional)"
       ],
-      "mock": "POST { \"kind\": \"webhook.received\", \"record_id\": 1 } to the inactive listener."
+      "mock": "Send a JSON body with kind=webhook.received to the inactive listener."
     }
   ],
   "installOptions": [
@@ -108,16 +82,16 @@
     }
   ],
   "counts": {
-    "tables": 18,
-    "domainTables": 8,
+    "tables": 14,
+    "domainTables": 4,
     "supportTables": 10,
-    "seedRows": 1165,
-    "queries": 78,
-    "pages": 31,
-    "widgets": 210,
-    "workflows": 11,
-    "listeners": 8,
-    "cronJobs": 6,
+    "seedRows": 804,
+    "queries": 54,
+    "pages": 19,
+    "widgets": 164,
+    "workflows": 5,
+    "listeners": 3,
+    "cronJobs": 2,
     "roles": 5
   },
   "pages": [
@@ -277,60 +251,6 @@
       ]
     },
     {
-      "slug": "support-reports-secondary",
-      "title": "Reports · secondary mix",
-      "description": "Secondary entity mix and value trend with exportable records.",
-      "tags": [
-        "report",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "support-reports-quality",
-      "title": "Reports · data quality",
-      "description": "Data quality checks, failing operations and aging work.",
-      "tags": [
-        "report",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "support-tickets-kanban",
-      "title": "Tickets · kanban",
-      "description": "Status board grouped by the primary workflow stage.",
-      "tags": [
-        "core",
-        "staff",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "support-tickets-calendar",
-      "title": "Tickets · calendar",
-      "description": "Calendar view of the primary date field.",
-      "tags": [
-        "core",
-        "staff",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "support-search",
-      "title": "Global search",
-      "description": "Cross-entity search across every core table.",
-      "tags": [
-        "shared",
-        "staff",
-        "manager",
-        "admin",
-        "viewer"
-      ]
-    },
-    {
       "slug": "support-profile",
       "title": "My profile",
       "description": "Staff profile and editable contact details.",
@@ -378,71 +298,11 @@
       ]
     },
     {
-      "slug": "support-admin-users",
-      "title": "Admin · users",
-      "description": "Tenant users, platform roles and app-level role assignment overview.",
-      "tags": [
-        "admin",
-        "manager"
-      ]
-    },
-    {
       "slug": "support-admin-roles",
       "title": "Admin · roles and permissions",
       "description": "Provisioned tenant roles, permission counts and the app page matrix.",
       "tags": [
         "admin"
-      ]
-    },
-    {
-      "slug": "support-admin-audit",
-      "title": "Admin · audit log",
-      "description": "Filterable audit log with old/new JSON diff.",
-      "tags": [
-        "admin",
-        "manager"
-      ]
-    },
-    {
-      "slug": "support-admin-settings",
-      "title": "Admin · system settings",
-      "description": "Settings and feature flags with audited updates.",
-      "tags": [
-        "admin"
-      ]
-    },
-    {
-      "slug": "support-admin-import",
-      "title": "Admin · import / export",
-      "description": "CSV import with validation summary and record export.",
-      "tags": [
-        "admin",
-        "manager"
-      ]
-    },
-    {
-      "slug": "support-admin-integrations",
-      "title": "Admin · integration health",
-      "description": "Integration health and inbound webhook event log.",
-      "tags": [
-        "admin"
-      ]
-    },
-    {
-      "slug": "support-admin-jobs",
-      "title": "Admin · jobs and workflow runs",
-      "description": "Workflow instance monitor, run logs and cron history.",
-      "tags": [
-        "admin"
-      ]
-    },
-    {
-      "slug": "support-admin-quality",
-      "title": "Admin · data quality",
-      "description": "Quality checks and operational failures.",
-      "tags": [
-        "admin",
-        "manager"
       ]
     }
   ],
@@ -455,13 +315,6 @@
       "edgeCount": 8
     },
     {
-      "slug": "support.round-robin-assignment",
-      "title": "Tickets · round-robin assignment",
-      "description": "Picks the least-loaded active staff member and assigns the record, then sends an in-app notification.",
-      "nodeCount": 6,
-      "edgeCount": 5
-    },
-    {
       "slug": "support.approval-chain",
       "title": "Tickets · approval chain",
       "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
@@ -469,39 +322,11 @@
       "edgeCount": 9
     },
     {
-      "slug": "support.threshold-sweep",
-      "title": "Tickets · threshold sweep",
-      "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
-      "nodeCount": 6,
-      "edgeCount": 5
-    },
-    {
       "slug": "support.daily-digest",
       "title": "Tickets · daily digest",
       "description": "Builds a daily summary and writes a single in-app notification.",
       "nodeCount": 5,
       "edgeCount": 4
-    },
-    {
-      "slug": "support.escalation",
-      "title": "Tickets · escalation",
-      "description": "Waits for a configurable delay, then escalates high-priority records and notifies the manager.",
-      "nodeCount": 7,
-      "edgeCount": 7
-    },
-    {
-      "slug": "support.integration-sync",
-      "title": "Customer Support Console · integration sync",
-      "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
-      "nodeCount": 6,
-      "edgeCount": 6
-    },
-    {
-      "slug": "support.document-generation",
-      "title": "Tickets · document generation",
-      "description": "Builds an HTML document from record fields, links it as an attachment and notifies the owner.",
-      "nodeCount": 6,
-      "edgeCount": 5
     },
     {
       "slug": "support.data-collection",
@@ -516,13 +341,6 @@
       "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
       "nodeCount": 5,
       "edgeCount": 4
-    },
-    {
-      "slug": "support.notify-only",
-      "title": "Customer Support Console · notify only",
-      "description": "Minimal workflow used by inbound webhooks and manual demos: writes one notification.",
-      "nodeCount": 3,
-      "edgeCount": 2
     }
   ],
   "roles": [
@@ -776,153 +594,6 @@
         {
           "key": "reference",
           "type": "text",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "interactions",
-      "title": "Interactions",
-      "core": false,
-      "seedCount": 160,
-      "fields": [
-        {
-          "key": "customer_id",
-          "type": "ref",
-          "required": true
-        },
-        {
-          "key": "ticket_id",
-          "type": "int",
-          "required": false
-        },
-        {
-          "key": "channel",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "subject",
-          "type": "text",
-          "required": true
-        },
-        {
-          "key": "body",
-          "type": "longtext",
-          "required": false
-        },
-        {
-          "key": "agent_id",
-          "type": "ref",
-          "required": false
-        },
-        {
-          "key": "occurred_at",
-          "type": "timestamptz",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "canned_replies",
-      "title": "Canned replies",
-      "core": false,
-      "seedCount": 48,
-      "fields": [
-        {
-          "key": "title",
-          "type": "text",
-          "required": true
-        },
-        {
-          "key": "category",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "body",
-          "type": "longtext",
-          "required": false
-        },
-        {
-          "key": "is_active",
-          "type": "bool",
-          "required": false
-        },
-        {
-          "key": "usage_count",
-          "type": "int",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "escalations",
-      "title": "Escalations",
-      "core": false,
-      "seedCount": 60,
-      "fields": [
-        {
-          "key": "ticket_id",
-          "type": "int",
-          "required": true
-        },
-        {
-          "key": "reason",
-          "type": "text",
-          "required": true
-        },
-        {
-          "key": "level",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "status",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "owner_id",
-          "type": "ref",
-          "required": false
-        },
-        {
-          "key": "due_at",
-          "type": "timestamptz",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "knowledge_articles",
-      "title": "Knowledge base",
-      "core": false,
-      "seedCount": 70,
-      "fields": [
-        {
-          "key": "title",
-          "type": "text",
-          "required": true
-        },
-        {
-          "key": "category",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "status",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "views",
-          "type": "int",
-          "required": false
-        },
-        {
-          "key": "body",
-          "type": "longtext",
           "required": false
         }
       ]

@@ -199,65 +199,6 @@
         "canExport": false
       },
       {
-        "page": "support-reports-secondary",
-        "pageTitle": "Reports · secondary mix",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-reports-quality",
-        "pageTitle": "Reports · data quality",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-tickets-kanban",
-        "pageTitle": "Tickets · kanban",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-tickets-calendar",
-        "pageTitle": "Tickets · calendar",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-search",
-        "pageTitle": "Global search",
-        "tags": [
-          "shared",
-          "staff",
-          "manager",
-          "admin",
-          "viewer"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
         "page": "support-profile",
         "pageTitle": "My profile",
         "tags": [
@@ -309,77 +250,10 @@
         "canExport": false
       },
       {
-        "page": "support-admin-users",
-        "pageTitle": "Admin · users",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
         "page": "support-admin-roles",
         "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-audit",
-        "pageTitle": "Admin · audit log",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-settings",
-        "pageTitle": "Admin · system settings",
-        "tags": [
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-import",
-        "pageTitle": "Admin · import / export",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-integrations",
-        "pageTitle": "Admin · integration health",
-        "tags": [
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-jobs",
-        "pageTitle": "Admin · jobs and workflow runs",
-        "tags": [
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-quality",
-        "pageTitle": "Admin · data quality",
-        "tags": [
-          "admin",
-          "manager"
         ],
         "canView": true,
         "canExport": false
@@ -450,34 +324,7 @@
         "canExecute": true
       },
       {
-        "query": "support.tickets.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.tickets.status",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.tickets.assign",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.tickets.score",
         "tags": [
           "write",
           "core",
@@ -513,28 +360,10 @@
         "canExecute": true
       },
       {
-        "query": "support.tickets.overdue",
-        "tags": [
-          "read",
-          "report",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.list",
         "tags": [
           "read",
           "core",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.export",
-        "tags": [
-          "read",
-          "export",
           "customers"
         ],
         "canExecute": true
@@ -585,25 +414,7 @@
         "canExecute": true
       },
       {
-        "query": "support.customers.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.status",
-        "tags": [
-          "write",
-          "core",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.assign",
         "tags": [
           "write",
           "core",
@@ -621,46 +432,10 @@
         "canExecute": true
       },
       {
-        "query": "support.customers.trend",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.by_status",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.overdue",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.list",
         "tags": [
           "read",
           "core",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.subscriptions.export",
-        "tags": [
-          "read",
-          "export",
           "subscriptions"
         ],
         "canExecute": true
@@ -711,15 +486,6 @@
         "canExecute": true
       },
       {
-        "query": "support.subscriptions.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.status",
         "tags": [
           "write",
@@ -733,15 +499,6 @@
         "tags": [
           "read",
           "core",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.payments.export",
-        "tags": [
-          "read",
-          "export",
           "payments"
         ],
         "canExecute": true
@@ -792,15 +549,6 @@
         "canExecute": true
       },
       {
-        "query": "support.payments.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.payments.status",
         "tags": [
           "write",
@@ -839,14 +587,6 @@
         "tags": [
           "read",
           "portal"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.integration_ping",
-        "tags": [
-          "read",
-          "integration"
         ],
         "canExecute": true
       },
@@ -948,53 +688,10 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.import_jobs",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.ops",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.operational_staff",
-        "tags": [
-          "read",
-          "shared",
-          "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.search",
-        "tags": [
-          "read",
-          "shared"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.my_tasks",
         "tags": [
           "read",
           "core"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_users",
-        "tags": [
-          "read",
-          "admin"
         ],
         "canExecute": true
       },
@@ -1007,44 +704,11 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.admin_workflow_runs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_workflow_logs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_cron_history",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.data_quality",
         "tags": [
           "read",
           "admin",
           "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.import_csv",
-        "tags": [
-          "write",
-          "admin",
-          "shared"
         ],
         "canExecute": true
       },
@@ -1075,14 +739,6 @@
         "canTrigger": true
       },
       {
-        "workflow": "support.round-robin-assignment",
-        "tags": [
-          "core",
-          "automation"
-        ],
-        "canTrigger": true
-      },
-      {
         "workflow": "support.approval-chain",
         "tags": [
           "core",
@@ -1091,43 +747,10 @@
         "canTrigger": true
       },
       {
-        "workflow": "support.threshold-sweep",
-        "tags": [
-          "core",
-          "automation",
-          "sla"
-        ],
-        "canTrigger": true
-      },
-      {
         "workflow": "support.daily-digest",
         "tags": [
           "automation",
           "digest"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.escalation",
-        "tags": [
-          "automation",
-          "escalation"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.integration-sync",
-        "tags": [
-          "automation",
-          "integration"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.document-generation",
-        "tags": [
-          "automation",
-          "documents"
         ],
         "canTrigger": true
       },
@@ -1144,14 +767,6 @@
         "tags": [
           "automation",
           "reliability"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.notify-only",
-        "tags": [
-          "automation",
-          "listener"
         ],
         "canTrigger": true
       }
@@ -1360,65 +975,6 @@
         "canExport": true
       },
       {
-        "page": "support-reports-secondary",
-        "pageTitle": "Reports · secondary mix",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-reports-quality",
-        "pageTitle": "Reports · data quality",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-tickets-kanban",
-        "pageTitle": "Tickets · kanban",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-tickets-calendar",
-        "pageTitle": "Tickets · calendar",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-search",
-        "pageTitle": "Global search",
-        "tags": [
-          "shared",
-          "staff",
-          "manager",
-          "admin",
-          "viewer"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
         "page": "support-profile",
         "pageTitle": "My profile",
         "tags": [
@@ -1470,77 +1026,10 @@
         "canExport": true
       },
       {
-        "page": "support-admin-users",
-        "pageTitle": "Admin · users",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
         "page": "support-admin-roles",
         "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-admin-audit",
-        "pageTitle": "Admin · audit log",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-admin-settings",
-        "pageTitle": "Admin · system settings",
-        "tags": [
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-admin-import",
-        "pageTitle": "Admin · import / export",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-admin-integrations",
-        "pageTitle": "Admin · integration health",
-        "tags": [
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-admin-jobs",
-        "pageTitle": "Admin · jobs and workflow runs",
-        "tags": [
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-admin-quality",
-        "pageTitle": "Admin · data quality",
-        "tags": [
-          "admin",
-          "manager"
         ],
         "canView": true,
         "canExport": true
@@ -1611,34 +1100,7 @@
         "canExecute": true
       },
       {
-        "query": "support.tickets.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.tickets.status",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.tickets.assign",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.tickets.score",
         "tags": [
           "write",
           "core",
@@ -1674,28 +1136,10 @@
         "canExecute": true
       },
       {
-        "query": "support.tickets.overdue",
-        "tags": [
-          "read",
-          "report",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.list",
         "tags": [
           "read",
           "core",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.export",
-        "tags": [
-          "read",
-          "export",
           "customers"
         ],
         "canExecute": true
@@ -1746,25 +1190,7 @@
         "canExecute": true
       },
       {
-        "query": "support.customers.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.status",
-        "tags": [
-          "write",
-          "core",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.assign",
         "tags": [
           "write",
           "core",
@@ -1782,46 +1208,10 @@
         "canExecute": true
       },
       {
-        "query": "support.customers.trend",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.by_status",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.overdue",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.list",
         "tags": [
           "read",
           "core",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.subscriptions.export",
-        "tags": [
-          "read",
-          "export",
           "subscriptions"
         ],
         "canExecute": true
@@ -1872,15 +1262,6 @@
         "canExecute": true
       },
       {
-        "query": "support.subscriptions.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.status",
         "tags": [
           "write",
@@ -1894,15 +1275,6 @@
         "tags": [
           "read",
           "core",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.payments.export",
-        "tags": [
-          "read",
-          "export",
           "payments"
         ],
         "canExecute": true
@@ -1953,15 +1325,6 @@
         "canExecute": true
       },
       {
-        "query": "support.payments.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.payments.status",
         "tags": [
           "write",
@@ -2000,14 +1363,6 @@
         "tags": [
           "read",
           "portal"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.integration_ping",
-        "tags": [
-          "read",
-          "integration"
         ],
         "canExecute": true
       },
@@ -2109,53 +1464,10 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.import_jobs",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.ops",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.operational_staff",
-        "tags": [
-          "read",
-          "shared",
-          "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.search",
-        "tags": [
-          "read",
-          "shared"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.my_tasks",
         "tags": [
           "read",
           "core"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_users",
-        "tags": [
-          "read",
-          "admin"
         ],
         "canExecute": true
       },
@@ -2168,44 +1480,11 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.admin_workflow_runs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_workflow_logs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_cron_history",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.data_quality",
         "tags": [
           "read",
           "admin",
           "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.import_csv",
-        "tags": [
-          "write",
-          "admin",
-          "shared"
         ],
         "canExecute": true
       },
@@ -2236,14 +1515,6 @@
         "canTrigger": true
       },
       {
-        "workflow": "support.round-robin-assignment",
-        "tags": [
-          "core",
-          "automation"
-        ],
-        "canTrigger": true
-      },
-      {
         "workflow": "support.approval-chain",
         "tags": [
           "core",
@@ -2252,43 +1523,10 @@
         "canTrigger": true
       },
       {
-        "workflow": "support.threshold-sweep",
-        "tags": [
-          "core",
-          "automation",
-          "sla"
-        ],
-        "canTrigger": true
-      },
-      {
         "workflow": "support.daily-digest",
         "tags": [
           "automation",
           "digest"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.escalation",
-        "tags": [
-          "automation",
-          "escalation"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.integration-sync",
-        "tags": [
-          "automation",
-          "integration"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.document-generation",
-        "tags": [
-          "automation",
-          "documents"
         ],
         "canTrigger": true
       },
@@ -2305,14 +1543,6 @@
         "tags": [
           "automation",
           "reliability"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.notify-only",
-        "tags": [
-          "automation",
-          "listener"
         ],
         "canTrigger": true
       }
@@ -2520,65 +1750,6 @@
         "canExport": true
       },
       {
-        "page": "support-reports-secondary",
-        "pageTitle": "Reports · secondary mix",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-reports-quality",
-        "pageTitle": "Reports · data quality",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-tickets-kanban",
-        "pageTitle": "Tickets · kanban",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-tickets-calendar",
-        "pageTitle": "Tickets · calendar",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-search",
-        "pageTitle": "Global search",
-        "tags": [
-          "shared",
-          "staff",
-          "manager",
-          "admin",
-          "viewer"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
         "page": "support-profile",
         "pageTitle": "My profile",
         "tags": [
@@ -2630,77 +1801,10 @@
         "canExport": false
       },
       {
-        "page": "support-admin-users",
-        "pageTitle": "Admin · users",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
         "page": "support-admin-roles",
         "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-audit",
-        "pageTitle": "Admin · audit log",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-settings",
-        "pageTitle": "Admin · system settings",
-        "tags": [
-          "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-import",
-        "pageTitle": "Admin · import / export",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-integrations",
-        "pageTitle": "Admin · integration health",
-        "tags": [
-          "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-jobs",
-        "pageTitle": "Admin · jobs and workflow runs",
-        "tags": [
-          "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-quality",
-        "pageTitle": "Admin · data quality",
-        "tags": [
-          "admin",
-          "manager"
         ],
         "canView": false,
         "canExport": false
@@ -2771,34 +1875,7 @@
         "canExecute": true
       },
       {
-        "query": "support.tickets.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.tickets.status",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.tickets.assign",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.tickets.score",
         "tags": [
           "write",
           "core",
@@ -2834,28 +1911,10 @@
         "canExecute": true
       },
       {
-        "query": "support.tickets.overdue",
-        "tags": [
-          "read",
-          "report",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.list",
         "tags": [
           "read",
           "core",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.export",
-        "tags": [
-          "read",
-          "export",
           "customers"
         ],
         "canExecute": true
@@ -2906,25 +1965,7 @@
         "canExecute": true
       },
       {
-        "query": "support.customers.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.status",
-        "tags": [
-          "write",
-          "core",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.assign",
         "tags": [
           "write",
           "core",
@@ -2942,46 +1983,10 @@
         "canExecute": true
       },
       {
-        "query": "support.customers.trend",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.by_status",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.overdue",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.list",
         "tags": [
           "read",
           "core",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.subscriptions.export",
-        "tags": [
-          "read",
-          "export",
           "subscriptions"
         ],
         "canExecute": true
@@ -3032,15 +2037,6 @@
         "canExecute": true
       },
       {
-        "query": "support.subscriptions.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.status",
         "tags": [
           "write",
@@ -3054,15 +2050,6 @@
         "tags": [
           "read",
           "core",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.payments.export",
-        "tags": [
-          "read",
-          "export",
           "payments"
         ],
         "canExecute": true
@@ -3113,15 +2100,6 @@
         "canExecute": true
       },
       {
-        "query": "support.payments.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.payments.status",
         "tags": [
           "write",
@@ -3160,14 +2138,6 @@
         "tags": [
           "read",
           "portal"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.integration_ping",
-        "tags": [
-          "read",
-          "integration"
         ],
         "canExecute": true
       },
@@ -3269,53 +2239,10 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.import_jobs",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.ops",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.operational_staff",
-        "tags": [
-          "read",
-          "shared",
-          "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.search",
-        "tags": [
-          "read",
-          "shared"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.my_tasks",
         "tags": [
           "read",
           "core"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_users",
-        "tags": [
-          "read",
-          "admin"
         ],
         "canExecute": true
       },
@@ -3328,44 +2255,11 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.admin_workflow_runs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_workflow_logs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_cron_history",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.data_quality",
         "tags": [
           "read",
           "admin",
           "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.import_csv",
-        "tags": [
-          "write",
-          "admin",
-          "shared"
         ],
         "canExecute": true
       },
@@ -3396,14 +2290,6 @@
         "canTrigger": true
       },
       {
-        "workflow": "support.round-robin-assignment",
-        "tags": [
-          "core",
-          "automation"
-        ],
-        "canTrigger": true
-      },
-      {
         "workflow": "support.approval-chain",
         "tags": [
           "core",
@@ -3412,43 +2298,10 @@
         "canTrigger": true
       },
       {
-        "workflow": "support.threshold-sweep",
-        "tags": [
-          "core",
-          "automation",
-          "sla"
-        ],
-        "canTrigger": true
-      },
-      {
         "workflow": "support.daily-digest",
         "tags": [
           "automation",
           "digest"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.escalation",
-        "tags": [
-          "automation",
-          "escalation"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.integration-sync",
-        "tags": [
-          "automation",
-          "integration"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.document-generation",
-        "tags": [
-          "automation",
-          "documents"
         ],
         "canTrigger": true
       },
@@ -3465,14 +2318,6 @@
         "tags": [
           "automation",
           "reliability"
-        ],
-        "canTrigger": true
-      },
-      {
-        "workflow": "support.notify-only",
-        "tags": [
-          "automation",
-          "listener"
         ],
         "canTrigger": true
       }
@@ -3676,65 +2521,6 @@
         "canExport": true
       },
       {
-        "page": "support-reports-secondary",
-        "pageTitle": "Reports · secondary mix",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-reports-quality",
-        "pageTitle": "Reports · data quality",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-tickets-kanban",
-        "pageTitle": "Tickets · kanban",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-tickets-calendar",
-        "pageTitle": "Tickets · calendar",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
-        "page": "support-search",
-        "pageTitle": "Global search",
-        "tags": [
-          "shared",
-          "staff",
-          "manager",
-          "admin",
-          "viewer"
-        ],
-        "canView": true,
-        "canExport": true
-      },
-      {
         "page": "support-profile",
         "pageTitle": "My profile",
         "tags": [
@@ -3786,77 +2572,10 @@
         "canExport": false
       },
       {
-        "page": "support-admin-users",
-        "pageTitle": "Admin · users",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
         "page": "support-admin-roles",
         "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-audit",
-        "pageTitle": "Admin · audit log",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-settings",
-        "pageTitle": "Admin · system settings",
-        "tags": [
-          "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-import",
-        "pageTitle": "Admin · import / export",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-integrations",
-        "pageTitle": "Admin · integration health",
-        "tags": [
-          "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-jobs",
-        "pageTitle": "Admin · jobs and workflow runs",
-        "tags": [
-          "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-quality",
-        "pageTitle": "Admin · data quality",
-        "tags": [
-          "admin",
-          "manager"
         ],
         "canView": false,
         "canExport": false
@@ -3927,34 +2646,7 @@
         "canExecute": false
       },
       {
-        "query": "support.tickets.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.tickets.status",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": false
-      },
-      {
-        "query": "support.tickets.assign",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": false
-      },
-      {
-        "query": "support.tickets.score",
         "tags": [
           "write",
           "core",
@@ -3990,28 +2682,10 @@
         "canExecute": true
       },
       {
-        "query": "support.tickets.overdue",
-        "tags": [
-          "read",
-          "report",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.list",
         "tags": [
           "read",
           "core",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.export",
-        "tags": [
-          "read",
-          "export",
           "customers"
         ],
         "canExecute": true
@@ -4062,25 +2736,7 @@
         "canExecute": false
       },
       {
-        "query": "support.customers.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.status",
-        "tags": [
-          "write",
-          "core",
-          "customers"
-        ],
-        "canExecute": false
-      },
-      {
-        "query": "support.customers.assign",
         "tags": [
           "write",
           "core",
@@ -4098,46 +2754,10 @@
         "canExecute": true
       },
       {
-        "query": "support.customers.trend",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.by_status",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.overdue",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.list",
         "tags": [
           "read",
           "core",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.subscriptions.export",
-        "tags": [
-          "read",
-          "export",
           "subscriptions"
         ],
         "canExecute": true
@@ -4188,15 +2808,6 @@
         "canExecute": false
       },
       {
-        "query": "support.subscriptions.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.status",
         "tags": [
           "write",
@@ -4210,15 +2821,6 @@
         "tags": [
           "read",
           "core",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.payments.export",
-        "tags": [
-          "read",
-          "export",
           "payments"
         ],
         "canExecute": true
@@ -4269,15 +2871,6 @@
         "canExecute": false
       },
       {
-        "query": "support.payments.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.payments.status",
         "tags": [
           "write",
@@ -4316,14 +2909,6 @@
         "tags": [
           "read",
           "portal"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.integration_ping",
-        "tags": [
-          "read",
-          "integration"
         ],
         "canExecute": true
       },
@@ -4425,53 +3010,10 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.import_jobs",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.ops",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.operational_staff",
-        "tags": [
-          "read",
-          "shared",
-          "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.search",
-        "tags": [
-          "read",
-          "shared"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.my_tasks",
         "tags": [
           "read",
           "core"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_users",
-        "tags": [
-          "read",
-          "admin"
         ],
         "canExecute": true
       },
@@ -4484,44 +3026,11 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.admin_workflow_runs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_workflow_logs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_cron_history",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.data_quality",
         "tags": [
           "read",
           "admin",
           "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.import_csv",
-        "tags": [
-          "write",
-          "admin",
-          "shared"
         ],
         "canExecute": true
       },
@@ -4552,14 +3061,6 @@
         "canTrigger": false
       },
       {
-        "workflow": "support.round-robin-assignment",
-        "tags": [
-          "core",
-          "automation"
-        ],
-        "canTrigger": false
-      },
-      {
         "workflow": "support.approval-chain",
         "tags": [
           "core",
@@ -4568,43 +3069,10 @@
         "canTrigger": false
       },
       {
-        "workflow": "support.threshold-sweep",
-        "tags": [
-          "core",
-          "automation",
-          "sla"
-        ],
-        "canTrigger": false
-      },
-      {
         "workflow": "support.daily-digest",
         "tags": [
           "automation",
           "digest"
-        ],
-        "canTrigger": false
-      },
-      {
-        "workflow": "support.escalation",
-        "tags": [
-          "automation",
-          "escalation"
-        ],
-        "canTrigger": false
-      },
-      {
-        "workflow": "support.integration-sync",
-        "tags": [
-          "automation",
-          "integration"
-        ],
-        "canTrigger": false
-      },
-      {
-        "workflow": "support.document-generation",
-        "tags": [
-          "automation",
-          "documents"
         ],
         "canTrigger": false
       },
@@ -4621,14 +3089,6 @@
         "tags": [
           "automation",
           "reliability"
-        ],
-        "canTrigger": false
-      },
-      {
-        "workflow": "support.notify-only",
-        "tags": [
-          "automation",
-          "listener"
         ],
         "canTrigger": false
       }
@@ -4831,65 +3291,6 @@
         "canExport": false
       },
       {
-        "page": "support-reports-secondary",
-        "pageTitle": "Reports · secondary mix",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-reports-quality",
-        "pageTitle": "Reports · data quality",
-        "tags": [
-          "report",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-tickets-kanban",
-        "pageTitle": "Tickets · kanban",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-tickets-calendar",
-        "pageTitle": "Tickets · calendar",
-        "tags": [
-          "core",
-          "staff",
-          "manager",
-          "admin"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
-        "page": "support-search",
-        "pageTitle": "Global search",
-        "tags": [
-          "shared",
-          "staff",
-          "manager",
-          "admin",
-          "viewer"
-        ],
-        "canView": true,
-        "canExport": false
-      },
-      {
         "page": "support-profile",
         "pageTitle": "My profile",
         "tags": [
@@ -4941,77 +3342,10 @@
         "canExport": false
       },
       {
-        "page": "support-admin-users",
-        "pageTitle": "Admin · users",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
         "page": "support-admin-roles",
         "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-audit",
-        "pageTitle": "Admin · audit log",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-settings",
-        "pageTitle": "Admin · system settings",
-        "tags": [
-          "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-import",
-        "pageTitle": "Admin · import / export",
-        "tags": [
-          "admin",
-          "manager"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-integrations",
-        "pageTitle": "Admin · integration health",
-        "tags": [
-          "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-jobs",
-        "pageTitle": "Admin · jobs and workflow runs",
-        "tags": [
-          "admin"
-        ],
-        "canView": false,
-        "canExport": false
-      },
-      {
-        "page": "support-admin-quality",
-        "pageTitle": "Admin · data quality",
-        "tags": [
-          "admin",
-          "manager"
         ],
         "canView": false,
         "canExport": false
@@ -5082,34 +3416,7 @@
         "canExecute": false
       },
       {
-        "query": "support.tickets.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.tickets.status",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": false
-      },
-      {
-        "query": "support.tickets.assign",
-        "tags": [
-          "write",
-          "core",
-          "tickets"
-        ],
-        "canExecute": false
-      },
-      {
-        "query": "support.tickets.score",
         "tags": [
           "write",
           "core",
@@ -5145,28 +3452,10 @@
         "canExecute": true
       },
       {
-        "query": "support.tickets.overdue",
-        "tags": [
-          "read",
-          "report",
-          "tickets"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.list",
         "tags": [
           "read",
           "core",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.export",
-        "tags": [
-          "read",
-          "export",
           "customers"
         ],
         "canExecute": true
@@ -5217,25 +3506,7 @@
         "canExecute": false
       },
       {
-        "query": "support.customers.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.customers.status",
-        "tags": [
-          "write",
-          "core",
-          "customers"
-        ],
-        "canExecute": false
-      },
-      {
-        "query": "support.customers.assign",
         "tags": [
           "write",
           "core",
@@ -5253,46 +3524,10 @@
         "canExecute": true
       },
       {
-        "query": "support.customers.trend",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.by_status",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.customers.overdue",
-        "tags": [
-          "read",
-          "report",
-          "customers"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.list",
         "tags": [
           "read",
           "core",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.subscriptions.export",
-        "tags": [
-          "read",
-          "export",
           "subscriptions"
         ],
         "canExecute": true
@@ -5343,15 +3578,6 @@
         "canExecute": false
       },
       {
-        "query": "support.subscriptions.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "subscriptions"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.subscriptions.status",
         "tags": [
           "write",
@@ -5365,15 +3591,6 @@
         "tags": [
           "read",
           "core",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.payments.export",
-        "tags": [
-          "read",
-          "export",
           "payments"
         ],
         "canExecute": true
@@ -5424,15 +3641,6 @@
         "canExecute": false
       },
       {
-        "query": "support.payments.lookup",
-        "tags": [
-          "read",
-          "lookup",
-          "payments"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.payments.status",
         "tags": [
           "write",
@@ -5471,14 +3679,6 @@
         "tags": [
           "read",
           "portal"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.integration_ping",
-        "tags": [
-          "read",
-          "integration"
         ],
         "canExecute": true
       },
@@ -5580,53 +3780,10 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.import_jobs",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.ops",
-        "tags": [
-          "read",
-          "shared",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.operational_staff",
-        "tags": [
-          "read",
-          "shared",
-          "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.search",
-        "tags": [
-          "read",
-          "shared"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.my_tasks",
         "tags": [
           "read",
           "core"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_users",
-        "tags": [
-          "read",
-          "admin"
         ],
         "canExecute": true
       },
@@ -5639,44 +3796,11 @@
         "canExecute": true
       },
       {
-        "query": "support.shared.admin_workflow_runs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_workflow_logs",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.admin_cron_history",
-        "tags": [
-          "read",
-          "admin"
-        ],
-        "canExecute": true
-      },
-      {
         "query": "support.shared.data_quality",
         "tags": [
           "read",
           "admin",
           "report"
-        ],
-        "canExecute": true
-      },
-      {
-        "query": "support.shared.import_csv",
-        "tags": [
-          "write",
-          "admin",
-          "shared"
         ],
         "canExecute": true
       },
@@ -5707,14 +3831,6 @@
         "canTrigger": false
       },
       {
-        "workflow": "support.round-robin-assignment",
-        "tags": [
-          "core",
-          "automation"
-        ],
-        "canTrigger": false
-      },
-      {
         "workflow": "support.approval-chain",
         "tags": [
           "core",
@@ -5723,43 +3839,10 @@
         "canTrigger": false
       },
       {
-        "workflow": "support.threshold-sweep",
-        "tags": [
-          "core",
-          "automation",
-          "sla"
-        ],
-        "canTrigger": false
-      },
-      {
         "workflow": "support.daily-digest",
         "tags": [
           "automation",
           "digest"
-        ],
-        "canTrigger": false
-      },
-      {
-        "workflow": "support.escalation",
-        "tags": [
-          "automation",
-          "escalation"
-        ],
-        "canTrigger": false
-      },
-      {
-        "workflow": "support.integration-sync",
-        "tags": [
-          "automation",
-          "integration"
-        ],
-        "canTrigger": false
-      },
-      {
-        "workflow": "support.document-generation",
-        "tags": [
-          "automation",
-          "documents"
         ],
         "canTrigger": false
       },
@@ -5776,14 +3859,6 @@
         "tags": [
           "automation",
           "reliability"
-        ],
-        "canTrigger": false
-      },
-      {
-        "workflow": "support.notify-only",
-        "tags": [
-          "automation",
-          "listener"
         ],
         "canTrigger": false
       }

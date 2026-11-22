@@ -62,44 +62,6 @@
     }
   },
   {
-    "slug": "inv.suppliers.export",
-    "title": "Suppliers · export",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "export",
-      "suppliers"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"name\", \"code\", \"status\", \"contact_name\", \"email\", \"phone\", \"lead_time_days\", \"min_order_value\", \"reliability_score\", \"payment_terms\", \"country\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:suppliers}}\nWHERE deleted_at IS NULL AND (coalesce(\"name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"code\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"contact_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"email\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
-      "inputDefinitions": [
-        {
-          "key": "search",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "status",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "inv.suppliers.detail",
     "title": "Suppliers · detail",
     "datasource": "primary",
@@ -324,23 +286,6 @@
     }
   },
   {
-    "slug": "inv.suppliers.lookup",
-    "title": "Suppliers · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "suppliers"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"name\"::text AS label FROM {{table:suppliers}} WHERE deleted_at IS NULL ORDER BY \"name\" LIMIT 500",
-      "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "inv.suppliers.status",
     "title": "Suppliers · change status",
     "datasource": "primary",
@@ -364,36 +309,6 @@
           "type": "string",
           "required": false,
           "default": "active"
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.suppliers.score",
-    "title": "Suppliers · save score",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "suppliers"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:suppliers}} SET \"reliability_score\" = $2::numeric, updated_at = now() WHERE id = $1::int RETURNING id, \"reliability_score\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "score",
-          "type": "number",
-          "required": false,
-          "default": 0
         }
       ],
       "parameterized": true,

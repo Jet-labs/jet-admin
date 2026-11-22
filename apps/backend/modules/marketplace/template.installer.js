@@ -17,6 +17,49 @@ const { loadPackage, listSlugs, tablePrefix, resolvePlaceholders, compileBundle,
 
 const LEDGER_TABLE = '"tblMarketplaceTemplateInstalls"';
 
+const RESOURCE_TYPE_LABELS = {
+  datasource: "Datasource",
+  dataQuery: "Query",
+  widget: "Widget",
+  workflow: "Workflow",
+  appPage: "App page",
+  listener: "Listener",
+  cronJob: "Cron job",
+  role: "Role",
+  demoUser: "Demo user",
+};
+
+function resourceKey(resource) {
+  return `${resource.type}:${resource.id}`;
+}
+
+function buildUninstallPlan(ledger) {
+  const resources = (Array.isArray(ledger.resources) ? ledger.resources : []).map((resource) => ({
+    key: resourceKey(resource),
+    id: resource.id,
+    type: resource.type,
+    typeLabel: RESOURCE_TYPE_LABELS[resource.type] || resource.type,
+    label: resource.key || resource.id,
+  }));
+  const tables = (Array.isArray(ledger.tables) ? ledger.tables : []).map((table) => ({
+    key: `table:${table}`,
+    id: table,
+    type: "table",
+    typeLabel: "Database table",
+    label: table,
+  }));
+  return { resources, tables, total: resources.length + tables.length };
+}
+
+async function updateLedgerContents(client, tenantID, slug, resources, tables) {
+  await client.query(
+    `UPDATE ${LEDGER_TABLE}
+        SET "resources" = $3::jsonb, "tables" = $4::jsonb, "updatedAt" = now()
+      WHERE "tenantID" = $1::uuid AND "slug" = $2`,
+    [tenantID, slug, JSON.stringify(resources), JSON.stringify(tables)]
+  );
+}
+
 function templateError(message, code = "TEMPLATE_ERROR", statusCode = 400) {
   const error = new Error(message);
   error.code = code;
@@ -356,7 +399,7 @@ async function installTemplate({ tenantID, slug, options = {}, userID, authConte
   }
 }
 
-async function cleanupInstall({ tenantID, slug, prefix, resources = [], tables = [], client }) {
+async function cleanupInstall({ tenantID, slug, prefix, resources = [], tables = [], client, keepLedger = false }) {
   const byType = (type) => resources.filter((r) => r.type === type).map((r) => r.id).filter(Boolean);
   const ids = (list) => (list.length ? { in: list } : null);
 
@@ -388,14 +431,29 @@ async function cleanupInstall({ tenantID, slug, prefix, resources = [], tables =
   // Roles and demo users.
   const roleIDs = byType("role");
   const demoUserIDs = byType("demoUser");
+  // Remove asset permissions for every selected resource, even when its role
+  // is being kept. Otherwise a partial uninstall would leave dangling grants.
+  const assetPermissionTypes = { appPage: "apppage", dataQuery: "dataquery", workflow: "workflow" };
+  for (const resource of resources) {
+    const assetType = assetPermissionTypes[resource.type];
+    if (!assetType || !resource.id) continue;
+    const permissionRows = await prisma.tblPermissions.findMany({
+      where: { permissionTitle: { startsWith: `tenant:asset:${assetType}:${resource.id}:` } },
+      select: { permissionID: true },
+    }).catch(() => []);
+    const permissionIDs = permissionRows.map((row) => row.permissionID);
+    if (permissionIDs.length) {
+      await prisma.tblRolePermissionMappings.deleteMany({
+        where: { permissionID: { in: permissionIDs } },
+      }).catch(() => {});
+      await prisma.tblPermissions.deleteMany({
+        where: { permissionID: { in: permissionIDs } },
+      }).catch(() => {});
+    }
+  }
   if (roleIDs.length) {
     await prisma.tblUserTenantRoleMappings.deleteMany({ where: { roleID: { in: roleIDs } } });
     await prisma.tblRolePermissionMappings.deleteMany({ where: { roleID: { in: roleIDs } } });
-    for (const pageID of pageIDs) {
-      await prisma.tblPermissions.deleteMany({
-        where: { permissionTitle: { startsWith: `tenant:asset:apppage:${pageID}:` } },
-      }).catch(() => {});
-    }
     for (const roleID of roleIDs) {
       await removePoliciesForRole(`role:${roleID}`, tenantID).catch(() => {});
     }
@@ -427,13 +485,13 @@ async function cleanupInstall({ tenantID, slug, prefix, resources = [], tables =
   // Tenant tables, function and ledger.
   if (client) {
     await dropTemplateTables(client, prefix, tables);
-    await deleteLedger(client, tenantID, slug);
+    if (!keepLedger) await deleteLedger(client, tenantID, slug);
   } else {
     const scratch = new Client({ connectionString: process.env.DATABASE_URL });
     await scratch.connect();
     try {
       await dropTemplateTables(scratch, prefix, tables);
-      await deleteLedger(scratch, tenantID, slug);
+      if (!keepLedger) await deleteLedger(scratch, tenantID, slug);
     } finally {
       await scratch.end().catch(() => {});
     }
@@ -441,7 +499,7 @@ async function cleanupInstall({ tenantID, slug, prefix, resources = [], tables =
   await reloadPolicies().catch(() => {});
 }
 
-async function uninstallTemplate({ tenantID, slug, userID }) {
+async function uninstallTemplate({ tenantID, slug, userID, selectedAssetKeys }) {
   let pkg = null;
   try {
     pkg = await loadPackage(slug);
@@ -458,16 +516,58 @@ async function uninstallTemplate({ tenantID, slug, userID }) {
     lockAcquired = true;
     const ledger = await getLedger(client, tenantID, slug);
     if (!ledger) return { removed: false, reason: "not-installed" };
+    const allResources = Array.isArray(ledger.resources) ? ledger.resources : [];
+    const allTables = Array.isArray(ledger.tables) && ledger.tables.length
+      ? ledger.tables
+      : (pkg ? pkg.tables : []);
+    const selection = Array.isArray(selectedAssetKeys) ? new Set(selectedAssetKeys) : null;
+    const selectedResources = selection
+      ? allResources.filter((resource) => selection.has(resourceKey(resource)))
+      : allResources;
+    const selectedTables = selection
+      ? allTables.filter((table) => selection.has(`table:${table}`))
+      : allTables;
+    if (selection && selectedResources.length === 0 && selectedTables.length === 0) {
+      throw templateError("Select at least one asset to uninstall.", "NO_ASSETS_SELECTED", 400);
+    }
+    const isFull = selectedResources.length === allResources.length && selectedTables.length === allTables.length;
     await cleanupInstall({
       tenantID,
       slug,
       prefix: ledger.tablePrefix || (pkg ? tablePrefix(pkg.manifest, tenantID) : ""),
-      resources: Array.isArray(ledger.resources) ? ledger.resources : [],
-      tables: Array.isArray(ledger.tables) && ledger.tables.length ? ledger.tables : (pkg ? pkg.tables : []),
+      resources: selectedResources,
+      tables: selectedTables,
       client,
+      keepLedger: !isFull,
     });
-    Logger.log("success", { message: "templateInstaller:uninstall:success", params: { tenantID, slug, userID } });
-    return { removed: true };
+    if (isFull) {
+      Logger.log("success", { message: "templateInstaller:uninstall:success", params: { tenantID, slug, userID } });
+      return {
+        removed: true,
+        mode: "full",
+        deleted: { resources: selectedResources.length, tables: selectedTables.length },
+        remaining: { resources: 0, tables: 0 },
+      };
+    }
+    const remainingResources = allResources.filter((resource) => !selection.has(resourceKey(resource)));
+    const remainingTables = allTables.filter((table) => !selection.has(`table:${table}`));
+    await updateLedgerContents(client, tenantID, slug, remainingResources, remainingTables);
+    Logger.log("success", {
+      message: "templateInstaller:uninstall:partial",
+      params: {
+        tenantID,
+        slug,
+        userID,
+        deletedResources: selectedResources.length,
+        deletedTables: selectedTables.length,
+      },
+    });
+    return {
+      removed: true,
+      mode: "partial",
+      deleted: { resources: selectedResources.length, tables: selectedTables.length },
+      remaining: { resources: remainingResources.length, tables: remainingTables.length },
+    };
   } finally {
     if (lockAcquired) await client.query("SELECT pg_advisory_unlock(hashtext($1))", [`marketplace-template:${tenantID}:${slug}`]).catch(() => {});
     await client.end().catch(() => {});
@@ -525,6 +625,7 @@ async function getTemplate({ tenantID, slug }) {
             options: ledger.options,
             resources: Array.isArray(ledger.resources) ? ledger.resources.length : 0,
             createdAt: ledger.createdAt,
+            uninstallPlan: buildUninstallPlan(ledger),
           }
         : null,
     };

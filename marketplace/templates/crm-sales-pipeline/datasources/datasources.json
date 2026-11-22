@@ -23,23 +23,5 @@
     },
     "requiresReconnect": false,
     "installStrategy": "asIs"
-  },
-  {
-    "slug": "integration",
-    "title": "CRM & Sales Pipeline · mock REST integration",
-    "type": "restapi",
-    "description": "Deliberately unreachable mock REST endpoint used by the integration-sync workflow to prove the error path. Reconnect to a real provider in production.",
-    "options": {
-      "baseUrl": "http://127.0.0.1:9",
-      "timeout": 5,
-      "authType": "none",
-      "headers": [],
-      "queryParams": [],
-      "contentType": "application/json",
-      "followRedirects": false,
-      "sslVerify": true
-    },
-    "requiresReconnect": true,
-    "installStrategy": "asIs"
   }
 ]

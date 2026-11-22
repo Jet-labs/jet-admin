@@ -33,23 +33,11 @@ The package is data-only: schema, deterministic seed, parameterized queries, wid
 | `ap-suppliers-create` | Create Supplier | core, staff, manager, admin |
 | `ap-dashboard` | Dashboard | core, shared, staff, manager, admin, viewer |
 | `ap-reports-operations` | Reports · operations | report, manager, admin |
-| `ap-reports-secondary` | Reports · secondary mix | report, manager, admin |
-| `ap-reports-quality` | Reports · data quality | report, manager, admin |
-| `ap-invoices-kanban` | Invoices · kanban | core, staff, manager, admin |
-| `ap-invoices-calendar` | Invoices · calendar | core, staff, manager, admin |
-| `ap-search` | Global search | shared, staff, manager, admin, viewer |
 | `ap-profile` | My profile | shared, staff, manager, admin, viewer, portal |
 | `ap-notifications` | Notifications | shared, staff, manager, admin, viewer, portal |
 | `ap-settings` | Settings | shared, manager, admin |
 | `ap-portal` | Client portal | portal, client, admin, manager |
-| `ap-admin-users` | Admin · users | admin, manager |
 | `ap-admin-roles` | Admin · roles and permissions | admin |
-| `ap-admin-audit` | Admin · audit log | admin, manager |
-| `ap-admin-settings` | Admin · system settings | admin |
-| `ap-admin-import` | Admin · import / export | admin, manager |
-| `ap-admin-integrations` | Admin · integration health | admin |
-| `ap-admin-jobs` | Admin · jobs and workflow runs | admin |
-| `ap-admin-quality` | Admin · data quality | admin, manager |
 
 ## Data model
 
@@ -108,52 +96,6 @@ erDiagram
     string tax_id
     string address
   }
-  INVOICE_LINES {
-    int id PK
-    int invoice_id FK
-    int line_number
-    string description
-    int quantity
-    decimal unit_price
-    decimal line_total
-    decimal tax_amount
-    string po_line_ref
-  }
-  PURCHASE_ORDER_LINES {
-    int id PK
-    int po_id FK
-    int line_number
-    string sku
-    string description
-    int quantity
-    decimal unit_price
-    decimal line_total
-    int received_qty
-  }
-  MATCH_RESULTS {
-    int id PK
-    int invoice_id FK
-    int po_id FK
-    int receipt_id FK
-    string match_type
-    string status
-    decimal variance_amount
-    decimal variance_pct
-    datetime checked_at
-    int checked_by_id FK
-  }
-  DISCREPANCIES {
-    int id PK
-    int invoice_id FK
-    int match_result_id FK
-    string severity
-    string category
-    string status
-    int assigned_to_id FK
-    decimal amount_impact
-    string description
-    datetime resolved_at
-  }
   SUPPLIERS ||--o{ INVOICES : "supplier_id"
   PURCHASE_ORDERS ||--o{ INVOICES : "po_id"
   STAFF ||--o{ INVOICES : "owner_id"
@@ -161,37 +103,22 @@ erDiagram
   STAFF ||--o{ PURCHASE_ORDERS : "buyer_id"
   PURCHASE_ORDERS ||--o{ RECEIPTS : "po_id"
   SUPPLIERS ||--o{ RECEIPTS : "supplier_id"
-  INVOICES ||--o{ INVOICE_LINES : "invoice_id"
-  PURCHASE_ORDERS ||--o{ PURCHASE_ORDER_LINES : "po_id"
-  INVOICES ||--o{ MATCH_RESULTS : "invoice_id"
-  PURCHASE_ORDERS ||--o{ MATCH_RESULTS : "po_id"
-  RECEIPTS ||--o{ MATCH_RESULTS : "receipt_id"
-  STAFF ||--o{ MATCH_RESULTS : "checked_by_id"
-  INVOICES ||--o{ DISCREPANCIES : "invoice_id"
-  MATCH_RESULTS ||--o{ DISCREPANCIES : "match_result_id"
-  STAFF ||--o{ DISCREPANCIES : "assigned_to_id"
   STAFF ||--o{ AUDIT_LOG : actor
   STAFF ||--o{ COMMENTS : author
   STAFF ||--o{ NOTIFICATIONS : recipient
 ```
 
-The package ships 8 domain tables plus 10 support tables (staff, lookups, audit, comments, attachments, notifications, settings, imports, operations, role matrix).
+The package ships 4 domain tables plus 10 support tables (staff, lookups, audit, comments, attachments, notifications, settings, imports, operations, role matrix).
 
 ## Workflows
 
 | Workflow | Purpose | Nodes |
 | --- | --- | --- |
 | `ap.intake-triage` | Invoices · intake triage | 8 |
-| `ap.round-robin-assignment` | Invoices · round-robin assignment | 6 |
 | `ap.approval-chain` | Invoices · approval chain | 8 |
-| `ap.threshold-sweep` | Invoices · threshold sweep | 6 |
 | `ap.daily-digest` | Invoices · daily digest | 5 |
-| `ap.escalation` | Invoices · escalation | 7 |
-| `ap.integration-sync` | Invoice Matching Desk · integration sync | 6 |
-| `ap.document-generation` | Invoices · document generation | 6 |
 | `ap.data-collection` | Invoices · supplier/customer follow-up | 4 |
 | `ap.error-recovery` | Invoice Matching Desk · expected failure and recovery | 5 |
-| `ap.notify-only` | Invoice Matching Desk · notify only | 3 |
 
 ### Invoices · intake triage
 
@@ -212,21 +139,6 @@ flowchart TD
   n4 -->|success| n6
   n6 -->|success| n7
   n5 -->|success| n7
-
-### Invoices · round-robin assignment
-
-flowchart TD
-  n0["start<br/><small>start</small>"]
-  n1["loadStaff<br/><small>dataQuery</small>"]
-  n2["pickAssignee<br/><small>javascript</small>"]
-  n3["assignOwner<br/><small>dataQuery</small>"]
-  n4["notifyOwner<br/><small>dataQuery</small>"]
-  n5["done<br/><small>end</small>"]
-  n0 -->|output| n1
-  n1 -->|success| n2
-  n2 -->|success| n3
-  n3 -->|success| n4
-  n4 -->|success| n5
 
 ### Invoices · approval chain
 
@@ -249,21 +161,6 @@ flowchart TD
   n5 -->|success| n6
   n6 -->|success| n7
 
-### Invoices · threshold sweep
-
-flowchart TD
-  n0["start<br/><small>start</small>"]
-  n1["loadOverdue<br/><small>dataQuery</small>"]
-  n2["boundBatch<br/><small>javascript</small>"]
-  n3["loopOverdue<br/><small>loop</small>"]
-  n4["notifyOverdue<br/><small>dataQuery</small>"]
-  n5["done<br/><small>end</small>"]
-  n0 -->|output| n1
-  n1 -->|success| n2
-  n2 -->|success| n3
-  n3 -->|loop| n4
-  n3 -->|completed| n5
-
 ### Invoices · daily digest
 
 flowchart TD
@@ -277,23 +174,29 @@ flowchart TD
   n2 -->|success| n3
   n3 -->|success| n4
 
-### Invoices · escalation
+### Invoices · supplier/customer follow-up
 
 flowchart TD
   n0["start<br/><small>start</small>"]
-  n1["waitForResponse<br/><small>delay</small>"]
-  n2["loadRecord<br/><small>dataQuery</small>"]
-  n3["readPriority<br/><small>javascript</small>"]
-  n4["needsEscalation<br/><small>condition</small>"]
-  n5["notifyEscalation<br/><small>dataQuery</small>"]
-  n6["done<br/><small>end</small>"]
+  n1["Follow up on Invoice #{{ ctx.recordID }}<br/><small>dataCollection</small>"]
+  n2["recordFollowUp<br/><small>dataQuery</small>"]
+  n3["done<br/><small>end</small>"]
   n0 -->|output| n1
-  n1 -->|success| n2
+  n1 -->|output| n2
+  n2 -->|success| n3
+
+### Invoice Matching Desk · expected failure and recovery
+
+flowchart TD
+  n0["start<br/><small>start</small>"]
+  n1["injectFailure<br/><small>javascript</small>"]
+  n2["compensate<br/><small>javascript</small>"]
+  n3["notifyRecovery<br/><small>dataQuery</small>"]
+  n4["done<br/><small>end</small>"]
+  n0 -->|output| n1
+  n1 -->|error| n2
   n2 -->|success| n3
   n3 -->|success| n4
-  n4 -->|escalate| n5
-  n4 -->|normal| n6
-  n5 -->|success| n6
 
 
 Failure behavior: every workflow declares per-node `errorHandling`; external sync and recovery workflows have explicit error edges. Human tasks (approval/dataCollection) suspend with an expiry and resume through the platform's data-collection endpoint. Cron jobs and listeners ship **inactive/disabled** until reviewed.
@@ -310,9 +213,7 @@ The installer creates tenant-scoped platform roles and grants asset-level Casbin
 
 ## Integrations
 
-- **ERP accounts-payable REST** — required: base URL, API token. Mock: Connector ships disabled with no credentials; seeded invoices and purchase orders are the demo source of truth.
-- **Supplier invoice webhook** — required: endpoint path, optional signature header. Mock: POST { "kind": "webhook.received", "record_id": 1 } to the inactive listener to simulate a supplier invoice.
-- **OCR document service** — required: endpoint URL, API key. Mock: Invoice files are represented by seeded metadata and attachment URLs until an OCR provider is connected.
+- **Inbound webhook** — required: endpoint path, signature header (optional). Mock: Send a JSON body with kind=webhook.received to the inactive listener.
 
 ## Install
 

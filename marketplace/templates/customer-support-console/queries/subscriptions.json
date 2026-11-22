@@ -62,44 +62,6 @@
     }
   },
   {
-    "slug": "support.subscriptions.export",
-    "title": "Subscriptions · export",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "export",
-      "subscriptions"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"customer_id\", \"plan\", \"status\", \"amount\", \"billing_cycle\", \"seats\", \"started_at\", \"renews_at\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:subscriptions}}\nWHERE deleted_at IS NULL AND ($1::text = '')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
-      "inputDefinitions": [
-        {
-          "key": "search",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "status",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "support.subscriptions.detail",
     "title": "Subscriptions · detail",
     "datasource": "primary",
@@ -289,23 +251,6 @@
           "default": []
         }
       ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "support.subscriptions.lookup",
-    "title": "Subscriptions · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "subscriptions"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"id\"::text AS label FROM {{table:subscriptions}} WHERE deleted_at IS NULL ORDER BY \"id\" LIMIT 500",
-      "inputDefinitions": [],
       "parameterized": true,
       "timeoutSeconds": 20
     }

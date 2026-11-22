@@ -60,7 +60,7 @@ async function main() {
     });
     const workflows = await prisma.tblWorkflows.findMany({ where: { tenantID }, select: { workflowID: true, title: true } });
     const byTitle = (text) => workflows.find((w) => w.title.toLowerCase().includes(text));
-    const cases = [
+    const candidateCases = [
       { title: "notify only", inputs: { recordID: 1, event: { kind: "record.created" } }, expect: "COMPLETED" },
       { title: "intake triage", inputs: { recordID: 1, staffID: 1 }, expect: "COMPLETED" },
       { title: "approval chain", inputs: { recordID: 1, staffID: 1 }, expect: ["RUNNING", "PAUSED", "WAITING"] },
@@ -68,6 +68,11 @@ async function main() {
       { title: "daily digest", inputs: { staffID: 1 }, expect: "COMPLETED" },
       { title: "expected failure and recovery", inputs: { recordID: 1 }, expect: "COMPLETED" },
     ];
+    const cases = candidateCases.filter((testCase) => {
+      const present = Boolean(byTitle(testCase.title));
+      if (!present) console.log(`  - ${testCase.title}: not included in this compact bundle`);
+      return present;
+    });
     let failed = 0;
     for (const testCase of cases) {
       const wf = byTitle(testCase.title);

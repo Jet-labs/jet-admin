@@ -33,23 +33,11 @@ The package is data-only: schema, deterministic seed, parameterized queries, wid
 | `support-payments-create` | Create Payment | core, staff, manager, admin |
 | `support-dashboard` | Dashboard | core, shared, staff, manager, admin, viewer |
 | `support-reports-operations` | Reports · operations | report, manager, admin |
-| `support-reports-secondary` | Reports · secondary mix | report, manager, admin |
-| `support-reports-quality` | Reports · data quality | report, manager, admin |
-| `support-tickets-kanban` | Tickets · kanban | core, staff, manager, admin |
-| `support-tickets-calendar` | Tickets · calendar | core, staff, manager, admin |
-| `support-search` | Global search | shared, staff, manager, admin, viewer |
 | `support-profile` | My profile | shared, staff, manager, admin, viewer, portal |
 | `support-notifications` | Notifications | shared, staff, manager, admin, viewer, portal |
 | `support-settings` | Settings | shared, manager, admin |
 | `support-portal` | Client portal | portal, client, admin, manager |
-| `support-admin-users` | Admin · users | admin, manager |
 | `support-admin-roles` | Admin · roles and permissions | admin |
-| `support-admin-audit` | Admin · audit log | admin, manager |
-| `support-admin-settings` | Admin · system settings | admin |
-| `support-admin-import` | Admin · import / export | admin, manager |
-| `support-admin-integrations` | Admin · integration health | admin |
-| `support-admin-jobs` | Admin · jobs and workflow runs | admin |
-| `support-admin-quality` | Admin · data quality | admin, manager |
 
 ## Data model
 
@@ -106,71 +94,27 @@ erDiagram
     string due_date
     string reference
   }
-  INTERACTIONS {
-    int id PK
-    int customer_id FK
-    int ticket_id
-    string channel
-    string subject
-    string body
-    int agent_id FK
-    datetime occurred_at
-  }
-  CANNED_REPLIES {
-    int id PK
-    string title
-    string category
-    string body
-    boolean is_active
-    int usage_count
-  }
-  ESCALATIONS {
-    int id PK
-    int ticket_id
-    string reason
-    string level
-    string status
-    int owner_id FK
-    datetime due_at
-  }
-  KNOWLEDGE_ARTICLES {
-    int id PK
-    string title
-    string category
-    string status
-    int views
-    string body
-  }
   CUSTOMERS ||--o{ TICKETS : "customer_id"
   STAFF ||--o{ TICKETS : "assignee_id"
   STAFF ||--o{ CUSTOMERS : "owner_id"
   CUSTOMERS ||--o{ SUBSCRIPTIONS : "customer_id"
   CUSTOMERS ||--o{ PAYMENTS : "customer_id"
-  CUSTOMERS ||--o{ INTERACTIONS : "customer_id"
-  STAFF ||--o{ INTERACTIONS : "agent_id"
-  STAFF ||--o{ ESCALATIONS : "owner_id"
   STAFF ||--o{ AUDIT_LOG : actor
   STAFF ||--o{ COMMENTS : author
   STAFF ||--o{ NOTIFICATIONS : recipient
 ```
 
-The package ships 8 domain tables plus 10 support tables (staff, lookups, audit, comments, attachments, notifications, settings, imports, operations, role matrix).
+The package ships 4 domain tables plus 10 support tables (staff, lookups, audit, comments, attachments, notifications, settings, imports, operations, role matrix).
 
 ## Workflows
 
 | Workflow | Purpose | Nodes |
 | --- | --- | --- |
 | `support.intake-triage` | Tickets · intake triage | 8 |
-| `support.round-robin-assignment` | Tickets · round-robin assignment | 6 |
 | `support.approval-chain` | Tickets · approval chain | 8 |
-| `support.threshold-sweep` | Tickets · threshold sweep | 6 |
 | `support.daily-digest` | Tickets · daily digest | 5 |
-| `support.escalation` | Tickets · escalation | 7 |
-| `support.integration-sync` | Customer Support Console · integration sync | 6 |
-| `support.document-generation` | Tickets · document generation | 6 |
 | `support.data-collection` | Tickets · supplier/customer follow-up | 4 |
 | `support.error-recovery` | Customer Support Console · expected failure and recovery | 5 |
-| `support.notify-only` | Customer Support Console · notify only | 3 |
 
 ### Tickets · intake triage
 
@@ -191,21 +135,6 @@ flowchart TD
   n4 -->|success| n6
   n6 -->|success| n7
   n5 -->|success| n7
-
-### Tickets · round-robin assignment
-
-flowchart TD
-  n0["start<br/><small>start</small>"]
-  n1["loadStaff<br/><small>dataQuery</small>"]
-  n2["pickAssignee<br/><small>javascript</small>"]
-  n3["assignOwner<br/><small>dataQuery</small>"]
-  n4["notifyOwner<br/><small>dataQuery</small>"]
-  n5["done<br/><small>end</small>"]
-  n0 -->|output| n1
-  n1 -->|success| n2
-  n2 -->|success| n3
-  n3 -->|success| n4
-  n4 -->|success| n5
 
 ### Tickets · approval chain
 
@@ -228,21 +157,6 @@ flowchart TD
   n5 -->|success| n6
   n6 -->|success| n7
 
-### Tickets · threshold sweep
-
-flowchart TD
-  n0["start<br/><small>start</small>"]
-  n1["loadOverdue<br/><small>dataQuery</small>"]
-  n2["boundBatch<br/><small>javascript</small>"]
-  n3["loopOverdue<br/><small>loop</small>"]
-  n4["notifyOverdue<br/><small>dataQuery</small>"]
-  n5["done<br/><small>end</small>"]
-  n0 -->|output| n1
-  n1 -->|success| n2
-  n2 -->|success| n3
-  n3 -->|loop| n4
-  n3 -->|completed| n5
-
 ### Tickets · daily digest
 
 flowchart TD
@@ -256,23 +170,29 @@ flowchart TD
   n2 -->|success| n3
   n3 -->|success| n4
 
-### Tickets · escalation
+### Tickets · supplier/customer follow-up
 
 flowchart TD
   n0["start<br/><small>start</small>"]
-  n1["waitForResponse<br/><small>delay</small>"]
-  n2["loadRecord<br/><small>dataQuery</small>"]
-  n3["readPriority<br/><small>javascript</small>"]
-  n4["needsEscalation<br/><small>condition</small>"]
-  n5["notifyEscalation<br/><small>dataQuery</small>"]
-  n6["done<br/><small>end</small>"]
+  n1["Follow up on Ticket #{{ ctx.recordID }}<br/><small>dataCollection</small>"]
+  n2["recordFollowUp<br/><small>dataQuery</small>"]
+  n3["done<br/><small>end</small>"]
   n0 -->|output| n1
-  n1 -->|success| n2
+  n1 -->|output| n2
+  n2 -->|success| n3
+
+### Customer Support Console · expected failure and recovery
+
+flowchart TD
+  n0["start<br/><small>start</small>"]
+  n1["injectFailure<br/><small>javascript</small>"]
+  n2["compensate<br/><small>javascript</small>"]
+  n3["notifyRecovery<br/><small>dataQuery</small>"]
+  n4["done<br/><small>end</small>"]
+  n0 -->|output| n1
+  n1 -->|error| n2
   n2 -->|success| n3
   n3 -->|success| n4
-  n4 -->|escalate| n5
-  n4 -->|normal| n6
-  n5 -->|success| n6
 
 
 Failure behavior: every workflow declares per-node `errorHandling`; external sync and recovery workflows have explicit error edges. Human tasks (approval/dataCollection) suspend with an expiry and resume through the platform's data-collection endpoint. Cron jobs and listeners ship **inactive/disabled** until reviewed.
@@ -289,9 +209,7 @@ The installer creates tenant-scoped platform roles and grants asset-level Casbin
 
 ## Integrations
 
-- **SendGrid email** — required: API key, from address. Mock: Connector ships disabled; use the notification center and packaged email HTML for demos.
-- **Stripe billing** — required: secret key, webhook signing secret. Mock: Payment history is seeded locally; the packaged REST connector is a mock until reconnected.
-- **Inbound support webhook** — required: endpoint path, optional signature header. Mock: POST { "kind": "webhook.received", "record_id": 1 } to the inactive listener.
+- **Inbound webhook** — required: endpoint path, signature header (optional). Mock: Send a JSON body with kind=webhook.received to the inactive listener.
 
 ## Install
 

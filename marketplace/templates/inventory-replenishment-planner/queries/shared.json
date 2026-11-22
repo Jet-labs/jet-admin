@@ -111,22 +111,6 @@
     }
   },
   {
-    "slug": "inv.shared.integration_ping",
-    "title": "Integrations · health probe",
-    "datasource": "integration",
-    "tags": [
-      "read",
-      "integration"
-    ],
-    "options": {
-      "method": "GET",
-      "path": "/status",
-      "headers": [],
-      "queryParams": [],
-      "timeoutSeconds": 5
-    }
-  },
-  {
     "slug": "inv.shared.notifications",
     "title": "Notifications · inbox",
     "datasource": "primary",
@@ -519,92 +503,6 @@
     }
   },
   {
-    "slug": "inv.shared.import_jobs",
-    "title": "Import center · jobs",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "shared",
-      "admin"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, entity, file_name, status, total_rows, success_rows, error_rows, error_report, created_at, completed_at FROM {{table:import_jobs}} ORDER BY created_at DESC LIMIT 100",
-      "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.shared.ops",
-    "title": "Operations · event log",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "shared",
-      "admin"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, kind, source, status, severity, message, payload, created_at FROM {{table:ops_events}} WHERE kind = ANY($1::text[]) ORDER BY created_at DESC LIMIT 200",
-      "inputDefinitions": [
-        {
-          "key": "kinds",
-          "type": "array",
-          "required": false,
-          "default": [
-            "integration_health",
-            "webhook",
-            "job_run",
-            "data_quality"
-          ]
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.shared.operational_staff",
-    "title": "Staff · workload assignment",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "shared",
-      "report"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT s.id, s.full_name, s.role_key, count(t.id)::int AS assigned\nFROM {{table:staff}} s LEFT JOIN {{table:replenishment_proposals}} t ON t.\"owner_id\" = s.id AND t.deleted_at IS NULL\nGROUP BY s.id, s.full_name, s.role_key ORDER BY assigned ASC, s.full_name",
-      "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.shared.search",
-    "title": "Global search · records",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "shared"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT * FROM (\nSELECT 'replenishment_proposals' AS entity, id, \"proposal_code\"::text AS title, coalesce(\"proposal_code\"::text, '') AS subtitle, \"status\" AS status, created_at FROM {{table:replenishment_proposals}} WHERE deleted_at IS NULL AND \"proposal_code\"::text ILIKE '%' || $1 || '%'\nUNION ALL\nSELECT 'stock_items' AS entity, id, \"product_name\"::text AS title, coalesce(\"product_name\"::text, '') AS subtitle, \"status\" AS status, created_at FROM {{table:stock_items}} WHERE deleted_at IS NULL AND \"product_name\"::text ILIKE '%' || $1 || '%'\nUNION ALL\nSELECT 'suppliers' AS entity, id, \"name\"::text AS title, coalesce(\"email\"::text, '') AS subtitle, \"status\" AS status, created_at FROM {{table:suppliers}} WHERE deleted_at IS NULL AND \"name\"::text ILIKE '%' || $1 || '%'\nUNION ALL\nSELECT 'purchase_orders' AS entity, id, \"po_number\"::text AS title, coalesce(\"po_number\"::text, '') AS subtitle, \"status\" AS status, created_at FROM {{table:purchase_orders}} WHERE deleted_at IS NULL AND \"po_number\"::text ILIKE '%' || $1 || '%'\n) results ORDER BY created_at DESC LIMIT 50",
-      "inputDefinitions": [
-        {
-          "key": "search",
-          "type": "string",
-          "required": false,
-          "default": ""
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "inv.shared.my_tasks",
     "title": "Dashboard · tasks for me",
     "datasource": "primary",
@@ -621,28 +519,6 @@
           "type": "number",
           "required": false,
           "default": 1
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.shared.admin_users",
-    "title": "Admin · tenant users",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "admin"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT u.\"userID\" AS \"userID\", u.email, u.\"firstName\", u.\"lastName\", utr.role, utr.\"createdAt\" AS joined_at, r.\"roleTitle\" AS primary_role\nFROM \"tblUsersTenantsRelationship\" utr\nJOIN \"tblUsers\" u ON u.\"userID\" = utr.\"userID\"\nLEFT JOIN \"tblUserTenantRoleMappings\" utm ON utm.\"tenantID\" = utr.\"tenantID\" AND utm.\"userID\" = utr.\"userID\"\nLEFT JOIN \"tblRoles\" r ON r.\"roleID\" = utm.\"roleID\"\nWHERE utr.\"tenantID\" = $1::uuid\nORDER BY u.email LIMIT 200",
-      "inputDefinitions": [
-        {
-          "key": "tenantID",
-          "type": "string",
-          "required": true
         }
       ],
       "parameterized": true,
@@ -672,72 +548,6 @@
     }
   },
   {
-    "slug": "inv.shared.admin_workflow_runs",
-    "title": "Admin · workflow runs",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "admin"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT i.\"instanceID\" AS id, i.status, i.\"startedAt\" AS started_at, i.\"completedAt\" AS completed_at, i.version, i.\"isTest\" AS is_test, w.title AS workflow_title\nFROM \"tblWorkflowInstances\" i LEFT JOIN \"tblWorkflows\" w ON w.\"workflowID\" = i.\"workflowID\"\nWHERE i.\"tenantID\" = $1::uuid ORDER BY i.\"createdAt\" DESC LIMIT 200",
-      "inputDefinitions": [
-        {
-          "key": "tenantID",
-          "type": "string",
-          "required": true
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.shared.admin_workflow_logs",
-    "title": "Admin · workflow run logs",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "admin"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT l.\"logID\" AS id, l.\"instanceID\" AS instance_id, l.\"nodeID\" AS node_id, l.\"eventType\" AS event_type, l.\"nodeStatus\" AS node_status, l.\"errorMessage\" AS error_message, l.payload, l.\"createdAt\" AS created_at\nFROM \"tblWorkflowInstanceLogs\" l JOIN \"tblWorkflowInstances\" i ON i.\"instanceID\" = l.\"instanceID\"\nWHERE i.\"tenantID\" = $1::uuid ORDER BY l.\"createdAt\" DESC LIMIT 300",
-      "inputDefinitions": [
-        {
-          "key": "tenantID",
-          "type": "string",
-          "required": true
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.shared.admin_cron_history",
-    "title": "Admin · cron job history",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "admin"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT h.\"cronJobHistoryID\" AS id, c.\"cronJobTitle\" AS job_title, h.status, h.\"scheduledAt\" AS scheduled_at, h.\"startTime\" AS start_time, h.\"endTime\" AS end_time, h.\"durationMs\" AS duration_ms, h.result\nFROM \"tblCronJobHistory\" h JOIN \"tblCronJobs\" c ON c.\"cronJobID\" = h.\"cronJobID\"\nWHERE c.\"tenantID\" = $1::uuid ORDER BY h.\"createdAt\" DESC LIMIT 200",
-      "inputDefinitions": [
-        {
-          "key": "tenantID",
-          "type": "string",
-          "required": true
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "inv.shared.data_quality",
     "title": "Admin · data quality checks",
     "datasource": "primary",
@@ -750,29 +560,6 @@
       "queryType": "query",
       "query": "SELECT * FROM (\nSELECT 'replenishment_proposals' AS entity, 'missing_label' AS check_name, count(*)::int AS affected_rows, 'Records with an empty display label' AS detail FROM {{table:replenishment_proposals}} WHERE deleted_at IS NULL AND (\"proposal_code\" IS NULL OR btrim(\"proposal_code\"::text) = '')\nUNION ALL\nSELECT 'replenishment_proposals', 'negative_amount', count(*)::int, 'Records with a negative financial amount' FROM {{table:replenishment_proposals}} WHERE deleted_at IS NULL AND \"unit_cost\" < 0\nUNION ALL\nSELECT 'stock_items' AS entity, 'missing_label' AS check_name, count(*)::int AS affected_rows, 'Records with an empty display label' AS detail FROM {{table:stock_items}} WHERE deleted_at IS NULL AND (\"product_name\" IS NULL OR btrim(\"product_name\"::text) = '')\nUNION ALL\nSELECT 'stock_items', 'negative_amount', count(*)::int, 'Records with a negative financial amount' FROM {{table:stock_items}} WHERE deleted_at IS NULL AND \"unit_cost\" < 0\nUNION ALL\nSELECT 'suppliers' AS entity, 'missing_label' AS check_name, count(*)::int AS affected_rows, 'Records with an empty display label' AS detail FROM {{table:suppliers}} WHERE deleted_at IS NULL AND (\"name\" IS NULL OR btrim(\"name\"::text) = '')\nUNION ALL\nSELECT 'suppliers', 'negative_amount', count(*)::int, 'Records with a negative financial amount' FROM {{table:suppliers}} WHERE deleted_at IS NULL AND \"min_order_value\" < 0\nUNION ALL\nSELECT 'purchase_orders' AS entity, 'missing_label' AS check_name, count(*)::int AS affected_rows, 'Records with an empty display label' AS detail FROM {{table:purchase_orders}} WHERE deleted_at IS NULL AND (\"po_number\" IS NULL OR btrim(\"po_number\"::text) = '')\nUNION ALL\nSELECT 'purchase_orders', 'negative_amount', count(*)::int, 'Records with a negative financial amount' FROM {{table:purchase_orders}} WHERE deleted_at IS NULL AND \"total_value\" < 0\n) checks ORDER BY affected_rows DESC, entity",
       "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.shared.import_csv",
-    "title": "Import center · import CSV",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "admin",
-      "shared"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "WITH source AS (\n  SELECT btrim(line) AS line, row_number() OVER () AS line_no\n  FROM regexp_split_to_table($1::text, E'\\n') AS line\n  WHERE btrim(line) <> ''\n), parsed AS (\n  SELECT line_no, string_to_array(line, ',') AS cols FROM source\n), valid AS (\n  SELECT line_no, cols FROM parsed WHERE array_length(cols, 1) >= 1\n), inserted AS (\n  INSERT INTO {{table:replenishment_proposals}} (\"proposal_code\")\n  SELECT btrim(cols[1]) FROM valid\n  ON CONFLICT DO NOTHING\n  RETURNING id\n)\n, stats AS (\n  SELECT (SELECT count(*)::int FROM source) - 1 AS total_rows, (SELECT count(*)::int FROM inserted) AS success_rows\n), job AS (\n  INSERT INTO {{table:import_jobs}} (entity, file_name, status, total_rows, success_rows, error_rows, error_report, created_at, completed_at)\n  SELECT 'replenishment_proposals', 'inline-import.csv',\n    CASE WHEN stats.total_rows = stats.success_rows THEN 'completed' ELSE 'completed_with_errors' END,\n    stats.total_rows, stats.success_rows, stats.total_rows - stats.success_rows, '[]'::jsonb, now(), now()\n  FROM stats RETURNING id\n)\nSELECT stats.total_rows, stats.success_rows, stats.total_rows - stats.success_rows AS error_rows, (SELECT id FROM job) AS job_id FROM stats",
-      "inputDefinitions": [
-        {
-          "key": "csv",
-          "type": "string",
-          "required": true
-        }
-      ],
       "parameterized": true,
       "timeoutSeconds": 20
     }

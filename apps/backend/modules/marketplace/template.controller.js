@@ -73,7 +73,13 @@ templateController.install = async (req, res) => {
 templateController.uninstall = async (req, res) => {
   try {
     const { tenantID, slug } = req.params;
-    const result = await uninstallTemplate({ tenantID, slug, userID: req.user?.userID });
+    const selectedAssetKeys = Array.isArray(req.body?.assetKeys) ? req.body.assetKeys : undefined;
+    const result = await uninstallTemplate({
+      tenantID,
+      slug,
+      userID: req.user?.userID,
+      selectedAssetKeys,
+    });
     return expressUtils.sendResponse(
       res,
       true,

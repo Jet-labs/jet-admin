@@ -188,8 +188,9 @@ function requireSpec(spec) {
   }
   if (!/^[a-z0-9-]+$/.test(spec.slug)) throw new Error(`Invalid template slug: ${spec.slug}`);
   if (!/^[a-z0-9_]+$/.test(spec.alias)) throw new Error(`Invalid template alias: ${spec.alias}`);
-  if (!Array.isArray(spec.entities) || spec.entities.length < 6) {
-    throw new Error(`${spec.slug}: at least 6 domain entities are required`);
+  const minimumEntities = spec.compact ? 4 : 6;
+  if (!Array.isArray(spec.entities) || spec.entities.length < minimumEntities) {
+    throw new Error(`${spec.slug}: at least ${minimumEntities} domain entities are required`);
   }
   if (SUPPORT_TABLE_NAMES.length + spec.entities.length > 20) {
     throw new Error(`${spec.slug}: ${SUPPORT_TABLE_NAMES.length + spec.entities.length} tables exceeds the 20-table limit`);

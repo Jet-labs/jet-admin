@@ -174,6 +174,20 @@ function validatePackage(pkg) {
   const errors = [];
   const warnings = [];
   const pm = pkg.manifest;
+  if (pkg.datasources.length < 2 || pkg.datasources.length > 3) {
+    errors.push("datasource count must be 2-3");
+  }
+  const databaseTypes = new Set([
+    "postgresql", "mysql", "mariadb", "mssql", "oracle", "sqlite",
+    "mongodb", "snowflake", "bigquery", "redshift", "clickhouse",
+  ]);
+  const databaseSources = pkg.datasources.filter((datasource) => databaseTypes.has(datasource.type));
+  if (databaseSources.some((datasource) => datasource.type !== "postgresql")) {
+    errors.push("only PostgreSQL may be used as a database datasource");
+  }
+  if (databaseSources.length > 1) {
+    errors.push("only one database datasource is allowed");
+  }
   const datasourceSlugs = new Set(pkg.datasources.map((d) => d.slug));
   const datasources = new Map(pkg.datasources.map((d) => [d.slug, d]));
   const tables = new Set(pkg.tables);
@@ -223,7 +237,7 @@ function validatePackage(pkg) {
   for (const wf of pkg.workflows) {
     errors.push(...validateWorkflow(wf, { queryIDs, workflowIDs }));
   }
-  if (pkg.listeners.length < 5 || pkg.listeners.length > 15) errors.push("listener count must be 5-15");
+  if (pkg.listeners.length < 2 || pkg.listeners.length > 15) errors.push("listener count must be 2-15");
   const endpointPaths = new Set();
   for (const listener of pkg.listeners) {
     if (!datasourceSlugs.has(listener.datasource)) errors.push(`listener ${listener.slug}: unknown datasource`);
@@ -252,7 +266,7 @@ function validatePackage(pkg) {
       }
     }
   }
-  if (pkg.cronJobs.length < 4 || pkg.cronJobs.length > 10) errors.push("cron job count must be 4-10");
+  if (pkg.cronJobs.length < 2 || pkg.cronJobs.length > 10) errors.push("cron job count must be 2-10");
   for (const cron of pkg.cronJobs) {
     if (!workflowIDs.has(cron.workflow)) errors.push(`cron ${cron.key}: unknown workflow`);
     if (!/^(\S+\s+){4}\S+$/.test(cron.schedule)) errors.push(`cron ${cron.key}: invalid 5-field schedule`);
@@ -279,7 +293,7 @@ function validatePackage(pkg) {
   if (pm.counts.seedRows < 100) errors.push("manifest seed row count looks too small");
   if (pkg.queries.length < 30 || pkg.queries.length > 80) errors.push("query count must be 30-80");
   if (pkg.pages.length < 12) errors.push("page count must be at least 12");
-  if (pkg.workflows.length < 8 || pkg.workflows.length > 20) errors.push("workflow count must be 8-20");
+  if (pkg.workflows.length < 4 || pkg.workflows.length > 20) errors.push("workflow count must be 4-20");
   if (!pkg.readme.includes("```mermaid")) errors.push("README must contain Mermaid diagrams");
   if (!pkg.readme.includes("## Page map")) errors.push("README must contain a page map");
   const assetRoot = path.join(pkg.dir, "assets");

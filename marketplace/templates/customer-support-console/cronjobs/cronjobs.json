@@ -18,25 +18,6 @@
     "retryDelaySeconds": 60
   },
   {
-    "key": "threshold-sweep",
-    "title": "Customer Support Console · Overdue and threshold sweep",
-    "description": "Overdue and threshold sweep. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
-    "schedule": "0 */4 * * *",
-    "timezone": "UTC",
-    "workflow": "934b96c1-5c4d-4f0b-a981-1cfc6f9638ac",
-    "workflowConfig": {
-      "inputValues": {
-        "days": 7,
-        "staffID": 1
-      },
-      "idempotencyKey": "support:threshold-sweep:{{ scheduledFor }}"
-    },
-    "isDisabled": true,
-    "timeoutSeconds": 300,
-    "retryAttempts": 2,
-    "retryDelaySeconds": 60
-  },
-  {
     "key": "intake-triage",
     "title": "Customer Support Console · Weekday intake triage rehearsal",
     "description": "Weekday intake triage rehearsal. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
@@ -49,60 +30,6 @@
         "staffID": 1
       },
       "idempotencyKey": "support:intake-triage:{{ scheduledFor }}"
-    },
-    "isDisabled": true,
-    "timeoutSeconds": 300,
-    "retryAttempts": 2,
-    "retryDelaySeconds": 60
-  },
-  {
-    "key": "document-generation",
-    "title": "Customer Support Console · End-of-day document generation",
-    "description": "End-of-day document generation. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
-    "schedule": "30 18 * * 1-5",
-    "timezone": "UTC",
-    "workflow": "c893358c-60b3-4c07-9ba6-97160d21de0a",
-    "workflowConfig": {
-      "inputValues": {
-        "recordID": 1
-      },
-      "idempotencyKey": "support:document-generation:{{ scheduledFor }}"
-    },
-    "isDisabled": true,
-    "timeoutSeconds": 300,
-    "retryAttempts": 2,
-    "retryDelaySeconds": 60
-  },
-  {
-    "key": "round-robin-assignment",
-    "title": "Customer Support Console · Daily assignment rebalance",
-    "description": "Daily assignment rebalance. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
-    "schedule": "0 7 * * *",
-    "timezone": "UTC",
-    "workflow": "7cc59cf3-101a-433a-8b32-a2d58a4ade2c",
-    "workflowConfig": {
-      "inputValues": {
-        "recordID": 1
-      },
-      "idempotencyKey": "support:round-robin-assignment:{{ scheduledFor }}"
-    },
-    "isDisabled": true,
-    "timeoutSeconds": 300,
-    "retryAttempts": 2,
-    "retryDelaySeconds": 60
-  },
-  {
-    "key": "integration-sync",
-    "title": "Customer Support Console · Integration sync health cycle",
-    "description": "Integration sync health cycle. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
-    "schedule": "0 */6 * * *",
-    "timezone": "UTC",
-    "workflow": "4f5efb86-9d07-44e1-8d61-b3b807d00e73",
-    "workflowConfig": {
-      "inputValues": {
-        "recordID": 1
-      },
-      "idempotencyKey": "support:integration-sync:{{ scheduledFor }}"
     },
     "isDisabled": true,
     "timeoutSeconds": 300,

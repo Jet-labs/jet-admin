@@ -18,25 +18,6 @@
     "retryDelaySeconds": 60
   },
   {
-    "key": "threshold-sweep",
-    "title": "CRM & Sales Pipeline · Overdue and threshold sweep",
-    "description": "Overdue and threshold sweep. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
-    "schedule": "0 */4 * * *",
-    "timezone": "UTC",
-    "workflow": "2339aab3-b3ad-460e-9f87-c531889b27f5",
-    "workflowConfig": {
-      "inputValues": {
-        "days": 7,
-        "staffID": 1
-      },
-      "idempotencyKey": "crm:threshold-sweep:{{ scheduledFor }}"
-    },
-    "isDisabled": true,
-    "timeoutSeconds": 300,
-    "retryAttempts": 2,
-    "retryDelaySeconds": 60
-  },
-  {
     "key": "intake-triage",
     "title": "CRM & Sales Pipeline · Weekday intake triage rehearsal",
     "description": "Weekday intake triage rehearsal. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
@@ -49,60 +30,6 @@
         "staffID": 1
       },
       "idempotencyKey": "crm:intake-triage:{{ scheduledFor }}"
-    },
-    "isDisabled": true,
-    "timeoutSeconds": 300,
-    "retryAttempts": 2,
-    "retryDelaySeconds": 60
-  },
-  {
-    "key": "document-generation",
-    "title": "CRM & Sales Pipeline · End-of-day document generation",
-    "description": "End-of-day document generation. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
-    "schedule": "30 18 * * 1-5",
-    "timezone": "UTC",
-    "workflow": "28649915-57b6-44d5-bfd5-b3f8a4685b1c",
-    "workflowConfig": {
-      "inputValues": {
-        "recordID": 1
-      },
-      "idempotencyKey": "crm:document-generation:{{ scheduledFor }}"
-    },
-    "isDisabled": true,
-    "timeoutSeconds": 300,
-    "retryAttempts": 2,
-    "retryDelaySeconds": 60
-  },
-  {
-    "key": "round-robin-assignment",
-    "title": "CRM & Sales Pipeline · Daily assignment rebalance",
-    "description": "Daily assignment rebalance. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
-    "schedule": "0 7 * * *",
-    "timezone": "UTC",
-    "workflow": "9b7e097f-656e-48c7-a1ac-742b0f4313ec",
-    "workflowConfig": {
-      "inputValues": {
-        "recordID": 1
-      },
-      "idempotencyKey": "crm:round-robin-assignment:{{ scheduledFor }}"
-    },
-    "isDisabled": true,
-    "timeoutSeconds": 300,
-    "retryAttempts": 2,
-    "retryDelaySeconds": 60
-  },
-  {
-    "key": "integration-sync",
-    "title": "CRM & Sales Pipeline · Integration sync health cycle",
-    "description": "Integration sync health cycle. Schedules are evaluated in the server's timezone (UTC in production). Installed disabled by default; enable after reviewing the workflow.",
-    "schedule": "0 */6 * * *",
-    "timezone": "UTC",
-    "workflow": "02e7f811-a78a-4cf7-b2f6-4c93e9772797",
-    "workflowConfig": {
-      "inputValues": {
-        "recordID": 1
-      },
-      "idempotencyKey": "crm:integration-sync:{{ scheduledFor }}"
     },
     "isDisabled": true,
     "timeoutSeconds": 300,

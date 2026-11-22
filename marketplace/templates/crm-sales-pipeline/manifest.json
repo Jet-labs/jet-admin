@@ -37,14 +37,6 @@
     {
       "title": "Reports · operations",
       "path": "assets/screenshots/reports-operations.svg"
-    },
-    {
-      "title": "Admin · audit log",
-      "path": "assets/screenshots/admin-audit.svg"
-    },
-    {
-      "title": "Client portal",
-      "path": "assets/screenshots/portal.svg"
     }
   ],
   "features": [
@@ -57,22 +49,13 @@
   ],
   "requiredIntegrations": [
     {
-      "key": "sendgrid-email",
-      "title": "SendGrid email",
-      "requiredFields": [
-        "API key",
-        "from address"
-      ],
-      "mock": "The packaged connector is disabled; use the notification center and email HTML samples for demos."
-    },
-    {
-      "key": "inbound-webhook",
-      "title": "Inbound lead webhook",
+      "key": "webhook",
+      "title": "Inbound webhook",
       "requiredFields": [
         "endpoint path",
-        "optional signature header"
+        "signature header (optional)"
       ],
-      "mock": "POST { \"kind\": \"record.created\", \"record_id\": 1 } to the inactive webhook listener."
+      "mock": "Send a JSON body with kind=webhook.received to the inactive listener."
     }
   ],
   "installOptions": [
@@ -99,16 +82,16 @@
     }
   ],
   "counts": {
-    "tables": 18,
-    "domainTables": 8,
+    "tables": 14,
+    "domainTables": 4,
     "supportTables": 10,
-    "seedRows": 1040,
-    "queries": 80,
-    "pages": 31,
-    "widgets": 209,
-    "workflows": 11,
-    "listeners": 8,
-    "cronJobs": 6,
+    "seedRows": 747,
+    "queries": 53,
+    "pages": 19,
+    "widgets": 163,
+    "workflows": 5,
+    "listeners": 3,
+    "cronJobs": 2,
     "roles": 5
   },
   "pages": [
@@ -268,60 +251,6 @@
       ]
     },
     {
-      "slug": "crm-reports-secondary",
-      "title": "Reports · secondary mix",
-      "description": "Secondary entity mix and value trend with exportable records.",
-      "tags": [
-        "report",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "crm-reports-quality",
-      "title": "Reports · data quality",
-      "description": "Data quality checks, failing operations and aging work.",
-      "tags": [
-        "report",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "crm-deals-kanban",
-      "title": "Deals · kanban",
-      "description": "Status board grouped by the primary workflow stage.",
-      "tags": [
-        "core",
-        "staff",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "crm-deals-calendar",
-      "title": "Deals · calendar",
-      "description": "Calendar view of the primary date field.",
-      "tags": [
-        "core",
-        "staff",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "crm-search",
-      "title": "Global search",
-      "description": "Cross-entity search across every core table.",
-      "tags": [
-        "shared",
-        "staff",
-        "manager",
-        "admin",
-        "viewer"
-      ]
-    },
-    {
       "slug": "crm-profile",
       "title": "My profile",
       "description": "Staff profile and editable contact details.",
@@ -369,71 +298,11 @@
       ]
     },
     {
-      "slug": "crm-admin-users",
-      "title": "Admin · users",
-      "description": "Tenant users, platform roles and app-level role assignment overview.",
-      "tags": [
-        "admin",
-        "manager"
-      ]
-    },
-    {
       "slug": "crm-admin-roles",
       "title": "Admin · roles and permissions",
       "description": "Provisioned tenant roles, permission counts and the app page matrix.",
       "tags": [
         "admin"
-      ]
-    },
-    {
-      "slug": "crm-admin-audit",
-      "title": "Admin · audit log",
-      "description": "Filterable audit log with old/new JSON diff.",
-      "tags": [
-        "admin",
-        "manager"
-      ]
-    },
-    {
-      "slug": "crm-admin-settings",
-      "title": "Admin · system settings",
-      "description": "Settings and feature flags with audited updates.",
-      "tags": [
-        "admin"
-      ]
-    },
-    {
-      "slug": "crm-admin-import",
-      "title": "Admin · import / export",
-      "description": "CSV import with validation summary and record export.",
-      "tags": [
-        "admin",
-        "manager"
-      ]
-    },
-    {
-      "slug": "crm-admin-integrations",
-      "title": "Admin · integration health",
-      "description": "Integration health and inbound webhook event log.",
-      "tags": [
-        "admin"
-      ]
-    },
-    {
-      "slug": "crm-admin-jobs",
-      "title": "Admin · jobs and workflow runs",
-      "description": "Workflow instance monitor, run logs and cron history.",
-      "tags": [
-        "admin"
-      ]
-    },
-    {
-      "slug": "crm-admin-quality",
-      "title": "Admin · data quality",
-      "description": "Quality checks and operational failures.",
-      "tags": [
-        "admin",
-        "manager"
       ]
     }
   ],
@@ -446,13 +315,6 @@
       "edgeCount": 8
     },
     {
-      "slug": "crm.round-robin-assignment",
-      "title": "Deals · round-robin assignment",
-      "description": "Picks the least-loaded active staff member and assigns the record, then sends an in-app notification.",
-      "nodeCount": 6,
-      "edgeCount": 5
-    },
-    {
       "slug": "crm.approval-chain",
       "title": "Deals · approval chain",
       "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
@@ -460,39 +322,11 @@
       "edgeCount": 9
     },
     {
-      "slug": "crm.threshold-sweep",
-      "title": "Deals · threshold sweep",
-      "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
-      "nodeCount": 6,
-      "edgeCount": 5
-    },
-    {
       "slug": "crm.daily-digest",
       "title": "Deals · daily digest",
       "description": "Builds a daily summary and writes a single in-app notification.",
       "nodeCount": 5,
       "edgeCount": 4
-    },
-    {
-      "slug": "crm.escalation",
-      "title": "Deals · escalation",
-      "description": "Waits for a configurable delay, then escalates high-priority records and notifies the manager.",
-      "nodeCount": 7,
-      "edgeCount": 7
-    },
-    {
-      "slug": "crm.integration-sync",
-      "title": "CRM & Sales Pipeline · integration sync",
-      "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
-      "nodeCount": 6,
-      "edgeCount": 6
-    },
-    {
-      "slug": "crm.document-generation",
-      "title": "Deals · document generation",
-      "description": "Builds an HTML document from record fields, links it as an attachment and notifies the owner.",
-      "nodeCount": 6,
-      "edgeCount": 5
     },
     {
       "slug": "crm.data-collection",
@@ -507,13 +341,6 @@
       "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
       "nodeCount": 5,
       "edgeCount": 4
-    },
-    {
-      "slug": "crm.notify-only",
-      "title": "CRM & Sales Pipeline · notify only",
-      "description": "Minimal workflow used by inbound webhooks and manual demos: writes one notification.",
-      "nodeCount": 3,
-      "edgeCount": 2
     }
   ],
   "roles": [
@@ -767,168 +594,6 @@
         {
           "key": "last_touch_at",
           "type": "timestamptz",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "activities",
-      "title": "Activities",
-      "core": false,
-      "seedCount": 140,
-      "fields": [
-        {
-          "key": "subject",
-          "type": "text",
-          "required": true
-        },
-        {
-          "key": "activity_type",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "related_type",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "related_id",
-          "type": "int",
-          "required": false
-        },
-        {
-          "key": "due_at",
-          "type": "timestamptz",
-          "required": false
-        },
-        {
-          "key": "status",
-          "type": "enum",
-          "required": false
-        },
-        {
-          "key": "owner_id",
-          "type": "ref",
-          "required": false
-        },
-        {
-          "key": "notes",
-          "type": "longtext",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "products",
-      "title": "Products",
-      "core": false,
-      "seedCount": 40,
-      "fields": [
-        {
-          "key": "name",
-          "type": "text",
-          "required": true
-        },
-        {
-          "key": "sku",
-          "type": "code",
-          "required": true
-        },
-        {
-          "key": "category",
-          "type": "enum",
-          "required": false
-        },
-        {
-          "key": "unit_price",
-          "type": "money",
-          "required": true
-        },
-        {
-          "key": "is_active",
-          "type": "bool",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "quotas",
-      "title": "Quotas",
-      "core": false,
-      "seedCount": 48,
-      "fields": [
-        {
-          "key": "rep_id",
-          "type": "ref",
-          "required": true
-        },
-        {
-          "key": "period",
-          "type": "text",
-          "required": true
-        },
-        {
-          "key": "target_amount",
-          "type": "money",
-          "required": true
-        },
-        {
-          "key": "attained_amount",
-          "type": "money",
-          "required": false
-        },
-        {
-          "key": "forecast_amount",
-          "type": "money",
-          "required": false
-        },
-        {
-          "key": "status",
-          "type": "enum",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "campaigns",
-      "title": "Campaigns",
-      "core": false,
-      "seedCount": 36,
-      "fields": [
-        {
-          "key": "name",
-          "type": "text",
-          "required": true
-        },
-        {
-          "key": "channel",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "status",
-          "type": "enum",
-          "required": false
-        },
-        {
-          "key": "budget",
-          "type": "money",
-          "required": false
-        },
-        {
-          "key": "start_date",
-          "type": "date",
-          "required": false
-        },
-        {
-          "key": "end_date",
-          "type": "date",
-          "required": false
-        },
-        {
-          "key": "owner_id",
-          "type": "ref",
           "required": false
         }
       ]

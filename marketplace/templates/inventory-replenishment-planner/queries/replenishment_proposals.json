@@ -364,23 +364,6 @@
     }
   },
   {
-    "slug": "inv.replenishment_proposals.lookup",
-    "title": "Replenishment Proposals · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "replenishment_proposals"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"proposal_code\"::text AS label FROM {{table:replenishment_proposals}} WHERE deleted_at IS NULL ORDER BY \"proposal_code\" LIMIT 500",
-      "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "inv.replenishment_proposals.status",
     "title": "Replenishment Proposals · change status",
     "datasource": "primary",
@@ -404,66 +387,6 @@
           "type": "string",
           "required": false,
           "default": "draft"
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.replenishment_proposals.assign",
-    "title": "Replenishment Proposals · assign owner",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "replenishment_proposals"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:replenishment_proposals}} SET \"owner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"owner_id\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "staffID",
-          "type": "number",
-          "required": false,
-          "default": 1
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.replenishment_proposals.score",
-    "title": "Replenishment Proposals · save score",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "replenishment_proposals"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:replenishment_proposals}} SET \"confidence_score\" = $2::numeric, updated_at = now() WHERE id = $1::int RETURNING id, \"confidence_score\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "score",
-          "type": "number",
-          "required": false,
-          "default": 0
         }
       ],
       "parameterized": true,
@@ -548,30 +471,6 @@
           "key": "dateTo",
           "type": "string",
           "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.replenishment_proposals.overdue",
-    "title": "Replenishment Proposals · overdue",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "replenishment_proposals"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"proposal_code\", \"sku_id\", \"warehouse_id\", \"supplier_id\", \"status\", \"urgency\", \"owner_id\", \"requested_qty\", \"suggested_qty\", \"unit_cost\", \"estimated_total\", \"confidence_score\", \"needed_by_date\", \"approved_at\", \"rationale\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:replenishment_proposals}}\nWHERE deleted_at IS NULL AND \"needed_by_date\" IS NOT NULL\n  AND \"needed_by_date\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('cancelled')\nORDER BY \"needed_by_date\" ASC LIMIT 100",
-      "inputDefinitions": [
-        {
-          "key": "days",
-          "type": "number",
-          "required": false,
-          "default": 7
         }
       ],
       "parameterized": true,

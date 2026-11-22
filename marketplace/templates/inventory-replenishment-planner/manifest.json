@@ -37,14 +37,6 @@
     {
       "title": "Reports · operations",
       "path": "assets/screenshots/reports-operations.svg"
-    },
-    {
-      "title": "Admin · audit log",
-      "path": "assets/screenshots/admin-audit.svg"
-    },
-    {
-      "title": "Client portal",
-      "path": "assets/screenshots/portal.svg"
     }
   ],
   "features": [
@@ -57,31 +49,13 @@
   ],
   "requiredIntegrations": [
     {
-      "key": "erp-rest",
-      "title": "ERP inventory REST",
-      "requiredFields": [
-        "base URL",
-        "API token"
-      ],
-      "mock": "Connector ships disabled with no credentials; seeded stock and purchase orders are the demo source of truth."
-    },
-    {
-      "key": "supplier-webhook",
-      "title": "Supplier ASN webhook",
+      "key": "webhook",
+      "title": "Inbound webhook",
       "requiredFields": [
         "endpoint path",
-        "optional signature header"
+        "signature header (optional)"
       ],
-      "mock": "POST { \"kind\": \"webhook.received\", \"record_id\": 1 } to the inactive listener to simulate an advance ship notice."
-    },
-    {
-      "key": "slack-alerts",
-      "title": "Slack replenishment alerts",
-      "requiredFields": [
-        "webhook URL",
-        "channel"
-      ],
-      "mock": "Alerts are mirrored into the in-app notification center until a Slack webhook is connected."
+      "mock": "Send a JSON body with kind=webhook.received to the inactive listener."
     }
   ],
   "installOptions": [
@@ -108,16 +82,16 @@
     }
   ],
   "counts": {
-    "tables": 18,
-    "domainTables": 8,
+    "tables": 16,
+    "domainTables": 6,
     "supportTables": 10,
-    "seedRows": 1319,
-    "queries": 80,
-    "pages": 31,
-    "widgets": 212,
-    "workflows": 11,
-    "listeners": 8,
-    "cronJobs": 6,
+    "seedRows": 891,
+    "queries": 54,
+    "pages": 19,
+    "widgets": 166,
+    "workflows": 5,
+    "listeners": 3,
+    "cronJobs": 2,
     "roles": 5
   },
   "pages": [
@@ -277,60 +251,6 @@
       ]
     },
     {
-      "slug": "inv-reports-secondary",
-      "title": "Reports · secondary mix",
-      "description": "Secondary entity mix and value trend with exportable records.",
-      "tags": [
-        "report",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "inv-reports-quality",
-      "title": "Reports · data quality",
-      "description": "Data quality checks, failing operations and aging work.",
-      "tags": [
-        "report",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "inv-replenishment_proposals-kanban",
-      "title": "Replenishment Proposals · kanban",
-      "description": "Status board grouped by the primary workflow stage.",
-      "tags": [
-        "core",
-        "staff",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "inv-replenishment_proposals-calendar",
-      "title": "Replenishment Proposals · calendar",
-      "description": "Calendar view of the primary date field.",
-      "tags": [
-        "core",
-        "staff",
-        "manager",
-        "admin"
-      ]
-    },
-    {
-      "slug": "inv-search",
-      "title": "Global search",
-      "description": "Cross-entity search across every core table.",
-      "tags": [
-        "shared",
-        "staff",
-        "manager",
-        "admin",
-        "viewer"
-      ]
-    },
-    {
       "slug": "inv-profile",
       "title": "My profile",
       "description": "Staff profile and editable contact details.",
@@ -378,71 +298,11 @@
       ]
     },
     {
-      "slug": "inv-admin-users",
-      "title": "Admin · users",
-      "description": "Tenant users, platform roles and app-level role assignment overview.",
-      "tags": [
-        "admin",
-        "manager"
-      ]
-    },
-    {
       "slug": "inv-admin-roles",
       "title": "Admin · roles and permissions",
       "description": "Provisioned tenant roles, permission counts and the app page matrix.",
       "tags": [
         "admin"
-      ]
-    },
-    {
-      "slug": "inv-admin-audit",
-      "title": "Admin · audit log",
-      "description": "Filterable audit log with old/new JSON diff.",
-      "tags": [
-        "admin",
-        "manager"
-      ]
-    },
-    {
-      "slug": "inv-admin-settings",
-      "title": "Admin · system settings",
-      "description": "Settings and feature flags with audited updates.",
-      "tags": [
-        "admin"
-      ]
-    },
-    {
-      "slug": "inv-admin-import",
-      "title": "Admin · import / export",
-      "description": "CSV import with validation summary and record export.",
-      "tags": [
-        "admin",
-        "manager"
-      ]
-    },
-    {
-      "slug": "inv-admin-integrations",
-      "title": "Admin · integration health",
-      "description": "Integration health and inbound webhook event log.",
-      "tags": [
-        "admin"
-      ]
-    },
-    {
-      "slug": "inv-admin-jobs",
-      "title": "Admin · jobs and workflow runs",
-      "description": "Workflow instance monitor, run logs and cron history.",
-      "tags": [
-        "admin"
-      ]
-    },
-    {
-      "slug": "inv-admin-quality",
-      "title": "Admin · data quality",
-      "description": "Quality checks and operational failures.",
-      "tags": [
-        "admin",
-        "manager"
       ]
     }
   ],
@@ -455,13 +315,6 @@
       "edgeCount": 8
     },
     {
-      "slug": "inv.round-robin-assignment",
-      "title": "Replenishment Proposals · round-robin assignment",
-      "description": "Picks the least-loaded active staff member and assigns the record, then sends an in-app notification.",
-      "nodeCount": 6,
-      "edgeCount": 5
-    },
-    {
       "slug": "inv.approval-chain",
       "title": "Replenishment Proposals · approval chain",
       "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
@@ -469,39 +322,11 @@
       "edgeCount": 9
     },
     {
-      "slug": "inv.threshold-sweep",
-      "title": "Replenishment Proposals · threshold sweep",
-      "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
-      "nodeCount": 6,
-      "edgeCount": 5
-    },
-    {
       "slug": "inv.daily-digest",
       "title": "Replenishment Proposals · daily digest",
       "description": "Builds a daily summary and writes a single in-app notification.",
       "nodeCount": 5,
       "edgeCount": 4
-    },
-    {
-      "slug": "inv.escalation",
-      "title": "Replenishment Proposals · escalation",
-      "description": "Waits for a configurable delay, then escalates high-priority records and notifies the manager.",
-      "nodeCount": 7,
-      "edgeCount": 7
-    },
-    {
-      "slug": "inv.integration-sync",
-      "title": "Inventory Replenishment Planner · integration sync",
-      "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
-      "nodeCount": 6,
-      "edgeCount": 6
-    },
-    {
-      "slug": "inv.document-generation",
-      "title": "Replenishment Proposals · document generation",
-      "description": "Builds an HTML document from record fields, links it as an attachment and notifies the owner.",
-      "nodeCount": 6,
-      "edgeCount": 5
     },
     {
       "slug": "inv.data-collection",
@@ -516,13 +341,6 @@
       "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
       "nodeCount": 5,
       "edgeCount": 4
-    },
-    {
-      "slug": "inv.notify-only",
-      "title": "Inventory Replenishment Planner · notify only",
-      "description": "Minimal workflow used by inbound webhooks and manual demos: writes one notification.",
-      "nodeCount": 3,
-      "edgeCount": 2
     }
   ],
   "roles": [
@@ -917,92 +735,6 @@
         {
           "key": "is_active",
           "type": "bool",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "demand_forecasts",
-      "title": "Demand Forecasts",
-      "core": false,
-      "seedCount": 180,
-      "fields": [
-        {
-          "key": "sku_id",
-          "type": "ref",
-          "required": true
-        },
-        {
-          "key": "warehouse_id",
-          "type": "ref",
-          "required": true
-        },
-        {
-          "key": "forecast_month",
-          "type": "date",
-          "required": true
-        },
-        {
-          "key": "forecast_qty",
-          "type": "int",
-          "required": true
-        },
-        {
-          "key": "actual_qty",
-          "type": "int",
-          "required": false
-        },
-        {
-          "key": "method",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "confidence",
-          "type": "int",
-          "required": false
-        }
-      ]
-    },
-    {
-      "key": "stock_movements",
-      "title": "Stock Movements",
-      "core": false,
-      "seedCount": 240,
-      "fields": [
-        {
-          "key": "sku_id",
-          "type": "ref",
-          "required": true
-        },
-        {
-          "key": "warehouse_id",
-          "type": "ref",
-          "required": true
-        },
-        {
-          "key": "movement_type",
-          "type": "enum",
-          "required": true
-        },
-        {
-          "key": "quantity",
-          "type": "int",
-          "required": true
-        },
-        {
-          "key": "reference",
-          "type": "text",
-          "required": false
-        },
-        {
-          "key": "occurred_at",
-          "type": "timestamptz",
-          "required": false
-        },
-        {
-          "key": "actor_id",
-          "type": "ref",
           "required": false
         }
       ]

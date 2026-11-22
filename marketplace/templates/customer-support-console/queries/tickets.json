@@ -344,23 +344,6 @@
     }
   },
   {
-    "slug": "support.tickets.lookup",
-    "title": "Tickets · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "tickets"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"subject\"::text AS label FROM {{table:tickets}} WHERE deleted_at IS NULL ORDER BY \"subject\" LIMIT 500",
-      "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "support.tickets.status",
     "title": "Tickets · change status",
     "datasource": "primary",
@@ -384,66 +367,6 @@
           "type": "string",
           "required": false,
           "default": "new"
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "support.tickets.assign",
-    "title": "Tickets · assign owner",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "tickets"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:tickets}} SET \"assignee_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"assignee_id\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "staffID",
-          "type": "number",
-          "required": false,
-          "default": 1
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "support.tickets.score",
-    "title": "Tickets · save score",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "tickets"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:tickets}} SET \"satisfaction_score\" = $2::numeric, updated_at = now() WHERE id = $1::int RETURNING id, \"satisfaction_score\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "score",
-          "type": "number",
-          "required": false,
-          "default": 0
         }
       ],
       "parameterized": true,
@@ -528,30 +451,6 @@
           "key": "dateTo",
           "type": "string",
           "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "support.tickets.overdue",
-    "title": "Tickets · overdue",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "tickets"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"subject\", \"customer_id\", \"requester_name\", \"status\", \"priority\", \"channel\", \"category\", \"assignee_id\", \"sla_due_at\", \"first_response_at\", \"resolved_at\", \"satisfaction_score\", \"description\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:tickets}}\nWHERE deleted_at IS NULL AND \"sla_due_at\" IS NOT NULL\n  AND \"sla_due_at\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('resolved', 'closed')\nORDER BY \"sla_due_at\" ASC LIMIT 100",
-      "inputDefinitions": [
-        {
-          "key": "days",
-          "type": "number",
-          "required": false,
-          "default": 7
         }
       ],
       "parameterized": true,

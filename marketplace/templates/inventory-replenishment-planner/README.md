@@ -33,23 +33,11 @@ The package is data-only: schema, deterministic seed, parameterized queries, wid
 | `inv-purchase_orders-create` | Create Purchase order | core, staff, manager, admin |
 | `inv-dashboard` | Dashboard | core, shared, staff, manager, admin, viewer |
 | `inv-reports-operations` | Reports · operations | report, manager, admin |
-| `inv-reports-secondary` | Reports · secondary mix | report, manager, admin |
-| `inv-reports-quality` | Reports · data quality | report, manager, admin |
-| `inv-replenishment_proposals-kanban` | Replenishment Proposals · kanban | core, staff, manager, admin |
-| `inv-replenishment_proposals-calendar` | Replenishment Proposals · calendar | core, staff, manager, admin |
-| `inv-search` | Global search | shared, staff, manager, admin, viewer |
 | `inv-profile` | My profile | shared, staff, manager, admin, viewer, portal |
 | `inv-notifications` | Notifications | shared, staff, manager, admin, viewer, portal |
 | `inv-settings` | Settings | shared, manager, admin |
 | `inv-portal` | Client portal | portal, client, admin, manager |
-| `inv-admin-users` | Admin · users | admin, manager |
 | `inv-admin-roles` | Admin · roles and permissions | admin |
-| `inv-admin-audit` | Admin · audit log | admin, manager |
-| `inv-admin-settings` | Admin · system settings | admin |
-| `inv-admin-import` | Admin · import / export | admin, manager |
-| `inv-admin-integrations` | Admin · integration health | admin |
-| `inv-admin-jobs` | Admin · jobs and workflow runs | admin |
-| `inv-admin-quality` | Admin · data quality | admin, manager |
 
 ## Data model
 
@@ -137,26 +125,6 @@ erDiagram
     int manager_id FK
     boolean is_active
   }
-  DEMAND_FORECASTS {
-    int id PK
-    int sku_id FK
-    int warehouse_id FK
-    string forecast_month
-    int forecast_qty
-    int actual_qty
-    string method
-    int confidence
-  }
-  STOCK_MOVEMENTS {
-    int id PK
-    int sku_id FK
-    int warehouse_id FK
-    string movement_type
-    int quantity
-    string reference
-    datetime occurred_at
-    int actor_id FK
-  }
   SKUS ||--o{ REPLENISHMENT_PROPOSALS : "sku_id"
   WAREHOUSES ||--o{ REPLENISHMENT_PROPOSALS : "warehouse_id"
   SUPPLIERS ||--o{ REPLENISHMENT_PROPOSALS : "supplier_id"
@@ -168,33 +136,22 @@ erDiagram
   WAREHOUSES ||--o{ PURCHASE_ORDERS : "warehouse_id"
   STAFF ||--o{ PURCHASE_ORDERS : "buyer_id"
   STAFF ||--o{ WAREHOUSES : "manager_id"
-  SKUS ||--o{ DEMAND_FORECASTS : "sku_id"
-  WAREHOUSES ||--o{ DEMAND_FORECASTS : "warehouse_id"
-  SKUS ||--o{ STOCK_MOVEMENTS : "sku_id"
-  WAREHOUSES ||--o{ STOCK_MOVEMENTS : "warehouse_id"
-  STAFF ||--o{ STOCK_MOVEMENTS : "actor_id"
   STAFF ||--o{ AUDIT_LOG : actor
   STAFF ||--o{ COMMENTS : author
   STAFF ||--o{ NOTIFICATIONS : recipient
 ```
 
-The package ships 8 domain tables plus 10 support tables (staff, lookups, audit, comments, attachments, notifications, settings, imports, operations, role matrix).
+The package ships 6 domain tables plus 10 support tables (staff, lookups, audit, comments, attachments, notifications, settings, imports, operations, role matrix).
 
 ## Workflows
 
 | Workflow | Purpose | Nodes |
 | --- | --- | --- |
 | `inv.intake-triage` | Replenishment Proposals · intake triage | 8 |
-| `inv.round-robin-assignment` | Replenishment Proposals · round-robin assignment | 6 |
 | `inv.approval-chain` | Replenishment Proposals · approval chain | 8 |
-| `inv.threshold-sweep` | Replenishment Proposals · threshold sweep | 6 |
 | `inv.daily-digest` | Replenishment Proposals · daily digest | 5 |
-| `inv.escalation` | Replenishment Proposals · escalation | 7 |
-| `inv.integration-sync` | Inventory Replenishment Planner · integration sync | 6 |
-| `inv.document-generation` | Replenishment Proposals · document generation | 6 |
 | `inv.data-collection` | Replenishment Proposals · supplier/customer follow-up | 4 |
 | `inv.error-recovery` | Inventory Replenishment Planner · expected failure and recovery | 5 |
-| `inv.notify-only` | Inventory Replenishment Planner · notify only | 3 |
 
 ### Replenishment Proposals · intake triage
 
@@ -215,21 +172,6 @@ flowchart TD
   n4 -->|success| n6
   n6 -->|success| n7
   n5 -->|success| n7
-
-### Replenishment Proposals · round-robin assignment
-
-flowchart TD
-  n0["start<br/><small>start</small>"]
-  n1["loadStaff<br/><small>dataQuery</small>"]
-  n2["pickAssignee<br/><small>javascript</small>"]
-  n3["assignOwner<br/><small>dataQuery</small>"]
-  n4["notifyOwner<br/><small>dataQuery</small>"]
-  n5["done<br/><small>end</small>"]
-  n0 -->|output| n1
-  n1 -->|success| n2
-  n2 -->|success| n3
-  n3 -->|success| n4
-  n4 -->|success| n5
 
 ### Replenishment Proposals · approval chain
 
@@ -252,21 +194,6 @@ flowchart TD
   n5 -->|success| n6
   n6 -->|success| n7
 
-### Replenishment Proposals · threshold sweep
-
-flowchart TD
-  n0["start<br/><small>start</small>"]
-  n1["loadOverdue<br/><small>dataQuery</small>"]
-  n2["boundBatch<br/><small>javascript</small>"]
-  n3["loopOverdue<br/><small>loop</small>"]
-  n4["notifyOverdue<br/><small>dataQuery</small>"]
-  n5["done<br/><small>end</small>"]
-  n0 -->|output| n1
-  n1 -->|success| n2
-  n2 -->|success| n3
-  n3 -->|loop| n4
-  n3 -->|completed| n5
-
 ### Replenishment Proposals · daily digest
 
 flowchart TD
@@ -280,23 +207,29 @@ flowchart TD
   n2 -->|success| n3
   n3 -->|success| n4
 
-### Replenishment Proposals · escalation
+### Replenishment Proposals · supplier/customer follow-up
 
 flowchart TD
   n0["start<br/><small>start</small>"]
-  n1["waitForResponse<br/><small>delay</small>"]
-  n2["loadRecord<br/><small>dataQuery</small>"]
-  n3["readPriority<br/><small>javascript</small>"]
-  n4["needsEscalation<br/><small>condition</small>"]
-  n5["notifyEscalation<br/><small>dataQuery</small>"]
-  n6["done<br/><small>end</small>"]
+  n1["Follow up on Proposal #{{ ctx.recordID }}<br/><small>dataCollection</small>"]
+  n2["recordFollowUp<br/><small>dataQuery</small>"]
+  n3["done<br/><small>end</small>"]
   n0 -->|output| n1
-  n1 -->|success| n2
+  n1 -->|output| n2
+  n2 -->|success| n3
+
+### Inventory Replenishment Planner · expected failure and recovery
+
+flowchart TD
+  n0["start<br/><small>start</small>"]
+  n1["injectFailure<br/><small>javascript</small>"]
+  n2["compensate<br/><small>javascript</small>"]
+  n3["notifyRecovery<br/><small>dataQuery</small>"]
+  n4["done<br/><small>end</small>"]
+  n0 -->|output| n1
+  n1 -->|error| n2
   n2 -->|success| n3
   n3 -->|success| n4
-  n4 -->|escalate| n5
-  n4 -->|normal| n6
-  n5 -->|success| n6
 
 
 Failure behavior: every workflow declares per-node `errorHandling`; external sync and recovery workflows have explicit error edges. Human tasks (approval/dataCollection) suspend with an expiry and resume through the platform's data-collection endpoint. Cron jobs and listeners ship **inactive/disabled** until reviewed.
@@ -313,9 +246,7 @@ The installer creates tenant-scoped platform roles and grants asset-level Casbin
 
 ## Integrations
 
-- **ERP inventory REST** — required: base URL, API token. Mock: Connector ships disabled with no credentials; seeded stock and purchase orders are the demo source of truth.
-- **Supplier ASN webhook** — required: endpoint path, optional signature header. Mock: POST { "kind": "webhook.received", "record_id": 1 } to the inactive listener to simulate an advance ship notice.
-- **Slack replenishment alerts** — required: webhook URL, channel. Mock: Alerts are mirrored into the in-app notification center until a Slack webhook is connected.
+- **Inbound webhook** — required: endpoint path, signature header (optional). Mock: Send a JSON body with kind=webhook.received to the inactive listener.
 
 ## Install
 

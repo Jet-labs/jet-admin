@@ -29,6 +29,9 @@ function chooseChecks(roles) {
     admin.pages.find((page) =>
       roles.every((role) => allows(role, "pages", "page", page.page, "canView"))
     ) || admin.pages[0];
+  const portalPage =
+    admin.pages.find((page) => /portal|client/i.test(page.page) || /portal|client/i.test(page.pageTitle)) ||
+    null;
 
   const adminQuery =
     admin.queries.find(
@@ -40,6 +43,13 @@ function chooseChecks(roles) {
     admin.queries.find((query) =>
       roles.every((role) => allows(role, "queries", "query", query.query, "canExecute"))
     ) || admin.queries[0];
+  const writeQuery =
+    admin.queries.find(
+      (query) =>
+        query.canExecute &&
+        (query.tags || []).includes("write") &&
+        roles.some((role) => !allows(role, "queries", "query", query.query, "canExecute"))
+    ) || admin.queries.find((query) => (query.tags || []).includes("write"));
 
   const adminWorkflow =
     admin.workflows.find(
@@ -50,7 +60,7 @@ function chooseChecks(roles) {
         )
     ) || admin.workflows.find((workflow) => workflow.canTrigger);
 
-  return { adminPage, commonPage, adminQuery, commonQuery, adminWorkflow };
+  return { adminPage, commonPage, portalPage, adminQuery, commonQuery, writeQuery, adminWorkflow };
 }
 
 async function main() {
@@ -131,6 +141,12 @@ async function main() {
         checks.commonQuery.query,
         "canExecute"
       );
+      const expectedPortalPage = checks.portalPage
+        ? allows(role, "pages", "page", checks.portalPage.page, "canView")
+        : null;
+      const expectedWriteQuery = checks.writeQuery
+        ? allows(role, "queries", "query", checks.writeQuery.query, "canExecute")
+        : null;
       const expectedWorkflow = checks.adminWorkflow
         ? allows(role, "workflows", "workflow", checks.adminWorkflow.workflow, "canTrigger")
         : null;
@@ -147,6 +163,14 @@ async function main() {
         `appPage:${pageID(checks.commonPage.page)}`,
         "read"
       );
+      const portalPage = checks.portalPage
+        ? await enforce(
+            user.userID,
+            tenantID,
+            `appPage:${pageID(checks.portalPage.page)}`,
+            "read"
+          )
+        : null;
       const adminQuery = await enforce(
         user.userID,
         tenantID,
@@ -159,6 +183,14 @@ async function main() {
         `dataquery:${queryID(checks.commonQuery.query)}`,
         "execute"
       );
+      const writeQuery = checks.writeQuery
+        ? await enforce(
+            user.userID,
+            tenantID,
+            `dataquery:${queryID(checks.writeQuery.query)}`,
+            "execute"
+          )
+        : null;
       const workflow = checks.adminWorkflow
         ? await enforce(
             user.userID,
@@ -171,13 +203,16 @@ async function main() {
       const ok =
         adminPage === expectedAdminPage &&
         commonPage === expectedCommonPage &&
+        (expectedPortalPage === null || portalPage === expectedPortalPage) &&
         adminQuery === expectedAdminQuery &&
         commonQuery === expectedCommonQuery &&
+        (expectedWriteQuery === null || writeQuery === expectedWriteQuery) &&
         (expectedWorkflow === null || workflow === expectedWorkflow);
       console.log(
         `  ${ok ? "+" : "!"} ${role.key}: adminPage=${adminPage}/${expectedAdminPage} ` +
-          `commonPage=${commonPage}/${expectedCommonPage} adminQuery=${adminQuery}/${expectedAdminQuery} ` +
-          `commonQuery=${commonQuery}/${expectedCommonQuery} workflow=${workflow}/${expectedWorkflow}`
+          `commonPage=${commonPage}/${expectedCommonPage} portalPage=${portalPage}/${expectedPortalPage} ` +
+          `adminQuery=${adminQuery}/${expectedAdminQuery} commonQuery=${commonQuery}/${expectedCommonQuery} ` +
+          `writeQuery=${writeQuery}/${expectedWriteQuery} workflow=${workflow}/${expectedWorkflow}`
       );
       if (!ok) failed += 1;
     }

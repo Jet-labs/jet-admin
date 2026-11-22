@@ -33,23 +33,11 @@ The package is data-only: schema, deterministic seed, parameterized queries, wid
 | `crm-contacts-create` | Create Contact | core, staff, manager, admin |
 | `crm-dashboard` | Dashboard | core, shared, staff, manager, admin, viewer |
 | `crm-reports-operations` | Reports · operations | report, manager, admin |
-| `crm-reports-secondary` | Reports · secondary mix | report, manager, admin |
-| `crm-reports-quality` | Reports · data quality | report, manager, admin |
-| `crm-deals-kanban` | Deals · kanban | core, staff, manager, admin |
-| `crm-deals-calendar` | Deals · calendar | core, staff, manager, admin |
-| `crm-search` | Global search | shared, staff, manager, admin, viewer |
 | `crm-profile` | My profile | shared, staff, manager, admin, viewer, portal |
 | `crm-notifications` | Notifications | shared, staff, manager, admin, viewer, portal |
 | `crm-settings` | Settings | shared, manager, admin |
 | `crm-portal` | Client portal | portal, client, admin, manager |
-| `crm-admin-users` | Admin · users | admin, manager |
 | `crm-admin-roles` | Admin · roles and permissions | admin |
-| `crm-admin-audit` | Admin · audit log | admin, manager |
-| `crm-admin-settings` | Admin · system settings | admin |
-| `crm-admin-import` | Admin · import / export | admin, manager |
-| `crm-admin-integrations` | Admin · integration health | admin |
-| `crm-admin-jobs` | Admin · jobs and workflow runs | admin |
-| `crm-admin-quality` | Admin · data quality | admin, manager |
 
 ## Data model
 
@@ -106,44 +94,6 @@ erDiagram
     string status
     datetime last_touch_at
   }
-  ACTIVITIES {
-    int id PK
-    string subject
-    string activity_type
-    string related_type
-    int related_id
-    datetime due_at
-    string status
-    int owner_id FK
-    string notes
-  }
-  PRODUCTS {
-    int id PK
-    string name
-    string sku
-    string category
-    decimal unit_price
-    boolean is_active
-  }
-  QUOTAS {
-    int id PK
-    int rep_id FK
-    string period
-    decimal target_amount
-    decimal attained_amount
-    decimal forecast_amount
-    string status
-  }
-  CAMPAIGNS {
-    int id PK
-    string name
-    string channel
-    string status
-    decimal budget
-    string start_date
-    string end_date
-    int owner_id FK
-  }
   ACCOUNTS ||--o{ DEALS : "account_id"
   CONTACTS ||--o{ DEALS : "contact_id"
   STAFF ||--o{ DEALS : "owner_id"
@@ -151,31 +101,22 @@ erDiagram
   STAFF ||--o{ ACCOUNTS : "owner_id"
   ACCOUNTS ||--o{ CONTACTS : "account_id"
   STAFF ||--o{ CONTACTS : "owner_id"
-  STAFF ||--o{ ACTIVITIES : "owner_id"
-  STAFF ||--o{ QUOTAS : "rep_id"
-  STAFF ||--o{ CAMPAIGNS : "owner_id"
   STAFF ||--o{ AUDIT_LOG : actor
   STAFF ||--o{ COMMENTS : author
   STAFF ||--o{ NOTIFICATIONS : recipient
 ```
 
-The package ships 8 domain tables plus 10 support tables (staff, lookups, audit, comments, attachments, notifications, settings, imports, operations, role matrix).
+The package ships 4 domain tables plus 10 support tables (staff, lookups, audit, comments, attachments, notifications, settings, imports, operations, role matrix).
 
 ## Workflows
 
 | Workflow | Purpose | Nodes |
 | --- | --- | --- |
 | `crm.intake-triage` | Deals · intake triage | 8 |
-| `crm.round-robin-assignment` | Deals · round-robin assignment | 6 |
 | `crm.approval-chain` | Deals · approval chain | 8 |
-| `crm.threshold-sweep` | Deals · threshold sweep | 6 |
 | `crm.daily-digest` | Deals · daily digest | 5 |
-| `crm.escalation` | Deals · escalation | 7 |
-| `crm.integration-sync` | CRM & Sales Pipeline · integration sync | 6 |
-| `crm.document-generation` | Deals · document generation | 6 |
 | `crm.data-collection` | Deals · supplier/customer follow-up | 4 |
 | `crm.error-recovery` | CRM & Sales Pipeline · expected failure and recovery | 5 |
-| `crm.notify-only` | CRM & Sales Pipeline · notify only | 3 |
 
 ### Deals · intake triage
 
@@ -196,21 +137,6 @@ flowchart TD
   n4 -->|success| n6
   n6 -->|success| n7
   n5 -->|success| n7
-
-### Deals · round-robin assignment
-
-flowchart TD
-  n0["start<br/><small>start</small>"]
-  n1["loadStaff<br/><small>dataQuery</small>"]
-  n2["pickAssignee<br/><small>javascript</small>"]
-  n3["assignOwner<br/><small>dataQuery</small>"]
-  n4["notifyOwner<br/><small>dataQuery</small>"]
-  n5["done<br/><small>end</small>"]
-  n0 -->|output| n1
-  n1 -->|success| n2
-  n2 -->|success| n3
-  n3 -->|success| n4
-  n4 -->|success| n5
 
 ### Deals · approval chain
 
@@ -233,21 +159,6 @@ flowchart TD
   n5 -->|success| n6
   n6 -->|success| n7
 
-### Deals · threshold sweep
-
-flowchart TD
-  n0["start<br/><small>start</small>"]
-  n1["loadOverdue<br/><small>dataQuery</small>"]
-  n2["boundBatch<br/><small>javascript</small>"]
-  n3["loopOverdue<br/><small>loop</small>"]
-  n4["notifyOverdue<br/><small>dataQuery</small>"]
-  n5["done<br/><small>end</small>"]
-  n0 -->|output| n1
-  n1 -->|success| n2
-  n2 -->|success| n3
-  n3 -->|loop| n4
-  n3 -->|completed| n5
-
 ### Deals · daily digest
 
 flowchart TD
@@ -261,23 +172,29 @@ flowchart TD
   n2 -->|success| n3
   n3 -->|success| n4
 
-### Deals · escalation
+### Deals · supplier/customer follow-up
 
 flowchart TD
   n0["start<br/><small>start</small>"]
-  n1["waitForResponse<br/><small>delay</small>"]
-  n2["loadRecord<br/><small>dataQuery</small>"]
-  n3["readPriority<br/><small>javascript</small>"]
-  n4["needsEscalation<br/><small>condition</small>"]
-  n5["notifyEscalation<br/><small>dataQuery</small>"]
-  n6["done<br/><small>end</small>"]
+  n1["Follow up on Deal #{{ ctx.recordID }}<br/><small>dataCollection</small>"]
+  n2["recordFollowUp<br/><small>dataQuery</small>"]
+  n3["done<br/><small>end</small>"]
   n0 -->|output| n1
-  n1 -->|success| n2
+  n1 -->|output| n2
+  n2 -->|success| n3
+
+### CRM & Sales Pipeline · expected failure and recovery
+
+flowchart TD
+  n0["start<br/><small>start</small>"]
+  n1["injectFailure<br/><small>javascript</small>"]
+  n2["compensate<br/><small>javascript</small>"]
+  n3["notifyRecovery<br/><small>dataQuery</small>"]
+  n4["done<br/><small>end</small>"]
+  n0 -->|output| n1
+  n1 -->|error| n2
   n2 -->|success| n3
   n3 -->|success| n4
-  n4 -->|escalate| n5
-  n4 -->|normal| n6
-  n5 -->|success| n6
 
 
 Failure behavior: every workflow declares per-node `errorHandling`; external sync and recovery workflows have explicit error edges. Human tasks (approval/dataCollection) suspend with an expiry and resume through the platform's data-collection endpoint. Cron jobs and listeners ship **inactive/disabled** until reviewed.
@@ -294,8 +211,7 @@ The installer creates tenant-scoped platform roles and grants asset-level Casbin
 
 ## Integrations
 
-- **SendGrid email** — required: API key, from address. Mock: The packaged connector is disabled; use the notification center and email HTML samples for demos.
-- **Inbound lead webhook** — required: endpoint path, optional signature header. Mock: POST { "kind": "record.created", "record_id": 1 } to the inactive webhook listener.
+- **Inbound webhook** — required: endpoint path, signature header (optional). Mock: Send a JSON body with kind=webhook.received to the inactive listener.
 
 ## Install
 

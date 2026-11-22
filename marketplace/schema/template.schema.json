@@ -11,9 +11,9 @@
     "queries": { "type": "array", "minItems": 30, "maxItems": 80, "items": { "$ref": "#/definitions/query" } },
     "widgets": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/widget" } },
     "pages": { "type": "array", "minItems": 12, "items": { "$ref": "#/definitions/page" } },
-    "workflows": { "type": "array", "minItems": 8, "maxItems": 20, "items": { "$ref": "#/definitions/workflow" } },
-    "listeners": { "type": "array", "minItems": 5, "maxItems": 15, "items": { "$ref": "#/definitions/listener" } },
-    "cronJobs": { "type": "array", "minItems": 4, "maxItems": 10, "items": { "$ref": "#/definitions/cronJob" } },
+    "workflows": { "type": "array", "minItems": 4, "maxItems": 20, "items": { "$ref": "#/definitions/workflow" } },
+    "listeners": { "type": "array", "minItems": 2, "maxItems": 15, "items": { "$ref": "#/definitions/listener" } },
+    "cronJobs": { "type": "array", "minItems": 2, "maxItems": 10, "items": { "$ref": "#/definitions/cronJob" } },
     "roles": { "type": "array", "minItems": 4, "maxItems": 7, "items": { "$ref": "#/definitions/role" } }
   },
   "definitions": {

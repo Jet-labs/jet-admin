@@ -62,44 +62,6 @@
     }
   },
   {
-    "slug": "ap.purchase_orders.export",
-    "title": "Purchase Orders · export",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "export",
-      "purchase_orders"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"po_number\", \"supplier_id\", \"status\", \"total_amount\", \"currency\", \"issued_at\", \"expected_date\", \"buyer_id\", \"department\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:purchase_orders}}\nWHERE deleted_at IS NULL AND (coalesce(\"po_number\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"department\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"notes\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
-      "inputDefinitions": [
-        {
-          "key": "search",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "status",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "ap.purchase_orders.detail",
     "title": "Purchase Orders · detail",
     "datasource": "primary",
@@ -314,23 +276,6 @@
     }
   },
   {
-    "slug": "ap.purchase_orders.lookup",
-    "title": "Purchase Orders · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "purchase_orders"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"po_number\"::text AS label FROM {{table:purchase_orders}} WHERE deleted_at IS NULL ORDER BY \"po_number\" LIMIT 500",
-      "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "ap.purchase_orders.status",
     "title": "Purchase Orders · change status",
     "datasource": "primary",
@@ -361,36 +306,6 @@
     }
   },
   {
-    "slug": "ap.purchase_orders.assign",
-    "title": "Purchase Orders · assign owner",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "purchase_orders"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:purchase_orders}} SET \"buyer_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"buyer_id\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "staffID",
-          "type": "number",
-          "required": false,
-          "default": 1
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "ap.purchase_orders.stats",
     "title": "Purchase Orders · KPI totals",
     "datasource": "primary",
@@ -412,86 +327,6 @@
           "key": "dateTo",
           "type": "string",
           "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "ap.purchase_orders.trend",
-    "title": "Purchase Orders · daily trend",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "purchase_orders"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT date_trunc('day', created_at)::date AS day, count(*)::int AS count, coalesce(sum(\"total_amount\"), 0)::numeric(14,2) AS total\nFROM {{table:purchase_orders}}\nWHERE deleted_at IS NULL AND created_at >= coalesce(NULLIF($1::text, '')::date, now() - interval '90 days')\n  AND created_at < (coalesce(NULLIF($2::text, '')::date, now()::date) + interval '1 day')\nGROUP BY 1 ORDER BY 1",
-      "inputDefinitions": [
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "ap.purchase_orders.by_status",
-    "title": "Purchase Orders · by status",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "purchase_orders"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"status\" AS status, count(*)::int AS count FROM {{table:purchase_orders}} WHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date) AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day')) GROUP BY 1 ORDER BY 2 DESC",
-      "inputDefinitions": [
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "ap.purchase_orders.overdue",
-    "title": "Purchase Orders · overdue",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "purchase_orders"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"po_number\", \"supplier_id\", \"status\", \"total_amount\", \"currency\", \"issued_at\", \"expected_date\", \"buyer_id\", \"department\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:purchase_orders}}\nWHERE deleted_at IS NULL AND \"issued_at\" IS NOT NULL\n  AND \"issued_at\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('closed', 'cancelled')\nORDER BY \"issued_at\" ASC LIMIT 100",
-      "inputDefinitions": [
-        {
-          "key": "days",
-          "type": "number",
-          "required": false,
-          "default": 7
         }
       ],
       "parameterized": true,

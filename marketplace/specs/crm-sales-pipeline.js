@@ -10,6 +10,7 @@ const TIERS = ["strategic", "enterprise", "mid_market", "smb"];
 
 module.exports = {
   slug: "crm-sales-pipeline",
+  compact: true,
   name: "CRM & Sales Pipeline",
   alias: "crm",
   category: "Sales & CRM",

@@ -344,23 +344,6 @@
     }
   },
   {
-    "slug": "ap.invoices.lookup",
-    "title": "Invoices · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "invoices"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"invoice_number\"::text AS label FROM {{table:invoices}} WHERE deleted_at IS NULL ORDER BY \"invoice_number\" LIMIT 500",
-      "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "ap.invoices.status",
     "title": "Invoices · change status",
     "datasource": "primary",
@@ -384,66 +367,6 @@
           "type": "string",
           "required": false,
           "default": "received"
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "ap.invoices.assign",
-    "title": "Invoices · assign owner",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "invoices"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:invoices}} SET \"owner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"owner_id\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "staffID",
-          "type": "number",
-          "required": false,
-          "default": 1
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "ap.invoices.score",
-    "title": "Invoices · save score",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "invoices"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:invoices}} SET \"match_score\" = $2::numeric, updated_at = now() WHERE id = $1::int RETURNING id, \"match_score\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "score",
-          "type": "number",
-          "required": false,
-          "default": 0
         }
       ],
       "parameterized": true,
@@ -528,30 +451,6 @@
           "key": "dateTo",
           "type": "string",
           "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "ap.invoices.overdue",
-    "title": "Invoices · overdue",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "invoices"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"invoice_number\", \"supplier_id\", \"po_id\", \"status\", \"total_amount\", \"currency\", \"invoice_date\", \"due_date\", \"received_at\", \"match_score\", \"discrepancy_count\", \"owner_id\", \"notes\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:invoices}}\nWHERE deleted_at IS NULL AND \"invoice_date\" IS NOT NULL\n  AND \"invoice_date\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('paid')\nORDER BY \"invoice_date\" ASC LIMIT 100",
-      "inputDefinitions": [
-        {
-          "key": "days",
-          "type": "number",
-          "required": false,
-          "default": 7
         }
       ],
       "parameterized": true,

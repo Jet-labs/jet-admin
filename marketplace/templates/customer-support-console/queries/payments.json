@@ -62,44 +62,6 @@
     }
   },
   {
-    "slug": "support.payments.export",
-    "title": "Payments · export",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "export",
-      "payments"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"customer_id\", \"invoice_number\", \"amount\", \"status\", \"method\", \"paid_at\", \"due_date\", \"reference\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:payments}}\nWHERE deleted_at IS NULL AND (coalesce(\"invoice_number\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"reference\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
-      "inputDefinitions": [
-        {
-          "key": "search",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "status",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "support.payments.detail",
     "title": "Payments · detail",
     "datasource": "primary",
@@ -289,23 +251,6 @@
           "default": []
         }
       ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "support.payments.lookup",
-    "title": "Payments · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "payments"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"invoice_number\"::text AS label FROM {{table:payments}} WHERE deleted_at IS NULL ORDER BY \"invoice_number\" LIMIT 500",
-      "inputDefinitions": [],
       "parameterized": true,
       "timeoutSeconds": 20
     }

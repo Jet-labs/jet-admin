@@ -62,44 +62,6 @@
     }
   },
   {
-    "slug": "inv.stock_items.export",
-    "title": "Stock Items · export",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "export",
-      "stock_items"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"product_name\", \"sku_id\", \"warehouse_id\", \"status\", \"planner_id\", \"on_hand\", \"reserved\", \"reorder_point\", \"safety_stock\", \"target_stock\", \"unit_cost\", \"last_counted_at\", \"next_review_at\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:stock_items}}\nWHERE deleted_at IS NULL AND (coalesce(\"product_name\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
-      "inputDefinitions": [
-        {
-          "key": "search",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "status",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "inv.stock_items.detail",
     "title": "Stock Items · detail",
     "datasource": "primary",
@@ -344,23 +306,6 @@
     }
   },
   {
-    "slug": "inv.stock_items.lookup",
-    "title": "Stock Items · lookup",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "lookup",
-      "stock_items"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT id, \"product_name\"::text AS label FROM {{table:stock_items}} WHERE deleted_at IS NULL ORDER BY \"product_name\" LIMIT 500",
-      "inputDefinitions": [],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "inv.stock_items.status",
     "title": "Stock Items · change status",
     "datasource": "primary",
@@ -391,36 +336,6 @@
     }
   },
   {
-    "slug": "inv.stock_items.assign",
-    "title": "Stock Items · assign owner",
-    "datasource": "primary",
-    "tags": [
-      "write",
-      "core",
-      "stock_items"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "UPDATE {{table:stock_items}} SET \"planner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"planner_id\"",
-      "inputDefinitions": [
-        {
-          "key": "id",
-          "type": "number",
-          "required": false,
-          "default": 1
-        },
-        {
-          "key": "staffID",
-          "type": "number",
-          "required": false,
-          "default": 1
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
     "slug": "inv.stock_items.stats",
     "title": "Stock Items · KPI totals",
     "datasource": "primary",
@@ -442,86 +357,6 @@
           "key": "dateTo",
           "type": "string",
           "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.stock_items.trend",
-    "title": "Stock Items · daily trend",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "stock_items"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT date_trunc('day', created_at)::date AS day, count(*)::int AS count, coalesce(sum(\"unit_cost\"), 0)::numeric(14,2) AS total\nFROM {{table:stock_items}}\nWHERE deleted_at IS NULL AND created_at >= coalesce(NULLIF($1::text, '')::date, now() - interval '90 days')\n  AND created_at < (coalesce(NULLIF($2::text, '')::date, now()::date) + interval '1 day')\nGROUP BY 1 ORDER BY 1",
-      "inputDefinitions": [
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.stock_items.by_status",
-    "title": "Stock Items · by status",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "stock_items"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"status\" AS status, count(*)::int AS count FROM {{table:stock_items}} WHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date) AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day')) GROUP BY 1 ORDER BY 2 DESC",
-      "inputDefinitions": [
-        {
-          "key": "dateFrom",
-          "type": "string",
-          "required": false
-        },
-        {
-          "key": "dateTo",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "parameterized": true,
-      "timeoutSeconds": 20
-    }
-  },
-  {
-    "slug": "inv.stock_items.overdue",
-    "title": "Stock Items · overdue",
-    "datasource": "primary",
-    "tags": [
-      "read",
-      "report",
-      "stock_items"
-    ],
-    "options": {
-      "queryType": "query",
-      "query": "SELECT \"id\", \"product_name\", \"sku_id\", \"warehouse_id\", \"status\", \"planner_id\", \"on_hand\", \"reserved\", \"reorder_point\", \"safety_stock\", \"target_stock\", \"unit_cost\", \"last_counted_at\", \"next_review_at\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:stock_items}}\nWHERE deleted_at IS NULL AND \"last_counted_at\" IS NOT NULL\n  AND \"last_counted_at\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('')\nORDER BY \"last_counted_at\" ASC LIMIT 100",
-      "inputDefinitions": [
-        {
-          "key": "days",
-          "type": "number",
-          "required": false,
-          "default": 7
         }
       ],
       "parameterized": true,

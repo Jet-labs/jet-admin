@@ -10,10 +10,16 @@ layer, role provisioning and an install ledger.
 
 | Template | Category | Tables | Seed rows | Queries | Pages | Workflows | Listeners | Cron | Roles |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `crm-sales-pipeline` | Sales & CRM | 18 | 2,390 | 80 | 31 | 11 | 8 | 6 | 5 |
-| `customer-support-console` | Customer Support | 18 | 2,640 | 78 | 31 | 11 | 8 | 6 | 5 |
-| `inventory-replenishment-planner` | Inventory & Operations | 18 | 2,948 | 80 | 31 | 11 | 8 | 6 | 5 |
-| `invoice-matching-desk` | Finance & Accounting | 18 | 3,380 | 78 | 31 | 11 | 8 | 6 | 5 |
+| `crm-sales-pipeline` | Sales & CRM | 14 | 1,684 | 53 | 19 | 5 | 3 | 2 | 5 |
+| `customer-support-console` | Customer Support | 14 | 1,798 | 54 | 19 | 5 | 3 | 2 | 5 |
+| `inventory-replenishment-planner` | Inventory & Operations | 16 | 1,972 | 54 | 19 | 5 | 3 | 2 | 5 |
+| `invoice-matching-desk` | Finance & Accounting | 14 | 1,738 | 54 | 19 | 5 | 3 | 2 | 5 |
+
+These are deliberately compact demo bundles: four core entities (plus any
+referenced lookup entities), one dashboard, core list/detail/create pages, one
+report, profile, notifications, settings, a portal and a role matrix. Each
+bundle creates exactly **two datasources**: the primary PostgreSQL connection
+and one inbound webhook. No second database connector is created.
 
 Customer Support Console, Inventory Replenishment Planner and Invoice Matching
 Desk are the second, third and fourth deliveries. The remaining original
@@ -21,77 +27,62 @@ template ideas stay deferred.
 
 ## What the CRM template includes
 
-- Leads, accounts, contacts, deals, activities, products, quotas and campaigns.
-- Deal pipeline (kanban), record calendar, dashboards, three reports, global
-  search, profile, notifications, settings and a client portal.
-- Admin panel: tenant users, provisioned roles/matrix, audit log with old/new
-  JSON, settings and feature flags, CSV import/export, integration health,
-  workflow/cron monitors and data-quality checks.
-- 11 workflows: intake triage, round-robin assignment, approval chain,
-  threshold sweep, daily digest, escalation, integration sync, document
-  generation, human data collection, expected-failure recovery and
-  notification-only.
-- 8 inactive webhook listeners, 6 disabled cron jobs and 5 Casbin roles.
-- Audit trigger on every domain and support table, soft delete/restore, CSV
-  import with an error summary, comments, attachments and saved views.
+- Leads, accounts, contacts and deals with owner, stage and value context.
+- Dashboard, core list/detail/create pages, one operations report, profile,
+  notifications, settings and a client portal.
+- Role matrix page with five Casbin roles and per-page/query/workflow grants.
+- Five workflows: intake triage, approval chain, daily digest, data collection
+  and expected-failure recovery.
+- Three inactive webhook listeners, two disabled cron jobs and two datasources
+  (PostgreSQL + inbound webhook).
+- Audit triggers, soft delete/restore, comments, attachments, saved views and
+  CSV-compatible exports.
 
 ## What the Customer Support Console includes
 
-- Customers, subscriptions, payments, tickets, interactions, escalations,
-  canned replies and a knowledge base.
-- Ticket queue, detail workspace, kanban, calendar, customer lookup with plan
-  and MRR context, payment/subscription history and global search.
-- Dashboard, SLA and CSAT reports, profile, notifications, settings and a
+- Customers, subscriptions, payments and tickets with plan, MRR, payment and
+  SLA context.
+- Ticket queue, detail workspace, customer lookup, payment/subscription history,
+  dashboard, one operations report, profile, notifications, settings and a
   client portal.
-- Admin panel: users, roles/permissions, audit diff viewer, settings and
-  feature flags, CSV import/export, integration health, job/workflow monitor,
-  webhook log and data quality.
-- 11 workflows covering intake triage, round-robin assignment, approval and
-  escalation, SLA sweeps, digests, integration sync, document generation,
-  data collection, error recovery and notification-only.
-- 8 inactive webhook listeners, 6 disabled cron jobs and 5 Casbin roles with
-  per-page, per-query and per-workflow asset permissions.
+- Role matrix page with five Casbin roles and per-page/query/workflow grants.
+- Five workflows: intake triage, approval chain, daily digest, data collection
+  and expected-failure recovery.
+- Three inactive webhook listeners, two disabled cron jobs and two datasources
+  (PostgreSQL + inbound webhook).
+- Audit triggers, soft delete/restore, comments, attachments, saved views and
+  CSV-compatible exports.
 
 ## What the Inventory Replenishment Planner includes
 
-- Stock items by SKU and warehouse with on-hand, reserved, reorder point,
-  safety stock, target stock, unit cost and stock-health status.
-- Replenishment proposals with requested/suggested quantities, urgency,
-  planner ownership, confidence score, approval timestamps and rationale.
-- Suppliers with lead time, minimum order value, reliability, payment terms
-  and status; purchase orders with expected/received dates and buyer context.
-- SKU catalog, warehouses, demand forecasts and stock movements as seeded
-  secondary entities for reporting and drill-down.
-- Low-stock queue, proposal kanban, purchase-order calendar, dashboards, three
-  reports, global search, profile, notifications and settings.
-- Admin panel: users, roles/permissions, audit diff viewer, settings and
-  feature flags, import/export, integration health, job/workflow monitor,
-  webhook log and data quality.
-- 11 workflows covering stock triage, proposal approval, supplier escalation,
-  reorder sweeps, digests, ERP sync, document generation, data collection,
-  error recovery and notification-only.
-- 8 inactive webhook listeners, 6 disabled cron jobs and 5 Casbin roles with
-  per-page, per-query and per-workflow asset permissions.
+- Stock items by SKU and warehouse, replenishment proposals, suppliers with
+  lead times/reliability, and purchase orders.
+- Low-stock queue, proposal workspace, supplier and purchase-order context,
+  dashboard, one operations report, profile, notifications, settings and a
+  client portal.
+- Role matrix page with five Casbin roles and per-page/query/workflow grants.
+- Five workflows: intake triage, approval chain, daily digest, data collection
+  and expected-failure recovery.
+- Three inactive webhook listeners, two disabled cron jobs and two datasources
+  (PostgreSQL + inbound webhook).
+- Audit triggers, soft delete/restore, comments, attachments, saved views and
+  CSV-compatible exports.
 
 ## What the Invoice Matching Desk includes
 
 - Invoices with supplier, PO and receipt links, match score, discrepancy count,
   currency, dates and owner.
-- Purchase orders and receipt records for two-way and three-way matching.
-- Invoice lines and PO lines for line-level context, plus match results with
-  price/quantity variance amounts and percentages.
-- Discrepancy queue with severity, category, owner, amount impact and
-  resolution state; approval and escalation routing on top.
-- Invoice queue, invoice detail, match kanban, PO calendar, dashboards, three
-  reports, global search, profile, notifications and settings.
-- Admin panel: users, roles/permissions, audit diff viewer, settings and
-  feature flags, import/export, integration health, job/workflow monitor,
-  webhook log and data quality.
-- 11 workflows covering intake triage, automated matching, approval, exception
-  escalation, aging sweeps, digests, ERP sync, document generation, data
-  collection, error recovery and notification-only.
-- 8 inactive webhook listeners, 6 disabled cron jobs and 5 Casbin roles with
-  per-page, per-query and per-workflow asset permissions.
+- Purchase orders, receipts and suppliers for two-way and three-way matching
+  context.
+- Invoice queue, detail workspace, dashboard, one operations report, profile,
+  notifications, settings and a client portal.
+- Role matrix page with five Casbin roles and per-page/query/workflow grants.
+- Five workflows: intake triage, approval chain, daily digest, data collection
+  and expected-failure recovery.
+- Three inactive webhook listeners, two disabled cron jobs and two datasources
+  (PostgreSQL + inbound webhook).
+- Audit triggers, soft delete/restore, comments, attachments, saved views and
+  CSV-compatible exports.
 
 ## Install
 
@@ -101,7 +92,8 @@ template ideas stay deferred.
 2. Select the **App bundles** section.
 3. Open **CRM & Sales Pipeline**.
 4. Choose install options:
-   - **Include sample data** (default on) loads 2,390 deterministic rows.
+   - **Include sample data** (default on) loads 1,684-1,972 deterministic rows
+     depending on the bundle.
    - **Create demo staff directory** creates demo platform users. These are
      not Firebase logins.
    - **Enable automation** enables the packaged cron jobs. Default off.
@@ -131,8 +123,26 @@ Other endpoints:
 - `GET  /api/v1/tenants/:tenantID/templates/:slug/assets/:assetPath`
 
 Install is idempotent per `(tenantID, slug)`. Re-running without
-`reinstall: true` returns the existing ledger record. Uninstall deletes the
-ledger, platform resources and the tenant-specific `tpl_*` tables.
+`reinstall: true` returns the existing ledger record.
+
+### Uninstall with asset selection
+
+The template detail response includes `install.uninstallPlan`, listing every
+installed platform resource and database table. The UI defaults to all assets
+selected and lets the operator unselect any page, query, workflow, widget,
+listener, role, datasource or table before deleting.
+
+```http
+DELETE /api/v1/tenants/:tenantID/templates/crm-sales-pipeline
+Content-Type: application/json
+
+{ "assetKeys": ["appPage:<id>", "dataQuery:<id>", "table:tpl_crm_abc123_deals"] }
+```
+
+Omitting `assetKeys` performs a full uninstall. A partial uninstall deletes only
+the selected assets, drops only the selected tables and keeps the remaining
+ledger entries installed. Asset permissions and Casbin policies for deleted
+resources are removed; kept assets retain their grants.
 
 ### Registering packages in the database
 
@@ -166,6 +176,7 @@ marketplace/
     validate-templates.js            npm run templates:validate
     smoke-sql.js                     DDL + seed + read-query smoke (rolled back)
     test-install.js                  install/uninstall smoke
+    test-uninstall.js                partial/full uninstall selection smoke
     test-pages.js                    page read-query smoke + orphan check
     test-workflows.js                Temporal workflow smoke
     test-roles.js                    Casbin allow/deny matrix
@@ -227,33 +238,31 @@ installer, gallery and asset endpoint read only those rows.
 
 - `npm run templates:validate` — passes for CRM, Customer Support, Inventory
   Replenishment and Invoice Matching.
-- `npm run templates:seed:db` — registers all four packages and 16 assets each
+- `npm run templates:seed:db` - registers all four packages and 14 assets each
   in the database.
-- CRM: SQL DDL + 2,390 seed rows + 45 read queries — pass in a rolled-back
-  transaction; 342 bundle resources + 16 cron/role resources; 69 page queries,
-  0 failures.
-- Customer Support: SQL DDL + 2,640 seed rows + 45 read queries — pass in a
-  rolled-back transaction; 357 bundle/install resources; 18 tables, 31 pages,
-  78 queries, 5 roles and 6 cron jobs on a fresh tenant; 69 page queries,
-  0 failures; 0 orphan tables/ledger rows.
-- Inventory Replenishment: SQL DDL + 2,948 seed rows + 45 read queries — pass
-  in a rolled-back transaction; 361 bundle/install resources; 18 tables,
-  31 pages, 80 queries, 5 roles and 6 cron jobs; 69 page queries, 0 failures;
-  0 orphan tables/ledger rows.
-- Invoice Matching: SQL DDL + 3,380 seed rows + 45 read queries — pass in a
-  rolled-back transaction; 359 bundle/install resources; 18 tables, 31 pages,
-  78 queries, 5 roles and 6 cron jobs; 69 page queries, 0 failures; 0 orphan
+- CRM: SQL DDL + 1,684 seed rows + 26 read queries - pass in a rolled-back
+  transaction; 257 install resources; 14 tables, 19 pages, 53 queries, 5 roles
+  and 2 cron jobs.
+- Customer Support: SQL DDL + 1,798 seed rows + 26 read queries - pass in a
+  rolled-back transaction; 259 install resources; 14 tables, 19 pages,
+  54 queries, 5 roles and 2 cron jobs; 49 page queries, 0 failures; 0 orphan
   tables/ledger rows.
-- Workflows - CRM 6/6 tested pass (5 complete, approval suspends as intended).
-  Customer Support graphs validate and its runtime smoke reached 5/6 per full
-  run after the Temporal worker was rebuilt; the remaining case passed on other
-  runs, so the residual error is remote-Neon flakiness. The harness retries a
-  case once, and threshold sweeps are capped at 5 iterations.
-- Roles — 5/5 allow/deny matrix pass for all four templates; demo users and
-  roles removed on uninstall. Query and workflow execution is granted per
-  asset.
-- Jest package tests — 20/20 pass across all four templates.
-- Frontend production build — passes.
+- Inventory Replenishment: SQL DDL + 1,972 seed rows + 26 read queries - pass
+  in a rolled-back transaction; 261 install resources; 16 tables, 19 pages,
+  54 queries, 5 roles and 2 cron jobs.
+- Invoice Matching: SQL DDL + 1,738 seed rows + 26 read queries - pass in a
+  rolled-back transaction; 261 install resources; 14 tables, 19 pages,
+  54 queries, 5 roles and 2 cron jobs.
+- Workflows - Customer Support compact bundle: 4/4 runtime cases pass (intake
+  triage, approval chain, daily digest, expected-failure recovery). Data
+  collection is packaged as the fifth workflow.
+- Roles - 5/5 allow/deny matrix pass for all four templates, including portal
+  page access and write-query CRUD denial for analyst/readonly roles.
+- Uninstall selection - partial uninstall removed one page + one table while
+  keeping 253 resources and 13 tables; full uninstall removed the remainder with
+  0 orphan tables or ledger rows.
+- Jest package tests - 20/20 pass across all four templates.
+- Frontend production build - passes.
 
 Known pre-existing repository test failures (not introduced by this work):
 `marketplaceSelection.test.js` and `curatedMarketplace.layout.test.js` are

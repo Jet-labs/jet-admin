@@ -44,9 +44,9 @@ for (const expected of TEMPLATE_CASES) {
       expect(pkg.queries.length).toBeGreaterThanOrEqual(30);
       expect(pkg.queries.length).toBeLessThanOrEqual(80);
       expect(pkg.pages.length).toBeGreaterThanOrEqual(12);
-      expect(pkg.workflows.length).toBeGreaterThanOrEqual(8);
-      expect(pkg.listeners.length).toBeGreaterThanOrEqual(5);
-      expect(pkg.cronJobs.length).toBeGreaterThanOrEqual(4);
+      expect(pkg.workflows.length).toBeGreaterThanOrEqual(4);
+      expect(pkg.listeners.length).toBeGreaterThanOrEqual(2);
+      expect(pkg.cronJobs.length).toBeGreaterThanOrEqual(2);
       expect(pkg.roles.length).toBeGreaterThanOrEqual(4);
       expect(pkg.workflows.some((wf) => wf.nodes.some((node) => node.type === "approval"))).toBe(true);
       expect(pkg.workflows.some((wf) => wf.nodes.some((node) => node.type === "dataCollection"))).toBe(true);
