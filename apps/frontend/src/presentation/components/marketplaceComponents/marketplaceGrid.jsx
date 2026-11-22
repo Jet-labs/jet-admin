@@ -12,6 +12,7 @@ import {
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { TemplateGallery } from "./templateGallery";
 import {
   Badge,
   Button,
@@ -34,7 +35,8 @@ const ITEM_TYPE_FILTERS = [
   { value: "datasource", label: "Datasources" },
   { value: "widget", label: "Widgets" },
   { value: "workflow", label: "Workflows" },
-  { value: "appTemplate", label: "App templates" },
+  { value: "appTemplate", label: "App pages" },
+  { value: "appBundle", label: "App bundles" },
 ];
 
 const TYPE_LABELS = {
@@ -44,7 +46,7 @@ const TYPE_LABELS = {
   workflow: "Workflow",
   appPage: "App page",
   listener: "Listener",
-  appTemplate: "App template",
+  appTemplate: "App page",
 };
 
 export const MarketplaceGrid = ({ tenantID }) => {
@@ -60,6 +62,7 @@ export const MarketplaceGrid = ({ tenantID }) => {
   const [preview, setPreview] = useState(null);
   const [selectedKeys, setSelectedKeys] = useState([]);
   const debouncedSearch = useDebounce(searchInput, 300);
+  const isBundleView = itemType === "appBundle";
 
   useEffect(() => {
     setCurrentPage(1);
@@ -88,7 +91,7 @@ export const MarketplaceGrid = ({ tenantID }) => {
         page: currentPage,
         pageSize: MARKETPLACE_PAGE_SIZE,
       }),
-    enabled: Boolean(tenantID),
+    enabled: Boolean(tenantID) && !isBundleView,
     refetchOnWindowFocus: false,
     placeholderData: (previous) => previous,
   });
@@ -173,9 +176,11 @@ export const MarketplaceGrid = ({ tenantID }) => {
         <PageHeader
           title={CONSTANTS.STRINGS.VIEW_MARKETPLACE_TITLE}
           subTitle={
-            totalCount === 0
-              ? "No items found"
-              : `${totalCount} integration item${totalCount === 1 ? "" : "s"}`
+            isBundleView
+              ? "Install-ready bundles with schema, seed data, pages and workflows"
+              : totalCount === 0
+                ? "No items found"
+                : `${totalCount} integration item${totalCount === 1 ? "" : "s"}`
           }
         >
           <div className="relative">
@@ -222,6 +227,10 @@ export const MarketplaceGrid = ({ tenantID }) => {
               "Storage & Files",
               "Identity & Security",
               "Productivity & Content",
+              "Customer Support",
+              "Finance & Accounting",
+              "Inventory & Operations",
+              "Sales & CRM",
             ].map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -230,6 +239,11 @@ export const MarketplaceGrid = ({ tenantID }) => {
           </select>
         </div>
 
+        {isBundleView ? (
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <TemplateGallery tenantID={tenantID} search={debouncedSearch} category={category} />
+          </div>
+        ) : (
         <div className="flex-1 overflow-y-auto p-3">
           {entries.length > 0 ? (
             <div
@@ -324,6 +338,7 @@ export const MarketplaceGrid = ({ tenantID }) => {
             </div>
           )}
         </div>
+        )}
 
         <Dialog
           open={preview !== null}
@@ -356,7 +371,7 @@ export const MarketplaceGrid = ({ tenantID }) => {
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    App templates include their widgets, queries, workflows and
+                    This item includes connected widgets, queries, workflows and
                     datasources. Clear any asset you do not want; dependent assets
                     are cleared with it.
                   </p>

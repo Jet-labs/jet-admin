@@ -24,7 +24,7 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 - [x] `tblMarketplaceTemplateInstalls` manual migration + Prisma model
 - [x] `installTemplate` / `uninstallTemplate` service (ledger, DDL/seed, bundle remap, cron, roles, demo users, compensation)
 - [x] Marketplace template API + authenticated static assets endpoint
-- [x] Marketplace gallery UI (App templates tab, filters, details, ERD, screenshots, install options, uninstall)
+- [x] Marketplace gallery UI (App bundles section, shared search/category/nav, details, ERD, screenshots, install options, uninstall)
 - [x] Opt-in parameterized PostgreSQL binding
 - [x] Kanban widget
 - [x] Calendar widget

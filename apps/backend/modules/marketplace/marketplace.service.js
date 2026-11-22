@@ -66,9 +66,9 @@ marketplaceService.listItems = async ({
         ],
       });
     }
-    // App templates are a first-class store surfaced by /templates, not the
-    // integration marketplace. Keep them out of this list even when legacy
-    // items are requested.
+    // App bundles are a first-class store surfaced by /templates, not the
+    // integration marketplace. Keep bundles out of the integration list; the
+    // curated single-page appTemplate items remain here as "App pages".
     and.push({ NOT: { sourceFamily: "marketplace-templates" } });
     const where = and.length ? { AND: and } : {};
 

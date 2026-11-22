@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useDebounce } from "@uidotdev/usehooks";
-import { Boxes, ExternalLink, Search, ShieldCheck, Store, Trash2, Users } from "lucide-react";
+import { Boxes, ExternalLink, ShieldCheck, Store, Trash2, Users } from "lucide-react";
 import {
   Badge,
   Button,
@@ -13,8 +12,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  Input,
-  PageHeader,
   Spinner,
 } from "@jet-admin/ui";
 import { CONSTANTS } from "../../../constants";
@@ -67,18 +64,15 @@ TemplateAsset.propTypes = {
   className: PropTypes.string,
 };
 
-export const TemplateGallery = ({ tenantID }) => {
+export const TemplateGallery = ({ tenantID, search = "", category = "" }) => {
   const queryClient = useQueryClient();
-  const [searchInput, setSearchInput] = useState("");
-  const [category, setCategory] = useState("");
   const [selectedSlug, setSelectedSlug] = useState(null);
   const [installOptions, setInstallOptions] = useState({ includeSampleData: true, createDemoUsers: false, enableAutomation: false });
   const [confirmUninstall, setConfirmUninstall] = useState(false);
-  const debouncedSearch = useDebounce(searchInput, 300);
 
   const listQuery = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.TEMPLATES(tenantID), debouncedSearch, category],
-    queryFn: () => listTemplatesAPI({ tenantID, search: debouncedSearch, category }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.TEMPLATES(tenantID), search, category],
+    queryFn: () => listTemplatesAPI({ tenantID, search, category }),
     enabled: Boolean(tenantID),
     refetchOnWindowFocus: false,
   });
@@ -134,7 +128,6 @@ export const TemplateGallery = ({ tenantID }) => {
   });
 
   const entries = listQuery.data?.entries || [];
-  const categories = listQuery.data?.categories || [];
   const selected = detailQuery.data;
   const isBusy = installMutation.isPending || uninstallMutation.isPending;
 
@@ -145,44 +138,18 @@ export const TemplateGallery = ({ tenantID }) => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-      <PageHeader
-        title="App templates"
-        subTitle={entries.length === 0 ? "No templates found" : `${entries.length} install-ready template${entries.length === 1 ? "" : "s"}`}
-      >
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/50" />
-            <Input
-              type="text"
-              size="sm"
-              placeholder="Search templates..."
-              className="w-56 pl-8"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-            />
-          </div>
-          <select
-            aria-label="Filter templates by category"
-            className="h-8 rounded border border-border/50 bg-background px-2 text-xs text-foreground"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-          >
-            <option value="">All categories</option>
-            {categories.map((item) => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-          </select>
-        </div>
-      </PageHeader>
-
       <div className="flex-1 overflow-auto p-3">
         {listQuery.isLoading ? (
           <div className="flex h-64 items-center justify-center"><Spinner /></div>
         ) : listQuery.error ? (
-          <NoEntityUI message="Could not load app templates. Check your permissions and try again." />
+          <NoEntityUI message="Could not load app bundles. Check your permissions and try again." />
         ) : entries.length === 0 ? (
-          <NoEntityUI message="No templates match these filters." />
+          <NoEntityUI message="No app bundles match these filters." />
         ) : (
+          <>
+          <p className="mb-2 text-xs text-muted-foreground">
+            {entries.length} app bundle{entries.length === 1 ? "" : "s"}
+          </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {entries.map((template) => (
               <article key={template.slug} className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
@@ -221,6 +188,7 @@ export const TemplateGallery = ({ tenantID }) => {
               </article>
             ))}
           </div>
+          </>
         )}
       </div>
 
@@ -344,4 +312,6 @@ export const TemplateGallery = ({ tenantID }) => {
 
 TemplateGallery.propTypes = {
   tenantID: PropTypes.string.isRequired,
+  search: PropTypes.string,
+  category: PropTypes.string,
 };

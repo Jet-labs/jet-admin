@@ -98,7 +98,7 @@ template ideas stay deferred.
 ### From the UI
 
 1. Open a tenant → **Marketplace**.
-2. Select the **App templates** tab.
+2. Select the **App bundles** section.
 3. Open **CRM & Sales Pipeline**.
 4. Choose install options:
    - **Include sample data** (default on) loads 2,390 deterministic rows.
