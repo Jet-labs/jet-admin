@@ -1,0 +1,323 @@
+[
+  {
+    "slug": "support-payments-create.heading",
+    "key": "heading",
+    "page": "support-payments-create",
+    "title": "Create Payment",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Payment\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-payments-create.form",
+    "key": "form",
+    "page": "support-payments-create",
+    "title": "New Payment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Payment",
+      "submitLabel": "Create Payment",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "customer_id",
+          "label": "Customer",
+          "type": "select",
+          "required": true,
+          "defaultValue": 62,
+          "options": [
+            {
+              "label": "#1",
+              "value": 1
+            },
+            {
+              "label": "#2",
+              "value": 2
+            },
+            {
+              "label": "#3",
+              "value": 3
+            },
+            {
+              "label": "#4",
+              "value": 4
+            },
+            {
+              "label": "#5",
+              "value": 5
+            },
+            {
+              "label": "#6",
+              "value": 6
+            },
+            {
+              "label": "#7",
+              "value": 7
+            },
+            {
+              "label": "#8",
+              "value": 8
+            },
+            {
+              "label": "#9",
+              "value": 9
+            },
+            {
+              "label": "#10",
+              "value": 10
+            },
+            {
+              "label": "#11",
+              "value": 11
+            },
+            {
+              "label": "#12",
+              "value": 12
+            },
+            {
+              "label": "#13",
+              "value": 13
+            },
+            {
+              "label": "#14",
+              "value": 14
+            },
+            {
+              "label": "#15",
+              "value": 15
+            },
+            {
+              "label": "#16",
+              "value": 16
+            },
+            {
+              "label": "#17",
+              "value": 17
+            },
+            {
+              "label": "#18",
+              "value": 18
+            },
+            {
+              "label": "#19",
+              "value": 19
+            },
+            {
+              "label": "#20",
+              "value": 20
+            },
+            {
+              "label": "#21",
+              "value": 21
+            },
+            {
+              "label": "#22",
+              "value": 22
+            },
+            {
+              "label": "#23",
+              "value": 23
+            },
+            {
+              "label": "#24",
+              "value": 24
+            },
+            {
+              "label": "#25",
+              "value": 25
+            },
+            {
+              "label": "#26",
+              "value": 26
+            },
+            {
+              "label": "#27",
+              "value": 27
+            },
+            {
+              "label": "#28",
+              "value": 28
+            },
+            {
+              "label": "#29",
+              "value": 29
+            },
+            {
+              "label": "#30",
+              "value": 30
+            },
+            {
+              "label": "#31",
+              "value": 31
+            },
+            {
+              "label": "#32",
+              "value": 32
+            },
+            {
+              "label": "#33",
+              "value": 33
+            },
+            {
+              "label": "#34",
+              "value": 34
+            },
+            {
+              "label": "#35",
+              "value": 35
+            },
+            {
+              "label": "#36",
+              "value": 36
+            },
+            {
+              "label": "#37",
+              "value": 37
+            },
+            {
+              "label": "#38",
+              "value": 38
+            },
+            {
+              "label": "#39",
+              "value": 39
+            },
+            {
+              "label": "#40",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "invoice_number",
+          "label": "Invoice",
+          "type": "text",
+          "required": true,
+          "defaultValue": "INV-00001"
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "number",
+          "required": true,
+          "defaultValue": 9197.44,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "pending",
+          "options": [
+            {
+              "label": "Paid",
+              "value": "paid"
+            },
+            {
+              "label": "Pending",
+              "value": "pending"
+            },
+            {
+              "label": "Failed",
+              "value": "failed"
+            },
+            {
+              "label": "Refunded",
+              "value": "refunded"
+            }
+          ]
+        },
+        {
+          "key": "method",
+          "label": "Method",
+          "type": "select",
+          "required": true,
+          "defaultValue": "bank_transfer",
+          "options": [
+            {
+              "label": "Card",
+              "value": "card"
+            },
+            {
+              "label": "Bank Transfer",
+              "value": "bank_transfer"
+            },
+            {
+              "label": "Paypal",
+              "value": "paypal"
+            },
+            {
+              "label": "Wire",
+              "value": "wire"
+            }
+          ]
+        },
+        {
+          "key": "paid_at",
+          "label": "Paid",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "due_date",
+          "label": "Due",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "reference",
+          "label": "Reference",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Compliance priority maintenance priority priority."
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "payments_create",
+              "inputValues": {
+                "customer_id": "{{ event.formData.customer_id }}",
+                "invoice_number": "{{ event.formData.invoice_number }}",
+                "amount": "{{ event.formData.amount }}",
+                "status": "{{ event.formData.status }}",
+                "method": "{{ event.formData.method }}",
+                "paid_at": "{{ event.formData.paid_at }}",
+                "due_date": "{{ event.formData.due_date }}",
+                "reference": "{{ event.formData.reference }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-payments-create.result",
+    "key": "result",
+    "page": "support-payments-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.payments_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.payments_create || {}).isLoading || false }}"
+    }
+  }
+]

@@ -1,0 +1,120 @@
+{
+  "slug": "support-payments-create",
+  "key": "payments-create",
+  "title": "Create Payment",
+  "description": "Validated create form for Payments with audit-logged writes.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "createdID",
+      "type": "number",
+      "defaultValue": 0
+    }
+  ],
+  "sources": [
+    {
+      "alias": "payments_create",
+      "type": "query",
+      "queryID": "7ae7bf19-b3b0-48a1-923c-5186d0645b2e",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "b6095bf6-e3fe-4704-8954-6cbe84dddb3f",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "9469e810-079c-4493-9a98-64f826680d2d",
+              "type": "widget",
+              "widgetKey": "widget_21221f20-77a1-4654-a0d2-919c1c6ca6b2_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "5f3029a7-8b6c-432d-9f72-22844d62b46b",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "1728a34f-1713-4805-ab5e-12be8c94aaef",
+              "type": "widget",
+              "widgetKey": "widget_ee61e600-8e09-4f4e-ae9a-f2733203b7c2_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "5266e183-c26d-4a99-ab15-446d5afb7d32",
+              "type": "widget",
+              "widgetKey": "widget_b60a9346-af06-4b38-b418-d03e640e5232_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "9469e810-079c-4493-9a98-64f826680d2d",
+        "type": "widget",
+        "widgetKey": "widget_21221f20-77a1-4654-a0d2-919c1c6ca6b2_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "1728a34f-1713-4805-ab5e-12be8c94aaef",
+        "type": "widget",
+        "widgetKey": "widget_ee61e600-8e09-4f4e-ae9a-f2733203b7c2_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "5266e183-c26d-4a99-ab15-446d5afb7d32",
+        "type": "widget",
+        "widgetKey": "widget_b60a9346-af06-4b38-b418-d03e640e5232_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "createdID",
+        "type": "number",
+        "defaultValue": 0
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "payments_create",
+        "type": "query",
+        "queryID": "7ae7bf19-b3b0-48a1-923c-5186d0645b2e",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

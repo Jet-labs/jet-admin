@@ -1,0 +1,224 @@
+[
+  {
+    "slug": "support-admin-audit.heading",
+    "key": "heading",
+    "page": "support-admin-audit",
+    "title": "Audit log",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Audit log\nEvery template write is captured by database triggers, including writes from workflows, listeners and cron jobs. Select an event to inspect the old/new snapshots.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-admin-audit.entity",
+    "key": "entity",
+    "page": "support-admin-audit",
+    "title": "Entity",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Entity",
+      "defaultValue": "",
+      "options": [
+        {
+          "label": "All entities",
+          "value": ""
+        },
+        {
+          "label": "Tickets",
+          "value": "tickets"
+        },
+        {
+          "label": "Customers",
+          "value": "customers"
+        },
+        {
+          "label": "Subscriptions",
+          "value": "subscriptions"
+        },
+        {
+          "label": "Payments",
+          "value": "payments"
+        },
+        {
+          "label": "Interactions",
+          "value": "interactions"
+        },
+        {
+          "label": "Canned replies",
+          "value": "canned_replies"
+        },
+        {
+          "label": "Escalations",
+          "value": "escalations"
+        },
+        {
+          "label": "Knowledge base",
+          "value": "knowledge_articles"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.entity",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-admin-audit.actor",
+    "key": "actor",
+    "page": "support-admin-audit",
+    "title": "Actor",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Filter by actor",
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.actor",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-admin-audit.range",
+    "key": "range",
+    "page": "support-admin-audit",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-admin-audit.table",
+    "key": "table",
+    "page": "support-admin-audit",
+    "title": "Audit events",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.audit || {}).data || [])",
+      "columns": [
+        {
+          "key": "created_at",
+          "label": "When",
+          "type": "date"
+        },
+        {
+          "key": "entity",
+          "label": "Entity",
+          "type": "badge"
+        },
+        {
+          "key": "entity_id",
+          "label": "Record",
+          "type": "number"
+        },
+        {
+          "key": "action",
+          "label": "Action",
+          "type": "badge"
+        },
+        {
+          "key": "actor",
+          "label": "Actor",
+          "type": "text"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No audit events.",
+      "isLoading": "{{ (state.queries.audit || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.auditID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-admin-audit.diff",
+    "key": "diff",
+    "page": "support-admin-audit",
+    "title": "Selected event",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Selected event (old/new)",
+      "dataTemplate": "{{ (state.widgets[\"widget_6b4d48a5-6e84-4463-9a17-d92cc87eda36_1\"] || {}).selectedRow || null }}",
+      "collapsed": false,
+      "isLoading": false
+    }
+  }
+]

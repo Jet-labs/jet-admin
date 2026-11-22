@@ -1,0 +1,343 @@
+[
+  {
+    "slug": "support.payments.list",
+    "title": "Payments · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "payments"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"customer_id\", \"invoice_number\", \"amount\", \"status\", \"method\", \"paid_at\", \"due_date\", \"reference\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:payments}}\nWHERE deleted_at IS NULL AND (coalesce(\"invoice_number\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"reference\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at >= NULLIF($7::text, '')::date)\n  AND (NULLIF($8::text, '')::date IS NULL OR created_at < (NULLIF($8::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $5::text = 'invoice_number' AND $6::text = 'asc' THEN \"invoice_number\" END ASC, CASE WHEN $5::text = 'invoice_number' AND $6::text = 'desc' THEN \"invoice_number\" END DESC, CASE WHEN $5::text = 'amount' AND $6::text = 'asc' THEN \"amount\" END ASC, CASE WHEN $5::text = 'amount' AND $6::text = 'desc' THEN \"amount\" END DESC, CASE WHEN $5::text = 'paid_at' AND $6::text = 'asc' THEN \"paid_at\" END ASC, CASE WHEN $5::text = 'paid_at' AND $6::text = 'desc' THEN \"paid_at\" END DESC, CASE WHEN $5::text = 'due_date' AND $6::text = 'asc' THEN \"due_date\" END ASC, CASE WHEN $5::text = 'due_date' AND $6::text = 'desc' THEN \"due_date\" END DESC, id DESC\nLIMIT $4::int OFFSET ((($3::int - 1) * $4::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "invoice_number"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.payments.export",
+    "title": "Payments · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "payments"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"customer_id\", \"invoice_number\", \"amount\", \"status\", \"method\", \"paid_at\", \"due_date\", \"reference\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:payments}}\nWHERE deleted_at IS NULL AND (coalesce(\"invoice_number\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"reference\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.payments.detail",
+    "title": "Payments · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "payments"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"customer_id\", \"invoice_number\", \"amount\", \"status\", \"method\", \"paid_at\", \"due_date\", \"reference\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:payments}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.payments.create",
+    "title": "Payments · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "payments"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:payments}} (\"customer_id\", \"invoice_number\", \"amount\", \"status\", \"method\", \"paid_at\", \"due_date\", \"reference\", created_at, updated_at)\nVALUES ($1::int, $2::text, $3::numeric, $4::text, $5::text, $6::timestamptz, $7::date, $8::text, now(), now())\nRETURNING \"id\", \"customer_id\", \"invoice_number\", \"amount\", \"status\", \"method\", \"paid_at\", \"due_date\", \"reference\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "customer_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "invoice_number",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "method",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "paid_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "due_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "reference",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.payments.update",
+    "title": "Payments · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "payments"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:payments}}\nSET \"customer_id\" = $2::int, \"invoice_number\" = $3::text, \"amount\" = $4::numeric, \"status\" = $5::text, \"method\" = $6::text, \"paid_at\" = $7::timestamptz, \"due_date\" = $8::date, \"reference\" = $9::text, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"customer_id\", \"invoice_number\", \"amount\", \"status\", \"method\", \"paid_at\", \"due_date\", \"reference\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "customer_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "invoice_number",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "method",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "paid_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "due_date",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "reference",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.payments.delete",
+    "title": "Payments · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "payments"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:payments}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.payments.restore",
+    "title": "Payments · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "payments"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:payments}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.payments.lookup",
+    "title": "Payments · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "payments"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"invoice_number\"::text AS label FROM {{table:payments}} WHERE deleted_at IS NULL ORDER BY \"invoice_number\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.payments.status",
+    "title": "Payments · change status",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "payments"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:payments}} SET \"status\" = $2::text, updated_at = now() WHERE id = $1::int RETURNING id, \"status\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false,
+          "default": "paid"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

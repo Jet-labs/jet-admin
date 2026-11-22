@@ -1,0 +1,270 @@
+[
+  {
+    "slug": "support-admin-roles.heading",
+    "key": "heading",
+    "page": "support-admin-roles",
+    "title": "Roles and permissions",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Roles and permissions\nProvisioned Casbin roles are read-only here. The page matrix mirrors the package's role map and can be adjusted for internal review; platform permission mappings remain the enforcement source.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-admin-roles.roles",
+    "key": "roles",
+    "page": "support-admin-roles",
+    "title": "Tenant roles",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.roles || {}).data || [])",
+      "columns": [
+        {
+          "key": "roleTitle",
+          "label": "Role",
+          "type": "text"
+        },
+        {
+          "key": "roleDescription",
+          "label": "Description",
+          "type": "text"
+        },
+        {
+          "key": "permission_count",
+          "label": "Permissions",
+          "type": "number"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No roles.",
+      "isLoading": "{{ (state.queries.roles || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-admin-roles.matrix",
+    "key": "matrix",
+    "page": "support-admin-roles",
+    "title": "Page matrix",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.matrix || {}).data || [])",
+      "columns": [
+        {
+          "key": "role_key",
+          "label": "Role",
+          "type": "badge"
+        },
+        {
+          "key": "page_slug",
+          "label": "Page",
+          "type": "text"
+        },
+        {
+          "key": "can_view",
+          "label": "View",
+          "type": "boolean"
+        },
+        {
+          "key": "can_export",
+          "label": "Export",
+          "type": "boolean"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No matrix rows.",
+      "isLoading": "{{ (state.queries.matrix || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-admin-roles.toggle",
+    "key": "toggle",
+    "page": "support-admin-roles",
+    "title": "Update matrix row",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Update matrix row",
+      "submitLabel": "Save matrix row",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "roleKey",
+          "label": "Role key",
+          "type": "select",
+          "required": true,
+          "options": []
+        },
+        {
+          "key": "pageSlug",
+          "label": "Page slug",
+          "type": "select",
+          "required": true,
+          "options": [
+            {
+              "label": "support-tickets-list",
+              "value": "support-tickets-list"
+            },
+            {
+              "label": "support-tickets-detail",
+              "value": "support-tickets-detail"
+            },
+            {
+              "label": "support-tickets-create",
+              "value": "support-tickets-create"
+            },
+            {
+              "label": "support-customers-list",
+              "value": "support-customers-list"
+            },
+            {
+              "label": "support-customers-detail",
+              "value": "support-customers-detail"
+            },
+            {
+              "label": "support-customers-create",
+              "value": "support-customers-create"
+            },
+            {
+              "label": "support-subscriptions-list",
+              "value": "support-subscriptions-list"
+            },
+            {
+              "label": "support-subscriptions-detail",
+              "value": "support-subscriptions-detail"
+            },
+            {
+              "label": "support-subscriptions-create",
+              "value": "support-subscriptions-create"
+            },
+            {
+              "label": "support-payments-list",
+              "value": "support-payments-list"
+            },
+            {
+              "label": "support-payments-detail",
+              "value": "support-payments-detail"
+            },
+            {
+              "label": "support-payments-create",
+              "value": "support-payments-create"
+            },
+            {
+              "label": "support-dashboard",
+              "value": "support-dashboard"
+            },
+            {
+              "label": "support-reports-operations",
+              "value": "support-reports-operations"
+            },
+            {
+              "label": "support-reports-secondary",
+              "value": "support-reports-secondary"
+            },
+            {
+              "label": "support-reports-quality",
+              "value": "support-reports-quality"
+            },
+            {
+              "label": "support-tickets-kanban",
+              "value": "support-tickets-kanban"
+            },
+            {
+              "label": "support-tickets-calendar",
+              "value": "support-tickets-calendar"
+            },
+            {
+              "label": "support-search",
+              "value": "support-search"
+            },
+            {
+              "label": "support-profile",
+              "value": "support-profile"
+            },
+            {
+              "label": "support-notifications",
+              "value": "support-notifications"
+            },
+            {
+              "label": "support-settings",
+              "value": "support-settings"
+            },
+            {
+              "label": "support-portal",
+              "value": "support-portal"
+            },
+            {
+              "label": "support-admin-users",
+              "value": "support-admin-users"
+            }
+          ]
+        },
+        {
+          "key": "canView",
+          "label": "Can view",
+          "type": "checkbox",
+          "defaultValue": true
+        },
+        {
+          "key": "canExport",
+          "label": "Can export",
+          "type": "checkbox",
+          "defaultValue": false
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "roleKey": "{{ event.formData.roleKey }}",
+                "pageSlug": "{{ event.formData.pageSlug }}",
+                "canView": "{{ event.formData.canView }}",
+                "canExport": "{{ event.formData.canExport }}"
+              },
+              "successToast": "Matrix updated",
+              "errorToast": "Matrix update failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

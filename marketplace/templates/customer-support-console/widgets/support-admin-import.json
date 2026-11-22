@@ -1,0 +1,130 @@
+[
+  {
+    "slug": "support-admin-import.heading",
+    "key": "heading",
+    "page": "support-admin-import",
+    "title": "Import / export",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Import / export\nPaste CSV with the header `subject,requester_name` for tickets. The importer validates row width, inserts valid rows and returns a success/error summary.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-admin-import.form",
+    "key": "form",
+    "page": "support-admin-import",
+    "title": "CSV import",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "CSV import",
+      "submitLabel": "Run import",
+      "fields": [
+        {
+          "key": "csv",
+          "label": "CSV content",
+          "type": "textarea",
+          "required": true,
+          "defaultValue": "subject,requester_name\nSample,row,value"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "import",
+              "inputValues": {
+                "csv": "{{ event.formData.csv }}"
+              },
+              "successToast": "Import completed",
+              "errorToast": "Import failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-admin-import.result",
+    "key": "result",
+    "page": "support-admin-import",
+    "title": "Import result",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Import result",
+      "dataTemplate": "{{ (state.queries.import || {}).data || null }}",
+      "isLoading": "{{ (state.queries.import || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-admin-import.jobs",
+    "key": "jobs",
+    "page": "support-admin-import",
+    "title": "Import jobs",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.jobs || {}).data || [])",
+      "columns": [
+        {
+          "key": "entity",
+          "label": "Entity",
+          "type": "text"
+        },
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "text"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "badge"
+        },
+        {
+          "key": "total_rows",
+          "label": "Total",
+          "type": "number"
+        },
+        {
+          "key": "success_rows",
+          "label": "Success",
+          "type": "number"
+        },
+        {
+          "key": "error_rows",
+          "label": "Errors",
+          "type": "number"
+        },
+        {
+          "key": "created_at",
+          "label": "When",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 8
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No import jobs.",
+      "isLoading": "{{ (state.queries.jobs || {}).isLoading || false }}"
+    }
+  }
+]

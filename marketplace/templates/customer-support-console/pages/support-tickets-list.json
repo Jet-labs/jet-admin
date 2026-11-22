@@ -1,0 +1,592 @@
+{
+  "slug": "support-tickets-list",
+  "key": "tickets-list",
+  "title": "Tickets · list",
+  "description": "Server-side list, filters, inline edit and bulk actions for tickets.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "search",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "status",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "page",
+      "type": "number",
+      "defaultValue": 1
+    },
+    {
+      "key": "sortBy",
+      "type": "string",
+      "defaultValue": "subject"
+    },
+    {
+      "key": "sortDir",
+      "type": "string",
+      "defaultValue": "asc"
+    },
+    {
+      "key": "dateFrom",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "dateTo",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "tickets",
+      "type": "query",
+      "queryID": "91f3a3e6-450f-4fcf-87e9-e68310e028f5",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "search": "{{ state.variables.search }}",
+        "page": "{{ state.variables.page }}",
+        "limit": 10,
+        "sortBy": "{{ state.variables.sortBy }}",
+        "sortDir": "{{ state.variables.sortDir }}",
+        "dateFrom": "{{ state.variables.dateFrom }}",
+        "dateTo": "{{ state.variables.dateTo }}",
+        "status": "{{ state.variables.status }}"
+      },
+      "refreshOn": [
+        "variables.search",
+        "variables.status",
+        "variables.page",
+        "variables.sortBy",
+        "variables.sortDir",
+        "variables.dateFrom",
+        "variables.dateTo"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "tickets_stats",
+      "type": "query",
+      "queryID": "179b9f53-f73b-4265-8fdf-9c02076654fa",
+      "triggerMode": "auto",
+      "inputValues": {
+        "dateFrom": "{{ state.variables.dateFrom }}",
+        "dateTo": "{{ state.variables.dateTo }}"
+      },
+      "refreshOn": [
+        "variables.dateFrom",
+        "variables.dateTo"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "tickets_views",
+      "type": "query",
+      "queryID": "20af545c-de2d-43c5-89d4-3301dd2ec549",
+      "triggerMode": "auto",
+      "inputValues": {
+        "prefix": "saved_view.support-tickets-list"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "tickets_selected",
+      "type": "query",
+      "queryID": "72003091-8434-46cb-bb34-3f8a628d8383",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "tickets_update",
+      "type": "query",
+      "queryID": "01d80f11-d132-42d9-96ce-c327a842ee15",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "tickets_delete",
+      "type": "query",
+      "queryID": "1cf5fbe0-5d6c-4962-8871-2873962f55f5",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "tickets_status",
+      "type": "query",
+      "queryID": "1caf48e4-4ead-437f-ab28-568aa6a62769",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "tickets_view_create",
+      "type": "query",
+      "queryID": "e98e6bde-cc6d-49da-844d-5472e7cc7a8f",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "fb56d288-360d-4853-b222-1692455004c6",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "a6320ac2-28d2-4e6c-bf59-692b9dd9cce4",
+              "type": "widget",
+              "widgetKey": "widget_713eac85-c2d4-48ce-aaca-f21e0cf236ff_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "e1a676ba-0110-48ba-b9e7-b9874775ac76",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "4074842b-8d83-42e7-9309-054522979773",
+              "type": "widget",
+              "widgetKey": "widget_008b5f3a-e5bb-450b-8df7-f430d2fad609_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "5418209c-3162-4d98-9967-b1b14122b8fc",
+              "type": "widget",
+              "widgetKey": "widget_89696eaf-0c19-46cb-bf61-946aed51e6d8_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "c7823f0d-b6a3-4384-a5b2-2ed680241810",
+              "type": "widget",
+              "widgetKey": "widget_5946363f-bc62-406d-b10f-cfc39f34439e_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 56
+            },
+            {
+              "id": "43466617-b279-449a-a865-44b09323efdf",
+              "type": "widget",
+              "widgetKey": "widget_b27e0af8-4864-40f1-8816-0c9bafa7c3c0_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 56
+            }
+          ]
+        },
+        {
+          "id": "83bd78c5-1db0-4ab1-ba42-d10d1bd35a9b",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "56f197a0-f025-4ca8-86c2-53df8ff7f3a3",
+              "type": "widget",
+              "widgetKey": "widget_ea181b2c-72cd-43f4-9aaa-62ff31a9a100_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 120
+            },
+            {
+              "id": "768240c2-228e-4bf3-803a-2746c688fcdc",
+              "type": "widget",
+              "widgetKey": "widget_0e36d2c7-056d-404a-9d24-65fbacb3db50_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 120
+            },
+            {
+              "id": "70d218eb-68a7-4b2c-a72f-6589aa4bcf1d",
+              "type": "widget",
+              "widgetKey": "widget_7e229053-afd4-411a-9e7e-3a06648d8554_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 120
+            }
+          ]
+        },
+        {
+          "id": "f5bf36e0-670a-48d7-8508-ef8a8608fb6e",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "cbb79671-3bf1-4964-b1f3-f9207cbbf06e",
+              "type": "widget",
+              "widgetKey": "widget_64857f97-d15e-4a00-9f74-673b6440109f_1",
+              "span": 9,
+              "sizing": "fill",
+              "minHeight": 460
+            },
+            {
+              "id": "6a6be57a-7228-40f9-bda4-639fa840945d",
+              "type": "widget",
+              "widgetKey": "widget_ea945dd6-0d81-4b1b-8f51-919da1cc09e4_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 460
+            }
+          ]
+        },
+        {
+          "id": "7f7f7749-e3ff-4cee-b414-961da17a94c5",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f10691f5-13bb-4dcb-aa77-650df60239f0",
+              "type": "widget",
+              "widgetKey": "widget_19680b66-1d4f-48be-8937-4aea55652ba0_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 48
+            },
+            {
+              "id": "ed92a232-2ae2-42b9-8215-8b408f40e5a3",
+              "type": "widget",
+              "widgetKey": "widget_63ccf57a-77a4-44b0-9ea0-81863fd7cab2_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 48
+            },
+            {
+              "id": "83d51420-40e5-462c-8238-64e8fafa6771",
+              "type": "widget",
+              "widgetKey": "widget_afa307ac-e34c-4db3-9a9c-e14008648856_1",
+              "span": 6,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "d608348f-0ccf-4a23-b1c2-5076c1da4031",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f823d48f-ffe1-4213-acd8-8f914f290035",
+              "type": "widget",
+              "widgetKey": "widget_3a2dee97-2cfd-456c-b34b-1b8ab962f35a_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 220
+            },
+            {
+              "id": "fb3ced48-f0de-4f63-a0d7-05a4362154e5",
+              "type": "widget",
+              "widgetKey": "widget_6d5c3c69-302c-4ef3-80d3-cbd6a3c52c97_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 220
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "a6320ac2-28d2-4e6c-bf59-692b9dd9cce4",
+        "type": "widget",
+        "widgetKey": "widget_713eac85-c2d4-48ce-aaca-f21e0cf236ff_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "4074842b-8d83-42e7-9309-054522979773",
+        "type": "widget",
+        "widgetKey": "widget_008b5f3a-e5bb-450b-8df7-f430d2fad609_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "5418209c-3162-4d98-9967-b1b14122b8fc",
+        "type": "widget",
+        "widgetKey": "widget_89696eaf-0c19-46cb-bf61-946aed51e6d8_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "c7823f0d-b6a3-4384-a5b2-2ed680241810",
+        "type": "widget",
+        "widgetKey": "widget_5946363f-bc62-406d-b10f-cfc39f34439e_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "43466617-b279-449a-a865-44b09323efdf",
+        "type": "widget",
+        "widgetKey": "widget_b27e0af8-4864-40f1-8816-0c9bafa7c3c0_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 56
+      },
+      {
+        "id": "56f197a0-f025-4ca8-86c2-53df8ff7f3a3",
+        "type": "widget",
+        "widgetKey": "widget_ea181b2c-72cd-43f4-9aaa-62ff31a9a100_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 120
+      },
+      {
+        "id": "768240c2-228e-4bf3-803a-2746c688fcdc",
+        "type": "widget",
+        "widgetKey": "widget_0e36d2c7-056d-404a-9d24-65fbacb3db50_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 120
+      },
+      {
+        "id": "70d218eb-68a7-4b2c-a72f-6589aa4bcf1d",
+        "type": "widget",
+        "widgetKey": "widget_7e229053-afd4-411a-9e7e-3a06648d8554_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 120
+      },
+      {
+        "id": "cbb79671-3bf1-4964-b1f3-f9207cbbf06e",
+        "type": "widget",
+        "widgetKey": "widget_64857f97-d15e-4a00-9f74-673b6440109f_1",
+        "span": 9,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "6a6be57a-7228-40f9-bda4-639fa840945d",
+        "type": "widget",
+        "widgetKey": "widget_ea945dd6-0d81-4b1b-8f51-919da1cc09e4_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 460
+      },
+      {
+        "id": "f10691f5-13bb-4dcb-aa77-650df60239f0",
+        "type": "widget",
+        "widgetKey": "widget_19680b66-1d4f-48be-8937-4aea55652ba0_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 48
+      },
+      {
+        "id": "ed92a232-2ae2-42b9-8215-8b408f40e5a3",
+        "type": "widget",
+        "widgetKey": "widget_63ccf57a-77a4-44b0-9ea0-81863fd7cab2_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 48
+      },
+      {
+        "id": "83d51420-40e5-462c-8238-64e8fafa6771",
+        "type": "widget",
+        "widgetKey": "widget_afa307ac-e34c-4db3-9a9c-e14008648856_1",
+        "span": 6,
+        "sizing": "fill"
+      },
+      {
+        "id": "f823d48f-ffe1-4213-acd8-8f914f290035",
+        "type": "widget",
+        "widgetKey": "widget_3a2dee97-2cfd-456c-b34b-1b8ab962f35a_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 220
+      },
+      {
+        "id": "fb3ced48-f0de-4f63-a0d7-05a4362154e5",
+        "type": "widget",
+        "widgetKey": "widget_6d5c3c69-302c-4ef3-80d3-cbd6a3c52c97_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 220
+      }
+    ],
+    "variables": [
+      {
+        "key": "search",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "status",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "page",
+        "type": "number",
+        "defaultValue": 1
+      },
+      {
+        "key": "sortBy",
+        "type": "string",
+        "defaultValue": "subject"
+      },
+      {
+        "key": "sortDir",
+        "type": "string",
+        "defaultValue": "asc"
+      },
+      {
+        "key": "dateFrom",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "dateTo",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "tickets",
+        "type": "query",
+        "queryID": "91f3a3e6-450f-4fcf-87e9-e68310e028f5",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "search": "{{ state.variables.search }}",
+          "page": "{{ state.variables.page }}",
+          "limit": 10,
+          "sortBy": "{{ state.variables.sortBy }}",
+          "sortDir": "{{ state.variables.sortDir }}",
+          "dateFrom": "{{ state.variables.dateFrom }}",
+          "dateTo": "{{ state.variables.dateTo }}",
+          "status": "{{ state.variables.status }}"
+        },
+        "refreshOn": [
+          "variables.search",
+          "variables.status",
+          "variables.page",
+          "variables.sortBy",
+          "variables.sortDir",
+          "variables.dateFrom",
+          "variables.dateTo"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "tickets_stats",
+        "type": "query",
+        "queryID": "179b9f53-f73b-4265-8fdf-9c02076654fa",
+        "triggerMode": "auto",
+        "inputValues": {
+          "dateFrom": "{{ state.variables.dateFrom }}",
+          "dateTo": "{{ state.variables.dateTo }}"
+        },
+        "refreshOn": [
+          "variables.dateFrom",
+          "variables.dateTo"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "tickets_views",
+        "type": "query",
+        "queryID": "20af545c-de2d-43c5-89d4-3301dd2ec549",
+        "triggerMode": "auto",
+        "inputValues": {
+          "prefix": "saved_view.support-tickets-list"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "tickets_selected",
+        "type": "query",
+        "queryID": "72003091-8434-46cb-bb34-3f8a628d8383",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "tickets_update",
+        "type": "query",
+        "queryID": "01d80f11-d132-42d9-96ce-c327a842ee15",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "tickets_delete",
+        "type": "query",
+        "queryID": "1cf5fbe0-5d6c-4962-8871-2873962f55f5",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "tickets_status",
+        "type": "query",
+        "queryID": "1caf48e4-4ead-437f-ab28-568aa6a62769",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "tickets_view_create",
+        "type": "query",
+        "queryID": "e98e6bde-cc6d-49da-844d-5472e7cc7a8f",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

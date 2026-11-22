@@ -1,0 +1,171 @@
+{
+  "slug": "support.error-recovery",
+  "key": "error-recovery",
+  "title": "Customer Support Console · expected failure and recovery",
+  "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+  "tags": [
+    "automation",
+    "reliability"
+  ],
+  "options": {
+    "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "0d7c8a5c-1ee9-4236-875c-4413d6a4ada7",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "injectFailure",
+      "nodeID": "d50e0860-acae-4112-ac0c-8497396afd31",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "injectFailure",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "code": "throw new Error(\"Synthetic upstream unavailable\");",
+        "outputVariable": "failure",
+        "retryLimit": 0
+      }
+    },
+    {
+      "key": "compensate",
+      "nodeID": "74986a14-b415-48ea-aefa-b8dfa145c228",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "compensate",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "return { recovered: true, fallback: \"cached snapshot\", recordID: ctx.recordID || 1 };",
+        "outputVariable": "recovery"
+      }
+    },
+    {
+      "key": "notifyRecovery",
+      "nodeID": "cb8ec2f6-173d-4c21-8274-0a59d18d835d",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyRecovery",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "c887cca4-c51b-46a9-8e15-aa443eef4189",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.staffID || 1 }}",
+          "title": "Customer Support Console recovery completed",
+          "body": "A failed upstream call was compensated without losing the record.",
+          "category": "warning",
+          "linkPage": "support-admin-jobs"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "1c06e1a2-2b0f-4300-8811-8cfc07ca4386",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.recovery }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "0d7c8a5c-1ee9-4236-875c-4413d6a4ada7",
+      "to": "d50e0860-acae-4112-ac0c-8497396afd31",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "d50e0860-acae-4112-ac0c-8497396afd31",
+      "to": "74986a14-b415-48ea-aefa-b8dfa145c228",
+      "handle": "error",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "74986a14-b415-48ea-aefa-b8dfa145c228",
+      "to": "cb8ec2f6-173d-4c21-8274-0a59d18d835d",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "cb8ec2f6-173d-4c21-8274-0a59d18d835d",
+      "to": "1c06e1a2-2b0f-4300-8811-8cfc07ca4386",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

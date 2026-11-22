@@ -1,0 +1,208 @@
+{
+  "slug": "support.threshold-sweep",
+  "key": "threshold-sweep",
+  "title": "Tickets · threshold sweep",
+  "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
+  "tags": [
+    "core",
+    "automation",
+    "sla"
+  ],
+  "options": {
+    "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
+    "inputDefinitions": [
+      {
+        "key": "days",
+        "type": "number",
+        "required": false,
+        "defaultValue": 7
+      },
+      {
+        "key": "staffID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "4074809b-04a8-4138-8d78-e0f9d8c293e3",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadOverdue",
+      "nodeID": "5cdb8078-464b-4e36-84e6-db2299b218a3",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadOverdue",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "c10322b4-19ac-4901-a90a-f88a90cbbf0f",
+        "outputVariable": "overdueRows",
+        "inputValues": {
+          "days": "{{ ctx.days }}"
+        }
+      }
+    },
+    {
+      "key": "boundBatch",
+      "nodeID": "1f18c4f0-7924-4f0b-a611-e041259af4ce",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "boundBatch",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "return (ctx.overdueRows || []).slice(0, 20);",
+        "outputVariable": "batch"
+      }
+    },
+    {
+      "key": "loopOverdue",
+      "nodeID": "e1667c7b-8cf4-493f-a567-4f5955eaa1d6",
+      "type": "loop",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loopOverdue",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "sourceVariable": "batch",
+        "itemVariable": "record",
+        "indexVariable": "index",
+        "outputVariable": "reminders",
+        "maxIterations": 20
+      }
+    },
+    {
+      "key": "notifyOverdue",
+      "nodeID": "67d302a2-e1a7-498e-a2bd-eed09271cee5",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "notifyOverdue",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "dataQueryID": "c887cca4-c51b-46a9-8e15-aa443eef4189",
+        "outputVariable": "reminder",
+        "inputValues": {
+          "staffID": "{{ ctx.record.${owner ? owner.key : 'id'} || ctx.staffID }}",
+          "title": "Tickets overdue",
+          "body": "Record #{{ ctx.record.id }} is past its due date and needs attention.",
+          "category": "warning",
+          "linkPage": "support-tickets-list"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "d3fe49a5-9787-498c-89e4-651424357f8e",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.reminders }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "4074809b-04a8-4138-8d78-e0f9d8c293e3",
+      "to": "5cdb8078-464b-4e36-84e6-db2299b218a3",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "5cdb8078-464b-4e36-84e6-db2299b218a3",
+      "to": "1f18c4f0-7924-4f0b-a611-e041259af4ce",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "1f18c4f0-7924-4f0b-a611-e041259af4ce",
+      "to": "e1667c7b-8cf4-493f-a567-4f5955eaa1d6",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "e1667c7b-8cf4-493f-a567-4f5955eaa1d6",
+      "to": "67d302a2-e1a7-498e-a2bd-eed09271cee5",
+      "handle": "loop",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "e1667c7b-8cf4-493f-a567-4f5955eaa1d6",
+      "to": "d3fe49a5-9787-498c-89e4-651424357f8e",
+      "handle": "completed",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

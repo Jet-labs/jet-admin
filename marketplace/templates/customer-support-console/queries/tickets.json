@@ -1,0 +1,561 @@
+[
+  {
+    "slug": "support.tickets.list",
+    "title": "Tickets · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"subject\", \"customer_id\", \"requester_name\", \"status\", \"priority\", \"channel\", \"category\", \"assignee_id\", \"sla_due_at\", \"first_response_at\", \"resolved_at\", \"satisfaction_score\", \"description\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:tickets}}\nWHERE deleted_at IS NULL AND (coalesce(\"subject\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"requester_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"description\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at >= NULLIF($7::text, '')::date)\n  AND (NULLIF($8::text, '')::date IS NULL OR created_at < (NULLIF($8::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $5::text = 'subject' AND $6::text = 'asc' THEN \"subject\" END ASC, CASE WHEN $5::text = 'subject' AND $6::text = 'desc' THEN \"subject\" END DESC, CASE WHEN $5::text = 'requester_name' AND $6::text = 'asc' THEN \"requester_name\" END ASC, CASE WHEN $5::text = 'requester_name' AND $6::text = 'desc' THEN \"requester_name\" END DESC, CASE WHEN $5::text = 'sla_due_at' AND $6::text = 'asc' THEN \"sla_due_at\" END ASC, CASE WHEN $5::text = 'sla_due_at' AND $6::text = 'desc' THEN \"sla_due_at\" END DESC, CASE WHEN $5::text = 'first_response_at' AND $6::text = 'asc' THEN \"first_response_at\" END ASC, CASE WHEN $5::text = 'first_response_at' AND $6::text = 'desc' THEN \"first_response_at\" END DESC, id DESC\nLIMIT $4::int OFFSET ((($3::int - 1) * $4::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "subject"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.export",
+    "title": "Tickets · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"subject\", \"customer_id\", \"requester_name\", \"status\", \"priority\", \"channel\", \"category\", \"assignee_id\", \"sla_due_at\", \"first_response_at\", \"resolved_at\", \"satisfaction_score\", \"description\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:tickets}}\nWHERE deleted_at IS NULL AND (coalesce(\"subject\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"requester_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"description\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.detail",
+    "title": "Tickets · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"subject\", \"customer_id\", \"requester_name\", \"status\", \"priority\", \"channel\", \"category\", \"assignee_id\", \"sla_due_at\", \"first_response_at\", \"resolved_at\", \"satisfaction_score\", \"description\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:tickets}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.create",
+    "title": "Tickets · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:tickets}} (\"subject\", \"customer_id\", \"requester_name\", \"status\", \"priority\", \"channel\", \"category\", \"assignee_id\", \"sla_due_at\", \"first_response_at\", \"resolved_at\", \"satisfaction_score\", \"description\", created_at, updated_at)\nVALUES ($1::text, $2::int, $3::text, $4::text, $5::text, $6::text, $7::text, $8::int, $9::timestamptz, $10::timestamptz, $11::timestamptz, $12::int, $13::text, now(), now())\nRETURNING \"id\", \"subject\", \"customer_id\", \"requester_name\", \"status\", \"priority\", \"channel\", \"category\", \"assignee_id\", \"sla_due_at\", \"first_response_at\", \"resolved_at\", \"satisfaction_score\", \"description\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "subject",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "customer_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "requester_name",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "priority",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "channel",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "category",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "assignee_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "sla_due_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "first_response_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "resolved_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "satisfaction_score",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "description",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.update",
+    "title": "Tickets · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:tickets}}\nSET \"subject\" = $2::text, \"customer_id\" = $3::int, \"requester_name\" = $4::text, \"status\" = $5::text, \"priority\" = $6::text, \"channel\" = $7::text, \"category\" = $8::text, \"assignee_id\" = $9::int, \"sla_due_at\" = $10::timestamptz, \"first_response_at\" = $11::timestamptz, \"resolved_at\" = $12::timestamptz, \"satisfaction_score\" = $13::int, \"description\" = $14::text, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"subject\", \"customer_id\", \"requester_name\", \"status\", \"priority\", \"channel\", \"category\", \"assignee_id\", \"sla_due_at\", \"first_response_at\", \"resolved_at\", \"satisfaction_score\", \"description\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "subject",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "customer_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "requester_name",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "priority",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "channel",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "category",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "assignee_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "sla_due_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "first_response_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "resolved_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "satisfaction_score",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "description",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.delete",
+    "title": "Tickets · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:tickets}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.restore",
+    "title": "Tickets · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:tickets}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.lookup",
+    "title": "Tickets · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"subject\"::text AS label FROM {{table:tickets}} WHERE deleted_at IS NULL ORDER BY \"subject\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.status",
+    "title": "Tickets · change status",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:tickets}} SET \"status\" = $2::text, updated_at = now() WHERE id = $1::int RETURNING id, \"status\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false,
+          "default": "new"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.assign",
+    "title": "Tickets · assign owner",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:tickets}} SET \"assignee_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"assignee_id\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.score",
+    "title": "Tickets · save score",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:tickets}} SET \"satisfaction_score\" = $2::numeric, updated_at = now() WHERE id = $1::int RETURNING id, \"satisfaction_score\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "score",
+          "type": "number",
+          "required": false,
+          "default": 0
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.stats",
+    "title": "Tickets · KPI totals",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT count(*)::int AS total,  count(*) FILTER (WHERE \"status\" = 'new')::int AS status_new, count(*) FILTER (WHERE \"status\" = 'open')::int AS status_open, count(*) FILTER (WHERE \"status\" = 'pending')::int AS status_pending, count(*) FILTER (WHERE \"status\" = 'resolved')::int AS status_resolved, count(*) FILTER (WHERE \"status\" = 'closed')::int AS status_closed\nFROM {{table:tickets}}\nWHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date)\n  AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day'))",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.trend",
+    "title": "Tickets · daily trend",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT date_trunc('day', created_at)::date AS day, count(*)::int AS count\nFROM {{table:tickets}}\nWHERE deleted_at IS NULL AND created_at >= coalesce(NULLIF($1::text, '')::date, now() - interval '90 days')\n  AND created_at < (coalesce(NULLIF($2::text, '')::date, now()::date) + interval '1 day')\nGROUP BY 1 ORDER BY 1",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.by_status",
+    "title": "Tickets · by status",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"status\" AS status, count(*)::int AS count FROM {{table:tickets}} WHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date) AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day')) GROUP BY 1 ORDER BY 2 DESC",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.tickets.overdue",
+    "title": "Tickets · overdue",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "tickets"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"subject\", \"customer_id\", \"requester_name\", \"status\", \"priority\", \"channel\", \"category\", \"assignee_id\", \"sla_due_at\", \"first_response_at\", \"resolved_at\", \"satisfaction_score\", \"description\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:tickets}}\nWHERE deleted_at IS NULL AND \"sla_due_at\" IS NOT NULL\n  AND \"sla_due_at\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('resolved', 'closed')\nORDER BY \"sla_due_at\" ASC LIMIT 100",
+      "inputDefinitions": [
+        {
+          "key": "days",
+          "type": "number",
+          "required": false,
+          "default": 7
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

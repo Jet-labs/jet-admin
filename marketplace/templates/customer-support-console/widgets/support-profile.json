@@ -1,0 +1,211 @@
+[
+  {
+    "slug": "support-profile.heading",
+    "key": "heading",
+    "page": "support-profile",
+    "title": "My profile",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# My profile\nUpdate your directory details. Role and permission changes are managed by an administrator.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-profile.picker",
+    "key": "picker",
+    "page": "support-profile",
+    "title": "Profile",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Profile",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Noor Wright",
+          "value": 1
+        },
+        {
+          "label": "Mira Okafor",
+          "value": 2
+        },
+        {
+          "label": "Ishaan Hassan",
+          "value": 3
+        },
+        {
+          "label": "Ravi Ivanova",
+          "value": 4
+        },
+        {
+          "label": "Tomás Ivanova",
+          "value": 5
+        },
+        {
+          "label": "Malik Osei",
+          "value": 6
+        },
+        {
+          "label": "Ishaan Osei",
+          "value": 7
+        },
+        {
+          "label": "Hugo Costa",
+          "value": 8
+        },
+        {
+          "label": "Tomás Wright",
+          "value": 9
+        },
+        {
+          "label": "Sofia Meyer",
+          "value": 10
+        },
+        {
+          "label": "Malik Sato",
+          "value": 11
+        },
+        {
+          "label": "Eli Chen",
+          "value": 12
+        },
+        {
+          "label": "Clara Okafor",
+          "value": 13
+        },
+        {
+          "label": "Mira Sato",
+          "value": 14
+        },
+        {
+          "label": "Ravi Wright",
+          "value": 15
+        },
+        {
+          "label": "Ishaan Dubey",
+          "value": 16
+        },
+        {
+          "label": "Priya Larsen",
+          "value": 17
+        },
+        {
+          "label": "Mira Tanaka",
+          "value": 18
+        },
+        {
+          "label": "Jonas Tanaka",
+          "value": 19
+        },
+        {
+          "label": "Eli Novak",
+          "value": 20
+        },
+        {
+          "label": "Owen Bennett",
+          "value": 21
+        },
+        {
+          "label": "Noah Dubois",
+          "value": 22
+        },
+        {
+          "label": "Aarav Meyer",
+          "value": 23
+        },
+        {
+          "label": "Malik Fischer",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-profile.profile",
+    "key": "profile",
+    "page": "support-profile",
+    "title": "Profile",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Profile",
+      "dataTemplate": "{{ (((state.queries.profile || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "isLoading": "{{ (state.queries.profile || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-profile.form",
+    "key": "form",
+    "page": "support-profile",
+    "title": "Edit profile",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Edit profile",
+      "submitLabel": "Save profile",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "fullName",
+          "label": "Full name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "department",
+          "label": "Department",
+          "type": "text"
+        },
+        {
+          "key": "jobTitle",
+          "label": "Job title",
+          "type": "text"
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text"
+        },
+        {
+          "key": "city",
+          "label": "City",
+          "type": "text"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "update",
+              "inputValues": {
+                "id": "{{ state.variables.staffID }}",
+                "fullName": "{{ event.formData.fullName }}",
+                "department": "{{ event.formData.department }}",
+                "jobTitle": "{{ event.formData.jobTitle }}",
+                "phone": "{{ event.formData.phone }}",
+                "city": "{{ event.formData.city }}"
+              },
+              "successToast": "Profile saved",
+              "errorToast": "Profile update failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

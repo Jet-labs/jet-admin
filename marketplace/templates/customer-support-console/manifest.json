@@ -1,0 +1,934 @@
+{
+  "id": "jet.marketplace.customer-support-console",
+  "slug": "customer-support-console",
+  "alias": "support",
+  "name": "Customer Support Console",
+  "version": "1.0.0",
+  "category": "Customer Support",
+  "tags": [
+    "support",
+    "helpdesk",
+    "tickets",
+    "sla",
+    "escalation",
+    "csat"
+  ],
+  "shortDescription": "Customer lookup, subscription context, tickets and escalation in one console.",
+  "longDescription": "A full support workspace: customer and subscription lookup, payment history, ticket intake, assignment, SLA tracking, escalation workflows, canned replies, CSAT and an admin panel for users, roles, audit, imports, integrations and data quality.",
+  "author": "Jet Admin",
+  "license": "MIT",
+  "minPlatformVersion": "2.1.0-preview.1",
+  "icon": "assets/icon.svg",
+  "cover": "assets/cover.svg",
+  "accent": "#0ea5e9",
+  "screenshots": [
+    {
+      "title": "Dashboard",
+      "path": "assets/screenshots/dashboard.svg"
+    },
+    {
+      "title": "Tickets · list",
+      "path": "assets/screenshots/tickets-list.svg"
+    },
+    {
+      "title": "Tickets · detail",
+      "path": "assets/screenshots/tickets-detail.svg"
+    },
+    {
+      "title": "Reports · operations",
+      "path": "assets/screenshots/reports-operations.svg"
+    },
+    {
+      "title": "Admin · audit log",
+      "path": "assets/screenshots/admin-audit.svg"
+    },
+    {
+      "title": "Client portal",
+      "path": "assets/screenshots/portal.svg"
+    }
+  ],
+  "features": [
+    "Seeded, domain-specific data model with audit triggers",
+    "Parameterized SQL queries with server-side pagination and CSV export",
+    "Role-aware pages and Casbin asset permissions",
+    "Workflow automations for intake, approvals, assignments and SLA sweeps",
+    "In-app notification center, comments, attachments and saved views",
+    "Admin screens for users, roles, audit, operations and data quality"
+  ],
+  "requiredIntegrations": [
+    {
+      "key": "sendgrid-email",
+      "title": "SendGrid email",
+      "requiredFields": [
+        "API key",
+        "from address"
+      ],
+      "mock": "Connector ships disabled; use the notification center and packaged email HTML for demos."
+    },
+    {
+      "key": "stripe-billing",
+      "title": "Stripe billing",
+      "requiredFields": [
+        "secret key",
+        "webhook signing secret"
+      ],
+      "mock": "Payment history is seeded locally; the packaged REST connector is a mock until reconnected."
+    },
+    {
+      "key": "inbound-webhook",
+      "title": "Inbound support webhook",
+      "requiredFields": [
+        "endpoint path",
+        "optional signature header"
+      ],
+      "mock": "POST { \"kind\": \"webhook.received\", \"record_id\": 1 } to the inactive listener."
+    }
+  ],
+  "installOptions": [
+    {
+      "key": "includeSampleData",
+      "label": "Include sample data",
+      "type": "boolean",
+      "default": true,
+      "description": "Load the deterministic demo dataset (30-300 rows per core table)."
+    },
+    {
+      "key": "createDemoUsers",
+      "label": "Create demo staff directory",
+      "type": "boolean",
+      "default": false,
+      "description": "Mark seeded staff as demo identities. These are not Firebase logins."
+    },
+    {
+      "key": "enableAutomation",
+      "label": "Enable cron automations",
+      "type": "boolean",
+      "default": false,
+      "description": "Enable the packaged cron jobs. Leave off until listeners and integrations are reviewed."
+    }
+  ],
+  "counts": {
+    "tables": 18,
+    "domainTables": 8,
+    "supportTables": 10,
+    "seedRows": 1165,
+    "queries": 78,
+    "pages": 31,
+    "widgets": 210,
+    "workflows": 11,
+    "listeners": 8,
+    "cronJobs": 6,
+    "roles": 5
+  },
+  "pages": [
+    {
+      "slug": "support-tickets-list",
+      "title": "Tickets · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for tickets.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-tickets-detail",
+      "title": "Tickets · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-tickets-create",
+      "title": "Create Ticket",
+      "description": "Validated create form for Tickets with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-customers-list",
+      "title": "Customers · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for customers.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-customers-detail",
+      "title": "Customers · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-customers-create",
+      "title": "Create Customer",
+      "description": "Validated create form for Customers with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-subscriptions-list",
+      "title": "Subscriptions · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for subscriptions.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-subscriptions-detail",
+      "title": "Subscriptions · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-subscriptions-create",
+      "title": "Create Subscription",
+      "description": "Validated create form for Subscriptions with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-payments-list",
+      "title": "Payments · list",
+      "description": "Server-side list, filters, inline edit and bulk actions for payments.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-payments-detail",
+      "title": "Payments · detail",
+      "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-payments-create",
+      "title": "Create Payment",
+      "description": "Validated create form for Payments with audit-logged writes.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-dashboard",
+      "title": "Dashboard",
+      "description": "KPIs, trends, tasks, notifications and recent audit activity.",
+      "tags": [
+        "core",
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer"
+      ]
+    },
+    {
+      "slug": "support-reports-operations",
+      "title": "Reports · operations",
+      "description": "Date-filtered operating trend, status mix and exportable record list.",
+      "tags": [
+        "report",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-reports-secondary",
+      "title": "Reports · secondary mix",
+      "description": "Secondary entity mix and value trend with exportable records.",
+      "tags": [
+        "report",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-reports-quality",
+      "title": "Reports · data quality",
+      "description": "Data quality checks, failing operations and aging work.",
+      "tags": [
+        "report",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-tickets-kanban",
+      "title": "Tickets · kanban",
+      "description": "Status board grouped by the primary workflow stage.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-tickets-calendar",
+      "title": "Tickets · calendar",
+      "description": "Calendar view of the primary date field.",
+      "tags": [
+        "core",
+        "staff",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-search",
+      "title": "Global search",
+      "description": "Cross-entity search across every core table.",
+      "tags": [
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer"
+      ]
+    },
+    {
+      "slug": "support-profile",
+      "title": "My profile",
+      "description": "Staff profile and editable contact details.",
+      "tags": [
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer",
+        "portal"
+      ]
+    },
+    {
+      "slug": "support-notifications",
+      "title": "Notifications",
+      "description": "In-app notification center with mark-as-read.",
+      "tags": [
+        "shared",
+        "staff",
+        "manager",
+        "admin",
+        "viewer",
+        "portal"
+      ]
+    },
+    {
+      "slug": "support-settings",
+      "title": "Settings",
+      "description": "Branding, notification preferences, general settings and feature flags.",
+      "tags": [
+        "shared",
+        "manager",
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-portal",
+      "title": "Client portal",
+      "description": "External-facing record list scoped to the selected client owner.",
+      "tags": [
+        "portal",
+        "client",
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "support-admin-users",
+      "title": "Admin · users",
+      "description": "Tenant users, platform roles and app-level role assignment overview.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "support-admin-roles",
+      "title": "Admin · roles and permissions",
+      "description": "Provisioned tenant roles, permission counts and the app page matrix.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-admin-audit",
+      "title": "Admin · audit log",
+      "description": "Filterable audit log with old/new JSON diff.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "support-admin-settings",
+      "title": "Admin · system settings",
+      "description": "Settings and feature flags with audited updates.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-admin-import",
+      "title": "Admin · import / export",
+      "description": "CSV import with validation summary and record export.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    },
+    {
+      "slug": "support-admin-integrations",
+      "title": "Admin · integration health",
+      "description": "Integration health and inbound webhook event log.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-admin-jobs",
+      "title": "Admin · jobs and workflow runs",
+      "description": "Workflow instance monitor, run logs and cron history.",
+      "tags": [
+        "admin"
+      ]
+    },
+    {
+      "slug": "support-admin-quality",
+      "title": "Admin · data quality",
+      "description": "Quality checks and operational failures.",
+      "tags": [
+        "admin",
+        "manager"
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "slug": "support.intake-triage",
+      "title": "Tickets · intake triage",
+      "description": "Loads a record, computes a deterministic risk/priority score, then routes to review or standard triage and notifies the owner.",
+      "nodeCount": 8,
+      "edgeCount": 8
+    },
+    {
+      "slug": "support.round-robin-assignment",
+      "title": "Tickets · round-robin assignment",
+      "description": "Picks the least-loaded active staff member and assigns the record, then sends an in-app notification.",
+      "nodeCount": 6,
+      "edgeCount": 5
+    },
+    {
+      "slug": "support.approval-chain",
+      "title": "Tickets · approval chain",
+      "description": "Human approval with timeout, rejection and expiry paths. Approved records move to the next stage; every path notifies the owner.",
+      "nodeCount": 8,
+      "edgeCount": 9
+    },
+    {
+      "slug": "support.threshold-sweep",
+      "title": "Tickets · threshold sweep",
+      "description": "Finds overdue records, iterates with a bounded loop and sends an in-app reminder for each one.",
+      "nodeCount": 6,
+      "edgeCount": 5
+    },
+    {
+      "slug": "support.daily-digest",
+      "title": "Tickets · daily digest",
+      "description": "Builds a daily summary and writes a single in-app notification.",
+      "nodeCount": 5,
+      "edgeCount": 4
+    },
+    {
+      "slug": "support.escalation",
+      "title": "Tickets · escalation",
+      "description": "Waits for a configurable delay, then escalates high-priority records and notifies the manager.",
+      "nodeCount": 7,
+      "edgeCount": 7
+    },
+    {
+      "slug": "support.integration-sync",
+      "title": "Customer Support Console · integration sync",
+      "description": "Calls the mock REST integration, normalizes the response and recovers through an explicit error path. The default endpoint is intentionally unreachable.",
+      "nodeCount": 6,
+      "edgeCount": 6
+    },
+    {
+      "slug": "support.document-generation",
+      "title": "Tickets · document generation",
+      "description": "Builds an HTML document from record fields, links it as an attachment and notifies the owner.",
+      "nodeCount": 6,
+      "edgeCount": 5
+    },
+    {
+      "slug": "support.data-collection",
+      "title": "Tickets · supplier/customer follow-up",
+      "description": "Suspends for a structured follow-up form, then records the answer as a comment.",
+      "nodeCount": 4,
+      "edgeCount": 3
+    },
+    {
+      "slug": "support.error-recovery",
+      "title": "Customer Support Console · expected failure and recovery",
+      "description": "Injects a bounded failure, follows the error edge and confirms the compensation path with a notification.",
+      "nodeCount": 5,
+      "edgeCount": 4
+    },
+    {
+      "slug": "support.notify-only",
+      "title": "Customer Support Console · notify only",
+      "description": "Minimal workflow used by inbound webhooks and manual demos: writes one notification.",
+      "nodeCount": 3,
+      "edgeCount": 2
+    }
+  ],
+  "roles": [
+    {
+      "key": "admin",
+      "title": "Support Administrator",
+      "scope": "all"
+    },
+    {
+      "key": "manager",
+      "title": "Support Manager",
+      "scope": "staff"
+    },
+    {
+      "key": "agent",
+      "title": "Support Agent",
+      "scope": "staff"
+    },
+    {
+      "key": "analyst",
+      "title": "Support Analyst",
+      "scope": "staff"
+    },
+    {
+      "key": "readonly",
+      "title": "Read-only Viewer",
+      "scope": "staff"
+    }
+  ],
+  "entities": [
+    {
+      "key": "tickets",
+      "title": "Tickets",
+      "core": true,
+      "seedCount": 120,
+      "fields": [
+        {
+          "key": "subject",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "customer_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "requester_name",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "priority",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "channel",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "category",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "assignee_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "sla_due_at",
+          "type": "timestamptz",
+          "required": false
+        },
+        {
+          "key": "first_response_at",
+          "type": "timestamptz",
+          "required": false
+        },
+        {
+          "key": "resolved_at",
+          "type": "timestamptz",
+          "required": false
+        },
+        {
+          "key": "satisfaction_score",
+          "type": "int",
+          "required": false
+        },
+        {
+          "key": "description",
+          "type": "longtext",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "customers",
+      "title": "Customers",
+      "core": true,
+      "seedCount": 90,
+      "fields": [
+        {
+          "key": "account_name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "contact_name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "key": "phone",
+          "type": "phone",
+          "required": false
+        },
+        {
+          "key": "plan",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "mrr",
+          "type": "money",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "owner_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "region",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "joined_at",
+          "type": "timestamptz",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "subscriptions",
+      "title": "Subscriptions",
+      "core": true,
+      "seedCount": 80,
+      "fields": [
+        {
+          "key": "customer_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "plan",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "type": "money",
+          "required": true
+        },
+        {
+          "key": "billing_cycle",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "seats",
+          "type": "int",
+          "required": false
+        },
+        {
+          "key": "started_at",
+          "type": "timestamptz",
+          "required": false
+        },
+        {
+          "key": "renews_at",
+          "type": "date",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "payments",
+      "title": "Payments",
+      "core": true,
+      "seedCount": 140,
+      "fields": [
+        {
+          "key": "customer_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "invoice_number",
+          "type": "code",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "type": "money",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "method",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "paid_at",
+          "type": "timestamptz",
+          "required": false
+        },
+        {
+          "key": "due_date",
+          "type": "date",
+          "required": false
+        },
+        {
+          "key": "reference",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "interactions",
+      "title": "Interactions",
+      "core": false,
+      "seedCount": 160,
+      "fields": [
+        {
+          "key": "customer_id",
+          "type": "ref",
+          "required": true
+        },
+        {
+          "key": "ticket_id",
+          "type": "int",
+          "required": false
+        },
+        {
+          "key": "channel",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "subject",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "body",
+          "type": "longtext",
+          "required": false
+        },
+        {
+          "key": "agent_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "occurred_at",
+          "type": "timestamptz",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "canned_replies",
+      "title": "Canned replies",
+      "core": false,
+      "seedCount": 48,
+      "fields": [
+        {
+          "key": "title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "category",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "body",
+          "type": "longtext",
+          "required": false
+        },
+        {
+          "key": "is_active",
+          "type": "bool",
+          "required": false
+        },
+        {
+          "key": "usage_count",
+          "type": "int",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "escalations",
+      "title": "Escalations",
+      "core": false,
+      "seedCount": 60,
+      "fields": [
+        {
+          "key": "ticket_id",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "reason",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "level",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "owner_id",
+          "type": "ref",
+          "required": false
+        },
+        {
+          "key": "due_at",
+          "type": "timestamptz",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "knowledge_articles",
+      "title": "Knowledge base",
+      "core": false,
+      "seedCount": 70,
+      "fields": [
+        {
+          "key": "title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "category",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "enum",
+          "required": true
+        },
+        {
+          "key": "views",
+          "type": "int",
+          "required": false
+        },
+        {
+          "key": "body",
+          "type": "longtext",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "categories": [
+    "Customer Support"
+  ]
+}

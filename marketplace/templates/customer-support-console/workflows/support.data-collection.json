@@ -1,0 +1,194 @@
+{
+  "slug": "support.data-collection",
+  "key": "data-collection",
+  "title": "Tickets · supplier/customer follow-up",
+  "description": "Suspends for a structured follow-up form, then records the answer as a comment.",
+  "tags": [
+    "automation",
+    "data-collection"
+  ],
+  "options": {
+    "description": "Suspends for a structured follow-up form, then records the answer as a comment.",
+    "inputDefinitions": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "916688f6-013e-4486-a2fb-8de8145c5d19",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "collectFollowUp",
+      "nodeID": "15cdc160-46fe-4417-b524-a1427439499f",
+      "type": "dataCollection",
+      "timeoutSeconds": 900,
+      "retryLimit": 0,
+      "config": {
+        "title": "Follow up on Ticket #{{ ctx.recordID }}",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "description": "Record the external response and the revised commitment date.",
+        "collectionType": "form",
+        "outputVariable": "followUp",
+        "expiryMinutes": 1440,
+        "formSchema": {
+          "type": "object",
+          "properties": {
+            "outcome": {
+              "type": "string",
+              "title": "Outcome",
+              "enum": [
+                "confirmed",
+                "delayed",
+                "declined"
+              ]
+            },
+            "revisedDate": {
+              "type": "string",
+              "title": "Revised date"
+            },
+            "notes": {
+              "type": "string",
+              "title": "Notes",
+              "minLength": 5
+            }
+          },
+          "required": [
+            "outcome",
+            "notes"
+          ]
+        },
+        "formUischema": {
+          "type": "VerticalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "scope": "#/properties/outcome"
+            },
+            {
+              "type": "Control",
+              "scope": "#/properties/revisedDate"
+            },
+            {
+              "type": "Control",
+              "scope": "#/properties/notes",
+              "options": {
+                "multi": true,
+                "rows": 3
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "key": "recordFollowUp",
+      "nodeID": "ded7c9b9-68dc-4060-ab75-12e9eb0864a4",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "recordFollowUp",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "dataQueryID": "47b280df-2bc9-48f3-8350-60f15f4b2fe8",
+        "outputVariable": "commentResult",
+        "inputValues": {
+          "entity": "tickets",
+          "entityID": "{{ ctx.recordID }}",
+          "authorID": "{{ ctx.staffID || 1 }}",
+          "body": "Follow-up: {{ ctx.followUp.outcome }} · {{ ctx.followUp.notes }} · revised {{ ctx.followUp.revisedDate }}"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "6b6ee6c9-40e7-44c3-ab2d-fe00e9cd2a88",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.followUp }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "916688f6-013e-4486-a2fb-8de8145c5d19",
+      "to": "15cdc160-46fe-4417-b524-a1427439499f",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "15cdc160-46fe-4417-b524-a1427439499f",
+      "to": "ded7c9b9-68dc-4060-ab75-12e9eb0864a4",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "ded7c9b9-68dc-4060-ab75-12e9eb0864a4",
+      "to": "6b6ee6c9-40e7-44c3-ab2d-fe00e9cd2a88",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

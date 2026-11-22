@@ -1,0 +1,187 @@
+{
+  "slug": "support-admin-import",
+  "key": "admin-import",
+  "title": "Admin · import / export",
+  "description": "CSV import with validation summary and record export.",
+  "accessTags": [
+    "admin",
+    "manager"
+  ],
+  "variables": [
+    {
+      "key": "entity",
+      "type": "string",
+      "defaultValue": "tickets"
+    },
+    {
+      "key": "csv",
+      "type": "string",
+      "defaultValue": ""
+    }
+  ],
+  "sources": [
+    {
+      "alias": "jobs",
+      "type": "query",
+      "queryID": "bd8f8949-6518-414d-857a-a50210e41e13",
+      "triggerMode": "auto",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "import",
+      "type": "query",
+      "queryID": "f347d0d1-e2f6-4c5b-931d-5cecbf6d1a00",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "export",
+      "type": "query",
+      "queryID": "f626b5b3-d044-4be1-a640-54a68dc7aa1b",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "1b99b75f-02bb-485d-8ace-9b19918c51c8",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "53ea48f1-65e5-428b-847d-3a0c8f78285a",
+              "type": "widget",
+              "widgetKey": "widget_3d506bb2-43e8-467d-ba76-68710ae10f14_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "4067f773-91b4-4813-8476-6cb61b7c82ff",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "9cdc4780-6bc0-4d8e-8bf5-41787d81223b",
+              "type": "widget",
+              "widgetKey": "widget_1300275c-3118-4029-98f3-aea441e0db64_1",
+              "span": 6,
+              "sizing": "fill",
+              "minHeight": 280
+            },
+            {
+              "id": "4ce010ff-ce36-4bb7-83f6-e7db32b0ac5c",
+              "type": "widget",
+              "widgetKey": "widget_df14fcfb-edd7-4318-b720-3a9844316fe3_1",
+              "span": 6,
+              "sizing": "fill",
+              "minHeight": 280
+            }
+          ]
+        },
+        {
+          "id": "eedb6139-c418-46b5-a85c-dbf2ceb4dc83",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "0a756d04-c157-4ce9-9c0c-7bc3ba563b40",
+              "type": "widget",
+              "widgetKey": "widget_3c9bcab0-362e-4ef4-a837-349cb697fef1_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 320
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "53ea48f1-65e5-428b-847d-3a0c8f78285a",
+        "type": "widget",
+        "widgetKey": "widget_3d506bb2-43e8-467d-ba76-68710ae10f14_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "9cdc4780-6bc0-4d8e-8bf5-41787d81223b",
+        "type": "widget",
+        "widgetKey": "widget_1300275c-3118-4029-98f3-aea441e0db64_1",
+        "span": 6,
+        "sizing": "fill",
+        "minHeight": 280
+      },
+      {
+        "id": "4ce010ff-ce36-4bb7-83f6-e7db32b0ac5c",
+        "type": "widget",
+        "widgetKey": "widget_df14fcfb-edd7-4318-b720-3a9844316fe3_1",
+        "span": 6,
+        "sizing": "fill",
+        "minHeight": 280
+      },
+      {
+        "id": "0a756d04-c157-4ce9-9c0c-7bc3ba563b40",
+        "type": "widget",
+        "widgetKey": "widget_3c9bcab0-362e-4ef4-a837-349cb697fef1_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 320
+      }
+    ],
+    "variables": [
+      {
+        "key": "entity",
+        "type": "string",
+        "defaultValue": "tickets"
+      },
+      {
+        "key": "csv",
+        "type": "string",
+        "defaultValue": ""
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "jobs",
+        "type": "query",
+        "queryID": "bd8f8949-6518-414d-857a-a50210e41e13",
+        "triggerMode": "auto",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "import",
+        "type": "query",
+        "queryID": "f347d0d1-e2f6-4c5b-931d-5cecbf6d1a00",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "export",
+        "type": "query",
+        "queryID": "f626b5b3-d044-4be1-a640-54a68dc7aa1b",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "slug": "support-tickets-calendar",
+  "key": "tickets-calendar",
+  "title": "Tickets · calendar",
+  "description": "Calendar view of the primary date field.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "tickets",
+      "type": "query",
+      "queryID": "91f3a3e6-450f-4fcf-87e9-e68310e028f5",
+      "triggerMode": "auto",
+      "inputValues": {
+        "search": "",
+        "page": 1,
+        "limit": 300,
+        "sortBy": "sla_due_at",
+        "sortDir": "asc",
+        "status": "",
+        "dateFrom": "",
+        "dateTo": ""
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "tickets_selected",
+      "type": "query",
+      "queryID": "72003091-8434-46cb-bb34-3f8a628d8383",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "83b13f82-f5cd-44fe-8d2c-1cbd6b57ff6f",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "ec74d52d-ed7d-46eb-9c17-c30d90e11e6f",
+              "type": "widget",
+              "widgetKey": "widget_44a8f8c1-096a-44bf-8c54-b8a5e22a2e1c_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "ba380236-045d-46fd-9af8-bf47f9b4be95",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "88acb3b8-9184-4e88-a713-a86388ec5434",
+              "type": "widget",
+              "widgetKey": "widget_f04ba884-c3bd-4c62-b8e0-84e6207b498b_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 540
+            },
+            {
+              "id": "d21cc794-34e9-49ff-bfd4-49cf94b8d828",
+              "type": "widget",
+              "widgetKey": "widget_69f426e6-9716-4321-b232-4f2be9ceb51c_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 540
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "ec74d52d-ed7d-46eb-9c17-c30d90e11e6f",
+        "type": "widget",
+        "widgetKey": "widget_44a8f8c1-096a-44bf-8c54-b8a5e22a2e1c_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "88acb3b8-9184-4e88-a713-a86388ec5434",
+        "type": "widget",
+        "widgetKey": "widget_f04ba884-c3bd-4c62-b8e0-84e6207b498b_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 540
+      },
+      {
+        "id": "d21cc794-34e9-49ff-bfd4-49cf94b8d828",
+        "type": "widget",
+        "widgetKey": "widget_69f426e6-9716-4321-b232-4f2be9ceb51c_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 540
+      }
+    ],
+    "variables": [
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "tickets",
+        "type": "query",
+        "queryID": "91f3a3e6-450f-4fcf-87e9-e68310e028f5",
+        "triggerMode": "auto",
+        "inputValues": {
+          "search": "",
+          "page": 1,
+          "limit": 300,
+          "sortBy": "sla_due_at",
+          "sortDir": "asc",
+          "status": "",
+          "dateFrom": "",
+          "dateTo": ""
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "tickets_selected",
+        "type": "query",
+        "queryID": "72003091-8434-46cb-bb34-3f8a628d8383",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

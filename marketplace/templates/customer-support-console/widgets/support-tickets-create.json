@@ -1,0 +1,506 @@
+[
+  {
+    "slug": "support-tickets-create.heading",
+    "key": "heading",
+    "page": "support-tickets-create",
+    "title": "Create Ticket",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Ticket\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-tickets-create.form",
+    "key": "form",
+    "page": "support-tickets-create",
+    "title": "New Ticket",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Ticket",
+      "submitLabel": "Create Ticket",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "subject",
+          "label": "Subject",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Login issue — Escalation inventory onboarding variance."
+        },
+        {
+          "key": "customer_id",
+          "label": "Customer",
+          "type": "select",
+          "required": true,
+          "defaultValue": 90,
+          "options": [
+            {
+              "label": "#1",
+              "value": 1
+            },
+            {
+              "label": "#2",
+              "value": 2
+            },
+            {
+              "label": "#3",
+              "value": 3
+            },
+            {
+              "label": "#4",
+              "value": 4
+            },
+            {
+              "label": "#5",
+              "value": 5
+            },
+            {
+              "label": "#6",
+              "value": 6
+            },
+            {
+              "label": "#7",
+              "value": 7
+            },
+            {
+              "label": "#8",
+              "value": 8
+            },
+            {
+              "label": "#9",
+              "value": 9
+            },
+            {
+              "label": "#10",
+              "value": 10
+            },
+            {
+              "label": "#11",
+              "value": 11
+            },
+            {
+              "label": "#12",
+              "value": 12
+            },
+            {
+              "label": "#13",
+              "value": 13
+            },
+            {
+              "label": "#14",
+              "value": 14
+            },
+            {
+              "label": "#15",
+              "value": 15
+            },
+            {
+              "label": "#16",
+              "value": 16
+            },
+            {
+              "label": "#17",
+              "value": 17
+            },
+            {
+              "label": "#18",
+              "value": 18
+            },
+            {
+              "label": "#19",
+              "value": 19
+            },
+            {
+              "label": "#20",
+              "value": 20
+            },
+            {
+              "label": "#21",
+              "value": 21
+            },
+            {
+              "label": "#22",
+              "value": 22
+            },
+            {
+              "label": "#23",
+              "value": 23
+            },
+            {
+              "label": "#24",
+              "value": 24
+            },
+            {
+              "label": "#25",
+              "value": 25
+            },
+            {
+              "label": "#26",
+              "value": 26
+            },
+            {
+              "label": "#27",
+              "value": 27
+            },
+            {
+              "label": "#28",
+              "value": 28
+            },
+            {
+              "label": "#29",
+              "value": 29
+            },
+            {
+              "label": "#30",
+              "value": 30
+            },
+            {
+              "label": "#31",
+              "value": 31
+            },
+            {
+              "label": "#32",
+              "value": 32
+            },
+            {
+              "label": "#33",
+              "value": 33
+            },
+            {
+              "label": "#34",
+              "value": 34
+            },
+            {
+              "label": "#35",
+              "value": 35
+            },
+            {
+              "label": "#36",
+              "value": 36
+            },
+            {
+              "label": "#37",
+              "value": 37
+            },
+            {
+              "label": "#38",
+              "value": 38
+            },
+            {
+              "label": "#39",
+              "value": 39
+            },
+            {
+              "label": "#40",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "key": "requester_name",
+          "label": "Requester",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Theo Meyer"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "open",
+          "options": [
+            {
+              "label": "New",
+              "value": "new"
+            },
+            {
+              "label": "Open",
+              "value": "open"
+            },
+            {
+              "label": "Pending",
+              "value": "pending"
+            },
+            {
+              "label": "Resolved",
+              "value": "resolved"
+            },
+            {
+              "label": "Closed",
+              "value": "closed"
+            }
+          ]
+        },
+        {
+          "key": "priority",
+          "label": "Priority",
+          "type": "select",
+          "required": true,
+          "defaultValue": "normal",
+          "options": [
+            {
+              "label": "Low",
+              "value": "low"
+            },
+            {
+              "label": "Normal",
+              "value": "normal"
+            },
+            {
+              "label": "High",
+              "value": "high"
+            },
+            {
+              "label": "Urgent",
+              "value": "urgent"
+            }
+          ]
+        },
+        {
+          "key": "channel",
+          "label": "Channel",
+          "type": "select",
+          "required": true,
+          "defaultValue": "chat",
+          "options": [
+            {
+              "label": "Email",
+              "value": "email"
+            },
+            {
+              "label": "Chat",
+              "value": "chat"
+            },
+            {
+              "label": "Phone",
+              "value": "phone"
+            },
+            {
+              "label": "Web",
+              "value": "web"
+            }
+          ]
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "select",
+          "required": true,
+          "defaultValue": "technical",
+          "options": [
+            {
+              "label": "Billing",
+              "value": "billing"
+            },
+            {
+              "label": "Technical",
+              "value": "technical"
+            },
+            {
+              "label": "Account",
+              "value": "account"
+            },
+            {
+              "label": "How To",
+              "value": "how_to"
+            },
+            {
+              "label": "Bug",
+              "value": "bug"
+            }
+          ]
+        },
+        {
+          "key": "assignee_id",
+          "label": "Assignee",
+          "type": "select",
+          "required": false,
+          "defaultValue": 3,
+          "options": [
+            {
+              "label": "Noor Wright",
+              "value": 1
+            },
+            {
+              "label": "Mira Okafor",
+              "value": 2
+            },
+            {
+              "label": "Ishaan Hassan",
+              "value": 3
+            },
+            {
+              "label": "Ravi Ivanova",
+              "value": 4
+            },
+            {
+              "label": "Tomás Ivanova",
+              "value": 5
+            },
+            {
+              "label": "Malik Osei",
+              "value": 6
+            },
+            {
+              "label": "Ishaan Osei",
+              "value": 7
+            },
+            {
+              "label": "Hugo Costa",
+              "value": 8
+            },
+            {
+              "label": "Tomás Wright",
+              "value": 9
+            },
+            {
+              "label": "Sofia Meyer",
+              "value": 10
+            },
+            {
+              "label": "Malik Sato",
+              "value": 11
+            },
+            {
+              "label": "Eli Chen",
+              "value": 12
+            },
+            {
+              "label": "Clara Okafor",
+              "value": 13
+            },
+            {
+              "label": "Mira Sato",
+              "value": 14
+            },
+            {
+              "label": "Ravi Wright",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Dubey",
+              "value": 16
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 17
+            },
+            {
+              "label": "Mira Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Jonas Tanaka",
+              "value": 19
+            },
+            {
+              "label": "Eli Novak",
+              "value": 20
+            },
+            {
+              "label": "Owen Bennett",
+              "value": 21
+            },
+            {
+              "label": "Noah Dubois",
+              "value": 22
+            },
+            {
+              "label": "Aarav Meyer",
+              "value": 23
+            },
+            {
+              "label": "Malik Fischer",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "sla_due_at",
+          "label": "SLA due",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "first_response_at",
+          "label": "First response",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "resolved_at",
+          "label": "Resolved",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        },
+        {
+          "key": "satisfaction_score",
+          "label": "CSAT score",
+          "type": "number",
+          "required": false,
+          "defaultValue": 95,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": false,
+          "defaultValue": "Settlement follow-up compliance handoff onboarding settlement maintenance variance diagnostic inventory diagnostic approval priority inspection diagnostic quarterly.",
+          "help": "Plain text or short notes"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_create",
+              "inputValues": {
+                "subject": "{{ event.formData.subject }}",
+                "customer_id": "{{ event.formData.customer_id }}",
+                "requester_name": "{{ event.formData.requester_name }}",
+                "status": "{{ event.formData.status }}",
+                "priority": "{{ event.formData.priority }}",
+                "channel": "{{ event.formData.channel }}",
+                "category": "{{ event.formData.category }}",
+                "assignee_id": "{{ event.formData.assignee_id }}",
+                "sla_due_at": "{{ event.formData.sla_due_at }}",
+                "first_response_at": "{{ event.formData.first_response_at }}",
+                "resolved_at": "{{ event.formData.resolved_at }}",
+                "satisfaction_score": "{{ event.formData.satisfaction_score }}",
+                "description": "{{ event.formData.description }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-create.result",
+    "key": "result",
+    "page": "support-tickets-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.tickets_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.tickets_create || {}).isLoading || false }}"
+    }
+  }
+]

@@ -1,0 +1,334 @@
+[
+  {
+    "slug": "support-reports-operations.heading",
+    "key": "heading",
+    "page": "support-reports-operations",
+    "title": "Operations report",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Operations report\nUse the date range to scope totals. The export button downloads the filtered record list as CSV.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-reports-operations.range",
+    "key": "range",
+    "page": "support-reports-operations",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "Date range",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-reports-operations.total",
+    "key": "total",
+    "page": "support-reports-operations",
+    "title": "Records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Records",
+      "valueTemplate": "{{ ((((state.queries.report_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.report_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-reports-operations.value",
+    "key": "value",
+    "page": "support-reports-operations",
+    "title": "Status groups",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Groups",
+      "prefix": "",
+      "valueTemplate": "{{ (((state.queries.report_status || {}).data || []).length) }}",
+      "isLoading": "{{ (state.queries.report_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-reports-operations.trend",
+    "key": "trend",
+    "page": "support-reports-operations",
+    "title": "Daily trend",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Daily trend",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.report_trend || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "bar",
+          "tooltip": true
+        },
+        "encoding": {
+          "x": {
+            "field": "day",
+            "type": "temporal",
+            "axis": {
+              "labelAngle": 0
+            }
+          },
+          "y": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "value": "#0ea5e9"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.report_trend || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-reports-operations.status",
+    "key": "status",
+    "page": "support-reports-operations",
+    "title": "Status mix",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Status mix",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.report_status || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "bar",
+          "tooltip": true
+        },
+        "encoding": {
+          "y": {
+            "field": "status",
+            "type": "nominal",
+            "sort": "-x"
+          },
+          "x": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "status",
+            "type": "nominal"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.report_status || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-reports-operations.data",
+    "key": "data",
+    "page": "support-reports-operations",
+    "title": "Filtered records",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.report_list || {}).data || [])",
+      "columns": [
+        {
+          "key": "subject",
+          "label": "Subject",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "customer_id",
+          "label": "Customer",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "requester_name",
+          "label": "Requester",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "priority",
+          "label": "Priority",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "channel",
+          "label": "Channel",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "assignee_id",
+          "label": "Assignee",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "sla_due_at",
+          "label": "SLA due",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "first_response_at",
+          "label": "First response",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "resolved_at",
+          "label": "Resolved",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "satisfaction_score",
+          "label": "CSAT score",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No records in this range.",
+      "isLoading": "{{ (state.queries.report_list || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-reports-operations.run",
+    "key": "run",
+    "page": "support-reports-operations",
+    "title": "Load export set",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Load filtered rows",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "report_list",
+              "inputValues": {
+                "search": "",
+                "status": "",
+                "dateFrom": "{{ state.variables.dateFrom }}",
+                "dateTo": "{{ state.variables.dateTo }}"
+              },
+              "successToast": "Report loaded",
+              "errorToast": "Report failed"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

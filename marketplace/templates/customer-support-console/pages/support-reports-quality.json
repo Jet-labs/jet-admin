@@ -1,0 +1,157 @@
+{
+  "slug": "support-reports-quality",
+  "key": "reports-quality",
+  "title": "Reports · data quality",
+  "description": "Data quality checks, failing operations and aging work.",
+  "accessTags": [
+    "report",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "dateFrom",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "key": "dateTo",
+      "type": "string",
+      "defaultValue": ""
+    }
+  ],
+  "sources": [
+    {
+      "alias": "quality",
+      "type": "query",
+      "queryID": "467dcd48-c5be-4d38-a077-426f7637a966",
+      "triggerMode": "auto",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "ops",
+      "type": "query",
+      "queryID": "d60343a2-bff4-445d-8e80-2cf4323837eb",
+      "triggerMode": "auto",
+      "inputValues": {
+        "kinds": [
+          "data_quality",
+          "job_run"
+        ]
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "005c1fa9-b360-4efa-9332-48d65d4bac4b",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "018a99e8-0b6a-40ff-b69e-792c161acbf3",
+              "type": "widget",
+              "widgetKey": "widget_2360a8fd-46cb-4c17-a7bc-55568792c688_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "d018f57c-dce5-4780-9644-775063711008",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "76254f23-c9d4-4590-9d18-ddd5b96a94c8",
+              "type": "widget",
+              "widgetKey": "widget_a179bd7a-e966-427e-8ea0-d85054937301_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 320
+            },
+            {
+              "id": "3351f1f5-edb5-4e82-b4d4-6ce5d9abde85",
+              "type": "widget",
+              "widgetKey": "widget_2622ba44-a958-4369-957f-fbe325d9c91e_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 320
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "018a99e8-0b6a-40ff-b69e-792c161acbf3",
+        "type": "widget",
+        "widgetKey": "widget_2360a8fd-46cb-4c17-a7bc-55568792c688_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "76254f23-c9d4-4590-9d18-ddd5b96a94c8",
+        "type": "widget",
+        "widgetKey": "widget_a179bd7a-e966-427e-8ea0-d85054937301_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 320
+      },
+      {
+        "id": "3351f1f5-edb5-4e82-b4d4-6ce5d9abde85",
+        "type": "widget",
+        "widgetKey": "widget_2622ba44-a958-4369-957f-fbe325d9c91e_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 320
+      }
+    ],
+    "variables": [
+      {
+        "key": "dateFrom",
+        "type": "string",
+        "defaultValue": ""
+      },
+      {
+        "key": "dateTo",
+        "type": "string",
+        "defaultValue": ""
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "quality",
+        "type": "query",
+        "queryID": "467dcd48-c5be-4d38-a077-426f7637a966",
+        "triggerMode": "auto",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "ops",
+        "type": "query",
+        "queryID": "d60343a2-bff4-445d-8e80-2cf4323837eb",
+        "triggerMode": "auto",
+        "inputValues": {
+          "kinds": [
+            "data_quality",
+            "job_run"
+          ]
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

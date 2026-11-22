@@ -1,0 +1,171 @@
+{
+  "slug": "support.daily-digest",
+  "key": "daily-digest",
+  "title": "Tickets · daily digest",
+  "description": "Builds a daily summary and writes a single in-app notification.",
+  "tags": [
+    "automation",
+    "digest"
+  ],
+  "options": {
+    "description": "Builds a daily summary and writes a single in-app notification.",
+    "inputDefinitions": [
+      {
+        "key": "staffID",
+        "type": "number",
+        "required": false,
+        "defaultValue": 1
+      }
+    ],
+    "workflowRunTimeout": 600,
+    "workflowTaskTimeout": 60,
+    "humanInLoopTimeout": 3600,
+    "defaultNodeTimeoutSeconds": 30,
+    "defaultRetryLimit": 1,
+    "defaultRetryDelaySeconds": 3,
+    "nodeDefaults": {
+      "javascript": {
+        "timeoutSeconds": 10,
+        "retryLimit": 1,
+        "retryDelaySeconds": 1
+      },
+      "dataQuery": {
+        "timeoutSeconds": 30,
+        "retryLimit": 1,
+        "retryDelaySeconds": 2
+      }
+    }
+  },
+  "nodes": [
+    {
+      "key": "start",
+      "nodeID": "e497307f-c53a-4980-a1a1-8456d63ab631",
+      "type": "start",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "start",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "key": "loadStats",
+      "nodeID": "dd999fc0-a32d-486a-85da-2424d07b9fdb",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "loadStats",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 320,
+          "y": 0
+        },
+        "dataQueryID": "179b9f53-f73b-4265-8fdf-9c02076654fa",
+        "outputVariable": "summary",
+        "inputValues": {}
+      }
+    },
+    {
+      "key": "composeDigest",
+      "nodeID": "638c3a58-25c3-4877-86dc-1ecf481acc22",
+      "type": "javascript",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "composeDigest",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 640,
+          "y": 0
+        },
+        "code": "\nvar s = (ctx.summary || [])[0] || {};\nreturn { total: Number(s.total || 0), value: Number(s.total_value || 0), staffID: ctx.staffID || 1 };\n",
+        "outputVariable": "digest"
+      }
+    },
+    {
+      "key": "sendDigest",
+      "nodeID": "f39504da-9a1d-4b6f-aa3c-61c44cc42d92",
+      "type": "dataQuery",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "sendDigest",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 960,
+          "y": 0
+        },
+        "dataQueryID": "c887cca4-c51b-46a9-8e15-aa443eef4189",
+        "outputVariable": "notification",
+        "inputValues": {
+          "staffID": "{{ ctx.digest.staffID }}",
+          "title": "Customer Support Console daily digest",
+          "body": "{{ ctx.digest.total }} records · value {{ ctx.digest.value }}",
+          "category": "info",
+          "linkPage": "support-dashboard"
+        }
+      }
+    },
+    {
+      "key": "done",
+      "nodeID": "2111c803-a203-49b7-85ba-988562e7d73c",
+      "type": "end",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "config": {
+        "title": "done",
+        "errorHandling": "continue",
+        "joinMode": "any",
+        "position": {
+          "x": 0,
+          "y": 220
+        },
+        "outputParameters": [
+          {
+            "name": "result",
+            "sourceVariable": "{{ ctx.digest }}"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "e497307f-c53a-4980-a1a1-8456d63ab631",
+      "to": "dd999fc0-a32d-486a-85da-2424d07b9fdb",
+      "handle": "output",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "dd999fc0-a32d-486a-85da-2424d07b9fdb",
+      "to": "638c3a58-25c3-4877-86dc-1ecf481acc22",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "638c3a58-25c3-4877-86dc-1ecf481acc22",
+      "to": "f39504da-9a1d-4b6f-aa3c-61c44cc42d92",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    },
+    {
+      "from": "f39504da-9a1d-4b6f-aa3c-61c44cc42d92",
+      "to": "2111c803-a203-49b7-85ba-988562e7d73c",
+      "handle": "success",
+      "edgeType": "smoothstep",
+      "edgeConfig": {}
+    }
+  ]
+}

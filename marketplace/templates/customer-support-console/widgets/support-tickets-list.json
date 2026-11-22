@@ -1,0 +1,664 @@
+[
+  {
+    "slug": "support-tickets-list.heading",
+    "key": "heading",
+    "page": "support-tickets-list",
+    "title": "Tickets",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Tickets\nBrowse, filter and update tickets. All edits are audit-logged and soft-deleted records can be restored from the record detail page.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-tickets-list.search",
+    "key": "search",
+    "page": "support-tickets-list",
+    "title": "Search",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Search tickets...",
+      "debounceMs": 350,
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-list.status",
+    "key": "status",
+    "page": "support-tickets-list",
+    "title": "Status filter",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "All statuses",
+      "defaultValue": "all",
+      "options": [
+        {
+          "label": "All statuses",
+          "value": "all"
+        },
+        {
+          "label": "New",
+          "value": "new"
+        },
+        {
+          "label": "Open",
+          "value": "open"
+        },
+        {
+          "label": "Pending",
+          "value": "pending"
+        },
+        {
+          "label": "Resolved",
+          "value": "resolved"
+        },
+        {
+          "label": "Closed",
+          "value": "closed"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.value === 'all' ? '' : event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-list.range",
+    "key": "range",
+    "page": "support-tickets-list",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-list.sort",
+    "key": "sort",
+    "page": "support-tickets-list",
+    "title": "Sort",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Sort by",
+      "defaultValue": "subject",
+      "options": [
+        {
+          "label": "Subject",
+          "value": "subject"
+        },
+        {
+          "label": "Requester Name",
+          "value": "requester_name"
+        },
+        {
+          "label": "Sla Due At",
+          "value": "sla_due_at"
+        },
+        {
+          "label": "First Response At",
+          "value": "first_response_at"
+        },
+        {
+          "label": "Resolved At",
+          "value": "resolved_at"
+        },
+        {
+          "label": "Satisfaction Score",
+          "value": "satisfaction_score"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.sortBy",
+              "value": "{{ event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-list.total",
+    "key": "total",
+    "page": "support-tickets-list",
+    "title": "Total records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total records",
+      "valueTemplate": "{{ ((((state.queries.tickets_stats || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.tickets_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-tickets-list.avg",
+    "key": "avg",
+    "page": "support-tickets-list",
+    "title": "Average",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Visible rows",
+      "valueTemplate": "{{ ((((state.queries.tickets_stats || {}).data || [])[0] || {}).total) }}",
+      "prefix": "",
+      "isLoading": "{{ (state.queries.tickets_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-tickets-list.selected",
+    "key": "selected",
+    "page": "support-tickets-list",
+    "title": "Selected record",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record",
+      "dataTemplate": "{{ (((state.queries.tickets_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row to inspect it.",
+      "isLoading": "{{ (state.queries.tickets_selected || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-tickets-list.table",
+    "key": "table",
+    "page": "support-tickets-list",
+    "title": "Tickets",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.tickets || {}).data || [])",
+      "columns": [
+        {
+          "key": "subject",
+          "label": "Subject",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "customer_id",
+          "label": "Customer",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "requester_name",
+          "label": "Requester",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "priority",
+          "label": "Priority",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "channel",
+          "label": "Channel",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "assignee_id",
+          "label": "Assignee",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "sla_due_at",
+          "label": "SLA due",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "first_response_at",
+          "label": "First response",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "resolved_at",
+          "label": "Resolved",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "satisfaction_score",
+          "label": "CSAT score",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageParam": "page",
+        "pageSize": 10,
+        "totalTemplate": "{{ ((state.queries.tickets || {}).data && (state.queries.tickets || {}).data[0] ? (state.queries.tickets || {}).data[0].total_count : 0) }}"
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": true,
+        "placeholder": "Search tickets..."
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv",
+        "serverSide": false,
+        "buttonLabel": "Export CSV"
+      },
+      "editing": {
+        "enabled": true
+      },
+      "bulkEdit": {
+        "enabled": false,
+        "saveLabel": "Save changes"
+      },
+      "multiSelect": {
+        "enabled": true,
+        "showSelectAll": true,
+        "actions": [
+          {
+            "label": "Archive selected",
+            "actionKey": "archive",
+            "variant": "destructive"
+          }
+        ]
+      },
+      "emptyText": "No tickets found.",
+      "emptyHint": "Adjust the filters or create a new record.",
+      "isLoading": "{{ (state.queries.tickets || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ],
+        "onPageChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": "{{ event.page }}"
+            }
+          }
+        ],
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "subject": "{{ event.updatedRow.subject }}",
+                "customer_id": "{{ event.updatedRow.customer_id }}",
+                "requester_name": "{{ event.updatedRow.requester_name }}",
+                "status": "{{ event.updatedRow.status }}",
+                "priority": "{{ event.updatedRow.priority }}",
+                "channel": "{{ event.updatedRow.channel }}",
+                "category": "{{ event.updatedRow.category }}",
+                "assignee_id": "{{ event.updatedRow.assignee_id }}",
+                "sla_due_at": "{{ event.updatedRow.sla_due_at }}",
+                "first_response_at": "{{ event.updatedRow.first_response_at }}",
+                "resolved_at": "{{ event.updatedRow.resolved_at }}",
+                "satisfaction_score": "{{ event.updatedRow.satisfaction_score }}",
+                "description": "{{ event.updatedRow.description }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ],
+        "onBulkAction": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_delete",
+              "inputValues": {
+                "ids": "{{ event.selectedRows.map(function (r) { return r.id; }) }}"
+              },
+              "successToast": "Records archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-list.actions",
+    "key": "actions",
+    "page": "support-tickets-list",
+    "title": "Selected record actions",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record actions",
+      "dataTemplate": "{{ (((state.queries.tickets_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row, then use the buttons below."
+    }
+  },
+  {
+    "slug": "support-tickets-list.archive",
+    "key": "archive",
+    "page": "support-tickets-list",
+    "title": "Archive selected",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive selected",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.selectedID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-list.advance",
+    "key": "advance",
+    "page": "support-tickets-list",
+    "title": "Advance status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Advance status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_status",
+              "inputValues": {
+                "id": "{{ state.variables.selectedID }}",
+                "status": "{{ \"open\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-list.explain",
+    "key": "explain",
+    "page": "support-tickets-list",
+    "title": "List notes",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "Rows are loaded server-side. Use the table toolbar to search, sort and export the current view. Inline edits and bulk actions run the template's parameterized update queries and write to the audit log.",
+      "format": "plain"
+    }
+  },
+  {
+    "slug": "support-tickets-list.views",
+    "key": "views",
+    "page": "support-tickets-list",
+    "title": "Saved views",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.tickets_views || {}).data || [])",
+      "columns": [
+        {
+          "key": "label",
+          "label": "View",
+          "type": "text",
+          "sortable": false
+        },
+        {
+          "key": "config_key",
+          "label": "Key",
+          "type": "text",
+          "sortable": false
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false,
+        "placeholder": "Filter saved views"
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No saved views yet.",
+      "isLoading": "{{ (state.queries.tickets_views || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.row.config_value.search || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.row.config_value.status || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-list.saveView",
+    "key": "saveView",
+    "page": "support-tickets-list",
+    "title": "Save current view",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Save current view",
+      "submitLabel": "Save view",
+      "fields": [
+        {
+          "key": "name",
+          "label": "View name",
+          "type": "text",
+          "required": true,
+          "placeholder": "e.g. My open tickets"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_view_create",
+              "inputValues": {
+                "configKey": "{{ \"saved_view.support-tickets-list.\" + String(event.formData.name || \"view\").toLowerCase().replace(/[^a-z0-9]+/g, \"-\") }}",
+                "value": "{{ ({ search: state.variables.search, status: state.variables.status, page: 1 }) }}",
+                "label": "{{ event.formData.name }}"
+              },
+              "successToast": "View saved",
+              "errorToast": "Could not save view"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

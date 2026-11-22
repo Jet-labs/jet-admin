@@ -1,0 +1,501 @@
+[
+  {
+    "slug": "support.customers.list",
+    "title": "Customers · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"account_name\", \"contact_name\", \"email\", \"phone\", \"plan\", \"mrr\", \"status\", \"owner_id\", \"region\", \"joined_at\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:customers}}\nWHERE deleted_at IS NULL AND (coalesce(\"account_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"contact_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"email\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"phone\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at >= NULLIF($7::text, '')::date)\n  AND (NULLIF($8::text, '')::date IS NULL OR created_at < (NULLIF($8::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $5::text = 'account_name' AND $6::text = 'asc' THEN \"account_name\" END ASC, CASE WHEN $5::text = 'account_name' AND $6::text = 'desc' THEN \"account_name\" END DESC, CASE WHEN $5::text = 'contact_name' AND $6::text = 'asc' THEN \"contact_name\" END ASC, CASE WHEN $5::text = 'contact_name' AND $6::text = 'desc' THEN \"contact_name\" END DESC, CASE WHEN $5::text = 'mrr' AND $6::text = 'asc' THEN \"mrr\" END ASC, CASE WHEN $5::text = 'mrr' AND $6::text = 'desc' THEN \"mrr\" END DESC, CASE WHEN $5::text = 'region' AND $6::text = 'asc' THEN \"region\" END ASC, CASE WHEN $5::text = 'region' AND $6::text = 'desc' THEN \"region\" END DESC, id DESC\nLIMIT $4::int OFFSET ((($3::int - 1) * $4::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "account_name"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.export",
+    "title": "Customers · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"account_name\", \"contact_name\", \"email\", \"phone\", \"plan\", \"mrr\", \"status\", \"owner_id\", \"region\", \"joined_at\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:customers}}\nWHERE deleted_at IS NULL AND (coalesce(\"account_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"contact_name\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"email\"::text, '') ILIKE '%' || $1::text || '%' OR coalesce(\"phone\"::text, '') ILIKE '%' || $1::text || '%')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.detail",
+    "title": "Customers · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"account_name\", \"contact_name\", \"email\", \"phone\", \"plan\", \"mrr\", \"status\", \"owner_id\", \"region\", \"joined_at\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:customers}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.create",
+    "title": "Customers · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:customers}} (\"account_name\", \"contact_name\", \"email\", \"phone\", \"plan\", \"mrr\", \"status\", \"owner_id\", \"region\", \"joined_at\", created_at, updated_at)\nVALUES ($1::text, $2::text, $3::text, $4::text, $5::text, $6::numeric, $7::text, $8::int, $9::text, $10::timestamptz, now(), now())\nRETURNING \"id\", \"account_name\", \"contact_name\", \"email\", \"phone\", \"plan\", \"mrr\", \"status\", \"owner_id\", \"region\", \"joined_at\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "account_name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "contact_name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "email",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "phone",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "plan",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "mrr",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "region",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "joined_at",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.update",
+    "title": "Customers · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:customers}}\nSET \"account_name\" = $2::text, \"contact_name\" = $3::text, \"email\" = $4::text, \"phone\" = $5::text, \"plan\" = $6::text, \"mrr\" = $7::numeric, \"status\" = $8::text, \"owner_id\" = $9::int, \"region\" = $10::text, \"joined_at\" = $11::timestamptz, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"account_name\", \"contact_name\", \"email\", \"phone\", \"plan\", \"mrr\", \"status\", \"owner_id\", \"region\", \"joined_at\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "account_name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "contact_name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "email",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "phone",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "plan",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "mrr",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "owner_id",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "region",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "joined_at",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.delete",
+    "title": "Customers · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:customers}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.restore",
+    "title": "Customers · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:customers}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.lookup",
+    "title": "Customers · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"account_name\"::text AS label FROM {{table:customers}} WHERE deleted_at IS NULL ORDER BY \"account_name\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.status",
+    "title": "Customers · change status",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:customers}} SET \"status\" = $2::text, updated_at = now() WHERE id = $1::int RETURNING id, \"status\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false,
+          "default": "active"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.assign",
+    "title": "Customers · assign owner",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:customers}} SET \"owner_id\" = $2::int, updated_at = now() WHERE id = $1::int RETURNING id, \"owner_id\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "staffID",
+          "type": "number",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.stats",
+    "title": "Customers · KPI totals",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT count(*)::int AS total,  count(*) FILTER (WHERE \"status\" = 'active')::int AS status_active, count(*) FILTER (WHERE \"status\" = 'trial')::int AS status_trial, count(*) FILTER (WHERE \"status\" = 'churned')::int AS status_churned\nFROM {{table:customers}}\nWHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date)\n  AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day'))",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.trend",
+    "title": "Customers · daily trend",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT date_trunc('day', created_at)::date AS day, count(*)::int AS count\nFROM {{table:customers}}\nWHERE deleted_at IS NULL AND created_at >= coalesce(NULLIF($1::text, '')::date, now() - interval '90 days')\n  AND created_at < (coalesce(NULLIF($2::text, '')::date, now()::date) + interval '1 day')\nGROUP BY 1 ORDER BY 1",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.by_status",
+    "title": "Customers · by status",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"status\" AS status, count(*)::int AS count FROM {{table:customers}} WHERE deleted_at IS NULL AND (NULLIF($1::text, '')::date IS NULL OR created_at >= NULLIF($1::text, '')::date) AND (NULLIF($2::text, '')::date IS NULL OR created_at < (NULLIF($2::text, '')::date + interval '1 day')) GROUP BY 1 ORDER BY 2 DESC",
+      "inputDefinitions": [
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.customers.overdue",
+    "title": "Customers · overdue",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "report",
+      "customers"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"account_name\", \"contact_name\", \"email\", \"phone\", \"plan\", \"mrr\", \"status\", \"owner_id\", \"region\", \"joined_at\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:customers}}\nWHERE deleted_at IS NULL AND \"joined_at\" IS NOT NULL\n  AND \"joined_at\" < now() - ($1::int || ' days')::interval\n  AND \"status\" NOT IN ('')\nORDER BY \"joined_at\" ASC LIMIT 100",
+      "inputDefinitions": [
+        {
+          "key": "days",
+          "type": "number",
+          "required": false,
+          "default": 7
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

@@ -1,0 +1,524 @@
+[
+  {
+    "slug": "support-dashboard.heading",
+    "key": "heading",
+    "page": "support-dashboard",
+    "title": "Dashboard",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Customer Support Console\nOperational overview for the current team. Use the date range to scope the metrics; tasks and notifications are filtered by the selected staff member.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-dashboard.range",
+    "key": "range",
+    "page": "support-dashboard",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "Reporting window",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-dashboard.staff",
+    "key": "staff",
+    "page": "support-dashboard",
+    "title": "Tasks for",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Tasks for",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Noor Wright",
+          "value": 1
+        },
+        {
+          "label": "Mira Okafor",
+          "value": 2
+        },
+        {
+          "label": "Ishaan Hassan",
+          "value": 3
+        },
+        {
+          "label": "Ravi Ivanova",
+          "value": 4
+        },
+        {
+          "label": "Tomás Ivanova",
+          "value": 5
+        },
+        {
+          "label": "Malik Osei",
+          "value": 6
+        },
+        {
+          "label": "Ishaan Osei",
+          "value": 7
+        },
+        {
+          "label": "Hugo Costa",
+          "value": 8
+        },
+        {
+          "label": "Tomás Wright",
+          "value": 9
+        },
+        {
+          "label": "Sofia Meyer",
+          "value": 10
+        },
+        {
+          "label": "Malik Sato",
+          "value": 11
+        },
+        {
+          "label": "Eli Chen",
+          "value": 12
+        },
+        {
+          "label": "Clara Okafor",
+          "value": 13
+        },
+        {
+          "label": "Mira Sato",
+          "value": 14
+        },
+        {
+          "label": "Ravi Wright",
+          "value": 15
+        },
+        {
+          "label": "Ishaan Dubey",
+          "value": 16
+        },
+        {
+          "label": "Priya Larsen",
+          "value": 17
+        },
+        {
+          "label": "Mira Tanaka",
+          "value": 18
+        },
+        {
+          "label": "Jonas Tanaka",
+          "value": 19
+        },
+        {
+          "label": "Eli Novak",
+          "value": 20
+        },
+        {
+          "label": "Owen Bennett",
+          "value": 21
+        },
+        {
+          "label": "Noah Dubois",
+          "value": 22
+        },
+        {
+          "label": "Aarav Meyer",
+          "value": 23
+        },
+        {
+          "label": "Malik Fischer",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-dashboard.qualityBadge",
+    "key": "qualityBadge",
+    "page": "support-dashboard",
+    "title": "Data quality issues",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ String(((state.queries.quality || {}).data || []).reduce(function (n, r) { return n + Number(r.affected_rows || 0); }, 0)) + \" issues\" }}",
+      "variant": "warning"
+    }
+  },
+  {
+    "slug": "support-dashboard.kpiTotal",
+    "key": "kpiTotal",
+    "page": "support-dashboard",
+    "title": "Tickets",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Tickets",
+      "valueTemplate": "{{ ((((state.queries.tickets_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.tickets_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-dashboard.kpiValue",
+    "key": "kpiValue",
+    "page": "support-dashboard",
+    "title": "Total value",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Secondary records",
+      "prefix": "",
+      "valueTemplate": "{{ ((((state.queries.customers_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.customers_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-dashboard.kpiSecond",
+    "key": "kpiSecond",
+    "page": "support-dashboard",
+    "title": "Customers",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Customers",
+      "valueTemplate": "{{ ((((state.queries.customers_summary || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.customers_summary || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-dashboard.kpiTasks",
+    "key": "kpiTasks",
+    "page": "support-dashboard",
+    "title": "Tasks for me",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Tasks for me",
+      "valueTemplate": "{{ (((state.queries.my_tasks || {}).data || []).length) }}",
+      "isLoading": "{{ (state.queries.my_tasks || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-dashboard.trend",
+    "key": "trend",
+    "page": "support-dashboard",
+    "title": "Volume trend",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "Volume trend",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.tickets_trend || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "line",
+          "tooltip": true,
+          "point": true
+        },
+        "encoding": {
+          "x": {
+            "field": "day",
+            "type": "temporal",
+            "axis": {
+              "labelAngle": 0
+            }
+          },
+          "y": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "value": "#0ea5e9"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.tickets_trend || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-dashboard.statusChart",
+    "key": "statusChart",
+    "page": "support-dashboard",
+    "title": "By status",
+    "type": "vega-lite",
+    "config": {
+      "showHeader": true,
+      "label": "By status",
+      "vegaSpec": {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "width": "container",
+        "height": "container",
+        "autosize": {
+          "type": "fit",
+          "contains": "padding"
+        },
+        "data": {
+          "values": "{{ (state.queries.tickets_status_chart || {}).data || [] }}"
+        },
+        "mark": {
+          "type": "arc",
+          "innerRadius": 55,
+          "tooltip": true
+        },
+        "encoding": {
+          "theta": {
+            "field": "count",
+            "type": "quantitative"
+          },
+          "color": {
+            "field": "status",
+            "type": "nominal"
+          }
+        }
+      },
+      "options": {
+        "renderer": "svg",
+        "showActions": false
+      },
+      "isLoading": "{{ (state.queries.tickets_status_chart || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-dashboard.tasks",
+    "key": "tasks",
+    "page": "support-dashboard",
+    "title": "Tasks for me",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.my_tasks || {}).data || [])",
+      "columns": [
+        {
+          "key": "subject",
+          "label": "Subject",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "customer_id",
+          "label": "Customer",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "requester_name",
+          "label": "Requester",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "priority",
+          "label": "Priority",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "channel",
+          "label": "Channel",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "assignee_id",
+          "label": "Assignee",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "sla_due_at",
+          "label": "SLA due",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "first_response_at",
+          "label": "First response",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "resolved_at",
+          "label": "Resolved",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "satisfaction_score",
+          "label": "CSAT score",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No open tasks for this staff member.",
+      "isLoading": "{{ (state.queries.my_tasks || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-dashboard.notifications",
+    "key": "notifications",
+    "page": "support-dashboard",
+    "title": "Notifications",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.notifications || {}).data || [])",
+      "columns": [
+        {
+          "key": "title",
+          "label": "Notification",
+          "type": "text"
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "badge"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No notifications.",
+      "isLoading": "{{ (state.queries.notifications || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-dashboard.activity",
+    "key": "activity",
+    "page": "support-dashboard",
+    "title": "Recent activity",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Recent activity",
+      "dataTemplate": "{{ (state.queries.recent_activity || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No activity yet.",
+      "isLoading": "{{ (state.queries.recent_activity || {}).isLoading || false }}"
+    }
+  }
+]

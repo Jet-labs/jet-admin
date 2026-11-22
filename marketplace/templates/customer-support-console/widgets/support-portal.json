@@ -1,0 +1,283 @@
+[
+  {
+    "slug": "support-portal.heading",
+    "key": "heading",
+    "page": "support-portal",
+    "title": "Client portal",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Client portal\nA restricted view of tickets owned by the selected client contact. External roles only receive this page, their profile and notifications.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-portal.client",
+    "key": "client",
+    "page": "support-portal",
+    "title": "Client contact",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "Client contact",
+      "defaultValue": 1,
+      "options": [
+        {
+          "label": "Noor Wright",
+          "value": 1
+        },
+        {
+          "label": "Mira Okafor",
+          "value": 2
+        },
+        {
+          "label": "Ishaan Hassan",
+          "value": 3
+        },
+        {
+          "label": "Ravi Ivanova",
+          "value": 4
+        },
+        {
+          "label": "Tomás Ivanova",
+          "value": 5
+        },
+        {
+          "label": "Malik Osei",
+          "value": 6
+        },
+        {
+          "label": "Ishaan Osei",
+          "value": 7
+        },
+        {
+          "label": "Hugo Costa",
+          "value": 8
+        },
+        {
+          "label": "Tomás Wright",
+          "value": 9
+        },
+        {
+          "label": "Sofia Meyer",
+          "value": 10
+        },
+        {
+          "label": "Malik Sato",
+          "value": 11
+        },
+        {
+          "label": "Eli Chen",
+          "value": 12
+        },
+        {
+          "label": "Clara Okafor",
+          "value": 13
+        },
+        {
+          "label": "Mira Sato",
+          "value": 14
+        },
+        {
+          "label": "Ravi Wright",
+          "value": 15
+        },
+        {
+          "label": "Ishaan Dubey",
+          "value": 16
+        },
+        {
+          "label": "Priya Larsen",
+          "value": 17
+        },
+        {
+          "label": "Mira Tanaka",
+          "value": 18
+        },
+        {
+          "label": "Jonas Tanaka",
+          "value": 19
+        },
+        {
+          "label": "Eli Novak",
+          "value": 20
+        },
+        {
+          "label": "Owen Bennett",
+          "value": 21
+        },
+        {
+          "label": "Noah Dubois",
+          "value": 22
+        },
+        {
+          "label": "Aarav Meyer",
+          "value": 23
+        },
+        {
+          "label": "Malik Fischer",
+          "value": 24
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.staffID",
+              "value": "{{ Number(event.value || 1) }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-portal.table",
+    "key": "table",
+    "page": "support-portal",
+    "title": "My records",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.portal || {}).data || [])",
+      "columns": [
+        {
+          "key": "subject",
+          "label": "Subject",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "customer_id",
+          "label": "Customer",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "requester_name",
+          "label": "Requester",
+          "sortable": true,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "priority",
+          "label": "Priority",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "channel",
+          "label": "Channel",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "sortable": true,
+          "type": "badge",
+          "editable": false
+        },
+        {
+          "key": "assignee_id",
+          "label": "Assignee",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "sla_due_at",
+          "label": "SLA due",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "first_response_at",
+          "label": "First response",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "resolved_at",
+          "label": "Resolved",
+          "sortable": true,
+          "type": "date",
+          "editable": false
+        },
+        {
+          "key": "satisfaction_score",
+          "label": "CSAT score",
+          "sortable": true,
+          "type": "number",
+          "editable": false
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 10
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No records are assigned to this contact.",
+      "isLoading": "{{ (state.queries.portal || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-portal.detail",
+    "key": "detail",
+    "page": "support-portal",
+    "title": "Record summary",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record summary",
+      "dataTemplate": "{{ (((state.queries.detail || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "isLoading": "{{ (state.queries.detail || {}).isLoading || false }}"
+    }
+  }
+]

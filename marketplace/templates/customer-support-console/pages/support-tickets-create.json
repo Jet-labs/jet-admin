@@ -1,0 +1,120 @@
+{
+  "slug": "support-tickets-create",
+  "key": "tickets-create",
+  "title": "Create Ticket",
+  "description": "Validated create form for Tickets with audit-logged writes.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "createdID",
+      "type": "number",
+      "defaultValue": 0
+    }
+  ],
+  "sources": [
+    {
+      "alias": "tickets_create",
+      "type": "query",
+      "queryID": "70988ba7-1939-4e9a-8be8-4264134ac64d",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "1be8b177-98cc-4b38-b65c-c43bb09ba7f7",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "e40a8bef-36c7-480a-9f67-19af3e880b4f",
+              "type": "widget",
+              "widgetKey": "widget_e865e367-6312-4677-8ec0-7ac24ea30a42_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "23167a45-f655-4cd1-8492-53cd92cc372b",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "8fba45fb-2b0c-45bc-8cd9-632cafcf40f7",
+              "type": "widget",
+              "widgetKey": "widget_64aa4400-7901-46ab-8c56-3e0330898e6f_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "ad2e7112-9900-41b7-b0f9-b5b1b2835dd5",
+              "type": "widget",
+              "widgetKey": "widget_a955437a-6c90-420e-b89a-688622bbae77_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "e40a8bef-36c7-480a-9f67-19af3e880b4f",
+        "type": "widget",
+        "widgetKey": "widget_e865e367-6312-4677-8ec0-7ac24ea30a42_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "8fba45fb-2b0c-45bc-8cd9-632cafcf40f7",
+        "type": "widget",
+        "widgetKey": "widget_64aa4400-7901-46ab-8c56-3e0330898e6f_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "ad2e7112-9900-41b7-b0f9-b5b1b2835dd5",
+        "type": "widget",
+        "widgetKey": "widget_a955437a-6c90-420e-b89a-688622bbae77_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "createdID",
+        "type": "number",
+        "defaultValue": 0
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "tickets_create",
+        "type": "query",
+        "queryID": "70988ba7-1939-4e9a-8be8-4264134ac64d",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

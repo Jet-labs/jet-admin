@@ -1,0 +1,271 @@
+[
+  {
+    "slug": "support-customers-create.heading",
+    "key": "heading",
+    "page": "support-customers-create",
+    "title": "Create Customer",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Create Customer\nComplete the fields below. Required fields are validated before the parameterized insert query runs; the database trigger records the audit entry.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-customers-create.form",
+    "key": "form",
+    "page": "support-customers-create",
+    "title": "New Customer",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "New Customer",
+      "submitLabel": "Create Customer",
+      "resetLabel": "Reset",
+      "layout": "grid",
+      "columns": 2,
+      "fields": [
+        {
+          "key": "account_name",
+          "label": "Account",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Cedar Digital"
+        },
+        {
+          "key": "contact_name",
+          "label": "Contact",
+          "type": "text",
+          "required": true,
+          "defaultValue": "Noah Meyer"
+        },
+        {
+          "key": "email",
+          "label": "Email",
+          "type": "email",
+          "required": true,
+          "defaultValue": "luca.novak.1@example.com"
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text",
+          "required": false,
+          "defaultValue": "+1-555-961-4933"
+        },
+        {
+          "key": "plan",
+          "label": "Plan",
+          "type": "select",
+          "required": true,
+          "defaultValue": "growth",
+          "options": [
+            {
+              "label": "Starter",
+              "value": "starter"
+            },
+            {
+              "label": "Growth",
+              "value": "growth"
+            },
+            {
+              "label": "Scale",
+              "value": "scale"
+            },
+            {
+              "label": "Enterprise",
+              "value": "enterprise"
+            }
+          ]
+        },
+        {
+          "key": "mrr",
+          "label": "MRR",
+          "type": "number",
+          "required": false,
+          "defaultValue": 4079.54,
+          "validation": {
+            "min": 0
+          }
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "defaultValue": "trial",
+          "options": [
+            {
+              "label": "Active",
+              "value": "active"
+            },
+            {
+              "label": "Trial",
+              "value": "trial"
+            },
+            {
+              "label": "Churned",
+              "value": "churned"
+            }
+          ]
+        },
+        {
+          "key": "owner_id",
+          "label": "Account owner",
+          "type": "select",
+          "required": false,
+          "defaultValue": 2,
+          "options": [
+            {
+              "label": "Noor Wright",
+              "value": 1
+            },
+            {
+              "label": "Mira Okafor",
+              "value": 2
+            },
+            {
+              "label": "Ishaan Hassan",
+              "value": 3
+            },
+            {
+              "label": "Ravi Ivanova",
+              "value": 4
+            },
+            {
+              "label": "Tomás Ivanova",
+              "value": 5
+            },
+            {
+              "label": "Malik Osei",
+              "value": 6
+            },
+            {
+              "label": "Ishaan Osei",
+              "value": 7
+            },
+            {
+              "label": "Hugo Costa",
+              "value": 8
+            },
+            {
+              "label": "Tomás Wright",
+              "value": 9
+            },
+            {
+              "label": "Sofia Meyer",
+              "value": 10
+            },
+            {
+              "label": "Malik Sato",
+              "value": 11
+            },
+            {
+              "label": "Eli Chen",
+              "value": 12
+            },
+            {
+              "label": "Clara Okafor",
+              "value": 13
+            },
+            {
+              "label": "Mira Sato",
+              "value": 14
+            },
+            {
+              "label": "Ravi Wright",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Dubey",
+              "value": 16
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 17
+            },
+            {
+              "label": "Mira Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Jonas Tanaka",
+              "value": 19
+            },
+            {
+              "label": "Eli Novak",
+              "value": 20
+            },
+            {
+              "label": "Owen Bennett",
+              "value": 21
+            },
+            {
+              "label": "Noah Dubois",
+              "value": 22
+            },
+            {
+              "label": "Aarav Meyer",
+              "value": 23
+            },
+            {
+              "label": "Malik Fischer",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "key": "region",
+          "label": "Region",
+          "type": "text",
+          "required": false,
+          "defaultValue": "Singapore"
+        },
+        {
+          "key": "joined_at",
+          "label": "Customer since",
+          "type": "text",
+          "required": false,
+          "defaultValue": ""
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "customers_create",
+              "inputValues": {
+                "account_name": "{{ event.formData.account_name }}",
+                "contact_name": "{{ event.formData.contact_name }}",
+                "email": "{{ event.formData.email }}",
+                "phone": "{{ event.formData.phone }}",
+                "plan": "{{ event.formData.plan }}",
+                "mrr": "{{ event.formData.mrr }}",
+                "status": "{{ event.formData.status }}",
+                "owner_id": "{{ event.formData.owner_id }}",
+                "region": "{{ event.formData.region }}",
+                "joined_at": "{{ event.formData.joined_at }}"
+              },
+              "successToast": "Record created",
+              "errorToast": "Create failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-customers-create.result",
+    "key": "result",
+    "page": "support-customers-create",
+    "title": "Created record",
+    "type": "json-viewer",
+    "config": {
+      "showHeader": true,
+      "label": "Created record",
+      "dataTemplate": "{{ (state.queries.customers_create || {}).data || null }}",
+      "isLoading": "{{ (state.queries.customers_create || {}).isLoading || false }}"
+    }
+  }
+]

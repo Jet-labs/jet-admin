@@ -1,0 +1,559 @@
+{
+  "slug": "support-payments-detail",
+  "key": "payments-detail",
+  "title": "Payments · detail",
+  "description": "Full record detail with tabs, comments, attachments and audit timeline.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "recordID",
+      "type": "number",
+      "defaultValue": 1
+    },
+    {
+      "key": "tab",
+      "type": "string",
+      "defaultValue": "overview"
+    }
+  ],
+  "sources": [
+    {
+      "alias": "payments_detail",
+      "type": "query",
+      "queryID": "47779f3f-7a11-4293-a1a1-0d961254272b",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.recordID }}"
+      },
+      "refreshOn": [
+        "variables.recordID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "payments_comments",
+      "type": "query",
+      "queryID": "07abd242-9294-42a3-9cd6-f8e70729e690",
+      "triggerMode": "auto",
+      "inputValues": {
+        "entity": "payments",
+        "entityID": "{{ state.variables.recordID }}"
+      },
+      "refreshOn": [
+        "variables.recordID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "payments_attachments",
+      "type": "query",
+      "queryID": "702fdb4d-c0b6-4dbc-8ab0-f986e39bb4ac",
+      "triggerMode": "auto",
+      "inputValues": {
+        "entity": "payments",
+        "entityID": "{{ state.variables.recordID }}"
+      },
+      "refreshOn": [
+        "variables.recordID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "payments_audit",
+      "type": "query",
+      "queryID": "f0155ef4-2cc3-48a7-ad74-09786673f84b",
+      "triggerMode": "auto",
+      "inputValues": {
+        "entity": "payments",
+        "entityID": "{{ state.variables.recordID }}",
+        "actor": "",
+        "dateFrom": "",
+        "dateTo": ""
+      },
+      "refreshOn": [
+        "variables.recordID"
+      ],
+      "refetchInterval": null
+    },
+    {
+      "alias": "payments_status",
+      "type": "query",
+      "queryID": "fcac9d75-aafd-497d-a8ac-376a2bdb4f48",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "payments_update",
+      "type": "query",
+      "queryID": "d8e571e3-2222-47c4-8e94-347cebc7b5c1",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "payments_delete",
+      "type": "query",
+      "queryID": "a6c556f7-e4ab-42c7-933f-8a9a46f5b3cf",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "payments_restore",
+      "type": "query",
+      "queryID": "a04c8ebd-0ecd-4f35-bf3f-f75cb4424486",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "payments_comment_create",
+      "type": "query",
+      "queryID": "47b280df-2bc9-48f3-8350-60f15f4b2fe8",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "payments_attachment_create",
+      "type": "query",
+      "queryID": "1d1451c7-3f27-4840-9c44-27dfdca5a404",
+      "triggerMode": "manual",
+      "inputValues": {},
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "f8ff328a-5339-4696-8114-67c3cdc41fe0",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "030ccace-f8ac-4407-a513-7247bce8ace4",
+              "type": "widget",
+              "widgetKey": "widget_4a9eaf0e-886d-4265-b521-993e1d1ffc04_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "c57e725e-0011-4847-9664-0b0a2ad01cc7",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "115a5c5d-25a4-4243-b6a5-13a924e0d2bc",
+              "type": "widget",
+              "widgetKey": "widget_52076cf0-07a9-4454-8783-3ff3b289a3e1_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 44
+            },
+            {
+              "id": "a6ccb2b1-ba67-4c77-9149-d36421018036",
+              "type": "widget",
+              "widgetKey": "widget_25e9395e-56ba-475e-9a78-36b68f227df5_1",
+              "span": 3,
+              "sizing": "fill",
+              "minHeight": 44
+            },
+            {
+              "id": "188dfdc6-bc0e-4b05-a0df-c027cc586983",
+              "type": "widget",
+              "widgetKey": "widget_5c75f795-8714-404d-9545-0f4302596049_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 44
+            },
+            {
+              "id": "26026e46-5549-4d8b-940d-72dbccc5e197",
+              "type": "widget",
+              "widgetKey": "widget_a5ef79db-beba-4ebf-90a0-17ac89be3e30_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 44
+            },
+            {
+              "id": "64cb9a63-b355-42c9-bf1b-e18edcfa177f",
+              "type": "widget",
+              "widgetKey": "widget_9d9debac-07c2-4cca-a5e7-331a53dfccf8_1",
+              "span": 2,
+              "sizing": "fill",
+              "minHeight": 44
+            }
+          ]
+        },
+        {
+          "id": "9b3b25fb-9d80-4e3c-8ddc-a482339a1e6b",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "781ba293-89c7-4db0-8115-f2ddbf993a9e",
+              "type": "widget",
+              "widgetKey": "widget_2252b84d-a632-43ba-9f96-6ae40ffb95f3_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 52
+            }
+          ]
+        },
+        {
+          "id": "ec3cb5fc-9fa5-416b-b93e-901351a7a0f5",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "d1f0d567-8f3b-4c46-bde9-baeb4bb32d10",
+              "type": "widget",
+              "widgetKey": "widget_78c6783f-5531-4c61-a334-8e44d779fc1e_1",
+              "span": 8,
+              "sizing": "fill",
+              "condition": "{{ state.variables.tab === 'overview' }}"
+            },
+            {
+              "id": "9b5aa25a-16fd-4a9e-951a-3a9e71a8ee11",
+              "type": "widget",
+              "widgetKey": "widget_8e54ba85-ef78-46bc-8db3-8b535d5bc678_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 300,
+              "condition": "{{ state.variables.tab === 'overview' }}"
+            }
+          ]
+        },
+        {
+          "id": "994f3147-d98d-436f-aafb-bc526c3c4876",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "10bcc82b-f7d6-4d4e-95aa-c9176b60601e",
+              "type": "widget",
+              "widgetKey": "widget_f148917f-df7f-407b-b1b5-ceec524330a3_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 280,
+              "condition": "{{ state.variables.tab === 'comments' }}"
+            },
+            {
+              "id": "a748e8e2-be85-45ba-a26f-ae8af7444beb",
+              "type": "widget",
+              "widgetKey": "widget_05231239-30af-46d0-8f89-749ce54d0a34_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 280,
+              "condition": "{{ state.variables.tab === 'comments' }}"
+            }
+          ]
+        },
+        {
+          "id": "2de9769b-75cb-4124-82ab-af63663ad956",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "62f158b3-0093-48d0-8679-11157f3a41dd",
+              "type": "widget",
+              "widgetKey": "widget_d50dfb6f-0ee1-4236-8c57-6fb9b6c3ab4b_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 280,
+              "condition": "{{ state.variables.tab === 'attachments' }}"
+            },
+            {
+              "id": "2a57f944-aeed-4330-a048-eb5b5f0302c8",
+              "type": "widget",
+              "widgetKey": "widget_843c9acf-b6bc-4620-9775-1225b243452e_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 280,
+              "condition": "{{ state.variables.tab === 'attachments' }}"
+            }
+          ]
+        },
+        {
+          "id": "8ba0553f-2e80-44f6-99b6-d2e65f2aee61",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "f550d732-f4e8-4768-8654-7e31b83d281a",
+              "type": "widget",
+              "widgetKey": "widget_0911028f-c973-4965-95ec-a3ad03177657_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 300,
+              "condition": "{{ state.variables.tab === 'activity' }}"
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "030ccace-f8ac-4407-a513-7247bce8ace4",
+        "type": "widget",
+        "widgetKey": "widget_4a9eaf0e-886d-4265-b521-993e1d1ffc04_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "115a5c5d-25a4-4243-b6a5-13a924e0d2bc",
+        "type": "widget",
+        "widgetKey": "widget_52076cf0-07a9-4454-8783-3ff3b289a3e1_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "a6ccb2b1-ba67-4c77-9149-d36421018036",
+        "type": "widget",
+        "widgetKey": "widget_25e9395e-56ba-475e-9a78-36b68f227df5_1",
+        "span": 3,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "188dfdc6-bc0e-4b05-a0df-c027cc586983",
+        "type": "widget",
+        "widgetKey": "widget_5c75f795-8714-404d-9545-0f4302596049_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "26026e46-5549-4d8b-940d-72dbccc5e197",
+        "type": "widget",
+        "widgetKey": "widget_a5ef79db-beba-4ebf-90a0-17ac89be3e30_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "64cb9a63-b355-42c9-bf1b-e18edcfa177f",
+        "type": "widget",
+        "widgetKey": "widget_9d9debac-07c2-4cca-a5e7-331a53dfccf8_1",
+        "span": 2,
+        "sizing": "fill",
+        "minHeight": 44
+      },
+      {
+        "id": "781ba293-89c7-4db0-8115-f2ddbf993a9e",
+        "type": "widget",
+        "widgetKey": "widget_2252b84d-a632-43ba-9f96-6ae40ffb95f3_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 52
+      },
+      {
+        "id": "d1f0d567-8f3b-4c46-bde9-baeb4bb32d10",
+        "type": "widget",
+        "widgetKey": "widget_78c6783f-5531-4c61-a334-8e44d779fc1e_1",
+        "span": 8,
+        "sizing": "fill",
+        "condition": "{{ state.variables.tab === 'overview' }}"
+      },
+      {
+        "id": "9b5aa25a-16fd-4a9e-951a-3a9e71a8ee11",
+        "type": "widget",
+        "widgetKey": "widget_8e54ba85-ef78-46bc-8db3-8b535d5bc678_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 300,
+        "condition": "{{ state.variables.tab === 'overview' }}"
+      },
+      {
+        "id": "10bcc82b-f7d6-4d4e-95aa-c9176b60601e",
+        "type": "widget",
+        "widgetKey": "widget_f148917f-df7f-407b-b1b5-ceec524330a3_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 280,
+        "condition": "{{ state.variables.tab === 'comments' }}"
+      },
+      {
+        "id": "a748e8e2-be85-45ba-a26f-ae8af7444beb",
+        "type": "widget",
+        "widgetKey": "widget_05231239-30af-46d0-8f89-749ce54d0a34_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 280,
+        "condition": "{{ state.variables.tab === 'comments' }}"
+      },
+      {
+        "id": "62f158b3-0093-48d0-8679-11157f3a41dd",
+        "type": "widget",
+        "widgetKey": "widget_d50dfb6f-0ee1-4236-8c57-6fb9b6c3ab4b_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 280,
+        "condition": "{{ state.variables.tab === 'attachments' }}"
+      },
+      {
+        "id": "2a57f944-aeed-4330-a048-eb5b5f0302c8",
+        "type": "widget",
+        "widgetKey": "widget_843c9acf-b6bc-4620-9775-1225b243452e_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 280,
+        "condition": "{{ state.variables.tab === 'attachments' }}"
+      },
+      {
+        "id": "f550d732-f4e8-4768-8654-7e31b83d281a",
+        "type": "widget",
+        "widgetKey": "widget_0911028f-c973-4965-95ec-a3ad03177657_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 300,
+        "condition": "{{ state.variables.tab === 'activity' }}"
+      }
+    ],
+    "variables": [
+      {
+        "key": "recordID",
+        "type": "number",
+        "defaultValue": 1
+      },
+      {
+        "key": "tab",
+        "type": "string",
+        "defaultValue": "overview"
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "payments_detail",
+        "type": "query",
+        "queryID": "47779f3f-7a11-4293-a1a1-0d961254272b",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.recordID }}"
+        },
+        "refreshOn": [
+          "variables.recordID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "payments_comments",
+        "type": "query",
+        "queryID": "07abd242-9294-42a3-9cd6-f8e70729e690",
+        "triggerMode": "auto",
+        "inputValues": {
+          "entity": "payments",
+          "entityID": "{{ state.variables.recordID }}"
+        },
+        "refreshOn": [
+          "variables.recordID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "payments_attachments",
+        "type": "query",
+        "queryID": "702fdb4d-c0b6-4dbc-8ab0-f986e39bb4ac",
+        "triggerMode": "auto",
+        "inputValues": {
+          "entity": "payments",
+          "entityID": "{{ state.variables.recordID }}"
+        },
+        "refreshOn": [
+          "variables.recordID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "payments_audit",
+        "type": "query",
+        "queryID": "f0155ef4-2cc3-48a7-ad74-09786673f84b",
+        "triggerMode": "auto",
+        "inputValues": {
+          "entity": "payments",
+          "entityID": "{{ state.variables.recordID }}",
+          "actor": "",
+          "dateFrom": "",
+          "dateTo": ""
+        },
+        "refreshOn": [
+          "variables.recordID"
+        ],
+        "refetchInterval": null
+      },
+      {
+        "alias": "payments_status",
+        "type": "query",
+        "queryID": "fcac9d75-aafd-497d-a8ac-376a2bdb4f48",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "payments_update",
+        "type": "query",
+        "queryID": "d8e571e3-2222-47c4-8e94-347cebc7b5c1",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "payments_delete",
+        "type": "query",
+        "queryID": "a6c556f7-e4ab-42c7-933f-8a9a46f5b3cf",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "payments_restore",
+        "type": "query",
+        "queryID": "a04c8ebd-0ecd-4f35-bf3f-f75cb4424486",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "payments_comment_create",
+        "type": "query",
+        "queryID": "47b280df-2bc9-48f3-8350-60f15f4b2fe8",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "payments_attachment_create",
+        "type": "query",
+        "queryID": "1d1451c7-3f27-4840-9c44-27dfdca5a404",
+        "triggerMode": "manual",
+        "inputValues": {},
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

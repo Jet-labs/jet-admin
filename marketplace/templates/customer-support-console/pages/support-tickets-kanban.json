@@ -1,0 +1,164 @@
+{
+  "slug": "support-tickets-kanban",
+  "key": "tickets-kanban",
+  "title": "Tickets · kanban",
+  "description": "Status board grouped by the primary workflow stage.",
+  "accessTags": [
+    "core",
+    "staff",
+    "manager",
+    "admin"
+  ],
+  "variables": [
+    {
+      "key": "selectedID",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ],
+  "sources": [
+    {
+      "alias": "tickets",
+      "type": "query",
+      "queryID": "91f3a3e6-450f-4fcf-87e9-e68310e028f5",
+      "triggerMode": "auto",
+      "inputValues": {
+        "search": "",
+        "page": 1,
+        "limit": 200,
+        "sortBy": "subject",
+        "sortDir": "asc",
+        "status": "",
+        "dateFrom": "",
+        "dateTo": ""
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "tickets_selected",
+      "type": "query",
+      "queryID": "72003091-8434-46cb-bb34-3f8a628d8383",
+      "triggerMode": "reactive",
+      "inputValues": {
+        "id": "{{ state.variables.selectedID }}"
+      },
+      "refreshOn": [
+        "variables.selectedID"
+      ],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "1e65158e-8baf-42e2-8246-bfa1db24fd57",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "485fe524-42cf-4101-a56f-47bcd548a9b0",
+              "type": "widget",
+              "widgetKey": "widget_7691b5a0-b6d7-472a-ade7-f6432d2ad5a4_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "6e861d50-706c-41a6-9261-f5c53c74ec96",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "9e27eb1f-08a9-4fc3-820f-2db0975aa3e6",
+              "type": "widget",
+              "widgetKey": "widget_0adebc9f-d690-40ad-9bd6-3fa55c233860_1",
+              "span": 8,
+              "sizing": "fill",
+              "minHeight": 520
+            },
+            {
+              "id": "840650be-e85e-4341-9477-d719d2302aad",
+              "type": "widget",
+              "widgetKey": "widget_e1f9f555-d171-45a1-a651-c26b361138d2_1",
+              "span": 4,
+              "sizing": "fill",
+              "minHeight": 520
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "485fe524-42cf-4101-a56f-47bcd548a9b0",
+        "type": "widget",
+        "widgetKey": "widget_7691b5a0-b6d7-472a-ade7-f6432d2ad5a4_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "9e27eb1f-08a9-4fc3-820f-2db0975aa3e6",
+        "type": "widget",
+        "widgetKey": "widget_0adebc9f-d690-40ad-9bd6-3fa55c233860_1",
+        "span": 8,
+        "sizing": "fill",
+        "minHeight": 520
+      },
+      {
+        "id": "840650be-e85e-4341-9477-d719d2302aad",
+        "type": "widget",
+        "widgetKey": "widget_e1f9f555-d171-45a1-a651-c26b361138d2_1",
+        "span": 4,
+        "sizing": "fill",
+        "minHeight": 520
+      }
+    ],
+    "variables": [
+      {
+        "key": "selectedID",
+        "type": "number",
+        "defaultValue": 1
+      }
+    ],
+    "dataSources": [
+      {
+        "alias": "tickets",
+        "type": "query",
+        "queryID": "91f3a3e6-450f-4fcf-87e9-e68310e028f5",
+        "triggerMode": "auto",
+        "inputValues": {
+          "search": "",
+          "page": 1,
+          "limit": 200,
+          "sortBy": "subject",
+          "sortDir": "asc",
+          "status": "",
+          "dateFrom": "",
+          "dateTo": ""
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "tickets_selected",
+        "type": "query",
+        "queryID": "72003091-8434-46cb-bb34-3f8a628d8383",
+        "triggerMode": "reactive",
+        "inputValues": {
+          "id": "{{ state.variables.selectedID }}"
+        },
+        "refreshOn": [
+          "variables.selectedID"
+        ],
+        "refetchInterval": null
+      }
+    ]
+  }
+}

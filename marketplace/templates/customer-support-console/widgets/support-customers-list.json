@@ -1,0 +1,629 @@
+[
+  {
+    "slug": "support-customers-list.heading",
+    "key": "heading",
+    "page": "support-customers-list",
+    "title": "Customers",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Customers\nBrowse, filter and update customers. All edits are audit-logged and soft-deleted records can be restored from the record detail page.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-customers-list.search",
+    "key": "search",
+    "page": "support-customers-list",
+    "title": "Search",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Search customers...",
+      "debounceMs": 350,
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-customers-list.status",
+    "key": "status",
+    "page": "support-customers-list",
+    "title": "Status filter",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "All statuses",
+      "defaultValue": "all",
+      "options": [
+        {
+          "label": "All statuses",
+          "value": "all"
+        },
+        {
+          "label": "Active",
+          "value": "active"
+        },
+        {
+          "label": "Trial",
+          "value": "trial"
+        },
+        {
+          "label": "Churned",
+          "value": "churned"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.value === 'all' ? '' : event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-customers-list.range",
+    "key": "range",
+    "page": "support-customers-list",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-customers-list.sort",
+    "key": "sort",
+    "page": "support-customers-list",
+    "title": "Sort",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Sort by",
+      "defaultValue": "account_name",
+      "options": [
+        {
+          "label": "Account Name",
+          "value": "account_name"
+        },
+        {
+          "label": "Contact Name",
+          "value": "contact_name"
+        },
+        {
+          "label": "Mrr",
+          "value": "mrr"
+        },
+        {
+          "label": "Region",
+          "value": "region"
+        },
+        {
+          "label": "Joined At",
+          "value": "joined_at"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.sortBy",
+              "value": "{{ event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-customers-list.total",
+    "key": "total",
+    "page": "support-customers-list",
+    "title": "Total records",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Total records",
+      "valueTemplate": "{{ ((((state.queries.customers_stats || {}).data || [])[0] || {}).total) }}",
+      "isLoading": "{{ (state.queries.customers_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-customers-list.avg",
+    "key": "avg",
+    "page": "support-customers-list",
+    "title": "Average",
+    "type": "stat",
+    "config": {
+      "showHeader": true,
+      "label": "Visible rows",
+      "valueTemplate": "{{ ((((state.queries.customers_stats || {}).data || [])[0] || {}).total) }}",
+      "prefix": "",
+      "isLoading": "{{ (state.queries.customers_stats || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-customers-list.selected",
+    "key": "selected",
+    "page": "support-customers-list",
+    "title": "Selected record",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record",
+      "dataTemplate": "{{ (((state.queries.customers_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row to inspect it.",
+      "isLoading": "{{ (state.queries.customers_selected || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-customers-list.table",
+    "key": "table",
+    "page": "support-customers-list",
+    "title": "Customers",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.customers || {}).data || [])",
+      "columns": [
+        {
+          "key": "account_name",
+          "label": "Account",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "contact_name",
+          "label": "Contact",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "email",
+          "label": "Email",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "plan",
+          "label": "Plan",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "mrr",
+          "label": "MRR",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "owner_id",
+          "label": "Account owner",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "region",
+          "label": "Region",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "joined_at",
+          "label": "Customer since",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageParam": "page",
+        "pageSize": 10,
+        "totalTemplate": "{{ ((state.queries.customers || {}).data && (state.queries.customers || {}).data[0] ? (state.queries.customers || {}).data[0].total_count : 0) }}"
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": true,
+        "placeholder": "Search customers..."
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv",
+        "serverSide": false,
+        "buttonLabel": "Export CSV"
+      },
+      "editing": {
+        "enabled": true
+      },
+      "bulkEdit": {
+        "enabled": false,
+        "saveLabel": "Save changes"
+      },
+      "multiSelect": {
+        "enabled": true,
+        "showSelectAll": true,
+        "actions": [
+          {
+            "label": "Archive selected",
+            "actionKey": "archive",
+            "variant": "destructive"
+          }
+        ]
+      },
+      "emptyText": "No customers found.",
+      "emptyHint": "Adjust the filters or create a new record.",
+      "isLoading": "{{ (state.queries.customers || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ],
+        "onPageChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": "{{ event.page }}"
+            }
+          }
+        ],
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "customers_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "account_name": "{{ event.updatedRow.account_name }}",
+                "contact_name": "{{ event.updatedRow.contact_name }}",
+                "email": "{{ event.updatedRow.email }}",
+                "phone": "{{ event.updatedRow.phone }}",
+                "plan": "{{ event.updatedRow.plan }}",
+                "mrr": "{{ event.updatedRow.mrr }}",
+                "status": "{{ event.updatedRow.status }}",
+                "owner_id": "{{ event.updatedRow.owner_id }}",
+                "region": "{{ event.updatedRow.region }}",
+                "joined_at": "{{ event.updatedRow.joined_at }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ],
+        "onBulkAction": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "customers_delete",
+              "inputValues": {
+                "ids": "{{ event.selectedRows.map(function (r) { return r.id; }) }}"
+              },
+              "successToast": "Records archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-customers-list.actions",
+    "key": "actions",
+    "page": "support-customers-list",
+    "title": "Selected record actions",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record actions",
+      "dataTemplate": "{{ (((state.queries.customers_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row, then use the buttons below."
+    }
+  },
+  {
+    "slug": "support-customers-list.archive",
+    "key": "archive",
+    "page": "support-customers-list",
+    "title": "Archive selected",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive selected",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "customers_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.selectedID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-customers-list.advance",
+    "key": "advance",
+    "page": "support-customers-list",
+    "title": "Advance status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Advance status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "customers_status",
+              "inputValues": {
+                "id": "{{ state.variables.selectedID }}",
+                "status": "{{ \"trial\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-customers-list.explain",
+    "key": "explain",
+    "page": "support-customers-list",
+    "title": "List notes",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "Rows are loaded server-side. Use the table toolbar to search, sort and export the current view. Inline edits and bulk actions run the template's parameterized update queries and write to the audit log.",
+      "format": "plain"
+    }
+  },
+  {
+    "slug": "support-customers-list.views",
+    "key": "views",
+    "page": "support-customers-list",
+    "title": "Saved views",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.customers_views || {}).data || [])",
+      "columns": [
+        {
+          "key": "label",
+          "label": "View",
+          "type": "text",
+          "sortable": false
+        },
+        {
+          "key": "config_key",
+          "label": "Key",
+          "type": "text",
+          "sortable": false
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false,
+        "placeholder": "Filter saved views"
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No saved views yet.",
+      "isLoading": "{{ (state.queries.customers_views || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.row.config_value.search || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.row.config_value.status || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-customers-list.saveView",
+    "key": "saveView",
+    "page": "support-customers-list",
+    "title": "Save current view",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Save current view",
+      "submitLabel": "Save view",
+      "fields": [
+        {
+          "key": "name",
+          "label": "View name",
+          "type": "text",
+          "required": true,
+          "placeholder": "e.g. My open customers"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "customers_view_create",
+              "inputValues": {
+                "configKey": "{{ \"saved_view.support-customers-list.\" + String(event.formData.name || \"view\").toLowerCase().replace(/[^a-z0-9]+/g, \"-\") }}",
+                "value": "{{ ({ search: state.variables.search, status: state.variables.status, page: 1 }) }}",
+                "label": "{{ event.formData.name }}"
+              },
+              "successToast": "View saved",
+              "errorToast": "Could not save view"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

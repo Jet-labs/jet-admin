@@ -1,0 +1,65 @@
+[
+  {
+    "slug": "support-tickets-kanban.heading",
+    "key": "heading",
+    "page": "support-tickets-kanban",
+    "title": "Tickets board",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Tickets board\nCards are grouped by **status**. Select a card to inspect the record; drag-and-drop is intentionally not enabled because status changes must run through the audited transition query.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-tickets-kanban.board",
+    "key": "board",
+    "page": "support-tickets-kanban",
+    "title": "Pipeline board",
+    "type": "kanban",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.tickets || {}).data || [])",
+      "groupBy": "status",
+      "titleKey": "subject",
+      "subtitleKey": "assignee_id",
+      "dateKey": "sla_due_at",
+      "badgeKey": "status",
+      "columns": [
+        "new",
+        "open",
+        "pending",
+        "resolved",
+        "closed"
+      ],
+      "emptyText": "No cards in this pipeline.",
+      "isLoading": "{{ (state.queries.tickets || {}).isLoading || false }}",
+      "events": {
+        "onCardSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.card.id }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-kanban.selected",
+    "key": "selected",
+    "page": "support-tickets-kanban",
+    "title": "Selected card",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected card",
+      "dataTemplate": "{{ (((state.queries.tickets_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a card.",
+      "isLoading": "{{ (state.queries.tickets_selected || {}).isLoading || false }}"
+    }
+  }
+]

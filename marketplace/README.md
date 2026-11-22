@@ -11,9 +11,11 @@ layer, role provisioning and an install ledger.
 | Template | Category | Tables | Seed rows | Queries | Pages | Workflows | Listeners | Cron | Roles |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `crm-sales-pipeline` | Sales & CRM | 18 | 2,390 | 80 | 31 | 11 | 8 | 6 | 5 |
+| `customer-support-console` | Customer Support | 18 | 2,640 | 78 | 31 | 11 | 8 | 6 | 5 |
 
-Only the CRM template is in scope for this delivery. The remaining 11 planned
-templates were explicitly deferred by the user.
+Customer Support Console is the second delivery. Inventory Replenishment
+Planner and Invoice Matching Desk are the next packages in progress; the
+remaining original template ideas stay deferred.
 
 ## What the CRM template includes
 
@@ -30,6 +32,23 @@ templates were explicitly deferred by the user.
 - 8 inactive webhook listeners, 6 disabled cron jobs and 5 Casbin roles.
 - Audit trigger on every domain and support table, soft delete/restore, CSV
   import with an error summary, comments, attachments and saved views.
+
+## What the Customer Support Console includes
+
+- Customers, subscriptions, payments, tickets, interactions, escalations,
+  canned replies and a knowledge base.
+- Ticket queue, detail workspace, kanban, calendar, customer lookup with plan
+  and MRR context, payment/subscription history and global search.
+- Dashboard, SLA and CSAT reports, profile, notifications, settings and a
+  client portal.
+- Admin panel: users, roles/permissions, audit diff viewer, settings and
+  feature flags, CSV import/export, integration health, job/workflow monitor,
+  webhook log and data quality.
+- 11 workflows covering intake triage, round-robin assignment, approval and
+  escalation, SLA sweeps, digests, integration sync, document generation,
+  data collection, error recovery and notification-only.
+- 8 inactive webhook listeners, 6 disabled cron jobs and 5 Casbin roles with
+  per-page, per-query and per-workflow asset permissions.
 
 ## Install
 
@@ -97,7 +116,7 @@ authoring folder; it only needs the DB rows.
 ```
 marketplace/
   schema/template.schema.json        JSON Schema for the package
-  specs/crm-sales-pipeline.js        source spec (deterministic generator input)
+  specs/<slug>.js                    source spec (deterministic generator input)
   scripts/
     lib/                             generator, compiler, model helpers
     generate-templates.js            npm run templates:generate
@@ -107,7 +126,7 @@ marketplace/
     test-pages.js                    page read-query smoke + orphan check
     test-workflows.js                Temporal workflow smoke
     test-roles.js                    Casbin allow/deny matrix
-  templates/crm-sales-pipeline/
+  templates/<slug>/
     manifest.json
     README.md
     schema/001-schema.sql
@@ -129,7 +148,8 @@ installer, gallery and asset endpoint read only those rows.
 
 ## How to author a new template
 
-1. Copy `marketplace/specs/crm-sales-pipeline.js` and change the metadata.
+1. Copy `marketplace/specs/crm-sales-pipeline.js` (or
+   `customer-support-console.js`) and change the metadata.
 2. Define 6–10 domain entities. Each field must use one of the supported types
    (`text`, `longtext`, `email`, `phone`, `url`, `code`, `int`, `money`,
    `decimal`, `bool`, `date`, `timestamptz`, `enum`, `ref`, `json`, `uuid`).
@@ -162,25 +182,35 @@ installer, gallery and asset endpoint read only those rows.
 
 ## Validation status
 
-- `npm run templates:validate` — passes.
-- `npm run templates:seed:db` — registers the CRM package + 16 assets in the database.
-- SQL DDL + 2,390 seed rows + 45 read queries — pass in a rolled-back transaction.
-- Fresh-tenant install — 342 bundle resources + 16 cron/role resources.
-- Page read-query smoke — 69 queries, 0 failures, 0 orphan tables/ledger rows.
-- Workflows — 6/6 tested pass (5 complete, approval suspends as intended).
-- Roles — 5/5 allow/deny matrix pass; demo users and roles removed on uninstall.
+- `npm run templates:validate` — passes for CRM and Customer Support.
+- `npm run templates:seed:db` — registers both packages and 16 assets each in
+  the database.
+- CRM: SQL DDL + 2,390 seed rows + 45 read queries — pass in a rolled-back
+  transaction; 342 bundle resources + 16 cron/role resources; 69 page queries,
+  0 failures.
+- Customer Support: SQL DDL + 2,640 seed rows + 45 read queries — pass in a
+  rolled-back transaction; 357 bundle/install resources; 18 tables, 31 pages,
+  78 queries, 5 roles and 6 cron jobs on a fresh tenant; 69 page queries,
+  0 failures; 0 orphan tables/ledger rows.
+- Workflows — CRM 6/6 tested pass (5 complete, approval suspends as intended).
+  Customer Support graphs validate; runtime execution is currently blocked
+  because Temporal is not running in the local Docker environment.
+- Roles — 5/5 allow/deny matrix pass for both templates; demo users and roles
+  removed on uninstall. Query and workflow execution is granted per asset.
 - Jest package tests — pass.
 - Frontend production build — passes.
 
 Known pre-existing repository test failures (not introduced by this work):
 `marketplaceSelection.test.js` and `curatedMarketplace.layout.test.js` are
 affected by the working tree's existing uncommitted curated-marketplace
-changes. They are unrelated to the CRM template.
+changes. They are unrelated to the template packages.
 
 ## Platform extensions
 
 - `tblMarketplaceTemplateInstalls` ledger + manual migration.
+- `tblMarketplaceTemplateAssets` BYTEA asset store + DB-backed package loader.
 - Opt-in PostgreSQL `$n` parameter binding (`dataQueryOptions.parameterized`).
 - Bundle v1 now remaps `appPageID` references in listener actions.
+- Per-asset query/workflow execution permissions for template roles.
 - Generic display-only `kanban` and `calendar` widgets.
 - Marketplace template API + authenticated gallery UI (templates tab).

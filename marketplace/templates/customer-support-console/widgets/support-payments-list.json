@@ -1,0 +1,590 @@
+[
+  {
+    "slug": "support-payments-list.heading",
+    "key": "heading",
+    "page": "support-payments-list",
+    "title": "Payments",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Payments\nBrowse, filter and update payments. All edits are audit-logged and soft-deleted records can be restored from the record detail page.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-payments-list.search",
+    "key": "search",
+    "page": "support-payments-list",
+    "title": "Search",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Search payments...",
+      "debounceMs": 350,
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-payments-list.status",
+    "key": "status",
+    "page": "support-payments-list",
+    "title": "Status filter",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "All statuses",
+      "defaultValue": "all",
+      "options": [
+        {
+          "label": "All statuses",
+          "value": "all"
+        },
+        {
+          "label": "Paid",
+          "value": "paid"
+        },
+        {
+          "label": "Pending",
+          "value": "pending"
+        },
+        {
+          "label": "Failed",
+          "value": "failed"
+        },
+        {
+          "label": "Refunded",
+          "value": "refunded"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.value === 'all' ? '' : event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-payments-list.range",
+    "key": "range",
+    "page": "support-payments-list",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-payments-list.sort",
+    "key": "sort",
+    "page": "support-payments-list",
+    "title": "Sort",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Sort by",
+      "defaultValue": "invoice_number",
+      "options": [
+        {
+          "label": "Invoice Number",
+          "value": "invoice_number"
+        },
+        {
+          "label": "Amount",
+          "value": "amount"
+        },
+        {
+          "label": "Paid At",
+          "value": "paid_at"
+        },
+        {
+          "label": "Due Date",
+          "value": "due_date"
+        },
+        {
+          "label": "Reference",
+          "value": "reference"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.sortBy",
+              "value": "{{ event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-payments-list.selected",
+    "key": "selected",
+    "page": "support-payments-list",
+    "title": "Selected record",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record",
+      "dataTemplate": "{{ (((state.queries.payments_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row to inspect it.",
+      "isLoading": "{{ (state.queries.payments_selected || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-payments-list.table",
+    "key": "table",
+    "page": "support-payments-list",
+    "title": "Payments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.payments || {}).data || [])",
+      "columns": [
+        {
+          "key": "customer_id",
+          "label": "Customer",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "invoice_number",
+          "label": "Invoice",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "method",
+          "label": "Method",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "paid_at",
+          "label": "Paid",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "due_date",
+          "label": "Due",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "reference",
+          "label": "Reference",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageParam": "page",
+        "pageSize": 10,
+        "totalTemplate": "{{ ((state.queries.payments || {}).data && (state.queries.payments || {}).data[0] ? (state.queries.payments || {}).data[0].total_count : 0) }}"
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": true,
+        "placeholder": "Search payments..."
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv",
+        "serverSide": false,
+        "buttonLabel": "Export CSV"
+      },
+      "editing": {
+        "enabled": true
+      },
+      "bulkEdit": {
+        "enabled": false,
+        "saveLabel": "Save changes"
+      },
+      "multiSelect": {
+        "enabled": true,
+        "showSelectAll": true,
+        "actions": [
+          {
+            "label": "Archive selected",
+            "actionKey": "archive",
+            "variant": "destructive"
+          }
+        ]
+      },
+      "emptyText": "No payments found.",
+      "emptyHint": "Adjust the filters or create a new record.",
+      "isLoading": "{{ (state.queries.payments || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ],
+        "onPageChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": "{{ event.page }}"
+            }
+          }
+        ],
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "payments_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "customer_id": "{{ event.updatedRow.customer_id }}",
+                "invoice_number": "{{ event.updatedRow.invoice_number }}",
+                "amount": "{{ event.updatedRow.amount }}",
+                "status": "{{ event.updatedRow.status }}",
+                "method": "{{ event.updatedRow.method }}",
+                "paid_at": "{{ event.updatedRow.paid_at }}",
+                "due_date": "{{ event.updatedRow.due_date }}",
+                "reference": "{{ event.updatedRow.reference }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ],
+        "onBulkAction": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "payments_delete",
+              "inputValues": {
+                "ids": "{{ event.selectedRows.map(function (r) { return r.id; }) }}"
+              },
+              "successToast": "Records archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-payments-list.actions",
+    "key": "actions",
+    "page": "support-payments-list",
+    "title": "Selected record actions",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record actions",
+      "dataTemplate": "{{ (((state.queries.payments_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row, then use the buttons below."
+    }
+  },
+  {
+    "slug": "support-payments-list.archive",
+    "key": "archive",
+    "page": "support-payments-list",
+    "title": "Archive selected",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive selected",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "payments_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.selectedID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-payments-list.advance",
+    "key": "advance",
+    "page": "support-payments-list",
+    "title": "Advance status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Advance status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "payments_status",
+              "inputValues": {
+                "id": "{{ state.variables.selectedID }}",
+                "status": "{{ \"pending\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-payments-list.explain",
+    "key": "explain",
+    "page": "support-payments-list",
+    "title": "List notes",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "Rows are loaded server-side. Use the table toolbar to search, sort and export the current view. Inline edits and bulk actions run the template's parameterized update queries and write to the audit log.",
+      "format": "plain"
+    }
+  },
+  {
+    "slug": "support-payments-list.views",
+    "key": "views",
+    "page": "support-payments-list",
+    "title": "Saved views",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.payments_views || {}).data || [])",
+      "columns": [
+        {
+          "key": "label",
+          "label": "View",
+          "type": "text",
+          "sortable": false
+        },
+        {
+          "key": "config_key",
+          "label": "Key",
+          "type": "text",
+          "sortable": false
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false,
+        "placeholder": "Filter saved views"
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No saved views yet.",
+      "isLoading": "{{ (state.queries.payments_views || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.row.config_value.search || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.row.config_value.status || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-payments-list.saveView",
+    "key": "saveView",
+    "page": "support-payments-list",
+    "title": "Save current view",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Save current view",
+      "submitLabel": "Save view",
+      "fields": [
+        {
+          "key": "name",
+          "label": "View name",
+          "type": "text",
+          "required": true,
+          "placeholder": "e.g. My open payments"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "payments_view_create",
+              "inputValues": {
+                "configKey": "{{ \"saved_view.support-payments-list.\" + String(event.formData.name || \"view\").toLowerCase().replace(/[^a-z0-9]+/g, \"-\") }}",
+                "value": "{{ ({ search: state.variables.search, status: state.variables.status, page: 1 }) }}",
+                "label": "{{ event.formData.name }}"
+              },
+              "successToast": "View saved",
+              "errorToast": "Could not save view"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

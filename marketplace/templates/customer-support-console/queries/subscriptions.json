@@ -1,0 +1,343 @@
+[
+  {
+    "slug": "support.subscriptions.list",
+    "title": "Subscriptions · list",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "subscriptions"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"customer_id\", \"plan\", \"status\", \"amount\", \"billing_cycle\", \"seats\", \"started_at\", \"renews_at\", \"created_at\", \"updated_at\", \"deleted_at\", count(*) OVER() AS total_count\nFROM {{table:subscriptions}}\nWHERE deleted_at IS NULL AND ($1::text = '')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($7::text, '')::date IS NULL OR created_at >= NULLIF($7::text, '')::date)\n  AND (NULLIF($8::text, '')::date IS NULL OR created_at < (NULLIF($8::text, '')::date + interval '1 day'))\nORDER BY CASE WHEN $5::text = 'amount' AND $6::text = 'asc' THEN \"amount\" END ASC, CASE WHEN $5::text = 'amount' AND $6::text = 'desc' THEN \"amount\" END DESC, CASE WHEN $5::text = 'seats' AND $6::text = 'asc' THEN \"seats\" END ASC, CASE WHEN $5::text = 'seats' AND $6::text = 'desc' THEN \"seats\" END DESC, CASE WHEN $5::text = 'started_at' AND $6::text = 'asc' THEN \"started_at\" END ASC, CASE WHEN $5::text = 'started_at' AND $6::text = 'desc' THEN \"started_at\" END DESC, CASE WHEN $5::text = 'renews_at' AND $6::text = 'asc' THEN \"renews_at\" END ASC, CASE WHEN $5::text = 'renews_at' AND $6::text = 'desc' THEN \"renews_at\" END DESC, id DESC\nLIMIT $4::int OFFSET ((($3::int - 1) * $4::int))",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "page",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "limit",
+          "type": "number",
+          "required": false,
+          "default": 10
+        },
+        {
+          "key": "sortBy",
+          "type": "string",
+          "required": false,
+          "default": "id"
+        },
+        {
+          "key": "sortDir",
+          "type": "string",
+          "required": false,
+          "default": "asc"
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.subscriptions.export",
+    "title": "Subscriptions · export",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "export",
+      "subscriptions"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"customer_id\", \"plan\", \"status\", \"amount\", \"billing_cycle\", \"seats\", \"started_at\", \"renews_at\", \"created_at\", \"updated_at\", \"deleted_at\"\nFROM {{table:subscriptions}}\nWHERE deleted_at IS NULL AND ($1::text = '')\n  AND ($2::text = '' OR \"status\" = $2::text)\n  AND (NULLIF($3::text, '')::date IS NULL OR created_at >= NULLIF($3::text, '')::date)\n  AND (NULLIF($4::text, '')::date IS NULL OR created_at < (NULLIF($4::text, '')::date + interval '1 day'))\nORDER BY id DESC\nLIMIT 5000",
+      "inputDefinitions": [
+        {
+          "key": "search",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateFrom",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "dateTo",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.subscriptions.detail",
+    "title": "Subscriptions · detail",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "core",
+      "subscriptions"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT \"id\", \"customer_id\", \"plan\", \"status\", \"amount\", \"billing_cycle\", \"seats\", \"started_at\", \"renews_at\", \"created_at\", \"updated_at\", \"deleted_at\" FROM {{table:subscriptions}} WHERE id = $1::int AND deleted_at IS NULL",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.subscriptions.create",
+    "title": "Subscriptions · create",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "subscriptions"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "INSERT INTO {{table:subscriptions}} (\"customer_id\", \"plan\", \"status\", \"amount\", \"billing_cycle\", \"seats\", \"started_at\", \"renews_at\", created_at, updated_at)\nVALUES ($1::int, $2::text, $3::text, $4::numeric, $5::text, $6::int, $7::timestamptz, $8::date, now(), now())\nRETURNING \"id\", \"customer_id\", \"plan\", \"status\", \"amount\", \"billing_cycle\", \"seats\", \"started_at\", \"renews_at\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "customer_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "plan",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "billing_cycle",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "seats",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "started_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "renews_at",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.subscriptions.update",
+    "title": "Subscriptions · update",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "subscriptions"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:subscriptions}}\nSET \"customer_id\" = $2::int, \"plan\" = $3::text, \"status\" = $4::text, \"amount\" = $5::numeric, \"billing_cycle\" = $6::text, \"seats\" = $7::int, \"started_at\" = $8::timestamptz, \"renews_at\" = $9::date, updated_at = now()\nWHERE id = $1::int AND deleted_at IS NULL\nRETURNING \"id\", \"customer_id\", \"plan\", \"status\", \"amount\", \"billing_cycle\", \"seats\", \"started_at\", \"renews_at\", \"created_at\", \"updated_at\", \"deleted_at\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": true,
+          "default": 1
+        },
+        {
+          "key": "customer_id",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "plan",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "key": "billing_cycle",
+          "type": "string",
+          "required": true
+        },
+        {
+          "key": "seats",
+          "type": "number",
+          "required": false
+        },
+        {
+          "key": "started_at",
+          "type": "string",
+          "required": false
+        },
+        {
+          "key": "renews_at",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.subscriptions.delete",
+    "title": "Subscriptions · soft delete",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "subscriptions"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:subscriptions}} SET deleted_at = now(), updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.subscriptions.restore",
+    "title": "Subscriptions · restore",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "subscriptions"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:subscriptions}} SET deleted_at = NULL, updated_at = now() WHERE id = ANY($1::int[]) AND deleted_at IS NOT NULL RETURNING id",
+      "inputDefinitions": [
+        {
+          "key": "ids",
+          "type": "array",
+          "required": false,
+          "default": []
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.subscriptions.lookup",
+    "title": "Subscriptions · lookup",
+    "datasource": "primary",
+    "tags": [
+      "read",
+      "lookup",
+      "subscriptions"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "SELECT id, \"id\"::text AS label FROM {{table:subscriptions}} WHERE deleted_at IS NULL ORDER BY \"id\" LIMIT 500",
+      "inputDefinitions": [],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  },
+  {
+    "slug": "support.subscriptions.status",
+    "title": "Subscriptions · change status",
+    "datasource": "primary",
+    "tags": [
+      "write",
+      "core",
+      "subscriptions"
+    ],
+    "options": {
+      "queryType": "query",
+      "query": "UPDATE {{table:subscriptions}} SET \"status\" = $2::text, updated_at = now() WHERE id = $1::int RETURNING id, \"status\"",
+      "inputDefinitions": [
+        {
+          "key": "id",
+          "type": "number",
+          "required": false,
+          "default": 1
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "required": false,
+          "default": "active"
+        }
+      ],
+      "parameterized": true,
+      "timeoutSeconds": 20
+    }
+  }
+]

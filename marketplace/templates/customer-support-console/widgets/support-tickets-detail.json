@@ -1,0 +1,674 @@
+[
+  {
+    "slug": "support-tickets-detail.heading",
+    "key": "heading",
+    "page": "support-tickets-detail",
+    "title": "Record detail",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Ticket detail\nRecord #{{ state.variables.recordID }} · every change is captured in the audit timeline.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-tickets-detail.status",
+    "key": "status",
+    "page": "support-tickets-detail",
+    "title": "Status",
+    "type": "badge",
+    "config": {
+      "showHeader": false,
+      "text": "{{ ((((state.queries.tickets_detail || {}).data || [])[0] || {}).status) }}",
+      "variant": "default"
+    }
+  },
+  {
+    "slug": "support-tickets-detail.statusForm",
+    "key": "statusForm",
+    "page": "support-tickets-detail",
+    "title": "Change status",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Select status",
+      "defaultValue": "new",
+      "options": [
+        {
+          "label": "New",
+          "value": "new"
+        },
+        {
+          "label": "Open",
+          "value": "open"
+        },
+        {
+          "label": "Pending",
+          "value": "pending"
+        },
+        {
+          "label": "Resolved",
+          "value": "resolved"
+        },
+        {
+          "label": "Closed",
+          "value": "closed"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "overview"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-detail.statusButton",
+    "key": "statusButton",
+    "page": "support-tickets-detail",
+    "title": "Apply status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Apply status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_status",
+              "inputValues": {
+                "id": "{{ state.variables.recordID }}",
+                "status": "{{ (state.widgets[\"widget_1427ca0d-e858-4415-ab36-d788c1d80576_1\"] || {}).value || \"new\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-detail.delete",
+    "key": "delete",
+    "page": "support-tickets-detail",
+    "title": "Archive",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive record",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-detail.restore",
+    "key": "restore",
+    "page": "support-tickets-detail",
+    "title": "Restore",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Restore record",
+      "variant": "outline",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_restore",
+              "inputValues": {
+                "ids": "{{ [state.variables.recordID] }}"
+              },
+              "successToast": "Record restored",
+              "errorToast": "Restore failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-detail.tabs",
+    "key": "tabs",
+    "page": "support-tickets-detail",
+    "title": "Record sections",
+    "type": "tabs",
+    "config": {
+      "showHeader": false,
+      "tabs": [
+        {
+          "label": "Overview",
+          "value": "overview"
+        },
+        {
+          "label": "Comments",
+          "value": "comments"
+        },
+        {
+          "label": "Attachments",
+          "value": "attachments"
+        },
+        {
+          "label": "Activity",
+          "value": "activity"
+        }
+      ],
+      "defaultTab": "overview",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.tab",
+              "value": "{{ event.value }}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-detail.record",
+    "key": "record",
+    "page": "support-tickets-detail",
+    "title": "Record fields",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Record fields",
+      "dataTemplate": "{{ (((state.queries.tickets_detail || {}).data || [])[0] || {}) }}",
+      "columns": 2,
+      "emptyText": "Record not found.",
+      "isLoading": "{{ (state.queries.tickets_detail || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-tickets-detail.editTable",
+    "key": "editTable",
+    "page": "support-tickets-detail",
+    "title": "Inline edit",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.tickets_detail || {}).data || [])",
+      "columns": [
+        {
+          "key": "subject",
+          "label": "Subject",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "customer_id",
+          "label": "Customer",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "requester_name",
+          "label": "Requester",
+          "sortable": true,
+          "type": "text",
+          "editable": true
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "priority",
+          "label": "Priority",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "channel",
+          "label": "Channel",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "assignee_id",
+          "label": "Assignee",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "sla_due_at",
+          "label": "SLA due",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "first_response_at",
+          "label": "First response",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "resolved_at",
+          "label": "Resolved",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "satisfaction_score",
+          "label": "CSAT score",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "sortable": false,
+          "type": "text",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 1
+      },
+      "search": {
+        "enabled": false
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": true
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No record loaded.",
+      "isLoading": "{{ (state.queries.tickets_detail || {}).isLoading || false }}",
+      "events": {
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "subject": "{{ event.updatedRow.subject }}",
+                "customer_id": "{{ event.updatedRow.customer_id }}",
+                "requester_name": "{{ event.updatedRow.requester_name }}",
+                "status": "{{ event.updatedRow.status }}",
+                "priority": "{{ event.updatedRow.priority }}",
+                "channel": "{{ event.updatedRow.channel }}",
+                "category": "{{ event.updatedRow.category }}",
+                "assignee_id": "{{ event.updatedRow.assignee_id }}",
+                "sla_due_at": "{{ event.updatedRow.sla_due_at }}",
+                "first_response_at": "{{ event.updatedRow.first_response_at }}",
+                "resolved_at": "{{ event.updatedRow.resolved_at }}",
+                "satisfaction_score": "{{ event.updatedRow.satisfaction_score }}",
+                "description": "{{ event.updatedRow.description }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-detail.comments",
+    "key": "comments",
+    "page": "support-tickets-detail",
+    "title": "Comments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.tickets_comments || {}).data || [])",
+      "columns": [
+        {
+          "key": "author",
+          "label": "Author",
+          "type": "text"
+        },
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Created",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No comments yet.",
+      "isLoading": "{{ (state.queries.tickets_comments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-tickets-detail.commentForm",
+    "key": "commentForm",
+    "page": "support-tickets-detail",
+    "title": "Add comment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add comment",
+      "submitLabel": "Post comment",
+      "fields": [
+        {
+          "key": "body",
+          "label": "Comment",
+          "type": "textarea",
+          "required": true,
+          "placeholder": "Add context, decisions or next steps"
+        },
+        {
+          "key": "authorID",
+          "label": "Author",
+          "type": "select",
+          "required": true,
+          "defaultValue": 1,
+          "options": [
+            {
+              "label": "Noor Wright",
+              "value": 1
+            },
+            {
+              "label": "Mira Okafor",
+              "value": 2
+            },
+            {
+              "label": "Ishaan Hassan",
+              "value": 3
+            },
+            {
+              "label": "Ravi Ivanova",
+              "value": 4
+            },
+            {
+              "label": "Tomás Ivanova",
+              "value": 5
+            },
+            {
+              "label": "Malik Osei",
+              "value": 6
+            },
+            {
+              "label": "Ishaan Osei",
+              "value": 7
+            },
+            {
+              "label": "Hugo Costa",
+              "value": 8
+            },
+            {
+              "label": "Tomás Wright",
+              "value": 9
+            },
+            {
+              "label": "Sofia Meyer",
+              "value": 10
+            },
+            {
+              "label": "Malik Sato",
+              "value": 11
+            },
+            {
+              "label": "Eli Chen",
+              "value": 12
+            },
+            {
+              "label": "Clara Okafor",
+              "value": 13
+            },
+            {
+              "label": "Mira Sato",
+              "value": 14
+            },
+            {
+              "label": "Ravi Wright",
+              "value": 15
+            },
+            {
+              "label": "Ishaan Dubey",
+              "value": 16
+            },
+            {
+              "label": "Priya Larsen",
+              "value": 17
+            },
+            {
+              "label": "Mira Tanaka",
+              "value": 18
+            },
+            {
+              "label": "Jonas Tanaka",
+              "value": 19
+            },
+            {
+              "label": "Eli Novak",
+              "value": 20
+            },
+            {
+              "label": "Owen Bennett",
+              "value": 21
+            },
+            {
+              "label": "Noah Dubois",
+              "value": 22
+            },
+            {
+              "label": "Aarav Meyer",
+              "value": 23
+            },
+            {
+              "label": "Malik Fischer",
+              "value": 24
+            }
+          ]
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_comment_create",
+              "inputValues": {
+                "entity": "tickets",
+                "entityID": "{{ state.variables.recordID }}",
+                "authorID": "{{ Number(event.formData.authorID || 1) }}",
+                "body": "{{ event.formData.body }}"
+              },
+              "successToast": "Comment added",
+              "errorToast": "Comment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-detail.attachments",
+    "key": "attachments",
+    "page": "support-tickets-detail",
+    "title": "Attachments",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.tickets_attachments || {}).data || [])",
+      "columns": [
+        {
+          "key": "file_name",
+          "label": "File",
+          "type": "link"
+        },
+        {
+          "key": "file_url",
+          "label": "URL",
+          "type": "link"
+        },
+        {
+          "key": "mime_type",
+          "label": "Type",
+          "type": "text"
+        },
+        {
+          "key": "created_at",
+          "label": "Uploaded",
+          "type": "date"
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv"
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No attachments yet.",
+      "isLoading": "{{ (state.queries.tickets_attachments || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-tickets-detail.attachmentForm",
+    "key": "attachmentForm",
+    "page": "support-tickets-detail",
+    "title": "Add attachment",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Add attachment",
+      "submitLabel": "Attach file",
+      "fields": [
+        {
+          "key": "fileName",
+          "label": "File name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "document.pdf"
+        },
+        {
+          "key": "fileURL",
+          "label": "File URL",
+          "type": "text",
+          "required": true,
+          "defaultValue": "https://files.example.invalid/document.pdf"
+        },
+        {
+          "key": "mimeType",
+          "label": "MIME type",
+          "type": "text",
+          "defaultValue": "application/pdf"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "tickets_attachment_create",
+              "inputValues": {
+                "entity": "tickets",
+                "entityID": "{{ state.variables.recordID }}",
+                "fileName": "{{ event.formData.fileName }}",
+                "fileURL": "{{ event.formData.fileURL }}",
+                "mimeType": "{{ event.formData.mimeType }}",
+                "uploadedBy": "{{ 1 }}"
+              },
+              "successToast": "Attachment linked",
+              "errorToast": "Attachment failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-tickets-detail.activity",
+    "key": "activity",
+    "page": "support-tickets-detail",
+    "title": "Audit timeline",
+    "type": "timeline",
+    "config": {
+      "showHeader": true,
+      "label": "Audit timeline",
+      "dataTemplate": "{{ (state.queries.tickets_audit || {}).data || [] }}",
+      "titleKey": "title",
+      "timeKey": "created_at",
+      "descriptionKey": "description",
+      "emptyText": "No audit entries yet.",
+      "isLoading": "{{ (state.queries.tickets_audit || {}).isLoading || false }}"
+    }
+  }
+]

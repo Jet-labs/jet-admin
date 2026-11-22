@@ -1,0 +1,586 @@
+[
+  {
+    "slug": "support-subscriptions-list.heading",
+    "key": "heading",
+    "page": "support-subscriptions-list",
+    "title": "Subscriptions",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "# Subscriptions\nBrowse, filter and update subscriptions. All edits are audit-logged and soft-deleted records can be restored from the record detail page.",
+      "format": "markdown"
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.search",
+    "key": "search",
+    "page": "support-subscriptions-list",
+    "title": "Search",
+    "type": "search-input",
+    "config": {
+      "showHeader": false,
+      "placeholder": "Search subscriptions...",
+      "debounceMs": 350,
+      "events": {
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.status",
+    "key": "status",
+    "page": "support-subscriptions-list",
+    "title": "Status filter",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "All statuses",
+      "defaultValue": "all",
+      "options": [
+        {
+          "label": "All statuses",
+          "value": "all"
+        },
+        {
+          "label": "Active",
+          "value": "active"
+        },
+        {
+          "label": "Trial",
+          "value": "trial"
+        },
+        {
+          "label": "Past Due",
+          "value": "past_due"
+        },
+        {
+          "label": "Canceled",
+          "value": "canceled"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.value === 'all' ? '' : event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.range",
+    "key": "range",
+    "page": "support-subscriptions-list",
+    "title": "Date range",
+    "type": "date-range-picker",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": "{{ event.startDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": "{{ event.endDate || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onClear": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateFrom",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.dateTo",
+              "value": ""
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.sort",
+    "key": "sort",
+    "page": "support-subscriptions-list",
+    "title": "Sort",
+    "type": "select",
+    "config": {
+      "showHeader": false,
+      "label": "",
+      "placeholder": "Sort by",
+      "defaultValue": "id",
+      "options": [
+        {
+          "label": "Amount",
+          "value": "amount"
+        },
+        {
+          "label": "Seats",
+          "value": "seats"
+        },
+        {
+          "label": "Started At",
+          "value": "started_at"
+        },
+        {
+          "label": "Renews At",
+          "value": "renews_at"
+        }
+      ],
+      "events": {
+        "onChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.sortBy",
+              "value": "{{ event.value }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.selected",
+    "key": "selected",
+    "page": "support-subscriptions-list",
+    "title": "Selected record",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record",
+      "dataTemplate": "{{ (((state.queries.subscriptions_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row to inspect it.",
+      "isLoading": "{{ (state.queries.subscriptions_selected || {}).isLoading || false }}"
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.table",
+    "key": "table",
+    "page": "support-subscriptions-list",
+    "title": "Subscriptions",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.subscriptions || {}).data || [])",
+      "columns": [
+        {
+          "key": "customer_id",
+          "label": "Customer",
+          "sortable": false,
+          "type": "text",
+          "editable": false
+        },
+        {
+          "key": "plan",
+          "label": "Plan",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "sortable": true,
+          "type": "number",
+          "editable": true,
+          "format": "0,0.00"
+        },
+        {
+          "key": "billing_cycle",
+          "label": "Billing cycle",
+          "sortable": true,
+          "type": "badge",
+          "editable": true
+        },
+        {
+          "key": "seats",
+          "label": "Seats",
+          "sortable": true,
+          "type": "number",
+          "editable": true
+        },
+        {
+          "key": "started_at",
+          "label": "Started",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        },
+        {
+          "key": "renews_at",
+          "label": "Renews",
+          "sortable": true,
+          "type": "date",
+          "editable": true
+        }
+      ],
+      "pagination": {
+        "enabled": true,
+        "pageParam": "page",
+        "pageSize": 10,
+        "totalTemplate": "{{ ((state.queries.subscriptions || {}).data && (state.queries.subscriptions || {}).data[0] ? (state.queries.subscriptions || {}).data[0].total_count : 0) }}"
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": true,
+        "placeholder": "Search subscriptions..."
+      },
+      "export": {
+        "enabled": true,
+        "format": "csv",
+        "serverSide": false,
+        "buttonLabel": "Export CSV"
+      },
+      "editing": {
+        "enabled": true
+      },
+      "bulkEdit": {
+        "enabled": false,
+        "saveLabel": "Save changes"
+      },
+      "multiSelect": {
+        "enabled": true,
+        "showSelectAll": true,
+        "actions": [
+          {
+            "label": "Archive selected",
+            "actionKey": "archive",
+            "variant": "destructive"
+          }
+        ]
+      },
+      "emptyText": "No subscriptions found.",
+      "emptyHint": "Adjust the filters or create a new record.",
+      "isLoading": "{{ (state.queries.subscriptions || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.selectedID",
+              "value": "{{ event.row.id }}"
+            }
+          }
+        ],
+        "onPageChange": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": "{{ event.page }}"
+            }
+          }
+        ],
+        "onSearch": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.searchTerm || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ],
+        "onRowSave": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "subscriptions_update",
+              "inputValues": {
+                "id": "{{ event.originalRow.id }}",
+                "customer_id": "{{ event.updatedRow.customer_id }}",
+                "plan": "{{ event.updatedRow.plan }}",
+                "status": "{{ event.updatedRow.status }}",
+                "amount": "{{ event.updatedRow.amount }}",
+                "billing_cycle": "{{ event.updatedRow.billing_cycle }}",
+                "seats": "{{ event.updatedRow.seats }}",
+                "started_at": "{{ event.updatedRow.started_at }}",
+                "renews_at": "{{ event.updatedRow.renews_at }}"
+              },
+              "successToast": "Record updated",
+              "errorToast": "Update failed"
+            }
+          }
+        ],
+        "onBulkAction": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "subscriptions_delete",
+              "inputValues": {
+                "ids": "{{ event.selectedRows.map(function (r) { return r.id; }) }}"
+              },
+              "successToast": "Records archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.actions",
+    "key": "actions",
+    "page": "support-subscriptions-list",
+    "title": "Selected record actions",
+    "type": "key-value",
+    "config": {
+      "showHeader": true,
+      "label": "Selected record actions",
+      "dataTemplate": "{{ (((state.queries.subscriptions_selected || {}).data || [])[0] || {}) }}",
+      "columns": 1,
+      "emptyText": "Select a row, then use the buttons below."
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.archive",
+    "key": "archive",
+    "page": "support-subscriptions-list",
+    "title": "Archive selected",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Archive selected",
+      "variant": "destructive",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "subscriptions_delete",
+              "inputValues": {
+                "ids": "{{ [state.variables.selectedID] }}"
+              },
+              "successToast": "Record archived",
+              "errorToast": "Archive failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.advance",
+    "key": "advance",
+    "page": "support-subscriptions-list",
+    "title": "Advance status",
+    "type": "button",
+    "config": {
+      "showHeader": false,
+      "text": "Advance status",
+      "events": {
+        "onClick": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "subscriptions_status",
+              "inputValues": {
+                "id": "{{ state.variables.selectedID }}",
+                "status": "{{ \"trial\" }}"
+              },
+              "successToast": "Status updated",
+              "errorToast": "Status update failed"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.explain",
+    "key": "explain",
+    "page": "support-subscriptions-list",
+    "title": "List notes",
+    "type": "text",
+    "config": {
+      "showHeader": false,
+      "content": "Rows are loaded server-side. Use the table toolbar to search, sort and export the current view. Inline edits and bulk actions run the template's parameterized update queries and write to the audit log.",
+      "format": "plain"
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.views",
+    "key": "views",
+    "page": "support-subscriptions-list",
+    "title": "Saved views",
+    "type": "table",
+    "config": {
+      "showHeader": true,
+      "dataArrayTemplate": "((state.queries.subscriptions_views || {}).data || [])",
+      "columns": [
+        {
+          "key": "label",
+          "label": "View",
+          "type": "text",
+          "sortable": false
+        },
+        {
+          "key": "config_key",
+          "label": "Key",
+          "type": "text",
+          "sortable": false
+        }
+      ],
+      "pagination": {
+        "enabled": false,
+        "pageSize": 5
+      },
+      "search": {
+        "enabled": true,
+        "serverSide": false,
+        "placeholder": "Filter saved views"
+      },
+      "export": {
+        "enabled": false
+      },
+      "editing": {
+        "enabled": false
+      },
+      "multiSelect": {
+        "enabled": false
+      },
+      "emptyText": "No saved views yet.",
+      "isLoading": "{{ (state.queries.subscriptions_views || {}).isLoading || false }}",
+      "events": {
+        "onRowSelect": [
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.search",
+              "value": "{{ event.row.config_value.search || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.status",
+              "value": "{{ event.row.config_value.status || '' }}"
+            }
+          },
+          {
+            "actionType": "SET_VARIABLE",
+            "config": {
+              "key": "state.variables.page",
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "slug": "support-subscriptions-list.saveView",
+    "key": "saveView",
+    "page": "support-subscriptions-list",
+    "title": "Save current view",
+    "type": "form",
+    "config": {
+      "showHeader": true,
+      "title": "Save current view",
+      "submitLabel": "Save view",
+      "fields": [
+        {
+          "key": "name",
+          "label": "View name",
+          "type": "text",
+          "required": true,
+          "placeholder": "e.g. My open subscriptions"
+        }
+      ],
+      "events": {
+        "onSubmit": [
+          {
+            "actionType": "EXECUTE_QUERY",
+            "config": {
+              "alias": "subscriptions_view_create",
+              "inputValues": {
+                "configKey": "{{ \"saved_view.support-subscriptions-list.\" + String(event.formData.name || \"view\").toLowerCase().replace(/[^a-z0-9]+/g, \"-\") }}",
+                "value": "{{ ({ search: state.variables.search, status: state.variables.status, page: 1 }) }}",
+                "label": "{{ event.formData.name }}"
+              },
+              "successToast": "View saved",
+              "errorToast": "Could not save view"
+            }
+          }
+        ]
+      }
+    }
+  }
+]

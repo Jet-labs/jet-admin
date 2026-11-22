@@ -1,0 +1,176 @@
+{
+  "slug": "support-admin-jobs",
+  "key": "admin-jobs",
+  "title": "Admin · jobs and workflow runs",
+  "description": "Workflow instance monitor, run logs and cron history.",
+  "accessTags": [
+    "admin"
+  ],
+  "variables": [],
+  "sources": [
+    {
+      "alias": "runs",
+      "type": "query",
+      "queryID": "f58b5648-5927-4474-a80e-ebb1e8351f88",
+      "triggerMode": "auto",
+      "inputValues": {
+        "tenantID": "{{ state.globals.tenantID }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "logs",
+      "type": "query",
+      "queryID": "727fd6c4-9c05-450e-be8e-5aca478c643e",
+      "triggerMode": "auto",
+      "inputValues": {
+        "tenantID": "{{ state.globals.tenantID }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    },
+    {
+      "alias": "cron",
+      "type": "query",
+      "queryID": "85ff1258-bacc-41a7-b526-2d105d0d2580",
+      "triggerMode": "auto",
+      "inputValues": {
+        "tenantID": "{{ state.globals.tenantID }}"
+      },
+      "refreshOn": [],
+      "refetchInterval": null
+    }
+  ],
+  "appPageConfig": {
+    "layoutVersion": 2,
+    "layout": {
+      "id": "root",
+      "type": "column",
+      "children": [
+        {
+          "id": "7bdc11c9-00ca-48b7-9851-dd922a1c8e87",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "57b56443-6ac1-4c88-8a28-e6873bc5cda0",
+              "type": "widget",
+              "widgetKey": "widget_eb2248bc-bc20-4620-85f1-8434530ee25c_1",
+              "span": 12,
+              "sizing": "fill"
+            }
+          ]
+        },
+        {
+          "id": "de42342e-95e2-4a86-bba8-090878496119",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "769c9213-8944-4d3c-9990-e08cf7941094",
+              "type": "widget",
+              "widgetKey": "widget_685de6d1-6854-4e22-bcae-8f3a9fb42a0a_1",
+              "span": 12,
+              "sizing": "fill",
+              "minHeight": 280
+            }
+          ]
+        },
+        {
+          "id": "085f0920-4b25-4f50-946a-c86346099d54",
+          "type": "row",
+          "sizing": "auto",
+          "children": [
+            {
+              "id": "a701f523-9547-4f66-8d9b-9d99ee44794e",
+              "type": "widget",
+              "widgetKey": "widget_7183c2d9-0b18-4983-80ff-aa2ddc0506f4_1",
+              "span": 7,
+              "sizing": "fill",
+              "minHeight": 300
+            },
+            {
+              "id": "915365c6-4cd1-4ca4-97e2-10be433c2129",
+              "type": "widget",
+              "widgetKey": "widget_811ca076-93ea-49dc-bae1-5a8e32564f15_1",
+              "span": 5,
+              "sizing": "fill",
+              "minHeight": 300
+            }
+          ]
+        }
+      ]
+    },
+    "layouts": {},
+    "widgets": [
+      {
+        "id": "57b56443-6ac1-4c88-8a28-e6873bc5cda0",
+        "type": "widget",
+        "widgetKey": "widget_eb2248bc-bc20-4620-85f1-8434530ee25c_1",
+        "span": 12,
+        "sizing": "fill"
+      },
+      {
+        "id": "769c9213-8944-4d3c-9990-e08cf7941094",
+        "type": "widget",
+        "widgetKey": "widget_685de6d1-6854-4e22-bcae-8f3a9fb42a0a_1",
+        "span": 12,
+        "sizing": "fill",
+        "minHeight": 280
+      },
+      {
+        "id": "a701f523-9547-4f66-8d9b-9d99ee44794e",
+        "type": "widget",
+        "widgetKey": "widget_7183c2d9-0b18-4983-80ff-aa2ddc0506f4_1",
+        "span": 7,
+        "sizing": "fill",
+        "minHeight": 300
+      },
+      {
+        "id": "915365c6-4cd1-4ca4-97e2-10be433c2129",
+        "type": "widget",
+        "widgetKey": "widget_811ca076-93ea-49dc-bae1-5a8e32564f15_1",
+        "span": 5,
+        "sizing": "fill",
+        "minHeight": 300
+      }
+    ],
+    "variables": [],
+    "dataSources": [
+      {
+        "alias": "runs",
+        "type": "query",
+        "queryID": "f58b5648-5927-4474-a80e-ebb1e8351f88",
+        "triggerMode": "auto",
+        "inputValues": {
+          "tenantID": "{{ state.globals.tenantID }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "logs",
+        "type": "query",
+        "queryID": "727fd6c4-9c05-450e-be8e-5aca478c643e",
+        "triggerMode": "auto",
+        "inputValues": {
+          "tenantID": "{{ state.globals.tenantID }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      },
+      {
+        "alias": "cron",
+        "type": "query",
+        "queryID": "85ff1258-bacc-41a7-b526-2d105d0d2580",
+        "triggerMode": "auto",
+        "inputValues": {
+          "tenantID": "{{ state.globals.tenantID }}"
+        },
+        "refreshOn": [],
+        "refetchInterval": null
+      }
+    ]
+  }
+}
