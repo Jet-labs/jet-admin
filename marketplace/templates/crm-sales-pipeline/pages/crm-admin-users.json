@@ -1,7 +1,7 @@
 {
   "slug": "crm-admin-users",
   "key": "admin-users",
-  "title": "Admin � users",
+  "title": "Admin · users",
   "description": "Tenant users, platform roles and app-level role assignment overview.",
   "accessTags": [
     "admin",

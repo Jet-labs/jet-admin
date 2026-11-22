@@ -310,7 +310,7 @@
       },
       {
         "page": "crm-admin-users",
-        "pageTitle": "Admin � users",
+        "pageTitle": "Admin · users",
         "tags": [
           "admin",
           "manager"
@@ -320,7 +320,7 @@
       },
       {
         "page": "crm-admin-roles",
-        "pageTitle": "Admin � roles and permissions",
+        "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
         ],
@@ -329,7 +329,7 @@
       },
       {
         "page": "crm-admin-audit",
-        "pageTitle": "Admin � audit log",
+        "pageTitle": "Admin · audit log",
         "tags": [
           "admin",
           "manager"
@@ -339,7 +339,7 @@
       },
       {
         "page": "crm-admin-settings",
-        "pageTitle": "Admin � system settings",
+        "pageTitle": "Admin · system settings",
         "tags": [
           "admin"
         ],
@@ -348,7 +348,7 @@
       },
       {
         "page": "crm-admin-import",
-        "pageTitle": "Admin � import / export",
+        "pageTitle": "Admin · import / export",
         "tags": [
           "admin",
           "manager"
@@ -358,7 +358,7 @@
       },
       {
         "page": "crm-admin-integrations",
-        "pageTitle": "Admin � integration health",
+        "pageTitle": "Admin · integration health",
         "tags": [
           "admin"
         ],
@@ -367,7 +367,7 @@
       },
       {
         "page": "crm-admin-jobs",
-        "pageTitle": "Admin � jobs and workflow runs",
+        "pageTitle": "Admin · jobs and workflow runs",
         "tags": [
           "admin"
         ],
@@ -376,7 +376,7 @@
       },
       {
         "page": "crm-admin-quality",
-        "pageTitle": "Admin � data quality",
+        "pageTitle": "Admin · data quality",
         "tags": [
           "admin",
           "manager"
@@ -1490,7 +1490,7 @@
       },
       {
         "page": "crm-admin-users",
-        "pageTitle": "Admin � users",
+        "pageTitle": "Admin · users",
         "tags": [
           "admin",
           "manager"
@@ -1500,7 +1500,7 @@
       },
       {
         "page": "crm-admin-roles",
-        "pageTitle": "Admin � roles and permissions",
+        "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
         ],
@@ -1509,7 +1509,7 @@
       },
       {
         "page": "crm-admin-audit",
-        "pageTitle": "Admin � audit log",
+        "pageTitle": "Admin · audit log",
         "tags": [
           "admin",
           "manager"
@@ -1519,7 +1519,7 @@
       },
       {
         "page": "crm-admin-settings",
-        "pageTitle": "Admin � system settings",
+        "pageTitle": "Admin · system settings",
         "tags": [
           "admin"
         ],
@@ -1528,7 +1528,7 @@
       },
       {
         "page": "crm-admin-import",
-        "pageTitle": "Admin � import / export",
+        "pageTitle": "Admin · import / export",
         "tags": [
           "admin",
           "manager"
@@ -1538,7 +1538,7 @@
       },
       {
         "page": "crm-admin-integrations",
-        "pageTitle": "Admin � integration health",
+        "pageTitle": "Admin · integration health",
         "tags": [
           "admin"
         ],
@@ -1547,7 +1547,7 @@
       },
       {
         "page": "crm-admin-jobs",
-        "pageTitle": "Admin � jobs and workflow runs",
+        "pageTitle": "Admin · jobs and workflow runs",
         "tags": [
           "admin"
         ],
@@ -1556,7 +1556,7 @@
       },
       {
         "page": "crm-admin-quality",
-        "pageTitle": "Admin � data quality",
+        "pageTitle": "Admin · data quality",
         "tags": [
           "admin",
           "manager"
@@ -2669,7 +2669,7 @@
       },
       {
         "page": "crm-admin-users",
-        "pageTitle": "Admin � users",
+        "pageTitle": "Admin · users",
         "tags": [
           "admin",
           "manager"
@@ -2679,7 +2679,7 @@
       },
       {
         "page": "crm-admin-roles",
-        "pageTitle": "Admin � roles and permissions",
+        "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
         ],
@@ -2688,7 +2688,7 @@
       },
       {
         "page": "crm-admin-audit",
-        "pageTitle": "Admin � audit log",
+        "pageTitle": "Admin · audit log",
         "tags": [
           "admin",
           "manager"
@@ -2698,7 +2698,7 @@
       },
       {
         "page": "crm-admin-settings",
-        "pageTitle": "Admin � system settings",
+        "pageTitle": "Admin · system settings",
         "tags": [
           "admin"
         ],
@@ -2707,7 +2707,7 @@
       },
       {
         "page": "crm-admin-import",
-        "pageTitle": "Admin � import / export",
+        "pageTitle": "Admin · import / export",
         "tags": [
           "admin",
           "manager"
@@ -2717,7 +2717,7 @@
       },
       {
         "page": "crm-admin-integrations",
-        "pageTitle": "Admin � integration health",
+        "pageTitle": "Admin · integration health",
         "tags": [
           "admin"
         ],
@@ -2726,7 +2726,7 @@
       },
       {
         "page": "crm-admin-jobs",
-        "pageTitle": "Admin � jobs and workflow runs",
+        "pageTitle": "Admin · jobs and workflow runs",
         "tags": [
           "admin"
         ],
@@ -2735,7 +2735,7 @@
       },
       {
         "page": "crm-admin-quality",
-        "pageTitle": "Admin � data quality",
+        "pageTitle": "Admin · data quality",
         "tags": [
           "admin",
           "manager"
@@ -3844,7 +3844,7 @@
       },
       {
         "page": "crm-admin-users",
-        "pageTitle": "Admin � users",
+        "pageTitle": "Admin · users",
         "tags": [
           "admin",
           "manager"
@@ -3854,7 +3854,7 @@
       },
       {
         "page": "crm-admin-roles",
-        "pageTitle": "Admin � roles and permissions",
+        "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
         ],
@@ -3863,7 +3863,7 @@
       },
       {
         "page": "crm-admin-audit",
-        "pageTitle": "Admin � audit log",
+        "pageTitle": "Admin · audit log",
         "tags": [
           "admin",
           "manager"
@@ -3873,7 +3873,7 @@
       },
       {
         "page": "crm-admin-settings",
-        "pageTitle": "Admin � system settings",
+        "pageTitle": "Admin · system settings",
         "tags": [
           "admin"
         ],
@@ -3882,7 +3882,7 @@
       },
       {
         "page": "crm-admin-import",
-        "pageTitle": "Admin � import / export",
+        "pageTitle": "Admin · import / export",
         "tags": [
           "admin",
           "manager"
@@ -3892,7 +3892,7 @@
       },
       {
         "page": "crm-admin-integrations",
-        "pageTitle": "Admin � integration health",
+        "pageTitle": "Admin · integration health",
         "tags": [
           "admin"
         ],
@@ -3901,7 +3901,7 @@
       },
       {
         "page": "crm-admin-jobs",
-        "pageTitle": "Admin � jobs and workflow runs",
+        "pageTitle": "Admin · jobs and workflow runs",
         "tags": [
           "admin"
         ],
@@ -3910,7 +3910,7 @@
       },
       {
         "page": "crm-admin-quality",
-        "pageTitle": "Admin � data quality",
+        "pageTitle": "Admin · data quality",
         "tags": [
           "admin",
           "manager"
@@ -5015,7 +5015,7 @@
       },
       {
         "page": "crm-admin-users",
-        "pageTitle": "Admin � users",
+        "pageTitle": "Admin · users",
         "tags": [
           "admin",
           "manager"
@@ -5025,7 +5025,7 @@
       },
       {
         "page": "crm-admin-roles",
-        "pageTitle": "Admin � roles and permissions",
+        "pageTitle": "Admin · roles and permissions",
         "tags": [
           "admin"
         ],
@@ -5034,7 +5034,7 @@
       },
       {
         "page": "crm-admin-audit",
-        "pageTitle": "Admin � audit log",
+        "pageTitle": "Admin · audit log",
         "tags": [
           "admin",
           "manager"
@@ -5044,7 +5044,7 @@
       },
       {
         "page": "crm-admin-settings",
-        "pageTitle": "Admin � system settings",
+        "pageTitle": "Admin · system settings",
         "tags": [
           "admin"
         ],
@@ -5053,7 +5053,7 @@
       },
       {
         "page": "crm-admin-import",
-        "pageTitle": "Admin � import / export",
+        "pageTitle": "Admin · import / export",
         "tags": [
           "admin",
           "manager"
@@ -5063,7 +5063,7 @@
       },
       {
         "page": "crm-admin-integrations",
-        "pageTitle": "Admin � integration health",
+        "pageTitle": "Admin · integration health",
         "tags": [
           "admin"
         ],
@@ -5072,7 +5072,7 @@
       },
       {
         "page": "crm-admin-jobs",
-        "pageTitle": "Admin � jobs and workflow runs",
+        "pageTitle": "Admin · jobs and workflow runs",
         "tags": [
           "admin"
         ],
@@ -5081,7 +5081,7 @@
       },
       {
         "page": "crm-admin-quality",
-        "pageTitle": "Admin � data quality",
+        "pageTitle": "Admin · data quality",
         "tags": [
           "admin",
           "manager"

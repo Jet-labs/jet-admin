@@ -1,7 +1,7 @@
 {
   "slug": "crm-admin-settings",
   "key": "admin-settings",
-  "title": "Admin � system settings",
+  "title": "Admin · system settings",
   "description": "Settings and feature flags with audited updates.",
   "accessTags": [
     "admin"

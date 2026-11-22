@@ -1,7 +1,7 @@
 {
   "slug": "crm-admin-import",
   "key": "admin-import",
-  "title": "Admin � import / export",
+  "title": "Admin · import / export",
   "description": "CSV import with validation summary and record export.",
   "accessTags": [
     "admin",

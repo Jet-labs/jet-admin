@@ -1,7 +1,7 @@
 {
   "slug": "crm-admin-audit",
   "key": "admin-audit",
-  "title": "Admin � audit log",
+  "title": "Admin · audit log",
   "description": "Filterable audit log with old/new JSON diff.",
   "accessTags": [
     "admin",

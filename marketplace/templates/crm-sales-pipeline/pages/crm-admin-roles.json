@@ -1,7 +1,7 @@
 {
   "slug": "crm-admin-roles",
   "key": "admin-roles",
-  "title": "Admin � roles and permissions",
+  "title": "Admin · roles and permissions",
   "description": "Provisioned tenant roles, permission counts and the app page matrix.",
   "accessTags": [
     "admin"

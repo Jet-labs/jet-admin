@@ -10,7 +10,7 @@ const { authorizedExecuteWorkflow } = require("../../apps/backend/utils/authoriz
 const { createSystemContext, ORIGIN_TYPES } = require("../../apps/backend/utils/executionContext");
 const { installTemplate, uninstallTemplate } = require("../../apps/backend/modules/marketplace/template.installer");
 
-const slug = "crm-sales-pipeline";
+const slug = process.argv[2] || "crm-sales-pipeline";
 const USER_ID = "1a3ece78-45ae-4a19-8475-3e443e2b01e8";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

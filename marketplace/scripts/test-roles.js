@@ -4,11 +4,60 @@ const { Client } = require("pg");
 const { prisma } = require("../../apps/backend/config/prisma.config");
 const { enforce } = require("../../apps/backend/config/casbin.config");
 const { installTemplate, uninstallTemplate } = require("../../apps/backend/modules/marketplace/template.installer");
+const { deterministicUUID } = require("../../apps/backend/modules/marketplace/template.package");
 
-const slug = "crm-sales-pipeline";
+const slug = process.argv[2] || "crm-sales-pipeline";
+const rolePlans = require(path.join(__dirname, "..", "templates", slug, "roles", "roles.json"));
 const USER_ID = "1a3ece78-45ae-4a19-8475-3e443e2b01e8";
 
+const entryFor = (role, collection, key, field) =>
+  (role[collection] || []).find((entry) => entry[key] === field);
+const allows = (role, collection, key, field, flag) =>
+  Boolean(entryFor(role, collection, key, field)?.[flag]);
+
+function chooseChecks(roles) {
+  const admin = roles.find((role) => role.key === "admin") || roles[0];
+  const others = roles.filter((role) => role !== admin);
+
+  const adminPage =
+    admin.pages.find(
+      (page) =>
+        page.canView &&
+        others.some((role) => !allows(role, "pages", "page", page.page, "canView"))
+    ) || admin.pages.find((page) => page.canView);
+  const commonPage =
+    admin.pages.find((page) =>
+      roles.every((role) => allows(role, "pages", "page", page.page, "canView"))
+    ) || admin.pages[0];
+
+  const adminQuery =
+    admin.queries.find(
+      (query) =>
+        query.canExecute &&
+        others.some((role) => !allows(role, "queries", "query", query.query, "canExecute"))
+    ) || admin.queries.find((query) => query.canExecute);
+  const commonQuery =
+    admin.queries.find((query) =>
+      roles.every((role) => allows(role, "queries", "query", query.query, "canExecute"))
+    ) || admin.queries[0];
+
+  const adminWorkflow =
+    admin.workflows.find(
+      (workflow) =>
+        workflow.canTrigger &&
+        others.some(
+          (role) => !allows(role, "workflows", "workflow", workflow.workflow, "canTrigger")
+        )
+    ) || admin.workflows.find((workflow) => workflow.canTrigger);
+
+  return { adminPage, commonPage, adminQuery, commonQuery, adminWorkflow };
+}
+
 async function main() {
+  const checks = chooseChecks(rolePlans);
+  if (!checks.adminPage || !checks.adminQuery) {
+    throw new Error(`Template "${slug}" does not expose role-checkable admin assets.`);
+  }
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
   const tenant = await client.query(
@@ -16,8 +65,15 @@ async function main() {
     [`Template Role QA ${Date.now()}`, USER_ID]
   );
   const tenantID = tenant.rows[0].tenantID;
-  await client.query(`INSERT INTO "tblUsersTenantsRelationship" ("tenantID","userID","role") VALUES ($1::uuid,$2::uuid,'ADMIN')`, [tenantID, USER_ID]);
-  await client.query(`INSERT INTO "tblUserTenantConfigMap" ("tenantID","userID","config") VALUES ($1::uuid,$2::uuid,'{}'::jsonb)`, [tenantID, USER_ID]);
+  const short = String(tenantID).replace(/-/g, "").slice(0, 8);
+  await client.query(
+    `INSERT INTO "tblUsersTenantsRelationship" ("tenantID","userID","role") VALUES ($1::uuid,$2::uuid,'ADMIN')`,
+    [tenantID, USER_ID]
+  );
+  await client.query(
+    `INSERT INTO "tblUserTenantConfigMap" ("tenantID","userID","config") VALUES ($1::uuid,$2::uuid,'{}'::jsonb)`,
+    [tenantID, USER_ID]
+  );
   console.log("tenant", tenantID);
   try {
     await installTemplate({
@@ -27,39 +83,111 @@ async function main() {
       userID: USER_ID,
       authContext: { authType: "USER", userID: USER_ID },
     });
-    const pages = await prisma.tblAppPages.findMany({ where: { tenantID }, select: { appPageID: true, appPageTitle: true } });
-    const adminPage = pages.find((p) => /Admin . users/.test(p.appPageTitle)) || pages.find((p) => /^Admin/.test(p.appPageTitle));
-    const portalPage = pages.find((p) => /Client portal/.test(p.appPageTitle));
-    const query = await prisma.tblDataQueries.findFirst({ where: { tenantID, dataQueryTitle: { contains: "Deals" } }, select: { dataQueryID: true, dataQueryTitle: true } });
-    const users = await prisma.tblUsers.findMany({ where: { email: { contains: `${slug}` } }, select: { userID: true, email: true } });
-    const userFor = (role) => users.find((u) => u.email.includes(`+${role}@`));
-    const matrix = [
-      ["admin", true, true],
-      ["manager", true, true],
-      ["sales_rep", false, true],
-      ["analyst", false, false],
-      ["client", false, false],
-    ];
+
+    const users = await prisma.tblUsers.findMany({
+      where: { email: { startsWith: `demo+${slug}+${short}+` } },
+      select: { userID: true, email: true },
+    });
+    const userFor = (role) =>
+      users.find((user) => user.email === `demo+${slug}+${short}+${role}@example.invalid`);
+
+    const ledgerRows = await client.query(
+      `SELECT "resources" FROM "tblMarketplaceTemplateInstalls" WHERE "tenantID"=$1::uuid AND "slug"=$2`,
+      [tenantID, slug]
+    );
+    const ledgerResources = ledgerRows.rows[0]?.resources || [];
+    const installedID = (type, key) => {
+      const originalID = deterministicUUID(`${slug}:${type}:${key}`);
+      const resource = ledgerResources.find(
+        (entry) => entry.type === type && entry.originalID === originalID
+      );
+      return resource?.id || originalID;
+    };
+    const pageID = (pageSlug) => installedID("appPage", pageSlug);
+    const queryID = (querySlug) => installedID("dataQuery", querySlug);
+    const workflowID = (workflowSlug) => installedID("workflow", workflowSlug);
+
     let failed = 0;
-    for (const [role, adminAllowed, queryAllowed] of matrix) {
-      const user = userFor(role);
+    for (const role of rolePlans) {
+      const user = userFor(role.key);
       if (!user) {
-        console.log(`  ! ${role}: demo user not found`);
+        console.log(`  ! ${role.key}: demo user not found`);
         failed += 1;
         continue;
       }
-      const pageAllowed = await enforce(user.userID, tenantID, `appPage:${adminPage.appPageID}`, "read");
-      const portalAllowed = await enforce(user.userID, tenantID, `appPage:${portalPage.appPageID}`, "read");
-      const queryCanRun = await enforce(user.userID, tenantID, `dataquery:${query.dataQueryID}`, "execute");
-      const ok = pageAllowed === adminAllowed && portalAllowed === true && queryCanRun === queryAllowed;
-      console.log(`  ${ok ? "+" : "!"} ${role}: adminPage=${pageAllowed} portalPage=${portalAllowed} query=${queryCanRun}`);
+      const expectedAdminPage = allows(role, "pages", "page", checks.adminPage.page, "canView");
+      const expectedCommonPage = allows(role, "pages", "page", checks.commonPage.page, "canView");
+      const expectedAdminQuery = allows(
+        role,
+        "queries",
+        "query",
+        checks.adminQuery.query,
+        "canExecute"
+      );
+      const expectedCommonQuery = allows(
+        role,
+        "queries",
+        "query",
+        checks.commonQuery.query,
+        "canExecute"
+      );
+      const expectedWorkflow = checks.adminWorkflow
+        ? allows(role, "workflows", "workflow", checks.adminWorkflow.workflow, "canTrigger")
+        : null;
+
+      const adminPage = await enforce(
+        user.userID,
+        tenantID,
+        `appPage:${pageID(checks.adminPage.page)}`,
+        "read"
+      );
+      const commonPage = await enforce(
+        user.userID,
+        tenantID,
+        `appPage:${pageID(checks.commonPage.page)}`,
+        "read"
+      );
+      const adminQuery = await enforce(
+        user.userID,
+        tenantID,
+        `dataquery:${queryID(checks.adminQuery.query)}`,
+        "execute"
+      );
+      const commonQuery = await enforce(
+        user.userID,
+        tenantID,
+        `dataquery:${queryID(checks.commonQuery.query)}`,
+        "execute"
+      );
+      const workflow = checks.adminWorkflow
+        ? await enforce(
+            user.userID,
+            tenantID,
+            `workflow:${workflowID(checks.adminWorkflow.workflow)}`,
+            "execute"
+          )
+        : null;
+
+      const ok =
+        adminPage === expectedAdminPage &&
+        commonPage === expectedCommonPage &&
+        adminQuery === expectedAdminQuery &&
+        commonQuery === expectedCommonQuery &&
+        (expectedWorkflow === null || workflow === expectedWorkflow);
+      console.log(
+        `  ${ok ? "+" : "!"} ${role.key}: adminPage=${adminPage}/${expectedAdminPage} ` +
+          `commonPage=${commonPage}/${expectedCommonPage} adminQuery=${adminQuery}/${expectedAdminQuery} ` +
+          `commonQuery=${commonQuery}/${expectedCommonQuery} workflow=${workflow}/${expectedWorkflow}`
+      );
       if (!ok) failed += 1;
     }
-    console.log(`roles: ${matrix.length - failed} ok, ${failed} failed`);
+    console.log(`roles: ${rolePlans.length - failed} ok, ${failed} failed`);
     if (failed) process.exitCode = 1;
   } finally {
     await uninstallTemplate({ tenantID, slug, userID: USER_ID });
-    const leftoverUsers = await prisma.tblUsers.count({ where: { email: { contains: slug } } });
+    const leftoverUsers = await prisma.tblUsers.count({
+      where: { email: { startsWith: `demo+${slug}+${short}+` } },
+    });
     const leftoverRoles = await prisma.tblRoles.count({ where: { tenantID } });
     console.log(`leftover demo users: ${leftoverUsers}, roles: ${leftoverRoles}`);
     await client.query('DELETE FROM "tblUserTenantConfigMap" WHERE "tenantID"=$1::uuid', [tenantID]);

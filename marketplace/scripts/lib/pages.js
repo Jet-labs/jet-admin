@@ -1335,7 +1335,7 @@ function buildAdminPages(ctx, spec) {
   // 1. Users.
   buildPage(ctx, spec, {
     key: "admin-users",
-    title: "Admin � users",
+    title: "Admin · users",
     description: "Tenant users, platform roles and app-level role assignment overview.",
     tags: ["admin", "manager"],
     variables: [{ key: "search", type: "string", defaultValue: "" }],
@@ -1385,7 +1385,7 @@ function buildAdminPages(ctx, spec) {
   // 2. Roles.
   buildPage(ctx, spec, {
     key: "admin-roles",
-    title: "Admin � roles and permissions",
+    title: "Admin · roles and permissions",
     description: "Provisioned tenant roles, permission counts and the app page matrix.",
     tags: ["admin"],
     variables: [{ key: "roleKey", type: "string", defaultValue: "admin" }],
@@ -1450,7 +1450,7 @@ function buildAdminPages(ctx, spec) {
   // 3. Audit.
   buildPage(ctx, spec, {
     key: "admin-audit",
-    title: "Admin � audit log",
+    title: "Admin · audit log",
     description: "Filterable audit log with old/new JSON diff.",
     tags: ["admin", "manager"],
     variables: [
@@ -1501,7 +1501,7 @@ function buildAdminPages(ctx, spec) {
   // 4. Settings and feature flags.
   buildPage(ctx, spec, {
     key: "admin-settings",
-    title: "Admin � system settings",
+    title: "Admin · system settings",
     description: "Settings and feature flags with audited updates.",
     tags: ["admin"],
     variables: [{ key: "kind", type: "string", defaultValue: "feature_flag" }],
@@ -1547,7 +1547,7 @@ function buildAdminPages(ctx, spec) {
   // 5. Import / export.
   buildPage(ctx, spec, {
     key: "admin-import",
-    title: "Admin � import / export",
+    title: "Admin · import / export",
     description: "CSV import with validation summary and record export.",
     tags: ["admin", "manager"],
     variables: [{ key: "entity", type: "string", defaultValue: main.key }, { key: "csv", type: "string", defaultValue: "" }],
@@ -1591,7 +1591,7 @@ function buildAdminPages(ctx, spec) {
   // 6. Integrations.
   buildPage(ctx, spec, {
     key: "admin-integrations",
-    title: "Admin � integration health",
+    title: "Admin · integration health",
     description: "Integration health and inbound webhook event log.",
     tags: ["admin"],
     variables: [],
@@ -1626,7 +1626,7 @@ function buildAdminPages(ctx, spec) {
   // 7. Jobs.
   buildPage(ctx, spec, {
     key: "admin-jobs",
-    title: "Admin � jobs and workflow runs",
+    title: "Admin · jobs and workflow runs",
     description: "Workflow instance monitor, run logs and cron history.",
     tags: ["admin"],
     variables: [],
@@ -1694,7 +1694,7 @@ function buildAdminPages(ctx, spec) {
   // 8. Data quality.
   buildPage(ctx, spec, {
     key: "admin-quality",
-    title: "Admin � data quality",
+    title: "Admin · data quality",
     description: "Quality checks and operational failures.",
     tags: ["admin", "manager"],
     variables: [],

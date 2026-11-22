@@ -1,7 +1,7 @@
 {
   "slug": "crm-admin-integrations",
   "key": "admin-integrations",
-  "title": "Admin � integration health",
+  "title": "Admin · integration health",
   "description": "Integration health and inbound webhook event log.",
   "accessTags": [
     "admin"

@@ -109,8 +109,6 @@ async function createRoles({ tenantID, pkg, ledger, authContext, userID }) {
   const rolePlans = [];
   for (const role of pkg.roles) {
     const general = new Set(role.generalPermissions || []);
-    if ((role.queryTags || []).includes("write")) general.add("tenant:dataquery:execute");
-    if (!["viewer", "client"].includes(role.key) && (role.workflowTags || []).length) general.add("tenant:workflow:execute");
     for (const title of general) permissionTitles.add(title);
     const assetPermissions = [];
     for (const page of role.pages || []) {
@@ -122,9 +120,23 @@ async function createRoles({ tenantID, pkg, ledger, authContext, userID }) {
       permissionTitles.add(`tenant:asset:apppage:${target}:read`);
       permissionTitles.add(`tenant:asset:apppage:${target}:execute`);
     }
-    // Query/workflow execution is granted at the general permission level for
-    // staff roles; page execute covers delegated page queries. External and
-    // viewer roles deliberately receive neither.
+    // Grant query/workflow execution per asset instead of a wildcard. This is
+    // what makes read-only roles genuinely read-only while still allowing
+    // those roles to run the queries and workflows their template role names.
+    for (const query of role.queries || []) {
+      if (!query.canExecute) continue;
+      const target = queryMap.get(queryId(query.query));
+      if (!target) continue;
+      assetPermissions.push({ resourceType: "dataquery", resourceID: target, action: "execute" });
+      permissionTitles.add(`tenant:asset:dataquery:${target}:execute`);
+    }
+    for (const workflow of role.workflows || []) {
+      if (!workflow.canTrigger) continue;
+      const target = workflowMap.get(workflowId(workflow.workflow));
+      if (!target) continue;
+      assetPermissions.push({ resourceType: "workflow", resourceID: target, action: "execute" });
+      permissionTitles.add(`tenant:asset:workflow:${target}:execute`);
+    }
     rolePlans.push({ role, general, assetPermissions });
   }
   // Create every asset permission outside the role transaction. Creating them

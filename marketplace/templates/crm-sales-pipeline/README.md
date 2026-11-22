@@ -42,14 +42,14 @@ The package is data-only: schema, deterministic seed, parameterized queries, wid
 | `crm-notifications` | Notifications | shared, staff, manager, admin, viewer, portal |
 | `crm-settings` | Settings | shared, manager, admin |
 | `crm-portal` | Client portal | portal, client, admin, manager |
-| `crm-admin-users` | Admin � users | admin, manager |
-| `crm-admin-roles` | Admin � roles and permissions | admin |
-| `crm-admin-audit` | Admin � audit log | admin, manager |
-| `crm-admin-settings` | Admin � system settings | admin |
-| `crm-admin-import` | Admin � import / export | admin, manager |
-| `crm-admin-integrations` | Admin � integration health | admin |
-| `crm-admin-jobs` | Admin � jobs and workflow runs | admin |
-| `crm-admin-quality` | Admin � data quality | admin, manager |
+| `crm-admin-users` | Admin · users | admin, manager |
+| `crm-admin-roles` | Admin · roles and permissions | admin |
+| `crm-admin-audit` | Admin · audit log | admin, manager |
+| `crm-admin-settings` | Admin · system settings | admin |
+| `crm-admin-import` | Admin · import / export | admin, manager |
+| `crm-admin-integrations` | Admin · integration health | admin |
+| `crm-admin-jobs` | Admin · jobs and workflow runs | admin |
+| `crm-admin-quality` | Admin · data quality | admin, manager |
 
 ## Data model
 
