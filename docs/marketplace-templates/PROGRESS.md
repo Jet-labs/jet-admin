@@ -35,9 +35,9 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 | # | Template | Package | Validate | Install smoke | Workflows | Roles | Commit |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | crm-sales-pipeline | [x] | [x] | [x] | [x] | [x] | `ee548d46` |
-| 2 | customer-support-console | [x] | [x] | [x] | [~] Temporal unavailable | [x] | this commit |
-| 3 | inventory-replenishment-planner | [x] | [x] | [x] | [~] Temporal unavailable | [x] | this commit |
-| 4 | invoice-matching-desk | [x] | [x] | [x] | [~] Temporal unavailable | [x] | this commit |
+| 2 | customer-support-console | [x] | [x] | [x] | [~] Temporal unavailable | [x] | `118b045c` |
+| 3 | inventory-replenishment-planner | [x] | [x] | [x] | [~] Temporal unavailable | [x] | `f7e9a347` |
+| 4 | invoice-matching-desk | [x] | [x] | [x] | [~] Temporal unavailable | [x] | `450ba4dc` |
 | 5 | ecommerce-operations | [ ] deferred | — | — | — | — | — |
 | 6 | hrms-people | [ ] deferred | — | — | — | — | — |
 | 7 | project-management | [ ] deferred | — | — | — | — | — |
@@ -115,6 +115,7 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 - [ ] Workflow run/log assertions Invoice Matching Desk — blocked on Temporal
 - [x] Frontend lint/build for changed files
 - [x] `marketplace/README.md` catalogue + authoring guide
+- [x] Four-template catalogue validation — CRM, Customer Support, Inventory Replenishment, Invoice Matching
 - [ ] Full 12-template validation — deferred by explicit user scope change
 
 ## Blockers / known limitations
@@ -125,6 +126,10 @@ Legend: `[x]` complete · `[~]` in progress · `[ ]` not started · `BLOCKED` un
 - XLSX export is Excel-compatible CSV; no XLSX runtime exists.
 - Existing curated-marketplace tests fail because of pre-existing uncommitted work in the tree; not modified here.
 - Workflow execution smoke tests need Temporal at `temporal:7233`. Docker Desktop currently cannot create or remove containers, so the local Temporal stack is unavailable; package validation and all DB-backed tests still run.
+
+## Final delivery summary
+
+All four catalogue packages validate against the real DB-backed loader, install on a fresh tenant with seeded data, render their page read queries, enforce the five-role permission matrix and uninstall with zero orphan tables or ledger rows. Runtime packages are registered in `tblMarketplaceItem.payload` / `tblMarketplaceTemplateAssets`; the `marketplace/templates/` folders remain authoring source only. The only outstanding runtime check is Temporal workflow execution, documented above as blocked by the Docker container-store failure.
 
 ### DB-backed runtime correction
 
