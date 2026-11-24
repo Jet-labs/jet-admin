@@ -13,6 +13,8 @@
 
 import { createApiClient } from "../client.js";
 import { safeArray, trimId } from "../utils.js";
+import { normalizeWorkflow, summarizeInstance } from "../normalize.js";
+import { validateWorkflowGraph } from "../validation/workflow.js";
 
 export const workflowTools = [
   {
@@ -55,17 +57,18 @@ export const workflowTools = [
   {
     name: "get_workflow",
     description:
-      "Get the FULL definition of a workflow — its nodes and edges (execution DAG).\n\n" +
-      "Returns: the raw workflow object including nodes (each { id, type, data }) and edges\n" +
-      "(each { id, source, target, ... }).\n\n" +
+      "Get the FULL definition of a workflow as a normalized graph.\n\n" +
+      "Returns: { workflowID, title, status:'active'|'inactive', description, workflowOptions, folderID,\n" +
+      "  nodeCount, edgeCount, nodes:[{id,type,data}], edges:[{id,source,target,sourceHandle,targetHandle,type}] }.\n" +
+      "The normalized nodes/edges can be edited and sent directly to update_workflow. Pass raw:true for the backend's\n" +
+      "raw DB relations (tblWorkflowNodes/tblWorkflowEdge) if you need every column.\n\n" +
       "Use this when:\n" +
-      "  - You need to modify a workflow — read nodes/edges here, modify, then send the complete arrays\n" +
-      "    to update_workflow\n" +
+      "  - You need to modify a workflow — read nodes/edges here, modify, then send the complete arrays to update_workflow\n" +
       "  - You want a working example of node/edge structure before building a new workflow\n" +
-      "  - Diagnosing why a workflow misbehaves (check node configs and branching conditions)\n\n" +
+      "  - Diagnosing why a workflow misbehaves (check node configs, handles and branching conditions)\n\n" +
       "Example call:\n" +
       '  { "workflowID": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d" }\n\n' +
-      "Related: update_workflow, get_workflow_schema (authoritative node schema), get_workflow_instance.",
+      "Related: update_workflow, describe_node_type, validate_workflow, get_workflow_instance.",
     inputSchema: {
       type: "object",
       properties: {
@@ -74,14 +77,16 @@ export const workflowTools = [
           description: "UUID of the workflow. Get it from list_workflows or get_tenant_resource_summary. " +
             "Example: '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d'.",
         },
+        raw: { type: "boolean", description: "Return the raw backend DB relations instead of the normalized graph. Default false." },
       },
       required: ["workflowID"],
     },
-    handler: async ({ workflowID }, context) => {
+    handler: async ({ workflowID, raw = false }, context) => {
       const { workflowAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      const w = await workflowAPI.getById(trimId(workflowID, "workflowID"));
-      if (!w) throw new Error(`Workflow not found: ${workflowID}`);
-      return w;
+      const res = await workflowAPI.getById(trimId(workflowID, "workflowID"));
+      if (!res) throw new Error(`Workflow not found: ${workflowID}`);
+      if (raw) return res;
+      return normalizeWorkflow(res);
     },
   },
 
@@ -165,6 +170,14 @@ export const workflowTools = [
     },
     handler: async ({ workflowTitle, workflowDescription, nodes, edges, inputParams }, context) => {
       const { workflowAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const validation = validateWorkflowGraph({ nodes, edges });
+      if (!validation.valid) {
+        const summary = validation.errors.slice(0, 6).map((e) => `${e.path}: ${e.message}`).join("; ");
+        throw Object.assign(
+          new Error(`Workflow validation failed: ${summary}`),
+          { code: "WORKFLOW_VALIDATION_FAILED", details: validation }
+        );
+      }
       // Backend expects `title` (not workflowTitle) and `workflowOptions` for extra metadata
       const result = await workflowAPI.create({
         title: workflowTitle,
@@ -221,6 +234,16 @@ export const workflowTools = [
     handler: async ({ workflowID, workflowTitle, workflowDescription, nodes, edges }, context) => {
       const { workflowAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const id = trimId(workflowID, "workflowID");
+      if (nodes !== undefined) {
+        const validation = validateWorkflowGraph({ nodes, edges: edges ?? [] });
+        if (!validation.valid) {
+          const summary = validation.errors.slice(0, 6).map((e) => `${e.path}: ${e.message}`).join("; ");
+          throw Object.assign(
+            new Error(`Workflow validation failed: ${summary}`),
+            { code: "WORKFLOW_VALIDATION_FAILED", details: validation }
+          );
+        }
+      }
       // Backend expects `title` (not workflowTitle)
       const updates = {};
       if (workflowTitle !== undefined)      updates.title = workflowTitle;
@@ -228,7 +251,13 @@ export const workflowTools = [
       if (nodes !== undefined)               updates.nodes = nodes;
       if (edges !== undefined)               updates.edges = edges;
       await workflowAPI.update(id, updates);
-      return { success: true, workflowID: id };
+      return {
+        success: true,
+        workflowID: id,
+        ...(nodes !== undefined ? { nodeCount: nodes.length } : {}),
+        ...(edges !== undefined ? { edgeCount: edges.length } : {}),
+        hint: nodes !== undefined || edges !== undefined ? "Re-read with get_workflow to verify the persisted DAG; edge ids may be regenerated." : undefined,
+      };
     },
   },
 
@@ -262,17 +291,17 @@ export const workflowTools = [
   {
     name: "execute_workflow",
     description:
-      "Trigger an ASYNC execution of a workflow and return immediately.\n\n" +
-      "Returns: the execution instance info including instanceID (e.g. { instanceID: 'inst_...' }).\n" +
-      "The workflow runs in the background — ALWAYS follow up with get_workflow_instance (poll until\n" +
-      "status is 'COMPLETED' or 'FAILED') to learn the outcome and see the execution log on failure.\n\n" +
-      "inputValues must provide a value for each inputParam the workflow declares (see create_workflow).\n\n" +
+      "Trigger an ASYNC execution of a workflow and return immediately (or wait with waitSeconds).\n\n" +
+      "Returns: execution instance info including instanceID. If waitSeconds > 0 (max 120), this tool also polls\n" +
+      "the instance every 2s and returns { instance: { status, errors, failedNode, contextData, logs } } when it\n" +
+      "reaches a terminal state or the wait expires. This removes the execute→poll loop for most runs.\n\n" +
+      "inputValues must provide a value for each inputParam the workflow declares. They are exposed to nodes as\n" +
+      "ctx.input.<name> (not ctx.<name>).\n\n" +
+      "ALWAYS check status AND contextData/output — a COMPLETED run can still take a wrong branch.\n\n" +
       "Example call:\n" +
       '  { "workflowID": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",\n' +
-      '    "inputValues": { "orderID": "ord_12345" } }\n' +
-      "Then poll:\n" +
-      '  { "instanceID": "<instanceID from the response>" }\n\n' +
-      "Related: get_workflow_instance, create_workflow, list_workflows.",
+      '    "inputValues": { "orderID": "ord_12345" }, "waitSeconds": 20 }\n\n' +
+      "Related: get_workflow_instance, create_workflow, validate_workflow.",
     inputSchema: {
       type: "object",
       properties: {
@@ -284,41 +313,72 @@ export const workflowTools = [
           type: "object",
           description: "Values for the workflow's declared input params. Example: { orderID: 'ord_12345' }.",
         },
+        waitSeconds: {
+          type: "number",
+          description: "Optional. Poll up to this many seconds for a terminal status (0-120). Default 0 (return immediately).",
+        },
       },
       required: ["workflowID"],
     },
-    handler: async ({ workflowID, inputValues = {} }, context) => {
+    handler: async ({ workflowID, inputValues = {}, waitSeconds = 0 }, context) => {
       const { workflowAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return workflowAPI.execute(trimId(workflowID, "workflowID"), { inputValues });
+      const execution = await workflowAPI.execute(trimId(workflowID, "workflowID"), { inputValues });
+      const wait = Math.max(0, Math.min(Number(waitSeconds) || 0, 120));
+      if (wait <= 0 || !execution?.instanceID) return execution;
+      const deadline = Date.now() + wait * 1000;
+      let raw = null;
+      while (Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        raw = await workflowAPI.getInstance(execution.instanceID);
+        if (["COMPLETED", "FAILED", "CANCELLED", "TERMINATED", "TIMED_OUT"].includes(raw?.status)) break;
+      }
+      return {
+        ...execution,
+        waitedSeconds: wait,
+        instance: raw ? summarizeInstance(raw) : null,
+        next: raw && ["COMPLETED", "FAILED", "CANCELLED", "TERMINATED", "TIMED_OUT"].includes(raw.status)
+          ? "Run reached a terminal state. Check status AND contextData/output."
+          : `Still running after ${wait}s. Call get_workflow_instance with instanceID.`,
+      };
     },
   },
 
   {
     name: "get_workflow_instance",
     description:
-      "Get the status and execution log of a workflow run.\n\n" +
-      "Returns: { status: 'COMPLETED'|'FAILED'|'RUNNING'|..., log: [ ...per-step execution entries ] }.\n" +
-      "On FAILED, the log entries show which node errored and why.\n\n" +
-      "Poll this after execute_workflow: check the status; if 'RUNNING', wait briefly and call again.\n" +
-      "Stop as soon as status is 'COMPLETED' or 'FAILED' — do not poll forever.\n\n" +
-      "Example call:\n" +
-      '  { "instanceID": "inst_9a8b7c6d5e4f" }\n\n' +
-      "Related: execute_workflow (returns the instanceID).",
+      "Get the status, errors and execution log of a workflow run.\n\n" +
+      "Returns (default summary): { instanceID, workflowID, status, startedAt, completedAt, output,\n" +
+      "  errors:[{nodeID,eventType,message,code?}], failedNode, contextData, nodeOutputs,\n" +
+      "  logCount, logsTruncated, logs (last maxLogs), pendingDataCollectionRequests }.\n" +
+      "The summary strips the huge __contextSnapshot repeated in every raw log entry; node outputs are still\n" +
+      "available under nodeOutputs. Use verbosity:'full' for the raw backend response.\n\n" +
+      "On FAILED, errors/failedNode name the failing node; cross-reference get_workflow to map nodeID → title/type.\n\n" +
+      "Example: { \"instanceID\": \"...\", \"maxLogs\": 20 }\n\n" +
+      "Related: execute_workflow (waitSeconds), list_workflow_instances, get_workflow.",
     inputSchema: {
       type: "object",
       properties: {
         instanceID: {
           type: "string",
-          description: "Instance ID returned by execute_workflow. Example: 'inst_9a8b7c6d5e4f'.",
+          description: "Instance ID returned by execute_workflow.",
+        },
+        verbosity: {
+          type: "string",
+          enum: ["summary", "full"],
+          description: "summary (default) strips context snapshots; full returns the raw backend response.",
+        },
+        maxLogs: {
+          type: "number",
+          description: "Max log entries to include in summary mode (default 50, 0 = none).",
         },
       },
       required: ["instanceID"],
     },
-    handler: async ({ instanceID }, context) => {
+    handler: async ({ instanceID, verbosity = "summary", maxLogs = 50 }, context) => {
       const { workflowAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const result = await workflowAPI.getInstance(trimId(instanceID, "instanceID"));
       if (!result) throw new Error(`Workflow instance not found: ${instanceID}`);
-      return result;
+      return summarizeInstance(result, { verbosity, maxLogs });
     },
   },
 ];
