@@ -45,6 +45,7 @@ export const queryTools = [
           datasourceType: q.datasourceType,
           datasourceID: q.datasourceID,
           runOnLoad: q.runOnLoad,
+          folderID: q.folderID ?? null,
           createdAt: q.createdAt,
         })),
         totalCount: data?.totalCount ?? queries.length,
@@ -89,6 +90,7 @@ export const queryTools = [
         datasourceID: q.datasourceID,
         datasourceType: q.datasourceType,
         runOnLoad: q.runOnLoad,
+        folderID: q.folderID ?? null,
         options: q.dataQueryOptions,
         datasource: q.tblDatasources
           ? {
@@ -222,14 +224,15 @@ export const queryTools = [
     handler: async ({ dataQueryID, ...updates }, context) => {
       const { queryAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const id = trimId(dataQueryID, "dataQueryID");
-      // Backend requires dataQueryOptions on update — backfill current values
-      // for any required field the caller omitted (title-only renames).
-      if (updates.dataQueryOptions === undefined || updates.datasourceID === undefined || updates.datasourceType === undefined) {
+      // Backend requires dataQueryOptions/dataQueryTitle on update — backfill current values
+      // for any required field the caller omitted (title-only renames, SQL-only edits).
+      if (updates.dataQueryOptions === undefined || updates.datasourceID === undefined || updates.datasourceType === undefined || updates.dataQueryTitle === undefined) {
         const current = await queryAPI.getById(id);
         const q = current?.dataQuery || current;
         if (updates.dataQueryOptions === undefined && q?.dataQueryOptions) updates.dataQueryOptions = q.dataQueryOptions;
         if (updates.datasourceID === undefined && q?.datasourceID) updates.datasourceID = q.datasourceID;
         if (updates.datasourceType === undefined && q?.datasourceType) updates.datasourceType = q.datasourceType;
+        if (updates.dataQueryTitle === undefined && q?.dataQueryTitle) updates.dataQueryTitle = q.dataQueryTitle;
       }
       await queryAPI.update(id, updates);
       return { success: true, dataQueryID: id };
