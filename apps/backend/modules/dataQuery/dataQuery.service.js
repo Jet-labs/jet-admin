@@ -561,7 +561,7 @@ dataQueryService.getDataQueryByID = async ({
  * @param {number} param0.userID
  * @param {number} param0.tenantID
  * @param {number} param0.dataQueryID
- * @returns {Promise<boolean>}
+ * @returns {Promise<object>} the newly created query
  */
 dataQueryService.cloneDataQueryByID = async ({
   userID,
@@ -618,7 +618,7 @@ dataQueryService.cloneDataQueryByID = async ({
         newDataQueryID: newDataQuery.dataQueryID,
       },
     });
-    return true;
+    return newDataQuery;
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryService:cloneDataQueryByID:failure",

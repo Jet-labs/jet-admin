@@ -13,7 +13,7 @@ const tenantRoleService = {};
  * @param {string} param0.roleTitle
  * @param {string} param0.roleDescription
  * @param {Array<number>} param0.permissionIDs
- * @returns {Promise<boolean>}
+ * @returns {Promise<object>} the created role
  */
 tenantRoleService.createRole = async ({
   tenantID,
@@ -100,7 +100,7 @@ tenantRoleService.createRole = async ({
       params: { roleID: createdRole.roleID },
     });
 
-    return true;
+    return createdRole;
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleService:createRole:failure",
@@ -310,10 +310,26 @@ tenantRoleService.getAllTenantPermissions = async ({ userID, tenantID }) => {
       message: "tenantRoleService:getAllTenantPermissions:params",
       params: { userID, tenantID },
     });
-    const permissions = await prisma.tblPermissions.findMany();
+    // Asset permissions (`tenant:asset:*`) are managed through the separate
+    // assetPermissions field and are filtered out by the role editor. Returning
+    // ~1,700 of them here makes the permission picker unusable and hides the
+    // real core permissions. Return unique core permissions only.
+    const allPermissions = await prisma.tblPermissions.findMany({
+      where: {
+        NOT: { permissionTitle: { startsWith: "tenant:asset:" } },
+      },
+      orderBy: { permissionTitle: "asc" },
+    });
+    const seen = new Set();
+    const permissions = allPermissions.filter((permission) => {
+      const key = permission.permissionTitle || permission.permissionID;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
     Logger.log("success", {
       message: "tenantRoleService:getAllTenantPermissions:success",
-      params: { permissionsLength: permissions?.length },
+      params: { permissionsLength: permissions?.length, rawLength: allPermissions.length },
     });
     return permissions;
   } catch (error) {

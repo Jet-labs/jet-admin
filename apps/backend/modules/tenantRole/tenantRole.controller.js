@@ -22,7 +22,7 @@ tenantRoleController.createRole = async (req, res) => {
       params: { tenantID, roleTitle, roleDescription, permissionIDs, assetPermissions },
     });
 
-    await tenantRoleService.createRole({
+    const createdRole = await tenantRoleService.createRole({
       tenantID: tenantID,
       roleTitle,
       roleDescription,
@@ -32,10 +32,10 @@ tenantRoleController.createRole = async (req, res) => {
 
     Logger.log("success", {
       message: "tenantRoleController:createRole:success",
-      params: { tenantID, tenantID, roleTitle, roleDescription, permissionIDs },
+      params: { tenantID, roleID: createdRole?.roleID, roleTitle, roleDescription, permissionIDs },
     });
 
-    return expressUtils.sendResponse(res, true, {}, null, constants.HTTP_STATUS.OK);
+    return expressUtils.sendResponse(res, true, { role: createdRole }, null, constants.HTTP_STATUS.OK);
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleController:createRole:catch-1",

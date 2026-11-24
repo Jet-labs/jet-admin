@@ -337,7 +337,7 @@ dataQueryController.cloneDataQueryByID = async (req, res) => {
       },
     });
 
-    await dataQueryService.cloneDataQueryByID({
+    const clonedQuery = await dataQueryService.cloneDataQueryByID({
       userID: user.userID,
       tenantID,
       dataQueryID,
@@ -350,10 +350,12 @@ dataQueryController.cloneDataQueryByID = async (req, res) => {
         userID: user.userID,
         tenantID,
         dataQueryID,
+        newDataQueryID: clonedQuery?.dataQueryID,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
+      dataQuery: clonedQuery,
       message: "Query cloned successfully.",
     }, null, constants.HTTP_STATUS.OK);
   } catch (error) {

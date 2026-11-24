@@ -21,11 +21,11 @@ const auditService = {};
  * @param {string|undefined} param0.dateTo   - ISO date string for end of range (inclusive)
  * @returns
  */
-auditService.getAuditLogsByTenantID = async ({ tenantID, skip, take, dateFrom, dateTo }) => {
+auditService.getAuditLogsByTenantID = async ({ tenantID, skip, take, dateFrom, dateTo, search, entityType }) => {
   try {
     Logger.log("info", {
       message: "auditService:getAuditLogsByTenantID:params",
-      params: { tenantID, skip, take },
+      params: { tenantID, skip, take, search, entityType },
     });
 
     const dateFilter =
@@ -39,6 +39,18 @@ auditService.getAuditLogsByTenantID = async ({ tenantID, skip, take, dateFrom, d
         : {};
 
     const where = { tenantID, ...dateFilter };
+    if (entityType) {
+      where.AND = [
+        ...(where.AND || []),
+        { metadata: { path: ["request", "url"], string_contains: entityType } },
+      ];
+    }
+    if (search) {
+      where.OR = [
+        { subType: { contains: search, mode: "insensitive" } },
+        { metadata: { path: ["request", "url"], string_contains: search } },
+      ];
+    }
 
     const auditLogs = await prisma.tblAuditLogs.findMany({
       where,
