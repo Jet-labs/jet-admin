@@ -276,44 +276,67 @@ export const datasourceTools = [
   {
     name: "test_datasource_connection",
     description:
-      "Test whether a set of connection options can reach a datasource — WITHOUT saving anything.\n\n" +
-      "Returns: the backend test result — typically { success, latencyMs?, ... } with latency when the\n" +
-      "connection succeeds, and an error description when it fails.\n\n" +
+      "Test whether connection options (or an existing saved datasource) can reach the backend - WITHOUT saving anything.\n\n" +
+      "Two modes:\n" +
+      "  - datasourceID: fetch the saved datasource and test its stored options (no secrets returned).\n" +
+      "  - datasourceType + datasourceOptions: test an unsaved candidate before create_datasource.\n\n" +
+      "Returns the backend test result with large response bodies truncated to bodyPreview/bodyLength.\n" +
       "SCOPE: host reachability ONLY. For restapi, success:true on a bare baseUrl does NOT prove any API\n" +
       "endpoint serves JSON (an SPA shell also returns 200 HTML). For endpoint validation use\n" +
       "test_datasource_json_endpoint with a testPath instead.\n\n" +
-      "Use this to validate credentials/options BEFORE create_datasource (creation does not test the\n" +
-      "connection), or to diagnose a broken existing connection with modified options.\n" +
-      "The options object MUST match the backend-validated shape for that datasourceType — call\n" +
-      "get_datasource_schemas FIRST and copy its structure.\n\n" +
-      "Example call 1 — PostgreSQL (connectionString form):\n" +
-      '  { "datasourceType": "postgresql",\n' +
-      '    "datasourceOptions": { "connectionOption": "connectionString",\n' +
-      '                           "connectionString": "postgresql://user:pass@host:5432/db?sslmode=require" } }\n' +
-      "Example call 2 — REST API reachability:\n" +
+      "Example 1 - saved datasource health:\n" +
+      '  { "datasourceID": "a0d92556-2a03-4d1b-b531-6e793215083a" }\n' +
+      "Example 2 - candidate REST API reachability:\n" +
       '  { "datasourceType": "restapi", "datasourceOptions": { "baseUrl": "https://api.example.com/v1",\n' +
       '      "timeout": 10, "authType": "none", "headers": [], "queryParams": [],\n' +
       '      "contentType": "application/json", "followRedirects": true, "sslVerify": true } }\n\n' +
-      "Related: test_datasource_json_endpoint, create_datasource, get_datasource_schemas.",
+      "Related: test_datasource_json_endpoint, create_datasource, get_datasource_schemas, list_datasources.",
     inputSchema: {
       type: "object",
       properties: {
+        datasourceID: {
+          type: "string",
+          description: "Optional. Test a saved datasource by ID (uses its stored options).",
+        },
         datasourceType: {
           type: "string",
-          description:
-            "Datasource type from list_datasource_types (35 values). Example: 'postgresql', 'restapi'.",
+          description: "Datasource type from list_datasource_types. Required unless datasourceID is provided.",
         },
         datasourceOptions: {
           type: "object",
-          description:
-            "Connection options — same shape create_datasource expects (see get_datasource_schemas).",
+          description: "Connection options - same shape create_datasource expects. Required unless datasourceID is provided.",
         },
       },
-      required: ["datasourceType", "datasourceOptions"],
     },
-    handler: async ({ datasourceType, datasourceOptions }, context) => {
+    handler: async ({ datasourceID, datasourceType, datasourceOptions }, context) => {
       const { datasourceAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return datasourceAPI.test({ datasourceType, datasourceOptions });
+      let type = datasourceType;
+      let options = datasourceOptions;
+      let source = "inline";
+      let title = null;
+      if (datasourceID) {
+        const res = await datasourceAPI.getById(trimId(datasourceID, "datasourceID"));
+        const ds = res?.datasource || res;
+        if (!ds) throw new Error(`Datasource not found: ${datasourceID}`);
+        type = ds.datasourceType;
+        options = ds.datasourceOptions;
+        source = "saved";
+        title = ds.datasourceTitle;
+      }
+      if (!type || !options) {
+        throw Object.assign(new Error("Provide datasourceID, or datasourceType + datasourceOptions."), { code: "TEST_INPUT_REQUIRED" });
+      }
+      const result = await datasourceAPI.test({ datasourceType: type, datasourceOptions: options });
+      const cr = result?.connectionResult || result;
+      if (cr && typeof cr.body === "string" && cr.body.length > 500) {
+        const preview = cr.body.slice(0, 500);
+        cr.bodyPreview = preview;
+        cr.bodyLength = cr.body.length;
+        cr.bodyTruncated = true;
+        cr.looksLikeHtml = /^\s*</.test(preview) || /<html/i.test(preview);
+        delete cr.body;
+      }
+      return { ...result, connectionResult: cr, source, ...(datasourceID ? { datasourceID, title } : {}) };
     },
   },
   {
