@@ -33,7 +33,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { z } from 'zod';
 
 // ─── 3. Tools (dynamic import — after env is set) ─────────────────────────────
-const { allTools } = await import('@jet-admin/mcp-server');
+const { allTools, registerResources, formatToolError } = await import('@jet-admin/mcp-server');
 
 // ─── Firebase Admin ───────────────────────────────────────────────────────────
 
@@ -171,15 +171,15 @@ async function mcpHandler(req, res) {
           `[mcp-server] tool:${tool.name} error: ${err?.message}\n`
         );
         return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({ error: true, message: err?.message || String(err), tool: tool.name }),
-          }],
+          content: [{ type: 'text', text: JSON.stringify(formatToolError(err, tool.name), null, 2) }],
           isError: true,
         };
       }
     });
   }
+
+  // Static architecture/binding/form/listener/permission resources + prompts.
+  try { registerResources(server); } catch (err) { process.stderr.write(`[mcp-server] resource registration failed: ${err?.message}\n`); }
 
   // ── Connect stateless transport and handle request ─────────────────────
   const transport = new StreamableHTTPServerTransport({

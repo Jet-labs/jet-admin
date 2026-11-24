@@ -41,7 +41,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 
 import { config } from "./config.js";
-import { allTools } from "./tools/index.js";
+import { allTools, registerResources, formatToolError } from "./tools/index.js";
 
 // ─── Global Error Safety ──────────────────────────────────────────────────────
 // Without these, unhandled errors silently crash the process and the MCP
@@ -139,16 +139,7 @@ for (const tool of allTools) {
             content: [
               {
                 type: "text",
-                text: JSON.stringify(
-                  {
-                    error: true,
-                    message: error?.message || String(error),
-                    tool: tool.name,
-                    hint: getErrorHint(error),
-                  },
-                  null,
-                  2
-                ),
+                text: JSON.stringify(formatToolError(error, tool.name), null, 2),
               },
             ],
             isError: true,
@@ -162,6 +153,14 @@ for (const tool of allTools) {
       `[jet-admin-mcp] WARNING: Failed to register tool "${tool?.name}": ${regError?.message}\n`
     );
   }
+}
+
+// ─── Register Resources + Prompts ─────────────────────────────────────────────
+try {
+  registerResources(server);
+  process.stderr.write("[jet-admin-mcp] Registered resources: architecture, bindings, workflow-nodes, forms, listeners, permissions\n");
+} catch (resourceError) {
+  process.stderr.write(`[jet-admin-mcp] WARNING: failed to register resources: ${resourceError?.message}\n`);
 }
 
 // ─── Start Transport ──────────────────────────────────────────────────────────
@@ -271,36 +270,8 @@ function jsonSchemaToZod(schema) {
 
 /**
  * Returns a user-friendly hint based on the error type.
- * @param {Error} error
- * @returns {string}
+ * @deprecated Kept for compatibility; formatToolError/hintForError in utils.js is the source of truth.
  */
 function getErrorHint(error) {
-  if (!error) return "An unknown error occurred.";
-  if (error.status === 401) {
-    return "Authentication failed. Check that JET_ADMIN_API_KEY is valid.";
-  }
-  if (error.status === 403) {
-    return "Permission denied (Casbin). The key is valid but its role lacks the required grant — e.g. move needs " +
-      "folder.update + per-entity update; clone needs create+read; page create needs dataquery/workflow/listener/widget execute. " +
-      "Fix in Roles, not by retrying with the same key.";
-  }
-  if (error.status === 404) {
-    return "Resource not found. Verify the ID is correct and belongs to the configured tenant.";
-  }
-  if (error.status === 429) {
-    return "Rate limit exceeded. Wait a moment before retrying, or reduce request frequency.";
-  }
-  if (error.status === 422 || error.status === 400) {
-    return "Validation error. Check that all required fields are provided and have correct types.";
-  }
-  if (error.status >= 500) {
-    return "The Jet Admin backend returned a server error. Check backend logs for details.";
-  }
-  if (
-    error.message?.includes("unreachable") ||
-    ["ECONNREFUSED", "ECONNRESET", "ETIMEDOUT"].includes(error.code)
-  ) {
-    return `Cannot connect to Jet Admin backend at ${config.baseUrl}. Ensure the backend is running.`;
-  }
   return "See error message above for details.";
 }

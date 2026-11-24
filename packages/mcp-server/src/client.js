@@ -36,6 +36,11 @@ function normalizeError(err) {
     const e = new Error(`Jet Admin API error: ${msg}`);
     e.status = status;
     e.data = data;
+    // Preserve structured backend diagnostics so tools can return actionable
+    // field paths, SQLSTATE codes and validation issues.
+    e.backendCode = data?.error?.code;
+    e.details = data?.error?.details;
+    e.issues = data?.error?.details?.issues;
 
     // Add specific hints for well-known status codes
     if (status === 429) {

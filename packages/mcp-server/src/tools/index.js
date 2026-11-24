@@ -14,6 +14,7 @@ import { appPageTools } from "./appPage.tools.js";
 import { iamTools } from "./iam.tools.js";
 import { introspectionTools } from "./introspection.tools.js";
 import { catalogTools } from "./catalog.tools.js";
+import { validationTools } from "./validation.tools.js";
 import { adminTools } from "./admin.tools.js";
 import { lifecycleTools } from "./lifecycle.tools.js";
 
@@ -25,6 +26,8 @@ export const allTools = [
   // Discovery — call these FIRST (live backend schemas + offline plugin catalogs)
   ...introspectionTools,
   ...catalogTools,
+  // Dry-run validators — call before create/update
+  ...validationTools,
   // Core CRUD
   ...datasourceTools,
   ...queryTools,
@@ -40,6 +43,11 @@ export const allTools = [
 ];
 
 export const toolMap = new Map(allTools.map((t) => [t.name, t]));
+
+// Shared registration helpers (resources/prompts + error formatting) used by
+// both the stdio entrypoint and apps/mcp-server's HTTP wrapper.
+export { registerResources } from "../resources.js";
+export { formatToolError } from "../utils.js";
 
 process.stderr.write(
   `[jet-admin-mcp] Registered ${allTools.length} tools:\n` +
