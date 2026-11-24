@@ -11,7 +11,8 @@
  */
 
 import { createApiClient } from "../client.js";
-import { trimId } from "../utils.js";
+import { trimId, safeArray } from "../utils.js";
+import { normalizeAction } from "../validation/listener.js";
 
 export const lifecycleTools = [
   // ─── Clone / Export (12) ────────────────────────────────────────────
@@ -35,11 +36,26 @@ export const lifecycleTools = [
   },
   {
     name: "clone_query",
-    description: "Clone a saved query.\n\nRelated: export_query.",
+    description:
+      "Clone a saved query. Returns the new dataQueryID (the backend clone endpoint does not return it; this tool diffs the list).\n\nRelated: export_query, get_query.",
     inputSchema: { type: "object", properties: { dataQueryID: { type: "string", description: "Query UUID." } }, required: ["dataQueryID"] },
     handler: async ({ dataQueryID }, context) => {
-      const { bundleAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return bundleAPI.cloneQuery(trimId(dataQueryID, "dataQueryID"));
+      const { bundleAPI, queryAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const id = trimId(dataQueryID, "dataQueryID");
+      const before = await queryAPI.list({ pageSize: 100 });
+      const beforeIDs = new Set(safeArray(before, "dataQueries").map((q) => q.dataQueryID));
+      const source = safeArray(before, "dataQueries").find((q) => q.dataQueryID === id);
+      await bundleAPI.cloneQuery(id);
+      const after = await queryAPI.list({ pageSize: 100 });
+      const created = safeArray(after, "dataQueries").filter((q) => !beforeIDs.has(q.dataQueryID));
+      const match = created.find((q) => source?.dataQueryTitle && String(q.dataQueryTitle || "").includes(source.dataQueryTitle)) || created[0];
+      return {
+        success: true,
+        dataQueryID: match?.dataQueryID || null,
+        dataQueryTitle: match?.dataQueryTitle || null,
+        sourceDataQueryID: id,
+        hint: match?.dataQueryID ? "Use get_query on the new ID to verify options." : "Clone succeeded but the new ID could not be identified; call list_queries.",
+      };
     },
   },
   {
@@ -255,18 +271,31 @@ export const lifecycleTools = [
   },
   {
     name: "submit_data_collection_request",
-    description: "Submit (resume) a data-collection request.\n\nRelated: get_data_collection_request.",
+    description:
+      "Submit (resume) a pending data-collection or approval request.\n\n" +
+      "Pass the form values DIRECTLY in formData (e.g. { name:'Ada', age:36 } or { decision:'approve', comment:'ok' }).\n" +
+      "The tool wraps them as { submittedData: ... } for the backend; do not pre-wrap. Required fields must match\n" +
+      "the request's collectionConfig.formSchema (Ajv validation).\n\n" +
+      "Returns: { success, collectionRequestID, driver, delivery }. Re-read the instance to confirm COMPLETED and\n" +
+      "the output variable (e.g. ctx.collectedData or ctx.approval).\n\n" +
+      "Related: get_data_collection_request, get_workflow_instance, validate_form_schema.",
     inputSchema: {
       type: "object",
       properties: {
         collectionRequestID: { type: "string", description: "Collection request UUID." },
-        formData: { type: "object", description: "Submitted form values." },
+        formData: { type: "object", description: "Raw submitted values, e.g. {name:'Ada',age:36}." },
       },
       required: ["collectionRequestID"],
     },
     handler: async ({ collectionRequestID, formData }, context) => {
       const { workflowExtraAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return workflowExtraAPI.submitDataCollection(trimId(collectionRequestID, "collectionRequestID"), formData || {});
+      const raw = formData || {};
+      // Accept both the documented raw formData and a legacy pre-wrapped
+      // { submittedData: {...} } payload, then send exactly one wrapper.
+      const submittedData = raw && typeof raw === "object" && raw.submittedData && Object.keys(raw).length === 1
+        ? raw.submittedData
+        : raw;
+      return workflowExtraAPI.submitDataCollection(trimId(collectionRequestID, "collectionRequestID"), { submittedData });
     },
   },
 
@@ -291,39 +320,86 @@ export const lifecycleTools = [
       "  trigger_query      { dataQueryID, inputValues }\n" +
       "  save_to_buffer     { bufferName, retentionPolicy, maxEvents, maxAgeHours }\n" +
       "  push_to_app_page   { appPageID, channelName, maxArrayLength }\n" +
-      "Use list_listener_action_types for the full catalog and validate_listener first.\n\n" +
+      "You may pass them either nested under action:{...} or flat. Use list_listener_action_types and validate_listener first.\n\n" +
       "Example: { \"listenerID\":\"<uuid>\", \"actionType\":\"transform\", \"actionConfig\":{\"script\":\"return event;\"} }\n\n" +
       "Related: update_listener_action, delete_listener_action, validate_listener.",
     inputSchema: {
       type: "object",
       properties: {
         listenerID: { type: "string", description: "Listener UUID." },
-        action: { type: "object", description: "Action object (e.g. { type, config })." },
+        action: { type: "object", description: "Optional action object (nested form)." },
+        actionType: { type: "string", description: "transform | trigger_workflow | trigger_query | save_to_buffer | push_to_app_page." },
+        actionConfig: { type: "object", description: "Type-specific config." },
+        isEnabled: { type: "boolean", description: "Default true." },
+        orderIndex: { type: "number", description: "Execution order; default 0." },
       },
-      required: ["listenerID", "action"],
+      required: ["listenerID"],
     },
-    handler: async ({ listenerID, action }, context) => {
+    handler: async ({ listenerID, action, actionType, actionConfig, isEnabled, orderIndex }, context) => {
       const { listenerExtraAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return listenerExtraAPI.addAction(trimId(listenerID, "listenerID"), action);
+      const normalized = normalizeAction({
+        ...(action || {}),
+        ...(actionType !== undefined ? { actionType } : {}),
+        ...(actionConfig !== undefined ? { actionConfig } : {}),
+        ...(isEnabled !== undefined ? { isEnabled } : {}),
+        ...(orderIndex !== undefined ? { orderIndex } : {}),
+      });
+      if (!normalized?.actionType) {
+        throw Object.assign(new Error("actionType is required (or pass action:{actionType,actionConfig})."), { code: "ACTION_TYPE_REQUIRED" });
+      }
+      const res = await listenerExtraAPI.addAction(trimId(listenerID, "listenerID"), {
+        actionType: normalized.actionType,
+        actionConfig: normalized.actionConfig || {},
+        ...(normalized.isEnabled !== undefined ? { isEnabled: normalized.isEnabled } : {}),
+        ...(normalized.orderIndex !== undefined ? { orderIndex: normalized.orderIndex } : {}),
+      });
+      const created = res?.action || res;
+      return {
+        success: true,
+        listenerID,
+        actionID: created?.actionID || null,
+        action: created,
+        hint: "Use get_listener to verify the pipeline order/config.",
+      };
     },
   },
   {
     name: "update_listener_action",
-    description: "Update a listener pipeline action.\n\nRelated: add_listener_action.",
+    description:
+      "Update a listener pipeline action. Accepts the same {actionType,actionConfig} shape as add_listener_action,\n" +
+      "either nested under action:{...} or flat. Returns {success,actionID,action}.\n\nRelated: add_listener_action, get_listener.",
     inputSchema: {
       type: "object",
       properties: {
         listenerID: { type: "string", description: "Listener UUID." },
         actionID: { type: "string", description: "Action UUID." },
-        action: { type: "object", description: "Replacement action object." },
+        action: { type: "object", description: "Optional replacement action object (nested form)." },
+        actionType: { type: "string", description: "Optional new actionType." },
+        actionConfig: { type: "object", description: "Optional new config." },
+        isEnabled: { type: "boolean", description: "Optional enabled flag." },
+        orderIndex: { type: "number", description: "Optional order." },
       },
-      required: ["listenerID", "actionID", "action"],
+      required: ["listenerID", "actionID"],
     },
-    handler: async ({ listenerID, actionID, action }, context) => {
+    handler: async ({ listenerID, actionID, action, actionType, actionConfig, isEnabled, orderIndex }, context) => {
       const { listenerExtraAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return listenerExtraAPI.updateAction(
-        trimId(listenerID, "listenerID"), trimId(actionID, "actionID"), action
+      const normalized = normalizeAction({
+        ...(action || {}),
+        ...(actionType !== undefined ? { actionType } : {}),
+        ...(actionConfig !== undefined ? { actionConfig } : {}),
+        ...(isEnabled !== undefined ? { isEnabled } : {}),
+        ...(orderIndex !== undefined ? { orderIndex } : {}),
+      });
+      const payload = {};
+      if (normalized?.actionType !== undefined) payload.actionType = normalized.actionType;
+      if (normalized?.actionConfig !== undefined) payload.actionConfig = normalized.actionConfig;
+      if (normalized?.isEnabled !== undefined) payload.isEnabled = normalized.isEnabled;
+      if (normalized?.orderIndex !== undefined) payload.orderIndex = normalized.orderIndex;
+      const res = await listenerExtraAPI.updateAction(
+        trimId(listenerID, "listenerID"), trimId(actionID, "actionID"), payload
       );
+      const updated = res?.action || res;
+      return { success: true, listenerID, actionID, action: updated, hint: "Use get_listener to verify." };
     },
   },
   {

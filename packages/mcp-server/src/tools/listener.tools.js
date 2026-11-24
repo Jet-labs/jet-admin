@@ -6,6 +6,7 @@
 
 import { createApiClient } from "../client.js";
 import { safeArray, trimId } from "../utils.js";
+import { normalizeAction } from "../validation/listener.js";
 
 export const listenerTools = [
   {
@@ -49,21 +50,20 @@ export const listenerTools = [
   {
     name: "get_listener",
     description:
-      "Get the FULL configuration of a listener, including its pipeline steps.\n\n" +
-      "Returns: the raw listener object — listenerConfig (connection settings for its type) and\n" +
-      "pipelineSteps (the ordered transform/filter/push steps applied to each incoming event).\n\n" +
-      "Use this before update_listener so you can send the complete modified config, or as a working\n" +
-      "example of pipeline step structure when building a new listener.\n\n" +
-      "Example call:\n" +
-      '  { "listenerID": "5c6d7e8f-9a0b-4c1d-2e3f-4a5b6c7d8e9f" }\n\n' +
-      "Related: update_listener, get_listener_schemas (authoritative config shape).",
+      "Get a listener plus its normalized pipeline actions.\n\n" +
+      "Returns: { listenerID, title, type, status, datasourceID, config, endpointPath, ingress,\n" +
+      "  actions:[{actionID,actionType,actionConfig,isEnabled,orderIndex}], folderID }.\n" +
+      "The backend raw relation is tblListenerActions; this tool maps it to actions for convenience.\n\n" +
+      "Use this before update_listener, to read the generated webhook URL (ingress.webhookUrls), or as a working\n" +
+      "example of action config. For action shapes call list_listener_action_types.\n\n" +
+      "Example: { \"listenerID\": \"5c6d7e8f-9a0b-4c1d-2e3f-4a5b6c7d8e9f\" }\n\n" +
+      "Related: update_listener, list_listener_action_types, validate_listener.",
     inputSchema: {
       type: "object",
       properties: {
         listenerID: {
           type: "string",
-          description: "UUID of the listener. Get it from list_listeners or get_tenant_resource_summary. " +
-            "Example: '5c6d7e8f-9a0b-4c1d-2e3f-4a5b6c7d8e9f'.",
+          description: "UUID of the listener. Get it from list_listeners or get_tenant_resource_summary.",
         },
       },
       required: ["listenerID"],
@@ -72,77 +72,91 @@ export const listenerTools = [
       const { listenerAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const result = await listenerAPI.getById(trimId(listenerID, "listenerID"));
       if (!result) throw new Error(`Listener not found: ${listenerID}`);
-      return result;
+      const l = result?.listener || result;
+      const actions = (l.tblListenerActions || l.actions || []).map((a) => ({
+        actionID: a.actionID,
+        actionType: a.actionType,
+        actionConfig: a.actionConfig || {},
+        isEnabled: a.isEnabled,
+        orderIndex: a.orderIndex,
+      }));
+      return {
+        listenerID: l.listenerID,
+        title: l.listenerTitle,
+        description: l.listenerDescription ?? null,
+        type: l.listenerType,
+        status: l.status,
+        datasourceID: l.datasourceID,
+        folderID: l.folderID ?? null,
+        config: l.listenerConfig || {},
+        endpointPath: l.endpointPath ?? null,
+        ingress: l.ingress || null,
+        actions,
+        actionCount: actions.length,
+      };
     },
   },
 
   {
     name: "create_listener",
     description:
-      "Create a NEW real-time listener.\n\n" +
-      "Returns: the created listener object including its new listenerID.\n" +
-      "Creation does NOT start the listener — call activate_listener afterwards. The pipeline runs only\n" +
-      "while the listener is active.\n\n" +
-      "A datasourceID (a datasource of matching type, e.g. a webhook datasource for\n" +
-      "webhook listeners) is REQUIRED — find one via get_tenant_resource_summary first.\n" +
+      "Create a NEW real-time listener (inactive). A datasourceID of a listener-capable type is REQUIRED.\n\n" +
+      "Returns: { success, listenerID, listener, actions, hint }. After creation, add actions with\n" +
+      "add_listener_action or pass them in actions[] here (they are created after the listener).\n" +
       "Creation does NOT start the listener — call activate_listener afterwards.\n\n" +
-      "listenerConfig shape by listenerType (call get_listener_schemas FIRST for the\n" +
-      "authoritative fields; backend also accepts legacy aliases):\n" +
-      "  websocket: { parseAsJSON: true, messageFilter?: '' } (connection URL lives on the datasource)\n" +
-      "  webhook:   { path: '/my-hook' } (alias: pathSuffix) — Jet Admin generates the inbound URL;\n" +
-      "             get it from get_listener after creation to give to the event source\n" +
+      "listenerConfig by type (get_listener_schemas is authoritative):\n" +
+      "  webhook:   { pathSuffix: '/my-hook' }   (prefer pathSuffix; path has produced endpointPath:null)\n" +
+      "  websocket: { parseAsJSON: true }         (URL lives on the datasource)\n" +
       "  sse:       { eventTypes?: '', parseAsJSON: true }\n" +
-      "  mqtt:      { topics: 'sensors/#', qos: 0 } | kafka: { topic: '...', consumerGroup?: 'jet-listener' }\n" +
-      "Pipeline: get_listener returns tblListenerActions (transform/save_to_buffer/\n" +
-      "trigger_query/push_to_app_page). Pass pipelineSteps on create when supported.\n\n" +
-      "Example call — inbound webhook (datasourceID required):\n" +
-      '  { "listenerTitle": "Stripe events", "listenerType": "webhook",\n' +
-      '    "datasourceID": "<webhook-datasource-UUID>",\n' +
-      '    "listenerConfig": { "path": "/stripe-events" } }\n\n' +
-      "After creating: activate_listener → get_listener (to read the generated webhook URL if applicable).\n\n" +
-      "Related: get_listener_schemas, activate_listener, update_listener, get_listener.",
+      "  mqtt:      { topics: 'sensors/#', qos: 0 } | kafka: { topic: '...', consumerGroup?: 'jet-listener' }\n\n" +
+      "Example: { \"listenerTitle\":\"Stripe events\", \"listenerType\":\"webhook\", \"datasourceID\":\"<webhook-ds-uuid>\",\n" +
+      "  \"listenerConfig\":{\"pathSuffix\":\"/stripe-events\"},\n" +
+      "  \"actions\":[{\"actionType\":\"transform\",\"actionConfig\":{\"script\":\"return event;\"}}] }\n\n" +
+      "Related: list_listener_types, validate_listener, add_listener_action, activate_listener.",
     inputSchema: {
       type: "object",
       properties: {
-        listenerTitle: {
-          type: "string",
-          description: "Human-readable name. Example: 'Live payments stream'.",
-        },
-        listenerType: {
-          type: "string",
-          description: "Listener-capable type from list_listener_types (13 values: postgresql, firestore, mongodb, " +
-            "graphql, rabbitmq, kafka, redis, webhook, mqtt, websocket, sse, syslog, nats). " +
-            "Pick 'webhook' for event sources that call you (Stripe, GitHub...), " +
-            "'websocket'/'sse' to consume an upstream stream. Example: 'websocket'.",
-        },
-        datasourceID: {
-          type: "string",
-          description: "Optional. UUID of an associated datasource if the listener feeds one. " +
-            "Example: 'd7a1c3e2-4b5f-4c6a-9e8d-1f2a3b4c5d6e'.",
-        },
-        listenerConfig: {
-          type: "object",
-          description: "Type-specific connection configuration (see tool description for shapes). " +
-            "Example: { url: 'wss://payments.example.com/feed' }.",
-        },
-        pipelineSteps: {
-          type: "array",
-          items: { type: "object" },
-          description: "Optional ordered steps applied to each event (filter, transform, push...). " +
-            "Each step: { type, config }. Use get_listener_schemas / get_listener for the exact step schema.",
-        },
+        listenerTitle: { type: "string", description: "Human-readable name." },
+        listenerType: { type: "string", description: "Listener-capable type from list_listener_types (webhook, websocket, sse, kafka, mqtt, postgresql, ...)." },
+        datasourceID: { type: "string", description: "REQUIRED. UUID of a datasource of matching type (e.g. webhook datasource)." },
+        listenerConfig: { type: "object", description: "Type-specific connection config (prefer pathSuffix for webhook)." },
+        transformScript: { type: "string", description: "Optional transform script; equivalent to a transform action with script." },
+        actions: { type: "array", items: { type: "object" }, description: "Optional pipeline actions [{actionType,actionConfig}] created after the listener." },
+        pipelineSteps: { type: "array", items: { type: "object" }, description: "Legacy alias for actions [{type,config}]." },
       },
-      required: ["listenerTitle", "listenerType"],
+      required: ["listenerTitle", "listenerType", "datasourceID"],
     },
-    handler: async ({ listenerTitle, listenerType, datasourceID, listenerConfig, pipelineSteps }, context) => {
-      const { listenerAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return listenerAPI.create({
+    handler: async ({ listenerTitle, listenerType, datasourceID, listenerConfig, transformScript, actions, pipelineSteps }, context) => {
+      const { listenerAPI, listenerExtraAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const created = await listenerAPI.create({
         listenerTitle,
         listenerType,
-        datasourceID: datasourceID ? trimId(datasourceID, "datasourceID") : undefined,
+        datasourceID: trimId(datasourceID, "datasourceID"),
         listenerConfig,
-        pipelineSteps: pipelineSteps || [],
+        ...(transformScript ? { transformScript } : {}),
       });
+      const listener = created?.listener || created;
+      const listenerID = listener?.listenerID;
+      const added = [];
+      for (const raw of actions || pipelineSteps || []) {
+        const action = normalizeAction(raw);
+        if (!action?.actionType) continue;
+        const res = await listenerExtraAPI.addAction(listenerID, {
+          actionType: action.actionType,
+          actionConfig: action.actionConfig || {},
+          ...(action.isEnabled !== undefined ? { isEnabled: action.isEnabled } : {}),
+          ...(action.orderIndex !== undefined ? { orderIndex: action.orderIndex } : {}),
+        });
+        added.push(res?.action || res);
+      }
+      return {
+        success: true,
+        listenerID,
+        listener,
+        actionCount: added.length,
+        actions: added,
+        hint: "Listener created inactive. Use add_listener_action for more actions, then activate_listener.",
+      };
     },
   },
 
