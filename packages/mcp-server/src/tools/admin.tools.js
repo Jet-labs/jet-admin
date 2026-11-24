@@ -16,6 +16,7 @@
 
 import { createApiClient } from "../client.js";
 import { safeArray, trimId } from "../utils.js";
+import { dedupePermissions, compactAuditLog } from "../normalize.js";
 
 export const adminTools = [
   // ─── Folders (5) ──────────────────────────────────────────────────────
@@ -265,21 +266,42 @@ export const adminTools = [
   // ─── Audit (2, read-only) ─────────────────────────────────────────────
   {
     name: "list_audit_logs",
-    description: "List audit logs (paginated, read-only).\n\nRelated: export_audit_logs.",
+    description:
+      "List audit logs (paginated, read-only).\n\n" +
+      "By default returns compact entries: { auditLogID, createdAt, type, subType, success, userID, apiKeyID,\n" +
+      "authType, method, path, statusCode, title } — HTTP headers and request/response bodies are omitted.\n" +
+      "Use search/entityType to filter client-side; compact:false returns the raw records.\n\n" +
+      "Example: { \"search\": \"mcptest_role\", \"pageSize\": 50 }\n\nRelated: export_audit_logs.",
     inputSchema: {
       type: "object",
       properties: {
         page: { type: "number", description: "Page (1-based)." },
-        pageSize: { type: "number", description: "Results per page." },
+        pageSize: { type: "number", description: "Results per page (default 20, max 100)." },
+        search: { type: "string", description: "Optional substring filter over compacted log fields (path/title/etc)." },
+        entityType: { type: "string", description: "Optional path fragment filter, e.g. 'roles', 'apikeys', 'workflows'." },
+        compact: { type: "boolean", description: "Default true. Set false for raw bodies (large)." },
       },
     },
-    handler: async ({ page, pageSize } = {}, context) => {
+    handler: async ({ page = 1, pageSize = 20, search, entityType, compact = true } = {}, context) => {
       const { auditAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      const data = await auditAPI.list({ page, pageSize });
+      const data = await auditAPI.list({ page, pageSize: Math.min(Number(pageSize) || 20, 100) });
       const logs = safeArray(data, "auditLogs");
-      return logs.length || data?.totalCount !== undefined
-        ? { auditLogs: logs, totalCount: data?.totalCount ?? logs.length }
-        : data;
+      if (!compact) {
+        return { auditLogs: logs, totalCount: data?.totalCount ?? logs.length };
+      }
+      let compacted = logs.map(compactAuditLog);
+      if (search) {
+        const q = String(search).toLowerCase();
+        compacted = compacted.filter((l) => JSON.stringify(l).toLowerCase().includes(q));
+      }
+      if (entityType) compacted = compacted.filter((l) => String(l.path || "").includes(entityType));
+      return {
+        auditLogs: compacted,
+        totalCount: data?.totalCount ?? logs.length,
+        returnedCount: compacted.length,
+        compact: true,
+        hint: "compact:false returns full request/response bodies; search/entityType filter within the fetched page.",
+      };
     },
   },
   {
@@ -458,19 +480,36 @@ export const adminTools = [
   },
   {
     name: "create_role",
-    description: "Create a custom role.\n\nRelated: list_tenant_roles.",
+    description:
+      "Create a custom role. Pass permissionIDs from list_permissions (deduped keys).\n\n" +
+      "Returns: { success, roleID, roleTitle, permissionIDs } — the tool diffs the role list before/after because the\n" +
+      "backend create endpoint returns only a success flag.\n\n" +
+      "Example: { \"roleTitle\": \"mcptest_role\", \"permissionIDs\": [\"<tenant:workflow:read id>\", \"<tenant:workflow:execute id>\"] }\n\n" +
+      "Related: list_permissions, get_role, update_role, list_tenant_roles.",
     inputSchema: {
       type: "object",
       properties: {
         roleTitle: { type: "string", description: "Role name." },
         roleDescription: { type: "string", description: "Optional description." },
-        permissionIDs: { type: "array", items: { type: "string" }, description: "Optional permission IDs." },
+        permissionIDs: { type: "array", items: { type: "string" }, description: "Optional permission IDs from list_permissions." },
       },
       required: ["roleTitle"],
     },
     handler: async ({ roleTitle, roleDescription, permissionIDs }, context) => {
       const { roleAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      return roleAPI.create({ roleTitle, roleDescription, permissionIDs });
+      const before = await roleAPI.list({ pageSize: 100 });
+      const beforeIDs = new Set(safeArray(before, "roles").map((r) => r.roleID));
+      await roleAPI.create({ roleTitle, roleDescription, permissionIDs });
+      const after = await roleAPI.list({ pageSize: 100 });
+      const created = safeArray(after, "roles").filter((r) => !beforeIDs.has(r.roleID));
+      const match = created.find((r) => r.roleTitle === roleTitle) || created[0];
+      return {
+        success: true,
+        roleID: match?.roleID || null,
+        roleTitle: match?.roleTitle || roleTitle,
+        permissionIDs: permissionIDs || [],
+        hint: match?.roleID ? "Role created. Use get_role to verify permission mappings." : "Role created but the new ID could not be identified; call list_tenant_roles.",
+      };
     },
   },
   {
@@ -509,13 +548,47 @@ export const adminTools = [
   },
   {
     name: "list_permissions",
-    description: "List all tenant permissions (for role assignment).\n\nRelated: create_role, update_role.",
-    inputSchema: { type: "object", properties: {} },
-    handler: async (_args, context) => {
+    description:
+      "List unique tenant permissions for role assignment.\n\n" +
+      "The backend returns duplicate rows (one per role mapping), and ~1,697 per-asset permissions.\n" +
+      "This tool dedupes by permission key, excludes tenant:asset:* by default, and supports search/module filters.\n" +
+      "Returns { permissions:[{permissionID,permissionTitle,permissionDescription}], totalCount, rawCount, assetsExcluded }.\n" +
+      "Use permissionIDs with create_role/update_role.\n\n" +
+      "Example: { \"module\": \"workflow\" }\n\nRelated: create_role, update_role, get_role.",
+    inputSchema: {
+      type: 'object',
+      properties: {
+        search: { type: 'string', description: 'Optional substring filter on permissionTitle.' },
+        module: { type: 'string', description: 'Optional module filter, e.g. workflow, dataquery, widget.' },
+        includeAssets: { type: 'boolean', description: 'Include tenant:asset:* permissions. Default false (there are ~1,697).' },
+      },
+    },
+    handler: async ({ search, module, includeAssets = false } = {}, context) => {
       const { roleAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const data = await roleAPI.listPermissions();
-      const permissions = safeArray(data, "permissions");
-      return { permissions, totalCount: data?.totalCount ?? permissions.length };
+      const deduped = dedupePermissions(safeArray(data, "permissions"));
+      let permissions = deduped.permissions;
+      let assetsExcluded = 0;
+      if (!includeAssets && module !== 'asset') {
+        const filtered = permissions.filter((p) => !String(p.permissionTitle || "").startsWith("tenant:asset:"));
+        assetsExcluded = permissions.length - filtered.length;
+        permissions = filtered;
+      }
+      if (search) {
+        const q = String(search).toLowerCase();
+        permissions = permissions.filter((p) => String(p.permissionTitle || "").toLowerCase().includes(q));
+      }
+      if (module) {
+        const prefix = `tenant:${module}:`;
+        permissions = permissions.filter((p) => String(p.permissionTitle || "").startsWith(prefix));
+      }
+      return {
+        permissions,
+        totalCount: permissions.length,
+        rawCount: deduped.rawCount,
+        assetsExcluded,
+        hint: "Deduped by permissionTitle; tenant:asset:* excluded unless includeAssets/module=asset. Use permissionID values with create_role/update_role.",
+      };
     },
   },
   {

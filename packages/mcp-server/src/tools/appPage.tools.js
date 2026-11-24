@@ -7,6 +7,7 @@
 import { createApiClient } from "../client.js";
 import { safeArray, trimId } from "../utils.js";
 import { config } from "../config.js";
+import { validateAppPageConfig } from "../validation/appPage.js";
 
 /**
  * Resolves the frontend base URL for preview links.
@@ -97,6 +98,7 @@ export const appPageTools = [
         appPageID: p.appPageID,
         title: p.appPageTitle,
         description: p.appPageDescription,
+        folderID: p.folderID ?? null,
         config: p.appPageConfig,
         createdAt: p.createdAt,
       };
@@ -181,15 +183,26 @@ export const appPageTools = [
     },
     handler: async ({ appPageTitle, appPageDescription, appPageConfig }, context) => {
       const { appPageAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
+      const pageConfig = appPageConfig || {
+        layoutVersion: 2,
+        layout: { id: "ROOT", type: "column", children: [] },
+        widgets: [],
+        dataSources: [],
+        variables: [],
+        layouts: {},
+      };
+      const validation = validateAppPageConfig(pageConfig);
+      if (!validation.valid) {
+        const summary = validation.errors.slice(0, 6).map((e) => `${e.path}: ${e.message}`).join("; ");
+        throw Object.assign(
+          new Error(`Invalid appPageConfig: ${summary}`),
+          { code: "APP_PAGE_VALIDATION_FAILED", details: validation }
+        );
+      }
       const result = await appPageAPI.create({
         appPageTitle,
         appPageDescription,
-        appPageConfig: appPageConfig || {
-          layout: { type: "grid", columns: 12 },
-          dataSources: [],
-          widgets: [],
-          variables: [],
-        },
+        appPageConfig: pageConfig,
       });
       if (!result) throw new Error("App Page creation returned no data.");
       return result;
@@ -253,6 +266,16 @@ export const appPageTools = [
     handler: async ({ appPageID, ...updates }, context) => {
       const { appPageAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const id = trimId(appPageID, "appPageID");
+      if (updates.appPageConfig !== undefined) {
+        const validation = validateAppPageConfig(updates.appPageConfig);
+        if (!validation.valid) {
+          const summary = validation.errors.slice(0, 6).map((e) => `${e.path}: ${e.message}`).join("; ");
+          throw Object.assign(
+            new Error(`Invalid appPageConfig: ${summary}`),
+            { code: "APP_PAGE_VALIDATION_FAILED", details: validation }
+          );
+        }
+      }
       // Backend rejects updates without appPageTitle — backfill from current page.
       if (updates.appPageTitle === undefined) {
         const current = await appPageAPI.getById(id);
@@ -260,7 +283,12 @@ export const appPageTools = [
         if (page?.appPageTitle) updates.appPageTitle = page.appPageTitle;
       }
       await appPageAPI.update(id, updates);
-      return { success: true, appPageID: id };
+      return {
+        success: true,
+        appPageID: id,
+        ...(updates.appPageConfig ? { config: updates.appPageConfig } : {}),
+        hint: "Re-read with get_app_page to verify persistence (update replaces the whole config).",
+      };
     },
   },
 

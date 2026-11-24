@@ -6,6 +6,7 @@
 
 import { createApiClient } from "../client.js";
 import { safeArray, trimId } from "../utils.js";
+import { WIDGET_TYPE_BY_TYPE, GENERATED_WIDGET_TYPES } from "../data/catalogs.js";
 
 export const widgetTools = [
   {
@@ -92,7 +93,7 @@ export const widgetTools = [
       "A widget alone does nothing until it is placed on a page and bound to data (a query, listener, or\n" +
       "workflow configured in the page's dataSources). Create the query first (create_query), then the\n" +
       "widget, then the page.\n\n" +
-      "Widget types and typical use cases (full list via list_widget_types, 32 types):\n" +
+      "Widget types and typical use cases (full list via list_widget_types):\n" +
       "  'table'  — show records/rows/lists of data\n" +
       "  'vega-lite'/'vega' — visualize data (bar, line, pie; 'chart' is NOT a valid type)\n" +
       "  'stat'   — display a single KPI metric value\n" +
@@ -175,7 +176,7 @@ export const widgetTools = [
         },
         widgetType: {
           type: "string",
-          description: "Widget type from list_widget_types (32 values, e.g. 'table', 'vega-lite', 'stat', 'form', 'text', 'button'). " +
+          description: "Widget type from list_widget_types (e.g. 'table', 'vega-lite', 'stat', 'form', 'text', 'button'). " +
             "Example: 'table'.",
         },
         widgetConfig: {
@@ -187,6 +188,12 @@ export const widgetTools = [
       required: ["widgetTitle", "widgetType"],
     },
     handler: async ({ widgetTitle, widgetType, widgetConfig }, context) => {
+      if (!WIDGET_TYPE_BY_TYPE[widgetType]) {
+        throw Object.assign(
+          new Error(`Unknown widgetType '${widgetType}'. Valid types: ${GENERATED_WIDGET_TYPES.map((w) => w.type).sort().join(", ")}. Use list_widget_types, then get_widget_schemas for one type.`),
+          { code: "WIDGET_TYPE_INVALID", details: { widgetType, validTypes: GENERATED_WIDGET_TYPES.map((w) => w.type) } }
+        );
+      }
       const { widgetAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const result = await widgetAPI.create({ widgetTitle, widgetType, widgetConfig: widgetConfig || {} });
       if (!result) throw new Error("Widget creation returned no data.");
