@@ -119,7 +119,7 @@ export const appPageTools = [
       "  {\n" +
       "    widgets: [ 'widget_<widgetID>_1' ],        // instance keys: 'widget_' + widgetID + '_' + index\n" +
       "    layoutVersion: 2,                            // REQUIRED for new pages\n" +
-      "    layout: { type: 'column', children: [       // root is ALWAYS a column node; 'grid' is NOT a legal type\n" +
+      "    layout: { id: 'ROOT', type: 'column', children: [  // root is ALWAYS a column node; 'grid' is NOT a legal type\n" +
       "      { id: 'row_1', type: 'row', sizing: 'auto', children:\n" +
       "        [{ id: 'slot_1', type: 'widget', span: 12, sizing: 'fill', widgetKey: 'widget_<widgetID>_1' }] } ] },\n" +
       "    layouts: {},                                // MUST stay {} on V2 — legacy lg/md grids are ignored\n" +
@@ -149,7 +149,7 @@ export const appPageTools = [
       '                  "widget_22222222-bbbb-4ccc-8ddd-000000000002_1",\n' +
       '                  "widget_33333333-cccc-4ddd-8eee-000000000003_1"],\n' +
       '      "layoutVersion": 2,\n' +
-      '      "layout": { "type": "column", "children": [\n' +
+      '      "layout": { "id": "ROOT", "type": "column", "children": [\n' +
       '        { "id": "row_1", "type": "row", "sizing": "auto", "children": [\n' +
       '          { "id": "slot_1", "type": "widget", "span": 12, "sizing": "fill", "widgetKey": "widget_11111111-aaaa-4bbb-8ccc-000000000001_1" } ] },\n' +
       '        { "id": "row_2", "type": "row", "sizing": "auto", "children": [\n' +
@@ -191,6 +191,11 @@ export const appPageTools = [
         variables: [],
         layouts: {},
       };
+      // Be forgiving about the two most common copy-paste omissions while
+      // keeping the stored config valid per get_app_page_schema.
+      if (pageConfig.layout && !pageConfig.layout.id) pageConfig.layout.id = "ROOT";
+      if (pageConfig.layoutVersion === undefined) pageConfig.layoutVersion = 2;
+      if (pageConfig.layouts === undefined) pageConfig.layouts = {};
       const validation = validateAppPageConfig(pageConfig);
       if (!validation.valid) {
         const summary = validation.errors.slice(0, 6).map((e) => `${e.path}: ${e.message}`).join("; ");
@@ -267,6 +272,9 @@ export const appPageTools = [
       const { appPageAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const id = trimId(appPageID, "appPageID");
       if (updates.appPageConfig !== undefined) {
+        if (updates.appPageConfig.layout && !updates.appPageConfig.layout.id) updates.appPageConfig.layout.id = "ROOT";
+        if (updates.appPageConfig.layoutVersion === undefined) updates.appPageConfig.layoutVersion = 2;
+        if (updates.appPageConfig.layouts === undefined) updates.appPageConfig.layouts = {};
         const validation = validateAppPageConfig(updates.appPageConfig);
         if (!validation.valid) {
           const summary = validation.errors.slice(0, 6).map((e) => `${e.path}: ${e.message}`).join("; ");
