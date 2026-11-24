@@ -105,17 +105,18 @@ export const datasourceTools = [
   {
     name: "get_datasource_schema",
     description:
-      "Introspect a datasource — returns its TABLES and COLUMNS for SQL databases.\n\n" +
-      "Returns (SQL datasources):\n" +
-      "  { tables: [{ name, columns: [{ name, type, ... }] }, ...] } (exact key names come from the backend)\n" +
-      "Returns (non-SQL datasources, e.g. restapi):\n" +
-      "  { success: true, type: 'restapi', message: '...does not support database schema tables...',\n" +
-      "    options: { ...connection config } } — the tool FALLS BACK automatically, this is not an error.\n\n" +
-      "Use this BEFORE writing SQL for create_query — write queries against real table/column names,\n" +
-      "never guessed ones. Also useful after create_datasource to confirm the connection sees the expected tables.\n\n" +
-      "Example call:\n" +
-      '  { "datasourceID": "d7a1c3e2-4b5f-4c6a-9e8d-1f2a3b4c5d6e" }\n\n' +
-      "Typical flow: get_datasource_schema → get_datasource_sample_data → create_query.\n\n" +
+      "Introspect a datasource — list its TABLES, then fetch COLUMNS for one table.\n\n" +
+      "SQL datasources:\n" +
+      "  - call with datasourceID only → { tables: [{ tableName, columnCount }], totalCount, hint }\n" +
+      "  - call with datasourceID + table → { table: '<name>', columns: [...] } (full column details)\n" +
+      "This avoids dumping thousands of columns at once. Table names are exact.\n\n" +
+      "Non-SQL datasources (e.g. restapi) fall back to connection config with an explanatory message — not an error.\n\n" +
+      "Use this BEFORE writing SQL for create_query — write queries against real table/column names, never guessed ones.\n\n" +
+      "Example call 1 — list tables:\n" +
+      '  { "datasourceID": "d7a1c3e2-4b5f-4c6a-9e8d-1f2a3b4c5d6e" }\n' +
+      "Example call 2 — columns of one table:\n" +
+      '  { "datasourceID": "d7a1c3e2-4b5f-4c6a-9e8d-1f2a3b4c5d6e", "table": "orders" }\n\n' +
+      "Typical flow: get_datasource_schema (table) → get_datasource_sample_data → create_query.\n\n" +
       "Related: get_datasource_sample_data (preview rows), get_datasource (connection config).",
     inputSchema: {
       type: "object",
@@ -124,14 +125,40 @@ export const datasourceTools = [
           type: "string",
           description: "UUID of the datasource to introspect. Example: 'd7a1c3e2-4b5f-4c6a-9e8d-1f2a3b4c5d6e'.",
         },
+        table: {
+          type: "string",
+          description: "Optional. Exact table name to return full columns for. Omit to list table names + column counts.",
+        },
       },
       required: ["datasourceID"],
     },
-    handler: async ({ datasourceID }, context) => {
+    handler: async ({ datasourceID, table }, context) => {
       const { datasourceAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const id = trimId(datasourceID, "datasourceID");
       try {
-        return await datasourceAPI.proxy(id, { action: "getSchema", params: {} });
+        const res = await datasourceAPI.proxy(id, { action: "getSchema", params: {} });
+        const tables = res?.result?.tables || res?.tables || [];
+        if (table) {
+          const found = tables.find((t) => (t.tableName || t.name) === table);
+          if (!found) {
+            throw Object.assign(
+              new Error(`Table '${table}' not found. Available tables: ${tables.map((t) => t.tableName || t.name).slice(0, 30).join(", ")}`),
+              { code: "TABLE_NOT_FOUND", details: { table, available: tables.map((t) => t.tableName || t.name) } }
+            );
+          }
+          return {
+            datasourceID: id,
+            table: found.tableName || found.name,
+            columnCount: (found.columns || []).length,
+            columns: found.columns || [],
+          };
+        }
+        return {
+          datasourceID: id,
+          tables: tables.map((t) => ({ tableName: t.tableName || t.name, columnCount: (t.columns || []).length })),
+          totalCount: tables.length,
+          hint: "Pass table:'<name>' to get the full column list for one table.",
+        };
       } catch (proxyErr) {
         // If the datasource type doesn't support schema introspection, fall back to config info.
         // NOTE: the backend proxy answers ALL action failures with HTTP 400, so status

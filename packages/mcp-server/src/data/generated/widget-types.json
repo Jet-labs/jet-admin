@@ -1,0 +1,419 @@
+[
+  {
+    "type": "vega-lite",
+    "category": "analytics",
+    "tags": [
+      "chart",
+      "graph",
+      "plot",
+      "bar",
+      "line",
+      "visualization",
+      "vega"
+    ],
+    "dataKey": "vegaSpec.data.values",
+    "required": []
+  },
+  {
+    "type": "vega",
+    "category": "analytics",
+    "tags": [
+      "chart",
+      "grammar",
+      "signals",
+      "visualization"
+    ],
+    "dataKey": "vegaSpec.data[].values (named datasets)",
+    "required": []
+  },
+  {
+    "type": "stat",
+    "category": "analytics",
+    "tags": [
+      "kpi",
+      "metric",
+      "number",
+      "indicator"
+    ],
+    "dataKey": "valueTemplate (single expression)",
+    "required": []
+  },
+  {
+    "type": "progress",
+    "category": "analytics",
+    "tags": [
+      "bar",
+      "percent",
+      "loader",
+      "status"
+    ],
+    "dataKey": "valueTemplate (0-100)",
+    "required": []
+  },
+  {
+    "type": "table",
+    "category": "data-display",
+    "tags": [
+      "grid",
+      "records",
+      "rows",
+      "spreadsheet",
+      "crud"
+    ],
+    "dataKey": "dataArrayTemplate (array)",
+    "required": []
+  },
+  {
+    "type": "key-value",
+    "category": "data-display",
+    "tags": [
+      "details",
+      "record",
+      "object",
+      "dictionary"
+    ],
+    "dataKey": "dataTemplate (object)",
+    "required": []
+  },
+  {
+    "type": "json-viewer",
+    "category": "data-display",
+    "tags": [
+      "json",
+      "tree",
+      "debug",
+      "object"
+    ],
+    "dataKey": "dataTemplate (any)",
+    "required": []
+  },
+  {
+    "type": "list",
+    "category": "data-display",
+    "tags": [
+      "rows",
+      "cards",
+      "items",
+      "collection"
+    ],
+    "dataKey": "dataTemplate (array)",
+    "required": []
+  },
+  {
+    "type": "timeline",
+    "category": "data-display",
+    "tags": [
+      "activity",
+      "feed",
+      "history",
+      "events"
+    ],
+    "dataKey": "dataTemplate (array)",
+    "required": []
+  },
+  {
+    "type": "badge",
+    "category": "data-display",
+    "tags": [
+      "status",
+      "pill",
+      "label",
+      "count"
+    ],
+    "dataKey": "text",
+    "required": []
+  },
+  {
+    "type": "button",
+    "category": "input",
+    "tags": [
+      "action",
+      "submit",
+      "trigger",
+      "click"
+    ],
+    "dataKey": null,
+    "required": []
+  },
+  {
+    "type": "form",
+    "category": "input",
+    "tags": [
+      "fields",
+      "submit",
+      "edit",
+      "create"
+    ],
+    "dataKey": "fields[].default",
+    "required": [
+      "fields"
+    ]
+  },
+  {
+    "type": "text-input",
+    "category": "input",
+    "tags": [
+      "text",
+      "field",
+      "textarea",
+      "string"
+    ],
+    "dataKey": "state.widgets.<id>.value",
+    "required": []
+  },
+  {
+    "type": "select",
+    "category": "input",
+    "tags": [
+      "dropdown",
+      "picker",
+      "options",
+      "choice"
+    ],
+    "dataKey": "state.widgets.<id>.value",
+    "required": []
+  },
+  {
+    "type": "multi-select",
+    "category": "input",
+    "tags": [
+      "dropdown",
+      "tags",
+      "multiple",
+      "checkbox-list"
+    ],
+    "dataKey": "state.widgets.<id>.value (array)",
+    "required": []
+  },
+  {
+    "type": "checkbox",
+    "category": "input",
+    "tags": [
+      "boolean",
+      "toggle",
+      "agree",
+      "check"
+    ],
+    "dataKey": "state.widgets.<id>.value (boolean)",
+    "required": []
+  },
+  {
+    "type": "radio-group",
+    "category": "input",
+    "tags": [
+      "choice",
+      "options",
+      "exclusive",
+      "orientation"
+    ],
+    "dataKey": "state.widgets.<id>.value",
+    "required": []
+  },
+  {
+    "type": "switch",
+    "category": "input",
+    "tags": [
+      "boolean",
+      "toggle",
+      "flag",
+      "on-off"
+    ],
+    "dataKey": "state.widgets.<id>.value (boolean)",
+    "required": []
+  },
+  {
+    "type": "slider",
+    "category": "input",
+    "tags": [
+      "range",
+      "number",
+      "threshold",
+      "quantity"
+    ],
+    "dataKey": "state.widgets.<id>.value (number)",
+    "required": []
+  },
+  {
+    "type": "search-input",
+    "category": "input",
+    "tags": [
+      "search",
+      "filter",
+      "debounce",
+      "query"
+    ],
+    "dataKey": "state.widgets.<id>.value",
+    "required": []
+  },
+  {
+    "type": "file-upload",
+    "category": "input",
+    "tags": [
+      "file",
+      "upload",
+      "attachment",
+      "csv"
+    ],
+    "dataKey": "state.widgets.<id>.value (file names)",
+    "required": []
+  },
+  {
+    "type": "date-picker",
+    "category": "input",
+    "tags": [
+      "date",
+      "time",
+      "calendar",
+      "schedule"
+    ],
+    "dataKey": "state.widgets.<id>.value (date-only YYYY-MM-DD calendar date; datetime local wall time YYYY-MM-DDTHH:mm:ss, no Z)",
+    "required": []
+  },
+  {
+    "type": "date-range-picker",
+    "category": "input",
+    "tags": [
+      "date-range",
+      "period",
+      "between",
+      "calendar"
+    ],
+    "dataKey": "state.widgets.<id>.start/.end (date-only calendar dates; datetime local wall time, no Z)",
+    "required": []
+  },
+  {
+    "type": "tabs",
+    "category": "structure",
+    "tags": [
+      "navigation",
+      "panels",
+      "sections",
+      "selector"
+    ],
+    "dataKey": "state.widgets.<id>.value (tab value)",
+    "required": []
+  },
+  {
+    "type": "divider",
+    "category": "structure",
+    "tags": [
+      "separator",
+      "spacer",
+      "rule",
+      "section"
+    ],
+    "dataKey": null,
+    "required": []
+  },
+  {
+    "type": "alert",
+    "category": "feedback",
+    "tags": [
+      "banner",
+      "notice",
+      "warning",
+      "error",
+      "dismiss"
+    ],
+    "dataKey": "message",
+    "required": [
+      "message"
+    ]
+  },
+  {
+    "type": "text",
+    "category": "content",
+    "tags": [
+      "markdown",
+      "paragraph",
+      "heading",
+      "rich-text"
+    ],
+    "dataKey": "content",
+    "required": []
+  },
+  {
+    "type": "image",
+    "category": "content",
+    "tags": [
+      "picture",
+      "photo",
+      "url",
+      "thumbnail"
+    ],
+    "dataKey": "src",
+    "required": []
+  },
+  {
+    "type": "video",
+    "category": "content",
+    "tags": [
+      "media",
+      "player",
+      "mp4",
+      "embed-video"
+    ],
+    "dataKey": "src",
+    "required": []
+  },
+  {
+    "type": "iframe",
+    "category": "content",
+    "tags": [
+      "embed",
+      "external",
+      "frame",
+      "dashboard-external"
+    ],
+    "dataKey": "url",
+    "required": []
+  },
+  {
+    "type": "html",
+    "category": "content",
+    "tags": [
+      "custom",
+      "sandbox",
+      "embed-html",
+      "snippet"
+    ],
+    "dataKey": null,
+    "required": []
+  },
+  {
+    "type": "code-block",
+    "category": "content",
+    "tags": [
+      "code",
+      "sql",
+      "snippet",
+      "readonly"
+    ],
+    "dataKey": "code",
+    "required": []
+  },
+  {
+    "type": "kanban",
+    "category": "display",
+    "tags": [
+      "board",
+      "pipeline",
+      "status",
+      "cards"
+    ],
+    "dataKey": "dataArrayTemplate (array of card objects)",
+    "required": []
+  },
+  {
+    "type": "calendar",
+    "category": "display",
+    "tags": [
+      "month",
+      "schedule",
+      "dates",
+      "calendar"
+    ],
+    "dataKey": "dataArrayTemplate (array of dated records)",
+    "required": []
+  }
+]

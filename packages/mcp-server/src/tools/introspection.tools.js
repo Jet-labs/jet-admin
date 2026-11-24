@@ -6,6 +6,8 @@
 
 import { createApiClient } from "../client.js";
 import { safeArray } from "../utils.js";
+import { getAllNodeContracts, getNodeContract } from "../data/nodeContracts.js";
+import { compactSchemaMap } from "../normalize.js";
 
 const MAX_PAGES = 50; // Hard cap to prevent infinite loops
 
@@ -64,9 +66,16 @@ export const introspectionTools = [
       "Example call: {} (no arguments)\n\n" +
       "If the stubs are not detailed enough (e.g. you need a widget's config), fetch the full resource with\n" +
       "get_widget / get_query / get_datasource / get_app_page using the id from this response.\n\n" +
+      "By default this returns counts + up to maxPerType examples per type (small response). Pass full:true to get every stub.\n\n" +
       "Related: search_resources (find one resource by name), list_* (paginated full listings).",
-    inputSchema: { type: "object", properties: {} },
-    handler: async (_args, context) => {
+    inputSchema: {
+      type: "object",
+      properties: {
+        full: { type: "boolean", description: "Return every stub. Default false (counts + up to maxPerType examples)." },
+        maxPerType: { type: "number", description: "Examples per type when full=false. Default 5, max 100." },
+      },
+    },
+    handler: async ({ full = false, maxPerType = 5 } = {}, context) => {
       const { datasourceAPI, queryAPI, widgetAPI, appPageAPI, listenerAPI, workflowAPI } =
         createApiClient(context.tenantId, context.apiKey, context.bearerToken);
 
@@ -102,15 +111,9 @@ export const introspectionTools = [
       const listeners   = getFulfilled(listenersResult, "listeners");
       const workflows   = getFulfilled(workflowsResult, "workflows");
 
-      return {
-        summary: {
-          datasources: datasources.length,
-          queries: queries.length,
-          widgets: widgets.length,
-          appPages: pages.length,
-          listeners: listeners.length,
-          workflows: workflows.length,
-        },
+      const limit = full ? Infinity : Math.max(1, Math.min(Number(maxPerType) || 5, 100));
+      const slice = (arr) => (Number.isFinite(limit) ? arr.slice(0, limit) : arr);
+      const mapped = {
         datasources: datasources.map((d) => ({
           id: d.datasourceID,
           title: d.datasourceTitle,
@@ -138,12 +141,26 @@ export const introspectionTools = [
           type: l.listenerType,
           status: l.status,
         })),
-        // DB field is `title` (not `workflowTitle`); status from `isDisabled`
         workflows: workflows.map((w) => ({
           id: w.workflowID,
           title: w.title ?? "(untitled)",
           status: w.isDisabled ? "inactive" : "active",
         })),
+      };
+      return {
+        summary: {
+          datasources: datasources.length,
+          queries: queries.length,
+          widgets: widgets.length,
+          appPages: pages.length,
+          listeners: listeners.length,
+          workflows: workflows.length,
+        },
+        ...Object.fromEntries(Object.entries(mapped).map(([k, v]) => [k, slice(v)])),
+        truncated: !full && Object.values(mapped).some((v) => v.length > limit),
+        hint: full
+          ? "Full stub list. Use get_* for full configs."
+          : `Showing up to ${Number.isFinite(limit) ? limit : "all"} examples per type. Pass full:true for every stub, or use search_resources / list_* to find a specific resource.`,
       };
     },
   },
@@ -270,15 +287,15 @@ export const introspectionTools = [
     name: "get_widget_schemas",
     description:
       "Fetch the JSON schema(s) defining how a widget's widgetConfig object must be structured.\n\n" +
-      "TRUNCATION WARNING: omitting widgetType returns all 32 schemas and WILL be truncated into a file.\n" +
       "PREFERRED: call list_widget_types first, then request ONE type per call (e.g. { \"widgetType\": \"stat\" }).\n" +
-      "Each entry carries its JSON schema plus a canonical descriptor (aliases, defaults, example, supported events/methods).\n" +
+      "Omitting widgetType returns a COMPACT field index (one line per type), not the full schemas. Pass full:true only " +
+      "if you really need the entire catalog.\n" +
+      "Each per-type entry carries its JSON schema plus a canonical descriptor (aliases, defaults, example, supported events/methods).\n" +
       "Author the canonical fields (stat valueTemplate, vega vegaSpec, iframe url, text textAlign); legacy aliases are migrated server-side.\n\n" +
-      "Use this when create_widget or update_widget returns a validation error, or BEFORE constructing a\n" +
-      "complex widgetConfig you are unsure about.\n\n" +
+      "If a type is unknown, the error lists all valid types (or call list_widget_types).\n\n" +
       "Example call 1 — one type (recommended):\n" +
       '  { "widgetType": "stat" }\n' +
-      "Example call 2 — all types (truncates; avoid):\n" +
+      "Example call 2 — compact index of all types:\n" +
       "  {}\n\n" +
       "Related: list_widget_types, create_widget, update_widget.",
     inputSchema: {
@@ -287,34 +304,45 @@ export const introspectionTools = [
         widgetType: {
           type: "string",
           description:
-            "Widget type from list_widget_types (e.g. 'table', 'stat', 'vega-lite', 'form', 'text'). " +
-            "Strongly recommended — omitting returns all 32 and truncates.",
+            "Widget type from list_widget_types (e.g. 'table', 'stat', 'vega-lite', 'form', 'text'). Omit for a compact index.",
+        },
+        full: {
+          type: "boolean",
+          description: "With no widgetType, return all full schemas (large). Default false.",
         },
       },
     },
-    handler: async ({ widgetType }, context) => {
-      if (!widgetType) {
-        process.stderr.write(
-          "[jet-admin-mcp] get_widget_schemas: no widgetType — returning all 32 schemas (may truncate; prefer per-type calls).\n"
-        );
-      }
+    handler: async ({ widgetType, full = false }, context) => {
       const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const res = await client.widgetAPI.getSchemas({ widgetType });
-      return res?.schemas || res;
+      const map = res?.schemas || res;
+      if (!widgetType) {
+        if (!full) return compactSchemaMap(map);
+        return map;
+      }
+      const one = map?.[widgetType];
+      if (!one) {
+        const valid = Object.keys(map || {}).sort();
+        throw Object.assign(
+          new Error(`No schema found for widgetType '${widgetType}'. Valid types: ${valid.join(", ")}. Error hint: call list_widget_types, then retry with a listed type.`),
+          { code: "WIDGET_TYPE_INVALID", details: { widgetType, validTypes: valid } }
+        );
+      }
+      return one;
     }
   },
   {
     name: "get_data_query_schemas",
     description:
-      "Fetch the JSON schema(s) defining how a query's dataQueryOptions object must be structured per datasource type.\n\n" +
-      "Returns: schema object(s) with the required options for building queries against each datasource type.\n" +
-      "Call WITHOUT datasourceType to get all schemas at once (recommended).\n\n" +
+      "Fetch the JSON schema defining how a query's dataQueryOptions object must be structured for a datasource type.\n\n" +
+      "PREFERRED: pass datasourceType (e.g. 'postgresql' or 'restapi') to get that type's full schema.\n" +
+      "Omitting datasourceType returns a COMPACT field index for every type. Pass full:true only if you need the entire catalog.\n\n" +
       "Use this when create_query / test_query_by_data needs options you are not sure about — e.g. how to pass\n" +
       "input arguments to a PostgreSQL query, or how to configure headers/auth for a REST API query.\n\n" +
-      "Example call 1 — all datasource query schemas:\n" +
-      "  {}\n" +
-      "Example call 2 — only REST API query options:\n" +
-      '  { "datasourceType": "restapi" }\n\n' +
+      "Example call 1 — PostgreSQL query options (recommended):\n" +
+      '  { "datasourceType": "postgresql" }\n' +
+      "Example call 2 — compact index of all types:\n" +
+      "  {}\n\n" +
       "Related: create_query, test_query_by_data, get_datasource_schemas (connection options, not query options).",
     inputSchema: {
       type: "object",
@@ -322,30 +350,46 @@ export const introspectionTools = [
         datasourceType: {
           type: "string",
           description:
-            "Optional. Datasource type from list_datasource_types (35 values, e.g. 'postgresql', 'mongodb', 'stripe'). " +
-            "Omit to receive all.",
+            "Datasource type from list_datasource_types (e.g. 'postgresql', 'restapi'). Omit for a compact index.",
+        },
+        full: {
+          type: "boolean",
+          description: "With no datasourceType, return all full schemas (large). Default false.",
         },
       },
     },
-    handler: async ({ datasourceType }, context) => {
+    handler: async ({ datasourceType, full = false }, context) => {
       const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const res = await client.queryAPI.getSchemas({ datasourceType });
-      return res?.schemas || res;
+      const map = res?.schemas || res;
+      if (!datasourceType) {
+        if (!full) return compactSchemaMap(map);
+        return map;
+      }
+      const one = map?.[datasourceType];
+      if (!one) {
+        const valid = Object.keys(map || {}).sort();
+        throw Object.assign(
+          new Error(`No query schema found for datasourceType '${datasourceType}'. Valid types: ${valid.join(", ")}.`),
+          { code: "DATASOURCE_TYPE_INVALID", details: { datasourceType, validTypes: valid } }
+        );
+      }
+      return one;
     }
   },
   {
     name: "get_datasource_schemas",
     description:
-      "Fetch the JSON schema(s) defining the datasourceOptions object required to CONNECT to each datasource type\n" +
+      "Fetch the JSON schema defining the datasourceOptions object required to CONNECT to a datasource type\n" +
       "(credentials, host/port, base URLs, auth settings).\n\n" +
-      "Returns: schema object(s) per datasource type.\n" +
-      "Call WITHOUT datasourceType to get all schemas at once (recommended).\n\n" +
+      "PREFERRED: pass datasourceType (e.g. 'postgresql' or 'restapi') to get that type's full schema.\n" +
+      "Omitting datasourceType returns a COMPACT field index for every type. Pass full:true only if you need the entire catalog.\n\n" +
       "Use this BEFORE create_datasource or test_datasource_connection when you are unsure which fields the\n" +
       "connection options require for a given datasource type.\n\n" +
-      "Example call 1 — all datasource connection schemas:\n" +
-      "  {}\n" +
-      "Example call 2 — only PostgreSQL connection requirements:\n" +
-      '  { "datasourceType": "postgresql" }\n\n' +
+      "Example call 1 — PostgreSQL connection options (recommended):\n" +
+      '  { "datasourceType": "postgresql" }\n' +
+      "Example call 2 — compact index of all types:\n" +
+      "  {}\n\n" +
       "Related: create_datasource, test_datasource_connection, get_data_query_schemas (query options, not connection options).",
     inputSchema: {
       type: "object",
@@ -353,15 +397,31 @@ export const introspectionTools = [
         datasourceType: {
           type: "string",
           description:
-            "Optional. Datasource type from list_datasource_types (35 values, e.g. 'postgresql', 'mongodb', 'stripe'). " +
-            "Omit to receive all.",
+            "Datasource type from list_datasource_types (e.g. 'postgresql', 'mongodb', 'stripe'). Omit for a compact index.",
+        },
+        full: {
+          type: "boolean",
+          description: "With no datasourceType, return all full schemas (large). Default false.",
         },
       },
     },
-    handler: async ({ datasourceType }, context) => {
+    handler: async ({ datasourceType, full = false }, context) => {
       const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
       const res = await client.datasourceAPI.getSchemas({ datasourceType });
-      return res?.schemas || res;
+      const map = res?.schemas || res;
+      if (!datasourceType) {
+        if (!full) return compactSchemaMap(map);
+        return map;
+      }
+      const one = map?.[datasourceType];
+      if (!one) {
+        const valid = Object.keys(map || {}).sort();
+        throw Object.assign(
+          new Error(`No datasource schema found for datasourceType '${datasourceType}'. Valid types: ${valid.join(", ")}.`),
+          { code: "DATASOURCE_TYPE_INVALID", details: { datasourceType, validTypes: valid } }
+        );
+      }
+      return one;
     }
   },
   {
@@ -398,38 +458,63 @@ export const introspectionTools = [
   {
     name: "get_workflow_schema",
     description:
-      "Fetch the JSON schema for workflow definitions — node configurations and edges.\n\n" +
-      "Returns: schema object(s) describing valid node types, node data structures, and edge shapes.\n" +
-      "The full map is large; pass nodeType to get one node. The schema describes node.data only.\n" +
-      "GRAPH ENVELOPE (not in the per-node schemas): nodes=[{id:'<uuid>',type:'<nodeType>',data:{...}}],\n" +
-      "edges=[{id:'<uuid>',source:'<nodeUUID>',target:'<nodeUUID>',sourceHandle:'<handle>'}].\n" +
+      "Fetch workflow node contracts: JSON schema, defaults, required config, handles and output shape.\n\n" +
+      "PREFERRED: pass nodeType to get one node's authoritative contract (same data as describe_node_type).\n" +
+      "Omitting nodeType returns a COMPACT index of all 13 implemented types (no full schemas). Pass full:true for all full schemas.\n\n" +
+      "The per-node schema describes node.data only. The graph envelope is:\n" +
+      "  nodes=[{id:'<uuid>',type:'<nodeType>',data:{...}}]\n" +
+      "  edges=[{id:'<uuid>',source:'<nodeUUID>',target:'<nodeUUID>',sourceHandle:'<handle>'}]\n" +
       "HANDLES: condition/switch = branch/case id or 'default'; loop = 'loop'/'completed'; fanout = branch id;\n" +
       "join = 'output'; dataQuery/javascript/subWorkflow = 'success'/'error'; start/delay/dataCollection/approval = 'output'.\n" +
-      "Workflow inputParams supplied at execute time are exposed to nodes as ctx.input.<name>.\n" +
-      "Call WITHOUT nodeType to get the complete workflow schema with all node types (recommended).\n\n" +
-      "Use this BEFORE create_workflow or update_workflow. Building workflow nodes/edges without consulting\n" +
-      "this schema is the most common cause of validation errors — the valid node types and their data shapes\n" +
-      "come from this call, not from guesswork.\n\n" +
-      "Example call 1 — full workflow schema with all node types:\n" +
-      "  {}\n" +
-      "Example call 2 — schema for a single node type:\n" +
-      '  { "nodeType": "dataQuery" }\n\n' +
-      "Related: create_workflow, update_workflow, get_workflow (inspect an existing workflow as a working example).",
+      "Workflow inputParams supplied at execute time are exposed to nodes as ctx.input.<name>.\n\n" +
+      "Use this BEFORE create_workflow or update_workflow. If a node type is unknown, the error lists valid types.\n\n" +
+      "Example call 1 — one node (recommended):\n" +
+      '  { "nodeType": "join" }\n' +
+      "Example call 2 — compact index:\n" +
+      "  {}\n\n" +
+      "Related: describe_node_type, list_workflow_node_types, validate_workflow, create_workflow.",
     inputSchema: {
       type: "object",
       properties: {
         nodeType: {
           type: "string",
           description:
-            "Optional. Workflow node type from list_workflow_node_types (e.g. 'dataQuery', 'condition', 'javascript'). " +
-            "Omit to receive the complete workflow schema with all node types.",
+            "Optional. Workflow node type from list_workflow_node_types (e.g. 'dataQuery', 'condition', 'join'). Omit for a compact index.",
+        },
+        full: {
+          type: "boolean",
+          description: "With no nodeType, return all full schemas (large). Default false.",
         },
       },
     },
-    handler: async ({ nodeType }, context) => {
-      const client = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
-      const res = await client.workflowAPI.getSchemas({ nodeType });
-      return res?.schemas || res;
+    handler: async ({ nodeType, full = false }, context) => {
+      if (!nodeType) {
+        if (!full) {
+          const contracts = getAllNodeContracts();
+          return {
+            totalCount: contracts.length,
+            nodeTypes: contracts.map((c) => ({
+              nodeType: c.nodeType,
+              label: c.label,
+              hasSchema: c.hasSchema,
+              required: c.required,
+              handles: c.handles,
+            })),
+            hint: "Compact index. Pass nodeType (or call describe_node_type) for the full schema, defaults, output and pitfalls.",
+          };
+        }
+        return Object.fromEntries(
+          getAllNodeContracts().map((c) => [c.nodeType, { nodeType: c.nodeType, label: c.label, schema: c.schema, defaults: c.defaults }])
+        );
+      }
+      const c = getNodeContract(nodeType);
+      if (!c) {
+        throw Object.assign(
+          new Error(`No schema found for workflow nodeType '${nodeType}'. Use list_workflow_node_types for valid values.`),
+          { code: "NODE_TYPE_INVALID", details: { nodeType, validTypes: getAllNodeContracts().map((x) => x.nodeType) } }
+        );
+      }
+      return { [nodeType]: { ...c, relatedTools: ["describe_node_type", "validate_workflow", "create_workflow"] } };
     }
   },
   {

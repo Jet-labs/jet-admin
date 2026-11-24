@@ -1,0 +1,317 @@
+[
+  {
+    "value": "postgresql",
+    "name": "PostgreSQL",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "restapi",
+    "name": "REST API",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "weburl",
+    "name": "Web URL",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "firestore",
+    "name": "Firestore",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "mysql",
+    "name": "MySQL",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "mongodb",
+    "name": "MongoDB",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "googlesheets",
+    "name": "Google Sheets",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "graphql",
+    "name": "GraphQL",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "rabbitmq",
+    "name": "RabbitMQ",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "kafka",
+    "name": "Kafka",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "redis",
+    "name": "Redis",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "mssql",
+    "name": "Microsoft SQL Server",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "supabase",
+    "name": "Supabase",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "bigquery",
+    "name": "BigQuery",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "airtable",
+    "name": "Airtable",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "s3",
+    "name": "AWS S3",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "elasticsearch",
+    "name": "Elasticsearch",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "stripe",
+    "name": "Stripe",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "oracle",
+    "name": "Oracle",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "sqlite",
+    "name": "SQLite",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "cockroachdb",
+    "name": "CockroachDB",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "neo4j",
+    "name": "Neo4j",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "twilio",
+    "name": "Twilio",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "sendgrid",
+    "name": "SendGrid",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "slack",
+    "name": "Slack",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "notion",
+    "name": "Notion",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "jira",
+    "name": "Jira",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "googleanalytics",
+    "name": "Google Analytics",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "webhook",
+    "name": "Webhook",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "mqtt",
+    "name": "MQTT",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "websocket",
+    "name": "WebSocket",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "sse",
+    "name": "Server-Sent Events",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "syslog",
+    "name": "Syslog",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "nats",
+    "name": "NATS",
+    "supportsListener": true,
+    "hasListenerConfig": true,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "excelcsv",
+    "name": "Excel & CSV",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "clickhouse",
+    "name": "ClickHouse",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "duckdb",
+    "name": "DuckDB",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "prometheus",
+    "name": "Prometheus",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "influxdb",
+    "name": "InfluxDB",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "filesystem",
+    "name": "File System",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "sftp",
+    "name": "SFTP",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "github",
+    "name": "GitHub",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "gitlab",
+    "name": "GitLab",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "smtp",
+    "name": "SMTP",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  },
+  {
+    "value": "ldap",
+    "name": "LDAP",
+    "supportsListener": false,
+    "hasListenerConfig": false,
+    "hasQueryConfig": true
+  }
+]
