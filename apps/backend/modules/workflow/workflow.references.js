@@ -21,19 +21,105 @@ function invalidGraph(message, details = {}) {
   return error;
 }
 
+function validateWorkflowGraphStructure({ nodes, edges }) {
+  if (!Array.isArray(nodes)) {
+    throw invalidGraph("nodes must be an array");
+  }
+  if (edges !== undefined && !Array.isArray(edges)) {
+    throw invalidGraph("edges must be an array");
+  }
+
+  const nodeByID = new Map();
+  const startNodes = [];
+  const endNodes = [];
+  nodes.forEach((node, index) => {
+    if (!node || typeof node !== "object") {
+      throw invalidGraph(`nodes[${index}] must be an object`);
+    }
+    const nodeType = node.type ?? node.nodeType;
+    const nodeID = node.id ?? node.nodeID;
+    if (!nodeID) {
+      throw invalidGraph(`nodes[${index}] is missing an id`, { index });
+    }
+    if (nodeByID.has(nodeID)) {
+      throw invalidGraph(`Duplicate workflow node id "${nodeID}"`, { index, nodeID });
+    }
+    nodeByID.set(nodeID, node);
+    if (nodeType === NODE_TYPE.START) startNodes.push(nodeID);
+    if (nodeType === NODE_TYPE.END) endNodes.push(nodeID);
+  });
+
+  if (startNodes.length === 0) throw invalidGraph("Workflow requires a start node");
+  if (startNodes.length > 1) throw invalidGraph("Workflow must have exactly one start node", { startNodes });
+  if (endNodes.length === 0) throw invalidGraph("Workflow requires at least one end node");
+
+  const edgeIDs = new Set();
+  (edges || []).forEach((edge, index) => {
+    if (!edge || typeof edge !== "object") {
+      throw invalidGraph(`edges[${index}] must be an object`);
+    }
+    const edgeID = edge.id ?? edge.edgeID;
+    if (edgeID) {
+      if (edgeIDs.has(edgeID)) throw invalidGraph(`Duplicate workflow edge id "${edgeID}"`, { index, edgeID });
+      edgeIDs.add(edgeID);
+    }
+    const source = edge.source ?? edge.upstreamNodeID;
+    const target = edge.target ?? edge.downstreamNodeID;
+    if (!nodeByID.has(source)) {
+      throw invalidGraph(`edges[${index}].source "${source}" does not reference a node`, { index, source });
+    }
+    if (!nodeByID.has(target)) {
+      throw invalidGraph(`edges[${index}].target "${target}" does not reference a node`, { index, target });
+    }
+    if (source === target) {
+      throw invalidGraph(`edges[${index}] is a self-loop`, { index });
+    }
+
+    const sourceNode = nodeByID.get(source);
+    const sourceType = sourceNode.type ?? sourceNode.nodeType;
+    const sourceData = sourceNode.data ?? sourceNode.nodeConfig ?? {};
+    const handle = edge.sourceHandle ?? null;
+    if (!handle) return; // legacy edges may rely on a single default handle
+
+    const allowedHandles = (() => {
+      if (sourceType === NODE_TYPE.CONDITION) {
+        return [...(sourceData.branches || []).map((b) => b?.id).filter(Boolean), "default", "error"];
+      }
+      if (sourceType === NODE_TYPE.SWITCH) {
+        return [...(sourceData.cases || []).map((c) => c?.id).filter(Boolean), "default", "error"];
+      }
+      if (sourceType === NODE_TYPE.FANOUT) {
+        return [...(sourceData.branches || []).map((b) => b?.id).filter(Boolean), "error"];
+      }
+      if (sourceType === NODE_TYPE.JOIN) return ["output"];
+      return null;
+    })();
+    if (allowedHandles && !allowedHandles.includes(handle)) {
+      throw invalidGraph(
+        `Invalid ${sourceType} output handle "${handle}" on node ${source}`,
+        { index, source, handle, allowed: allowedHandles }
+      );
+    }
+  });
+}
+
 /**
- * Validate node types and tenant ownership of query/sub-workflow references.
+ * Validate node types, graph structure/handles, and tenant ownership of
+ * query/sub-workflow references.
  *
  * @param {object} params
  * @param {string} params.tenantID
  * @param {Array<object>} params.nodes - React Flow nodes as accepted by the API
+ * @param {Array<object>} [params.edges] - React Flow edges
  * @throws {Error} with statusCode 400 on invalid input
  */
-async function validateWorkflowGraph({ tenantID, nodes }) {
+async function validateWorkflowGraph({ tenantID, nodes, edges }) {
   if (nodes === undefined) return;
   if (!Array.isArray(nodes)) {
     throw invalidGraph("nodes must be an array");
   }
+
+  validateWorkflowGraphStructure({ nodes, edges });
 
   const dataQueryIDs = [];
   const workflowIDs = [];
@@ -150,6 +236,7 @@ async function findWorkflowReferences({ tenantID, workflowID }) {
 
 module.exports = {
   validateWorkflowGraph,
+  validateWorkflowGraphStructure,
   findWorkflowReferences,
   ALLOWED_NODE_TYPES,
 };

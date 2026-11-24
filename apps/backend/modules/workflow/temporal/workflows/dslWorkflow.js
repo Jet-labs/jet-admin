@@ -153,12 +153,13 @@ function resolveSuspendTimeoutHandle(node) {
 function normalizeApprovalDecision(humanData) {
   // Current form shape: explicit { decision: 'approve' | 'reject' } radio.
   if (humanData && typeof humanData.decision === 'string') {
-    return { approved: humanData.decision.toLowerCase() === 'approve', comment: humanData?.comment ?? '' };
+    const decision = humanData.decision.toLowerCase();
+    return { approved: decision === 'approve', decision, comment: humanData?.comment ?? '' };
   }
   // Legacy checkbox shape { approved: boolean } from earlier form version.
   const raw = humanData?.approved;
   const approved = raw === true || String(raw).toLowerCase() === 'true';
-  return { approved, comment: humanData?.comment ?? '' };
+  return { approved, decision: approved ? 'approve' : 'reject', comment: humanData?.comment ?? '' };
 }
 
 // New histories use request identity, a single deadline and canonical DB data.
@@ -196,7 +197,7 @@ async function waitForHumanNode(node, suspended, context, common) {
       } else if (resolution.status === 'EXPIRED') {
         const timeoutHandle = resolveSuspendTimeoutHandle(node);
         if (!timeoutHandle) throw ApplicationFailure.nonRetryable(`Data collection timeout for node ${node.id}`);
-        const data = node.type === 'approval' ? { approved: false, expired: true, comment: '' } : { expired: true };
+        const data = node.type === 'approval' ? { approved: false, decision: 'expired', expired: true, comment: '' } : { expired: true };
         result = { output: { [suspended.outputVariable]: data, success: true }, nextHandle: timeoutHandle };
       } else if (resolution.status !== 'PENDING' && resolution.status !== 'SUBMITTED') {
         throw ApplicationFailure.nonRetryable(`Human-input request is ${resolution.status}`);
@@ -585,7 +586,7 @@ async function executeLoopNode(loopNode, context, common, graph) {
             const timeoutHandle = resolveSuspendTimeoutHandle(curNode);
             if (!timeoutHandle) throw ApplicationFailure.nonRetryable(`Data collection timeout for ${res.nodeID} inside loop ${loopNode.id}`);
             const expiredData = curNode.type === 'approval'
-              ? { approved: false, expired: true, comment: '' }
+              ? { approved: false, decision: 'expired', expired: true, comment: '' }
               : { expired: true };
             iterContext[res.outputVariable] = expiredData;
             iterContext[`__node_${res.nodeID}`] = { output: { [res.outputVariable]: expiredData }, status: 'success' };
@@ -800,7 +801,7 @@ export async function dslInterpreterWorkflow({ nodes, edges, initialContext, ins
                 // COMPLETED row so it survives in assembled history/context, with
                 // the expiry noted on the row for the timeline.
                 const expiredData = node.type === 'approval'
-                  ? { approved: false, expired: true, comment: '' }
+                  ? { approved: false, decision: 'expired', expired: true, comment: '' }
                   : { expired: true };
                 context[result.outputVariable] = expiredData;
                 context[`__node_${nid}`] = { output: { [result.outputVariable]: expiredData }, status: 'success' };

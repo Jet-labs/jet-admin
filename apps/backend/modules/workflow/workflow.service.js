@@ -183,7 +183,7 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges,
       throw new Error("Creator ID or Created By API Key ID is required");
     }
 
-    await validateWorkflowGraph({ tenantID, nodes });
+    await validateWorkflowGraph({ tenantID, nodes, edges });
 
     const workflowCreationTransaction = await prisma.$transaction(async (tx) => {
       const workflow = await tx.tblWorkflows.create({
@@ -268,7 +268,7 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
   try {
     // Validate references before mutating: a rejected PATCH must leave the
     // existing graph untouched.
-    await validateWorkflowGraph({ tenantID, nodes });
+    await validateWorkflowGraph({ tenantID, nodes, edges });
 
     const workflowUpdateTransaction = await prisma.$transaction(async (tx) => {
       // A PATCH must only change the fields that were sent. In particular a
@@ -738,7 +738,7 @@ workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputValues = {}
   });
 
   try {
-    await validateWorkflowGraph({ tenantID, nodes });
+    await validateWorkflowGraph({ tenantID, nodes, edges });
 
     // Attribute test runs launched from a saved workflow editor so they show
     // up in that workflow's run history (still stored as isTest runs).

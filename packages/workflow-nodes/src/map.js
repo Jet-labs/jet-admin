@@ -50,6 +50,75 @@ export const WORKFLOW_NODES_MAP = {
             expiryMinutes: 60,
             isDisabled: false,
         },
+        schema: {
+            type: 'object',
+            properties: {
+                title: { type: 'string', title: 'Form Title' },
+                description: { type: 'string', title: 'Instructions' },
+                collectionType: { type: 'string', title: 'Collection Type', enum: ['form'], default: 'form' },
+                fields: {
+                    type: 'array',
+                    title: 'Builder Fields',
+                    description: 'UI convenience list; the runtime contract is formSchema.',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            key: { type: 'string' },
+                            label: { type: 'string' },
+                            fieldType: { type: 'string' },
+                            required: { type: 'boolean' },
+                            placeholder: { type: 'string' },
+                            options: { type: 'string' },
+                        },
+                    },
+                },
+                formSchema: {
+                    type: 'object',
+                    title: 'Form JSON Schema',
+                    description: 'JSON Schema used by the backend (Ajv) to validate the submitted data.',
+                },
+                formUischema: {
+                    type: 'object',
+                    title: 'Form UI Schema',
+                    description: 'Optional JSON Forms UISchema.',
+                },
+                outputVariable: {
+                    type: 'string',
+                    title: 'Output Variable Name',
+                    pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$',
+                    default: 'collectedData',
+                },
+                expiryMinutes: {
+                    type: 'integer',
+                    title: 'Expiry (minutes, 0 = never)',
+                    minimum: 0,
+                    maximum: 10080,
+                    default: 60,
+                },
+                errorHandling: {
+                    type: 'string',
+                    title: 'Error Behavior',
+                    enum: ['fail_workflow', 'continue', 'retry_then_continue', 'retry_then_fail'],
+                    default: 'fail_workflow',
+                },
+                isDisabled: { type: 'boolean', title: 'Skip this node', default: false },
+            },
+            required: ['formSchema'],
+        },
+        uischema: {
+            type: 'VerticalLayout',
+            elements: [
+                { type: 'Control', scope: '#/properties/title' },
+                { type: 'Control', scope: '#/properties/description', options: { multi: true, rows: 2 } },
+                { type: 'Control', scope: '#/properties/formSchema' },
+                { type: 'Control', scope: '#/properties/formUischema' },
+                { type: 'Control', scope: '#/properties/outputVariable' },
+                { type: 'Control', scope: '#/properties/expiryMinutes' },
+                { type: 'Control', scope: '#/properties/errorHandling' },
+                { type: 'Control', scope: '#/properties/isDisabled' },
+            ],
+        },
     },
     [WORKFLOW_NODE_TYPES.DATA_QUERY.value]: {
         label: WORKFLOW_NODE_TYPES.DATA_QUERY.label,
@@ -285,6 +354,26 @@ export const WORKFLOW_NODES_MAP = {
                 title: { type: "string", title: "Node Title" },
                 description: { type: "string", title: "Description" },
                 switchValue: { type: "string", title: "Switch Value" },
+                cases: {
+                    type: "array",
+                    title: "Cases",
+                    description: "Each case id becomes the outgoing edge sourceHandle; unmatched goes to 'default'.",
+                    items: {
+                        type: "object",
+                        properties: {
+                            id: { type: "string", title: "Case ID" },
+                            label: { type: "string", title: "Label" },
+                            operator: {
+                                type: "string",
+                                title: "Operator",
+                                enum: ["equals", "not_equals", "contains", "greater_than", "less_than", "expression"],
+                                default: "equals",
+                            },
+                            matchValue: { type: "string", title: "Match Value" },
+                        },
+                        required: ["id"],
+                    },
+                },
                 errorHandling: {
                     type: "string",
                     title: "Error Behavior",
@@ -405,6 +494,19 @@ export const WORKFLOW_NODES_MAP = {
             properties: {
                 title: { type: "string", title: "Node Title" },
                 description: { type: "string", title: "Description" },
+                branches: {
+                    type: "array",
+                    title: "Branches",
+                    description: "Every branch fires; each branch id becomes the outgoing edge sourceHandle.",
+                    items: {
+                        type: "object",
+                        properties: {
+                            id: { type: "string", title: "Branch ID" },
+                            name: { type: "string", title: "Branch Name" },
+                        },
+                        required: ["id"],
+                    },
+                },
                 errorHandling: {
                     type: "string",
                     title: "Error Behavior",
@@ -444,6 +546,12 @@ export const WORKFLOW_NODES_MAP = {
             properties: {
                 title: { type: "string", title: "Node Title" },
                 description: { type: "string", title: "Description" },
+                sourceVariables: {
+                    type: "array",
+                    title: "Source Variables",
+                    description: "Bare context variable names to wait for and merge, e.g. [\"aResult\",\"bResult\"].",
+                    items: { type: "string" },
+                },
                 outputVariable: {
                     type: "string",
                     title: "Output Variable Name",
@@ -636,6 +744,24 @@ export const WORKFLOW_NODES_MAP = {
                             expression: { type: "string", title: "Expression" },
                             leftOperand: { type: "string", title: "Left Operand" },
                             rightOperand: { type: "string", title: "Right Operand" },
+                            conditionLogic: { type: "string", title: "Condition Logic", enum: ["AND", "OR"], default: "AND" },
+                            conditions: {
+                                type: "array",
+                                title: "Structured Conditions",
+                                description: "Preferred runtime shape; each entry is evaluated with conditionLogic.",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        operator: {
+                                            type: "string",
+                                            enum: ["equals", "not_equals", "contains", "not_contains", "starts_with", "ends_with", "greater_than", "less_than", "greater_or_equal", "less_or_equal", "is_empty", "is_not_empty", "matches_regex", "expression"],
+                                        },
+                                        leftValue: { type: "string" },
+                                        rightValue: { type: "string" },
+                                    },
+                                    required: ["operator"],
+                                },
+                            },
                         },
                     },
                 },
