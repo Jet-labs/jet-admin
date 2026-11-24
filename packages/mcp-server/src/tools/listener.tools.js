@@ -79,7 +79,13 @@ export const listenerTools = [
         actionConfig: a.actionConfig || {},
         isEnabled: a.isEnabled,
         orderIndex: a.orderIndex,
+        createdAt: a.createdAt,
       }));
+      const webhookUrls = l.ingress?.webhookUrls || [];
+      let endpointPath = l.endpointPath ?? null;
+      if (!endpointPath && webhookUrls[0]) {
+        try { endpointPath = new URL(webhookUrls[0]).pathname; } catch {}
+      }
       return {
         listenerID: l.listenerID,
         title: l.listenerTitle,
@@ -89,7 +95,8 @@ export const listenerTools = [
         datasourceID: l.datasourceID,
         folderID: l.folderID ?? null,
         config: l.listenerConfig || {},
-        endpointPath: l.endpointPath ?? null,
+        endpointPath,
+        webhookUrls,
         ingress: l.ingress || null,
         actions,
         actionCount: actions.length,
@@ -105,7 +112,7 @@ export const listenerTools = [
       "add_listener_action or pass them in actions[] here (they are created after the listener).\n" +
       "Creation does NOT start the listener — call activate_listener afterwards.\n\n" +
       "listenerConfig by type (get_listener_schemas is authoritative):\n" +
-      "  webhook:   { pathSuffix: '/my-hook' }   (prefer pathSuffix; path has produced endpointPath:null)\n" +
+      "  webhook:   { pathSuffix: '/my-hook' }   (ingress.webhookUrls is authoritative; endpointPath may be null)\n" +
       "  websocket: { parseAsJSON: true }         (URL lives on the datasource)\n" +
       "  sse:       { eventTypes?: '', parseAsJSON: true }\n" +
       "  mqtt:      { topics: 'sensors/#', qos: 0 } | kafka: { topic: '...', consumerGroup?: 'jet-listener' }\n\n" +
