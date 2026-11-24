@@ -86,6 +86,7 @@ export function summarizeInstance(raw, { verbosity = 'summary', maxLogs = 50 } =
     logCount: allLogs.length,
     logsTruncated: allLogs.length > logs.length,
     logs,
+    suspended: Array.isArray(raw.pendingDataCollectionRequests) && raw.pendingDataCollectionRequests.length > 0,
     pendingDataCollectionRequests: raw.pendingDataCollectionRequests || [],
   };
 }

@@ -293,8 +293,9 @@ export const workflowTools = [
     description:
       "Trigger an ASYNC execution of a workflow and return immediately (or wait with waitSeconds).\n\n" +
       "Returns: execution instance info including instanceID. If waitSeconds > 0 (max 120), this tool also polls\n" +
-      "the instance every 2s and returns { instance: { status, errors, failedNode, contextData, logs } } when it\n" +
-      "reaches a terminal state or the wait expires. This removes the execute→poll loop for most runs.\n\n" +
+      "the instance every 2s and returns { instance: { status, suspended, errors, failedNode, contextData, logs } }\n" +
+      "when it reaches a terminal state, suspends on a human task, or the wait expires. This removes the\n" +
+      "execute→poll loop for most runs. Worker latency is roughly 5s per node, so use 60-120 for 4+ nodes.\n\n" +
       "inputValues must provide a value for each inputParam the workflow declares. They are exposed to nodes as\n" +
       "ctx.input.<name> (not ctx.<name>).\n\n" +
       "ALWAYS check status AND contextData/output — a COMPLETED run can still take a wrong branch.\n\n" +
