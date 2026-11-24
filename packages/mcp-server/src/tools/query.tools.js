@@ -117,7 +117,8 @@ export const queryTools = [
       "dataQueryOptions shape by datasourceType (BACKEND TRUTH — from get_data_query_schemas, not the legacy below):\n" +
       "  postgresql/mysql/mssql/sqlite/cockroachdb/oracle: { queryType: 'query', query: 'SELECT ... WHERE x = {{inputs.name}}', inputDefinitions?: [{ key, type }] }\n" +
       "    — inputDefinitions declares params substituted at run time via inputValues. Template refs use\n" +
-      "    {{inputs.<key>}} inside apiEndpoint/query/body. Legacy {sql,inputArgs} is NOT accepted — use query/inputDefinitions.\n" +
+      "    {{inputs.<key>}} inside apiEndpoint/query/body. inputDefinitions.type is one of\n" +
+      "    string|number|boolean|array|object (use 'number' for integers). Legacy {sql,inputArgs} is NOT accepted.\n" +
       "  restapi: { apiEndpoint: '/resource', method: 'GET'|'POST'|'PUT'|'DELETE'|'PATCH', headers?: [{key,value}],\n" +
       "             body?, queryParams?: [{key,value}], contentType?, inputDefinitions?: [{key,type}] }\n" +
       "    — apiEndpoint is relative to the datasource baseUrl. For path params with slashes/URLs use\n" +
@@ -197,11 +198,12 @@ export const queryTools = [
       "uses — when editing SQL or REST config, first call get_query to read the current options, then send\n" +
       "the complete modified object, not a fragment.\n" +
       "After updating, call test_query to confirm the query still returns valid data.\n\n" +
-      "Example call — fix a WHERE clause:\n" +
+      "Example call — change the WHERE clause (backend shape):\n" +
       '  { "dataQueryID": "9f8b7a6c-5d4e-4f3a-2b1c-0d9e8f7a6b5c",\n' +
       '    "dataQueryOptions": {\n' +
-      '      "sql": "SELECT id, status, total FROM orders WHERE status = $1 AND total > 0",\n' +
-      '      "inputArgs": [{ "name": "status", "type": "string" }] } }\n\n' +
+      '      "queryType": "query",\n' +
+      '      "query": "SELECT id, status, total FROM orders WHERE status = {{inputs.status}} AND total > 0",\n' +
+      '      "inputDefinitions": [{ "key": "status", "type": "string" }] } }\n\n' +
       "Related: get_query (read current config first), test_query.",
     inputSchema: {
       type: "object",

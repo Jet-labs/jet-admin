@@ -90,7 +90,7 @@ const CONTRACTS = {
     semantics:
       'sourceVariable is a template resolving to an array (e.g. {{ctx.items}}). The body chain hangs off sourceHandle "loop"; ' +
       'the post-loop path uses "completed". The loop outputVariable collects each body iteration output. itemVariable default item, indexVariable default index.',
-    pitfalls: ['If the source is not an array it is wrapped as [value] or treated as empty.', 'maxIterations caps runaway loops (default 1000).'],
+    pitfalls: ['If the source is not an array it is wrapped as [value] or treated as empty.', 'maxIterations caps runaway loops (default 1000).', 'Only loopResults (not the body output variable) is addressable after the completed handle; referencing the body variable in end.outputParameters is silently dropped.'],
   },
   delay: {
     handles: ['output'],
@@ -135,7 +135,7 @@ const CONTRACTS = {
     required: ['childWorkflowID'],
     output: '{ [outputVariable]: childOutput, childInstanceID?, childStatus? }',
     semantics: 'Starts a child workflow. Use inputMapping to map child input names to templates (e.g. { token: "{{ctx.input.seed}}" }). Child instance is also discoverable via list_workflow_instances (parentInstanceID/parentNodeID).',
-    pitfalls: ['inputValues is persisted but silently ignored; use inputMapping.', 'maxDepth guards recursion (default 5).'],
+    pitfalls: ['inputValues is persisted but silently ignored; use inputMapping.', 'maxDepth guards recursion (default 5).', 'subResult nests the child end outputParameters (e.g. subResult.childValue.value); use mergeOutputs or know the child contract.'],
   },
 };
 
