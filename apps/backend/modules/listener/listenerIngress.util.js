@@ -71,7 +71,7 @@ function getListenerIngressInfo(listener) {
     info.webhookUrls = getListenerWebhookUrls({
       tenantID: listener.tenantID,
       listenerID: listener.listenerID,
-      pathSuffix: listener.listenerConfig && listener.listenerConfig.pathSuffix,
+      pathSuffix: listener.listenerConfig && (listener.listenerConfig.pathSuffix || listener.listenerConfig.path),
     });
   }
   return info;

@@ -16,15 +16,23 @@ const updateListenerSchema = z.object({
   status: z.string().optional(),
 }).passthrough();
 
+const LISTENER_ACTION_TYPES = [
+  "transform",
+  "trigger_workflow",
+  "trigger_query",
+  "save_to_buffer",
+  "push_to_app_page",
+];
+
 const addListenerActionSchema = z.object({
-  actionType: z.string().min(1, "Action type is required"),
+  actionType: z.enum(LISTENER_ACTION_TYPES),
   actionConfig: z.object({}).passthrough(),
   isEnabled: z.boolean().optional(),
   orderIndex: z.number().int().optional(),
 }).passthrough();
 
 const updateListenerActionSchema = z.object({
-  actionType: z.string().optional(),
+  actionType: z.enum(LISTENER_ACTION_TYPES).optional(),
   actionConfig: z.object({}).passthrough().optional(),
   isEnabled: z.boolean().optional(),
   orderIndex: z.number().int().optional(),
@@ -40,6 +48,7 @@ const listenerIdParamSchema = z.object({
 });
 
 module.exports = {
+  LISTENER_ACTION_TYPES,
   createListenerSchema,
   updateListenerSchema,
   addListenerActionSchema,

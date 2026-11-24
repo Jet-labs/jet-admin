@@ -180,18 +180,23 @@ datasourceService.testDatasourceConnection = async ({
   });
   try {
     let finalOptions = datasourceOptions;
+    let finalType = datasourceType;
     const targetDSID = datasourceID || datasourceOptions?.datasourceID;
     if (targetDSID) {
       const existing = await prisma.tblDatasources.findFirst({
         where: { datasourceID: targetDSID, tenantID },
       });
-      const existingDecrypted = existing ? decryptOptions(existing.datasourceOptions) : null;
+      if (!existing) {
+        throw new Error("Datasource not found");
+      }
+      const existingDecrypted = decryptOptions(existing.datasourceOptions);
       finalOptions = mergeAndRestoreMaskedOptions(datasourceOptions, existingDecrypted);
+      finalType = finalType || existing.datasourceType;
     }
 
-    const component = DATASOURCE_LOGIC_COMPONENTS[datasourceType];
+    const component = DATASOURCE_LOGIC_COMPONENTS[finalType];
     if (!component || typeof component.testConnection !== "function") {
-      throw new Error(`Connection test for datasource type '${datasourceType}' is not supported.`);
+      throw new Error(`Connection test for datasource type '${finalType}' is not supported.`);
     }
 
     const connectionResult = await component.testConnection({

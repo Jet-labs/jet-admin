@@ -55,6 +55,21 @@ router.post(
   datasourceController.testDatasourceJsonEndpoint
 );
 
+// Saved-datasource health check — decrypts stored options server-side.
+router.post(
+  "/:datasourceID/test",
+  validate(datasourceIdParamSchema, "params"),
+  authMiddleware.authorize(P.datasource.test),
+  datasourceController.testSavedDatasourceConnection
+);
+
+router.get(
+  "/:datasourceID/health",
+  validate(datasourceIdParamSchema, "params"),
+  authMiddleware.authorize(P.datasource.test),
+  datasourceController.testSavedDatasourceConnection
+);
+
 router.post(
   "/upload",
   authMiddleware.authorize(P.datasource.create),

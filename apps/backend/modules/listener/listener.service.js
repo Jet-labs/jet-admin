@@ -14,6 +14,7 @@ const {
   mergeAndRestoreMaskedOptions,
 } = require("../../utils/sensitive");
 const { assertTenantReferences } = require("../../utils/tenantReference.util");
+const { LISTENER_ACTION_TYPES } = require("./listener.validator");
 
 const PROXY_SYNC_TIMEOUT_MS = 3000;
 const PLACEMENT_LOOKUP_TIMEOUT_MS = 3000;
@@ -24,6 +25,20 @@ function maskListener(listener) {
     ...listener,
     listenerConfig: maskDatasourceOptions(listener.listenerConfig),
   };
+}
+
+/**
+ * Webhook history used `listenerConfig.path` while the ingress/proxy reads
+ * `pathSuffix`. Normalize at write time and fall back at read time so both
+ * spellings produce the same public URL.
+ */
+function normalizeListenerConfig(listenerType, listenerConfig) {
+  if (!listenerConfig || typeof listenerConfig !== "object") return listenerConfig;
+  if (listenerType !== "webhook") return listenerConfig;
+  if (listenerConfig.pathSuffix || !listenerConfig.path) return listenerConfig;
+  const { path, ...rest } = listenerConfig;
+  const suffix = String(path || "").replace(/^\/+/, "");
+  return suffix ? { ...rest, pathSuffix: suffix } : rest;
 }
 
 async function validateActionReferences({ tenantID, actionType, actionConfig = {} }) {
@@ -238,7 +253,7 @@ const listenerService = {
             listenerTitle: data.listenerTitle,
             listenerDescription: data.listenerDescription || null,
             listenerType: data.listenerType,
-            listenerConfig: data.listenerConfig || {},
+            listenerConfig: normalizeListenerConfig(data.listenerType, data.listenerConfig || {}),
             status: data.status || 'inactive',
             endpointPath: data.endpointPath || null,
             creatorID: finalCreatorID,
@@ -262,6 +277,29 @@ const listenerService = {
           });
           created.tblListenerActions.push(action);
           created.transformScript = data.transformScript;
+        }
+
+        // Support the documented create payload shape: [{ type, config }] or
+        // [{ actionType, actionConfig }]. Previously these were silently dropped.
+        const pipelineSteps = Array.isArray(data.pipelineSteps) ? data.pipelineSteps : [];
+        for (const [stepIndex, step] of pipelineSteps.entries()) {
+          const actionType = step?.actionType || step?.type;
+          const actionConfig = step?.actionConfig || step?.config || {};
+          if (!LISTENER_ACTION_TYPES.includes(actionType)) {
+            throw new Error(
+              `pipelineSteps[${stepIndex}].actionType must be one of: ${LISTENER_ACTION_TYPES.join(', ')}`
+            );
+          }
+          const action = await tx.tblListenerActions.create({
+            data: {
+              listenerID: created.listenerID,
+              actionType,
+              actionConfig,
+              orderIndex: Number.isInteger(step.orderIndex) ? step.orderIndex : created.tblListenerActions.length,
+              isEnabled: step.isEnabled !== undefined ? Boolean(step.isEnabled) : true,
+            },
+          });
+          created.tblListenerActions.push(action);
         }
 
         return created;
@@ -335,9 +373,12 @@ const listenerService = {
           }
         }
 
-        const effectiveListenerConfig = data.listenerConfig !== undefined
-          ? mergeAndRestoreMaskedOptions(data.listenerConfig, existing.listenerConfig)
-          : existing.listenerConfig;
+        const effectiveListenerConfig = normalizeListenerConfig(
+          existing.listenerType,
+          data.listenerConfig !== undefined
+            ? mergeAndRestoreMaskedOptions(data.listenerConfig, existing.listenerConfig)
+            : existing.listenerConfig
+        );
 
         return await tx.tblListeners.update({
           where: { listenerID },

@@ -133,6 +133,47 @@ datasourceController.testDatasourceConnection = async (req, res) => {
 };
 
 /**
+ * POST /datasources/:datasourceID/test
+ * GET  /datasources/:datasourceID/health
+ * Test a saved datasource with its decrypted stored options.
+ */
+datasourceController.testSavedDatasourceConnection = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, datasourceID } = req.params;
+
+    const connectionResult = await datasourceService.testDatasourceConnection({
+      userID: user.userID,
+      tenantID,
+      datasourceID,
+    });
+
+    return expressUtils.sendResponse(
+      res,
+      true,
+      {
+        datasourceID,
+        healthy: true,
+        connectionResult,
+        message: "Saved datasource connection tested successfully.",
+      }, null, constants.HTTP_STATUS.OK
+    );
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:testSavedDatasourceConnection:error",
+      params: { error: error.message || error },
+    });
+    return expressUtils.sendResponse(
+      res,
+      false,
+      { healthy: false },
+      error.message || error,
+      constants.HTTP_STATUS.BAD_REQUEST
+    );
+  }
+};
+
+/**
  * POST /datasources/test-json — validates a restapi endpoint returns JSON.
  * Separate from testDatasourceConnection (host reachability), which is untouched.
  */
