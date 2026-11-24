@@ -62,6 +62,7 @@ export function summarizeInstance(raw, { verbosity = 'summary', maxLogs = 50 } =
     if (p.error?.message) errors.push({ nodeID: l.nodeID || null, eventType: l.eventType, message: p.error.message });
   }
   const failedLog = [...allLogs].reverse().find((l) => l.nodeStatus === 'failed' || l.eventType === 'NODE_FAILED');
+  const failedNode = errors.find((e) => e.nodeID)?.nodeID || failedLog?.nodeID || null;
   const contextData = {};
   const nodeOutputs = {};
   for (const [k, v] of Object.entries(raw.contextData || {})) {
@@ -79,7 +80,7 @@ export function summarizeInstance(raw, { verbosity = 'summary', maxLogs = 50 } =
     completedAt: raw.completedAt,
     output: raw.output,
     errors,
-    failedNode: failedLog?.nodeID || null,
+    failedNode,
     contextData,
     nodeOutputs,
     logCount: allLogs.length,

@@ -37,7 +37,8 @@ export const validationTools = [
       },
     },
     handler: async ({ nodes, edges, workflowID }, context) => {
-      if (workflowID) {
+      const hasInline = nodes !== undefined || edges !== undefined;
+      if (workflowID && !hasInline) {
         const { workflowAPI } = createApiClient(context.tenantId, context.apiKey, context.bearerToken);
         const res = await workflowAPI.getById(trimId(workflowID, 'workflowID'));
         const raw = res?.workflow ?? res;
@@ -46,7 +47,12 @@ export const validationTools = [
         return { source: 'stored', workflowID, ...result, next: nextStep(result) };
       }
       const result = validateWorkflowGraph({ nodes, edges });
-      return { source: 'inline', ...result, next: nextStep(result) };
+      return {
+        source: 'inline',
+        ...(workflowID ? { note: 'workflowID was ignored because inline nodes/edges were provided.' } : {}),
+        ...result,
+        next: nextStep(result),
+      };
     },
   },
   {
