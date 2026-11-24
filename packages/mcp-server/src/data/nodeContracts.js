@@ -128,7 +128,7 @@ const CONTRACTS = {
     required: ['sourceVariables'],
     output: '{ [outputVariable]: { varName: value, ... } }',
     semantics: 'Waits for upstream variables and merges them. sourceVariables are BARE context names (e.g. ["aResult","bResult"]), not {{ctx.*}} templates. joinMode all|any, requireAll true|false. Outgoing edge sourceHandle MUST be "output".',
-    pitfalls: ['Using "success" as the join output handle is rejected at runtime.', 'Templates in sourceVariables produce "missing upstream output(s)" errors.'],
+    pitfalls: ['Using "success" as the join output handle is rejected at runtime.', 'Templates in sourceVariables produce "missing upstream output(s)" errors.', 'Observed platform flake: a freshly created join barrier can hang with "Activity task timed out: activity StartToClose timeout"; re-saving the identical DAG via update_workflow then re-running has completed it.'],
   },
   subWorkflow: {
     handles: ['success', 'error'],

@@ -331,6 +331,7 @@ export const workflowTools = [
         await new Promise((resolve) => setTimeout(resolve, 2000));
         raw = await workflowAPI.getInstance(execution.instanceID);
         if (["COMPLETED", "FAILED", "CANCELLED", "TERMINATED", "TIMED_OUT"].includes(raw?.status)) break;
+        if (Array.isArray(raw?.pendingDataCollectionRequests) && raw.pendingDataCollectionRequests.length > 0) break;
       }
       return {
         ...execution,
@@ -338,7 +339,9 @@ export const workflowTools = [
         instance: raw ? summarizeInstance(raw) : null,
         next: raw && ["COMPLETED", "FAILED", "CANCELLED", "TERMINATED", "TIMED_OUT"].includes(raw.status)
           ? "Run reached a terminal state. Check status AND contextData/output."
-          : `Still running after ${wait}s. Call get_workflow_instance with instanceID.`,
+          : raw?.pendingDataCollectionRequests?.length
+            ? "Run is suspended on a human task. Submit via submit_data_collection_request, then re-read the instance."
+            : `Still running after ${wait}s. Call get_workflow_instance with instanceID.`,
       };
     },
   },

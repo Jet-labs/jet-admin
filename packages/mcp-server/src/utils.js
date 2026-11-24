@@ -219,7 +219,14 @@ export function formatToolError(error, toolName) {
   if (status !== undefined) payload.status = status;
   const code = error?.backendCode || error?.code;
   if (code !== undefined) payload.code = code;
-  if (error?.details !== undefined) payload.details = error.details;
+  if (error?.details !== undefined) {
+    if (error.details && typeof error.details === "object" && !Array.isArray(error.details)) {
+      const { stack, name, ...rest } = error.details;
+      if (Object.keys(rest).length) payload.details = rest;
+    } else {
+      payload.details = error.details;
+    }
+  }
   if (error?.issues !== undefined) payload.issues = error.issues;
   return payload;
 }
