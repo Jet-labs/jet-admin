@@ -106,7 +106,13 @@ export const workflowTools = [
       "    so later nodes can use {{ctx.<outputVariable>}}.\n" +
       "  - A linear workflow needs a 'start' node, your steps, and an 'end' node, with edges\n" +
       "    chaining each node to the next. Condition/switch edges must use sourceHandle matching\n" +
-      "    a branch/case id (plus 'default'); loop edges use 'loop'/'completed'.\n\n" +
+      "    a branch/case id (plus 'default'); loop edges use 'loop'/'completed'; fanout edges use\n" +
+      "    each branch id; join uses 'output'.\n" +
+      "  - INPUT SCOPE: inputParams declared here are supplied via execute_workflow.inputValues and\n" +
+      "    exposed to nodes as ctx.input.<name>, NOT ctx.<name>.\n" +
+      "  - CONTROL-FLOW CONFIG: condition branches use {id,name,conditions:[{operator,leftValue,rightValue}],conditionLogic}\n" +
+      "    (expression is raw JS with ctx, not {{...}}); switch cases use {id,label,operator,matchValue};\n" +
+      "    fanout uses branches:[{id,name}]; join.sourceVariables are BARE names like [\"aResult\"], not {{ctx.*}} templates.\n\n" +
       "Example call — run a saved query, then summarize via JS:\n" +
       '  { "workflowTitle": "Notify on new refunds",\n' +
       '    "workflowDescription": "Fetches refunds and builds a digest.",\n' +

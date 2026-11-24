@@ -400,6 +400,12 @@ export const introspectionTools = [
     description:
       "Fetch the JSON schema for workflow definitions — node configurations and edges.\n\n" +
       "Returns: schema object(s) describing valid node types, node data structures, and edge shapes.\n" +
+      "The full map is large; pass nodeType to get one node. The schema describes node.data only.\n" +
+      "GRAPH ENVELOPE (not in the per-node schemas): nodes=[{id:'<uuid>',type:'<nodeType>',data:{...}}],\n" +
+      "edges=[{id:'<uuid>',source:'<nodeUUID>',target:'<nodeUUID>',sourceHandle:'<handle>'}].\n" +
+      "HANDLES: condition/switch = branch/case id or 'default'; loop = 'loop'/'completed'; fanout = branch id;\n" +
+      "join = 'output'; dataQuery/javascript/subWorkflow = 'success'/'error'; start/delay/dataCollection/approval = 'output'.\n" +
+      "Workflow inputParams supplied at execute time are exposed to nodes as ctx.input.<name>.\n" +
       "Call WITHOUT nodeType to get the complete workflow schema with all node types (recommended).\n\n" +
       "Use this BEFORE create_workflow or update_workflow. Building workflow nodes/edges without consulting\n" +
       "this schema is the most common cause of validation errors — the valid node types and their data shapes\n" +

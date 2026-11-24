@@ -282,7 +282,18 @@ export const lifecycleTools = [
   },
   {
     name: "add_listener_action",
-    description: "Add an action to a listener pipeline.\n\nRelated: update_listener_action, delete_listener_action.",
+    description:
+      "Add an action to a listener pipeline.\n\n" +
+      "The backend shape is { actionType, actionConfig, isEnabled?, orderIndex? }. Do NOT send {type,config}:\n" +
+      "it is rejected with actionType/actionConfig required. Valid actionType values and config keys:\n" +
+      "  transform          { script }\n" +
+      "  trigger_workflow   { workflowID, inputValues }\n" +
+      "  trigger_query      { dataQueryID, inputValues }\n" +
+      "  save_to_buffer     { bufferName, retentionPolicy, maxEvents, maxAgeHours }\n" +
+      "  push_to_app_page   { appPageID, channelName, maxArrayLength }\n" +
+      "Use list_listener_action_types for the full catalog and validate_listener first.\n\n" +
+      "Example: { \"listenerID\":\"<uuid>\", \"actionType\":\"transform\", \"actionConfig\":{\"script\":\"return event;\"} }\n\n" +
+      "Related: update_listener_action, delete_listener_action, validate_listener.",
     inputSchema: {
       type: "object",
       properties: {

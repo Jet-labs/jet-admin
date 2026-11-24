@@ -116,7 +116,8 @@ export const appPageTools = [
       "appPageConfig structure (V2 layout tree — get_app_page_schema is authoritative; layouts.lg is LEGACY):\n" +
       "  {\n" +
       "    widgets: [ 'widget_<widgetID>_1' ],        // instance keys: 'widget_' + widgetID + '_' + index\n" +
-      "    layout: { type: 'grid', children: [        // V2 tree of row/widget nodes (NOT layouts.lg)\n" +
+      "    layoutVersion: 2,                            // REQUIRED for new pages\n" +
+      "    layout: { type: 'column', children: [       // root is ALWAYS a column node; 'grid' is NOT a legal type\n" +
       "      { id: 'row_1', type: 'row', sizing: 'auto', children:\n" +
       "        [{ id: 'slot_1', type: 'widget', span: 12, sizing: 'fill', widgetKey: 'widget_<widgetID>_1' }] } ] },\n" +
       "    layouts: {},                                // MUST stay {} on V2 — legacy lg/md grids are ignored\n" +
@@ -145,7 +146,8 @@ export const appPageTools = [
       '      "widgets": ["widget_11111111-aaaa-4bbb-8ccc-000000000001_1",\n' +
       '                  "widget_22222222-bbbb-4ccc-8ddd-000000000002_1",\n' +
       '                  "widget_33333333-cccc-4ddd-8eee-000000000003_1"],\n' +
-      '      "layout": { "type": "grid", "children": [\n' +
+      '      "layoutVersion": 2,\n' +
+      '      "layout": { "type": "column", "children": [\n' +
       '        { "id": "row_1", "type": "row", "sizing": "auto", "children": [\n' +
       '          { "id": "slot_1", "type": "widget", "span": 12, "sizing": "fill", "widgetKey": "widget_11111111-aaaa-4bbb-8ccc-000000000001_1" } ] },\n' +
       '        { "id": "row_2", "type": "row", "sizing": "auto", "children": [\n' +
@@ -219,7 +221,8 @@ export const appPageTools = [
       '  { "appPageID": "7e8f9a0b-1c2d-4e3f-a4b5-c6d7e8f9a0b1",\n' +
       '    "appPageConfig": {\n' +
       '      "widgets": [ ...existing keys..., "widget_44444444-dddd-4eee-8fff-000000000004_1" ],\n' +
-      '      "layout": { "type": "grid", "children": [ ...existing rows...,\n' +
+      '      "layoutVersion": 2,\n' +
+      '      "layout": { "type": "column", "children": [ ...existing rows...,\n' +
       '        { "id": "row_new", "type": "row", "sizing": "auto", "children": [\n' +
       '          { "id": "slot_new", "type": "widget", "span": 12, "sizing": "fill",\n' +
       '            "widgetKey": "widget_44444444-dddd-4eee-8fff-000000000004_1" } ] } ] },\n' +

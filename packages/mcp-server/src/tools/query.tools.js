@@ -208,7 +208,7 @@ export const queryTools = [
           type: "string",
           description: "UUID of the query to update. Example: '9f8b7a6c-5d4e-4f3a-2b1c-0d9e8f7a6b5c'.",
         },
-        dataQueryTitle: { type: "string", description: "Optional. New title. Example: 'orders_by_status_v2'." },
+        dataQueryTitle: { type: "string", description: "REQUIRED by the backend. Always send the existing title for a title-less edit (read it with get_query) — this tool backfills it in code, but the API rejects an omitted title." },
         datasourceID: { type: "string", description: "Optional. New datasource UUID to run against." },
         datasourceType: { type: "string", description: "Optional. New datasource type. Example: 'postgresql'." },
         dataQueryOptions: {
