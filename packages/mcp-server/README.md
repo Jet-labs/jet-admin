@@ -57,7 +57,7 @@ node src/index.js
 
 You should see:
 ```
-[jet-admin-mcp] Registered 52 tools:
+[jet-admin-mcp] Registered 130 tools:
   • get_tenant_resource_summary
   • search_resources
   • get_widget_schemas
@@ -67,7 +67,7 @@ You should see:
   Base URL  : http://localhost:5000
   Tenant ID : abc-123
   API Key   : api_key_...
-  Tools     : 52
+  Tools     : 130
   Transport : stdio
 [jet-admin-mcp] Server connected and ready.
 ```
@@ -121,8 +121,31 @@ In your Antigravity/Claude Desktop config file, add:
 | `get_data_query_schemas` | Authoritative JSON schemas for query options per datasource type |
 | `get_datasource_schemas` | Authoritative JSON schemas for datasource connection options |
 | `get_listener_schemas` | Authoritative JSON schemas for listener configs and pipelines |
-| `get_workflow_schema` | Authoritative JSON schema for workflow nodes and edges |
+| `get_workflow_schema` | Compact node index, or one node's full contract (prefer `describe_node_type`) |
+| `describe_node_type` | **Authoritative per-node contract**: schema, defaults, required config, handles, output, pitfalls |
 | `get_app_page_schema` | Authoritative JSON schema for app page configs |
+
+### ✅ Validation / dry-run (call before writes)
+
+| Tool | Description |
+|------|-------------|
+| `validate_workflow` | Graph/node/edge/handle/cycle validation; structured errors with `path`, `code`, `fix` |
+| `validate_app_page` | V2 layout, widget keys, spans, dataSources, variables |
+| `validate_form_schema` | JSON Schema + JSON Forms UISchema for dataCollection/forms |
+| `validate_expression` | safe-path vs js-template vs condition-js |
+| `validate_listener` | Listener type/config + every pipeline action |
+| `list_listener_action_types` | Action types and their config keys |
+
+### 📚 Resources & prompts
+
+The server also exposes `jetadmin://docs/architecture`, `/bindings`, `/workflow-nodes`, `/forms`, `/listeners`, `/permissions`, plus prompts `build_workflow` and `debug_workflow_run`. They contain the platform map, binding rules, node contracts and common pitfalls — call them before building complex resources.
+
+Catalogs are generated from the real platform packages and merged with live `/schemas` keys:
+
+```bash
+node packages/mcp-server/scripts/generate-catalogs.mjs
+npm test
+```
 
 ### 📦 Datasource Tools
 
@@ -224,8 +247,20 @@ test_query_by_data (iterate) → create_query → test_query   ← validate befo
         ↓
 get_widget_schemas → create_widget                        ← visual elements
         ↓
-create_app_page → get_app_page_preview_url                ← assemble page, share link
+create_app_page → validate_app_page → get_app_page_preview_url   ← assemble page, share link
 ```
+
+For workflows:
+
+```
+describe_node_type → validate_workflow → create_workflow
+        ↓
+execute_workflow (waitSeconds) → get_workflow_instance (summary)
+        ↓
+check status AND contextData/output (a COMPLETED run can still take a wrong branch)
+```
+
+For human-in-the-loop: `execute_workflow` → `pendingDataCollectionRequests` → `get_data_collection_request` → `submit_data_collection_request` (pass raw values in `formData`).
 
 **Destructive tools** (`delete_*`) state their cascade effects in the description and require explicit
 user confirmation before the agent calls them. **Full-replacement updates** (`update_app_page`,
