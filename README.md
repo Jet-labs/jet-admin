@@ -622,6 +622,7 @@ S3_PUBLIC_BASE_URL=http://localhost:9000
 OPENROUTER_API_KEY=sk-or-...
 ```
 
+
 **Frontend `.env`:**
 ```env
 VITE_SERVER_HOST=http://localhost:8090
@@ -632,7 +633,26 @@ VITE_FIREBASE_API_KEY=...
 
 ---
 
-## 🤝 Contributing
+## ?? Contributing
+
+This project is still growing ? and yes, it has a few bugs and rough edges.
+If you are interested in helping out, **we would love your contributions!**
+
+### How to Help
+
+- Fix bugs
+- Improve code structure
+- Suggest or add new features
+- Clean up or improve documentation
+
+### Getting Started
+
+1. Fork the repo
+2. Create a branch
+3. Make your changes
+4. Open a pull request
+
+If you are not sure where to start, check out the issues tab.
 
 ### Branch Naming
 
