@@ -3,9 +3,7 @@ import PropTypes from "prop-types";
 import { useEditor } from "@craftjs/core";
 import {
   Command,
-  Loader2,
   Play,
-  Save,
   Settings,
   Undo2,
   Redo2,
@@ -47,7 +45,6 @@ const SHORTCUTS = [
 export default function EditorHeader({
   previewMode,
   setPreviewMode,
-  saveState = null,
   tenantID = null,
 }) {
   const { actions, canUndo, canRedo } = useEditor((state, query) => ({
@@ -133,65 +130,8 @@ export default function EditorHeader({
 
   return (
     <>
-      <div className="flex items-center justify-between p-2 border-b border-border gap-2 shrink-0">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="text-xs font-semibold text-foreground">Page Builder</span>
-          <span className="truncate text-xs text-muted-foreground/60 pl-2 border-l border-border/50">
-            {previewMode
-              ? "Preview Mode active"
-              : "Drag empty space to lasso · Space+drag pan · Ctrl/Cmd+wheel zoom · [ ] span · Alt+←/→ reorder"}
-          </span>
-        </div>
-
+      <div className="flex items-center justify-end p-1.5 border-b border-border gap-2 shrink-0">
         <div className="flex shrink-0 items-center gap-1">
-          {saveState && (
-            <>
-              <span
-                className={`flex items-center gap-1 rounded border px-1.5 py-0.5 text-[9px] font-medium ${
-                  saveState.isSaving
-                    ? "border-border bg-muted/40 text-muted-foreground"
-                    : saveState.isDirty
-                      ? "border-amber-500/40 bg-amber-500/10 text-amber-500"
-                      : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                }`}
-                title={
-                  saveState.isDirty
-                    ? "Layout changes are not saved yet"
-                    : "All layout changes are saved"
-                }
-              >
-                {saveState.isSaving ? (
-                  <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                ) : (
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      saveState.isDirty ? "bg-amber-400" : "bg-emerald-400"
-                    }`}
-                  />
-                )}
-                {saveState.isSaving
-                  ? "Saving…"
-                  : saveState.isDirty
-                    ? `${saveState.changeCount || 1} unsaved`
-                    : "Saved"}
-              </span>
-              {saveState.onSave && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={saveState.isDirty ? "secondary" : "ghost"}
-                  className="h-7 gap-1 px-2 text-[10px]"
-                  onClick={() => saveState.onSave()}
-                  disabled={saveState.isSaving || !saveState.isDirty}
-                  title="Save page (same as the page header Save button)"
-                >
-                  <Save className="h-3 w-3" />
-                  Save
-                </Button>
-              )}
-              <span className="mx-0.5 h-4 w-px bg-border" aria-hidden="true" />
-            </>
-          )}
           <Button
             type="button"
             variant="ghost"
@@ -386,11 +326,5 @@ export default function EditorHeader({
 EditorHeader.propTypes = {
   previewMode: PropTypes.bool,
   setPreviewMode: PropTypes.func,
-  saveState: PropTypes.shape({
-    isDirty: PropTypes.bool,
-    changeCount: PropTypes.number,
-    isSaving: PropTypes.bool,
-    onSave: PropTypes.func,
-  }),
   tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };

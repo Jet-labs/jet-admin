@@ -1,61 +1,85 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { ResizablePanel, ResizablePanelGroup } from "../../ui/resizable";
 import { useAppPageStateTree } from "../../../../logic/appPageRuntime";
 import { CodeEditor, Label, Checkbox } from "@jet-admin/ui";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { StringUtils } from "../../../../utils/string";
 
-export const AppPageConsole = () => {
+export const AppPageConsole = ({ isCollapsed = false, onToggleCollapse }) => {
   const contextTree = useAppPageStateTree();
   const [isTruncated, setIsTruncated] = useState(true);
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       <div className="flex flex-shrink-0 items-center justify-between border-b border-border bg-muted/20 p-2">
-        <div>
+        <button
+          type="button"
+          className="flex items-center gap-1.5 text-left"
+          onClick={onToggleCollapse}
+          aria-expanded={!isCollapsed}
+          title={isCollapsed ? "Expand page data" : "Collapse page data"}
+        >
+          {isCollapsed ? (
+            <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+          )}
           <span className="block text-xs font-medium text-foreground">
             Page data
           </span>
-          <span className="block text-[11px] text-muted-foreground">
-            Live values available to widgets on this page.
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Label className="flex cursor-pointer items-center gap-2 text-xs">
-            <Checkbox
-              checked={isTruncated}
-              onCheckedChange={(checked) => setIsTruncated(checked === true)}
-              aria-label="Trim large values"
-            />
-            Trim large values
-          </Label>
-        </div>
+          {!isCollapsed && (
+            <span className="block text-[11px] text-muted-foreground">
+              Live values available to widgets on this page.
+            </span>
+          )}
+        </button>
+        {!isCollapsed && (
+          <div className="flex items-center gap-2">
+            <Label className="flex cursor-pointer items-center gap-2 text-xs">
+              <Checkbox
+                checked={isTruncated}
+                onCheckedChange={(checked) => setIsTruncated(checked === true)}
+                aria-label="Trim large values"
+              />
+              Trim large values
+            </Label>
+          </div>
+        )}
       </div>
 
-      <ResizablePanelGroup direction="horizontal" className="flex-1">
-        <ResizablePanel defaultSize={100} className="flex flex-col bg-background">
-          <div className="flex-1 overflow-hidden">
-            {!contextTree ? (
-               <div className="p-2 text-xs italic text-muted-foreground">Page data is not available in preview.</div>
-            ) : Object.keys(contextTree.queries || {}).length === 0 && Object.keys(contextTree.workflows || {}).length === 0 && Object.keys(contextTree.listeners || {}).length === 0 ? (
-               <div className="p-2 text-xs italic text-muted-foreground">Connect a data source to preview page data.</div>
-            ) : (
-              <CodeEditor
-                language="json"
-                    value={StringUtils.safeJsonStringify(
-                      contextTree,
-                      isTruncated ? 50 : Infinity,
-                      isTruncated ? 1000 : Infinity,
-                      isTruncated ? 5000 : Infinity
-                    )}
-                readOnly={true}
-                height="100%"
-                showHeader={false}
-                className="h-full border-0 rounded-none bg-background"
-              />
-            )}
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+      {!isCollapsed && (
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
+          <ResizablePanel defaultSize={100} className="flex flex-col bg-background">
+            <div className="flex-1 overflow-hidden">
+              {!contextTree ? (
+                <div className="p-2 text-xs italic text-muted-foreground">Page data is not available in preview.</div>
+              ) : Object.keys(contextTree.queries || {}).length === 0 && Object.keys(contextTree.workflows || {}).length === 0 && Object.keys(contextTree.listeners || {}).length === 0 ? (
+                <div className="p-2 text-xs italic text-muted-foreground">Connect a data source to preview page data.</div>
+              ) : (
+                <CodeEditor
+                  language="json"
+                  value={StringUtils.safeJsonStringify(
+                    contextTree,
+                    isTruncated ? 50 : Infinity,
+                    isTruncated ? 1000 : Infinity,
+                    isTruncated ? 5000 : Infinity
+                  )}
+                  readOnly={true}
+                  height="100%"
+                  showHeader={false}
+                  className="h-full border-0 rounded-none bg-background"
+                />
+              )}
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      )}
     </div>
   );
+};
+
+AppPageConsole.propTypes = {
+  isCollapsed: PropTypes.bool,
+  onToggleCollapse: PropTypes.func,
 };

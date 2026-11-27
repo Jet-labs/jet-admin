@@ -8,7 +8,6 @@ import {
   CodeEditor,
   Input,
   Label,
-  PageHeader,
   SearchSelect,
   Section,
   Select,
@@ -55,6 +54,8 @@ import {
 } from "../../logic/applicationRuntime/routeOrdering";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { ApplicationFeedback } from "../components/applicationComponents/applicationFeedback";
+import { EditorTopBar } from "../components/editorShell/editorTopBar";
+import { useEditorFocusMode } from "../components/editorShell/useEditorFocusMode";
 import { ApplicationPageVersionStatus } from "../components/applicationComponents/applicationPageVersionStatus";
 import { ApplicationRouteQueryDialog } from "../components/applicationComponents/applicationRouteQueryDialog";
 import { ApplicationRouteSettingsDialog } from "../components/applicationComponents/applicationRouteSettingsDialog";
@@ -78,6 +79,7 @@ function ApplicationStudioSession() {
   const navigate = useNavigate();
   const principal = firebaseUserState?.user?.uid;
   const client = useQueryClient();
+  const [focusMode, setFocusMode] = useEditorFocusMode();
   const key = ["application", principal, tenantID, applicationID];
   const query = useQuery({
     queryKey: key,
@@ -458,13 +460,21 @@ function ApplicationStudioSession() {
   if (query.error) {
     return (
       <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-        <PageHeader title="Application" subTitle="Unable to load this application">
-          <Button variant="outline" size="sm" asChild>
-            <Link to={CONSTANTS.ROUTES.VIEW_APPLICATIONS.path(tenantID)}>
-              Back to applications
-            </Link>
-          </Button>
-        </PageHeader>
+        <EditorTopBar
+          title="Application"
+          subtitle="Unable to load this application"
+          onBack={() => navigate(CONSTANTS.ROUTES.VIEW_APPLICATIONS.path(tenantID))}
+          backLabel="Back to Applications"
+          focusMode={focusMode}
+          onToggleFocus={() => setFocusMode((value) => !value)}
+          actions={
+            <Button variant="outline" size="sm" asChild>
+              <Link to={CONSTANTS.ROUTES.VIEW_APPLICATIONS.path(tenantID)}>
+                Back to applications
+              </Link>
+            </Button>
+          }
+        />
         <div className="p-2">
           <ApplicationFeedback error={query.error} onRetry={() => query.refetch()} />
         </div>
@@ -481,47 +491,65 @@ function ApplicationStudioSession() {
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-      <PageHeader
+      <EditorTopBar
         title={app.title}
-        id={applicationID}
-        subTitle={
-          archived
-            ? "Archived · linked pages preserved"
-            : `Draft revision ${app.draft.revision}${dirty ? " · Unsaved changes" : ""}`
+        subtitle={`Application Studio | Draft revision ${app.draft.revision}${dirty ? " | Unsaved changes" : ""}`}
+        badge={
+          <Badge
+            variant={archived ? "secondary" : "outline"}
+            className="h-4 px-1 text-[9px]"
+            title="Draft changes do not affect deployed releases until you publish and deploy a new release."
+          >
+            {archived ? "Archived" : dirty ? "Unsaved" : "Draft"}
+          </Badge>
         }
-        onSave={() => {
-          if (dirty && validation.valid && !archived && !busy) save.mutate();
-        }}
-        isSaving={save.isPending}
-        saveDisabled={archived || !dirty || !validation.valid || busy}
-        saveText="Save draft"
-      >
-        <Badge variant={archived ? "secondary" : "outline"}>
-          {archived ? "Archived" : "Draft"}
-        </Badge>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={!canPreview}
-          onClick={() =>
-            navigate(CONSTANTS.ROUTES.APPLICATION_PREVIEW.path(tenantID, applicationID))
-          }
-        >
-          Preview composition
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="text-destructive hover:bg-destructive/10 border-destructive/20"
-          disabled={archived || dirty || busy}
-          onClick={handleArchive}
-        >
-          {archive.isPending ? <Spinner size={14} /> : <Archive className="h-3.5 w-3.5" />}
-          Archive
-        </Button>
-      </PageHeader>
+        onBack={() => navigate(CONSTANTS.ROUTES.VIEW_APPLICATIONS.path(tenantID))}
+        backLabel="Back to Applications"
+        focusMode={focusMode}
+        onToggleFocus={() => setFocusMode((value) => !value)}
+        actions={
+          <>
+            <div className="hidden items-center gap-0.5 sm:flex">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8"
+              disabled={!canPreview}
+              onClick={() =>
+                navigate(
+                  CONSTANTS.ROUTES.APPLICATION_PREVIEW.path(tenantID, applicationID)
+                )
+              }
+            >
+              Preview
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 text-destructive hover:bg-destructive/10 border-destructive/20"
+              disabled={archived || dirty || busy}
+              onClick={handleArchive}
+            >
+              {archive.isPending ? <Spinner size={14} /> : <Archive className="h-3.5 w-3.5" />}
+              Archive
+            </Button>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              className="ml-1 h-8"
+              onClick={() => {
+                if (dirty && validation.valid && !archived && !busy) save.mutate();
+              }}
+              disabled={archived || !dirty || !validation.valid || busy}
+            >
+              {save.isPending ? "Saving..." : "Save draft"}
+            </Button>
+          </>
+        }
+      />
 
       <div className="min-h-0 flex-1 overflow-hidden p-2">
         <ResizablePanelGroup
@@ -533,7 +561,7 @@ function ApplicationStudioSession() {
         >
           <ResizablePanel
             id={CONSTANTS.RESIZABLE_PANEL_IDS.APPLICATION_STUDIO_PREVIEW_TOP_PANEL}
-            defaultSize={74}
+            defaultSize={82}
             minSize={38}
             className="min-h-0"
           >
@@ -1240,9 +1268,9 @@ function ApplicationStudioSession() {
 
           <ResizablePanel
             id={CONSTANTS.RESIZABLE_PANEL_IDS.APPLICATION_STUDIO_JSON_PANEL}
-            defaultSize={26}
+            defaultSize={18}
             minSize={14}
-            className="min-h-[120px]"
+            className="min-h-[80px]"
           >
             <div className="flex h-full min-h-0 flex-col overflow-hidden rounded border border-border bg-card">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-2 py-1.5">

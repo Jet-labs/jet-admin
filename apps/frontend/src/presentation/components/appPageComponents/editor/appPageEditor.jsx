@@ -64,12 +64,12 @@ export const AppPageEditor = ({
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       <Tabs defaultValue="widgets" className="flex flex-col h-full w-full">
-        <TabsList>
-          <TabsTrigger value="widgets" className="text-[11px] font-semibold p-2">Widgets</TabsTrigger>
-          <TabsTrigger value="widget-versions" className="text-[11px] font-semibold p-2">Widget versions</TabsTrigger>
-          <TabsTrigger value="datasources" className="text-[11px] font-semibold p-2">Data</TabsTrigger>
-          <TabsTrigger value="variables" className="text-[11px] font-semibold p-2">Vars</TabsTrigger>
-          <TabsTrigger value="settings" className="text-[11px] font-semibold p-2">Settings</TabsTrigger>
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="widgets" className="shrink-0 text-[11px] font-semibold p-2">Widgets</TabsTrigger>
+          <TabsTrigger value="widget-versions" className="shrink-0 text-[11px] font-semibold p-2">Widget versions</TabsTrigger>
+          <TabsTrigger value="datasources" className="shrink-0 text-[11px] font-semibold p-2">Data</TabsTrigger>
+          <TabsTrigger value="variables" className="shrink-0 text-[11px] font-semibold p-2">Vars</TabsTrigger>
+          <TabsTrigger value="settings" className="shrink-0 text-[11px] font-semibold p-2">Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="widgets" className="flex-1 min-h-0 m-0 data-[state=active]:flex data-[state=active]:flex-col data-[state=inactive]:hidden overflow-hidden">

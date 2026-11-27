@@ -72,7 +72,7 @@ export const ProtectedLayout = () => {
       loadingContainerClass="h-screen w-screen bg-background flex flex-col justify-center items-center"
     >
       <div className="flex h-full w-full flex-col justify-start items-stretch overflow-hidden">
-        <nav className="w-full border-b border-border bg-background">
+        <nav className="global-nav w-full border-b border-border bg-background">
           <div className="px-3 py-2 sm:px-4 sm:py-3">
             <div className="flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center justify-start gap-2 rtl:justify-end sm:gap-4">
@@ -145,12 +145,12 @@ export const ProtectedLayout = () => {
             defaultSize={20}
             minSize={15}
             maxSize={30}
-            className="max-md:hidden"
+            className="max-md:hidden main-navigation"
           >
             <MainDrawerList />
           </ResizablePanel>
-          <ResizableHandle withHandle={true} className="max-md:hidden" />
-          <ResizablePanel defaultSize={80}>
+          <ResizableHandle withHandle={true} className="max-md:hidden main-navigation-handle" />
+          <ResizablePanel defaultSize={80} className="main-content-panel">
             <div className="w-full h-full overflow-hidden bg-background">
               <Outlet />
             </div>

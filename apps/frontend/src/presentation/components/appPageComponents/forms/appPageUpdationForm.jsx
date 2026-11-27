@@ -1,9 +1,8 @@
 ﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { Undo } from "lucide-react";
 import { CONSTANTS } from "../../../../constants";
 import {
   getAppPageByIDAPI,
@@ -31,9 +30,11 @@ import { AppPageRuntimeProvider } from "../../../../logic/appPageRuntime/AppPage
 import { AppPageDataSourceBootstrapper } from "../editor/appPageDataSourceBootstrapper";
 import { AppPageWorkflowInputHost } from '../appPageWorkflowInputHost';
 
-import { PageHeader, Button } from "@jet-admin/ui";
+import { Badge, Button } from "@jet-admin/ui";
 import { BundleExportButton } from "../../bundleComponents/bundleExportButton";
 import { AssetVersionsButton } from "../../assetVersionComponents/assetVersionsButton";
+import { EditorTopBar } from "../../editorShell/editorTopBar";
+import { useEditorFocusMode } from "../../editorShell/useEditorFocusMode";
 
 const EMPTY_INITIAL_VALUES = {
   appPageTitle: "",
@@ -60,6 +61,10 @@ import { appPageConfigSignature } from "../layout/engine/configSignature.js";
 
 export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [focusMode, setFocusMode] = useEditorFocusMode();
+  const consolePanelRef = useRef(null);
+  const [consoleCollapsed, setConsoleCollapsed] = useState(false);
   const { showConfirmation } = useGlobalUI();
   const [searchParams] = useSearchParams();
   const linkedApplicationID = searchParams.get("applicationId");
@@ -256,62 +261,78 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
 
   return (
     <div className="flex h-full w-full flex-col items-center bg-background">
-      <PageHeader
-        title={CONSTANTS.STRINGS.UPDATE_APP_PAGE_FORM_TITLE}
-        parentTitle={CONSTANTS.STRINGS.MAIN_DRAWER_APP_PAGES_TITLE}
-        id={appPageID}
-        onSave={appPageUpdationForm.handleSubmit}
-        isSaving={isUpdatingAppPage}
-      >
-        {historyIndex > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
-              {historyIndex} unsaved change{historyIndex > 1 ? "s" : ""}
-            </span>
+      <EditorTopBar
+        title={appPageUpdationForm.values.appPageTitle || appPage?.appPageTitle || "App page"}
+        subtitle={`Page Builder · ID ${String(appPageID).slice(0, 8)}`}
+        badge={
+          <Badge
+            variant={historyIndex > 0 ? "outline" : "secondary"}
+            className="h-4 px-1 text-[9px]"
+            title="Saving this page updates the working page and its editor history only. Deployed Applications keep their captured page and data-source versions until you publish a new release."
+          >
+            {historyIndex > 0
+              ? `${historyIndex} unsaved change${historyIndex > 1 ? "s" : ""}`
+              : "Saved"}
+          </Badge>
+        }
+        onBack={() => navigate(CONSTANTS.ROUTES.VIEW_APP_PAGES.path(tenantID))}
+        backLabel="Back to App Pages"
+        focusMode={focusMode}
+        onToggleFocus={() => setFocusMode((value) => !value)}
+        actions={
+          <>
+            {historyIndex > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1 px-2 text-xs"
+                onClick={handleUndo}
+                title="Undo last change"
+              >
+                Undo
+              </Button>
+            )}
+            <div className="hidden items-center gap-0.5 sm:flex">
+            <AppPageVersionHistory
+              key={`appPageVersionHistory_${appPage?.appPageID}`}
+              tenantID={tenantID}
+              appPageID={appPageID}
+            />
+            <AssetVersionsButton
+              tenantID={tenantID}
+              assetType="appPage"
+              assetID={appPageID}
+            />
+            <AppPageDeletionForm
+              key={`appPageDeletionForm_${appPage?.appPageID}`}
+              tenantID={tenantID}
+              appPageID={appPageID}
+            />
+            <AppPageCloneForm
+              key={`appPageCloneForm_${appPage?.appPageID}`}
+              tenantID={tenantID}
+              appPageID={appPageID}
+            />
+            <BundleExportButton
+              tenantID={tenantID}
+              entityType="appPage"
+              entityID={appPageID}
+            />
+            </div>
             <Button
-              variant="outline"
+              type="button"
               size="sm"
-              onClick={handleUndo}
-              title="Undo Last Change"
+              className="ml-1 h-8"
+              onClick={appPageUpdationForm.handleSubmit}
+              disabled={isUpdatingAppPage}
+              title="Save page (updates the working page, not deployed releases)"
             >
-              <Undo className="h-4 w-4 mr-1.5" />
-              Undo
+              {isUpdatingAppPage ? "Saving…" : "Update"}
             </Button>
-          </div>
-        )}
-        <AppPageVersionHistory
-          key={`appPageVersionHistory_${appPage?.appPageID}`}
-          tenantID={tenantID}
-          appPageID={appPageID}
-        />
-        <AssetVersionsButton
-          tenantID={tenantID}
-          assetType="appPage"
-          assetID={appPageID}
-        />
-        <AppPageDeletionForm
-          key={`appPageDeletionForm_${appPage?.appPageID}`}
-          tenantID={tenantID}
-          appPageID={appPageID}
-        />
-        <AppPageCloneForm
-          key={`appPageCloneForm_${appPage?.appPageID}`}
-          tenantID={tenantID}
-          appPageID={appPageID}
-        />
-        <BundleExportButton
-          tenantID={tenantID}
-          entityType="appPage"
-          entityID={appPageID}
-        />
-      </PageHeader>
-
-      <div className="w-full border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-900 dark:text-amber-200">
-        Saving this page updates the working page and its editor history only.
-        Deployed Applications keep using the page version and data-source
-        versions captured in their release until you create/select a new page
-        version and publish.
-      </div>
+          </>
+        }
+      />
 
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingAppPage || !hasInitialized}
@@ -326,7 +347,7 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
             <AppPageDataSourceBootstrapper />
             <AppPageWorkflowInputHost />
             <ResizablePanelGroup direction="vertical" className="!h-full !w-full">
-              <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_TOP_PANEL} defaultSize={75} className="flex min-h-0 min-w-0">
+              <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_TOP_PANEL} defaultSize={82} className="flex min-h-0 min-w-0">
                 <ResizablePanelGroup
                   direction="horizontal"
                   autoSaveId={
@@ -384,8 +405,24 @@ export const AppPageUpdationForm = ({ tenantID, appPageID }) => {
                 </ResizablePanelGroup>
               </ResizablePanel>
               <ResizableHandle withHandle={true} />
-              <ResizablePanel id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_CONSOLE_PANEL} defaultSize={25} className="overflow-hidden min-h-[40px] flex flex-col">
-                <AppPageConsole />
+              <ResizablePanel
+                ref={consolePanelRef}
+                id={CONSTANTS.RESIZABLE_PANEL_IDS.APP_PAGE_UPDATE_CONSOLE_PANEL}
+                defaultSize={18}
+                minSize={10}
+                collapsedSize={5}
+                onCollapse={() => setConsoleCollapsed(true)}
+                onExpand={() => setConsoleCollapsed(false)}
+                className="overflow-hidden min-h-[40px] flex flex-col"
+              >
+                <AppPageConsole
+                  isCollapsed={consoleCollapsed}
+                  onToggleCollapse={() =>
+                    consolePanelRef.current?.[
+                      consoleCollapsed ? "expand" : "collapse"
+                    ]?.()
+                  }
+                />
               </ResizablePanel>
             </ResizablePanelGroup>
           </AppPageRuntimeProvider>
